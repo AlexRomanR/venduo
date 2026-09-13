@@ -87,3 +87,62 @@ clona el repositorio y corre `npm run dev` sin configurar nada, y es el respaldo
 Supabase falla durante la demostración.
 
 Cuando la pantalla está en modo demo hay que decirlo, como hace `config-status.tsx`.
+
+## Skills de diseño de terceros
+
+El proyecto tiene instaladas skills externas de animación y diseño. **Esta regla se carga
+siempre; ellas se cargan a demanda.** Cuando se contradigan, gana lo que está acá.
+
+| Skill                      | Cuándo invocarla                                                    |
+| -------------------------- | ------------------------------------------------------------------- |
+| `design-taste-frontend-v1` | Diseñar una pantalla nueva: jerarquía, espaciado, tipografía        |
+| `impeccable`               | Revisar lo ya construido: `/impeccable audit`, `/impeccable polish` |
+| `animate`                  | Agregar una animación concreta                                      |
+| `review-animations`        | Criticar una animación existente                                    |
+| `ask-sonner`               | Dudas sobre los avisos, que ya usan Sonner                          |
+
+### Qué gana cuando hay conflicto
+
+Estas skills vienen de afuera y no conocen las restricciones de Venduo. **Lo de acá es
+restricción, lo de ellas es oficio dentro de esa restricción.**
+
+No negociable, aunque una skill proponga lo contrario:
+
+- **shadcn/ui como base.** Se compone y se envuelve; no se reemplaza por componentes a
+  medida. Media hora ganada en originalidad es media hora perdida en consistencia.
+- **Tokens semánticos de color**, nunca valores fijos: si no, el tema oscuro se rompe.
+- **375 px primero.** Una propuesta que solo funciona en pantalla ancha se rechaza.
+- **Español rioplatense** en todo texto de interfaz.
+- **`formatMoney`** para todo monto.
+- **Sonner** para los avisos. No instalar otra biblioteca de notificaciones.
+
+Lo que sí conviene tomar de ellas: ritmo de espaciado, escala tipográfica, jerarquía
+visual, curvas y duraciones de animación, y qué **no** animar.
+
+### Móvil y escritorio, en ese orden
+
+Al generar una vista, resolver **primero los 375 px** y después dejarla crecer. No al
+revés: una vista pensada en escritorio y comprimida después produce pantallas donde todo
+entra pero nada se lee.
+
+Los puntos de control son **375 px** y **1280 px**. Entre medio, que el layout fluya con
+`flex-wrap` y `grid` en lugar de saltos por cada tamaño intermedio.
+
+Tres cosas que hay que verificar en las dos anchuras antes de dar una vista por hecha: que
+no haya desplazamiento horizontal, que ningún objetivo táctil baje de 44 px, y que el
+contenido tenga un ancho máximo en escritorio — una línea de texto de 1280 px no se lee.
+
+### Dónde vale la pena el esfuerzo
+
+En 48 horas el diseño no se reparte parejo:
+
+| Superficie                           | Criterio                                                                         |
+| ------------------------------------ | -------------------------------------------------------------------------------- |
+| Tienda pública y perfil del vendedor | **Acá sí.** Es lo que ve un comprador desde el celular y lo que ve un jurado     |
+| Paneles (`/panel`, `/vendedor`)      | shadcn por defecto, rápido y aburrido. Sirven para trabajar, no para impresionar |
+
+Para animación, los tres lugares donde cambia la percepción del producto: aplicar una
+propuesta de la IA en el editor de bloques, el carrito, y los avisos.
+
+**Animar de menos es mejor que animar de más.** Una animación que se interpone entre la
+persona y lo que quiere hacer es peor que ninguna.

@@ -75,3 +75,17 @@ con `npm run sync:agents`. Editar siempre el original.
 | `visual-block-editor`   | Plantillas, tipos de bloque, propuestas de la IA            |
 | `ai-task-workflow`      | Agregar o cambiar una tarea de IA                           |
 | `qa-verification`       | Verificación antes de commitear                             |
+
+### Skills de terceros
+
+Instaladas para diseño y animación, en el mismo directorio. **No se editan y el script de sincronización no las toca.** Las reglas de `ui-styling.md` mandan sobre ellas cuando se contradigan.
+
+| Skill                      | Para qué                                                | Origen               |
+| -------------------------- | ------------------------------------------------------- | -------------------- |
+| `impeccable`               | Auditar y pulir lo construido                           | pbakaus/impeccable   |
+| `design-taste-frontend-v1` | Jerarquía, espaciado y tipografía de una pantalla nueva | leonxlnx/taste-skill |
+| `animate`                  | Construir una animación                                 | emilkowalski/skills  |
+| `review-animations`        | Criticar una animación existente                        | emilkowalski/skills  |
+| `ask-sonner`               | Avisos con Sonner                                       | emilkowalski/skills  |
+
+Sus binarios no se versionan: quien clone el repositorio corre `npx impeccable install` para bajar el de su plataforma.

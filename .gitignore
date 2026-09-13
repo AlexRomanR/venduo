@@ -47,3 +47,7 @@ next-env.d.ts
 /supabase/.branches
 /supabase/.temp
 /supabase/.env
+
+# binarios de skills de terceros: son por plataforma y pesan ~15 MB cada uno.
+# Cada persona los baja con `npx impeccable install`.
+**/skills/*/scripts/bin/

@@ -1,0 +1,11 @@
+{
+  "comentario": "Generado por scripts/sync-agent-config.mjs. No editar. Lista las skills que el script administra; lo que no está acá no se toca.",
+  "managed": [
+    "ai-task-workflow",
+    "database-migration",
+    "implement-feature",
+    "qa-verification",
+    "sales-and-commissions",
+    "visual-block-editor"
+  ]
+}
