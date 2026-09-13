@@ -1,8 +1,9 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, Mail } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -12,19 +13,38 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
 
-const loginSchema = z.object({
+const MIN_PASSWORD = 8
+
+// Los dos esquemas declaran los mismos campos y solo cambian las reglas: si
+// tuvieran formas distintas, el resolver no podría alternar entre ellos.
+const baseSchema = z.object({
+  fullName: z.string().max(80),
   email: z.email("Escribí un email válido."),
+  password: z.string(),
 })
 
-type LoginValues = z.infer<typeof loginSchema>
+const signInSchema = baseSchema.extend({
+  password: z.string().min(1, "Escribí tu contraseña."),
+})
+
+const signUpSchema = baseSchema.extend({
+  fullName: z.string().min(2, "Escribí tu nombre.").max(80),
+  password: z
+    .string()
+    .min(MIN_PASSWORD, `Mínimo ${MIN_PASSWORD} caracteres.`)
+    .max(72, "Máximo 72 caracteres."),
+})
+
+type Mode = "ingresar" | "registrarse"
+type Values = z.infer<typeof baseSchema>
 
 export function LoginForm({
   next,
@@ -35,84 +55,78 @@ export function LoginForm({
   configured: boolean
   initialError?: string
 }) {
-  const [sent, setSent] = React.useState(false)
-  const [googleLoading, setGoogleLoading] = React.useState(false)
+  const router = useRouter()
+  const [mode, setMode] = React.useState<Mode>("ingresar")
 
-  const form = useForm<LoginValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: "" },
+  const isSignUp = mode === "registrarse"
+
+  const form = useForm<Values>({
+    resolver: zodResolver(isSignUp ? signUpSchema : signInSchema),
+    defaultValues: { fullName: "", email: "", password: "" },
   })
 
   React.useEffect(() => {
     if (initialError) toast.error(initialError)
   }, [initialError])
 
-  const redirectTo =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
-      : undefined
+  // Los requisitos de contraseña cambian entre modos, así que los errores
+  // pendientes dejan de aplicar al cambiar.
+  function switchTo(nextMode: Mode) {
+    setMode(nextMode)
+    form.clearErrors()
+  }
 
-  async function onSubmit(values: LoginValues) {
+  async function onSubmit(values: Values) {
     const supabase = createClient()
     if (!supabase) {
       toast.error("Falta configurar Supabase en .env.local")
       return
     }
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email: values.email,
-      options: { emailRedirectTo: redirectTo },
-    })
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({
+        email: values.email,
+        password: values.password,
+        // El disparador de la base lee full_name de acá para crear el perfil.
+        options: { data: { full_name: values.fullName } },
+      })
 
-    if (error) {
-      toast.error(error.message)
-      return
+      if (error) {
+        toast.error(
+          error.message.includes("already registered")
+            ? "Ese email ya tiene cuenta. Probá ingresando."
+            : error.message
+        )
+        return
+      }
+
+      toast.success("Cuenta creada.")
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      })
+
+      if (error) {
+        toast.error(
+          error.message.includes("Invalid login credentials")
+            ? "Email o contraseña incorrectos."
+            : error.message
+        )
+        return
+      }
     }
 
-    setSent(true)
-    toast.success("Revisá tu correo: te mandamos el enlace de acceso.")
-  }
-
-  async function signInWithGoogle() {
-    const supabase = createClient()
-    if (!supabase) {
-      toast.error("Falta configurar Supabase en .env.local")
-      return
-    }
-
-    setGoogleLoading(true)
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo },
-    })
-
-    if (error) {
-      setGoogleLoading(false)
-      toast.error(error.message)
-    }
-  }
-
-  if (sent) {
-    return (
-      <div className="flex flex-col items-start gap-3">
-        <Mail className="size-6 text-muted-foreground" />
-        <p className="text-sm">
-          Enviamos un enlace a{" "}
-          <span className="font-medium">{form.getValues("email")}</span>. Abrilo
-          desde este mismo navegador.
-        </p>
-        <Button variant="outline" size="sm" onClick={() => setSent(false)}>
-          Usar otro email
-        </Button>
-      </div>
-    )
+    // refresh() revalida el layout del servidor, que es el que lee la sesión.
+    router.push(next)
+    router.refresh()
   }
 
   return (
     <div className="flex flex-col gap-4">
       {!configured ? (
-        <p className="rounded-md bg-muted p-3 text-sm text-muted-foreground">
-          Supabase todavía no está configurado, así que el login no va a
+        <p className="rounded-md bg-muted p-3 text-sm">
+          Supabase todavía no está configurado, así que el ingreso no va a
           funcionar. Completá <code className="font-mono">.env.local</code> y
           reiniciá el servidor.
         </p>
@@ -123,6 +137,26 @@ export function LoginForm({
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-4"
         >
+          {isSignUp ? (
+            <FormField
+              control={form.control}
+              name="fullName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nombre</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Tu nombre"
+                      autoComplete="name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ) : null}
+
           <FormField
             control={form.control}
             name="email"
@@ -142,29 +176,50 @@ export function LoginForm({
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Contraseña</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    autoComplete={
+                      isSignUp ? "new-password" : "current-password"
+                    }
+                    {...field}
+                  />
+                </FormControl>
+                {isSignUp ? (
+                  <FormDescription>
+                    Mínimo {MIN_PASSWORD} caracteres.
+                  </FormDescription>
+                ) : null}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? (
               <Loader2 className="animate-spin" />
             ) : null}
-            Enviarme el enlace
+            {isSignUp ? "Crear cuenta" : "Ingresar"}
           </Button>
         </form>
       </Form>
 
-      <div className="flex items-center gap-3">
-        <Separator className="flex-1" />
-        <span className="text-xs text-muted-foreground">o</span>
-        <Separator className="flex-1" />
-      </div>
-
-      <Button
-        variant="outline"
-        onClick={signInWithGoogle}
-        disabled={googleLoading}
-      >
-        {googleLoading ? <Loader2 className="animate-spin" /> : null}
-        Continuar con Google
-      </Button>
+      <p className="text-center text-sm text-muted-foreground">
+        {isSignUp ? "¿Ya tenés cuenta?" : "¿No tenés cuenta?"}{" "}
+        <button
+          type="button"
+          onClick={() => switchTo(isSignUp ? "ingresar" : "registrarse")}
+          className="font-medium text-foreground underline underline-offset-4"
+        >
+          {isSignUp ? "Ingresar" : "Crear una"}
+        </button>
+      </p>
     </div>
   )
 }

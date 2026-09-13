@@ -232,7 +232,10 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
-enable_confirmations = true
+# Desactivado a propósito: el registro es correo y contraseña, sin verificación.
+# El correo igual queda guardado en auth.users, así que activar esto más
+# adelante no pide migrar nada — solo volver a poner true y empujar.
+enable_confirmations = false
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
