@@ -58,14 +58,14 @@ Tres propiedades lo hacen creíble como antecedente laboral:
 
 ## 4. Los módulos
 
-| Módulo | Qué hace | Para quién |
-|---|---|---|
+| Módulo                      | Qué hace                                                                                                                | Para quién  |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------- |
 | **Editor de tienda con IA** | Sobre una plantilla del rubro, la IA agrega, elimina y edita bloques visuales según lo que el emprendedor pide en texto | Emprendedor |
-| **Cobro por QR** | QR de la tienda y del vendedor, pago por transferencia con comprobante | Ambos |
-| **Inteligencia de negocio** | Preguntas en lenguaje natural que devuelven gráficos y estadísticas | Emprendedor |
-| **Marketing con IA** | Genera copys y piezas adaptadas a cada red social, listos para publicar en Facebook y WhatsApp | Emprendedor |
-| **Red de vendedores** | Alta de vendedores, enlaces de referido, comisiones automáticas | Ambos |
-| **Segunda mano** | Filtro del catálogo que reúne los productos usados y reacondicionados, con los descuentos destacados | Emprendedor |
+| **Cobro por QR**            | QR de la tienda y del vendedor, pago por transferencia con comprobante                                                  | Ambos       |
+| **Inteligencia de negocio** | Preguntas en lenguaje natural que devuelven gráficos y estadísticas                                                     | Emprendedor |
+| **Marketing con IA**        | Genera copys y piezas adaptadas a cada red social, listos para publicar en Facebook y WhatsApp                          | Emprendedor |
+| **Red de vendedores**       | Alta de vendedores, enlaces de referido, comisiones automáticas                                                         | Ambos       |
+| **Segunda mano**            | Filtro del catálogo que reúne los productos usados y reacondicionados, con los descuentos destacados                    | Emprendedor |
 
 **Sobre la segunda mano:** no es una sección aparte que se genera sola. Es un **filtro dentro del catálogo** de cada tienda. Lo que define que un producto sea de segunda mano es un campo que el emprendedor elige al cargarlo, junto con un precio de comparación opcional que produce el descuento destacado.
 
@@ -103,10 +103,10 @@ El reglamento boliviano de servicios de pago regula la figura de Administradora 
 
 Hay dos arquitecturas posibles y **solo una resuelve el problema**:
 
-| Arquitectura | ¿Resuelve? |
-|---|---|
+| Arquitectura                                                                                                                                                        | ¿Resuelve?                                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | El comprador paga a la pasarela, y **la pasarela dispersa** directo al emprendedor y al vendedor. Venduo solo instruye el reparto y nunca es titular de los fondos. | **Sí.** Venduo queda como plataforma tecnológica; la actividad regulada la ejerce el sujeto autorizado. |
-| El comprador paga a una cuenta de Venduo, y después Venduo transfiere a cada parte. | **No.** Es intermediación de pagos, por más que el cobro entre por una pasarela autorizada. |
+| El comprador paga a una cuenta de Venduo, y después Venduo transfiere a cada parte.                                                                                 | **No.** Es intermediación de pagos, por más que el cobro entre por una pasarela autorizada.             |
 
 **PagoFácil es el candidato para producción.** Está en proceso de adecuación para operar como Entidad Tecnológica Financiera bajo supervisión de ASFI, mediante la razón social ETF PAYIN & PAYOUT SRL, y publicita dispersión automática de pagos, que es exactamente el reparto que Venduo necesita.
 
@@ -155,15 +155,15 @@ Se intenta el plan A; si no llega, entra el plan B. **El modelo de datos soporta
 
 ### Stack
 
-| Capa | Tecnología |
-|---|---|
-| Framework | Next.js 15 (App Router) y TypeScript |
-| Base de datos | Supabase, PostgreSQL con Row Level Security |
-| Autenticación | Supabase Auth |
-| Archivos | Supabase Storage |
-| Estilos y componentes | Tailwind CSS y shadcn/ui |
-| IA | Capa propia con proveedor intercambiable por configuración |
-| Hosting | Vercel |
+| Capa                  | Tecnología                                                 |
+| --------------------- | ---------------------------------------------------------- |
+| Framework             | Next.js 15 (App Router) y TypeScript                       |
+| Base de datos         | Supabase, PostgreSQL con Row Level Security                |
+| Autenticación         | Supabase Auth                                              |
+| Archivos              | Supabase Storage                                           |
+| Estilos y componentes | Tailwind CSS y shadcn/ui                                   |
+| IA                    | Capa propia con proveedor intercambiable por configuración |
+| Hosting               | Vercel                                                     |
 
 ### Moneda
 
@@ -175,12 +175,12 @@ Se intenta el plan A; si no llega, entra el plan B. **El modelo de datos soporta
 
 Ruteo **por path, no por subdominio**:
 
-| Ruta | Qué es |
-|---|---|
-| `/t/{slug}` | Tienda pública del emprendedor |
+| Ruta        | Qué es                                              |
+| ----------- | --------------------------------------------------- |
+| `/t/{slug}` | Tienda pública del emprendedor                      |
 | `/v/{slug}` | Perfil público del vendedor y su enlace de referido |
-| `/panel` | Panel del emprendedor |
-| `/vendedor` | Panel del vendedor |
+| `/panel`    | Panel del emprendedor                               |
+| `/vendedor` | Panel del vendedor                                  |
 
 Se usa el slug y no el identificador interno porque estas URLs **se imprimen en códigos QR y se mandan por WhatsApp**: tienen que ser legibles y compartibles.
 
@@ -238,27 +238,27 @@ Las cláusulas de borrado en cascada quedan declaradas en el esquema, pero **sol
 
 #### Identidad
 
-| Tabla | Qué guarda |
-|---|---|
-| `profiles` | Perfil del usuario. Se crea solo al registrarse, mediante un disparador sobre la tabla de usuarios de Supabase |
+| Tabla             | Qué guarda                                                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `profiles`        | Perfil del usuario. Se crea solo al registrarse, mediante un disparador sobre la tabla de usuarios de Supabase                        |
 | `seller_profiles` | Identidad del vendedor: nombre visible, slug público, ciudad. **Vive fuera de toda tienda** — es lo que sostiene el historial laboral |
 
 #### Tenant
 
 **`stores`** — la tienda es el tenant.
 
-| Columna | Tipo | Nota |
-|---|---|---|
-| `id` | uuid | |
-| `owner_id` | uuid | **Único.** Una tienda por usuario |
-| `name`, `slug`, `tagline`, `description`, `logo_url` | text | `slug` con índice único parcial |
-| `template_key` | text | Referencia a la plantilla, anulable si se retira del catálogo |
-| `theme` | jsonb | Colores y tipografía resueltos |
-| `commission_bps` | integer | Porcentaje de comisión en **puntos básicos** (entero, 0 a 10000) |
-| `seller_network_enabled` | boolean | Interruptor de la red de vendedores |
-| `seller_join_mode` | enum | `abierta` o `con_aprobacion` |
-| `is_published` | boolean | |
-| `created_at`, `updated_at`, `deleted_at` | timestamptz | |
+| Columna                                              | Tipo        | Nota                                                             |
+| ---------------------------------------------------- | ----------- | ---------------------------------------------------------------- |
+| `id`                                                 | uuid        |                                                                  |
+| `owner_id`                                           | uuid        | **Único.** Una tienda por usuario                                |
+| `name`, `slug`, `tagline`, `description`, `logo_url` | text        | `slug` con índice único parcial                                  |
+| `template_key`                                       | text        | Referencia a la plantilla, anulable si se retira del catálogo    |
+| `theme`                                              | jsonb       | Colores y tipografía resueltos                                   |
+| `commission_bps`                                     | integer     | Porcentaje de comisión en **puntos básicos** (entero, 0 a 10000) |
+| `seller_network_enabled`                             | boolean     | Interruptor de la red de vendedores                              |
+| `seller_join_mode`                                   | enum        | `abierta` o `con_aprobacion`                                     |
+| `is_published`                                       | boolean     |                                                                  |
+| `created_at`, `updated_at`, `deleted_at`             | timestamptz |                                                                  |
 
 No hay columna de moneda: es constante del sistema.
 
@@ -266,43 +266,43 @@ No hay columna de moneda: es constante del sistema.
 
 **`subscriptions`** — una por tienda.
 
-| Columna | Nota |
-|---|---|
-| `store_id` | Único |
-| `plan_key` | |
-| `status` | `prueba`, `activa`, `bloqueada`, `cancelada` |
-| `trial_ends_at` | Vencimiento de la prueba |
-| `blocked_at` | Cuándo se bloqueó |
-| `purge_at` | `blocked_at` más 90 días. Marca la única eliminación física del sistema |
+| Columna         | Nota                                                                    |
+| --------------- | ----------------------------------------------------------------------- |
+| `store_id`      | Único                                                                   |
+| `plan_key`      |                                                                         |
+| `status`        | `prueba`, `activa`, `bloqueada`, `cancelada`                            |
+| `trial_ends_at` | Vencimiento de la prueba                                                |
+| `blocked_at`    | Cuándo se bloqueó                                                       |
+| `purge_at`      | `blocked_at` más 90 días. Marca la única eliminación física del sistema |
 
 #### Catálogo
 
 **`products`** — suma respecto del esquema actual:
 
-| Columna | Nota |
-|---|---|
-| `condition` | `nuevo`, `segunda_mano` o `reacondicionado`. **Lo elige el emprendedor al cargar el producto** y es lo que alimenta el filtro de segunda mano |
-| `condition_note` | Descripción del estado, para usados |
-| `compare_at_price_cents` | Precio anterior, opcional. Debe ser mayor o igual al precio. Es lo que produce el descuento destacado |
-| `deleted_at` | Borrado lógico |
+| Columna                  | Nota                                                                                                                                          |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `condition`              | `nuevo`, `segunda_mano` o `reacondicionado`. **Lo elige el emprendedor al cargar el producto** y es lo que alimenta el filtro de segunda mano |
+| `condition_note`         | Descripción del estado, para usados                                                                                                           |
+| `compare_at_price_cents` | Precio anterior, opcional. Debe ser mayor o igual al precio. Es lo que produce el descuento destacado                                         |
+| `deleted_at`             | Borrado lógico                                                                                                                                |
 
 #### Venta
 
 **`orders`**
 
-| Columna | Nota |
-|---|---|
-| `order_number` | Correlativo legible, para que el emprendedor pueda nombrar un pedido |
-| `buyer_name` | Obligatorio |
-| `buyer_phone` | **Obligatorio.** Es el canal por el que se coordina la entrega |
-| `buyer_email` | Opcional |
-| `seller_id` | **Anulable.** Vacío es venta directa por carrito; con valor es venta referida. Un solo flujo de compra, dos modelos de negocio |
-| `referral_code` | Copia textual del código usado, sobrevive al borrado del vínculo |
-| `subtotal_cents`, `total_cents` | |
-| `commission_bps`, `commission_cents` | **Congelados al momento de la venta** |
-| `net_to_store_cents` | Lo que le corresponde al emprendedor |
-| `status` | `pendiente`, `pagado`, `enviado`, `entregado`, `cancelado` |
-| `payment_proof_url`, `paid_at` | |
+| Columna                              | Nota                                                                                                                           |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `order_number`                       | Correlativo legible, para que el emprendedor pueda nombrar un pedido                                                           |
+| `buyer_name`                         | Obligatorio                                                                                                                    |
+| `buyer_phone`                        | **Obligatorio.** Es el canal por el que se coordina la entrega                                                                 |
+| `buyer_email`                        | Opcional                                                                                                                       |
+| `seller_id`                          | **Anulable.** Vacío es venta directa por carrito; con valor es venta referida. Un solo flujo de compra, dos modelos de negocio |
+| `referral_code`                      | Copia textual del código usado, sobrevive al borrado del vínculo                                                               |
+| `subtotal_cents`, `total_cents`      |                                                                                                                                |
+| `commission_bps`, `commission_cents` | **Congelados al momento de la venta**                                                                                          |
+| `net_to_store_cents`                 | Lo que le corresponde al emprendedor                                                                                           |
+| `status`                             | `pendiente`, `pagado`, `enviado`, `entregado`, `cancelado`                                                                     |
+| `payment_proof_url`, `paid_at`       |                                                                                                                                |
 
 Sin marca de borrado: un pedido se cancela, no se borra.
 
@@ -312,40 +312,40 @@ Sin marca de borrado: un pedido se cancela, no se borra.
 
 **`store_sellers`** — el vínculo tienda-vendedor. Es el corazón del multi-tenancy cruzado.
 
-| Columna | Nota |
-|---|---|
-| `store_id`, `user_id` | Únicos como par, entre filas vivas |
-| `referral_code` | Único entre filas vivas. Es lo que va en el enlace y el QR |
-| `status` | `pendiente`, `activo`, `rechazado`, `suspendido` |
-| `joined_at`, `approved_at`, `approved_by` | |
-| `deleted_at` | |
+| Columna                                   | Nota                                                       |
+| ----------------------------------------- | ---------------------------------------------------------- |
+| `store_id`, `user_id`                     | Únicos como par, entre filas vivas                         |
+| `referral_code`                           | Único entre filas vivas. Es lo que va en el enlace y el QR |
+| `status`                                  | `pendiente`, `activo`, `rechazado`, `suspendido`           |
+| `joined_at`, `approved_at`, `approved_by` |                                                            |
+| `deleted_at`                              |                                                            |
 
 El estado inicial depende de `seller_join_mode` de la tienda: `activo` si el alta es abierta, `pendiente` si exige aprobación.
 
 **`commissions`** — el ciclo de vida del pago al vendedor.
 
-| Columna | Nota |
-|---|---|
-| `order_id` | **Único.** Defensa contra el doble conteo si el pedido oscila entre estados |
-| `store_id` | **Anulable, no cascada** |
-| `store_name` | **Copia del nombre de la tienda** |
-| `seller_id` | Anulable |
-| `seller_user_id` | Obligatorio. Redundante a propósito, para que la política de seguridad del panel del vendedor no necesite un join |
-| `base_amount_cents`, `rate_bps`, `amount_cents` | La tasa **congelada** al momento de la venta |
-| `status` | `pendiente`, `confirmada`, `pagada`, `anulada` |
-| `paid_at`, `payment_reference` | |
+| Columna                                         | Nota                                                                                                              |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `order_id`                                      | **Único.** Defensa contra el doble conteo si el pedido oscila entre estados                                       |
+| `store_id`                                      | **Anulable, no cascada**                                                                                          |
+| `store_name`                                    | **Copia del nombre de la tienda**                                                                                 |
+| `seller_id`                                     | Anulable                                                                                                          |
+| `seller_user_id`                                | Obligatorio. Redundante a propósito, para que la política de seguridad del panel del vendedor no necesite un join |
+| `base_amount_cents`, `rate_bps`, `amount_cents` | La tasa **congelada** al momento de la venta                                                                      |
+| `status`                                        | `pendiente`, `confirmada`, `pagada`, `anulada`                                                                    |
+| `paid_at`, `payment_reference`                  |                                                                                                                   |
 
 **Por qué el vínculo con la tienda es anulable y el nombre va copiado.** Cuando se purga una tienda que no se suscribió, la comisión sobrevive con el nombre del comercio y el historial del vendedor queda intacto. Si la comisión se borrara en cascada, el día que un emprendedor abandona la plataforma se borraría el antecedente laboral de todos sus vendedores — exactamente lo que la plataforma promete no hacer.
 
 #### Tienda visual
 
-| Tabla | Qué guarda |
-|---|---|
-| `block_types` | **Catálogo global.** Cada tipo de bloque con su esquema de propiedades y sus valores por defecto |
-| `templates`, `template_pages` | **Catálogo global.** Plantillas por rubro y los bloques que siembran cada página |
-| `store_pages` | Páginas concretas de cada tienda, con estado borrador o publicada |
-| `store_blocks` | Bloques concretos: tipo, posición, propiedades en JSON y visibilidad |
-| `block_edit_proposals` | Lo que la IA propuso, con el estado previo guardado |
+| Tabla                         | Qué guarda                                                                                       |
+| ----------------------------- | ------------------------------------------------------------------------------------------------ |
+| `block_types`                 | **Catálogo global.** Cada tipo de bloque con su esquema de propiedades y sus valores por defecto |
+| `templates`, `template_pages` | **Catálogo global.** Plantillas por rubro y los bloques que siembran cada página                 |
+| `store_pages`                 | Páginas concretas de cada tienda, con estado borrador o publicada                                |
+| `store_blocks`                | Bloques concretos: tipo, posición, propiedades en JSON y visibilidad                             |
+| `block_edit_proposals`        | Lo que la IA propuso, con el estado previo guardado                                              |
 
 El vínculo de un bloque con su tipo **no se puede romper**: no se retira del catálogo un tipo de bloque que alguna tienda esté usando.
 
@@ -353,11 +353,11 @@ El filtro de segunda mano no es un tipo de bloque aparte: es una **propiedad del
 
 #### IA y difusión
 
-| Tabla | Qué guarda |
-|---|---|
-| `ai_generations` | Historial de todo lo que generó la IA: tipo, proveedor, modelo, prompt y salida |
-| `social_connections` | Credenciales de Facebook y WhatsApp por tienda. **Sin políticas de lectura: solo accesible desde el servidor** |
-| `social_posts` | Posteos generados. Su estado distingue `publicado` por API de `compartido` manualmente, que es lo que permite sostener el plan A y el plan B con el mismo modelo |
+| Tabla                | Qué guarda                                                                                                                                                       |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ai_generations`     | Historial de todo lo que generó la IA: tipo, proveedor, modelo, prompt y salida                                                                                  |
+| `social_connections` | Credenciales de Facebook y WhatsApp por tienda. **Sin políticas de lectura: solo accesible desde el servidor**                                                   |
+| `social_posts`       | Posteos generados. Su estado distingue `publicado` por API de `compartido` manualmente, que es lo que permite sostener el plan A y el plan B con el mismo modelo |
 
 ### Comisiones: el congelamiento
 
