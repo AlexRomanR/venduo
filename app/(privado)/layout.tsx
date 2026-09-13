@@ -7,12 +7,15 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
 /**
- * Shell del área privada.
+ * Shell compartido de las áreas privadas: `/panel` y `/vendedor`.
+ *
+ * El grupo de rutas `(privado)` no aparece en la URL; existe para que las dos
+ * áreas compartan este encabezado sin duplicarlo.
  *
  * Deliberadamente mínimo: header, estado de las capas y salida.
  * La navegación se agrega a medida que aparezcan las secciones.
  */
-export default async function DashboardLayout({
+export default async function PrivadoLayout({
   children,
 }: {
   children: React.ReactNode

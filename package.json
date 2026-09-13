@@ -12,6 +12,8 @@
     "format:check": "prettier --check .",
     "check": "npm run typecheck && npm run lint && npm run format:check",
     "setup": "node scripts/setup.mjs",
+    "sync:agents": "node scripts/sync-agent-config.mjs",
+    "sync:agents:check": "node scripts/sync-agent-config.mjs --check",
     "db:types": "supabase gen types typescript --linked > types/database.ts",
     "db:push": "supabase db push",
     "db:start": "supabase start",

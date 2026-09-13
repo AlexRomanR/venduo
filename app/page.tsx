@@ -5,7 +5,7 @@ import { redirect } from "next/navigation"
  *
  * No hay landing: este scaffold deja la infraestructura montada
  * (Supabase, capa de IA, QR, validación) y la UI se construye
- * sobre `/dashboard`.
+ * sobre `/panel` y `/vendedor`.
  */
 export default function Home() {
   redirect("/login")

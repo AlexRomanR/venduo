@@ -4,10 +4,10 @@ import { createServerClient } from "@supabase/ssr"
 import { env, isSupabaseConfigured } from "@/lib/env"
 
 /** Rutas que exigen sesión iniciada. */
-const PROTECTED_PREFIXES = ["/dashboard"]
+const PROTECTED_PREFIXES = ["/panel", "/vendedor"]
 
 /**
- * Refresca el token de Supabase en cada request y protege el dashboard.
+ * Refresca el token de Supabase en cada request y protege las áreas privadas.
  * Sin credenciales configuradas deja pasar todo (modo demo).
  */
 export async function updateSession(request: NextRequest) {

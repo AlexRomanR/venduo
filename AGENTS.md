@@ -1,0 +1,77 @@
+# Venduo
+
+Plataforma boliviana donde un emprendedor elige una plantilla, describe su negocio y
+obtiene una tienda online que la IA edita por bloques. Esa tienda puede activar una red de
+vendedores jóvenes que colocan sus productos a comisión y construyen, con cada venta, un
+historial laboral verificable.
+
+MVP de hackathon de 48 horas. **La especificación del producto es `VENDUO.md`** y es la
+fuente de verdad: si algo de acá la contradice, gana `VENDUO.md`.
+
+## Stack
+
+Next.js 15 con App Router y TypeScript · Supabase (PostgreSQL con RLS, Auth, Storage) ·
+Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Vercel.
+
+## Comandos
+
+| Comando                | Qué hace                                                         |
+| ---------------------- | ---------------------------------------------------------------- |
+| `npm run dev`          | Servidor de desarrollo                                           |
+| `npm run check`        | Tipos, lint y formato **en secuencia**. Lo mismo que corre el CI |
+| `npm run format`       | Arregla el formato                                               |
+| `npm run build`        | Build de producción                                              |
+| `npx supabase db push` | Aplica las migraciones pendientes                                |
+| `npm run db:types`     | Regenera `types/database.ts` desde el esquema real               |
+| `npm run sync:agents`  | Copia las skills de `.agents/` a `.claude/`                      |
+
+## Lo que hay que saber antes de tocar nada
+
+- **Una tienda por usuario**, impuesto por índice único. Un vendedor, en cambio, pertenece
+  a varias: ahí está toda la dificultad del aislamiento.
+- **Dinero en centavos enteros, porcentajes en puntos básicos.** Nunca punto flotante. La
+  moneda es el boliviano y es constante del sistema: no hay columna de moneda.
+- **Borrado lógico en todas partes.** Toda consulta filtra `deleted_at is null`, y los
+  índices únicos son parciales.
+- **El checkout no es una inserción del cliente.** `orders` no tiene política de INSERT: el
+  pedido se crea con la función `create_order`, que recalcula los precios en el servidor.
+- **La comisión se congela al momento de la venta.** Nunca se recalcula después.
+- **`types/database.ts` es generado.** Los alias van en `types/index.ts`.
+- **La IA propone, el sistema valida y ejecuta.** Toda salida del modelo se valida con zod
+  antes de tocar la base o la pantalla.
+
+## Lo que NO se construye
+
+Está en `VENDUO.md` §7 y vale tanto como la lista de lo que sí. Si una tarea pide algo de
+acá, frená y preguntá antes de escribir código:
+
+multi-tienda por usuario · gestión de envíos · cobro de la suscripción · notificaciones
+por email · app móvil nativa · **tests automatizados**.
+
+## Reglas
+
+En `.agents/rules/`, que Antigravity carga solo. Son la misma fuente que importa Claude
+Code desde `CLAUDE.md`, así que las dos herramientas aplican los mismos estándares.
+
+| Archivo            | Cubre                                                            |
+| ------------------ | ---------------------------------------------------------------- |
+| `architecture.md`  | App Router, componentes de servidor, rutas, clientes de Supabase |
+| `database-rls.md`  | Dinero, borrado lógico, políticas RLS, migraciones               |
+| `domain-venduo.md` | Reglas de negocio, comisiones, roles, alcance                    |
+| `ui-styling.md`    | Móvil primero, Tailwind v4, shadcn/ui, textos                    |
+| `ai-layer.md`      | Interfaz del proveedor, esquemas zod, modo mock                  |
+| `code-quality.md`  | TypeScript estricto, secretos, commits                           |
+
+## Skills
+
+En `.agents/skills/`, que es la **fuente única**: `.claude/skills/` se genera desde acá
+con `npm run sync:agents`. Editar siempre el original.
+
+| Skill                   | Cuándo                                                      |
+| ----------------------- | ----------------------------------------------------------- |
+| `implement-feature`     | Una feature de punta a punta, de la migración a la pantalla |
+| `database-migration`    | Migraciones, políticas RLS, índices, funciones              |
+| `sales-and-commissions` | Checkout, referidos, comisiones, entrega por WhatsApp       |
+| `visual-block-editor`   | Plantillas, tipos de bloque, propuestas de la IA            |
+| `ai-task-workflow`      | Agregar o cambiar una tarea de IA                           |
+| `qa-verification`       | Verificación antes de commitear                             |

@@ -28,7 +28,7 @@ export default async function LoginPage({
         </CardHeader>
         <CardContent>
           <LoginForm
-            next={next ?? "/dashboard"}
+            next={next ?? "/panel"}
             configured={isSupabaseConfigured}
             initialError={error}
           />

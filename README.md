@@ -39,7 +39,7 @@ npm run setup   # crea .env.local desde .env.example y te dice qué falta
 | Autenticación | Supabase Auth (email + Google)        | `app/login/`, `app/auth/`, `middleware.ts`           |
 | Archivos      | Supabase Storage                      | `lib/supabase/storage.ts`                            |
 | IA            | Capa propia, proveedor intercambiable | `lib/ai/`                                            |
-| Gráficos      | Recharts                              | `components/dashboard/sales-charts.tsx`              |
+| Gráficos      | Recharts                              | `components/ui/chart.tsx`                            |
 | Códigos QR    | qrcode                                | `lib/qr.ts`, `app/api/qr/`                           |
 | Validación    | zod                                   | `lib/ai/schemas.ts`, `lib/validation/`, `lib/env.ts` |
 | Hosting       | Vercel                                | —                                                    |
@@ -136,12 +136,13 @@ un JSON mal formado produce un error claro, no una pantalla rota.
 ```
 app/
   page.tsx                 Redirige a /login
-  login/                   Ingreso (magic link + Google)
+  login/                   Registro e ingreso con email y contraseña
   auth/callback/           Intercambio de código por sesión
   auth/sign-out/           Cierre de sesión
-  dashboard/
-    layout.tsx             Shell del área privada
-    page.tsx               Placeholder — acá se construye la app
+  (privado)/               Grupo de rutas: no aparece en la URL
+    layout.tsx             Shell compartido de las áreas privadas
+    panel/                 Panel del emprendedor
+    vendedor/              Panel del vendedor
   api/
     health/                Estado del servidor y de las capas
 
@@ -224,12 +225,15 @@ pero no hay vistas más allá del login. Lo que ya está disponible en `lib/`:
   y tres tareas listas: `generateStoreBlueprint`, `analyzeSales` y
   `generateCampaign`. Toda salida validada con zod antes de usarse.
 - **Supabase** (`lib/supabase/`): clientes de browser, servidor y admin, helper
-  de Storage y el middleware que protege `/dashboard`.
+  de Storage y el middleware que protege `/panel` y `/vendedor`.
 - **Esquema de base** (`supabase/migrations/`) con seis tablas,
   RLS en todas y los dos buckets de Storage.
 - **QR** (`lib/qr.ts`) para generar códigos en PNG o SVG.
 - **Validación y formato** (`lib/validation/`, `lib/format.ts`).
 - **shadcn/ui completo** en `components/ui/`.
 
-Para agregar una sección: creá la carpeta bajo `app/dashboard/`, sumá el link
-en `app/dashboard/layout.tsx` y usá lo que ya está en `lib/`.
+Para agregar una sección: creá la carpeta bajo `app/(privado)/panel/`, sumá el
+link en `app/(privado)/layout.tsx` y usá lo que ya está en `lib/`.
+
+Las reglas y skills que siguen Claude Code y Antigravity están en `CLAUDE.md`,
+`AGENTS.md` y `.agents/`.
