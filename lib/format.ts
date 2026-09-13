@@ -1,5 +1,17 @@
+/**
+ * Moneda y locale del sistema.
+ *
+ * Constantes y no configuración por tienda: Venduo opera solo en Bolivia.
+ */
+export const CURRENCY = "BOB"
+export const LOCALE = "es-BO"
+
 /** Formatea un monto guardado en centavos. */
-export function formatMoney(cents: number, currency = "ARS", locale = "es-AR") {
+export function formatMoney(
+  cents: number,
+  currency = CURRENCY,
+  locale = LOCALE
+) {
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
@@ -7,11 +19,11 @@ export function formatMoney(cents: number, currency = "ARS", locale = "es-AR") {
   }).format(cents / 100)
 }
 
-export function formatNumber(value: number, locale = "es-AR") {
+export function formatNumber(value: number, locale = LOCALE) {
   return new Intl.NumberFormat(locale).format(value)
 }
 
-export function formatDate(value: string | Date, locale = "es-AR") {
+export function formatDate(value: string | Date, locale = LOCALE) {
   const date = typeof value === "string" ? new Date(value) : value
   return new Intl.DateTimeFormat(locale, {
     day: "2-digit",

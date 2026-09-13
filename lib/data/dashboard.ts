@@ -4,6 +4,7 @@ import {
   type DashboardMetrics,
   type SalesPoint,
 } from "@/lib/demo-data"
+import { CURRENCY } from "@/lib/format"
 
 const DAYS = 30
 
@@ -23,12 +24,12 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   } = await supabase.auth.getUser()
   if (!user) return getDemoMetrics()
 
+  // Una tienda por usuario: el índice único sobre owner_id lo garantiza.
   const { data: store } = await supabase
     .from("stores")
-    .select("id, currency")
+    .select("id")
     .eq("owner_id", user.id)
-    .order("created_at", { ascending: true })
-    .limit(1)
+    .is("deleted_at", null)
     .maybeSingle()
 
   if (!store) return getDemoMetrics()
@@ -46,7 +47,8 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
     supabase
       .from("products")
       .select("id", { count: "exact", head: true })
-      .eq("store_id", store.id),
+      .eq("store_id", store.id)
+      .is("deleted_at", null),
     supabase
       .from("order_items")
       .select(
@@ -106,7 +108,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
     averageTicketCents: orderCount ? Math.round(revenueCents / orderCount) : 0,
     series,
     topProducts,
-    currency: store.currency,
+    currency: CURRENCY,
     isDemo: false,
   }
 }

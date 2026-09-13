@@ -1,11 +1,3 @@
-/**
- * Tipos de la base de datos.
- *
- * Escritos a mano para que el proyecto compile sin conexión a Supabase.
- * Una vez creado el proyecto real, regeneralos con:
- *   npm run db:types
- */
-
 export type Json =
   | string
   | number
@@ -14,205 +6,1139 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type OrderStatus =
-  "pendiente" | "pagado" | "enviado" | "entregado" | "cancelado"
-
-export type AIGenerationKind = "tienda" | "analisis" | "marketing"
-
-export interface Database {
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   public: {
     Tables: {
-      profiles: {
+      ai_generations: {
         Row: {
-          id: string
-          full_name: string | null
-          avatar_url: string | null
           created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["ai_generation_kind"]
+          model: string
+          output: Json
+          prompt: string
+          provider: string
+          store_id: string | null
+          user_id: string
         }
         Insert: {
-          id: string
-          full_name?: string | null
-          avatar_url?: string | null
           created_at?: string
-        }
-        Update: {
-          full_name?: string | null
-          avatar_url?: string | null
-        }
-        Relationships: []
-      }
-      stores: {
-        Row: {
-          id: string
-          owner_id: string
-          name: string
-          slug: string
-          tagline: string | null
-          description: string | null
-          logo_url: string | null
-          currency: string
-          is_published: boolean
-          created_at: string
-        }
-        Insert: {
           id?: string
-          owner_id: string
-          name: string
-          slug: string
-          tagline?: string | null
-          description?: string | null
-          logo_url?: string | null
-          currency?: string
-          is_published?: boolean
-          created_at?: string
+          kind: Database["public"]["Enums"]["ai_generation_kind"]
+          model: string
+          output: Json
+          prompt: string
+          provider: string
+          store_id?: string | null
+          user_id: string
         }
         Update: {
-          name?: string
-          slug?: string
-          tagline?: string | null
-          description?: string | null
-          logo_url?: string | null
-          currency?: string
-          is_published?: boolean
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["ai_generation_kind"]
+          model?: string
+          output?: Json
+          prompt?: string
+          provider?: string
+          store_id?: string | null
+          user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ai_generations_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      products: {
+      block_edit_proposals: {
         Row: {
+          applied_at: string | null
+          created_at: string
           id: string
+          operations: Json
+          page_id: string
+          prompt: string
+          snapshot_before: Json
+          status: Database["public"]["Enums"]["block_proposal_status"]
           store_id: string
-          name: string
-          description: string | null
-          price_cents: number
-          stock: number
+          validation_errors: Json | null
+        }
+        Insert: {
+          applied_at?: string | null
+          created_at?: string
+          id?: string
+          operations: Json
+          page_id: string
+          prompt: string
+          snapshot_before: Json
+          status?: Database["public"]["Enums"]["block_proposal_status"]
+          store_id: string
+          validation_errors?: Json | null
+        }
+        Update: {
+          applied_at?: string | null
+          created_at?: string
+          id?: string
+          operations?: Json
+          page_id?: string
+          prompt?: string
+          snapshot_before?: Json
+          status?: Database["public"]["Enums"]["block_proposal_status"]
+          store_id?: string
+          validation_errors?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "block_edit_proposals_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "store_pages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "block_edit_proposals_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      block_types: {
+        Row: {
           category: string | null
-          image_url: string | null
-          is_active: boolean
           created_at: string
+          default_props: Json
+          description: string | null
+          is_active: boolean
+          key: string
+          max_per_page: number | null
+          name: string
+          props_schema: Json
         }
         Insert: {
-          id?: string
-          store_id: string
-          name: string
-          description?: string | null
-          price_cents: number
-          stock?: number
           category?: string | null
-          image_url?: string | null
-          is_active?: boolean
           created_at?: string
+          default_props?: Json
+          description?: string | null
+          is_active?: boolean
+          key: string
+          max_per_page?: number | null
+          name: string
+          props_schema: Json
         }
         Update: {
-          name?: string
-          description?: string | null
-          price_cents?: number
-          stock?: number
           category?: string | null
-          image_url?: string | null
+          created_at?: string
+          default_props?: Json
+          description?: string | null
           is_active?: boolean
+          key?: string
+          max_per_page?: number | null
+          name?: string
+          props_schema?: Json
         }
         Relationships: []
       }
-      orders: {
+      commissions: {
         Row: {
-          id: string
-          store_id: string
-          buyer_name: string
-          buyer_email: string | null
-          buyer_phone: string | null
-          total_cents: number
-          status: OrderStatus
-          payment_proof_url: string | null
+          amount_cents: number
+          base_amount_cents: number
+          confirmed_at: string | null
           created_at: string
+          id: string
+          order_id: string
+          paid_at: string | null
+          payment_reference: string | null
+          rate_bps: number
+          seller_id: string | null
+          seller_user_id: string
+          status: Database["public"]["Enums"]["commission_status"]
+          store_id: string | null
+          store_name: string
         }
         Insert: {
-          id?: string
-          store_id: string
-          buyer_name: string
-          buyer_email?: string | null
-          buyer_phone?: string | null
-          total_cents: number
-          status?: OrderStatus
-          payment_proof_url?: string | null
+          amount_cents: number
+          base_amount_cents: number
+          confirmed_at?: string | null
           created_at?: string
+          id?: string
+          order_id: string
+          paid_at?: string | null
+          payment_reference?: string | null
+          rate_bps: number
+          seller_id?: string | null
+          seller_user_id: string
+          status?: Database["public"]["Enums"]["commission_status"]
+          store_id?: string | null
+          store_name: string
         }
         Update: {
-          status?: OrderStatus
-          payment_proof_url?: string | null
+          amount_cents?: number
+          base_amount_cents?: number
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          order_id?: string
+          paid_at?: string | null
+          payment_reference?: string | null
+          rate_bps?: number
+          seller_id?: string | null
+          seller_user_id?: string
+          status?: Database["public"]["Enums"]["commission_status"]
+          store_id?: string | null
+          store_name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "commissions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "store_sellers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_items: {
         Row: {
+          created_at: string
           id: string
           order_id: string
           product_id: string | null
           product_name: string
           quantity: number
+          store_id: string
           unit_price_cents: number
         }
         Insert: {
+          created_at?: string
           id?: string
           order_id: string
           product_id?: string | null
           product_name: string
           quantity: number
+          store_id: string
           unit_price_cents: number
         }
         Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_id?: string | null
+          product_name?: string
           quantity?: number
+          store_id?: string
           unit_price_cents?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      ai_generations: {
+      orders: {
         Row: {
-          id: string
-          user_id: string
-          store_id: string | null
-          kind: AIGenerationKind
-          provider: string
-          model: string
-          prompt: string
-          output: Json
+          buyer_email: string | null
+          buyer_name: string
+          buyer_phone: string
+          commission_bps: number
+          commission_cents: number
           created_at: string
+          id: string
+          net_to_store_cents: number
+          order_number: number
+          paid_at: string | null
+          payment_proof_url: string | null
+          referral_code: string | null
+          seller_id: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          store_id: string
+          subtotal_cents: number
+          total_cents: number
+          updated_at: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          store_id?: string | null
-          kind: AIGenerationKind
-          provider: string
-          model: string
-          prompt: string
-          output: Json
+          buyer_email?: string | null
+          buyer_name: string
+          buyer_phone: string
+          commission_bps?: number
+          commission_cents?: number
           created_at?: string
+          id?: string
+          net_to_store_cents?: number
+          order_number?: number
+          paid_at?: string | null
+          payment_proof_url?: string | null
+          referral_code?: string | null
+          seller_id?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          store_id: string
+          subtotal_cents: number
+          total_cents: number
+          updated_at?: string
         }
-        Update: never
+        Update: {
+          buyer_email?: string | null
+          buyer_name?: string
+          buyer_phone?: string
+          commission_bps?: number
+          commission_cents?: number
+          created_at?: string
+          id?: string
+          net_to_store_cents?: number
+          order_number?: number
+          paid_at?: string | null
+          payment_proof_url?: string | null
+          referral_code?: string | null
+          seller_id?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          store_id?: string
+          subtotal_cents?: number
+          total_cents?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "store_sellers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plans: {
+        Row: {
+          created_at: string
+          features: Json
+          is_active: boolean
+          key: string
+          name: string
+          trial_days: number
+        }
+        Insert: {
+          created_at?: string
+          features?: Json
+          is_active?: boolean
+          key: string
+          name: string
+          trial_days?: number
+        }
+        Update: {
+          created_at?: string
+          features?: Json
+          is_active?: boolean
+          key?: string
+          name?: string
+          trial_days?: number
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category: string | null
+          compare_at_price_cents: number | null
+          condition: Database["public"]["Enums"]["product_condition"]
+          condition_note: string | null
+          created_at: string
+          deleted_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          price_cents: number
+          stock: number
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          compare_at_price_cents?: number | null
+          condition?: Database["public"]["Enums"]["product_condition"]
+          condition_note?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          price_cents: number
+          stock?: number
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          compare_at_price_cents?: number | null
+          condition?: Database["public"]["Enums"]["product_condition"]
+          condition_note?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          price_cents?: number
+          stock?: number
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          deleted_at: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      seller_profiles: {
+        Row: {
+          bio: string | null
+          city: string | null
+          created_at: string
+          deleted_at: string | null
+          display_name: string
+          phone: string | null
+          slug: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          city?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          display_name: string
+          phone?: string | null
+          slug: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          city?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          display_name?: string
+          phone?: string | null
+          slug?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      social_connections: {
+        Row: {
+          access_token: string | null
+          created_at: string
+          expires_at: string | null
+          external_account_id: string | null
+          id: string
+          provider: Database["public"]["Enums"]["social_provider"]
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          access_token?: string | null
+          created_at?: string
+          expires_at?: string | null
+          external_account_id?: string | null
+          id?: string
+          provider: Database["public"]["Enums"]["social_provider"]
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string | null
+          created_at?: string
+          expires_at?: string | null
+          external_account_id?: string | null
+          id?: string
+          provider?: Database["public"]["Enums"]["social_provider"]
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_connections_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_posts: {
+        Row: {
+          ai_generation_id: string | null
+          content: string
+          created_at: string
+          deleted_at: string | null
+          error: string | null
+          external_post_id: string | null
+          id: string
+          media_url: string | null
+          product_id: string | null
+          provider: Database["public"]["Enums"]["social_provider"]
+          published_at: string | null
+          status: Database["public"]["Enums"]["social_post_status"]
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          ai_generation_id?: string | null
+          content: string
+          created_at?: string
+          deleted_at?: string | null
+          error?: string | null
+          external_post_id?: string | null
+          id?: string
+          media_url?: string | null
+          product_id?: string | null
+          provider: Database["public"]["Enums"]["social_provider"]
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["social_post_status"]
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          ai_generation_id?: string | null
+          content?: string
+          created_at?: string
+          deleted_at?: string | null
+          error?: string | null
+          external_post_id?: string | null
+          id?: string
+          media_url?: string | null
+          product_id?: string | null
+          provider?: Database["public"]["Enums"]["social_provider"]
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["social_post_status"]
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_ai_generation_id_fkey"
+            columns: ["ai_generation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_generations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_posts_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_posts_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_blocks: {
+        Row: {
+          block_type_key: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          is_visible: boolean
+          page_id: string
+          position: number
+          props: Json
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          block_type_key: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_visible?: boolean
+          page_id: string
+          position: number
+          props?: Json
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          block_type_key?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_visible?: boolean
+          page_id?: string
+          position?: number
+          props?: Json
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_blocks_block_type_key_fkey"
+            columns: ["block_type_key"]
+            isOneToOne: false
+            referencedRelation: "block_types"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "store_blocks_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "store_pages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_blocks_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_pages: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: string
+          is_home: boolean
+          key: string
+          published_at: string | null
+          status: Database["public"]["Enums"]["page_status"]
+          store_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_home?: boolean
+          key: string
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["page_status"]
+          store_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_home?: boolean
+          key?: string
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["page_status"]
+          store_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_pages_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_sellers: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          deleted_at: string | null
+          id: string
+          joined_at: string
+          referral_code: string
+          status: Database["public"]["Enums"]["seller_status"]
+          store_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          joined_at?: string
+          referral_code: string
+          status?: Database["public"]["Enums"]["seller_status"]
+          store_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          joined_at?: string
+          referral_code?: string
+          status?: Database["public"]["Enums"]["seller_status"]
+          store_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_sellers_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stores: {
+        Row: {
+          commission_bps: number
+          created_at: string
+          deleted_at: string | null
+          description: string | null
+          id: string
+          is_published: boolean
+          logo_url: string | null
+          name: string
+          owner_id: string
+          seller_join_mode: Database["public"]["Enums"]["seller_join_mode"]
+          seller_network_enabled: boolean
+          slug: string
+          tagline: string | null
+          template_key: string | null
+          theme: Json
+          updated_at: string
+        }
+        Insert: {
+          commission_bps?: number
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          logo_url?: string | null
+          name: string
+          owner_id: string
+          seller_join_mode?: Database["public"]["Enums"]["seller_join_mode"]
+          seller_network_enabled?: boolean
+          slug: string
+          tagline?: string | null
+          template_key?: string | null
+          theme?: Json
+          updated_at?: string
+        }
+        Update: {
+          commission_bps?: number
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          logo_url?: string | null
+          name?: string
+          owner_id?: string
+          seller_join_mode?: Database["public"]["Enums"]["seller_join_mode"]
+          seller_network_enabled?: boolean
+          slug?: string
+          tagline?: string | null
+          template_key?: string | null
+          theme?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stores_template_key_fkey"
+            columns: ["template_key"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          blocked_at: string | null
+          created_at: string
+          id: string
+          plan_key: string
+          purge_at: string | null
+          status: Database["public"]["Enums"]["subscription_status"]
+          store_id: string
+          trial_ends_at: string
+          updated_at: string
+        }
+        Insert: {
+          blocked_at?: string | null
+          created_at?: string
+          id?: string
+          plan_key: string
+          purge_at?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          store_id: string
+          trial_ends_at?: string
+          updated_at?: string
+        }
+        Update: {
+          blocked_at?: string | null
+          created_at?: string
+          id?: string
+          plan_key?: string
+          purge_at?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          store_id?: string
+          trial_ends_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_plan_key_fkey"
+            columns: ["plan_key"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "subscriptions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: true
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_pages: {
+        Row: {
+          blocks: Json
+          is_home: boolean
+          page_key: string
+          template_key: string
+          title: string
+        }
+        Insert: {
+          blocks?: Json
+          is_home?: boolean
+          page_key: string
+          template_key: string
+          title: string
+        }
+        Update: {
+          blocks?: Json
+          is_home?: boolean
+          page_key?: string
+          template_key?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_pages_template_key_fkey"
+            columns: ["template_key"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          is_active: boolean
+          key: string
+          name: string
+          preview_image_url: string | null
+          sector: string
+          theme: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          is_active?: boolean
+          key: string
+          name: string
+          preview_image_url?: string | null
+          sector: string
+          theme?: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          is_active?: boolean
+          key?: string
+          name?: string
+          preview_image_url?: string | null
+          sector?: string
+          theme?: Json
+        }
         Relationships: []
       }
     }
-    Views: Record<never, never>
-    Functions: Record<never, never>
-    Enums: {
-      order_status: OrderStatus
-      ai_generation_kind: AIGenerationKind
+    Views: {
+      [_ in never]: never
     }
-    CompositeTypes: Record<never, never>
+    Functions: {
+      apply_template: {
+        Args: { p_store_id: string; p_template_key: string }
+        Returns: undefined
+      }
+      create_order: {
+        Args: {
+          p_buyer_email: string
+          p_buyer_name: string
+          p_buyer_phone: string
+          p_items: Json
+          p_referral_code: string
+          p_store_id: string
+        }
+        Returns: string
+      }
+      generate_referral_code: { Args: never; Returns: string }
+      join_store: { Args: { p_store_slug: string }; Returns: string }
+      my_seller_ids: { Args: never; Returns: string[] }
+      my_store_id: { Args: never; Returns: string }
+      store_is_live: { Args: { p_store_id: string }; Returns: boolean }
+    }
+    Enums: {
+      ai_generation_kind: "tienda" | "bloques" | "analisis" | "marketing"
+      block_proposal_status: "propuesta" | "aplicada" | "rechazada" | "invalida"
+      commission_status: "pendiente" | "confirmada" | "pagada" | "anulada"
+      order_status:
+        "pendiente" | "pagado" | "enviado" | "entregado" | "cancelado"
+      page_status: "borrador" | "publicada"
+      product_condition: "nuevo" | "segunda_mano" | "reacondicionado"
+      seller_join_mode: "abierta" | "con_aprobacion"
+      seller_status: "pendiente" | "activo" | "rechazado" | "suspendido"
+      social_post_status: "borrador" | "publicado" | "compartido" | "fallido"
+      social_provider: "facebook" | "whatsapp"
+      subscription_status: "prueba" | "activa" | "bloqueada" | "cancelada"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
 }
 
-type PublicSchema = Database["public"]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-export type Tables<T extends keyof PublicSchema["Tables"]> =
-  PublicSchema["Tables"][T]["Row"]
-export type TablesInsert<T extends keyof PublicSchema["Tables"]> =
-  PublicSchema["Tables"][T]["Insert"]
-export type TablesUpdate<T extends keyof PublicSchema["Tables"]> =
-  PublicSchema["Tables"][T]["Update"]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
-export type Store = Tables<"stores">
-export type Product = Tables<"products">
-export type Order = Tables<"orders">
-export type OrderItem = Tables<"order_items">
-export type Profile = Tables<"profiles">
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      ai_generation_kind: ["tienda", "bloques", "analisis", "marketing"],
+      block_proposal_status: ["propuesta", "aplicada", "rechazada", "invalida"],
+      commission_status: ["pendiente", "confirmada", "pagada", "anulada"],
+      order_status: [
+        "pendiente",
+        "pagado",
+        "enviado",
+        "entregado",
+        "cancelado",
+      ],
+      page_status: ["borrador", "publicada"],
+      product_condition: ["nuevo", "segunda_mano", "reacondicionado"],
+      seller_join_mode: ["abierta", "con_aprobacion"],
+      seller_status: ["pendiente", "activo", "rechazado", "suspendido"],
+      social_post_status: ["borrador", "publicado", "compartido", "fallido"],
+      social_provider: ["facebook", "whatsapp"],
+      subscription_status: ["prueba", "activa", "bloqueada", "cancelada"],
+    },
+  },
+} as const

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { DEMO_PRODUCTS } from "@/lib/demo-data"
-import type { Product } from "@/types/database"
+import { CURRENCY } from "@/lib/format"
+import type { Product } from "@/types"
 
 export interface ProductsResult {
   products: Product[]
@@ -10,7 +11,7 @@ export interface ProductsResult {
 }
 
 /**
- * Productos de la primera tienda del usuario.
+ * Productos de la tienda del usuario.
  * Sin sesión o sin tienda devuelve el catálogo de ejemplo.
  */
 export async function getProducts(): Promise<ProductsResult> {
@@ -19,7 +20,7 @@ export async function getProducts(): Promise<ProductsResult> {
   const demo: ProductsResult = {
     products: DEMO_PRODUCTS,
     storeId: null,
-    currency: "ARS",
+    currency: CURRENCY,
     isDemo: true,
   }
 
@@ -30,12 +31,12 @@ export async function getProducts(): Promise<ProductsResult> {
   } = await supabase.auth.getUser()
   if (!user) return demo
 
+  // Una tienda por usuario: el índice único sobre owner_id lo garantiza.
   const { data: store } = await supabase
     .from("stores")
-    .select("id, currency")
+    .select("id")
     .eq("owner_id", user.id)
-    .order("created_at", { ascending: true })
-    .limit(1)
+    .is("deleted_at", null)
     .maybeSingle()
 
   if (!store) return demo
@@ -44,12 +45,13 @@ export async function getProducts(): Promise<ProductsResult> {
     .from("products")
     .select("*")
     .eq("store_id", store.id)
+    .is("deleted_at", null)
     .order("created_at", { ascending: false })
 
   return {
     products: products ?? [],
     storeId: store.id,
-    currency: store.currency,
+    currency: CURRENCY,
     isDemo: false,
   }
 }

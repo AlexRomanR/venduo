@@ -1,4 +1,5 @@
-import type { Product } from "@/types/database"
+import { CURRENCY } from "@/lib/format"
+import type { Product } from "@/types"
 
 export interface SalesPoint {
   date: string
@@ -50,9 +51,13 @@ const DEMO_TOP_PRODUCTS = [
     revenueCents: 1_088_000,
   },
   { name: "Cafetera prensa francesa", unitsSold: 54, revenueCents: 1_026_000 },
-  { name: "Filtros de papel x100", unitsSold: 97, revenueCents: 213_400 },
+  {
+    name: "Molinillo manual reacondicionado",
+    unitsSold: 33,
+    revenueCents: 462_000,
+  },
   { name: "Taza cerámica Venduo", unitsSold: 71, revenueCents: 461_500 },
-  { name: "Molinillo manual", unitsSold: 33, revenueCents: 792_000 },
+  { name: "Filtros de papel x100", unitsSold: 97, revenueCents: 213_400 },
 ]
 
 /** Métricas de ejemplo para poder ver el dashboard sin base de datos. */
@@ -68,46 +73,67 @@ export function getDemoMetrics(): DashboardMetrics {
     averageTicketCents: orders ? Math.round(revenueCents / orders) : 0,
     series,
     topProducts: DEMO_TOP_PRODUCTS,
-    currency: "ARS",
+    currency: CURRENCY,
     isDemo: true,
   }
 }
 
+const NOW = new Date().toISOString()
+
+/** Campos comunes a todo producto de ejemplo. */
+const DEMO_PRODUCT_BASE = {
+  store_id: "demo-store",
+  compare_at_price_cents: null,
+  condition: "nuevo" as const,
+  condition_note: null,
+  image_url: null,
+  created_at: NOW,
+  updated_at: NOW,
+  deleted_at: null,
+}
+
 export const DEMO_PRODUCTS: Product[] = [
   {
+    ...DEMO_PRODUCT_BASE,
     id: "demo-1",
-    store_id: "demo-store",
     name: "Café de especialidad 250g",
     description: "Tueste medio, notas a caramelo y almendra.",
-    price_cents: 850000,
+    price_cents: 8500,
     stock: 42,
     category: "Café",
-    image_url: null,
     is_active: true,
-    created_at: new Date().toISOString(),
   },
   {
+    ...DEMO_PRODUCT_BASE,
     id: "demo-2",
-    store_id: "demo-store",
     name: "Cafetera prensa francesa",
     description: "600 ml, vidrio borosilicato y filtro de acero.",
-    price_cents: 1900000,
+    price_cents: 19000,
     stock: 12,
     category: "Equipamiento",
-    image_url: null,
     is_active: true,
-    created_at: new Date().toISOString(),
   },
   {
+    ...DEMO_PRODUCT_BASE,
     id: "demo-3",
-    store_id: "demo-store",
+    name: "Molinillo manual reacondicionado",
+    description: "Revisado y calibrado. Muelas de cerámica en buen estado.",
+    price_cents: 14000,
+    compare_at_price_cents: 24000,
+    condition: "reacondicionado",
+    condition_note: "Marcas de uso en la carcasa, mecanismo impecable.",
+    stock: 3,
+    category: "Equipamiento",
+    is_active: true,
+  },
+  {
+    ...DEMO_PRODUCT_BASE,
+    id: "demo-4",
     name: "Filtros de papel x100",
     description: "Compatibles con V60 tamaño 02.",
-    price_cents: 220000,
+    price_cents: 2200,
     stock: 0,
     category: "Accesorios",
-    image_url: null,
     is_active: false,
-    created_at: new Date().toISOString(),
   },
 ]
