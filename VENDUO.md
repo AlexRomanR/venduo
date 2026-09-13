@@ -165,11 +165,21 @@ Se intenta el plan A; si no llega, entra el plan B. **El modelo de datos soporta
 | IA                    | Capa propia con proveedor intercambiable por configuración |
 | Hosting               | Vercel                                                     |
 
+### Cuentas y acceso
+
+**Correo y contraseña, sin verificación.** Quien se registra entra al instante: no hay enlace por correo ni código que esperar. La fricción de verificar un correo es exactamente la barrera que la plataforma promete no ponerle a un joven que se suma desde el celular.
+
+El correo **se guarda igual**, así que exigir verificación más adelante es cambiar un ajuste del proyecto, sin migrar datos ni rehacer el formulario.
+
+**Al registrarse se elige con qué intención se entra:** tener un negocio o vender para otros. Esa elección decide qué ve la persona a continuación y, en el caso del vendedor, le crea de una su identidad y su URL pública.
+
+Lo que **no** hace es gobernar permisos. Los permisos siguen derivando de los datos: sos dueño si tenés una tienda, y sos vendedor si tenés un vínculo activo con alguna. Una misma persona puede ser las dos cosas, y la elección del registro no se lo impide — solo dice por dónde empezó.
+
+> El ingreso con Google queda para después: el proveedor no está habilitado y hacerlo exige credenciales de Google Cloud.
+
 ### Moneda
 
 **Boliviano, único.** No hay moneda configurable por tienda: es una constante del sistema. Los montos se guardan **en centavos, como enteros**. Nunca se usa punto flotante para dinero.
-
-> Pendiente de código: el esquema actual trae `stores.currency` con valor por defecto `'ARS'` y `lib/format.ts` formatea en `es-AR`. Ambos deben corregirse.
 
 ### URLs
 
@@ -238,10 +248,10 @@ Las cláusulas de borrado en cascada quedan declaradas en el esquema, pero **sol
 
 #### Identidad
 
-| Tabla             | Qué guarda                                                                                                                            |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `profiles`        | Perfil del usuario. Se crea solo al registrarse, mediante un disparador sobre la tabla de usuarios de Supabase                        |
-| `seller_profiles` | Identidad del vendedor: nombre visible, slug público, ciudad. **Vive fuera de toda tienda** — es lo que sostiene el historial laboral |
+| Tabla             | Qué guarda                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `profiles`        | Perfil del usuario y con qué intención se registró. Se crea solo al darse de alta, mediante un disparador sobre la tabla de usuarios de Supabase |
+| `seller_profiles` | Identidad del vendedor: nombre visible, slug público, ciudad. **Vive fuera de toda tienda** — es lo que sostiene el historial laboral            |
 
 #### Tenant
 
@@ -390,9 +400,7 @@ using (seller_id = any (public.my_seller_ids()))
 using (seller_user_id = (select auth.uid()))
 ```
 
-**El checkout no es una inserción del cliente.** Un comprador anónimo que inserta directamente en la tabla de pedidos puede declarar el total que quiera. El pedido debe crearse mediante una función del servidor que **recalcula los precios desde el catálogo** y resuelve el código de referido validando que pertenezca a esa tienda y esté activo.
-
-> Pendiente de código: la política `"pedidos: crear"` de `supabase/migrations/0002_app_schema.sql` tiene hoy exactamente ese agujero.
+**El checkout no es una inserción del cliente.** Un comprador anónimo que inserta directamente en la tabla de pedidos puede declarar el total que quiera. Por eso la tabla de pedidos **no tiene política de inserción**: el pedido se crea mediante una función del servidor que **recalcula los precios desde el catálogo** y resuelve el código de referido validando que pertenezca a esa tienda y esté activo.
 
 ---
 
