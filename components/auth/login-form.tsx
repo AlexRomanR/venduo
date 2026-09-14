@@ -68,13 +68,19 @@ export function LoginForm({
   next,
   configured,
   initialError,
+  rolInicial,
 }: {
   next: string
   configured: boolean
   initialError?: string
+  rolInicial?: "emprendedor" | "vendedor"
 }) {
   const router = useRouter()
-  const [mode, setMode] = React.useState<Mode>("ingresar")
+  // Quien llega desde la portada ya eligió un camino: se le abre el registro,
+  // no el ingreso.
+  const [mode, setMode] = React.useState<Mode>(
+    rolInicial ? "registrarse" : "ingresar"
+  )
 
   const isSignUp = mode === "registrarse"
 
@@ -84,7 +90,7 @@ export function LoginForm({
       fullName: "",
       email: "",
       password: "",
-      role: "emprendedor",
+      role: rolInicial ?? "emprendedor",
     },
   })
 

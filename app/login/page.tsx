@@ -13,9 +13,13 @@ export const metadata = { title: "Ingresar" }
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; error?: string }>
+  searchParams: Promise<{ next?: string; error?: string; rol?: string }>
 }) {
-  const { next, error } = await searchParams
+  const { next, error, rol } = await searchParams
+
+  // La portada manda el rol ya elegido; cualquier otro valor se ignora.
+  const rolInicial =
+    rol === "emprendedor" || rol === "vendedor" ? rol : undefined
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-12">
@@ -31,6 +35,7 @@ export default async function LoginPage({
             next={next ?? "/panel"}
             configured={isSupabaseConfigured}
             initialError={error}
+            rolInicial={rolInicial}
           />
         </CardContent>
       </Card>

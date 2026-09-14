@@ -46,6 +46,15 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Mundo de la portada: la tarjeta de recarga. */
+  --color-recarga: var(--recarga);
+  --color-recarga-alta: var(--recarga-alta);
+  --color-denominacion: var(--denominacion);
+  --color-tinta: var(--tinta);
+  --color-plata: var(--plata);
+  --color-carton: var(--carton);
+  --font-denominacion: var(--font-archivo-black);
 }
 
 :root {
@@ -81,6 +90,18 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /*
+   * Mundo de la portada. El magenta es el campo, no un acento: ocupa regiones
+   * enteras. Se eligió este valor y no uno más brillante porque el texto
+   * blanco encima tiene que pasar 4,5:1, y el amarillo de denominación 3:1.
+   */
+  --recarga: #c8006e;
+  --recarga-alta: #e0007c;
+  --denominacion: #ffd400;
+  --tinta: #14060f;
+  --plata: #b8bcc0;
+  --carton: #f7f3f0;
 }
 
 .dark {
@@ -126,5 +147,33 @@
   }
   html {
     @apply font-sans;
+  }
+
+  /*
+   * Lo que el navegador dibuja solo también lleva el diseño. Sin esto, la
+   * selección, el cursor y la barra de desplazamiento salen con los valores
+   * de fábrica, que no pertenecen a ningún sistema.
+   */
+  ::selection {
+    background: var(--recarga);
+    color: #fff;
+  }
+
+  :root {
+    caret-color: var(--recarga);
+    accent-color: var(--recarga);
+    scrollbar-color: var(--recarga) transparent;
+  }
+
+  /* Las cifras de dinero se alinean en columna: nunca bailan al cambiar. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  /* Sobre el campo magenta, el anillo de foco tiene que verse sobre magenta. */
+  .campo-recarga :focus-visible {
+    outline: 3px solid var(--denominacion);
+    outline-offset: 3px;
   }
 }
