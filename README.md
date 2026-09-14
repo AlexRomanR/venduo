@@ -157,7 +157,7 @@ lib/                       Infraestructura lista para usar, sin UI encima
 
 components/
   ui/                      shadcn/ui completo
-  auth/login-form.tsx      Formulario de ingreso
+  auth/acceso.tsx          Ingreso y registro, con la promesa de cada rol
   config-status.tsx        Checklist de capas configuradas
 
 supabase/migrations/       Esquema SQL, RLS y buckets

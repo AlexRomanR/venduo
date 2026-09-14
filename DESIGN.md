@@ -125,8 +125,11 @@ reducida para que el titular mande sin necesidad de un segundo color. El sistema
 está hecho para un Android de gama baja con datos móviles, así que el peso visual
 lo cargan la tipografía y el espacio, no los efectos.
 
-Este mundo rige las **superficies públicas**: la portada, la tienda `/t/{slug}` y
-el perfil del vendedor `/v/{slug}`. Los paneles privados (`/panel`, `/vendedor`)
+Este mundo rige las **superficies públicas**: la portada, el ingreso `/login`, la
+tienda `/t/{slug}` y el perfil del vendedor `/v/{slug}`. El ingreso entra acá
+porque es la continuación directa de la portada: quien viene de elegir «Crear mi
+tienda» no debería cambiar de mundo al llegar. Los paneles privados
+(`/panel`, `/vendedor`)
 siguen con los tokens por defecto de shadcn (`--background`, `--foreground`,
 `--primary`…), que conviven en `app/globals.css` a propósito. Esa división es
 deliberada y está descrita en `Layout`.
@@ -250,8 +253,8 @@ una regla inferior de tinta al 15%. Las anclas de navegación se esconden bajo
 
 ### Named Rules
 
-**La regla de los dos mundos.** Las superficies públicas —portada, `/t/{slug}`,
-`/v/{slug}`— usan los tokens de este documento. Los paneles privados usan los
+**La regla de los dos mundos.** Las superficies públicas —portada, `/login`,
+`/t/{slug}`, `/v/{slug}`— usan los tokens de este documento. Los paneles privados usan los
 tokens semánticos de shadcn (`bg-background`, `text-muted-foreground`) tal como
 vienen. No se mezclan en una misma pantalla y no se migra uno al otro sin decisión
 explícita: el esfuerzo de diseño se gasta donde miran el comprador y el jurado.

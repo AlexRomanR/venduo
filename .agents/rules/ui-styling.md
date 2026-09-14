@@ -12,10 +12,10 @@ cubre cómo se ve.
 
 ### Dos mundos, a propósito
 
-| Superficie                                              | Sistema                                                            |
-| ------------------------------------------------------- | ------------------------------------------------------------------ |
-| Portada, tienda pública `/t/{slug}`, perfil `/v/{slug}` | El mundo editorial de `DESIGN.md`: papel, tinta y un rojo de señal |
-| Paneles `/panel` y `/vendedor`                          | Los tokens de shadcn sin tocar                                     |
+| Superficie                                                        | Sistema                                                            |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Portada, ingreso `/login`, tienda `/t/{slug}`, perfil `/v/{slug}` | El mundo editorial de `DESIGN.md`: papel, tinta y un rojo de señal |
+| Paneles `/panel` y `/vendedor`                                    | Los tokens de shadcn sin tocar                                     |
 
 No es descuido: en 48 horas el diseño se gasta donde lo ve un comprador y un jurado. Los
 paneles sirven para trabajar, no para impresionar. **No mezclar los dos sistemas en una
