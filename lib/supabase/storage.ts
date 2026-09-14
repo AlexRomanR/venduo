@@ -41,7 +41,7 @@ export async function uploadFile(
   const supabase = createClient()
   if (!supabase) {
     throw new Error(
-      "Supabase no está configurado. Completá .env.local para poder subir archivos."
+      "Supabase no está configurado. Completa .env.local para poder subir archivos."
     )
   }
 

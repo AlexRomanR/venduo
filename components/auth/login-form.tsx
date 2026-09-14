@@ -44,17 +44,17 @@ const ROLES = [
 // tuvieran formas distintas, el resolver no podría alternar entre ellos.
 const baseSchema = z.object({
   fullName: z.string().max(80),
-  email: z.email("Escribí un email válido."),
+  email: z.email("Escribe un correo válido."),
   password: z.string(),
   role: z.enum(["emprendedor", "vendedor"]),
 })
 
 const signInSchema = baseSchema.extend({
-  password: z.string().min(1, "Escribí tu contraseña."),
+  password: z.string().min(1, "Escribe tu contraseña."),
 })
 
 const signUpSchema = baseSchema.extend({
-  fullName: z.string().min(2, "Escribí tu nombre.").max(80),
+  fullName: z.string().min(2, "Escribe tu nombre.").max(80),
   password: z
     .string()
     .min(MIN_PASSWORD, `Mínimo ${MIN_PASSWORD} caracteres.`)
@@ -122,7 +122,7 @@ export function LoginForm({
       if (error) {
         toast.error(
           error.message.includes("already registered")
-            ? "Ese email ya tiene cuenta. Probá ingresando."
+            ? "Ese correo ya tiene cuenta. Prueba ingresando."
             : error.message
         )
         return
@@ -138,7 +138,7 @@ export function LoginForm({
       if (error) {
         toast.error(
           error.message.includes("Invalid login credentials")
-            ? "Email o contraseña incorrectos."
+            ? "Correo o contraseña incorrectos."
             : error.message
         )
         return
@@ -155,8 +155,8 @@ export function LoginForm({
       {!configured ? (
         <p className="rounded-md bg-muted p-3 text-sm">
           Supabase todavía no está configurado, así que el ingreso no va a
-          funcionar. Completá <code className="font-mono">.env.local</code> y
-          reiniciá el servidor.
+          funcionar. Completa <code className="font-mono">.env.local</code> y
+          reinicia el servidor.
         </p>
       ) : null}
 
@@ -205,7 +205,7 @@ export function LoginForm({
                   })}
                 </div>
                 <FormDescription>
-                  Podés hacer las dos cosas más adelante.
+                  Puedes hacer las dos cosas más adelante.
                 </FormDescription>
               </FormItem>
 
@@ -234,11 +234,11 @@ export function LoginForm({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Correo</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder="vos@ejemplo.com"
+                    placeholder="tu@ejemplo.com"
                     autoComplete="email"
                     {...field}
                   />
@@ -283,7 +283,7 @@ export function LoginForm({
       </Form>
 
       <p className="text-center text-sm text-muted-foreground">
-        {isSignUp ? "¿Ya tenés cuenta?" : "¿No tenés cuenta?"}{" "}
+        {isSignUp ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?"}{" "}
         <button
           type="button"
           onClick={() => switchTo(isSignUp ? "ingresar" : "registrarse")}

@@ -11,9 +11,10 @@ import {
 } from "./schemas"
 
 const BASE_SYSTEM =
-  "Sos el asistente de Venduo, una plataforma que ayuda a emprendedores " +
-  "de Latinoamérica a vender online. Escribís en español rioplatense, " +
-  "claro y concreto, sin relleno."
+  "Eres el asistente de Venduo, una plataforma que ayuda a emprendedores " +
+  "bolivianos a vender online. Escribes en español neutro de Bolivia, " +
+  "tratando de tú, claro y concreto, sin relleno. Los montos son en " +
+  "bolivianos."
 
 /** Genera la tienda completa (datos + catálogo + copy) a partir de una idea. */
 export async function generateStoreBlueprint(
@@ -29,7 +30,7 @@ export async function generateStoreBlueprint(
       {
         role: "user",
         content: [
-          `Creá una tienda online para este negocio: ${input.prompt}`,
+          `Crea una tienda online para este negocio: ${input.prompt}`,
           `Moneda: ${input.currency}. Cantidad de productos: ${input.productCount}.`,
           "Los precios van en centavos (enteros) y tienen que ser realistas para el mercado local.",
         ].join("\n"),
@@ -84,7 +85,7 @@ export async function generateCampaign(input: {
           `Tienda: ${input.storeName}`,
           `Público: ${input.audience}`,
           `Objetivo: ${input.objective}`,
-          "Generá posts listos para publicar en distintos canales.",
+          "Genera publicaciones listas para usar en distintos canales.",
         ].join("\n"),
       },
     ],

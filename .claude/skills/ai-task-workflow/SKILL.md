@@ -77,7 +77,7 @@ export async function describeProduct(input: {
         content: [
           `Producto: ${input.name}`,
           `Categoría: ${input.category}`,
-          "Escribí una descripción para la tienda.",
+          "Escribe una descripción para la tienda.",
         ].join("\n"),
       },
     ],

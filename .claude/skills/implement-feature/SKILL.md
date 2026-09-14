@@ -110,8 +110,8 @@ compartido entre el formulario y lo que lo procesa.
 Escribir los tres estados: con datos, vacío y cargando. Una tienda recién creada y un
 vendedor sin ventas son el estado normal durante la demostración.
 
-Montos siempre por `formatMoney`. Textos en español rioplatense. Arrancar el diseño en
-375 px.
+Montos siempre por `formatMoney`. Textos en español neutro boliviano, tratando de "tú".
+Arrancar el diseño en 375 px.
 
 ---
 

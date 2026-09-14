@@ -81,11 +81,13 @@ La especificación funcional completa vive en `VENDUO.md` y es la fuente de verd
 
 ## Evidence on Hand
 
-- **Hay un negocio real de referencia** que el equipo va a usar para la demostración. Sus
-  datos concretos —rubro, catálogo, precios, historia— **todavía no están registrados
-  acá**; hay que capturarlos antes de construir la demostración para no contradecirlos.
+- **No hay ningún negocio real detrás.** La tienda de la demostración es ficticia y la
+  arma el equipo registrándose y cargando productos como lo haría cualquier usuario. Eso
+  la vuelve una prueba del flujo real, no un dato precargado.
+- **Nunca presentar la tienda de la demostración como un cliente.** Es un ejemplo, y
+  decirlo cuesta menos que un jurado descubriéndolo.
 - **Los datos de ejemplo actuales son ficticios.** `lib/demo-data.ts` contiene un catálogo
-  inventado de café. No presentarlos como un cliente real.
+  inventado de café, que es lo que se ve en modo demo sin credenciales.
 - **Las cifras de la sección 2 de `VENDUO.md` son material de pitch** y no tienen fuente
   citada en el repositorio. Verificarlas antes de mostrarlas a un jurado.
 - No hay testimonios, casos de éxito, prensa ni métricas de uso. **No inventarlos.**

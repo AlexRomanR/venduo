@@ -35,8 +35,8 @@ export function ConfigStatus() {
         </div>
         {todo ? (
           <p className="pt-2 text-sm text-muted-foreground">
-            Copiá <code className="font-mono">.env.example</code> a{" "}
-            <code className="font-mono">.env.local</code> y completá las claves.
+            Copia <code className="font-mono">.env.example</code> a{" "}
+            <code className="font-mono">.env.local</code> y completa las claves.
             Mientras tanto la app funciona con datos de ejemplo.
           </p>
         ) : null}

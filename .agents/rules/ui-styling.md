@@ -46,15 +46,23 @@ mensaje crudo de Supabase: decir qué pasó en términos del usuario.
 
 ## Textos
 
-**Todo en español rioplatense**, que es el registro del resto del producto: "Ingresá",
-"Escribí tu contraseña", "¿No tenés cuenta?".
+**Español neutro boliviano, tratando de "tú":** "Ingresa", "Escribe tu contraseña", "¿No
+tienes cuenta?". Funciona en todo el país, en el altiplano y en el oriente.
+
+**Nada de voseo rioplatense.** "Ingresá", "Escribí", "tenés" son argentinos: le hablan a
+un boliviano con acento extranjero, y un jurado local lo nota.
+
+Preferir **"correo"** sobre "email", que es la palabra que usa la gente.
 
 Los mensajes de error dicen qué hacer, no qué falló internamente:
 
 ```
-"Email o contraseña incorrectos."          sí
+"Correo o contraseña incorrectos."         sí
 "AuthApiError: invalid_credentials"        no
 ```
+
+Lo mismo aplica a los textos que **genera la IA**: la instrucción de sistema en
+`lib/ai/tasks.ts` fija el registro para todo lo que el modelo devuelva.
 
 ## Dinero y fechas
 
@@ -112,7 +120,7 @@ No negociable, aunque una skill proponga lo contrario:
   medida. Media hora ganada en originalidad es media hora perdida en consistencia.
 - **Tokens semánticos de color**, nunca valores fijos: si no, el tema oscuro se rompe.
 - **375 px primero.** Una propuesta que solo funciona en pantalla ancha se rechaza.
-- **Español rioplatense** en todo texto de interfaz.
+- **Español neutro boliviano con "tú"** en todo texto de interfaz.
 - **`formatMoney`** para todo monto.
 - **Sonner** para los avisos. No instalar otra biblioteca de notificaciones.
 

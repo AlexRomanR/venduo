@@ -11,7 +11,7 @@ export default function VendedorPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Mis ventas</h1>
         <p className="text-sm text-muted-foreground">
-          Acá vas a ver tus ventas, tus comisiones y tus materiales.
+          Aquí vas a ver tus ventas, tus comisiones y tus materiales.
         </p>
       </div>
     </div>

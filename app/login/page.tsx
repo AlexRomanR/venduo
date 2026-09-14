@@ -23,7 +23,7 @@ export default async function LoginPage({
         <CardHeader>
           <CardTitle>Entrar a Venduo</CardTitle>
           <CardDescription>
-            Ingresá con tu email y contraseña, o creá una cuenta.
+            Ingresa con tu correo y contraseña, o crea una cuenta.
           </CardDescription>
         </CardHeader>
         <CardContent>

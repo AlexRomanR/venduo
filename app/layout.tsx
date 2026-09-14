@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s · Venduo",
   },
   description:
-    "Creá tu tienda, cargá productos, cobrá con QR y entendé tus ventas con IA.",
+    "Crea tu tienda, carga productos, cobra con QR y entiende tus ventas con IA.",
 }
 
 export default function RootLayout({

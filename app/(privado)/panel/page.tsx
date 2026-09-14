@@ -13,7 +13,7 @@ export default function PanelPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Inicio</h1>
-        <p className="text-sm text-muted-foreground">Acá va tu aplicación.</p>
+        <p className="text-sm text-muted-foreground">Aquí va tu aplicación.</p>
       </div>
 
       <ConfigStatus />
