@@ -7,9 +7,13 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  /*
+   * Apuntaba a sí misma y nunca resolvía, así que toda la app caía al serif
+   * por defecto del navegador en vez de usar Geist.
+   */
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-geist-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -47,14 +51,12 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Mundo de la portada: la tarjeta de recarga. */
-  --color-recarga: var(--recarga);
-  --color-recarga-alta: var(--recarga-alta);
-  --color-denominacion: var(--denominacion);
+  /* Mundo de la portada pública. */
+  --color-senal: var(--senal);
+  --color-senal-alta: var(--senal-alta);
   --color-tinta: var(--tinta);
-  --color-plata: var(--plata);
-  --color-carton: var(--carton);
-  --font-denominacion: var(--font-archivo-black);
+  --color-papel: var(--papel);
+  --font-titular: var(--font-titular);
 }
 
 :root {
@@ -92,16 +94,19 @@
   --sidebar-ring: oklch(0.708 0 0);
 
   /*
-   * Mundo de la portada. El magenta es el campo, no un acento: ocupa regiones
-   * enteras. Se eligió este valor y no uno más brillante porque el texto
-   * blanco encima tiene que pasar 4,5:1, y el amarillo de denominación 3:1.
+   * Mundo de la portada pública.
+   *
+   * Papel claro como campo, tinta casi negra, y un rojo de señal que aparece
+   * poco y manda cuando aparece: la acción principal, las cifras, el bloque
+   * de cierre. El color no baña la pantalla; marca.
+   *
+   * El rojo pasa 4,5:1 contra el papel, así que sirve para texto y no solo
+   * para fondos.
    */
-  --recarga: #c8006e;
-  --recarga-alta: #e0007c;
-  --denominacion: #ffd400;
-  --tinta: #14060f;
-  --plata: #b8bcc0;
-  --carton: #f7f3f0;
+  --papel: #f1f0ee;
+  --tinta: #16171a;
+  --senal: #d62d12;
+  --senal-alta: #ee3a1c;
 }
 
 .dark {
@@ -155,14 +160,14 @@
    * de fábrica, que no pertenecen a ningún sistema.
    */
   ::selection {
-    background: var(--recarga);
+    background: var(--senal);
     color: #fff;
   }
 
   :root {
-    caret-color: var(--recarga);
-    accent-color: var(--recarga);
-    scrollbar-color: var(--recarga) transparent;
+    caret-color: var(--senal);
+    accent-color: var(--senal);
+    scrollbar-color: var(--senal) transparent;
   }
 
   /* Las cifras de dinero se alinean en columna: nunca bailan al cambiar. */
@@ -171,9 +176,28 @@
     font-feature-settings: "tnum";
   }
 
-  /* Sobre el campo magenta, el anillo de foco tiene que verse sobre magenta. */
-  .campo-recarga :focus-visible {
-    outline: 3px solid var(--denominacion);
+  /* Sobre el bloque rojo, el anillo de foco tiene que verse sobre rojo. */
+  .campo-senal :focus-visible {
+    outline: 3px solid #fff;
     outline-offset: 3px;
+  }
+
+  /*
+   * Un solo momento de movimiento: lo que entra al viewport sube y aparece,
+   * partiendo de un estado ya visible. Si el JavaScript no corre o la persona
+   * pidió menos movimiento, todo queda en su lugar final.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .entra {
+      opacity: 0;
+      transform: translateY(14px);
+      transition:
+        opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .entra[data-visible="true"] {
+      opacity: 1;
+      transform: none;
+    }
   }
 }

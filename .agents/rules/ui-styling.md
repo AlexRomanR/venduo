@@ -1,5 +1,26 @@
 # Interfaz
 
+## El sistema visual vive en DESIGN.md
+
+**`DESIGN.md` en la raíz es la fuente del mundo visual**: paleta con sus valores, escala
+tipográfica, ritmo de espaciado, pesos de regla, patrones de componente y gramática de
+movimiento. Se derivó de la portada ya construida, no de intenciones, y es lo que hereda
+cada superficie nueva.
+
+Leerlo antes de diseñar una pantalla. Esta regla cubre lo que no se negocia; `DESIGN.md`
+cubre cómo se ve.
+
+### Dos mundos, a propósito
+
+| Superficie                                              | Sistema                                                            |
+| ------------------------------------------------------- | ------------------------------------------------------------------ |
+| Portada, tienda pública `/t/{slug}`, perfil `/v/{slug}` | El mundo editorial de `DESIGN.md`: papel, tinta y un rojo de señal |
+| Paneles `/panel` y `/vendedor`                          | Los tokens de shadcn sin tocar                                     |
+
+No es descuido: en 48 horas el diseño se gasta donde lo ve un comprador y un jurado. Los
+paneles sirven para trabajar, no para impresionar. **No mezclar los dos sistemas en una
+misma pantalla.**
+
 ## Móvil primero, en serio
 
 El usuario real de Venduo vende por TikTok desde el celular y compra desde el celular.
@@ -77,6 +98,28 @@ formatDate(fecha)
 Nunca dividir por 100 en el JSX ni armar el símbolo de moneda a mano. Si `formatMoney` no
 alcanza para un caso, se extiende ahí y no en el componente.
 
+## Imágenes
+
+Siempre por `next/image`, nunca `<img>` suelto: sin eso no hay redimensionado ni
+formatos modernos, y el público está en datos móviles.
+
+**Pedir el original grande y dejar que Next lo reduzca.** El error fácil es pedirle a la
+fuente una versión ya achicada —`?w=400`— y que Next la vuelva a procesar: son dos
+compresiones sobre un original chico, y en una pantalla densa se ve pixelado.
+
+```tsx
+src="https://…/foto.jpg?w=2000&q=85"   // fuente grande
+sizes="(max-width: 640px) 100vw, 500px" // lo que mide en pantalla
+quality={90}
+```
+
+`sizes` tiene que decir **cuánto mide el elemento en pantalla**, no cuánto pesa el
+archivo. Si miente, Next elige mal la variante: de más desperdicia datos, de menos se ve
+borroso.
+
+Las fotos de terceros solo de bancos de uso libre, y **verificar que la URL resuelva**
+antes de darla por buena.
+
 ## Estados vacíos y de carga
 
 Toda lista tiene tres estados y los tres se escriben: con datos, vacía y cargando. Una
@@ -126,6 +169,16 @@ No negociable, aunque una skill proponga lo contrario:
 
 Lo que sí conviene tomar de ellas: ritmo de espaciado, escala tipográfica, jerarquía
 visual, curvas y duraciones de animación, y qué **no** animar.
+
+Y una más, que ya está resuelta: **el mundo visual ya está elegido y documentado en
+`DESIGN.md`.** Una skill de diseño no lo vuelve a abrir. Se usa para ejecutar mejor dentro
+de él, nunca para proponer otra paleta o tipografía.
+
+### Iconos
+
+Se dibujan, desde `lucide-react`, con un grosor y tamaño consistentes. **Nunca un glifo de
+texto ni un emoji haciendo de icono** — un `+` o una `↓` escritos como carácter heredan la
+métrica de la tipografía y no alinean con nada.
 
 ### Móvil y escritorio, en ese orden
 

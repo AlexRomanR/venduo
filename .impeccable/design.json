@@ -1,0 +1,351 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-13T00:00:00.000Z",
+  "title": "Design System: Venduo",
+  "extensions": {
+    "colorMeta": {
+      "papel": {
+        "role": "neutral",
+        "displayName": "Papel Frío",
+        "canonical": "#f1f0ee",
+        "tonalRamp": [
+          "#232220",
+          "#3a3835",
+          "#55524e",
+          "#757169",
+          "#9b9790",
+          "#c2beb8",
+          "#e0ddd8",
+          "#f7f6f4"
+        ]
+      },
+      "tinta": {
+        "role": "neutral",
+        "displayName": "Tinta",
+        "canonical": "#16171a",
+        "tonalRamp": [
+          "#0b0c0e",
+          "#16171a",
+          "#2a2c31",
+          "#42454c",
+          "#5f636b",
+          "#8b8f97",
+          "#bcc0c6",
+          "#eceef1"
+        ]
+      },
+      "senal": {
+        "role": "primary",
+        "displayName": "Rojo de Señal",
+        "canonical": "#d62d12",
+        "tonalRamp": [
+          "#2e0800",
+          "#4d1003",
+          "#731a06",
+          "#9c230b",
+          "#d62d12",
+          "#ee3a1c",
+          "#f5836a",
+          "#fbc9bf"
+        ]
+      },
+      "senal-alta": {
+        "role": "primary",
+        "displayName": "Rojo Encendido",
+        "canonical": "#ee3a1c",
+        "tonalRamp": [
+          "#330a02",
+          "#551105",
+          "#7d1a08",
+          "#ab240d",
+          "#d62d12",
+          "#ee3a1c",
+          "#f78c76",
+          "#fcd0c7"
+        ]
+      },
+      "plata": {
+        "role": "neutral",
+        "displayName": "Plata",
+        "canonical": "#b8bcc0",
+        "tonalRamp": [
+          "#1d1f21",
+          "#333639",
+          "#4d5155",
+          "#6c7175",
+          "#8f9498",
+          "#b8bcc0",
+          "#d7dadd",
+          "#f0f2f3"
+        ]
+      },
+      "blanco": {
+        "role": "neutral",
+        "displayName": "Blanco sobre Rojo",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#1a1a1a",
+          "#333333",
+          "#4d4d4d",
+          "#737373",
+          "#999999",
+          "#c2c2c2",
+          "#e6e6e6",
+          "#ffffff"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Titular de apertura y de cierre. Uno por pantalla, medida 12-13ch, con text-balance."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Titular de sección, medida 16-18ch. Crece a clamp(2rem,6vw,3.5rem) sobre el bloque rojo."
+      },
+      "numeral": {
+        "displayName": "Cifra",
+        "purpose": "Cifras destacadas en rojo, siempre tabulares y siempre con un detalle en versalita debajo."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Nombre de un ítem dentro de una lista o retícula separada por reglas."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto corriente en Geist a 70% de opacidad, medida 46-48ch; hasta 68ch en respuestas largas."
+      },
+      "body-lead": {
+        "displayName": "Entradilla",
+        "purpose": "Párrafo bajo el titular de apertura, medida 52ch."
+      },
+      "label": {
+        "displayName": "Label de sección",
+        "purpose": "Nombre de la sección en versalita roja. Es el mismo texto que el ancla de navegación; no repite el titular."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "entra",
+        "value": "opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "El único gesto del sistema: el elemento sube 14px y aparece al entrar al viewport. Solo debajo del pliegue."
+      },
+      {
+        "name": "escalonado",
+        "value": "70ms a 90ms entre hermanos",
+        "purpose": "Demora acumulada entre elementos hermanos que entran juntos, con tope práctico de tres pasos."
+      },
+      {
+        "name": "estado",
+        "value": "cubic-bezier(0, 0, 0.2, 1) 500ms",
+        "purpose": "Recuperación de color y escala 1.02 de la fotografía, y llenado de la demostración de tienda (escalón de 130ms por producto)."
+      },
+      {
+        "name": "cuenta",
+        "value": "900ms, salida cúbica (1 - (1-t)^3)",
+        "purpose": "La cifra que cuenta hasta su valor al entrar en pantalla."
+      },
+      {
+        "name": "marcador",
+        "value": "transform 300ms cubic-bezier(0, 0, 0.2, 1)",
+        "purpose": "Giro del marcador del acordeón al abrir."
+      }
+    ],
+    "breakpoints": [
+      { "name": "base", "value": "375px" },
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "container", "value": "1152px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón primario",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "La acción de conversión. Una sola por bloque.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Crear mi tienda</a>",
+      "css": ".ds-btn-primary { display: inline-block; background: var(--senal, #d62d12); color: #fff; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 1rem; font-weight: 600; padding: 12px 20px; border: none; border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-primary:hover { background: var(--senal-alta, #ee3a1c); } .ds-btn-primary:focus-visible { outline: 3px solid var(--tinta, #16171a); outline-offset: 3px; }"
+    },
+    {
+      "name": "Botón secundario",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Trazo de 2 px sobre papel; en hover se invierte a campo tinta.",
+      "html": "<a class=\"ds-btn-outline\" href=\"#\">Quiero vender</a>",
+      "css": ".ds-btn-outline { display: inline-block; background: transparent; color: var(--tinta, #16171a); font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 1rem; font-weight: 600; padding: 12px 20px; border: 2px solid var(--tinta, #16171a); border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-outline:hover { background: var(--tinta, #16171a); color: #fff; } .ds-btn-outline:focus-visible { outline: 3px solid var(--senal, #d62d12); outline-offset: 3px; }"
+    },
+    {
+      "name": "Botón sobre el bloque rojo",
+      "kind": "button",
+      "refersTo": "button-outline-sobre-senal",
+      "description": "Variante del secundario dentro del campo rojo; el foco es un contorno blanco porque un anillo de color no se vería.",
+      "html": "<div class=\"ds-campo-senal\"><a class=\"ds-btn-sobre-senal\" href=\"#\">Sumarme como vendedor</a></div>",
+      "css": ".ds-campo-senal { background: var(--senal, #d62d12); padding: 32px; } .ds-btn-sobre-senal { display: inline-block; background: transparent; color: #fff; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 1rem; font-weight: 600; padding: 12px 20px; border: 2px solid #fff; border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-sobre-senal:hover { background: #fff; color: var(--senal, #d62d12); } .ds-campo-senal :focus-visible { outline: 3px solid #fff; outline-offset: 3px; }"
+    },
+    {
+      "name": "Cabecera de sección",
+      "kind": "custom",
+      "refersTo": "section-label",
+      "description": "Label rojo en versalita que nombra la sección —el mismo texto del ancla de navegación— y debajo el titular en Archivo extrabold.",
+      "html": "<header class=\"ds-section-header\"><p class=\"ds-section-label\">Qué viene adentro</p><h2 class=\"ds-section-title\">Todo lo que antes hacías en cinco apps distintas.</h2></header>",
+      "css": ".ds-section-header { color: var(--tinta, #16171a); } .ds-section-label { margin: 0; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--senal, #d62d12); } .ds-section-title { margin: 20px 0 0; max-width: 18ch; font-family: var(--font-titular, system-ui), sans-serif; font-size: clamp(1.9rem, 5vw, 2.75rem); font-weight: 800; line-height: 1.04; letter-spacing: -0.03em; }"
+    },
+    {
+      "name": "Ítem de lista con regla",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "El patrón que reemplaza a la tarjeta: regla superior de 1 px, sin sombra y sin radio; en hover la regla y el título pasan a rojo.",
+      "html": "<article class=\"ds-item-regla\"><h3 class=\"ds-item-titulo\">Editor con IA</h3><p class=\"ds-item-detalle\">Le hablas y la tienda cambia: precios, textos, categorías, portada.</p></article>",
+      "css": ".ds-item-regla { border-top: 1px solid rgba(22, 23, 26, 0.15); padding: 24px 0; color: var(--tinta, #16171a); transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-item-regla:hover { border-top-color: var(--senal, #d62d12); } .ds-item-titulo { margin: 0; font-family: var(--font-titular, system-ui), sans-serif; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.02em; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-item-regla:hover .ds-item-titulo { color: var(--senal, #d62d12); } .ds-item-detalle { margin: 8px 0 0; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; line-height: 1.625; opacity: 0.7; }"
+    },
+    {
+      "name": "Cifra",
+      "kind": "custom",
+      "refersTo": "typography.numeral",
+      "description": "Numeral rojo tabular con su detalle en versalita apagada. Cuenta hasta su valor al entrar, partiendo del valor final ya renderizado.",
+      "html": "<div class=\"ds-cifra\"><p class=\"ds-cifra-valor\">4.100</p><p class=\"ds-cifra-detalle\">Vendedores con historial activo</p></div>",
+      "css": ".ds-cifra-valor { margin: 0; font-family: var(--font-titular, system-ui), sans-serif; font-size: clamp(2.5rem, 7vw, 3.25rem); font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: var(--senal, #d62d12); font-variant-numeric: tabular-nums; font-feature-settings: \"tnum\"; } .ds-cifra-detalle { margin: 12px 0 0; max-width: 24ch; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; line-height: 1.625; letter-spacing: 0.025em; text-transform: uppercase; color: var(--tinta, #16171a); opacity: 0.6; }"
+    },
+    {
+      "name": "Barra de navegación",
+      "kind": "nav",
+      "description": "Encabezado adherido en papel translúcido con desenfoque y regla inferior; la acción roja sobrevive al colapso móvil.",
+      "html": "<header class=\"ds-nav\"><span class=\"ds-nav-marca\">Venduo</span><nav class=\"ds-nav-enlaces\"><a href=\"#\">Cómo funciona</a><a href=\"#\">Módulos</a><a href=\"#\">Preguntas</a></nav><a class=\"ds-nav-accion\" href=\"#\">Crear mi tienda</a></header>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 24px; padding: 14px 20px; background: color-mix(in srgb, var(--papel, #f1f0ee) 90%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(22, 23, 26, 0.15); color: var(--tinta, #16171a); } .ds-nav-marca { flex: 1; font-family: var(--font-titular, system-ui), sans-serif; font-size: 1.125rem; font-weight: 800; letter-spacing: -0.02em; } .ds-nav-enlaces { display: flex; gap: 24px; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; } .ds-nav-enlaces a { color: inherit; text-decoration: none; opacity: 0.7; transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-enlaces a:hover { opacity: 1; } .ds-nav-accion { background: var(--senal, #d62d12); color: #fff; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; font-weight: 600; padding: 10px 16px; border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-accion:hover { background: var(--senal-alta, #ee3a1c); }"
+    },
+    {
+      "name": "Chip de estado",
+      "kind": "chip",
+      "refersTo": "chip-estado",
+      "description": "Única forma redondeada del sistema: una etiqueta de estado corta dentro de una cabecera de tienda.",
+      "html": "<span class=\"ds-chip-estado\">Abierta</span>",
+      "css": ".ds-chip-estado { display: inline-block; background: transparent; color: var(--senal, #d62d12); font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.7rem; font-weight: 500; padding: 2px 8px; border: 1px solid color-mix(in srgb, var(--senal, #d62d12) 40%, transparent); border-radius: 9999px; }"
+    },
+    {
+      "name": "Fotografía editorial",
+      "kind": "custom",
+      "description": "Blanco y negro que recupera color y escala 1.02 al pasar el cursor, con pie que describe la escena sin nombrar a nadie.",
+      "html": "<figure class=\"ds-foto\"><div class=\"ds-foto-marco\"><img src=\"https://images.unsplash.com/photo-1687422808248-f807f4ea2a2e?w=800&q=85&auto=format&fit=crop\" alt=\"Comerciante revisando pedidos en su teléfono\" /></div><figcaption>El negocio que ya existe, con el celular como mostrador.</figcaption></figure>",
+      "css": ".ds-foto { margin: 0; color: var(--tinta, #16171a); } .ds-foto-marco { position: relative; overflow: hidden; aspect-ratio: 4 / 5; background: rgba(22, 23, 26, 0.1); } .ds-foto-marco img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); transition: filter 500ms cubic-bezier(0, 0, 0.2, 1), transform 500ms cubic-bezier(0, 0, 0.2, 1); } .ds-foto-marco img:hover { filter: grayscale(0); transform: scale(1.02); } .ds-foto figcaption { margin-top: 12px; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.75rem; line-height: 1.625; opacity: 0.55; }"
+    },
+    {
+      "name": "Acordeón de preguntas",
+      "kind": "custom",
+      "description": "<details> nativo, accesible y sin JavaScript; el título pasa a rojo en hover.",
+      "html": "<details class=\"ds-acordeon\"><summary><span class=\"ds-acordeon-p\">¿Cuánto cuesta?</span><svg class=\"ds-acordeon-mas\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M8 2v12M2 8h12\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg></summary><p class=\"ds-acordeon-r\">Crear la tienda y publicarla no cuesta nada.</p></details>",
+      "css": ".ds-acordeon { border-top: 1px solid rgba(22, 23, 26, 0.15); color: var(--tinta, #16171a); } .ds-acordeon summary { display: flex; align-items: flex-start; gap: 16px; padding: 24px 0; cursor: pointer; list-style: none; } .ds-acordeon summary::-webkit-details-marker { display: none; } .ds-acordeon-p { flex: 1; font-family: var(--font-titular, system-ui), sans-serif; font-weight: 700; letter-spacing: -0.01em; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-acordeon:hover .ds-acordeon-p { color: var(--senal, #d62d12); } .ds-acordeon-mas { flex-shrink: 0; margin-top: 4px; color: var(--senal, #d62d12); transition: transform 300ms cubic-bezier(0, 0, 0.2, 1); } .ds-acordeon[open] .ds-acordeon-mas { transform: rotate(45deg); } .ds-acordeon-r { margin: 0; padding-bottom: 28px; max-width: 68ch; font-family: var(--font-geist-sans, system-ui), sans-serif; line-height: 1.625; opacity: 0.7; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "El diario del mercado",
+    "overview": "Venduo se ve como una página impresa: papel claro, tinta casi negra, reglas de un píxel que separan las secciones y un solo rojo de señal que aparece poco y manda cuando aparece. No hay degradados, ni tarjetas flotando, ni un teléfono en ángulo. Lo que estructura la página es la retícula y la línea, no la caja.\n\nLa densidad es alta arriba y respira abajo: bloques de texto acotados en medida (ch), titulares grandes con tracking cerrado, y cuerpos de texto a opacidad reducida para que el titular mande sin necesidad de un segundo color. El sistema está hecho para un Android de gama baja con datos móviles, así que el peso visual lo cargan la tipografía y el espacio, no los efectos.\n\nEste mundo rige las superficies públicas: la portada, la tienda /t/{slug} y el perfil del vendedor /v/{slug}. Los paneles privados (/panel, /vendedor) siguen con los tokens por defecto de shadcn, que conviven en app/globals.css a propósito.",
+    "keyCharacteristics": [
+      "Campo de papel #f1f0ee, nunca blanco puro, en toda superficie pública.",
+      "Un solo acento: el rojo de señal. Sin paleta secundaria.",
+      "Separación por regla de un píxel; cero tarjetas y cero sombras.",
+      "Archivo extrabold con tracking negativo para titulares y cifras; Geist para leer.",
+      "Fotografía en blanco y negro que recupera color al pasar el cursor.",
+      "Un solo gesto de movimiento: entrar al viewport."
+    ],
+    "rules": [
+      {
+        "name": "La regla de la voz única",
+        "body": "El rojo ocupa menos del 10% de cualquier pantalla. Si aparece en más de dos lugares en un viewport, uno de ellos no era importante.",
+        "section": "colors"
+      },
+      {
+        "name": "La regla del papel",
+        "body": "Ninguna superficie pública usa #fff como fondo. El blanco es un color de texto sobre rojo, no un campo.",
+        "section": "colors"
+      },
+      {
+        "name": "La regla de la opacidad",
+        "body": "La jerarquía de texto se construye bajando opacidad sobre tinta, nunca introduciendo un gris nuevo.",
+        "section": "colors"
+      },
+      {
+        "name": "La regla de las dos caras",
+        "body": "Archivo solo para titulares, cifras y nombres de ítem; Geist para todo lo que se lee en párrafo. Un número que representa dinero va en Archivo con .tabular, sin excepción.",
+        "section": "typography"
+      },
+      {
+        "name": "La regla de la medida",
+        "body": "Ningún párrafo supera los 68ch. Un texto de 1280 px de ancho no se lee, y el contenedor por sí solo no lo impide.",
+        "section": "typography"
+      },
+      {
+        "name": "La regla del dinero",
+        "body": "Todo monto pasa por formatMoney de lib/format.ts y se muestra con .tabular, para que las columnas no bailen al cambiar. Nunca se divide por 100 en el JSX ni se arma el símbolo a mano.",
+        "section": "typography"
+      },
+      {
+        "name": "La regla de los dos mundos",
+        "body": "Las superficies públicas —portada, /t/{slug}, /v/{slug}— usan los tokens de este documento. Los paneles privados usan los tokens semánticos de shadcn tal como vienen. No se mezclan en una misma pantalla y no se migra uno al otro sin decisión explícita.",
+        "section": "layout"
+      },
+      {
+        "name": "La regla del contenedor único",
+        "body": "Todo alinea a max-w-6xl. Si algo necesita romper esa línea, lo que sale a sangre es el fondo, nunca el texto.",
+        "section": "layout"
+      },
+      {
+        "name": "La regla sin sombra",
+        "body": "Ningún elemento de una superficie pública lleva box-shadow. Si algo necesita separarse del fondo, se le pone una regla o se le cambia el campo.",
+        "section": "elevation"
+      },
+      {
+        "name": "La regla del campo",
+        "body": "Un cambio de sección se anuncia con una regla de un píxel; un cambio de tono se anuncia cambiando el campo entero. No hay estado intermedio.",
+        "section": "elevation"
+      },
+      {
+        "name": "La regla de la esquina viva",
+        "body": "Un contenedor no se redondea. El redondeo se reserva para lo que se toca.",
+        "section": "shapes"
+      },
+      {
+        "name": "La regla de la lista sobre la tarjeta",
+        "body": "Una colección se rinde como lista o retícula de ítems separados por regla superior, no como tarjetas. La caja no es andamiaje.",
+        "section": "shapes"
+      },
+      {
+        "name": "La regla del estado final",
+        "body": "Toda animación parte de un estado ya legible: la clase que oculta se agrega recién al montar, y con prefers-reduced-motion: reduce o sin JavaScript todo queda en su posición final. Una animación nunca es requisito para leer la página.",
+        "section": "components"
+      },
+      {
+        "name": "La regla del pliegue",
+        "body": "Lo que se ve sin desplazar se rinde quieto. El revelado se usa solo debajo del pliegue, para que en un equipo lento la primera pantalla se lea de inmediato.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do usar papel #f1f0ee como campo de toda superficie pública y tinta #16171a para el texto.",
+      "Do reservar el rojo para la acción principal, las cifras, el label de sección y, como campo, un solo bloque por página.",
+      "Do separar con reglas de 1 px a tinta 15%, y usar el trazo de 2 px solo para coronar un bloque de apertura o trazar el botón secundario.",
+      "Do construir la jerarquía de texto bajando opacidad sobre tinta.",
+      "Do poner todo monto por formatMoney y con .tabular.",
+      "Do rendir la fotografía en blanco y negro, devolviendo el color en hover.",
+      "Do resolver a 375 px primero, con objetivos táctiles de 44 px, y recién después dejar crecer hasta 1280 px.",
+      "Do escribir en español neutro boliviano tratando de «tú», también en los textos que genera la IA.",
+      "Do dejar el estado final legible sin JavaScript y con movimiento reducido.",
+      "Do componer sobre shadcn/ui envolviendo o con asChild."
+    ],
+    "donts": [
+      "Don't usar sombras. Ninguna, de ningún tipo, en superficies públicas.",
+      "Don't rendir una colección como tarjetas: va como lista o retícula separada por reglas.",
+      "Don't redondear un contenedor. El radio es para lo que se toca.",
+      "Don't introducir un segundo acento de color, ni un degradado, ni un gris que no sea tinta con opacidad o la plata ya declarada.",
+      "Don't usar blanco puro como fondo de una superficie pública.",
+      "Don't publicar una foto a color junto al rojo: le compite al único acento.",
+      "Don't mezclar los tokens de este mundo con los tokens de shadcn en una misma pantalla.",
+      "Don't animar en el primer viewport, ni mover, escalar o ensombrecer un botón al pasar el cursor: el hover es cambio de color.",
+      "Don't mostrar una cifra ilustrativa sin su descargo al pie.",
+      "Don't concatenar clases a mano: las condicionales van por cn()."
+    ]
+  }
+}
