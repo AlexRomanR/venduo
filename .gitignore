@@ -52,6 +52,9 @@ next-env.d.ts
 # Cada persona los baja con `npx impeccable install`.
 **/skills/*/scripts/bin/
 
+# playwright mcp: capturas, snapshots y logs de consola de cada sesión de revisión
+/.playwright-mcp
+
 # impeccable: los contratos de dirección (surfaces/) sí se versionan, porque
 # son la estrategia que el equipo hereda. El resto es estado de sesión.
 /.impeccable/questions
