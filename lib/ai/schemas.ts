@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+import { CURRENCY } from "@/lib/format"
+
 /* -------------------------------------------------------------------------
  * Entradas (formularios y cuerpos de request)
  * ---------------------------------------------------------------------- */
@@ -7,9 +9,11 @@ import { z } from "zod"
 export const generateStoreRequestSchema = z.object({
   prompt: z
     .string()
-    .min(15, "Contá un poco más sobre el negocio (mínimo 15 caracteres).")
+    .min(15, "Cuenta un poco más sobre el negocio (mínimo 15 caracteres).")
     .max(2000),
-  currency: z.string().length(3).default("ARS"),
+  // La moneda del sistema es el boliviano, no el peso argentino con el que
+  // venía este esquema.
+  currency: z.string().length(3).default(CURRENCY),
   productCount: z.number().int().min(3).max(12).default(6),
 })
 export type GenerateStoreRequest = z.infer<typeof generateStoreRequestSchema>
@@ -78,6 +82,43 @@ export const salesInsightSchema = z.object({
   recommendations: z.array(z.string().min(1).max(300)).min(1).max(5),
 })
 export type SalesInsight = z.infer<typeof salesInsightSchema>
+
+/**
+ * Lo que la IA devuelve para una pregunta de inteligencia de negocio.
+ *
+ * Escribe la consulta. Lo que la hace segura no es confiar en el modelo sino
+ * dónde corre: `run_insight_sql` la ejecuta en una transacción de solo lectura
+ * —Postgres rechaza cualquier escritura— y solo contra vistas ya acotadas a la
+ * tienda de quien pregunta, donde `store_id` ni siquiera existe.
+ *
+ * El contrato de columnas es lo que permite dibujar sin adivinar: toda consulta
+ * devuelve `etiqueta` y `valor`.
+ */
+export const insightSqlSchema = z.object({
+  titulo: z.string().min(1).max(60),
+  /** Qué se va a mostrar y de dónde sale, en una frase. */
+  explicacion: z.string().min(1).max(300),
+  /** Paso 1 del razonamiento: qué forma pide la pregunta. */
+  grafico: z.enum(["linea", "area", "columna", "barra", "numero", "tabla"]),
+  /** Si `valor` son centavos o un conteo. Decide cómo se formatea. */
+  formato: z.enum(["dinero", "cantidad"]),
+  /** Paso 2: qué vistas hacen falta. Se pide explícito para poder auditarlo. */
+  vistas: z
+    .array(
+      z.enum([
+        "mis_ventas",
+        "mis_items",
+        "mis_productos",
+        "mis_vendedores",
+        "mis_comisiones",
+      ])
+    )
+    .min(1)
+    .max(5),
+  /** Paso 3: la consulta. Devuelve `etiqueta` y `valor`, nada más. */
+  sql: z.string().min(10).max(2000),
+})
+export type InsightSql = z.infer<typeof insightSqlSchema>
 
 export const marketingCampaignSchema = z.object({
   objective: z.string().min(1).max(200),

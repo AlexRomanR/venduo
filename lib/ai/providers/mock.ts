@@ -1,4 +1,4 @@
-import { z } from "zod"
+﻿import { z } from "zod"
 
 import {
   AIError,
@@ -16,16 +16,16 @@ const SAMPLE_TEXT: Record<string, string> = {
   title: "Tienda de ejemplo",
   slug: "tienda-demo",
   description:
-    "Contenido de ejemplo generado en modo demo. Configurá AI_PROVIDER y AI_API_KEY para usar un modelo real.",
+    "Contenido de ejemplo generado en modo demo. Configura AI_PROVIDER y AI_API_KEY para usar un modelo real.",
   summary: "Resumen de ejemplo del período analizado.",
-  headline: "Vendé más, con menos vueltas",
+  headline: "Vende más, con menos vueltas",
   tagline: "Tu tienda online lista en minutos",
   categor: "Café",
   hashtag: "venduo",
-  currency: "ARS",
+  currency: "BOB",
   color: "#0f172a",
   insight: "Las ventas crecen los fines de semana.",
-  recommendation: "Reforzá el stock de los tres productos más vendidos.",
+  recommendation: "Refuerza el stock de los tres productos más vendidos.",
   channel: "Instagram",
   message: "Mensaje de marketing de ejemplo.",
 }
@@ -101,6 +101,107 @@ function sampleFromSchema(
 }
 
 /**
+ * Consulta plausible a partir de palabras sueltas del pedido.
+ *
+ * No pretende entender: busca términos y devuelve una consulta que existe. Las
+ * cifras son reales porque salen de la base igual que con un modelo de verdad
+ * — lo simulado es la interpretación de la pregunta, no el dato.
+ *
+ * El orden de las ramas importa: la de vendedores va primero porque "han
+ * vendido" contiene "vendid" y se comía las preguntas sobre la red.
+ */
+function sqlDeDemostracion(pedido: string) {
+  const t = pedido.toLowerCase()
+
+  if (/vendedor|comisi|red|qui[eé]n vende/.test(t)) {
+    return {
+      titulo: "Comisiones por vendedor",
+      explicacion:
+        "Comisiones confirmadas y pagadas de cada vendedor, de mayor a menor.",
+      grafico: "barra",
+      formato: "dinero",
+      vistas: ["mis_comisiones"],
+      sql: "select nombre as etiqueta, sum(amount_cents) as valor from mis_comisiones where status in ('confirmada','pagada') group by 1 order by 2 desc limit 15",
+    }
+  }
+
+  if (/producto|art[ií]culo|m[aá]s vendid/.test(t)) {
+    return {
+      titulo: "Productos más vendidos",
+      explicacion: "Unidades vendidas por producto, sin contar los cancelados.",
+      grafico: "barra",
+      formato: "cantidad",
+      vistas: ["mis_items"],
+      sql: "select product_name as etiqueta, sum(quantity) as valor from mis_items where status <> 'cancelado' group by 1 order by 2 desc limit 15",
+    }
+  }
+
+  if (/inventario|stock|categor/.test(t)) {
+    return {
+      titulo: "Stock por categoría",
+      explicacion: "Unidades en stock agrupadas por categoría del catálogo.",
+      grafico: "barra",
+      formato: "cantidad",
+      vistas: ["mis_productos"],
+      sql: "select coalesce(category, 'Sin categoría') as etiqueta, sum(stock) as valor from mis_productos where is_active group by 1 order by 2 desc limit 15",
+    }
+  }
+
+  if (/semana/.test(t)) {
+    return {
+      titulo: "Ventas por semana",
+      explicacion: "Ingresos por semana de los últimos 90 días.",
+      grafico: "linea",
+      formato: "dinero",
+      vistas: ["mis_ventas"],
+      sql: "select to_char(date_trunc('week', created_at), 'YYYY-MM-DD') as etiqueta, sum(total_cents) as valor from mis_ventas where status <> 'cancelado' and created_at >= now() - interval '90 days' group by 1 order by 1",
+    }
+  }
+
+  if (/mes|mensual/.test(t)) {
+    return {
+      titulo: "Ventas por mes",
+      explicacion: "Ingresos por mes del último año.",
+      grafico: "columna",
+      formato: "dinero",
+      vistas: ["mis_ventas"],
+      sql: "select to_char(date_trunc('month', created_at), 'YYYY-MM') as etiqueta, sum(total_cents) as valor from mis_ventas where status <> 'cancelado' and created_at >= now() - interval '365 days' group by 1 order by 1",
+    }
+  }
+
+  if (/estado|pendiente|cancelad/.test(t)) {
+    return {
+      titulo: "Pedidos por estado",
+      explicacion: "Cuántos pedidos hay en cada estado.",
+      grafico: "barra",
+      formato: "cantidad",
+      vistas: ["mis_ventas"],
+      sql: "select status as etiqueta, count(*) as valor from mis_ventas group by 1 order by 2 desc",
+    }
+  }
+
+  if (/cu[aá]nto vend|total|ingreso|factur/.test(t)) {
+    return {
+      titulo: "Ventas del período",
+      explicacion: "Total facturado en los últimos 30 días.",
+      grafico: "numero",
+      formato: "dinero",
+      vistas: ["mis_ventas"],
+      sql: "select 'Total' as etiqueta, coalesce(sum(total_cents), 0) as valor from mis_ventas where status <> 'cancelado' and created_at >= now() - interval '30 days'",
+    }
+  }
+
+  return {
+    titulo: "Ventas por día",
+    explicacion: "Ingresos diarios de los últimos 30 días.",
+    grafico: "linea",
+    formato: "dinero",
+    vistas: ["mis_ventas"],
+    sql: "select to_char(date_trunc('day', created_at), 'YYYY-MM-DD') as etiqueta, sum(total_cents) as valor from mis_ventas where status <> 'cancelado' and created_at >= now() - interval '30 days' group by 1 order by 1",
+  }
+}
+
+/**
  * Proveedor por defecto cuando no hay ninguna API key configurada.
  * Deriva la respuesta del propio esquema zod, así que siempre valida
  * y el proyecto se puede levantar y demostrar sin credenciales.
@@ -119,7 +220,7 @@ export function createMockProvider(
       return {
         text:
           "[modo demo] No hay proveedor de IA configurado. " +
-          "Definí AI_PROVIDER, AI_MODEL y AI_API_KEY en .env.local para usar un modelo real.\n\n" +
+          "Define AI_PROVIDER, AI_MODEL y AI_API_KEY en .env.local para usar un modelo real.\n\n" +
           `Pedido recibido: ${last.slice(0, 280)}`,
         provider: "mock",
         model,
@@ -129,6 +230,24 @@ export function createMockProvider(
     async generateObject<T>(
       options: GenerateObjectOptions<T>
     ): Promise<GenerateObjectResult<T>> {
+      // La consulta de inteligencia de negocio necesita un caso aparte. Derivar
+      // el ejemplo del esquema daría siempre la misma respuesta, y un chat que
+      // contesta lo mismo a cualquier pregunta se lee como roto, no como demo.
+      if (options.schemaName === "InsightSql") {
+        const pedido = options.messages.at(-1)?.content ?? ""
+        const sugerido = sqlDeDemostracion(pedido)
+        const validado = options.schema.safeParse(sugerido)
+
+        if (validado.success) {
+          return {
+            object: validado.data,
+            raw: JSON.stringify(sugerido, null, 2),
+            provider: "mock",
+            model,
+          }
+        }
+      }
+
       const jsonSchema = z.toJSONSchema(options.schema, {
         io: "output",
       }) as JsonSchema
@@ -140,7 +259,7 @@ export function createMockProvider(
       if (!result.success) {
         throw new AIError(
           `El modo demo no pudo generar un ejemplo para "${options.schemaName}". ` +
-            "Configurá un proveedor real de IA.",
+            "Configura un proveedor real de IA.",
           "mock"
         )
       }

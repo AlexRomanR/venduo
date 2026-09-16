@@ -6,6 +6,11 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   : undefined
 
 const nextConfig: NextConfig = {
+  // `@react-pdf/renderer` arma el documento con un reconciliador propio y
+  // lee las fuentes del disco: empaquetarlo lo rompe. Se deja que el runtime
+  // lo cargue tal cual desde node_modules.
+  serverExternalPackages: ["@react-pdf/renderer"],
+
   images: {
     remotePatterns: [
       ...(supabaseHost
