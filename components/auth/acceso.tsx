@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, Store, Users, type LucideIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -151,7 +150,6 @@ export function Acceso({
   initialError?: string
   rolInicial?: Rol
 }) {
-  const router = useRouter()
   // Quien llega desde la portada ya eligió un camino: se le abre el registro,
   // no el ingreso.
   const [modo, setModo] = React.useState<Modo>(
@@ -228,15 +226,15 @@ export function Acceso({
       }
     }
 
-    // `next` viene del middleware: alguien pidió una ruta privada sin sesión y
-    // ahí quiere volver. Sin eso, manda el rol, porque el vendedor no tiene
-    // nada que hacer en el panel del emprendedor.
-    const destino =
-      next ?? (values.role === "vendedor" ? "/vendedor" : "/panel")
-
-    // refresh() revalida el layout del servidor, que es el que lee la sesión.
-    router.push(destino)
-    router.refresh()
+    // El destino lo resuelve el servidor, que es el único que sabe si esta
+    // cuenta tiene tienda o vínculos. Antes se empujaba a `/panel` y esa
+    // pantalla rebotaba: se veía el panel un instante antes de salir de él.
+    //
+    // Navegación completa y no `router.push`: el destino es un route handler
+    // que responde con una redirección, no una pantalla.
+    window.location.assign(
+      next ? `/auth/destino?next=${encodeURIComponent(next)}` : "/auth/destino"
+    )
   }
 
   return (

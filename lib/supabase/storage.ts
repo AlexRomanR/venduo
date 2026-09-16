@@ -4,6 +4,11 @@ import { createClient } from "./client"
 export const BUCKETS = {
   /** Público: fotos de productos y logos de tienda. */
   productImages: "product-images",
+  /**
+   * Público: fotos de perfil. Lo es a propósito — el avatar del vendedor se
+   * muestra en su historial laboral, que abre alguien sin cuenta.
+   */
+  avatars: "avatars",
   /** Privado: comprobantes de pago subidos por el comprador. */
   paymentProofs: "payment-proofs",
 } as const
@@ -49,7 +54,7 @@ export async function uploadFile(
     throw new Error("El archivo supera los 5 MB.")
   }
   if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-    throw new Error("Formato no admitido. Usá JPG, PNG, WEBP o AVIF.")
+    throw new Error("Formato no admitido. Usa JPG, PNG, WEBP o AVIF.")
   }
 
   const path = `${folder}/${safeName(file.name)}`
@@ -60,7 +65,7 @@ export async function uploadFile(
 
   if (error) throw new Error(error.message)
 
-  if (bucket === BUCKETS.productImages) {
+  if (bucket === BUCKETS.productImages || bucket === BUCKETS.avatars) {
     const { data } = supabase.storage.from(bucket).getPublicUrl(path)
     return { path, url: data.publicUrl }
   }

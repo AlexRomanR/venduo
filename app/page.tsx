@@ -133,8 +133,19 @@ export default async function Inicio() {
             </a>
           </nav>
 
+          {/* Quien ya tiene cuenta entraba por la misma puerta que quien
+              viene a crear una, y no la encontraba. */}
+          {user ? null : (
+            <Link
+              href="/login"
+              className="flex min-h-11 items-center px-1 text-sm font-medium opacity-70 transition-opacity hover:opacity-100"
+            >
+              Ingresar
+            </Link>
+          )}
+
           <Link
-            href={user ? "/panel" : "/login?rol=emprendedor"}
+            href={user ? "/auth/destino" : "/login?rol=emprendedor"}
             className="flex min-h-11 items-center rounded-sm bg-senal px-4 text-sm font-semibold text-white transition-colors hover:bg-senal-alta"
           >
             {user ? "Ir a mi panel" : "Crear mi tienda"}

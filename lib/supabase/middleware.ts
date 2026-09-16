@@ -4,7 +4,14 @@ import { createServerClient } from "@supabase/ssr"
 import { env, isSupabaseConfigured } from "@/lib/env"
 
 /** Rutas que exigen sesión iniciada. */
-const PROTECTED_PREFIXES = ["/panel", "/vendedor"]
+const PROTECTED_PREFIXES = [
+  "/panel",
+  "/vendedor",
+  "/cuenta",
+  "/crear",
+  "/sumarme",
+  "/explorar",
+]
 
 /**
  * Refresca el token de Supabase en cada request y protege las áreas privadas.

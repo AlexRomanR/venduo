@@ -45,10 +45,16 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${archivo.variable} antialiased`}
-      >
+    // Las variables de fuente van en <html> y no en <body>: `globals.css`
+    // aplica `font-sans` sobre <html>, y una variable declarada en <body> no
+    // es visible para su propio padre. Con ellas abajo, --font-sans resolvía
+    // vacío y todo el texto de párrafo caía al serif del navegador.
+    <html
+      lang="es"
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${archivo.variable}`}
+    >
+      <body className="antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
