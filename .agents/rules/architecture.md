@@ -14,16 +14,51 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 
 ## Rutas
 
-| Ruta          | Qué es                          | Acceso          |
-| ------------- | ------------------------------- | --------------- |
-| `/`           | Redirige a `/login`             | Público         |
-| `/login`      | Registro e ingreso              | Público         |
-| `/t/{slug}`   | Tienda pública del emprendedor  | Público         |
-| `/v/{slug}`   | Perfil público del vendedor     | Público         |
-| `/panel`      | Panel del emprendedor           | Requiere sesión |
-| `/vendedor`   | Panel del vendedor              | Requiere sesión |
-| `/auth/*`     | Callback y cierre de sesión     | —               |
-| `/api/health` | Estado del servidor y sus capas | Público         |
+| Ruta                          | Qué es                                                  | Acceso          |
+| ----------------------------- | ------------------------------------------------------- | --------------- |
+| `/`                           | Portada pública                                         | Público         |
+| `/login`                      | Registro e ingreso                                      | Público         |
+| `/t/{slug}`                   | Tienda pública del emprendedor                          | Público         |
+| `/v/{slug}`                   | Perfil público del vendedor                             | Público         |
+| `/crear`                      | Alta de la tienda, paso 1: elegir plantilla             | Requiere sesión |
+| `/crear/negocio`              | Alta de la tienda, paso 2: nombre y rubro               | Requiere sesión |
+| `/sumarme`                    | Alta del vendedor: reparte los tres caminos             | Requiere sesión |
+| `/explorar/tiendas`           | Vitrina de tiendas que aceptan vendedores               | Requiere sesión |
+| `/explorar/productos`         | Vitrina de productos abiertos a vendedores              | Requiere sesión |
+| `/panel`                      | Resumen del emprendedor                                 | Requiere sesión |
+| `/panel/{seccion}`            | Productos, pedidos, vendedores, estadísticas, marketing | Requiere sesión |
+| `/panel/productos/nuevo`      | Alta de un producto                                     | Requiere sesión |
+| `/panel/productos/{id}`       | Edición de un producto                                  | Requiere sesión |
+| `/panel/productos/categorias` | Las categorías del catálogo                             | Requiere sesión |
+| `/panel/estadisticas/pdf`     | El informe del tablero en PDF. `?g={id}` para uno solo  | Requiere sesión |
+| `/vendedor`                   | Panel del vendedor y su historial                       | Requiere sesión |
+| `/cuenta`                     | Datos de la persona, de su tienda y de su perfil        | Requiere sesión |
+| `/auth/destino`               | Resuelve a dónde entra la cuenta y redirige             | Requiere sesión |
+| `/auth/*`                     | Callback y cierre de sesión                             | —               |
+| `/api/health`                 | Estado del servidor y sus capas                         | Público         |
+
+## A dónde entra cada cuenta
+
+El destino no lo decide `primary_role`, que es solo una intención. Lo decide el
+estado de los datos, y lo resuelve un `redirect()` en el componente de servidor:
+
+| Situación                                          | Va a        |
+| -------------------------------------------------- | ----------- |
+| Emprendedor sin tienda, o con tienda sin plantilla | `/crear`    |
+| Emprendedor con plantilla elegida                  | `/panel`    |
+| Vendedor sin ningún vínculo a una tienda           | `/sumarme`  |
+| Vendedor con al menos un vínculo                   | `/vendedor` |
+
+La comprobación del emprendedor es sobre `stores.template_key` y no sobre la
+existencia de la fila: es lo que marca que el alta terminó.
+
+**El ingreso no adivina el destino: manda a `/auth/destino`.** Ese route handler
+resuelve en el servidor y redirige una sola vez. Antes empujaba a `/panel` y esa
+pantalla rebotaba, así que se veía el panel un instante antes de salir de él.
+
+El rol **redirige pero no prohíbe**. Un vendedor que pide `/crear` va a su panel,
+y encuentra ahí un enlace a `/crear?abrir=1` que lo deja pasar: `primary_role` es
+una intención, y una misma persona puede terminar siendo dueña y vendedora.
 
 Ruteo **por path, no por subdominio**. Se usa el slug y no el identificador porque estas
 URLs se imprimen en códigos QR y se mandan por WhatsApp.
@@ -39,16 +74,32 @@ actualizar esta lista.
 app/
   (privado)/          Grupo de rutas: no aparece en la URL
     layout.tsx        Shell compartido de las áreas privadas
-    panel/            Panel del emprendedor
+    panel/            Resumen del emprendedor y sus secciones
     vendedor/         Panel del vendedor
+    cuenta/           Ajustes de la persona, su tienda y su perfil
+  v/[slug]/           Historial laboral público del vendedor
+  crear/              Alta de la tienda (layout propio)
+    negocio/
+  sumarme/            Alta del vendedor: reparte los tres caminos
+  explorar/           Vitrinas del vendedor (layout propio)
+    tiendas/
+    productos/
   login/
   auth/callback/      Intercambio de código por sesión
+  auth/destino/       Resuelve a dónde entra la cuenta
   auth/sign-out/
   api/health/
 
 components/
   ui/                 shadcn/ui. No editar a mano: se regeneran
-  auth/               Formulario de ingreso y registro
+  auth/               Ingreso y registro
+  onboarding/         Altas: marco, pasos, carrusel y vista previa
+  explorar/           Vitrinas: navegación, buscador, paginación y listas
+  cuenta/             Formularios de ajustes y foto de perfil
+  insights/           Cuaderno, tablero y gráficos SVG
+  productos/          Catálogo: lista, filtros, formulario, fotos y categorías
+  panel/              Shell, cifras y piezas de los dos paneles
+  landing/            Piezas de la portada
   config-status.tsx   Checklist de capas configuradas
   theme-provider.tsx
 
@@ -57,6 +108,9 @@ lib/
   data/               Consultas de lectura
   validation/         Esquemas zod compartidos
   ai/                 Capa de IA
+  insights/           Lo que se puede preguntar, la lectura y el documento PDF
+  demo-data.ts        Datos de ejemplo del modo demo
+  estilos.ts          Clases del vestido editorial de los controles
   format.ts           Moneda, fechas, slugs
   qr.ts               Códigos QR
   env.ts              Entorno validado con zod

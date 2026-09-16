@@ -1,5 +1,59 @@
 import { CURRENCY } from "@/lib/format"
-import type { Product } from "@/types"
+import type { CommissionStatus, Product, SubscriptionStatus } from "@/types"
+
+export interface Suscripcion {
+  status: SubscriptionStatus
+  trialEndsAt: string | null
+  diasRestantes: number | null
+  porVencer: boolean
+}
+
+export interface ResumenPanel {
+  tienda: {
+    id: string
+    name: string
+    slug: string
+    isPublished: boolean
+    templateKey: string | null
+  }
+  ventasCents: number
+  pedidos: number
+  pedidosPendientes: number
+  vendedoresActivos: number
+  vendedoresPendientes: number
+  productos: number
+  suscripcion: Suscripcion | null
+  esDemo: boolean
+}
+
+/**
+ * Panel de ejemplo.
+ *
+ * Con números, no en cero: el panel vacío ya tiene su propio estado y lo que
+ * hace falta demostrar sin base de datos es cómo se ve funcionando.
+ */
+export const RESUMEN_DEMO: ResumenPanel = {
+  tienda: {
+    id: "demo-store",
+    name: "Café Illimani",
+    slug: "cafe-illimani",
+    isPublished: true,
+    templateKey: "abarrotes",
+  },
+  ventasCents: 1_284_500,
+  pedidos: 37,
+  pedidosPendientes: 4,
+  vendedoresActivos: 6,
+  vendedoresPendientes: 2,
+  productos: 24,
+  suscripcion: {
+    status: "prueba",
+    trialEndsAt: new Date(Date.now() + 5 * 86_400_000).toISOString(),
+    diasRestantes: 5,
+    porVencer: true,
+  },
+  esDemo: true,
+}
 
 export interface SalesPoint {
   date: string
@@ -78,6 +132,348 @@ export function getDemoMetrics(): DashboardMetrics {
   }
 }
 
+export interface ComisionItem {
+  id: string
+  storeName: string
+  amountCents: number
+  baseCents: number
+  rateBps: number
+  status: CommissionStatus
+  createdAt: string
+}
+
+export interface ResumenVendedor {
+  volumenCents: number
+  ventas: number
+  porEstado: Record<CommissionStatus, number>
+  ganadoCents: number
+  tiendasActivas: number
+  tiendasPendientes: number
+  tiendasEnHistorial: number
+  desde: string | null
+  perfil: {
+    slug: string
+    displayName: string
+    city: string | null
+    bio: string | null
+  } | null
+  esDemo: boolean
+}
+
+export interface PerfilPublico {
+  slug: string
+  displayName: string
+  city: string | null
+  bio: string | null
+  avatarUrl: string | null
+  ventas: number
+  volumenCents: number
+  tiendas: number
+  desde: string | null
+  historial: Array<{ storeName: string; ventas: number; desde: string | null }>
+}
+
+const HACE = (dias: number) =>
+  new Date(Date.now() - dias * 86_400_000).toISOString()
+
+/** Panel del vendedor de ejemplo, con historial ya empezado. */
+export const RESUMEN_VENDEDOR_DEMO: ResumenVendedor = {
+  volumenCents: 412_000,
+  ventas: 17,
+  porEstado: {
+    pendiente: 8_400,
+    confirmada: 26_600,
+    pagada: 14_400,
+    anulada: 3_600,
+  },
+  ganadoCents: 41_000,
+  tiendasActivas: 2,
+  tiendasPendientes: 1,
+  tiendasEnHistorial: 3,
+  desde: HACE(94),
+  perfil: {
+    slug: "ana-quispe-4f2c1a",
+    displayName: "Ana Quispe",
+    city: "El Alto",
+    bio: "Vendo por WhatsApp y en ferias los fines de semana.",
+  },
+  esDemo: true,
+}
+
+export const COMISIONES_DEMO: ComisionItem[] = [
+  {
+    id: "demo-c-1",
+    storeName: "Rosa Deportes",
+    amountCents: 2_160,
+    baseCents: 18_000,
+    rateBps: 1200,
+    status: "confirmada",
+    createdAt: HACE(2),
+  },
+  {
+    id: "demo-c-2",
+    storeName: "Café Illimani",
+    amountCents: 850,
+    baseCents: 8_500,
+    rateBps: 1000,
+    status: "pendiente",
+    createdAt: HACE(4),
+  },
+  {
+    id: "demo-c-3",
+    storeName: "Rosa Deportes",
+    amountCents: 2_880,
+    baseCents: 24_000,
+    rateBps: 1200,
+    status: "pagada",
+    createdAt: HACE(11),
+  },
+  {
+    id: "demo-c-4",
+    storeName: "Panadería Doña Elsa",
+    amountCents: 3_600,
+    baseCents: 45_000,
+    rateBps: 800,
+    status: "anulada",
+    createdAt: HACE(19),
+  },
+]
+
+export interface TiendaAbierta {
+  id: string
+  name: string
+  slug: string
+  tagline: string | null
+  joinMode: string
+  commissionBps: number
+}
+
+export interface ProductoVitrina {
+  id: string
+  name: string
+  priceCents: number
+  compareAtPriceCents: number | null
+  imageUrl: string | null
+  condition: string
+  storeName: string
+  storeSlug: string
+  commissionBps: number
+}
+
+/** Tiendas de ejemplo para que la vitrina del vendedor no salga vacía. */
+export const TIENDAS_ABIERTAS_DEMO: TiendaAbierta[] = [
+  {
+    id: "demo-tienda-1",
+    name: "Rosa Deportes",
+    slug: "rosa-deportes",
+    tagline: "Ropa deportiva en Santa Cruz. Buzos, poleras y mochilas.",
+    joinMode: "abierta",
+    commissionBps: 1200,
+  },
+  {
+    id: "demo-tienda-2",
+    name: "Panadería Doña Elsa",
+    slug: "panaderia-dona-elsa",
+    tagline: "Cuñapés, empanadas y masitas por encargo en La Paz.",
+    joinMode: "con_aprobacion",
+    commissionBps: 800,
+  },
+  {
+    id: "demo-tienda-3",
+    name: "Café Illimani",
+    slug: "cafe-illimani",
+    tagline: "Café de especialidad y equipamiento para prepararlo.",
+    joinMode: "abierta",
+    commissionBps: 1000,
+  },
+]
+
+export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
+  {
+    id: "demo-v-1",
+    name: "Buzo oversize",
+    priceCents: 18000,
+    compareAtPriceCents: null,
+    imageUrl: null,
+    condition: "nuevo",
+    storeName: "Rosa Deportes",
+    storeSlug: "rosa-deportes",
+    commissionBps: 1200,
+  },
+  {
+    id: "demo-v-2",
+    name: "Mochila urbana",
+    priceCents: 24000,
+    compareAtPriceCents: 30000,
+    imageUrl: null,
+    condition: "nuevo",
+    storeName: "Rosa Deportes",
+    storeSlug: "rosa-deportes",
+    commissionBps: 1200,
+  },
+  {
+    id: "demo-v-3",
+    name: "Café de especialidad 250g",
+    priceCents: 8500,
+    compareAtPriceCents: null,
+    imageUrl: null,
+    condition: "nuevo",
+    storeName: "Café Illimani",
+    storeSlug: "cafe-illimani",
+    commissionBps: 1000,
+  },
+  {
+    id: "demo-v-4",
+    name: "Molinillo manual reacondicionado",
+    priceCents: 14000,
+    compareAtPriceCents: 24000,
+    imageUrl: null,
+    condition: "reacondicionado",
+    storeName: "Café Illimani",
+    storeSlug: "cafe-illimani",
+    commissionBps: 1000,
+  },
+]
+
+export interface PlantillaResumen {
+  key: string
+  name: string
+  sector: string
+  description: string | null
+  bloques: string[]
+}
+
+export interface RubroConPlantillas {
+  key: string
+  name: string
+  plantillas: PlantillaResumen[]
+}
+
+/**
+ * Espejo del catálogo sembrado en la migración de onboarding.
+ *
+ * Existe para que la galería de plantillas se vea completa sin base de datos:
+ * es la primera pantalla después del registro y un catálogo vacío ahí parece
+ * un producto roto, no un producto sin configurar.
+ */
+export const RUBROS_DEMO: RubroConPlantillas[] = [
+  {
+    key: "moda",
+    name: "Moda",
+    plantillas: [
+      {
+        key: "moda",
+        name: "Indumentaria",
+        sector: "moda",
+        description:
+          "Grilla visual, talles y temporada. Incluye sección de segunda mano.",
+        bloques: ["hero", "product_grid", "product_grid", "contact"],
+      },
+      {
+        key: "moda_calzado",
+        name: "Calzado",
+        sector: "moda",
+        description:
+          "Fichas con talles y fotos por ángulo. Pensada para zapatillas y calzado urbano.",
+        bloques: ["hero", "product_grid", "product_grid", "contact"],
+      },
+    ],
+  },
+  {
+    key: "gastronomia",
+    name: "Comida",
+    plantillas: [
+      {
+        key: "gastronomia",
+        name: "Cocina",
+        sector: "gastronomia",
+        description: "Menú por categorías y pedido rápido por WhatsApp.",
+        bloques: ["hero", "product_grid", "faq", "contact"],
+      },
+      {
+        key: "reposteria",
+        name: "Repostería",
+        sector: "gastronomia",
+        description:
+          "Catálogo por encargo con anticipación de pedido. Para tortas, postres y mesas dulces.",
+        bloques: ["hero", "product_grid", "faq", "contact"],
+      },
+    ],
+  },
+  {
+    key: "tecnologia",
+    name: "Tecnología",
+    plantillas: [
+      {
+        key: "tecnologia",
+        name: "Electrónica",
+        sector: "tecnologia",
+        description:
+          "Ficha técnica extendida y comparación de precios. Incluye sección de reacondicionados.",
+        bloques: ["hero", "product_grid", "product_grid", "faq", "contact"],
+      },
+      {
+        key: "celulares",
+        name: "Celulares",
+        sector: "tecnologia",
+        description:
+          "Equipos y accesorios, con estado del producto bien visible y garantía declarada.",
+        bloques: ["hero", "product_grid", "product_grid", "contact"],
+      },
+    ],
+  },
+  {
+    key: "belleza",
+    name: "Belleza",
+    plantillas: [
+      {
+        key: "belleza",
+        name: "Cosmética",
+        sector: "belleza",
+        description:
+          "Productos por tipo de piel y rutina, con testimonios de clientas.",
+        bloques: ["hero", "product_grid", "testimonials", "contact"],
+      },
+    ],
+  },
+  {
+    key: "hogar",
+    name: "Hogar",
+    plantillas: [
+      {
+        key: "hogar",
+        name: "Decoración",
+        sector: "hogar",
+        description:
+          "Ambientes completos y piezas sueltas, con foco en la foto grande.",
+        bloques: ["hero", "about", "product_grid", "cta"],
+      },
+      {
+        key: "carpinteria",
+        name: "Muebles a medida",
+        sector: "hogar",
+        description:
+          "Piezas por encargo, foco en fotos grandes y terminaciones.",
+        bloques: ["hero", "about", "product_grid", "cta"],
+      },
+    ],
+  },
+  {
+    key: "abarrotes",
+    name: "Abarrotes",
+    plantillas: [
+      {
+        key: "abarrotes",
+        name: "Almacén",
+        sector: "abarrotes",
+        description:
+          "Catálogo amplio, precios visibles, pensado para reposición frecuente.",
+        bloques: ["hero", "product_grid", "contact"],
+      },
+    ],
+  },
+]
+
 const NOW = new Date().toISOString()
 
 /** Campos comunes a todo producto de ejemplo. */
@@ -87,6 +483,12 @@ const DEMO_PRODUCT_BASE = {
   condition: "nuevo" as const,
   condition_note: null,
   image_url: null,
+  images: [],
+  category_id: null,
+  sku: null,
+  low_stock_threshold: 3,
+  is_featured: false,
+  seller_enabled: true,
   created_at: NOW,
   updated_at: NOW,
   deleted_at: null,

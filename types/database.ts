@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       ai_generations: {
@@ -202,7 +227,21 @@ export type Database = {
             foreignKeyName: "commissions_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: true
+            referencedRelation: "mis_ventas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "mis_vendedores"
             referencedColumns: ["id"]
           },
           {
@@ -214,6 +253,53 @@ export type Database = {
           },
           {
             foreignKeyName: "commissions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insights: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: string
+          posicion: number
+          pregunta: string
+          spec: Json
+          store_id: string
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          posicion?: number
+          pregunta: string
+          spec: Json
+          store_id: string
+          titulo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          posicion?: number
+          pregunta?: string
+          spec?: Json
+          store_id?: string
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insights_store_id_fkey"
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
@@ -257,7 +343,21 @@ export type Database = {
             foreignKeyName: "order_items_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "mis_ventas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "mis_productos"
             referencedColumns: ["id"]
           },
           {
@@ -281,6 +381,7 @@ export type Database = {
           buyer_email: string | null
           buyer_name: string
           buyer_phone: string
+          commission_base_cents: number
           commission_bps: number
           commission_cents: number
           created_at: string
@@ -301,6 +402,7 @@ export type Database = {
           buyer_email?: string | null
           buyer_name: string
           buyer_phone: string
+          commission_base_cents?: number
           commission_bps?: number
           commission_cents?: number
           created_at?: string
@@ -321,6 +423,7 @@ export type Database = {
           buyer_email?: string | null
           buyer_name?: string
           buyer_phone?: string
+          commission_base_cents?: number
           commission_bps?: number
           commission_cents?: number
           created_at?: string
@@ -338,6 +441,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "orders_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "mis_vendedores"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "orders_seller_id_fkey"
             columns: ["seller_id"]
@@ -381,9 +491,51 @@ export type Database = {
         }
         Relationships: []
       }
+      product_categories: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          description: string | null
+          id: string
+          name: string
+          position: number
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          position?: number
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          position?: number
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_categories_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category: string | null
+          category_id: string | null
           compare_at_price_cents: number | null
           condition: Database["public"]["Enums"]["product_condition"]
           condition_note: string | null
@@ -392,15 +544,21 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          images: string[]
           is_active: boolean
+          is_featured: boolean
+          low_stock_threshold: number
           name: string
           price_cents: number
+          seller_enabled: boolean
+          sku: string | null
           stock: number
           store_id: string
           updated_at: string
         }
         Insert: {
           category?: string | null
+          category_id?: string | null
           compare_at_price_cents?: number | null
           condition?: Database["public"]["Enums"]["product_condition"]
           condition_note?: string | null
@@ -409,15 +567,21 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: string[]
           is_active?: boolean
+          is_featured?: boolean
+          low_stock_threshold?: number
           name: string
           price_cents: number
+          seller_enabled?: boolean
+          sku?: string | null
           stock?: number
           store_id: string
           updated_at?: string
         }
         Update: {
           category?: string | null
+          category_id?: string | null
           compare_at_price_cents?: number | null
           condition?: Database["public"]["Enums"]["product_condition"]
           condition_note?: string | null
@@ -426,14 +590,26 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: string[]
           is_active?: boolean
+          is_featured?: boolean
+          low_stock_threshold?: number
           name?: string
           price_cents?: number
+          seller_enabled?: boolean
+          sku?: string | null
           stock?: number
           store_id?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "products_store_id_fkey"
             columns: ["store_id"]
@@ -450,6 +626,7 @@ export type Database = {
           deleted_at: string | null
           full_name: string | null
           id: string
+          primary_role: Database["public"]["Enums"]["user_role"] | null
           updated_at: string
         }
         Insert: {
@@ -458,6 +635,7 @@ export type Database = {
           deleted_at?: string | null
           full_name?: string | null
           id: string
+          primary_role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string
         }
         Update: {
@@ -466,7 +644,32 @@ export type Database = {
           deleted_at?: string | null
           full_name?: string | null
           id?: string
+          primary_role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      sectors: {
+        Row: {
+          created_at: string
+          is_active: boolean
+          key: string
+          name: string
+          position: number
+        }
+        Insert: {
+          created_at?: string
+          is_active?: boolean
+          key: string
+          name: string
+          position?: number
+        }
+        Update: {
+          created_at?: string
+          is_active?: boolean
+          key?: string
+          name?: string
+          position?: number
         }
         Relationships: []
       }
@@ -608,6 +811,13 @@ export type Database = {
             foreignKeyName: "social_posts_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
+            referencedRelation: "mis_productos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_posts_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
@@ -676,6 +886,35 @@ export type Database = {
             foreignKeyName: "store_blocks_store_id_fkey"
             columns: ["store_id"]
             isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_invites: {
+        Row: {
+          code: string
+          created_at: string
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_invites_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: true
             referencedRelation: "stores"
             referencedColumns: ["id"]
           },
@@ -957,11 +1196,165 @@ export type Database = {
           sector?: string
           theme?: Json
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "templates_sector_fkey"
+            columns: ["sector"]
+            isOneToOne: false
+            referencedRelation: "sectors"
+            referencedColumns: ["key"]
+          },
+        ]
       }
     }
     Views: {
-      [_ in never]: never
+      mis_comisiones: {
+        Row: {
+          amount_cents: number | null
+          base_amount_cents: number | null
+          created_at: string | null
+          id: string | null
+          nombre: string | null
+          rate_bps: number | null
+          status: Database["public"]["Enums"]["commission_status"] | null
+        }
+        Relationships: []
+      }
+      mis_items: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          order_id: string | null
+          product_name: string | null
+          quantity: number | null
+          status: Database["public"]["Enums"]["order_status"] | null
+          total_cents: number | null
+          unit_price_cents: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "mis_ventas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mis_productos: {
+        Row: {
+          category: string | null
+          compare_at_price_cents: number | null
+          condition: Database["public"]["Enums"]["product_condition"] | null
+          created_at: string | null
+          id: string | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          low_stock_threshold: number | null
+          name: string | null
+          price_cents: number | null
+          seller_enabled: boolean | null
+          sku: string | null
+          stock: number | null
+        }
+        Insert: {
+          category?: string | null
+          compare_at_price_cents?: number | null
+          condition?: Database["public"]["Enums"]["product_condition"] | null
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          low_stock_threshold?: number | null
+          name?: string | null
+          price_cents?: number | null
+          seller_enabled?: boolean | null
+          sku?: string | null
+          stock?: number | null
+        }
+        Update: {
+          category?: string | null
+          compare_at_price_cents?: number | null
+          condition?: Database["public"]["Enums"]["product_condition"] | null
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          low_stock_threshold?: number | null
+          name?: string | null
+          price_cents?: number | null
+          seller_enabled?: boolean | null
+          sku?: string | null
+          stock?: number | null
+        }
+        Relationships: []
+      }
+      mis_vendedores: {
+        Row: {
+          ciudad: string | null
+          id: string | null
+          joined_at: string | null
+          nombre: string | null
+          referral_code: string | null
+          status: Database["public"]["Enums"]["seller_status"] | null
+        }
+        Relationships: []
+      }
+      mis_ventas: {
+        Row: {
+          commission_base_cents: number | null
+          commission_cents: number | null
+          created_at: string | null
+          id: string | null
+          referral_code: string | null
+          seller_id: string | null
+          status: Database["public"]["Enums"]["order_status"] | null
+          total_cents: number | null
+        }
+        Insert: {
+          commission_base_cents?: number | null
+          commission_cents?: number | null
+          created_at?: string | null
+          id?: string | null
+          referral_code?: string | null
+          seller_id?: string | null
+          status?: Database["public"]["Enums"]["order_status"] | null
+          total_cents?: number | null
+        }
+        Update: {
+          commission_base_cents?: number | null
+          commission_cents?: number | null
+          created_at?: string | null
+          id?: string | null
+          referral_code?: string | null
+          seller_id?: string | null
+          status?: Database["public"]["Enums"]["order_status"] | null
+          total_cents?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "mis_vendedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "store_sellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       apply_template: {
@@ -979,11 +1372,76 @@ export type Database = {
         }
         Returns: string
       }
+      create_store: {
+        Args: {
+          p_commission_bps?: number
+          p_description: string
+          p_name: string
+          p_sellers?: boolean
+          p_template_key: string
+        }
+        Returns: string
+      }
+      ensure_seller_profile: { Args: { p_user_id: string }; Returns: undefined }
+      generate_invite_code: { Args: never; Returns: string }
       generate_referral_code: { Args: never; Returns: string }
-      join_store: { Args: { p_store_slug: string }; Returns: string }
+      insight_filtro: {
+        Args: { p_dataset: string; p_fecha: string }
+        Returns: string
+      }
+      join_store: {
+        Args: { p_invite_code?: string; p_store_slug: string }
+        Returns: string
+      }
       my_seller_ids: { Args: never; Returns: string[] }
+      my_seller_invite: { Args: never; Returns: string }
       my_store_id: { Args: never; Returns: string }
+      rotate_seller_invite: { Args: never; Returns: string }
+      run_insight: {
+        Args: {
+          p_dataset: string
+          p_desde?: string
+          p_dimension: string
+          p_hasta?: string
+          p_limite?: number
+          p_metrica: string
+        }
+        Returns: {
+          etiqueta: string
+          orden: string
+          valor: number
+        }[]
+      }
+      run_insight_sql: {
+        Args: { p_sql: string }
+        Returns: {
+          etiqueta: string
+          valor: number
+        }[]
+      }
+      seller_public_stats: {
+        Args: { p_slug: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          city: string
+          desde: string
+          display_name: string
+          tiendas: number
+          ventas: number
+          volumen_cents: number
+        }[]
+      }
+      seller_public_stores: {
+        Args: { p_slug: string }
+        Returns: {
+          desde: string
+          store_name: string
+          ventas: number
+        }[]
+      }
       store_is_live: { Args: { p_store_id: string }; Returns: boolean }
+      take_product: { Args: { p_product_id: string }; Returns: string }
     }
     Enums: {
       ai_generation_kind: "tienda" | "bloques" | "analisis" | "marketing"
@@ -998,6 +1456,7 @@ export type Database = {
       social_post_status: "borrador" | "publicado" | "compartido" | "fallido"
       social_provider: "facebook" | "whatsapp"
       subscription_status: "prueba" | "activa" | "bloqueada" | "cancelada"
+      user_role: "emprendedor" | "vendedor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1120,6 +1579,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       ai_generation_kind: ["tienda", "bloques", "analisis", "marketing"],
@@ -1139,6 +1601,7 @@ export const Constants = {
       social_post_status: ["borrador", "publicado", "compartido", "fallido"],
       social_provider: ["facebook", "whatsapp"],
       subscription_status: ["prueba", "activa", "bloqueada", "cancelada"],
+      user_role: ["emprendedor", "vendedor"],
     },
   },
 } as const

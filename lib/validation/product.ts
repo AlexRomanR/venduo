@@ -10,7 +10,7 @@ export const productSchema = z.object({
   name: z.string().min(2, "El nombre es muy corto.").max(120),
   description: z.string().max(600).optional().or(z.literal("")),
   price: z
-    .number({ error: "Poné un precio." })
+    .number({ error: "Pon un precio." })
     .nonnegative("El precio no puede ser negativo."),
   stock: z.number().int().min(0).max(9999),
   category: z.string().max(60).optional().or(z.literal("")),

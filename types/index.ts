@@ -29,6 +29,8 @@ export type Plan = Tables<"plans">
 export type Product = Tables<"products">
 export type ProductInsert = TablesInsert<"products">
 export type ProductUpdate = TablesUpdate<"products">
+export type ProductCategory = Tables<"product_categories">
+export type ProductCategoryInsert = TablesInsert<"product_categories">
 
 // Venta
 export type Order = Tables<"orders">
@@ -43,6 +45,8 @@ export type StorePage = Tables<"store_pages">
 export type StoreBlock = Tables<"store_blocks">
 export type BlockType = Tables<"block_types">
 export type Template = Tables<"templates">
+export type TemplatePage = Tables<"template_pages">
+export type Sector = Tables<"sectors">
 export type BlockEditProposal = Tables<"block_edit_proposals">
 
 // IA y difusión

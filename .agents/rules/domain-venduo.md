@@ -71,8 +71,80 @@ La decide la tienda, no quien se suma: `stores.seller_join_mode` es `abierta` (e
 `activo` al instante) o `con_aprobacion` (entra `pendiente`). Eso lo resuelve
 `join_store()`; no replicar la lógica en el cliente.
 
+### Dos caminos, un solo vínculo
+
+Un vendedor llega de dos maneras y hay que tener clara la diferencia:
+
+| Camino                | Qué habilita               | Función                    | Espera aprobación        |
+| --------------------- | -------------------------- | -------------------------- | ------------------------ |
+| Sumarse a la tienda   | El catálogo completo       | `join_store`               | Según `seller_join_mode` |
+| Entrar por invitación | El catálogo completo       | `join_store` con el código | **No**                   |
+| Tomar un producto     | Ese producto de la vitrina | `take_product`             | **No**                   |
+
+### La invitación no es el enlace de la tienda
+
+`venduo.../t/{slug}` es **público**: está impreso en el código QR y se manda por
+WhatsApp a cualquiera. Si tenerlo bastara para entrar sin aprobación,
+`con_aprobacion` sería decorativo.
+
+La invitación es un código aparte que vive en **`store_invites`**, una tabla con
+RLS activo y **cero políticas** —como `social_connections`—: ni el dueño la lee
+con un `select`. Llega a su código por `my_seller_invite()` y lo cambia con
+`rotate_seller_invite()`, las dos `security definer`.
+
+Nunca ponerlo como columna de `stores`: la política de lectura de esa tabla
+expone toda tienda publicada a cualquiera, así que sería un código de invitación
+consultable.
+
+El enlace lleva **la tienda y el código juntos** (`/sumarme?t={slug}&inv={codigo}`).
+No hay ni debe haber un endpoint que traduzca código a tienda: sería justo la
+herramienta para averiguar por descarte qué códigos valen.
+
+Un vínculo `pendiente` que después recibe la invitación pasa a `activo`: la
+invitación **es** la aprobación, y dejarlo esperando contradiría al dueño.
+
+**Marcar un producto es el consentimiento.** Por eso tomar un producto entra `activo`
+aunque la tienda sea `con_aprobacion`: ese modo gobierna el acceso al catálogo entero,
+no al producto que el dueño ya publicó como disponible. Un vínculo pendiente que toma
+un producto marcado pasa a activo, porque dejarlo esperando contradiría al dueño.
+
+Los dos caminos escriben **el mismo vínculo** en `store_sellers`, con un solo código de
+referido por tienda. No hay códigos por producto, y no debe haberlos: `orders.seller_id`
+apunta a un vínculo y el índice único sobre `commissions.order_id` es lo que garantiza
+una comisión por pedido. Un código por producto obliga a rehacer las dos cosas.
+
+### Qué producto acepta vendedores
+
+Dos interruptores, y los dos tienen que estar encendidos:
+
+- `stores.seller_network_enabled` — si la tienda acepta vendedores. Se elige al crearla.
+- `products.seller_enabled` — si ese producto en particular se puede vender. Nace en
+  `true`: el interruptor que manda es el de la tienda, y lo razonable es que al
+  encenderla el catálogo entero esté disponible y el dueño apague las excepciones.
+
+**La comisión se calcula solo sobre los productos habilitados.** Si un pedido mezcla
+productos marcados con otros que no lo están, pagar sobre el total le cobraría al
+emprendedor una comisión que nunca ofreció. `orders.commission_base_cents` guarda esa
+base y se congela igual que la tasa: cambiar después qué productos aceptan vendedores
+no reescribe la historia.
+
 El código de referido usa un alfabeto sin caracteres ambiguos — nada de `0/O` ni `1/I/L` —
 porque se dicta por teléfono y se tipea cuando el QR no escanea.
+
+## El catálogo
+
+Las categorías son **una tabla por tienda**, `product_categories`, y no texto
+suelto en cada producto. Antes lo eran, y dos productos de la misma categoría
+podían escribirla distinto sin que nadie se enterara.
+
+`products.category` sigue existiendo, pero es **una copia derivada** de
+`category_id` que mantiene la base: los bloques de la tienda pública guardan un
+nombre de categoría en sus propiedades y filtran por texto. Está explicado en
+`database-rls.md`.
+
+Un producto lleva además las fotos en `images` —la primera es la portada—, un
+código interno opcional, el umbral de aviso de stock y si va destacado. La foto
+que ve la vitrina sale siempre de `image_url`, que es la portada derivada.
 
 ## Segunda mano
 

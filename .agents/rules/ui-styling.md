@@ -10,16 +10,29 @@ cada superficie nueva.
 Leerlo antes de diseñar una pantalla. Esta regla cubre lo que no se negocia; `DESIGN.md`
 cubre cómo se ve.
 
-### Dos mundos, a propósito
+### Un solo mundo
 
-| Superficie                                                        | Sistema                                                            |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------ |
-| Portada, ingreso `/login`, tienda `/t/{slug}`, perfil `/v/{slug}` | El mundo editorial de `DESIGN.md`: papel, tinta y un rojo de señal |
-| Paneles `/panel` y `/vendedor`                                    | Los tokens de shadcn sin tocar                                     |
+**Toda la aplicación usa el mundo editorial de `DESIGN.md`**: papel, tinta y un rojo de
+señal. Portada, ingreso, altas, vitrinas, paneles, tienda pública y perfil del vendedor.
 
-No es descuido: en 48 horas el diseño se gasta donde lo ve un comprador y un jurado. Los
-paneles sirven para trabajar, no para impresionar. **No mezclar los dos sistemas en una
-misma pantalla.**
+Esto reemplaza la regla anterior de "dos mundos", que reservaba los paneles para los
+tokens de shadcn sin tocar. Se fue estrechando hasta desaparecer —primero el ingreso,
+después las altas, al final los paneles— y sostenerla ya solo producía costuras entre
+pantallas que la misma persona recorre en el mismo minuto.
+
+**Editorial no quiere decir _landing_.** Un diario también es denso. Lo que cambia entre
+una portada y un panel no es la paleta ni la tipografía, es el ritmo:
+
+|               | Portada y tienda          | Paneles                                    |
+| ------------- | ------------------------- | ------------------------------------------ |
+| Aire vertical | `80px` entre secciones    | `40–48px`; el contenido manda              |
+| Titular       | Display, uno por pantalla | El nombre de la tienda o de la persona     |
+| Rojo          | La acción de conversión   | Solo lo que pide una acción: un pendiente  |
+| Barra         | Anclas de navegación      | Navegación persistente, siempre a la vista |
+
+**Los componentes de `components/ui/` se siguen usando.** Se visten con las clases de
+`lib/estilos.ts` en vez de reemplazarse: lo que aportan es el cableado de accesibilidad
+de los formularios, que no se regala por una cuestión de color.
 
 ## Móvil primero, en serio
 
@@ -36,8 +49,12 @@ para nada en este producto.
 ## Tailwind v4
 
 La configuración vive en `app/globals.css`, no en un `tailwind.config`. Los colores se
-usan por sus variables semánticas —`bg-background`, `text-muted-foreground`,
-`border-primary`— y no con valores fijos, para que el tema claro y oscuro funcionen solos.
+usan **siempre por su token** —`bg-papel`, `text-tinta`, `text-senal`, `border-tinta/15`—
+y nunca con un valor fijo: un `#16171a` escrito a mano es un color que ya no responde a
+`DESIGN.md`.
+
+Las jerarquías intermedias son **tinta con opacidad**, no grises nuevos: `opacity-70`
+para texto secundario, `opacity-55` para detalle, `border-tinta/15` para una divisoria.
 
 Clases condicionales siempre con `cn()` de `lib/utils`, que resuelve los conflictos de
 Tailwind. Nunca concatenar strings de clases a mano.
@@ -174,6 +191,67 @@ Y una más, que ya está resuelta: **el mundo visual ya está elegido y document
 `DESIGN.md`.** Una skill de diseño no lo vuelve a abrir. Se usa para ejecutar mejor dentro
 de él, nunca para proponer otra paleta o tipografía.
 
+### Gráficos
+
+Se dibujan **a mano en SVG**, sin biblioteca: el público está en datos móviles y este
+mundo no tiene sombras, ni contenedores redondeados, ni una segunda paleta que una
+biblioteca de gráficos da por supuesta.
+
+**Toda serie va en el rojo de señal, una sola por gráfico.** No es solo por la regla del
+acento único: el validador de la skill `dataviz` mostró que un ramp de un solo tono no
+separa categorías ni con visión normal —ΔE 7,0 entre adyacentes—, así que la identidad
+**nunca** puede venir del color.
+
+De ahí se sigue lo demás:
+
+- **No hay tortas ni anillos.** Una pregunta de composición va a **barras ordenadas con
+  etiqueta directa**: la identidad la da el nombre y la posición.
+- El eje **siempre arranca en cero**. Un eje truncado exagera la variación.
+- Rejilla horizontal y recesiva (tinta al 12%), trazo de 2 px, extremos redondeados de
+  4 px anclados a la base, y marcador solo en el punto activo y el último.
+- Los ejes usan el monto abreviado de `lib/format.ts`; el valor completo va en el
+  tooltip, que es donde alguien lo lee.
+- Rotular el primero y el último del eje, no los treinta.
+- El SVG lleva **`viewBox` y `max-w-full`** además del ancho medido. No es
+  redundante: el navegador descarta notificaciones del observador de tamaño
+  cuando sospecha un bucle —pasaba dos de cada tres veces al angostar la
+  ventana—, y sin ese tope el gráfico se quedaba con el ancho de escritorio
+  desbordando la pantalla. Con la medida al día escala 1:1 y no cambia nada.
+
+#### El informe en PDF
+
+El tablero se exporta con **`@react-pdf/renderer`**, y el documento vive en
+`lib/insights/documento.tsx`. Es la única dependencia que se agregó fuera de lo
+que ya estaba: el PDF tiene que ser un archivo de verdad, que se abra en su
+pestaña y se pueda guardar y mandar por WhatsApp, y eso no lo da imprimir la
+pantalla.
+
+Se genera **en el servidor**, en `app/(privado)/panel/estadisticas/pdf/route.ts`,
+y esa decisión no es de comodidad: la biblioteca y las cuatro tipografías juntas
+pesan más que varias pantallas, y el público está en datos móviles. Así lo único
+que viaja al teléfono es el PDF. La ruta además hereda la sesión, así que RLS
+sigue puesta y el informe no ve nada que no vea el panel.
+
+`?g={id}` limita el informe a un gráfico: es la descarga individual, y usa el
+mismo documento con otro rótulo.
+
+Cuatro cosas que hay que respetar si se toca:
+
+1. **Las fuentes se leen del disco, de `public/fuentes`, nunca de una URL.** Un
+   corte de red en mitad de una demostración devolvería un documento con otra
+   letra. Son Archivo 700/800 y Geist 400/600, las mismas de la pantalla.
+2. **Los `<Text>` dentro de un `<Svg>` no heredan la familia de la página.** Si
+   se olvida el `fontFamily`, esos rótulos salen en Helvetica y se nota.
+3. **Un bloque no se parte entre hojas** (`wrap={false}`): media gráfica arriba
+   y media abajo no se lee. La única excepción es la tabla, que puede ser más
+   larga que una página.
+4. **Los colores son los de `globals.css`, copiados como constantes.** El PDF no
+   ve las variables CSS: si la paleta cambia allá, hay que cambiarla acá.
+
+El documento lleva marco a 20pt del filo, cabecera con la marca y el nombre de
+la tienda, y pie con la marca, la fecha y el número de página. Marco, cabecera y
+pie van `fixed`, así que se repiten en todas las hojas.
+
 ### Iconos
 
 Se dibujan, desde `lucide-react`, con un grosor y tamaño consistentes. **Nunca un glifo de
@@ -197,10 +275,10 @@ contenido tenga un ancho máximo en escritorio — una línea de texto de 1280 p
 
 En 48 horas el diseño no se reparte parejo:
 
-| Superficie                           | Criterio                                                                         |
-| ------------------------------------ | -------------------------------------------------------------------------------- |
-| Tienda pública y perfil del vendedor | **Acá sí.** Es lo que ve un comprador desde el celular y lo que ve un jurado     |
-| Paneles (`/panel`, `/vendedor`)      | shadcn por defecto, rápido y aburrido. Sirven para trabajar, no para impresionar |
+| Superficie                           | Criterio                                                                       |
+| ------------------------------------ | ------------------------------------------------------------------------------ |
+| Tienda pública y perfil del vendedor | **Acá sí.** Es lo que ve un comprador desde el celular y lo que ve un jurado   |
+| Paneles (`/panel`, `/vendedor`)      | El mismo mundo, con menos aire. Sirven para trabajar, y trabajar también se ve |
 
 Para animación, los tres lugares donde cambia la percepción del producto: aplicar una
 propuesta de la IA en el editor de bloques, el carrito, y los avisos.

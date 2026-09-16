@@ -125,14 +125,16 @@ reducida para que el titular mande sin necesidad de un segundo color. El sistema
 está hecho para un Android de gama baja con datos móviles, así que el peso visual
 lo cargan la tipografía y el espacio, no los efectos.
 
-Este mundo rige las **superficies públicas**: la portada, el ingreso `/login`, la
-tienda `/t/{slug}` y el perfil del vendedor `/v/{slug}`. El ingreso entra acá
-porque es la continuación directa de la portada: quien viene de elegir «Crear mi
-tienda» no debería cambiar de mundo al llegar. Los paneles privados
-(`/panel`, `/vendedor`)
-siguen con los tokens por defecto de shadcn (`--background`, `--foreground`,
-`--primary`…), que conviven en `app/globals.css` a propósito. Esa división es
-deliberada y está descrita en `Layout`.
+Este mundo rige **toda la aplicación**: la portada, el ingreso, las altas, las
+vitrinas, los paneles, la tienda `/t/{slug}` y el perfil del vendedor
+`/v/{slug}`. Lo que cambia entre una portada y un panel es el ritmo, no el
+sistema: el panel usa la misma paleta y la misma tipografía con la mitad del
+aire vertical y la navegación siempre a la vista.
+
+Los tokens por defecto de shadcn (`--background`, `--foreground`, `--primary`…)
+siguen declarados en `app/globals.css` porque los componentes generados los
+usan, pero **ninguna pantalla se diseña con ellos**: los controles se visten con
+las clases de `lib/estilos.ts`.
 
 **Key Characteristics:**
 
@@ -253,11 +255,14 @@ una regla inferior de tinta al 15%. Las anclas de navegación se esconden bajo
 
 ### Named Rules
 
-**La regla de los dos mundos.** Las superficies públicas —portada, `/login`,
-`/t/{slug}`, `/v/{slug}`— usan los tokens de este documento. Los paneles privados usan los
-tokens semánticos de shadcn (`bg-background`, `text-muted-foreground`) tal como
-vienen. No se mezclan en una misma pantalla y no se migra uno al otro sin decisión
-explícita: el esfuerzo de diseño se gasta donde miran el comprador y el jurado.
+**La regla del mundo único.** Toda pantalla usa los tokens de este documento, sin
+excepción. Lo que separa un panel de una portada es el **ritmo**, no el sistema:
+secciones de `40–48px` en vez de `80px`, el nombre de la tienda en lugar de un
+display, navegación persistente, y el rojo reservado a lo que pide una acción.
+
+Reemplaza a la regla anterior de "dos mundos". Se fue estrechando hasta
+desaparecer, y sostenerla solo producía costuras entre pantallas que la misma
+persona recorre en el mismo minuto.
 
 **La regla del contenedor único.** Todo alinea a `max-w-6xl`. Si algo necesita
 romper esa línea, lo que sale a sangre es el fondo, nunca el texto.
@@ -382,11 +387,28 @@ de la banda.
 
 ### Motion
 
-Un solo gesto: **entrar**. El elemento sube `14px` y aparece en 500 ms con
+El gesto de fondo es **entrar**. El elemento sube `14px` y aparece en 500 ms con
 `cubic-bezier(0.16, 1, 0.3, 1)`. Los elementos hermanos se escalonan de 70 a 90 ms
 entre uno y el siguiente, con un tope práctico de tres pasos. Los cambios de estado
 (`hover`, foco) son solo de color, con la transición corta por defecto; la foto y
 el llenado de la demostración usan 500 ms `ease-out`.
+
+**Las pantallas donde se elige algo llevan más movimiento**, porque ahí la
+respuesta del sistema es parte de la decisión. Tres gestos sancionados, y no más:
+
+- **Deslizar.** Una colección que se recorre —la galería de plantillas— va en
+  carrusel arrastrable, con flechas rectangulares de 44 px y un contador tabular
+  `01 / 10`. Las flechas se apagan al llegar al extremo; no se esconden.
+- **Revelar.** Un campo que depende de una elección anterior aparece con una
+  transición de altura de 300 ms `ease-out` (`grid-rows-[0fr]` a `[1fr]`) en vez
+  de estar deshabilitado ocupando lugar. Lo mismo la barra de continuación, que
+  entra desde abajo al elegir.
+- **Acercar.** Una vista previa seleccionable escala a `1.02` en 500 ms `ease-out`
+  al pasar el cursor, heredando el gesto de la fotografía. **Sigue valiendo que un
+  botón no se mueve ni escala en `hover`:** esto es para el contenido que se elige,
+  no para el control que se pulsa.
+
+Todo esto respeta `prefers-reduced-motion`, y el estado final se lee sin JavaScript.
 
 **La regla del estado final.** Toda animación parte de un estado ya legible: la
 clase que oculta se agrega recién al montar, y con `prefers-reduced-motion: reduce`

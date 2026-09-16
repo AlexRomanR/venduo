@@ -100,8 +100,46 @@ y descuenta stock. Nada de eso puede quedar en manos del cliente.
 **Si alguna vez escribís `supabase.from("orders").insert(...)`, está mal.** Lo mismo para
 `commissions`: las crea un disparador cuando el pedido pasa a `pagado`.
 
-Las otras funciones del servidor son `join_store(p_store_slug)` y
-`apply_template(p_store_id, p_template_key)`.
+Las otras funciones del servidor son `join_store(p_store_slug, p_invite_code)`,
+`take_product(p_product_id)`, `my_seller_invite()`, `rotate_seller_invite()`,
+`apply_template(p_store_id, p_template_key)`,
+`create_store(p_name, p_description, p_template_key, p_sellers, p_commission_bps)`,
+`run_insight(...)` y las dos del historial público, `seller_public_stats(p_slug)` y
+`seller_public_stores(p_slug)`.
+
+**`run_insight_sql` es la única que ejecuta SQL que no escribió una persona.** Es la
+excepción a todo lo demás y se sostiene en tres cosas que impone Postgres: corre con
+`security invoker` —RLS activa—, en una transacción de **solo lectura** que rechaza
+cualquier escritura, y solo contra las vistas `mis_*`, que ya están acotadas a
+`my_store_id()` y donde `store_id` ni siquiera aparece. Está explicado en `ai-layer.md`.
+
+**La tienda tampoco se inserta desde el cliente.** `create_store` resuelve tres
+cosas que no se pueden repartir: el slug único —comprobarlo desde el navegador es
+una carrera perdida, y ese slug es el que se imprime en el QR—, la suscripción de
+prueba —que no tiene política de INSERT a propósito, así que la tienda nacería sin
+ella— y la siembra de la plantilla. En llamadas separadas, que falle la segunda
+deja una tienda a medio crear.
+
+## Columnas derivadas: las mantiene la base
+
+`products` tiene dos columnas que **son copias** y no se escriben desde la
+aplicación. Las pone el disparador `producto_derivados` en cada insert y update:
+
+| Columna     | Sale de       | Por qué existe la copia                                     |
+| ----------- | ------------- | ----------------------------------------------------------- |
+| `image_url` | `images[1]`   | La portada. Los bloques de la tienda pública la leen        |
+| `category`  | `category_id` | Los bloques filtran por nombre y las vistas `mis_*` lo leen |
+
+**No escribirlas en un insert ni en un update.** La fuente son `images` y
+`category_id`; el disparador también refresca `updated_at`. Renombrar una
+categoría arrastra la copia a sus productos, y eso lo hace
+`categoria_renombrada` sobre `product_categories`.
+
+`product_categories` es por tienda, con único parcial sobre
+`(store_id, lower(name))`: "Poleras" y "poleras" son la misma, y una categoría
+dada de baja no bloquea su nombre para siempre. Borrarla no borra productos —
+`category_id` es `on delete set null`— y quedan sin categoría, visibles y a la
+venta.
 
 ## Migraciones
 
@@ -123,5 +161,12 @@ Las políticas RLS van juntas en su propio archivo, para poder auditarlas de una
 
 ## Tablas sin políticas
 
-`social_connections` tiene RLS activo y **cero políticas**, a propósito: guarda tokens de
-Meta y solo se accede con la clave de servicio. No agregarle políticas.
+Dos tablas tienen RLS activo y **cero políticas**, a propósito. No agregarles.
+
+`social_connections` guarda tokens de Meta y solo se accede con la clave de servicio.
+
+`store_invites` guarda el código de invitación de cada tienda. Ni siquiera el dueño la
+lee con un `select`: llega a su código por `my_seller_invite()`, que es
+`security definer`. Si el código fuera una columna de `stores`, la política
+`"tiendas: leer"` —que expone toda tienda publicada— lo dejaría a la vista de
+cualquiera.

@@ -34,13 +34,14 @@ Se obtiene con `getAIProvider()` de `lib/ai/index.ts`. `getAIStatus()` devuelve
 
 ## Las tareas que existen
 
-En `lib/ai/tasks.ts` hay **tres**, y todas siguen el mismo molde:
+En `lib/ai/tasks.ts` hay **cuatro**, y todas siguen el mismo molde:
 
 | Tarea                    | Devuelve                         |
 | ------------------------ | -------------------------------- |
 | `generateStoreBlueprint` | `{ blueprint, provider, model }` |
 | `analyzeSales`           | `{ insight, provider, model }`   |
 | `generateCampaign`       | `{ campaign, provider, model }`  |
+| `buildInsightSql`        | `{ consulta, provider, model }`  |
 
 Para agregar una cuarta:
 
@@ -62,6 +63,26 @@ AI_API_KEY=...
 
 Para sumar un proveedor nuevo: escribir el adaptador en `lib/ai/providers/` implementando
 `AIProvider`, y registrarlo en `REGISTRY` de `lib/ai/index.ts`. Nada más cambia.
+
+### Dos trampas del adaptador
+
+**El razonamiento viaja dentro de la respuesta.** Gemini 3 piensa antes de
+contestar, ese pensamiento llega como una parte más —marcada con `thought`— y
+**gasta el mismo presupuesto de salida**. Un adaptador que concatena todas las
+partes le pega el razonamiento delante al JSON y no parsea nada; y con el nivel
+por defecto el modelo se comía los 4096 tokens deliberando sobre qué vista usar,
+así que el JSON llegaba cortado a mitad de una frase. `google.ts` filtra las
+partes de pensamiento y baja el nivel con `thinkingConfig`. La misma pregunta
+pasó de 18 a 6 segundos.
+
+El nombre del parámetro cambió entre generaciones —`thinkingLevel` en la 3,
+`thinkingBudget` en la 2.5— y mandar el de la otra es un 400. Por eso se elige
+por modelo, y los que no razonan no lo reciben.
+
+**Saturación no es error.** Un 503 de Google dice "high demand" y un momento
+después responde bien; si eso llega a la pantalla como "la IA no pudo
+responder", es falso y además no dice qué hacer. Se reintenta 429, 500 y 503 con
+espera creciente. Nunca un 400: volvería a fallar igual.
 
 ## El modo mock no es opcional
 
@@ -97,16 +118,80 @@ sirve para instrumentación, no para persistir.
 
 ## Inteligencia de negocio: las defensas
 
-Cuando la IA arme consultas sobre los datos, tres reglas que no son negociables:
+Tres reglas que no son negociables:
 
-- **La IA solo lee.** Nunca borra, actualiza ni ejecuta nada que modifique datos. Rol de
-  base de datos de solo lectura.
-- **El `store_id` lo impone el sistema, nunca la IA.** El filtro se inyecta del lado del
-  servidor, después de recibir la propuesta.
-- **Lista blanca de tablas**, tiempo máximo de consulta y tope de filas.
+- **La IA solo lee.** Nunca borra, actualiza ni ejecuta nada que modifique datos.
+- **El `store_id` lo impone el sistema, nunca la IA.**
+- **Lista blanca de tablas**, tope de filas y rango acotado.
 
-Hoy `analyzeSales` recibe un arreglo de ventas ya calculado y no genera consultas. Esas
-defensas hay que escribirlas antes de que empiece a hacerlo.
+### La IA escribe SQL, pero no elige dónde corre
+
+El modelo devuelve la consulta. Lo que la hace segura no es confiar en él ni
+filtrar palabras —eso siempre se rodea— sino **dónde se ejecuta**.
+`run_insight_sql` impone tres cosas que las hace cumplir Postgres, no la
+aplicación:
+
+1. **`security invoker`**: corre como el usuario, con RLS activa.
+2. **`set local transaction read only`**: la base rechaza toda escritura, aunque
+   el filtro de texto se rodee. Comprobado: un UPDATE levanta
+   _"cannot execute UPDATE in a read-only transaction"_.
+3. **`statement_timeout` y `limit` impuesto por el servidor**, no por la
+   consulta que llegó.
+
+### Solo las vistas de mi tienda
+
+RLS no alcanza por sí sola. La política de `products` deja leer el catálogo de
+**toda tienda publicada** —hace falta para que un comprador navegue— y la de
+`seller_profiles` es pública por el historial laboral. Con las tablas base a la
+vista, "mis productos más vendidos" podía mezclar los de todos: no una fuga de
+datos privados, pero sí **una respuesta incorrecta**, que en una herramienta de
+análisis es igual de grave.
+
+Por eso la IA escribe contra cinco vistas ya acotadas a `my_store_id()`:
+
+| Vista            | Qué trae                       |
+| ---------------- | ------------------------------ |
+| `mis_ventas`     | Pedidos                        |
+| `mis_items`      | Líneas de pedido, por producto |
+| `mis_productos`  | Catálogo y stock               |
+| `mis_vendedores` | La red                         |
+| `mis_comisiones` | Lo que generó cada vendedor    |
+
+**En esas vistas no existe `store_id`.** El alcance deja de depender de que el
+modelo se acuerde de filtrar. Nombrar una tabla base corta la consulta.
+
+El contrato de salida es fijo: toda consulta devuelve `etiqueta` y `valor`. Eso
+es lo que permite dibujar sin adivinar qué vino.
+
+**Una fila no siempre es una cifra.** `normalizarForma` degrada a `numero` solo
+cuando la etiqueta es un rótulo de total. Una consulta agrupada que devolvió un
+único grupo —"activo", "2026-09"— conserva su gráfico: volverla un número suelto
+tira la etiqueta, y "5" no contesta "¿en qué estado están mis vendedores?".
+
+**El tipo de gráfico que nombra la persona manda.** Torta y dona no existen —la
+paleta es un solo rojo y el color no puede separar categorías, ver
+`ui-styling.md`—, así que el modelo tiene instrucción de contestar con barra
+ordenada **y decirlo**, en vez de ignorar el pedido en silencio.
+
+**El esquema que ve el modelo vive en `lib/insights/esquema.ts`.** Es lo único
+que sabe de la base: agregar una columna a una vista sin agregarla ahí la deja
+invisible.
+
+### La lectura del gráfico se calcula, no se pregunta
+
+La `explicacion` que devuelve el modelo se escribe **antes** de ejecutar la
+consulta, así que solo puede describir la intención —"voy a mostrar las ventas
+por vendedor"—, nunca lo que salió. Sirve de epígrafe del gráfico y nada más.
+
+Lo que **lee** el gráfico es `leerGrafico()` de `lib/insights/lectura.ts`, que
+mira las filas ya calculadas y dice quién encabeza, con cuánta ventaja y cómo
+viene la tendencia. Se calcula en vez de pedírselo al modelo por dos razones:
+sale al instante, y las cifras no pueden estar mal porque salen del mismo
+resultado que se está dibujando. Un segundo viaje al proveedor costaría otros
+seis segundos y podría contradecir al gráfico que tiene al lado.
+
+`analyzeSales` es otra cosa y sigue como estaba: recibe una serie ya calculada y la
+comenta en palabras. No genera consultas.
 
 ## Edición de la tienda
 

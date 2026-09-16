@@ -62,3 +62,6 @@ next-env.d.ts
 /.impeccable/mocks
 /.impeccable/review
 /.impeccable/build
+
+# Archivos de bloqueo que deja Word abierto.
+~$*

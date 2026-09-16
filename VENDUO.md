@@ -36,7 +36,7 @@ Una plataforma donde cualquier emprendedor elige una plantilla, describe su nego
 
 ### Para el vendedor
 
-1. Se registra y se suma a una o varias tiendas. Por defecto el alta es inmediata; si el emprendedor lo configuró así, queda a la espera de aprobación.
+1. Se suma a una o varias tiendas, o toma productos sueltos de una vitrina pública que reúne lo que cada emprendedor marcó como disponible para vendedores. Sumarse a una tienda entera puede quedar a la espera de aprobación; tomar un producto marcado no, porque marcarlo ya fue el consentimiento del dueño.
 2. Recibe un enlace y un QR propios, más los materiales de promoción que la IA generó.
 3. Vende por sus redes, en su barrio o cara a cara.
 4. Cada venta que entra por su enlace queda trazada y le genera comisión automática.
@@ -189,6 +189,8 @@ Ruteo **por path, no por subdominio**:
 | ----------- | --------------------------------------------------- |
 | `/t/{slug}` | Tienda pública del emprendedor                      |
 | `/v/{slug}` | Perfil público del vendedor y su enlace de referido |
+| `/crear`    | Alta de la tienda: plantilla y descripción          |
+| `/sumarme`  | Alta del vendedor: cómo sumarse a una tienda        |
 | `/panel`    | Panel del emprendedor                               |
 | `/vendedor` | Panel del vendedor                                  |
 
@@ -213,7 +215,8 @@ Tan importante como la lista de lo que sí:
 
 - **Inicio** — presentación del producto
 - **Crear** — elección de plantilla y onboarding conversacional
-- **Panel del emprendedor** — productos, pedidos, vendedores, estadísticas, marketing
+- **Empezar a vender** — el equivalente del vendedor: cómo sumarse a una tienda
+- **Panel del emprendedor** — resumen, y desde ahí productos, pedidos, vendedores, estadísticas, marketing
 - **Panel del vendedor** — ventas, comisiones, materiales de promoción
 - **Tienda pública** — catálogo con filtro de segunda mano, ficha de producto, carrito, checkout
 - **Perfil público del vendedor** — su historial laboral verificable
@@ -289,12 +292,13 @@ No hay columna de moneda: es constante del sistema.
 
 **`products`** — suma respecto del esquema actual:
 
-| Columna                  | Nota                                                                                                                                          |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `condition`              | `nuevo`, `segunda_mano` o `reacondicionado`. **Lo elige el emprendedor al cargar el producto** y es lo que alimenta el filtro de segunda mano |
-| `condition_note`         | Descripción del estado, para usados                                                                                                           |
-| `compare_at_price_cents` | Precio anterior, opcional. Debe ser mayor o igual al precio. Es lo que produce el descuento destacado                                         |
-| `deleted_at`             | Borrado lógico                                                                                                                                |
+| Columna                  | Nota                                                                                                                                            |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `condition`              | `nuevo`, `segunda_mano` o `reacondicionado`. **Lo elige el emprendedor al cargar el producto** y es lo que alimenta el filtro de segunda mano   |
+| `condition_note`         | Descripción del estado, para usados                                                                                                             |
+| `compare_at_price_cents` | Precio anterior, opcional. Debe ser mayor o igual al precio. Es lo que produce el descuento destacado                                           |
+| `seller_enabled`         | Si este producto se puede vender por vendedores. Nace en `true`; el interruptor que manda es el de la tienda. Es lo que arma la vitrina pública |
+| `deleted_at`             | Borrado lógico                                                                                                                                  |
 
 #### Venta
 
@@ -310,6 +314,7 @@ No hay columna de moneda: es constante del sistema.
 | `referral_code`                      | Copia textual del código usado, sobrevive al borrado del vínculo                                                               |
 | `subtotal_cents`, `total_cents`      |                                                                                                                                |
 | `commission_bps`, `commission_cents` | **Congelados al momento de la venta**                                                                                          |
+| `commission_base_cents`              | Sobre cuánto se calculó la comisión: solo los productos con `seller_enabled`. También congelado                                |
 | `net_to_store_cents`                 | Lo que le corresponde al emprendedor                                                                                           |
 | `status`                             | `pendiente`, `pagado`, `enviado`, `entregado`, `cancelado`                                                                     |
 | `payment_proof_url`, `paid_at`       |                                                                                                                                |
@@ -349,13 +354,16 @@ El estado inicial depende de `seller_join_mode` de la tienda: `activo` si el alt
 
 #### Tienda visual
 
-| Tabla                         | Qué guarda                                                                                       |
-| ----------------------------- | ------------------------------------------------------------------------------------------------ |
-| `block_types`                 | **Catálogo global.** Cada tipo de bloque con su esquema de propiedades y sus valores por defecto |
-| `templates`, `template_pages` | **Catálogo global.** Plantillas por rubro y los bloques que siembran cada página                 |
-| `store_pages`                 | Páginas concretas de cada tienda, con estado borrador o publicada                                |
-| `store_blocks`                | Bloques concretos: tipo, posición, propiedades en JSON y visibilidad                             |
-| `block_edit_proposals`        | Lo que la IA propuso, con el estado previo guardado                                              |
+| Tabla                         | Qué guarda                                                                                                                                           |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `block_types`                 | **Catálogo global.** Cada tipo de bloque con su esquema de propiedades y sus valores por defecto                                                     |
+| `templates`, `template_pages` | **Catálogo global.** Plantillas por rubro y los bloques que siembran cada página                                                                     |
+| `sectors`                     | **Catálogo global.** Los rubros con su nombre visible y su orden. `templates.sector` lo referencia, y es lo que agrupa la galería del alta           |
+| `store_invites`               | El código de invitación de cada tienda. **RLS activo y cero políticas**: ni el dueño la lee directamente, llega a su código por `my_seller_invite()` |
+| `insights`                    | Gráficos guardados. Guarda la **especificación**, no las filas: se recalcula con los datos de cada día                                               |
+| `store_pages`                 | Páginas concretas de cada tienda, con estado borrador o publicada                                                                                    |
+| `store_blocks`                | Bloques concretos: tipo, posición, propiedades en JSON y visibilidad                                                                                 |
+| `block_edit_proposals`        | Lo que la IA propuso, con el estado previo guardado                                                                                                  |
 
 El vínculo de un bloque con su tipo **no se puede romper**: no se retira del catálogo un tipo de bloque que alguna tienda esté usando.
 

@@ -135,13 +135,15 @@ un JSON mal formado produce un error claro, no una pantalla rota.
 
 ```
 app/
-  page.tsx                 Redirige a /login
-  login/                   Registro e ingreso con email y contraseña
+  page.tsx                 Portada pública
+  login/                   Registro e ingreso con correo y contraseña
+  crear/                   Alta de la tienda: plantilla (paso 1) y negocio (paso 2)
+  sumarme/                 Alta del vendedor: cómo sumarse a una tienda
   auth/callback/           Intercambio de código por sesión
   auth/sign-out/           Cierre de sesión
   (privado)/               Grupo de rutas: no aparece en la URL
     layout.tsx             Shell compartido de las áreas privadas
-    panel/                 Panel del emprendedor
+    panel/                 Resumen del emprendedor y sus cinco secciones
     vendedor/              Panel del vendedor
   api/
     health/                Estado del servidor y de las capas
@@ -149,8 +151,9 @@ app/
 lib/                       Infraestructura lista para usar, sin UI encima
   ai/                      Capa de IA: tipos, registro, adaptadores, tareas
   supabase/                Clientes (browser, server, admin), middleware, storage
-  data/                    Consultas de ejemplo sobre el esquema
+  data/                    Consultas de lectura: panel, plantillas, dashboard
   validation/              Esquemas zod compartidos entre formularios y acciones
+  demo-data.ts             Datos de ejemplo del modo demo
   env.ts                   Entorno validado con zod
   qr.ts                    Generación de códigos QR
   format.ts                Moneda, fechas, slugs
@@ -158,6 +161,9 @@ lib/                       Infraestructura lista para usar, sin UI encima
 components/
   ui/                      shadcn/ui completo
   auth/acceso.tsx          Ingreso y registro, con la promesa de cada rol
+  onboarding/              Altas: marco, pasos, galería y vista previa
+  panel/                   Piezas del panel del emprendedor
+  landing/                 Piezas de la portada
   config-status.tsx        Checklist de capas configuradas
 
 supabase/migrations/       Esquema SQL, RLS y buckets
