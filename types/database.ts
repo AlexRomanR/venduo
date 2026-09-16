@@ -1396,6 +1396,13 @@ export type Database = {
       my_seller_ids: { Args: never; Returns: string[] }
       my_seller_invite: { Args: never; Returns: string }
       my_store_id: { Args: never; Returns: string }
+      referido_publico: {
+        Args: { p_codigo: string; p_store_id: string }
+        Returns: {
+          codigo: string
+          nombre: string
+        }[]
+      }
       rotate_seller_invite: { Args: never; Returns: string }
       run_insight: {
         Args: {

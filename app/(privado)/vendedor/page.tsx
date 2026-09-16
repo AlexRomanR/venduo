@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { ArrowUpRight, Plus } from "lucide-react"
 
 import { getVinculosDeVendedor } from "@/lib/data/panel"
+import { urlDeReferido } from "@/lib/tienda"
 import {
   getComisionesDeVendedor,
   getResumenVendedor,
@@ -71,7 +72,7 @@ export default async function VendedorPage() {
 
   const qr = principal
     ? await toDataURL(
-        `${sitio}/t/${principal.storeSlug}?ref=${principal.referralCode}`,
+        urlDeReferido(principal.storeSlug, principal.referralCode),
         { size: 320, margin: 1, dark: "#16171a" }
       )
     : null
@@ -180,7 +181,10 @@ export default async function VendedorPage() {
                   <div className="mt-4">
                     <MaterialesVendedor
                       storeName={vinculo.storeName}
-                      enlace={`${sitio}/t/${vinculo.storeSlug}?ref=${vinculo.referralCode}`}
+                      enlace={urlDeReferido(
+                        vinculo.storeSlug,
+                        vinculo.referralCode
+                      )}
                       codigo={vinculo.referralCode}
                     />
                   </div>

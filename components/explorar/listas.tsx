@@ -5,6 +5,7 @@ import { Check, Copy, Loader2, Store, Tag } from "lucide-react"
 import { toast } from "sonner"
 
 import type { ProductoVitrina, TiendaAbierta } from "@/lib/demo-data"
+import { urlDeProducto } from "@/lib/tienda"
 import { formatMoney, formatPercent } from "@/lib/format"
 import { createClient } from "@/lib/supabase/client"
 
@@ -174,7 +175,7 @@ export function ListaProductos({
       {productos.map((producto) => {
         const codigo = codigos[producto.id]
         const enlace = codigo
-          ? `${siteUrl}/t/${producto.storeSlug}?ref=${codigo}`
+          ? urlDeProducto(producto.storeSlug, producto.id, codigo)
           : null
         const ganancia = Math.round(
           (producto.priceCents * producto.commissionBps) / 10000

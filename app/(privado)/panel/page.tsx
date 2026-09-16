@@ -11,6 +11,7 @@ import {
 } from "lucide-react"
 
 import { getMiTienda, getResumenPanel } from "@/lib/data/panel"
+import { urlDeTienda } from "@/lib/tienda"
 import { RESUMEN_DEMO } from "@/lib/demo-data"
 import { getSiteUrl, isSupabaseConfigured } from "@/lib/env"
 import { formatMoney, formatNumber } from "@/lib/format"
@@ -68,7 +69,7 @@ export default async function PanelPage() {
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
   const resumen = (await getResumenPanel()) ?? RESUMEN_DEMO
-  const url = `${getSiteUrl()}/t/${resumen.tienda.slug}`
+  const url = urlDeTienda(resumen.tienda.slug)
   const qr = await toDataURL(url, { size: 320, margin: 1, dark: "#16171a" })
 
   // Lo que espera una acción. Se arma acá y no en la interfaz porque el orden

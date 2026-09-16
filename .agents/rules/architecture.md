@@ -19,6 +19,7 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/`                           | Portada pública                                         | Público         |
 | `/login`                      | Registro e ingreso                                      | Público         |
 | `/t/{slug}`                   | Tienda pública del emprendedor                          | Público         |
+| `/t/{slug}/p/{id}`            | Un producto de esa tienda, con su formulario de pedido  | Público         |
 | `/v/{slug}`                   | Perfil público del vendedor                             | Público         |
 | `/crear`                      | Alta de la tienda, paso 1: elegir plantilla             | Requiere sesión |
 | `/crear/negocio`              | Alta de la tienda, paso 2: nombre y rubro               | Requiere sesión |
@@ -60,8 +61,32 @@ El rol **redirige pero no prohíbe**. Un vendedor que pide `/crear` va a su pane
 y encuentra ahí un enlace a `/crear?abrir=1` que lo deja pasar: `primary_role` es
 una intención, y una misma persona puede terminar siendo dueña y vendedora.
 
-Ruteo **por path, no por subdominio**. Se usa el slug y no el identificador porque estas
-URLs se imprimen en códigos QR y se mandan por WhatsApp.
+## El enlace de la tienda
+
+Se usa el slug y no el identificador porque estas URLs se imprimen en códigos QR y se
+mandan por WhatsApp.
+
+**Nadie arma ese enlace a mano.** Sale de `urlDeTienda`, `urlDeReferido` y
+`urlDeProducto`, en `lib/tienda.ts`. Antes lo concatenaban siete archivos y cambiar la
+forma obligaba a encontrarlos todos.
+
+Hay **dos formas y un interruptor**, `NEXT_PUBLIC_DOMINIO_TIENDAS`:
+
+| El interruptor | El enlace                    |
+| -------------- | ---------------------------- |
+| Vacío          | `venduo.app/t/rosa-deportes` |
+| `venduo.com`   | `rosa-deportes.venduo.com`   |
+
+El subdominio es la forma deseable —se dicta por teléfono sin explicar una barra— pero
+necesita tres cosas que no se resuelven desde el código: el dominio propio, un registro
+DNS comodín `*.dominio`, y ese comodín dado de alta en el proveedor. Hasta que existan,
+el interruptor queda vacío y todo sale por ruta.
+
+El middleware **reescribe**, no redirige: `rosa-deportes.venduo.com` sirve `/t/rosa-deportes`
+sin cambiar la barra de direcciones. La ruta `/t/{slug}` sigue existiendo siempre, así que
+un QR ya impreso no deja de funcionar el día que se enciende el dominio.
+`SUBDOMINIOS_RESERVADOS` protege `www`, `app`, `api` y compañía de ser tomados por una
+tienda.
 
 **No se usa `/dashboard`.** Es la única ruta que estuvo en inglés y ya se renombró.
 
@@ -77,6 +102,7 @@ app/
     panel/            Resumen del emprendedor y sus secciones
     vendedor/         Panel del vendedor
     cuenta/           Ajustes de la persona, su tienda y su perfil
+  t/[slug]/           Tienda pública: portada, producto y pedido
   v/[slug]/           Historial laboral público del vendedor
   crear/              Alta de la tienda (layout propio)
     negocio/
@@ -98,6 +124,7 @@ components/
   cuenta/             Formularios de ajustes y foto de perfil
   insights/           Cuaderno, tablero y gráficos SVG
   productos/          Catálogo: lista, filtros, formulario, fotos y categorías
+  tienda/             La tienda pública: bloques, marco y formulario de pedido
   panel/              Shell, cifras y piezas de los dos paneles
   landing/            Piezas de la portada
   config-status.tsx   Checklist de capas configuradas
@@ -111,6 +138,7 @@ lib/
   insights/           Lo que se puede preguntar, la lectura y el documento PDF
   demo-data.ts        Datos de ejemplo del modo demo
   estilos.ts          Clases del vestido editorial de los controles
+  tienda.ts           El enlace de una tienda, y el slug que pide un subdominio
   format.ts           Moneda, fechas, slugs
   qr.ts               Códigos QR
   env.ts              Entorno validado con zod

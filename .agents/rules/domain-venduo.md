@@ -81,6 +81,26 @@ Un vendedor llega de dos maneras y hay que tener clara la diferencia:
 | Entrar por invitación | El catálogo completo       | `join_store` con el código | **No**                   |
 | Tomar un producto     | Ese producto de la vitrina | `take_product`             | **No**                   |
 
+### El código de referido se propaga, no se valida en la tienda
+
+Quien compra es **anónimo**, y `store_sellers` solo se lee `to authenticated`. Así que la
+tienda pública no puede comprobar si un código existe.
+
+De ahí dos reglas:
+
+1. **El código viaja tal como vino** por toda la tienda —de la portada al producto—
+   después de una limpieza de forma. Propagar solo el código ya resuelto parecía más
+   prudente y era justo lo contrario: para un comprador real nunca resolvía, así que el
+   referido se perdía al primer clic y con él la comisión del vendedor.
+2. **El árbitro es `create_order`.** Vuelve a resolver el código contra esa tienda antes
+   de congelar la comisión. Un código inventado se ignora ahí y la venta queda sin
+   vendedor, que es lo correcto.
+
+El cartel de "te trajo Ana" es otra cosa: solo se muestra, y sale de `referido_publico`,
+una función `security definer` que confirma que el código pertenece a un vínculo activo
+de esa tienda y devuelve el nombre público del vendedor. Que falle no cambia a quién se
+le paga.
+
 ### La invitación no es el enlace de la tienda
 
 `venduo.../t/{slug}` es **público**: está impreso en el código QR y se manda por

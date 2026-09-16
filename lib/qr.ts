@@ -1,5 +1,7 @@
 import QRCode from "qrcode"
 
+import { urlDeTienda } from "@/lib/tienda"
+
 export type QRKind = "tienda" | "vendedor" | "pago"
 
 export interface QROptions {
@@ -55,13 +57,17 @@ export function buildQRTarget(
   id: string,
   extra?: Record<string, string>
 ): string {
-  const paths: Record<QRKind, string> = {
-    tienda: `/t/${id}`,
-    vendedor: `/v/${id}`,
-    pago: `/pagar/${id}`,
-  }
+  // La tienda puede vivir en un subdominio, así que su URL la arma
+  // `urlDeTienda`; las otras dos son siempre rutas del sitio.
+  const base =
+    kind === "tienda"
+      ? urlDeTienda(id)
+      : new URL(
+          kind === "vendedor" ? `/v/${id}` : `/pagar/${id}`,
+          siteUrl
+        ).toString()
 
-  const url = new URL(paths[kind], siteUrl)
+  const url = new URL(base)
   for (const [key, value] of Object.entries(extra ?? {})) {
     url.searchParams.set(key, value)
   }
