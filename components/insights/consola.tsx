@@ -178,7 +178,7 @@ export function Consola({
           type="submit"
           disabled={enCurso || texto.trim().length === 0}
           aria-label="Preguntar"
-          className="flex size-12 shrink-0 items-center justify-center rounded-sm bg-senal text-white transition-colors hover:bg-senal-alta disabled:opacity-40"
+          className="flex size-12 shrink-0 items-center justify-center rounded-plantilla bg-senal text-white transition-colors hover:bg-senal-alta disabled:opacity-40"
         >
           {enCurso ? (
             <Loader2 aria-hidden="true" className="size-4 animate-spin" />
@@ -270,7 +270,7 @@ export function Consola({
                     onClick={() => alGuardar(entrada)}
                     disabled={entrada.guardado}
                     className={cn(
-                      "flex min-h-11 shrink-0 items-center gap-2 rounded-sm border-2 px-4 text-sm font-semibold transition-colors",
+                      "flex min-h-11 shrink-0 items-center gap-2 rounded-plantilla border-2 px-4 text-sm font-semibold transition-colors",
                       entrada.guardado
                         ? "border-tinta/20 text-tinta/40"
                         : "border-tinta hover:bg-tinta hover:text-papel"

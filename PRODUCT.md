@@ -39,13 +39,21 @@ El mecanismo que un competidor no podría copiar sin rehacer su modelo: **Venduo
 comisión por venta.** El porcentaje que se descuenta va íntegro al vendedor que la generó.
 El único ingreso es la suscripción del emprendedor, y el joven no paga nunca nada.
 
+Y al comprador le da una garantía que un negocio de TikTok no puede dar solo: **su pago
+queda retenido hasta que recibe el pedido.** Si el producto no aparece, no pierde la plata.
+
 ## Operating Context
 
 - **El celular es el dispositivo principal**, tanto para vender como para comprar.
 - **La entrega se coordina por WhatsApp** entre el emprendedor y el comprador. La
-  plataforma arma el mensaje con el detalle del pedido; no gestiona envíos.
-- **El cobro es por QR** con comprobante de transferencia. En el MVP la pasarela está
-  simulada: el comprador sube el comprobante y el emprendedor confirma a mano.
+  plataforma arma el mensaje con el detalle del pedido y registra solo dos marcas —enviado
+  y recibido—, que son las que liberan el pago. No gestiona envíos.
+- **El cobro es por PagoFácil, con custodia.** El comprador paga, el dinero queda retenido
+  en PagoFácil, y se libera al emprendedor y al vendedor cuando el comprador confirma que
+  recibió —o solo, si pasa el plazo sin respuesta—. Si hay un reclamo, el pago se congela y
+  Venduo media. **Venduo nunca recibe ni guarda el dinero**, y el costo de PagoFácil lo
+  absorbe el emprendedor. En el MVP la pasarela es simulada, y lo construido hoy todavía es
+  un flujo provisorio de QR bancario con comprobante, sin custodia.
 - Los enlaces de tienda y de vendedor **se imprimen en códigos QR y se mandan por
   WhatsApp**, así que tienen que ser legibles y compartibles.
 - El vendedor trabaja en sus redes, en su barrio y cara a cara.
@@ -61,11 +69,15 @@ El único ingreso es la suscripción del emprendedor, y el joven no paga nunca n
   plataforma y sus datos se purgan, el antecedente laboral del joven queda intacto.
 - **Registro con correo y contraseña, sin verificación.** La fricción de verificar un
   correo es la barrera que la plataforma promete no ponerle a un joven.
-- **Fuera de alcance, confirmado:** gestión de envíos, cobro de la suscripción,
-  notificaciones por correo, aplicación móvil nativa y tests automatizados.
-- **Decisión abierta:** si en producción la pasarela puede dispersar el pago a un
-  beneficiario que no es el comercio, y qué identificación le exige. Si exigiera alta
-  formal de cada vendedor, choca con la promesa de cero barrera de entrada.
+- **Fuera de alcance, confirmado:** gestión de envíos, recibir o guardar el dinero de una
+  venta, cobro de la suscripción, notificaciones por correo, aplicación móvil nativa y
+  tests automatizados.
+- **Decisiones abiertas con PagoFácil:** si puede retener un cobro y liberarlo o devolverlo
+  por orden de Venduo; si la dispersión admite como beneficiario al vendedor, que no es el
+  comercio; y qué identificación le exige. Si exigiera alta formal de cada vendedor, choca
+  con la promesa de cero barrera de entrada.
+- **Decisiones abiertas del producto:** el plazo de liberación automática (se propone 7
+  días desde el envío) y qué pasa si el emprendedor nunca marca el pedido enviado.
 
 La especificación funcional completa vive en `VENDUO.md` y es la fuente de verdad.
 

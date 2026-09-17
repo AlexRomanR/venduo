@@ -891,6 +891,66 @@ export type Database = {
           },
         ]
       }
+      store_design_versions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          note: string | null
+          number: number
+          origin: Database["public"]["Enums"]["design_origin"]
+          pages: Json
+          store_id: string
+          template_key: string | null
+          template_version: number | null
+          theme_overrides: Json
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          note?: string | null
+          number: number
+          origin: Database["public"]["Enums"]["design_origin"]
+          pages?: Json
+          store_id: string
+          template_key?: string | null
+          template_version?: number | null
+          theme_overrides?: Json
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          note?: string | null
+          number?: number
+          origin?: Database["public"]["Enums"]["design_origin"]
+          pages?: Json
+          store_id?: string
+          template_key?: string | null
+          template_version?: number | null
+          theme_overrides?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_design_versions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_design_versions_template_key_fkey"
+            columns: ["template_key"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
       store_invites: {
         Row: {
           code: string
@@ -1035,7 +1095,7 @@ export type Database = {
           slug: string
           tagline: string | null
           template_key: string | null
-          theme: Json
+          theme_overrides: Json
           updated_at: string
           whatsapp: string | null
         }
@@ -1056,7 +1116,7 @@ export type Database = {
           slug: string
           tagline?: string | null
           template_key?: string | null
-          theme?: Json
+          theme_overrides?: Json
           updated_at?: string
           whatsapp?: string | null
         }
@@ -1077,7 +1137,7 @@ export type Database = {
           slug?: string
           tagline?: string | null
           template_key?: string | null
-          theme?: Json
+          theme_overrides?: Json
           updated_at?: string
           whatsapp?: string | null
         }
@@ -1183,7 +1243,7 @@ export type Database = {
           name: string
           preview_image_url: string | null
           sector: string
-          theme: Json
+          version: number
         }
         Insert: {
           created_at?: string
@@ -1193,7 +1253,7 @@ export type Database = {
           name: string
           preview_image_url?: string | null
           sector: string
-          theme?: Json
+          version?: number
         }
         Update: {
           created_at?: string
@@ -1203,7 +1263,7 @@ export type Database = {
           name?: string
           preview_image_url?: string | null
           sector?: string
-          theme?: Json
+          version?: number
         }
         Relationships: [
           {
@@ -1374,6 +1434,18 @@ export type Database = {
         Args: { p_store_id: string; p_template_key: string }
         Returns: undefined
       }
+      capture_design_version: {
+        Args: {
+          p_note?: string
+          p_origin: Database["public"]["Enums"]["design_origin"]
+          p_store_id: string
+        }
+        Returns: string
+      }
+      change_store_template: {
+        Args: { p_keep_sections?: boolean; p_template_key: string }
+        Returns: string
+      }
       create_order: {
         Args: {
           p_buyer_email: string
@@ -1440,6 +1512,10 @@ export type Database = {
           valor: number
         }[]
       }
+      seed_template_pages: {
+        Args: { p_store_id: string; p_template_key: string }
+        Returns: undefined
+      }
       seller_public_stats: {
         Args: { p_slug: string }
         Returns: {
@@ -1468,6 +1544,7 @@ export type Database = {
       ai_generation_kind: "tienda" | "bloques" | "analisis" | "marketing"
       block_proposal_status: "propuesta" | "aplicada" | "rechazada" | "invalida"
       commission_status: "pendiente" | "confirmada" | "pagada" | "anulada"
+      design_origin: "inicial" | "alta" | "antes_de_cambiar_plantilla"
       order_status:
         "pendiente" | "pagado" | "enviado" | "entregado" | "cancelado"
       page_status: "borrador" | "publicada"
@@ -1608,6 +1685,7 @@ export const Constants = {
       ai_generation_kind: ["tienda", "bloques", "analisis", "marketing"],
       block_proposal_status: ["propuesta", "aplicada", "rechazada", "invalida"],
       commission_status: ["pendiente", "confirmada", "pagada", "anulada"],
+      design_origin: ["inicial", "alta", "antes_de_cambiar_plantilla"],
       order_status: [
         "pendiente",
         "pagado",

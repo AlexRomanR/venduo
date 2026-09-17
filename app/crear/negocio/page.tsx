@@ -6,7 +6,7 @@ import { getMiTienda } from "@/lib/data/panel"
 import { getPlantillasPorRubro } from "@/lib/data/plantillas"
 import { FormularioNegocio } from "@/components/onboarding/formulario-negocio"
 import { Pasos, PASOS_CREAR } from "@/components/onboarding/pasos"
-import { VistaPrevia } from "@/components/onboarding/vista-previa"
+import { Miniatura } from "@/components/plantillas/miniatura"
 
 export const metadata = { title: "Cuenta tu negocio" }
 
@@ -61,7 +61,7 @@ export default async function NegocioPage({
           </p>
 
           <div className="mt-5 border-t-2 border-tinta pt-5">
-            <VistaPrevia bloques={elegida.bloques} />
+            <Miniatura clave={elegida.key} className="border border-tinta" />
             <h2 className="mt-4 font-titular text-lg font-bold tracking-[-0.02em]">
               {elegida.name}
               {rubro ? (

@@ -165,7 +165,7 @@ export function CambiarEstado({
           onClick={() => aplicar(paso.estado, paso.aviso)}
           disabled={enCurso !== null}
           className={cn(
-            "flex min-h-11 items-center gap-2 rounded-sm px-4 text-sm font-semibold transition-colors disabled:opacity-50",
+            "flex min-h-11 items-center gap-2 rounded-plantilla px-4 text-sm font-semibold transition-colors disabled:opacity-50",
             paso.principal
               ? "bg-senal text-white hover:bg-senal-alta"
               : "border-2 border-tinta hover:bg-tinta hover:text-papel"

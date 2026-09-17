@@ -100,7 +100,7 @@ export function Vacio({
       {accion ? (
         <Link
           href={accion.href}
-          className="mt-5 inline-flex min-h-11 items-center rounded-sm bg-senal px-5 text-sm font-semibold text-white transition-colors hover:bg-senal-alta"
+          className="mt-5 inline-flex min-h-11 items-center rounded-plantilla bg-senal px-5 text-sm font-semibold text-white transition-colors hover:bg-senal-alta"
         >
           {accion.texto}
         </Link>

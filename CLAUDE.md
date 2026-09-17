@@ -39,6 +39,9 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
 - **`types/database.ts` es generado.** Los alias van en `types/index.ts`.
 - **La IA propone, el sistema valida y ejecuta.** Toda salida del modelo se valida con zod
   antes de tocar la base o la pantalla.
+- **Una tienda se ve con su plantilla, y ningún componente pregunta cuál es.** La base
+  vive en código, la personalización en `stores.theme_overrides` y lo que se dibuja se
+  calcula. Todo en `docs/store-templates.md`.
 
 ## Lo que NO se construye
 

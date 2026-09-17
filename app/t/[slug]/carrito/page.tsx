@@ -1,12 +1,19 @@
 import { notFound } from "next/navigation"
 
-import { getTiendaPublica } from "@/lib/data/tienda-publica"
+import { getTiendaPublica, marcoDeTienda } from "@/lib/data/tienda-publica"
+import { kitDePlantilla } from "@/components/plantillas"
 import { Checkout } from "@/components/tienda/checkout"
-import { Cabecera, Pie } from "@/components/tienda/marco"
 import { crearPedido, type PedidoInput } from "../acciones"
 
 export const metadata = { title: "Tu carrito" }
 
+/**
+ * El carrito y el checkout.
+ *
+ * El marco y el título son de la plantilla; el formulario es el mismo en todas,
+ * porque lo que pide —quién eres y cómo te contactan— no cambia con el rubro.
+ * Toma la identidad de los tokens.
+ */
 export default async function CarritoPage({
   params,
 }: {
@@ -23,27 +30,27 @@ export default async function CarritoPage({
     return crearPedido(slug, entrada)
   }
 
+  const kit = kitDePlantilla(tienda.plantilla)
+  const marco = marcoDeTienda(tienda)
+
   return (
     <>
-      <Cabecera
-        nombre={tienda.nombre}
-        slug={tienda.slug}
-        logoUrl={tienda.logoUrl}
+      <kit.Cabecera
+        marco={marco}
         referido={null}
+        codigo={null}
         enlaceDelCarrito={false}
       />
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:py-14">
-        <h1 className="font-titular text-[clamp(1.75rem,5vw,2.75rem)] leading-[1.03] font-extrabold tracking-[-0.03em]">
-          Tu pedido.
-        </h1>
+        <kit.Encabezado titulo="Tu pedido" />
 
         <div className="mt-10">
           <Checkout slug={slug} nombreTienda={tienda.nombre} crear={pedir} />
         </div>
       </main>
 
-      <Pie nombre={tienda.nombre} />
+      <kit.Pie marco={marco} codigo={null} />
     </>
   )
 }

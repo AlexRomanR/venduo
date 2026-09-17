@@ -20,12 +20,15 @@ export function FiltrosTienda({
   usados,
   total,
   mostrando,
+  redondeadas = false,
 }: {
   categorias: CategoriaPublica[]
   /** Cuántos productos no son nuevos. Con cero, el filtro no se dibuja. */
   usados: number
   total: number
   mostrando: number
+  /** Con el radio de la plantilla. La base editorial las quiere rectas. */
+  redondeadas?: boolean
 }) {
   const router = useRouter()
   const ruta = usePathname()
@@ -50,16 +53,18 @@ export function FiltrosTienda({
     <div className="flex flex-col gap-4">
       <div className="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
         <div className="flex w-max items-center gap-2 sm:w-auto sm:flex-wrap">
-          <Ficha
+          <FichaDeFiltro
+            redondeada={redondeadas}
             activa={!hayFiltro}
             onClick={() => aplicar({ condicion: null, categoria: null })}
           >
             Todo
-          </Ficha>
+          </FichaDeFiltro>
 
           {usados > 0 ? (
             <>
-              <Ficha
+              <FichaDeFiltro
+                redondeada={redondeadas}
                 activa={condicion === "segunda_mano"}
                 onClick={() =>
                   aplicar({
@@ -69,8 +74,9 @@ export function FiltrosTienda({
                 }
               >
                 Segunda mano
-              </Ficha>
-              <Ficha
+              </FichaDeFiltro>
+              <FichaDeFiltro
+                redondeada={redondeadas}
                 activa={condicion === "reacondicionado"}
                 onClick={() =>
                   aplicar({
@@ -82,8 +88,9 @@ export function FiltrosTienda({
                 }
               >
                 Reacondicionado
-              </Ficha>
-              <Ficha
+              </FichaDeFiltro>
+              <FichaDeFiltro
+                redondeada={redondeadas}
                 activa={condicion === "oferta"}
                 onClick={() =>
                   aplicar({
@@ -92,14 +99,15 @@ export function FiltrosTienda({
                 }
               >
                 En oferta
-              </Ficha>
+              </FichaDeFiltro>
             </>
           ) : null}
 
           {categorias
             .filter((c) => c.productos > 0)
             .map((c) => (
-              <Ficha
+              <FichaDeFiltro
+                redondeada={redondeadas}
                 key={c.id}
                 activa={categoria === c.id}
                 onClick={() =>
@@ -107,7 +115,7 @@ export function FiltrosTienda({
                 }
               >
                 {c.nombre}
-              </Ficha>
+              </FichaDeFiltro>
             ))}
         </div>
       </div>
@@ -124,14 +132,16 @@ export function FiltrosTienda({
   )
 }
 
-function Ficha({
+function FichaDeFiltro({
   activa,
   onClick,
   children,
+  redondeada,
 }: {
   activa: boolean
   onClick: () => void
   children: React.ReactNode
+  redondeada: boolean
 }) {
   return (
     <button
@@ -140,6 +150,7 @@ function Ficha({
       aria-pressed={activa}
       className={cn(
         "flex min-h-11 shrink-0 items-center border px-4 text-sm font-semibold transition-colors",
+        redondeada && "rounded-plantilla px-5",
         activa
           ? "border-senal bg-senal text-white"
           : "border-tinta/25 hover:border-tinta"

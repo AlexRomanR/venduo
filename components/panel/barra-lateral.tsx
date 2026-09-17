@@ -16,6 +16,9 @@ import {
   Megaphone,
   Menu,
   Package,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Palette,
   Plus,
   Receipt,
   Search,
@@ -31,6 +34,7 @@ import {
 import { toast } from "sonner"
 
 import { formatMoney } from "@/lib/format"
+import { COOKIE_BARRA } from "@/lib/preferencias"
 import { cn } from "@/lib/utils"
 import type { BarraLateral } from "@/lib/data/barra"
 import {
@@ -40,6 +44,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface Item {
   href: string
@@ -61,7 +70,39 @@ function estaActivo(
 }
 
 /**
- * Lo que hay adentro de la barra, igual en escritorio y en el cajón del móvil.
+ * El nombre de un control del riel, al pasar el mouse.
+ *
+ * Plegada, la barra es solo íconos, y un ícono sin nombre obliga a adivinar.
+ * Desplegada no hace falta: el nombre ya está escrito al lado.
+ */
+function ConNombre({
+  nombre,
+  plegada,
+  children,
+}: {
+  nombre: string
+  plegada: boolean
+  children: React.ReactElement
+}) {
+  if (!plegada) return children
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent
+        side="right"
+        sideOffset={8}
+        className="rounded-none bg-tinta text-xs font-semibold text-papel"
+      >
+        {nombre}
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
+/**
+ * Lo que hay adentro de la barra: en escritorio, desplegada o plegada, y en el
+ * cajón del móvil.
  *
  * Las secciones las arman los datos: quien tiene tienda ve "Tu tienda", quien
  * vende para otras ve "Como vendedor", y quien hace las dos cosas ve las dos.
@@ -74,9 +115,14 @@ function estaActivo(
 function Contenido({
   datos,
   alNavegar,
+  plegada = false,
+  alPlegar,
 }: {
   datos: BarraLateral
   alNavegar?: () => void
+  plegada?: boolean
+  /** Solo en escritorio: el cajón del móvil se cierra, no se pliega. */
+  alPlegar?: () => void
 }) {
   const pathname = usePathname()
   const { tienda, vendedor, contadores: c, persona } = datos
@@ -141,6 +187,11 @@ function Contenido({
           icono: ChartColumn,
         },
         {
+          href: "/panel/apariencia",
+          nombre: "Apariencia",
+          icono: Palette,
+        },
+        {
           href: "/panel/marketing",
           nombre: "Marketing",
           icono: Megaphone,
@@ -186,22 +237,62 @@ function Contenido({
     }
   }
 
+  const botonCuadrado =
+    "flex size-11 items-center justify-center border border-tinta/25 transition-colors hover:border-tinta"
+
   return (
     <div className="flex h-full flex-col">
-      {/* Marca */}
-      <div className="flex items-center justify-between gap-3 px-5 pt-5 pb-4">
-        <Link
-          href="/auth/destino"
-          onClick={alNavegar}
-          className="flex min-h-11 items-center font-titular text-xl font-extrabold tracking-[-0.03em]"
-        >
-          Venduo
-        </Link>
+      {/* Marca y, en escritorio, el botón que pliega la barra */}
+      <div
+        className={cn(
+          "flex items-center gap-3 pt-5 pb-4",
+          plegada ? "flex-col px-3" : "justify-between px-5"
+        )}
+      >
+        {plegada ? null : (
+          <Link
+            href="/auth/destino"
+            onClick={alNavegar}
+            className="flex min-h-11 items-center font-titular text-xl font-extrabold tracking-[-0.03em]"
+          >
+            Venduo
+          </Link>
+        )}
+
         <div className="flex items-center gap-2">
-          {datos.esDemo ? (
+          {datos.esDemo && !plegada ? (
             <span className="border border-senal px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-senal uppercase">
               Demo
             </span>
+          ) : null}
+
+          {alPlegar ? (
+            <ConNombre
+              nombre={plegada ? "Mostrar la barra (Ctrl+B)" : ""}
+              plegada={plegada}
+            >
+              <button
+                type="button"
+                onClick={alPlegar}
+                aria-label={
+                  plegada
+                    ? "Mostrar la barra lateral"
+                    : "Ocultar la barra lateral"
+                }
+                aria-expanded={!plegada}
+                title={plegada ? undefined : "Ocultar la barra (Ctrl+B)"}
+                className={cn(
+                  "flex size-11 items-center justify-center transition-colors hover:text-senal",
+                  plegada ? "" : "-mr-2"
+                )}
+              >
+                {plegada ? (
+                  <PanelLeftOpen aria-hidden="true" className="size-5" />
+                ) : (
+                  <PanelLeftClose aria-hidden="true" className="size-5" />
+                )}
+              </button>
+            </ConNombre>
           ) : null}
 
           {/* Solo en el cajón. El cierre que trae shadcn mide 28 px y dice
@@ -221,9 +312,62 @@ function Contenido({
 
       {/* El desplazamiento de la página es rojo por sistema; acá sería un segundo
           trazo rojo pegado al contenido, así que se apaga a tinta. */}
-      <div className="flex-1 [scrollbar-width:thin] [scrollbar-color:color-mix(in_oklab,var(--tinta)_20%,transparent)_transparent] overflow-y-auto px-3 pb-6">
+      <div
+        className={cn(
+          "flex-1 [scrollbar-width:thin] [scrollbar-color:color-mix(in_oklab,var(--tinta)_20%,transparent)_transparent] overflow-x-hidden overflow-y-auto pb-6",
+          "px-3"
+        )}
+      >
         {/* La tienda: lo primero que se reconoce, y su enlace a mano */}
-        {tienda ? (
+        {tienda && plegada ? (
+          <div className="flex flex-col items-center gap-2 border-t-2 border-tinta pt-4">
+            <ConNombre nombre={tienda.nombre} plegada>
+              <a
+                href={tienda.url}
+                target="_blank"
+                rel="noreferrer noopener"
+                aria-label={`Ver ${tienda.nombre}`}
+                className="flex size-11 items-center justify-center overflow-hidden border border-tinta/20 bg-tinta/5"
+              >
+                {tienda.logoUrl ? (
+                  <Image
+                    src={tienda.logoUrl}
+                    alt=""
+                    width={88}
+                    height={88}
+                    unoptimized
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <Store aria-hidden="true" className="size-4 opacity-45" />
+                )}
+              </a>
+            </ConNombre>
+
+            <ConNombre nombre="Copiar el enlace" plegada>
+              <button
+                type="button"
+                onClick={copiarEnlace}
+                aria-label="Copiar el enlace de tu tienda"
+                className={botonCuadrado}
+              >
+                <Copy aria-hidden="true" className="size-4" />
+              </button>
+            </ConNombre>
+
+            <ConNombre nombre="Nuevo producto" plegada>
+              <Link
+                href="/panel/productos/nuevo"
+                aria-label="Nuevo producto"
+                className="flex size-11 items-center justify-center border-2 border-tinta transition-colors hover:bg-tinta hover:text-papel"
+              >
+                <Plus aria-hidden="true" className="size-4" />
+              </Link>
+            </ConNombre>
+          </div>
+        ) : null}
+
+        {tienda && !plegada ? (
           <div className="mx-2 border-t-2 border-tinta pt-4">
             <div className="flex items-center gap-3">
               <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden border border-tinta/20 bg-tinta/5">
@@ -284,7 +428,7 @@ function Contenido({
             <Link
               href="/panel/productos/nuevo"
               onClick={alNavegar}
-              className="mt-2 flex min-h-11 items-center justify-center gap-2 rounded-sm border-2 border-tinta text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
+              className="mt-2 flex min-h-11 items-center justify-center gap-2 rounded-plantilla border-2 border-tinta text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
             >
               <Plus aria-hidden="true" className="size-4" />
               Nuevo producto
@@ -293,13 +437,14 @@ function Contenido({
         ) : null}
 
         {deTienda.length > 0 ? (
-          <Grupo titulo="Tu tienda">
+          <Grupo titulo="Tu tienda" plegada={plegada}>
             {deTienda.map((item) => (
               <Entrada
                 key={item.href}
                 item={item}
                 pathname={pathname}
                 alNavegar={alNavegar}
+                plegada={plegada}
               />
             ))}
           </Grupo>
@@ -308,6 +453,7 @@ function Contenido({
         {deVendedor.length > 0 && vendedor ? (
           <Grupo
             titulo="Como vendedor"
+            plegada={plegada}
             detalle={
               c.comisionesPorCobrarCents > 0
                 ? `Te deben ${formatMoney(c.comisionesPorCobrarCents)}`
@@ -325,6 +471,7 @@ function Contenido({
                 item={item}
                 pathname={pathname}
                 alNavegar={alNavegar}
+                plegada={plegada}
               />
             ))}
           </Grupo>
@@ -332,7 +479,7 @@ function Contenido({
 
         {/* La otra mitad del producto, para quien todavía no la usa */}
         {tienda && !vendedor ? (
-          <Grupo titulo="Gana extra">
+          <Grupo titulo="Gana extra" plegada={plegada}>
             <Entrada
               item={{
                 href: "/sumarme",
@@ -341,12 +488,13 @@ function Contenido({
               }}
               pathname={pathname}
               alNavegar={alNavegar}
+              plegada={plegada}
             />
           </Grupo>
         ) : null}
 
         {!tienda && vendedor ? (
-          <Grupo titulo="Tu propio negocio">
+          <Grupo titulo="Tu propio negocio" plegada={plegada}>
             <Entrada
               item={{
                 href: "/crear?abrir=1",
@@ -355,63 +503,107 @@ function Contenido({
               }}
               pathname={pathname}
               alNavegar={alNavegar}
+              plegada={plegada}
             />
           </Grupo>
         ) : null}
       </div>
 
       {/* Quién está adentro, y la salida */}
-      <div className="border-t border-tinta/15 px-5 py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-tinta/20 bg-tinta/5 font-titular text-sm font-bold">
-            {persona.avatarUrl ? (
-              <Image
-                src={persona.avatarUrl}
-                alt=""
-                width={72}
-                height={72}
-                unoptimized
-                className="size-full object-cover"
-              />
-            ) : (
-              persona.nombre.charAt(0).toUpperCase()
-            )}
-          </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold">{persona.nombre}</p>
-            {persona.correo ? (
-              <p className="truncate text-xs opacity-45">{persona.correo}</p>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <Link
-            href="/cuenta"
-            onClick={alNavegar}
-            aria-current={pathname.startsWith("/cuenta") ? "page" : undefined}
-            className={cn(
-              "flex min-h-11 items-center justify-center gap-1.5 border text-xs font-semibold transition-colors",
-              pathname.startsWith("/cuenta")
-                ? "border-senal text-senal"
-                : "border-tinta/25 hover:border-tinta"
-            )}
-          >
-            <Settings aria-hidden="true" className="size-3.5" />
-            Mi cuenta
-          </Link>
+      {plegada ? (
+        <div className="flex flex-col items-center gap-2 border-t border-tinta/15 px-3 py-4">
+          <ConNombre nombre="Mi cuenta" plegada>
+            <Link
+              href="/cuenta"
+              aria-label={`Mi cuenta, ${persona.nombre}`}
+              aria-current={pathname.startsWith("/cuenta") ? "page" : undefined}
+              className={cn(
+                "flex size-11 items-center justify-center overflow-hidden rounded-full border font-titular text-sm font-bold",
+                pathname.startsWith("/cuenta")
+                  ? "border-senal text-senal"
+                  : "border-tinta/20 bg-tinta/5"
+              )}
+            >
+              {persona.avatarUrl ? (
+                <Image
+                  src={persona.avatarUrl}
+                  alt=""
+                  width={88}
+                  height={88}
+                  unoptimized
+                  className="size-full object-cover"
+                />
+              ) : (
+                persona.nombre.charAt(0).toUpperCase()
+              )}
+            </Link>
+          </ConNombre>
 
           <form action="/auth/sign-out" method="post">
-            <button
-              type="submit"
-              className="flex min-h-11 w-full items-center justify-center gap-1.5 border border-tinta/25 text-xs font-semibold transition-colors hover:border-senal hover:text-senal"
-            >
-              <LogOut aria-hidden="true" className="size-3.5" />
-              Salir
-            </button>
+            <ConNombre nombre="Salir" plegada>
+              <button
+                type="submit"
+                aria-label="Salir"
+                className="flex size-11 items-center justify-center border border-tinta/25 transition-colors hover:border-senal hover:text-senal"
+              >
+                <LogOut aria-hidden="true" className="size-4" />
+              </button>
+            </ConNombre>
           </form>
         </div>
-      </div>
+      ) : (
+        <div className="border-t border-tinta/15 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-tinta/20 bg-tinta/5 font-titular text-sm font-bold">
+              {persona.avatarUrl ? (
+                <Image
+                  src={persona.avatarUrl}
+                  alt=""
+                  width={72}
+                  height={72}
+                  unoptimized
+                  className="size-full object-cover"
+                />
+              ) : (
+                persona.nombre.charAt(0).toUpperCase()
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold">{persona.nombre}</p>
+              {persona.correo ? (
+                <p className="truncate text-xs opacity-45">{persona.correo}</p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <Link
+              href="/cuenta"
+              onClick={alNavegar}
+              aria-current={pathname.startsWith("/cuenta") ? "page" : undefined}
+              className={cn(
+                "flex min-h-11 items-center justify-center gap-1.5 border text-xs font-semibold transition-colors",
+                pathname.startsWith("/cuenta")
+                  ? "border-senal text-senal"
+                  : "border-tinta/25 hover:border-tinta"
+              )}
+            >
+              <Settings aria-hidden="true" className="size-3.5" />
+              Mi cuenta
+            </Link>
+
+            <form action="/auth/sign-out" method="post">
+              <button
+                type="submit"
+                className="flex min-h-11 w-full items-center justify-center gap-1.5 border border-tinta/25 text-xs font-semibold transition-colors hover:border-senal hover:text-senal"
+              >
+                <LogOut aria-hidden="true" className="size-3.5" />
+                Salir
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -420,29 +612,42 @@ function Grupo({
   titulo,
   detalle,
   detalleUrgente = false,
+  plegada,
   children,
 }: {
   titulo: string
   detalle?: string
   detalleUrgente?: boolean
+  plegada: boolean
   children: React.ReactNode
 }) {
   return (
-    <nav aria-label={titulo} className="mt-7">
-      <p className="px-2 text-[11px] font-semibold tracking-[0.14em] text-senal uppercase">
-        {titulo}
-      </p>
-      {detalle ? (
-        <p
-          className={cn(
-            "tabular mt-1 px-2 text-xs",
-            detalleUrgente ? "font-semibold" : "opacity-45"
-          )}
-        >
-          {detalle}
-        </p>
-      ) : null}
-      <ul className="mt-2 flex flex-col">{children}</ul>
+    <nav
+      aria-label={titulo}
+      className={cn(plegada ? "mt-4 border-t border-tinta/15 pt-4" : "mt-7")}
+    >
+      {plegada ? null : (
+        <>
+          <p className="px-2 text-[11px] font-semibold tracking-[0.14em] text-senal uppercase">
+            {titulo}
+          </p>
+          {detalle ? (
+            <p
+              className={cn(
+                "tabular mt-1 px-2 text-xs",
+                detalleUrgente ? "font-semibold" : "opacity-45"
+              )}
+            >
+              {detalle}
+            </p>
+          ) : null}
+        </>
+      )}
+      <ul
+        className={cn("flex flex-col", plegada ? "items-center gap-1" : "mt-2")}
+      >
+        {children}
+      </ul>
     </nav>
   )
 }
@@ -451,25 +656,71 @@ function Entrada({
   item,
   pathname,
   alNavegar,
+  plegada,
 }: {
   item: Item
   pathname: string
   alNavegar?: () => void
+  plegada: boolean
 }) {
   const activo = estaActivo(pathname, item)
   const Icono = item.icono
   // Los hijos se abren solo dentro de su sección: listados siempre, la barra
   // crecería hasta obligar a desplazarla para llegar a "Salir".
-  const abierto = activo && item.hijos && item.hijos.length > 0
+  const abierto = !plegada && activo && item.hijos && item.hijos.length > 0
+  const actual =
+    activo && pathname === item.href.split("?")[0] ? "page" : undefined
+
+  if (plegada) {
+    const nombre = item.contador
+      ? `${item.nombre} · ${item.contador.etiqueta}`
+      : item.pronto
+        ? `${item.nombre} · pronto`
+        : item.nombre
+
+    return (
+      <li>
+        <ConNombre nombre={nombre} plegada>
+          <Link
+            href={item.href}
+            aria-label={nombre}
+            aria-current={actual}
+            className={cn(
+              "relative flex size-11 items-center justify-center border-l-2 transition-colors",
+              activo
+                ? "border-senal text-senal"
+                : "border-transparent hover:text-senal"
+            )}
+          >
+            <Icono
+              aria-hidden="true"
+              className={cn("size-[18px]", activo ? "" : "opacity-60")}
+            />
+            {item.contador ? (
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "tabular absolute top-1 right-0.5 flex h-4 min-w-4 items-center justify-center px-1 text-[9px] font-bold",
+                  item.contador.urgente
+                    ? "bg-senal text-white"
+                    : "bg-tinta text-papel"
+                )}
+              >
+                {item.contador.valor > 9 ? "9+" : item.contador.valor}
+              </span>
+            ) : null}
+          </Link>
+        </ConNombre>
+      </li>
+    )
+  }
 
   return (
     <li>
       <Link
         href={item.href}
         onClick={alNavegar}
-        aria-current={
-          activo && pathname === item.href.split("?")[0] ? "page" : undefined
-        }
+        aria-current={actual}
         className={cn(
           // La regla de 2 px a la izquierda es el mismo trazo que abre un tema
           // en el resto del sistema, girado para una columna.
@@ -539,11 +790,70 @@ function Entrada({
   )
 }
 
-/** La barra fija de escritorio. */
-export function BarraLateralEscritorio({ datos }: { datos: BarraLateral }) {
+/**
+ * La barra fija de escritorio, que se pliega a un riel de íconos.
+ *
+ * Plegada no desaparece: queda un riel de 72 px con los íconos, sus contadores
+ * y su nombre al pasar el mouse. Ocultarla del todo dejaría los avisos
+ * —pedidos con comprobante, productos sin stock— fuera de la vista justo
+ * cuando alguien quiso más lugar para trabajar.
+ *
+ * El estado vive en una cookie y no en `localStorage`: la lee el layout del
+ * lado del servidor, así la página llega ya con el ancho correcto. Con
+ * `localStorage` se dibujaría abierta y se cerraría un instante después.
+ */
+export function BarraLateralEscritorio({
+  datos,
+  plegadaInicial,
+}: {
+  datos: BarraLateral
+  plegadaInicial: boolean
+}) {
+  const [plegada, setPlegada] = React.useState(plegadaInicial)
+
+  const alternar = React.useCallback(() => {
+    setPlegada((antes) => {
+      const ahora = !antes
+      document.cookie = ahora
+        ? `${COOKIE_BARRA}=plegada; path=/; max-age=31536000; samesite=lax`
+        : `${COOKIE_BARRA}=; path=/; max-age=0; samesite=lax`
+      return ahora
+    })
+  }, [])
+
+  // Ctrl+B o Cmd+B, el atajo de barra lateral de la mayoría de los editores.
+  React.useEffect(() => {
+    function alTeclear(evento: KeyboardEvent) {
+      if (
+        evento.key.toLowerCase() === "b" &&
+        (evento.ctrlKey || evento.metaKey) &&
+        !evento.altKey
+      ) {
+        // No robarlo mientras se escribe: en un campo de texto, Ctrl+B es de
+        // quien escribe.
+        const destino = evento.target as HTMLElement | null
+        if (destino?.closest("input, textarea, [contenteditable='true']")) {
+          return
+        }
+        evento.preventDefault()
+        alternar()
+      }
+    }
+
+    window.addEventListener("keydown", alTeclear)
+    return () => window.removeEventListener("keydown", alTeclear)
+  }, [alternar])
+
   return (
-    <aside className="sticky top-0 hidden h-screen w-[17rem] shrink-0 border-r border-tinta/15 bg-papel lg:block">
-      <Contenido datos={datos} />
+    <aside
+      data-plegada={plegada ? "" : undefined}
+      className={cn(
+        "sticky top-0 hidden h-screen shrink-0 overflow-hidden border-r border-tinta/15 bg-papel lg:block",
+        "transition-[width] duration-200 ease-out motion-reduce:transition-none",
+        plegada ? "w-[4.5rem]" : "w-[17rem]"
+      )}
+    >
+      <Contenido datos={datos} plegada={plegada} alPlegar={alternar} />
     </aside>
   )
 }

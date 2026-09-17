@@ -26,23 +26,38 @@ El punto más fácil de hacer mal de todo el sistema.
 - `commission_bps` vive en **`stores`**, no en el vínculo del vendedor.
 - **Una comisión por pedido**, garantizado por índice único sobre `order_id`. Sin eso, un
   pedido que va y vuelve entre estados genera comisiones duplicadas.
-- Ciclo: `pendiente` → `confirmada` → `pagada`, más `anulada`. Un pedido cancelado
-  **anula** la comisión; nunca la borra.
+- Ciclo: `pendiente` → `confirmada` → `pagada`, más `anulada`, **atado a la custodia del
+  pago** (ver abajo). Un pedido cancelado **anula** la comisión; nunca la borra.
 - La crea un disparador cuando el pedido pasa a `pagado`. **No insertarla desde código.**
 
-### Confirmar el pago es lo que paga la comisión
+### El estado del pedido mueve la comisión
 
-El panel de pedidos cambia un estado y **nada más**: todo lo que se sigue de ese
-cambio lo hace el disparador `handle_order_status_change`.
+El pago lo cobra **PagoFácil y lo retiene** hasta que el pedido llega; recién ahí se
+libera y se reparte. El modelo completo está en `VENDUO.md` §5. La comisión sigue a esa
+custodia:
 
-| El estado pasa a | Y la base                                                |
-| ---------------- | -------------------------------------------------------- |
-| `pagado`         | Crea la comisión contra la base congelada, `confirmada`  |
-| `cancelado`      | Anula sus comisiones y **devuelve el stock** al catálogo |
+| El pedido pasa a | Qué pasó con el dinero                    | La comisión      |
+| ---------------- | ----------------------------------------- | ---------------- |
+| `pagado`         | PagoFácil lo cobró y lo retiene           | Nace `pendiente` |
+| `enviado`        | Sigue retenido                            | `pendiente`      |
+| `entregado`      | Se ordena liberarlo                       | `confirmada`     |
+| —                | PagoFácil confirmó la transferencia       | `pagada`         |
+| `en_disputa`     | Congelado mientras Venduo revisa          | `pendiente`      |
+| `cancelado`      | Devuelto al comprador, si llegó a pagarse | `anulada`        |
 
-Nunca duplicar esto desde la aplicación: escribir en `commissions` o ajustar
-`products.stock` a mano daría comisiones dobles y stock inventado el día que
-alguien cambie dos veces de estado.
+Todo lo que se sigue de un cambio de estado lo hace el disparador
+`handle_order_status_change`, y cancelar además **devuelve el stock** al catálogo. Nunca
+duplicarlo desde la aplicación: escribir en `commissions` o ajustar `products.stock` a mano
+daría comisiones dobles y stock inventado el día que alguien cambie dos veces de estado.
+
+**Una comisión `pendiente` no es trabajo hecho.** El pago puede terminar devuelto, así que
+el historial laboral y lo que el vendedor ve como ganado cuentan solo `confirmada` y
+`pagada`.
+
+> **Hoy el disparador no sigue esta tabla.** Crea la comisión directamente `confirmada` al
+> pasar a `pagado`, porque se escribió para el flujo provisorio sin custodia. Al construir
+> la pasarela hay que cambiarlo para que nazca `pendiente` y se confirme en `entregado`, y
+> sumar el estado `en_disputa` al enum.
 
 ## El historial laboral del vendedor
 
@@ -195,10 +210,10 @@ Todo el flujo público —catálogo, carrito, pedido, pago— lo hace un comprad
 expondría los pedidos de todas las tiendas. Se abren dos funciones `security definer`
 acotadas, y la llave es el identificador del pedido, que es un uuid y no se adivina:
 
-| Función                | Para qué                                                   |
-| ---------------------- | ---------------------------------------------------------- |
-| `pedido_publico`       | El pedido y los datos de pago de su tienda                 |
-| `adjuntar_comprobante` | El comprobante, **solo mientras el pedido siga pendiente** |
+| Función                | Para qué                                            |
+| ---------------------- | --------------------------------------------------- |
+| `pedido_publico`       | El pedido y los datos de pago de su tienda          |
+| `adjuntar_comprobante` | Provisorio: el comprobante, mientras siga pendiente |
 
 `pedido_publico` nunca devuelve la comisión, el vendedor ni el neto del comercio: eso es
 de la tienda, no del comprador.
@@ -207,23 +222,59 @@ de la tienda, no del comprador.
 alguien que todavía no dio ningún dato. Lo que el carrito diga de los montos es solo para
 mostrar: `create_order` recalcula cada precio desde el catálogo.
 
-**El comprobante se guarda por ruta, no por URL.** Vive en un bucket privado, y firmar una
-URL exige permiso de lectura que el comprador anónimo no tiene — pedirla devuelve un 400 y
-la subida parece fallar cuando ya ocurrió. Quien necesite verlo lo firma del lado del
-servidor.
+### El cobro: PagoFácil con custodia
 
-**Venduo no cobra.** El comprador transfiere al QR del comercio —`stores.payment_qr_url`,
-que el emprendedor sube en `/cuenta`— y sube su captura. Sin ese QR cargado la pantalla de
-pago queda con un hueco y el comprador tiene que preguntar por WhatsApp.
+**Venduo nunca recibe ni guarda el dinero.** El comprador le paga a PagoFácil, que lo
+retiene. Venduo solo le da órdenes: liberar, devolver y cómo repartir. Si el dinero pasara
+por una cuenta de Venduo, aunque fuera un día, sería intermediación de pagos y exigiría
+autorización de ASFI — `VENDUO.md` §5 lo explica.
+
+- **Se libera con dos marcas:** el emprendedor marca el pedido _enviado_ y el comprador
+  confirma que lo _recibió_. Si el comprador no responde, se libera solo pasado un plazo
+  que corre desde el envío.
+- **Al liberarse, PagoFácil dispersa directo:** el vendedor recibe su comisión completa y
+  el emprendedor el resto. **El costo de PagoFácil lo absorbe el emprendedor**, nunca sale
+  de la parte del vendedor.
+- **Venduo no cobra comisión por venta.**
+- **Confirmar el pago ya no es tarea del emprendedor.** Lo avisa PagoFácil; nadie lo
+  marca a mano.
+
+### Reclamos
+
+Si el comprador reclama antes de la liberación, el pedido pasa a `en_disputa` y **el pago
+queda congelado**. Venduo revisa el caso con las dos partes y decide: a favor del
+emprendedor, se libera; a favor del comprador, se ordena la devolución y la comisión se
+anula. Liberado el pago ya no hay reclamo dentro de la plataforma, porque el dinero salió
+de la custodia.
+
+### Lo provisorio que hay que reemplazar
+
+**Lo que hoy está construido no sigue este modelo.** La pantalla de pago muestra el QR
+bancario que subió el emprendedor (`stores.payment_qr_url`, en `/cuenta`), el comprador
+sube una captura (`adjuntar_comprobante`, `orders.payment_proof_url`) y el emprendedor
+confirma el pago a mano. El dinero va directo del comprador al comercio, **sin custodia**.
+
+Se hizo antes de decidir el cobro y queda solo mientras no exista la pasarela. **No
+construir nada nuevo encima**: ni reportes sobre comprobantes ni pasos que dependan de que
+el emprendedor confirme el pago.
+
+Dos cosas de ese flujo que siguen valiendo mientras exista: el comprobante se guarda **por
+ruta y no por URL** —vive en un bucket privado y firmar una URL exige un permiso de lectura
+que el comprador anónimo no tiene—, y quien lo necesite ver lo firma del lado del servidor.
 
 ## Entrega por WhatsApp
 
-**La gestión de envíos está fuera de alcance.** La entrega se coordina entre el
-emprendedor y el comprador por WhatsApp. Lo que sí hace la plataforma es armar ese mensaje
-con el detalle del pedido y abrir la conversación, usando `orders.buyer_phone` — que por
-eso es obligatorio.
+**La gestión de envíos está fuera de alcance**: no hay couriers, guías ni seguimiento. La
+entrega se coordina entre el emprendedor y el comprador por WhatsApp. Lo que sí hace la
+plataforma es armar ese mensaje con el detalle del pedido y abrir la conversación, usando
+`orders.buyer_phone` — que por eso es obligatorio.
 
-`stores` no tiene columna de teléfono.
+Lo que sí registra son **las dos marcas que liberan el pago**: _enviado_, que pone el
+emprendedor, y _recibido_, que pone el comprador. No son seguimiento de envío: son la
+condición de la custodia.
+
+`stores.whatsapp` es el número del comercio, para que el comprador le escriba desde la
+tienda pública.
 
 ## Lo que NO se construye
 
@@ -231,7 +282,9 @@ Esta lista es tan importante como la de lo que sí. Si una tarea pide algo de ac
 detenerse y preguntar antes de escribir código:
 
 - **Multi-tienda por usuario**
-- **Gestión de envíos** — se coordina por WhatsApp
+- **Gestión de envíos** — se coordina por WhatsApp; solo se registran las marcas de
+  enviado y recibido
+- **Recibir o guardar el dinero de una venta** — lo hace PagoFácil; Venduo solo instruye
 - **Cobro de la suscripción** — se modela el estado, no el cobro
 - **Notificaciones por email**
 - **Aplicación móvil nativa** — la tienda es responsive y con eso alcanza

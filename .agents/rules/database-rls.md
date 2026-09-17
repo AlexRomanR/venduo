@@ -98,11 +98,14 @@ de referido comprobando que pertenezca a **esa** tienda y esté activo, congela 
 y descuenta stock. Nada de eso puede quedar en manos del cliente.
 
 **Si alguna vez escribís `supabase.from("orders").insert(...)`, está mal.** Lo mismo para
-`commissions`: las crea un disparador cuando el pedido pasa a `pagado`.
+`commissions`: las crea un disparador cuando el pedido pasa a `pagado`, y los estados
+siguientes la mueven. Qué estado de pedido corresponde a qué estado de comisión está en
+`domain-venduo.md`, atado a la custodia del pago en PagoFácil.
 
 Las otras funciones del servidor son `join_store(p_store_slug, p_invite_code)`,
 `take_product(p_product_id)`, `my_seller_invite()`, `rotate_seller_invite()`,
 `apply_template(p_store_id, p_template_key)`,
+`change_store_template(p_template_key, p_keep_sections)`,
 `create_store(p_name, p_description, p_template_key, p_sellers, p_commission_bps)`,
 `run_insight(...)` y las dos del historial público, `seller_public_stats(p_slug)` y
 `seller_public_stores(p_slug)`.
@@ -140,6 +143,24 @@ categoría arrastra la copia a sus productos, y eso lo hace
 dada de baja no bloquea su nombre para siempre. Borrarla no borra productos —
 `category_id` es `on delete set null`— y quedan sin categoría, visibles y a la
 venta.
+
+## La apariencia de una tienda
+
+`stores.theme_overrides` guarda **solo lo que la tienda cambia** respecto de la base de su
+plantilla; `{}` es la plantilla tal cual. La base vive en código, así que nunca copiar
+tokens a esta columna "para tenerlos a mano": sería una copia que se desactualiza.
+
+**Se valida al leer**, con `personalizacionSchema`. Termina dentro de una etiqueta `<style>`
+en la tienda pública: un valor que no sea un token cerrado es una inyección.
+
+**Cambiar de plantilla es `change_store_template`**, no un `update` de `template_key`. La
+función guarda antes un punto de restauración en `store_design_versions`, que no tiene
+políticas de escritura a propósito: una versión editable desde el cliente dejaría de ser
+un respaldo. Las dos auxiliares, `capture_design_version` y `seed_template_pages`, no
+comprueban dueño y por eso no se exponen: tienen `revoke` para `anon` y `authenticated`.
+
+Las páginas que siembra una plantilla nacen **`publicada`**: en borrador, la política de
+lectura se las escondía al comprador anónimo mientras el dueño sí las veía.
 
 ## Migraciones
 

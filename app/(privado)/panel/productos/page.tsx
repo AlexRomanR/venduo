@@ -72,7 +72,7 @@ export default async function ProductosPage({
         <div className="flex flex-wrap gap-3">
           <Link
             href="/panel/productos/categorias"
-            className="flex min-h-11 items-center gap-2 rounded-sm border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
+            className="flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
           >
             <Tags aria-hidden="true" className="size-4" />
             Categorías
@@ -80,7 +80,7 @@ export default async function ProductosPage({
 
           <Link
             href="/panel/productos/nuevo"
-            className="flex min-h-11 items-center gap-2 rounded-sm bg-senal px-4 text-sm font-semibold text-white transition-colors hover:bg-senal-alta"
+            className="flex min-h-11 items-center gap-2 rounded-plantilla bg-senal px-4 text-sm font-semibold text-white transition-colors hover:bg-senal-alta"
           >
             <Plus aria-hidden="true" className="size-4" />
             Nuevo producto

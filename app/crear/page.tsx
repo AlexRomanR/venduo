@@ -47,9 +47,10 @@ export default async function CrearPage({
             Elige por dónde empieza tu tienda.
           </h1>
           <p className="mt-5 max-w-[52ch] text-lg leading-relaxed opacity-70">
-            Cada plantilla trae las secciones que ese rubro necesita. No es una
-            decisión definitiva: en el siguiente paso cuentas qué vendes y la IA
-            la ajusta, y después puedes cambiar lo que quieras.
+            Cada plantilla tiene su propia forma de verse —la letra, los
+            colores, cómo muestra tus productos— y trae las secciones que ese
+            rubro necesita. No es definitiva: puedes cambiarla después desde tu
+            panel sin perder nada.
           </p>
         </div>
 

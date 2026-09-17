@@ -96,7 +96,7 @@ export default async function VendedorPage() {
         {resumen.perfil ? (
           <Link
             href={`/v/${resumen.perfil.slug}`}
-            className="inline-flex min-h-11 items-center gap-2 rounded-sm bg-senal px-5 text-sm font-semibold text-white transition-colors hover:bg-senal-alta"
+            className="inline-flex min-h-11 items-center gap-2 rounded-plantilla bg-senal px-5 text-sm font-semibold text-white transition-colors hover:bg-senal-alta"
           >
             Ver mi perfil público
             <ArrowUpRight aria-hidden="true" className="size-4" />

@@ -1,7 +1,8 @@
 ---
 name: sales-and-commissions
 description: >-
-  Use this skill when developing or modifying the checkout flow, QR payment,
+  Use this skill when developing or modifying the checkout flow, the PagoFácil
+  payment with escrow (retention, release on delivery, refunds and disputes),
   referral code tracking, commission calculations and freezing, WhatsApp
   delivery message generation, and the verified seller profile.
 ---
@@ -99,7 +100,13 @@ duplicados.
 
 Cancelar un pedido **anula** la comisión y devuelve el stock. Nunca la borra.
 
-Ciclo: `pendiente` → `confirmada` → `pagada`, más `anulada`.
+Ciclo: `pendiente` → `confirmada` → `pagada`, más `anulada`, atado a la custodia del pago:
+nace `pendiente` mientras PagoFácil retiene el dinero, pasa a `confirmada` al liberarse cuando
+el pedido llega a `entregado`, y queda `pagada` cuando PagoFácil transfirió al vendedor. La
+tabla completa está en `domain-venduo.md`.
+
+> Hoy el disparador la crea directamente `confirmada` al pasar a `pagado`: se escribió
+> para el flujo provisorio sin custodia y hay que cambiarlo al construir la pasarela.
 
 ---
 
@@ -113,14 +120,16 @@ Al construir el perfil público en `/v/{slug}`, leer de `commissions` y no de `s
 una comisión puede no tener tienda viva detrás, y su vendedor igual merece que se le
 cuente esa venta.
 
-Contar solo las `confirmada` y `pagada`. Una `anulada` no es trabajo hecho.
+Contar solo las `confirmada` y `pagada`. Una `anulada` no es trabajo hecho, y una
+`pendiente` todavía no: el pago sigue retenido y puede terminar devuelto.
 
 ---
 
-## Pago por QR
+## Códigos QR para compartir
 
 `lib/qr.ts` expone `toDataURL`, `toSVG`, `toPNGBuffer` y `buildQRTarget`. Ese último arma
-el destino según el tipo:
+el destino según el tipo. Son los QR del enlace de la tienda y del vendedor, los que se
+imprimen y se comparten; **no tienen nada que ver con el cobro**:
 
 ```ts
 import { buildQRTarget, toDataURL } from "@/lib/qr"
@@ -129,9 +138,44 @@ const url = buildQRTarget("vendedor", getSiteUrl(), codigoDeReferido)
 const png = await toDataURL(url)
 ```
 
-En el MVP la pasarela es **simulada**: el comprador sube el comprobante al bucket
-`payment-proofs`, que es privado, y el emprendedor confirma a mano pasando el pedido a
-`pagado`. Ese cambio de estado es el que dispara la comisión.
+---
+
+## El cobro: PagoFácil con custodia
+
+**Venduo nunca recibe ni guarda el dinero.** El comprador paga en PagoFácil, que lo
+retiene, y Venduo solo le da órdenes. Que el dinero pase por una cuenta de Venduo, aunque
+sea un día, es intermediación de pagos: `VENDUO.md` §5.
+
+| Paso                                       | Pedido       | Quién lo mueve                           |
+| ------------------------------------------ | ------------ | ---------------------------------------- |
+| Carrito confirmado, precios recalculados   | `pendiente`  | `create_order`                           |
+| Pago cobrado y retenido                    | `pagado`     | El aviso de PagoFácil, no una persona    |
+| Coordinado por WhatsApp y despachado       | `enviado`    | El emprendedor                           |
+| Recibido, o vencido el plazo sin respuesta | `entregado`  | El comprador, o el vencimiento           |
+| Reclamo antes de liberar: pago congelado   | `en_disputa` | El comprador; resuelve Venduo            |
+| Devuelto al comprador                      | `cancelado`  | Venduo, o el emprendedor antes de enviar |
+
+Al liberarse, PagoFácil **dispersa directo**: el vendedor recibe su comisión completa y el
+emprendedor el resto, **menos el costo de PagoFácil, que absorbe él**. Venduo no cobra
+comisión por venta.
+
+Tres reglas que se rompen fácil:
+
+- **`pagado` no lo marca nadie a mano.** Lo pone el aviso de PagoFácil, verificado del lado
+  del servidor. Un botón de "confirmar pago" en el panel es exactamente lo que este modelo
+  elimina.
+- **Liberar y devolver son excluyentes.** Un pedido tiene `released_at` o `refunded_at`,
+  nunca los dos. Comprobarlo antes de dar la orden, no después.
+- **Un reclamo solo existe antes de liberar.** Con el dinero ya dispersado no queda nada
+  que congelar.
+
+### El flujo provisorio que hay que reemplazar
+
+Lo construido hoy no tiene custodia: la pantalla de pago muestra el QR bancario del
+emprendedor, el comprador sube una captura al bucket privado `payment-proofs` y el
+emprendedor confirma a mano pasando el pedido a `pagado`. **No construir nada nuevo
+encima.** Mientras exista, el comprobante se guarda por ruta y se firma del lado del
+servidor.
 
 ---
 
@@ -140,8 +184,12 @@ En el MVP la pasarela es **simulada**: el comprador sube el comprobante al bucke
 La gestión de envíos está fuera de alcance. La plataforma **arma el mensaje** y abre la
 conversación; la coordinación es entre las dos personas.
 
-El teléfono sale de `orders.buyer_phone`, que por eso es obligatorio. **`stores` no tiene
-columna de teléfono.**
+El teléfono del comprador sale de `orders.buyer_phone`, que por eso es obligatorio. El del
+comercio es `stores.whatsapp`.
+
+Coordinar la entrega no es gestionarla: no hay couriers ni seguimiento. Lo único que la
+plataforma registra son las marcas de **enviado** y **recibido**, porque son las que liberan
+el pago.
 
 ```ts
 const texto = [
@@ -163,6 +211,10 @@ Montos siempre por `formatMoney`; nunca dividir por 100 a mano.
 - [ ] El pedido se crea con `create_order`, no con un insert.
 - [ ] La comisión sale del pedido, no se recalcula.
 - [ ] Un pedido cancelado anula la comisión y devuelve el stock.
+- [ ] La comisión nace `pendiente` mientras el pago está retenido, y se confirma al liberarse.
+- [ ] Nadie marca `pagado` a mano: lo pone el aviso de PagoFácil.
+- [ ] Un pedido en disputa no se libera ni se devuelve hasta que Venduo resuelve.
+- [ ] Liberar y devolver no pueden pasar los dos sobre el mismo pedido.
 - [ ] El código de un vendedor de **otra** tienda no genera comisión.
 - [ ] Un pedido sin código queda como venta directa, sin errores.
 - [ ] El perfil del vendedor suma comisiones de varias tiendas.

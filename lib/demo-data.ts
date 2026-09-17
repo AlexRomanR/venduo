@@ -350,7 +350,7 @@ export interface RubroConPlantillas {
 }
 
 /**
- * Espejo del catálogo sembrado en la migración de onboarding.
+ * Espejo del catálogo sembrado en la migración de plantillas de tienda.
  *
  * Existe para que la galería de plantillas se vea completa sin base de datos:
  * es la primera pantalla después del registro y un catálogo vacío ahí parece
@@ -362,63 +362,18 @@ export const RUBROS_DEMO: RubroConPlantillas[] = [
     name: "Moda",
     plantillas: [
       {
-        key: "moda",
-        name: "Indumentaria",
+        key: "fashion",
+        name: "Pasarela",
         sector: "moda",
         description:
-          "Grilla visual, talles y temporada. Incluye sección de segunda mano.",
-        bloques: ["hero", "product_grid", "product_grid", "contact"],
-      },
-      {
-        key: "moda_calzado",
-        name: "Calzado",
-        sector: "moda",
-        description:
-          "Fichas con talles y fotos por ángulo. Pensada para zapatillas y calzado urbano.",
-        bloques: ["hero", "product_grid", "product_grid", "contact"],
-      },
-    ],
-  },
-  {
-    key: "gastronomia",
-    name: "Comida",
-    plantillas: [
-      {
-        key: "gastronomia",
-        name: "Cocina",
-        sector: "gastronomia",
-        description: "Menú por categorías y pedido rápido por WhatsApp.",
-        bloques: ["hero", "product_grid", "faq", "contact"],
-      },
-      {
-        key: "reposteria",
-        name: "Repostería",
-        sector: "gastronomia",
-        description:
-          "Catálogo por encargo con anticipación de pedido. Para tortas, postres y mesas dulces.",
-        bloques: ["hero", "product_grid", "faq", "contact"],
-      },
-    ],
-  },
-  {
-    key: "tecnologia",
-    name: "Tecnología",
-    plantillas: [
-      {
-        key: "tecnologia",
-        name: "Electrónica",
-        sector: "tecnologia",
-        description:
-          "Ficha técnica extendida y comparación de precios. Incluye sección de reacondicionados.",
-        bloques: ["hero", "product_grid", "product_grid", "faq", "contact"],
-      },
-      {
-        key: "celulares",
-        name: "Celulares",
-        sector: "tecnologia",
-        description:
-          "Equipos y accesorios, con estado del producto bien visible y garantía declarada.",
-        bloques: ["hero", "product_grid", "product_grid", "contact"],
+          "Ropa, calzado y carteras. Fotos grandes en retrato, las categorías a la vista y la segunda mano con vitrina propia.",
+        bloques: [
+          "hero",
+          "categories",
+          "product_grid",
+          "product_grid",
+          "product_grid",
+        ],
       },
     ],
   },
@@ -427,48 +382,12 @@ export const RUBROS_DEMO: RubroConPlantillas[] = [
     name: "Belleza",
     plantillas: [
       {
-        key: "belleza",
-        name: "Cosmética",
+        key: "perfume",
+        name: "Esencia",
         sector: "belleza",
         description:
-          "Productos por tipo de piel y rutina, con testimonios de clientas.",
-        bloques: ["hero", "product_grid", "testimonials", "contact"],
-      },
-    ],
-  },
-  {
-    key: "hogar",
-    name: "Hogar",
-    plantillas: [
-      {
-        key: "hogar",
-        name: "Decoración",
-        sector: "hogar",
-        description:
-          "Ambientes completos y piezas sueltas, con foco en la foto grande.",
-        bloques: ["hero", "about", "product_grid", "cta"],
-      },
-      {
-        key: "carpinteria",
-        name: "Muebles a medida",
-        sector: "hogar",
-        description:
-          "Piezas por encargo, foco en fotos grandes y terminaciones.",
-        bloques: ["hero", "about", "product_grid", "cta"],
-      },
-    ],
-  },
-  {
-    key: "abarrotes",
-    name: "Abarrotes",
-    plantillas: [
-      {
-        key: "abarrotes",
-        name: "Almacén",
-        sector: "abarrotes",
-        description:
-          "Catálogo amplio, precios visibles, pensado para reposición frecuente.",
-        bloques: ["hero", "product_grid", "contact"],
+          "Perfumes, fragancias y cuidado personal. Una vitrina serena, fichas con presencia y asesoría por WhatsApp.",
+        bloques: ["hero", "product_grid", "categories", "product_grid", "faq"],
       },
     ],
   },

@@ -143,7 +143,7 @@ app/
   auth/sign-out/           Cierre de sesión
   (privado)/               Grupo de rutas: no aparece en la URL
     layout.tsx             Shell compartido de las áreas privadas
-    panel/                 Resumen del emprendedor y sus cinco secciones
+    panel/                 Resumen del emprendedor y sus secciones, apariencia incluida
     vendedor/              Panel del vendedor
   api/
     health/                Estado del servidor y de las capas
@@ -152,6 +152,7 @@ lib/                       Infraestructura lista para usar, sin UI encima
   ai/                      Capa de IA: tipos, registro, adaptadores, tareas
   supabase/                Clientes (browser, server, admin), middleware, storage
   data/                    Consultas de lectura: panel, plantillas, dashboard
+  plantillas/              La base de cada plantilla de tienda: tokens y registro
   validation/              Esquemas zod compartidos entre formularios y acciones
   demo-data.ts             Datos de ejemplo del modo demo
   env.ts                   Entorno validado con zod
@@ -161,12 +162,15 @@ lib/                       Infraestructura lista para usar, sin UI encima
 components/
   ui/                      shadcn/ui completo
   auth/acceso.tsx          Ingreso y registro, con la promesa de cada rol
-  onboarding/              Altas: marco, pasos, galería y vista previa
+  onboarding/              Altas: marco, pasos y galería de plantillas
+  plantillas/              Un kit de componentes por plantilla de tienda
+  tienda/                  Lo que comparten todas las plantillas: carrito, checkout, pago
   panel/                   Piezas del panel del emprendedor
   landing/                 Piezas de la portada
   config-status.tsx        Checklist de capas configuradas
 
 supabase/migrations/       Esquema SQL, RLS y buckets
+docs/store-templates.md    El sistema de plantillas de tienda
 types/database.ts          Tipos de la base (regenerables con npm run db:types)
 ```
 
@@ -179,7 +183,7 @@ types/database.ts          Tipos de la base (regenerables con npm run db:types)
 | `profiles`       | Perfil del usuario, se crea solo al registrarse |
 | `stores`         | Tiendas; una por dueño en el MVP                |
 | `products`       | Catálogo, precios en centavos (enteros)         |
-| `orders`         | Pedidos con estado y comprobante                |
+| `orders`         | Pedidos con su estado y la custodia del pago    |
 | `order_items`    | Líneas del pedido                               |
 | `ai_generations` | Historial de lo que generó la IA                |
 

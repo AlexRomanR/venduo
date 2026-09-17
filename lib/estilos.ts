@@ -19,11 +19,11 @@ export const CAMPO_LINEA = `h-12 ${CAMPO}`
 
 /** Botón primario: el rojo de señal, uno por bloque. */
 export const BOTON_PRIMARIO =
-  "flex min-h-12 items-center justify-center gap-2 rounded-sm bg-senal px-5 font-semibold text-white transition-colors hover:bg-senal-alta disabled:opacity-60"
+  "flex min-h-12 items-center justify-center gap-2 rounded-plantilla bg-senal px-5 font-semibold text-white transition-colors hover:bg-senal-alta disabled:opacity-60"
 
 /** Botón secundario: trazo de 2 px que se invierte al pasar el cursor. */
 export const BOTON_SECUNDARIO =
-  "flex min-h-12 items-center justify-center gap-2 rounded-sm border-2 border-tinta px-5 font-semibold transition-colors hover:bg-tinta hover:text-papel disabled:opacity-60"
+  "flex min-h-12 items-center justify-center gap-2 rounded-plantilla border-2 border-tinta px-5 font-semibold transition-colors hover:bg-tinta hover:text-papel disabled:opacity-60"
 
 /** Mensaje de error de un campo. */
 export const ERROR_CAMPO = "text-sm text-senal"

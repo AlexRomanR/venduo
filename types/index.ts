@@ -48,6 +48,7 @@ export type Template = Tables<"templates">
 export type TemplatePage = Tables<"template_pages">
 export type Sector = Tables<"sectors">
 export type BlockEditProposal = Tables<"block_edit_proposals">
+export type StoreDesignVersion = Tables<"store_design_versions">
 
 // IA y difusión
 export type AIGeneration = Tables<"ai_generations">
@@ -58,6 +59,7 @@ export type OrderStatus = Enums<"order_status">
 export type ProductCondition = Enums<"product_condition">
 export type SellerStatus = Enums<"seller_status">
 export type SellerJoinMode = Enums<"seller_join_mode">
+export type DesignOrigin = Enums<"design_origin">
 export type CommissionStatus = Enums<"commission_status">
 export type SubscriptionStatus = Enums<"subscription_status">
 export type PageStatus = Enums<"page_status">

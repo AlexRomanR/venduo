@@ -1,4 +1,6 @@
 import { isSupabaseConfigured } from "@/lib/env"
+import { aparienciaDeTienda } from "@/lib/plantillas"
+import type { Apariencia } from "@/lib/plantillas/apariencia"
 import { createClient } from "@/lib/supabase/server"
 import { urlDeTienda } from "@/lib/tienda"
 
@@ -36,6 +38,11 @@ export interface BarraLateral {
     pendientes: number
   } | null
   contadores: Contadores
+  /**
+   * La identidad de la plantilla de su tienda, para teñir el panel. `null`
+   * para quien solo vende: su panel cruza tiendas y lleva el mundo de Venduo.
+   */
+  apariencia: Apariencia | null
   esDemo: boolean
 }
 
@@ -65,6 +72,7 @@ function barraDeDemostracion(): BarraLateral {
       pedidosConComprobante: 1,
       productosPocoStock: 1,
     },
+    apariencia: aparienciaDeTienda("fashion", {}),
     esDemo: true,
   }
 }
@@ -101,7 +109,9 @@ export async function getBarraLateral(): Promise<BarraLateral> {
         .maybeSingle(),
       supabase
         .from("stores")
-        .select("id, name, slug, logo_url, is_published, template_key")
+        .select(
+          "id, name, slug, logo_url, is_published, template_key, theme_overrides"
+        )
         .eq("owner_id", user.id)
         .is("deleted_at", null)
         .maybeSingle(),
@@ -203,6 +213,9 @@ export async function getBarraLateral(): Promise<BarraLateral> {
           }
         : null,
     contadores,
+    apariencia: tiendaFila
+      ? aparienciaDeTienda(tiendaFila.template_key, tiendaFila.theme_overrides)
+      : null,
     esDemo: false,
   }
 }

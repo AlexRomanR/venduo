@@ -125,11 +125,17 @@ reducida para que el titular mande sin necesidad de un segundo color. El sistema
 está hecho para un Android de gama baja con datos móviles, así que el peso visual
 lo cargan la tipografía y el espacio, no los efectos.
 
-Este mundo rige **toda la aplicación**: la portada, el ingreso, las altas, las
-vitrinas, los paneles, la tienda `/t/{slug}` y el perfil del vendedor
-`/v/{slug}`. Lo que cambia entre una portada y un panel es el ritmo, no el
-sistema: el panel usa la misma paleta y la misma tipografía con la mitad del
-aire vertical y la navegación siempre a la vista.
+Este mundo rige **Venduo**: la portada, el ingreso, las altas, las vitrinas y el
+perfil del vendedor `/v/{slug}`. Lo que cambia entre una portada y un panel es el
+ritmo, no el sistema: el panel usa la misma paleta y la misma tipografía con la
+mitad del aire vertical y la navegación siempre a la vista.
+
+**Una tienda `/t/{slug}`, y el panel de su dueño, usan el mundo de su plantilla.**
+Las plantillas redefinen estos mismos tokens —papel, tinta, señal, titular,
+cuerpo, radio— y traen sus propios componentes; sus valores están en
+`lib/plantillas` y el sistema entero en `docs/store-templates.md`. Este documento
+es además **la base editorial**: la plantilla de respaldo con la que se dibuja
+toda tienda cuya plantilla se retiró.
 
 Los tokens por defecto de shadcn (`--background`, `--foreground`, `--primary`…)
 siguen declarados en `app/globals.css` porque los componentes generados los

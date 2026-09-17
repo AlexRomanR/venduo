@@ -19,9 +19,10 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/`                           | Portada pública                                         | Público         |
 | `/login`                      | Registro e ingreso                                      | Público         |
 | `/t/{slug}`                   | Tienda pública del emprendedor                          | Público         |
+| `/t/{slug}/catalogo`          | Catálogo completo: filtros, búsqueda y orden por URL    | Público         |
 | `/t/{slug}/p/{id}`            | Ficha de producto, con selector de cantidad             | Público         |
 | `/t/{slug}/carrito`           | Carrito y checkout                                      | Público         |
-| `/t/{slug}/pedido/{id}`       | Pago por QR, comprobante y confirmación                 | Público         |
+| `/t/{slug}/pedido/{id}`       | Pago y seguimiento del pedido (hoy, flujo provisorio)   | Público         |
 | `/v/{slug}`                   | Perfil público del vendedor                             | Público         |
 | `/crear`                      | Alta de la tienda, paso 1: elegir plantilla             | Requiere sesión |
 | `/crear/negocio`              | Alta de la tienda, paso 2: nombre y rubro               | Requiere sesión |
@@ -30,10 +31,11 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/explorar/productos`         | Vitrina de productos abiertos a vendedores              | Requiere sesión |
 | `/panel`                      | Resumen del emprendedor                                 | Requiere sesión |
 | `/panel/{seccion}`            | Productos, pedidos, vendedores, estadísticas, marketing | Requiere sesión |
-| `/panel/pedidos/{id}`         | Un pedido: detalle, estados y comprobante               | Requiere sesión |
+| `/panel/pedidos/{id}`         | Un pedido: detalle y estados                            | Requiere sesión |
 | `/panel/productos/nuevo`      | Alta de un producto                                     | Requiere sesión |
 | `/panel/productos/{id}`       | Edición de un producto                                  | Requiere sesión |
 | `/panel/productos/categorias` | Las categorías del catálogo                             | Requiere sesión |
+| `/panel/apariencia`           | La plantilla de la tienda, cambiarla y su historial     | Requiere sesión |
 | `/panel/estadisticas/pdf`     | El informe del tablero en PDF. `?g={id}` para uno solo  | Requiere sesión |
 | `/vendedor`                   | Panel del vendedor y su historial                       | Requiere sesión |
 | `/cuenta`                     | Datos de la persona, de su tienda y de su perfil        | Requiere sesión |
@@ -105,7 +107,8 @@ app/
     panel/            Resumen del emprendedor y sus secciones
     vendedor/         Panel del vendedor
     cuenta/           Ajustes de la persona, su tienda y su perfil
-  t/[slug]/           Tienda pública: catálogo, producto, carrito y pago
+  t/[slug]/           Tienda pública: portada, catálogo, producto, carrito y pago.
+                      Compone el kit de la plantilla; no sabe cuál es
   v/[slug]/           Historial laboral público del vendedor
   crear/              Alta de la tienda (layout propio)
     negocio/
@@ -122,13 +125,18 @@ app/
 components/
   ui/                 shadcn/ui. No editar a mano: se regeneran
   auth/               Ingreso y registro
-  onboarding/         Altas: marco, pasos, carrusel y vista previa
+  onboarding/         Altas: marco, pasos y carrusel de plantillas
   explorar/           Vitrinas: navegación, buscador, paginación y listas
   cuenta/             Formularios de ajustes y foto de perfil
   insights/           Cuaderno, tablero y gráficos SVG
-  pedidos/            Lista, estados y comprobante de un pedido
+  pedidos/            Lista, detalle y estados de un pedido
   productos/          Catálogo: lista, filtros, formulario, fotos y categorías
-  tienda/             La tienda pública: bloques, marco y formulario de pedido
+  plantillas/         Un kit de componentes por plantilla, su registro y el tema
+    clasica/          La base editorial. Los demás kits heredan de esta
+    fashion/          Pasarela
+    perfume/          Esencia
+  tienda/             Lo compartido por todas las plantillas: carrito, checkout,
+                      pago, agregar, filtros y buscador
   panel/              Shell, cifras y piezas de los dos paneles
   landing/            Piezas de la portada
   config-status.tsx   Checklist de capas configuradas
@@ -140,9 +148,13 @@ lib/
   validation/         Esquemas zod compartidos
   ai/                 Capa de IA
   insights/           Lo que se puede preguntar, la lectura y el documento PDF
+  plantillas/         La base de cada plantilla: tokens, esquema de la apariencia,
+                      registro y qué significa cada bloque
   demo-data.ts        Datos de ejemplo del modo demo
   estilos.ts          Clases del vestido editorial de los controles
-  tienda.ts           El enlace de una tienda, y el slug que pide un subdominio
+  tienda.ts           El enlace de una tienda, sus rutas internas y el slug de un subdominio
+  catalogo.ts         Filtrar y ordenar el catálogo público, sin dependencias de servidor
+  fuentes.ts          Todas las tipografías, con next/font
   format.ts           Moneda, fechas, slugs
   pedidos.ts          Los estados de un pedido, sin dependencias de servidor
   qr.ts               Códigos QR
@@ -153,7 +165,26 @@ types/
   index.ts            Alias escritos a mano
 
 supabase/migrations/  SQL con marca de tiempo en el nombre
+
+docs/
+  store-templates.md  El sistema de plantillas: capas, base de datos, cómo agregar una
 ```
+
+## Plantillas de tienda
+
+Una tienda se dibuja con **el kit de su plantilla**. Las páginas de `app/t/[slug]` piden
+`kitDePlantilla(tienda.plantilla)` y componen sus piezas; nunca preguntan qué plantilla es.
+El layout pinta la apariencia —base más personalización— como variables CSS en `:root`, y
+el panel de quien tiene tienda hace lo mismo.
+
+Dos trampas:
+
+- **Nada que dependa de la plantilla va en `components/tienda/`.** Esa carpeta es lo
+  compartido; lo propio va en el kit.
+- **No pasar la tienda entera a un componente de cliente.** `TiendaPublica` trae el
+  catálogo completo: a la cabecera se le pasa `marcoDeTienda(tienda)`.
+
+Todo el sistema está en `docs/store-templates.md`.
 
 ## Los tres clientes de Supabase
 

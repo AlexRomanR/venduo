@@ -127,7 +127,7 @@ export function AgregarAlCarrito({
           onClick={alAgregar}
           disabled={disponible === 0}
           className={cn(
-            "flex min-h-12 flex-1 items-center justify-center gap-2 rounded-sm px-5 font-semibold transition-colors",
+            "flex min-h-12 flex-1 items-center justify-center gap-2 rounded-plantilla px-5 font-semibold transition-colors",
             recien
               ? "bg-tinta text-papel"
               : "bg-senal text-white hover:bg-senal-alta",
@@ -151,7 +151,7 @@ export function AgregarAlCarrito({
           <button
             type="button"
             onClick={() => router.push(`/t/${slug}/carrito`)}
-            className="flex min-h-12 items-center justify-center rounded-sm border-2 border-tinta px-5 font-semibold transition-colors hover:bg-tinta hover:text-papel"
+            className="flex min-h-12 items-center justify-center rounded-plantilla border-2 border-tinta px-5 font-semibold transition-colors hover:bg-tinta hover:text-papel"
           >
             Ir a pagar
           </button>

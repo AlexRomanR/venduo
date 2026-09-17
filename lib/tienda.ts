@@ -71,6 +71,27 @@ export function urlDeProducto(
 }
 
 /**
+ * Una ruta dentro de la tienda, para navegar sin salir de ella.
+ *
+ * Relativa y siempre con `/t/{slug}`: el middleware deja pasar esa forma tal
+ * cual también desde un subdominio. Lleva el código del vendedor si lo hay,
+ * para que el cartel de "te trajo" siga en cada pantalla; el carrito además lo
+ * recuerda, así que perderlo acá no le quita la venta a nadie.
+ */
+export function rutaDeTienda(
+  slug: string,
+  subruta = "",
+  parametros: Record<string, string | null | undefined> = {}
+): string {
+  const consulta = new URLSearchParams()
+  for (const [clave, valor] of Object.entries(parametros)) {
+    if (valor) consulta.set(clave, valor)
+  }
+  const texto = consulta.toString()
+  return `/t/${slug}${subruta}${texto ? `?${texto}` : ""}`
+}
+
+/**
  * Cómo se muestra un enlace cuando se lee, no cuando se hace clic.
  *
  * Sin el `https://`, que nadie dicta por teléfono ni copia a mano.

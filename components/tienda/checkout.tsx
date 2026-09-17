@@ -100,7 +100,7 @@ export function Checkout({
         </p>
         <Link
           href={`/t/${slug}`}
-          className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-sm bg-senal px-6 font-semibold text-white transition-colors hover:bg-senal-alta"
+          className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-plantilla bg-senal px-6 font-semibold text-white transition-colors hover:bg-senal-alta"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
           Ver el catálogo

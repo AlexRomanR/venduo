@@ -1,7 +1,8 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 
 import { getTiendaPublica } from "@/lib/data/tienda-publica"
 import { urlDeTienda } from "@/lib/tienda"
+import { EstiloDePlantilla } from "@/components/plantillas/estilo"
 import { ProveedorCarrito } from "@/components/tienda/carrito"
 
 /**
@@ -39,6 +40,17 @@ export async function generateMetadata({
   }
 }
 
+/** La barra del navegador del celular toma el color del papel de la tienda. */
+export async function generateViewport({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Viewport> {
+  const { slug } = await params
+  const tienda = await getTiendaPublica(slug)
+  return tienda ? { themeColor: tienda.apariencia.colores.papel } : {}
+}
+
 export default async function TiendaLayout({
   children,
   params,
@@ -47,10 +59,19 @@ export default async function TiendaLayout({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
+  // La misma lectura que la página: `getTiendaPublica` está en caché por visita.
+  const tienda = await getTiendaPublica(slug)
 
   return (
     <ProveedorCarrito slug={slug}>
-      <div className="flex min-h-screen flex-col bg-papel text-tinta">
+      {/* El tema se pinta en el servidor, junto con el HTML: si esperara al
+          navegador, la tienda aparecería un instante con los colores de
+          Venduo antes de tomar los suyos. */}
+      {tienda ? <EstiloDePlantilla apariencia={tienda.apariencia} /> : null}
+      <div
+        data-plantilla={tienda?.plantilla}
+        className="flex min-h-screen flex-col bg-papel text-tinta"
+      >
         {children}
       </div>
     </ProveedorCarrito>

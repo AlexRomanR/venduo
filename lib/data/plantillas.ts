@@ -1,3 +1,4 @@
+import { plantillaDeTienda } from "@/lib/plantillas"
 import { createClient } from "@/lib/supabase/server"
 import { RUBROS_DEMO, type RubroConPlantillas } from "@/lib/demo-data"
 
@@ -7,8 +8,8 @@ export type { PlantillaResumen, RubroConPlantillas } from "@/lib/demo-data"
  * El catálogo de plantillas agrupado por rubro, para la galería del paso 1.
  *
  * Los bloques vienen de `template_pages`, que es lo mismo que `apply_template`
- * copia a la tienda. Así la vista previa muestra la estructura real y no una
- * ilustración que se desactualiza sola en cuanto alguien edita la plantilla.
+ * copia a la tienda: la galería los resume en texto. La miniatura, en cambio,
+ * sale de la base en código de cada plantilla (`components/plantillas`).
  */
 export async function getPlantillasPorRubro(): Promise<RubroConPlantillas[]> {
   const supabase = await createClient()
@@ -32,7 +33,11 @@ export async function getPlantillasPorRubro(): Promise<RubroConPlantillas[]> {
   ])
 
   const rubros = rubrosResult.data ?? []
-  const plantillas = plantillasResult.data ?? []
+  // Solo las que tienen base en código: una fila activa sin kit se dibujaría
+  // con la base editorial, y quien la eligió no vería lo que eligió.
+  const plantillas = (plantillasResult.data ?? []).filter(
+    (plantilla) => plantillaDeTienda(plantilla.key) === plantilla.key
+  )
 
   if (rubros.length === 0 || plantillas.length === 0) return RUBROS_DEMO
 
@@ -86,6 +91,7 @@ export async function getNombresDeBloque(): Promise<Record<string, string>> {
 
 export const NOMBRES_DE_BLOQUE_DEMO: Record<string, string> = {
   hero: "Portada",
+  categories: "Categorías",
   product_grid: "Grilla de productos",
   about: "Sobre el negocio",
   testimonials: "Testimonios",

@@ -1,5 +1,13 @@
+import { cache } from "react"
+
+import {
+  aparienciaDeTienda,
+  plantillaDeTienda,
+  type ClavePlantilla,
+} from "@/lib/plantillas"
+import type { Apariencia } from "@/lib/plantillas/apariencia"
 import { createClient } from "@/lib/supabase/server"
-import type { Json, Product, ProductCondition } from "@/types"
+import type { Json, Product } from "@/types"
 
 export interface BloquePublico {
   id: string
@@ -22,10 +30,39 @@ export interface TiendaPublica {
   whatsapp: string | null
   aceptaVendedores: boolean
   comisionBps: number
+  /** Con qué kit se dibuja. Una clave retirada ya llega resuelta a la base. */
+  plantilla: ClavePlantilla
+  /** La base de la plantilla con la personalización de la tienda encima. */
+  apariencia: Apariencia
   bloques: BloquePublico[]
   productos: Product[]
   categorias: CategoriaPublica[]
   esDemo: boolean
+}
+
+/**
+ * Lo que necesitan la cabecera y el pie de la tienda.
+ *
+ * Existe para no pasarle la tienda entera a un componente de cliente: con ella
+ * viajaría el catálogo completo dentro de la página, solo para dibujar un
+ * nombre y un menú.
+ */
+export interface MarcoDeTienda {
+  slug: string
+  nombre: string
+  logoUrl: string | null
+  whatsapp: string | null
+  categorias: CategoriaPublica[]
+}
+
+export function marcoDeTienda(tienda: TiendaPublica): MarcoDeTienda {
+  return {
+    slug: tienda.slug,
+    nombre: tienda.nombre,
+    logoUrl: tienda.logoUrl,
+    whatsapp: tienda.whatsapp,
+    categorias: tienda.categorias.filter((c) => c.productos > 0),
+  }
 }
 
 /** El vendedor al que se le acredita la venta, si el enlace traía código. */
@@ -70,9 +107,11 @@ function bloquesDeDemostracion(): BloquePublico[] {
  * casos. `store_is_live()` ya combina publicación y suscripción vigente, así
  * que una tienda con la prueba vencida deja de verse sin código extra.
  */
-export async function getTiendaPublica(
+export const getTiendaPublica = cache(async function getTiendaPublica(
   slug: string
 ): Promise<TiendaPublica | null> {
+  // `cache`: el layout la pide para teñir la tienda, la página para dibujarla
+  // y los metadatos para la tarjeta de WhatsApp. Es una sola lectura por visita.
   const supabase = await createClient()
 
   if (!supabase) {
@@ -88,6 +127,8 @@ export async function getTiendaPublica(
       whatsapp: null,
       aceptaVendedores: true,
       comisionBps: 1200,
+      plantilla: "fashion",
+      apariencia: aparienciaDeTienda("fashion", {}),
       bloques: bloquesDeDemostracion(),
       productos: [],
       categorias: [],
@@ -98,7 +139,7 @@ export async function getTiendaPublica(
   const { data: tienda } = await supabase
     .from("stores")
     .select(
-      "id, slug, name, description, logo_url, whatsapp, seller_network_enabled, commission_bps, is_published"
+      "id, slug, name, description, logo_url, whatsapp, seller_network_enabled, commission_bps, is_published, template_key, theme_overrides"
     )
     .eq("slug", slug)
     .is("deleted_at", null)
@@ -165,6 +206,8 @@ export async function getTiendaPublica(
     whatsapp: tienda.whatsapp,
     aceptaVendedores: tienda.seller_network_enabled,
     comisionBps: tienda.commission_bps,
+    plantilla: plantillaDeTienda(tienda.template_key),
+    apariencia: aparienciaDeTienda(tienda.template_key, tienda.theme_overrides),
     bloques,
     productos: catalogo,
     categorias: (categorias ?? []).map((categoria) => ({
@@ -174,7 +217,7 @@ export async function getTiendaPublica(
     })),
     esDemo: false,
   }
-}
+})
 
 /** Un producto de la tienda pública. Devuelve `null` si no se sirve. */
 export async function getProductoPublico(
@@ -231,35 +274,6 @@ export function codigoDeReferido(valor: unknown): string | null {
 
   const limpio = valor.trim().toUpperCase()
   return /^[A-Z0-9]{4,20}$/.test(limpio) ? limpio : null
-}
-
-/** Los filtros de la vitrina pública. */
-export function filtrarCatalogo(
-  productos: Product[],
-  filtros: { categoria?: string; condicion?: string; buscar?: string }
-): Product[] {
-  let salida = productos
-
-  if (filtros.categoria) {
-    salida = salida.filter((p) => p.category_id === filtros.categoria)
-  }
-
-  if (filtros.condicion) {
-    salida = salida.filter(
-      (p) => p.condition === (filtros.condicion as ProductCondition)
-    )
-  }
-
-  const buscar = filtros.buscar?.trim().toLowerCase()
-  if (buscar) {
-    salida = salida.filter(
-      (p) =>
-        p.name.toLowerCase().includes(buscar) ||
-        p.description?.toLowerCase().includes(buscar)
-    )
-  }
-
-  return salida
 }
 
 /**

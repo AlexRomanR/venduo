@@ -42,7 +42,7 @@ export function MaterialesVendedor({
       <button
         type="button"
         onClick={() => copiar(enlace, "Enlace")}
-        className="flex min-h-11 items-center gap-2 rounded-sm border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
+        className="flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
       >
         {copiado === "Enlace" ? (
           <Check aria-hidden="true" className="size-4" />
@@ -55,7 +55,7 @@ export function MaterialesVendedor({
       <button
         type="button"
         onClick={() => copiar(mensaje, "Mensaje")}
-        className="flex min-h-11 items-center gap-2 rounded-sm bg-senal px-4 text-sm font-semibold text-white transition-colors hover:bg-senal-alta"
+        className="flex min-h-11 items-center gap-2 rounded-plantilla bg-senal px-4 text-sm font-semibold text-white transition-colors hover:bg-senal-alta"
       >
         {copiado === "Mensaje" ? (
           <Check aria-hidden="true" className="size-4" />

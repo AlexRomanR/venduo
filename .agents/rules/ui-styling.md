@@ -10,15 +10,30 @@ cada superficie nueva.
 Leerlo antes de diseñar una pantalla. Esta regla cubre lo que no se negocia; `DESIGN.md`
 cubre cómo se ve.
 
-### Un solo mundo
+### El mundo de Venduo y el de cada tienda
 
-**Toda la aplicación usa el mundo editorial de `DESIGN.md`**: papel, tinta y un rojo de
-señal. Portada, ingreso, altas, vitrinas, paneles, tienda pública y perfil del vendedor.
+**Venduo usa el mundo editorial de `DESIGN.md`**: papel, tinta y un rojo de señal. Portada,
+ingreso, altas, vitrinas del vendedor y su perfil público.
 
-Esto reemplaza la regla anterior de "dos mundos", que reservaba los paneles para los
-tokens de shadcn sin tocar. Se fue estrechando hasta desaparecer —primero el ingreso,
-después las altas, al final los paneles— y sostenerla ya solo producía costuras entre
-pantallas que la misma persona recorre en el mismo minuto.
+**Una tienda usa el de su plantilla**, y su dueño también, en su panel. La plantilla
+redefine los mismos tokens —`papel`, `tinta`, `senal`, `font-titular`, el radio— y trae su
+propio kit de componentes para la tienda pública. Cómo funciona, y cómo se agrega una, está
+en `docs/store-templates.md`.
+
+Tres reglas que se desprenden:
+
+- **Nunca preguntar por la plantilla en un componente.** Ni `if (plantilla === …)` ni
+  clases por clave. Lo que cambia entre plantillas vive en su kit
+  (`components/plantillas/{clave}`) o en sus tokens (`lib/plantillas/{clave}.ts`).
+- **Lo compartido se escribe con tokens y queda bien en todas**: carrito, checkout, pago,
+  filtros, y todas las pantallas del panel. Un `#16171a` o un `rounded-sm` fijos ya no
+  responden a la plantilla: usar `text-tinta` y `rounded-plantilla`.
+- **El panel cambia la piel, no la estructura.** Las pantallas de trabajo son las mismas
+  en todas las plantillas.
+
+Esto reemplaza la regla anterior de "un solo mundo", que a su vez había reemplazado la de
+"dos mundos". Lo que se mantiene de las dos: quien trabaja y quien compra en la misma
+tienda ven la misma identidad, sin costuras entre pantallas.
 
 **Editorial no quiere decir _landing_.** Un diario también es denso. Lo que cambia entre
 una portada y un panel no es la paleta ni la tipografía, es el ritmo:
@@ -27,8 +42,11 @@ una portada y un panel no es la paleta ni la tipografía, es el ritmo:
 | ------------- | ------------------------- | ------------------------------------------ |
 | Aire vertical | `80px` entre secciones    | `40–48px`; el contenido manda              |
 | Titular       | Display, uno por pantalla | El nombre de la tienda o de la persona     |
-| Rojo          | La acción de conversión   | Solo lo que pide una acción: un pendiente  |
+| Señal         | La acción de conversión   | Solo lo que pide una acción: un pendiente  |
 | Barra         | Anclas de navegación      | Navegación persistente, siempre a la vista |
+
+"Rojo" en esta regla quiere decir **la señal**: en Venduo es rojo, en Pasarela azul y en
+Esencia oro viejo. La regla de usarla poco no cambia con el color.
 
 ### La barra lateral de los paneles
 
@@ -205,8 +223,9 @@ Lo que sí conviene tomar de ellas: ritmo de espaciado, escala tipográfica, jer
 visual, curvas y duraciones de animación, y qué **no** animar.
 
 Y una más, que ya está resuelta: **el mundo visual ya está elegido y documentado en
-`DESIGN.md`.** Una skill de diseño no lo vuelve a abrir. Se usa para ejecutar mejor dentro
-de él, nunca para proponer otra paleta o tipografía.
+`DESIGN.md`**, y el de cada plantilla en `lib/plantillas`. Una skill de diseño no los
+vuelve a abrir. Se usa para ejecutar mejor dentro de ellos; una paleta o tipografía nueva
+es una plantilla nueva, con su contraste medido, no un ajuste de pantalla.
 
 ### Gráficos
 

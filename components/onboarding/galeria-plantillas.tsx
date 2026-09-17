@@ -13,7 +13,7 @@ import {
   useCarousel,
   type CarouselApi,
 } from "@/components/ui/carousel"
-import { VistaPrevia } from "@/components/onboarding/vista-previa"
+import { Miniatura } from "@/components/plantillas/miniatura"
 
 export function GaleriaPlantillas({
   rubros,
@@ -106,7 +106,9 @@ export function GaleriaPlantillas({
             return (
               <CarouselItem
                 key={plantilla.key}
-                className="basis-[82%] pl-5 sm:basis-1/2 lg:basis-1/3"
+                // De a dos también en escritorio: cada plantilla tiene su
+                // identidad, y en un tercio del ancho la miniatura no se lee.
+                className="basis-[88%] pl-5 sm:basis-1/2"
               >
                 <button
                   type="button"
@@ -125,9 +127,14 @@ export function GaleriaPlantillas({
                 >
                   {/* La foto del sistema escala a 1.02 en hover; la vista
                       previa hereda ese mismo gesto y no inventa otro. */}
-                  <div className="overflow-hidden">
+                  <div
+                    className={cn(
+                      "overflow-hidden border transition-colors",
+                      seleccionada ? "border-senal" : "border-tinta"
+                    )}
+                  >
                     <div className="transition-transform duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transform-none">
-                      <VistaPrevia bloques={plantilla.bloques} />
+                      <Miniatura clave={plantilla.key} />
                     </div>
                   </div>
 

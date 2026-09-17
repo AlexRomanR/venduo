@@ -133,7 +133,7 @@ export default async function PanelPage() {
 
         <Link
           href={`/t/${resumen.tienda.slug}`}
-          className="group inline-flex min-h-11 items-center gap-2 rounded-sm border-2 border-tinta px-5 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
+          className="group inline-flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-5 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
         >
           Ver mi tienda
           <ArrowUpRight aria-hidden="true" className="size-4" />

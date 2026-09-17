@@ -72,7 +72,7 @@ export default async function PedidoPage({
           href={mensajeDeEntrega(pedido, nombreTienda)}
           target="_blank"
           rel="noreferrer noopener"
-          className="flex min-h-11 items-center gap-2 rounded-sm border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
+          className="flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
         >
           <MessageCircle aria-hidden="true" className="size-4" />
           Coordinar la entrega
