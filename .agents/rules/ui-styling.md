@@ -30,6 +30,23 @@ una portada y un panel no es la paleta ni la tipografía, es el ritmo:
 | Rojo          | La acción de conversión   | Solo lo que pide una acción: un pendiente  |
 | Barra         | Anclas de navegación      | Navegación persistente, siempre a la vista |
 
+### La barra lateral de los paneles
+
+`/panel`, `/vendedor` y `/cuenta` comparten una barra lateral fija desde `lg` y un cajón
+por debajo: una columna de 272 px en una pantalla de 375 deja 100 px para trabajar. El
+cajón es el `Sheet` de shadcn con `showCloseButton={false}` y `shadow-none` —el suyo mide
+28 px y dice "Close"— y un cierre propio de 44 px.
+
+Las secciones las deciden los datos (`lib/data/barra.ts`), no `primary_role`: quien tiene
+tienda ve "Tu tienda", quien vende para otras ve "Como vendedor", y quien hace las dos
+ve las dos.
+
+Los contadores siguen la regla del rojo: **rojo solo si pide una acción** —un pedido que
+ya trajo comprobante, un producto sin stock, una solicitud de vendedor—; en tinta si solo
+informa. El atajo "Nuevo producto" va con trazo y no relleno rojo por lo mismo: vive en
+todas las pantallas y competiría con el botón principal de cada una. En el móvil, el botón
+del menú lleva un punto rojo si adentro hay algo urgente.
+
 **Los componentes de `components/ui/` se siguen usando.** Se visten con las clases de
 `lib/estilos.ts` en vez de reemplazarse: lo que aportan es el cableado de accesibilidad
 de los formularios, que no se regala por una cuestión de color.
