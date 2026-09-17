@@ -19,14 +19,17 @@ export default function NoEncontrado() {
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center px-5 py-24 text-center">
       <p className="text-xs font-semibold tracking-[0.16em] uppercase opacity-55">
-        No está disponible
+        No encontrado
       </p>
       <h1 className="mt-4 font-titular text-[clamp(2rem,7vw,3rem)] leading-tight font-extrabold tracking-[-0.03em]">
-        Esto ya no está aquí
+        Esto no está disponible
       </h1>
-      <p className="mt-4 max-w-[42ch] leading-relaxed opacity-70">
-        Puede que el producto se haya agotado para siempre o que el enlace esté
-        incompleto.
+      {/* Un solo texto para los tres casos: esta pantalla no sabe cuál fue, y
+          decir "el producto se agotó" a quien abre una tienda despublicada lo
+          manda a buscar el error en el lugar equivocado. */}
+      <p className="mt-4 max-w-[44ch] leading-relaxed opacity-70">
+        Puede que la tienda todavía no esté publicada, que el producto ya no
+        exista o que el enlace esté incompleto.
       </p>
       {slug ? (
         <Link href={`/t/${slug}`} className={cn(BOTON_PRIMARIO, "mt-9")}>
