@@ -6,15 +6,21 @@ import {
   getTiendaPublica,
 } from "@/lib/data/tienda-publica"
 import { Bloque, TarjetaProducto } from "@/components/tienda/bloques"
-import { Cabecera, Pie } from "@/components/tienda/marco"
+import { FiltrosTienda } from "@/components/tienda/filtros"
+import {
+  BarraDelCarrito,
+  Cabecera,
+  DatosDeLaTienda,
+  Pie,
+} from "@/components/tienda/marco"
 
 /**
  * La tienda pública.
  *
- * Se arma con los bloques que sembró la plantilla al crear la tienda. Si una
- * tienda todavía no tiene bloques —o los tiene todos ocultos— igual muestra su
- * catálogo: un comercio recién creado es el estado normal durante una
- * demostración, no un caso raro.
+ * Se arma con los bloques que sembró la plantilla, y debajo va el catálogo
+ * completo con su filtro. Los bloques son la cara del negocio; el catálogo
+ * filtrable es lo que la gente vino a usar, y por eso está siempre, aunque la
+ * plantilla no traiga ninguna grilla.
  */
 export default async function TiendaPage({
   params,
@@ -33,7 +39,20 @@ export default async function TiendaPage({
   const codigo = codigoDeReferido(consulta.ref)
   const referido = await getReferido(tienda.id, codigo)
 
-  const tieneGrilla = tienda.bloques.some((b) => b.tipo === "product_grid")
+  const condicion =
+    typeof consulta.condicion === "string" ? consulta.condicion : null
+  const categoria =
+    typeof consulta.categoria === "string" ? consulta.categoria : null
+
+  const catalogo = tienda.productos.filter((p) => {
+    if (categoria && p.category_id !== categoria) return false
+    if (!condicion) return true
+    // "oferta" no es una condición del producto: es tener precio anterior.
+    if (condicion === "oferta") return Boolean(p.compare_at_price_cents)
+    return p.condition === condicion
+  })
+
+  const usados = tienda.productos.filter((p) => p.condition !== "nuevo").length
 
   return (
     <>
@@ -44,10 +63,10 @@ export default async function TiendaPage({
         referido={referido}
       />
 
-      <main>
+      <main className="flex-1">
         {tienda.bloques.length === 0 ? (
-          <section className="py-20 md:py-28">
-            <div className="mx-auto w-full max-w-5xl px-5">
+          <section className="py-16 md:py-24">
+            <div className="mx-auto w-full max-w-6xl px-5">
               <h1 className="max-w-[16ch] font-titular text-[clamp(2.5rem,9vw,5rem)] leading-[0.98] font-extrabold tracking-[-0.04em]">
                 {tienda.nombre}
               </h1>
@@ -59,28 +78,65 @@ export default async function TiendaPage({
             </div>
           </section>
         ) : (
-          tienda.bloques.map((bloque) => (
-            <Bloque
-              key={bloque.id}
-              bloque={bloque}
-              productos={tienda.productos}
-              slug={tienda.slug}
-              codigo={codigo}
-            />
-          ))
+          tienda.bloques
+            // La grilla de la plantilla sobra: abajo está el catálogo completo
+            // con su filtro, y dos grillas seguidas se leen como un error.
+            .filter((b) => b.tipo !== "product_grid")
+            .map((bloque) => (
+              <Bloque
+                key={bloque.id}
+                bloque={bloque}
+                productos={tienda.productos}
+                slug={tienda.slug}
+                codigo={codigo}
+              />
+            ))
         )}
 
-        {/* Red de seguridad: si ningún bloque dibuja productos, el catálogo no
-            puede quedar invisible. Es lo que la persona vino a ver. */}
-        {!tieneGrilla && tienda.productos.length > 0 ? (
-          <section className="border-t border-tinta/15 py-16 md:py-20">
-            <div className="mx-auto w-full max-w-5xl px-5">
-              <h2 className="font-titular text-[clamp(1.5rem,4vw,2.25rem)] leading-tight font-extrabold tracking-[-0.03em]">
-                Nuestros productos
-              </h2>
+        <DatosDeLaTienda
+          nombre={tienda.nombre}
+          // Con bloques, la descripción puede no aparecer en ninguno: se
+          // muestra acá. Sin bloques ya salió en la portada de respaldo.
+          descripcion={
+            tienda.bloques.some((b) => b.tipo === "about")
+              ? null
+              : tienda.bloques.length === 0
+                ? null
+                : tienda.descripcion
+          }
+          whatsapp={tienda.whatsapp}
+          productos={tienda.productos.length}
+          comisionBps={tienda.comisionBps}
+          aceptaVendedores={tienda.aceptaVendedores}
+        />
 
-              <div className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-                {tienda.productos.map((producto) => (
+        <section
+          id="catalogo"
+          className="scroll-mt-20 border-t-2 border-tinta py-14 md:py-16"
+        >
+          <div className="mx-auto w-full max-w-6xl px-5">
+            <h2 className="font-titular text-[clamp(1.75rem,5vw,2.75rem)] leading-tight font-extrabold tracking-[-0.03em]">
+              El catálogo
+            </h2>
+
+            <div className="mt-8">
+              <FiltrosTienda
+                categorias={tienda.categorias}
+                usados={usados}
+                total={tienda.productos.length}
+                mostrando={catalogo.length}
+              />
+            </div>
+
+            {catalogo.length === 0 ? (
+              <p className="mt-12 max-w-[48ch] leading-relaxed opacity-55">
+                {tienda.productos.length === 0
+                  ? "Esta tienda todavía no cargó sus productos. Vuelve en un rato."
+                  : "Nada coincide con ese filtro. Prueba con otro, o mira todo el catálogo."}
+              </p>
+            ) : (
+              <div className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {catalogo.map((producto) => (
                   <TarjetaProducto
                     key={producto.id}
                     producto={producto}
@@ -89,22 +145,13 @@ export default async function TiendaPage({
                   />
                 ))}
               </div>
-            </div>
-          </section>
-        ) : null}
-
-        {tienda.productos.length === 0 ? (
-          <section className="border-t border-tinta/15 py-16">
-            <div className="mx-auto w-full max-w-5xl px-5">
-              <p className="max-w-[48ch] leading-relaxed opacity-55">
-                Esta tienda todavía no cargó sus productos. Vuelve en un rato.
-              </p>
-            </div>
-          </section>
-        ) : null}
+            )}
+          </div>
+        </section>
       </main>
 
       <Pie nombre={tienda.nombre} />
+      <BarraDelCarrito slug={tienda.slug} />
     </>
   )
 }

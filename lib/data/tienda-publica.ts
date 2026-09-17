@@ -19,6 +19,7 @@ export interface TiendaPublica {
   nombre: string
   descripcion: string | null
   logoUrl: string | null
+  whatsapp: string | null
   aceptaVendedores: boolean
   comisionBps: number
   bloques: BloquePublico[]
@@ -84,6 +85,7 @@ export async function getTiendaPublica(
       nombre: "Rosa Deportes",
       descripcion: "Ropa deportiva en Santa Cruz.",
       logoUrl: null,
+      whatsapp: null,
       aceptaVendedores: true,
       comisionBps: 1200,
       bloques: bloquesDeDemostracion(),
@@ -96,7 +98,7 @@ export async function getTiendaPublica(
   const { data: tienda } = await supabase
     .from("stores")
     .select(
-      "id, slug, name, description, logo_url, seller_network_enabled, commission_bps, is_published"
+      "id, slug, name, description, logo_url, whatsapp, seller_network_enabled, commission_bps, is_published"
     )
     .eq("slug", slug)
     .is("deleted_at", null)
@@ -160,6 +162,7 @@ export async function getTiendaPublica(
     nombre: tienda.name,
     descripcion: tienda.description,
     logoUrl: tienda.logo_url,
+    whatsapp: tienda.whatsapp,
     aceptaVendedores: tienda.seller_network_enabled,
     comisionBps: tienda.commission_bps,
     bloques,
@@ -257,4 +260,78 @@ export function filtrarCatalogo(
   }
 
   return salida
+}
+
+/**
+ * El pedido, para quien acaba de hacerlo.
+ *
+ * Pasa por `pedido_publico`, que es `security definer`: `orders` se lee solo
+ * `to authenticated` y quien compró no tiene cuenta. Esa función devuelve lo
+ * que el comprador ya sabe más los datos de pago de la tienda, y nunca la
+ * comisión ni el vendedor: eso es del comercio.
+ */
+export async function getPedidoPublico(
+  pedidoId: string
+): Promise<PedidoPublicoConTienda | null> {
+  const supabase = await createClient()
+  if (!supabase) return null
+
+  const { data } = await supabase.rpc("pedido_publico", {
+    p_order_id: pedidoId,
+  })
+
+  if (!data || typeof data !== "object") return null
+
+  const crudo = data as Record<string, Json>
+  const tienda = (crudo.tienda ?? {}) as Record<string, Json>
+  const items = Array.isArray(crudo.items) ? crudo.items : []
+
+  return {
+    id: String(crudo.id),
+    numero: Number(crudo.numero),
+    estado: String(crudo.estado),
+    totalCents: Number(crudo.total_cents),
+    comprador: String(crudo.comprador),
+    tieneComprobante: Boolean(crudo.tiene_comprobante),
+    items: items.map((item) => {
+      const fila = item as Record<string, Json>
+      return {
+        nombre: String(fila.nombre),
+        cantidad: Number(fila.cantidad),
+        precioCents: Number(fila.precio_cents),
+        totalCents: Number(fila.total_cents),
+      }
+    }),
+    tienda: {
+      nombre: String(tienda.nombre),
+      slug: String(tienda.slug),
+      logoUrl: tienda.logo_url ? String(tienda.logo_url) : null,
+      whatsapp: tienda.whatsapp ? String(tienda.whatsapp) : null,
+      qrUrl: tienda.qr_url ? String(tienda.qr_url) : null,
+      instrucciones: tienda.instrucciones ? String(tienda.instrucciones) : null,
+    },
+  }
+}
+
+export interface PedidoPublicoConTienda {
+  id: string
+  numero: number
+  estado: string
+  totalCents: number
+  comprador: string
+  tieneComprobante: boolean
+  items: Array<{
+    nombre: string
+    cantidad: number
+    precioCents: number
+    totalCents: number
+  }>
+  tienda: {
+    nombre: string
+    slug: string
+    logoUrl: string | null
+    whatsapp: string | null
+    qrUrl: string | null
+    instrucciones: string | null
+  }
 }

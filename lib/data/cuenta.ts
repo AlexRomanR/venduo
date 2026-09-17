@@ -15,6 +15,9 @@ export interface Cuenta {
     sellerNetworkEnabled: boolean
     commissionBps: number
     sellerJoinMode: string
+    whatsapp: string | null
+    paymentQrUrl: string | null
+    paymentInstructions: string | null
   } | null
   vendedor: {
     slug: string
@@ -50,7 +53,7 @@ export async function getCuenta(): Promise<Cuenta | null> {
     supabase
       .from("stores")
       .select(
-        "id, name, slug, tagline, description, logo_url, is_published, seller_network_enabled, commission_bps, seller_join_mode"
+        "id, name, slug, tagline, description, logo_url, is_published, seller_network_enabled, commission_bps, seller_join_mode, whatsapp, payment_qr_url, payment_instructions"
       )
       .eq("owner_id", user.id)
       .is("deleted_at", null)
@@ -82,6 +85,9 @@ export async function getCuenta(): Promise<Cuenta | null> {
           sellerNetworkEnabled: tiendaResult.data.seller_network_enabled,
           commissionBps: tiendaResult.data.commission_bps,
           sellerJoinMode: tiendaResult.data.seller_join_mode,
+          whatsapp: tiendaResult.data.whatsapp,
+          paymentQrUrl: tiendaResult.data.payment_qr_url,
+          paymentInstructions: tiendaResult.data.payment_instructions,
         }
       : null,
     vendedor: vendedorResult.data

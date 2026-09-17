@@ -87,3 +87,43 @@ export async function removeFile(bucket: BucketName, path: string) {
   const { error } = await supabase.storage.from(bucket).remove([path])
   if (error) throw new Error(error.message)
 }
+
+/**
+ * Sube a un bucket privado y devuelve solo la ruta.
+ *
+ * `uploadFile` firma una URL después de subir, y firmar exige permiso de
+ * lectura sobre el objeto. El comprador que sube su comprobante es anónimo y
+ * no lo tiene —la política de lectura de `payment-proofs` es `to authenticated`
+ * y por dueño—, así que pedir la firma devuelve un 400 y la subida parece
+ * fallar cuando en realidad ya pasó.
+ *
+ * Un objeto privado se referencia por su ruta. Quien necesite verlo —el
+ * emprendedor, en su panel de pedidos— la firma del lado del servidor.
+ */
+export async function uploadPrivateFile(
+  bucket: BucketName,
+  file: File,
+  folder: string
+): Promise<{ path: string }> {
+  const supabase = createClient()
+  if (!supabase) {
+    throw new Error("Supabase no está configurado.")
+  }
+
+  if (file.size > MAX_UPLOAD_BYTES) {
+    throw new Error("El archivo supera los 5 MB.")
+  }
+  if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+    throw new Error("Formato no admitido. Usa JPG, PNG, WEBP o AVIF.")
+  }
+
+  const path = `${folder}/${safeName(file.name)}`
+
+  const { error } = await supabase.storage
+    .from(bucket)
+    .upload(path, file, { cacheControl: "3600", upsert: false })
+
+  if (error) throw new Error(error.message)
+
+  return { path }
+}

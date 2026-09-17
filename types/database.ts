@@ -1028,6 +1028,8 @@ export type Database = {
           logo_url: string | null
           name: string
           owner_id: string
+          payment_instructions: string | null
+          payment_qr_url: string | null
           seller_join_mode: Database["public"]["Enums"]["seller_join_mode"]
           seller_network_enabled: boolean
           slug: string
@@ -1035,6 +1037,7 @@ export type Database = {
           template_key: string | null
           theme: Json
           updated_at: string
+          whatsapp: string | null
         }
         Insert: {
           commission_bps?: number
@@ -1046,6 +1049,8 @@ export type Database = {
           logo_url?: string | null
           name: string
           owner_id: string
+          payment_instructions?: string | null
+          payment_qr_url?: string | null
           seller_join_mode?: Database["public"]["Enums"]["seller_join_mode"]
           seller_network_enabled?: boolean
           slug: string
@@ -1053,6 +1058,7 @@ export type Database = {
           template_key?: string | null
           theme?: Json
           updated_at?: string
+          whatsapp?: string | null
         }
         Update: {
           commission_bps?: number
@@ -1064,6 +1070,8 @@ export type Database = {
           logo_url?: string | null
           name?: string
           owner_id?: string
+          payment_instructions?: string | null
+          payment_qr_url?: string | null
           seller_join_mode?: Database["public"]["Enums"]["seller_join_mode"]
           seller_network_enabled?: boolean
           slug?: string
@@ -1071,6 +1079,7 @@ export type Database = {
           template_key?: string | null
           theme?: Json
           updated_at?: string
+          whatsapp?: string | null
         }
         Relationships: [
           {
@@ -1357,6 +1366,10 @@ export type Database = {
       }
     }
     Functions: {
+      adjuntar_comprobante: {
+        Args: { p_order_id: string; p_url: string }
+        Returns: boolean
+      }
       apply_template: {
         Args: { p_store_id: string; p_template_key: string }
         Returns: undefined
@@ -1396,6 +1409,7 @@ export type Database = {
       my_seller_ids: { Args: never; Returns: string[] }
       my_seller_invite: { Args: never; Returns: string }
       my_store_id: { Args: never; Returns: string }
+      pedido_publico: { Args: { p_order_id: string }; Returns: Json }
       referido_publico: {
         Args: { p_codigo: string; p_store_id: string }
         Returns: {

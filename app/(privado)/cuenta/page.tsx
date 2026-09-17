@@ -9,6 +9,7 @@ import {
   FormTienda,
   FormVendedor,
 } from "@/components/cuenta/formularios"
+import { FormCobro } from "@/components/cuenta/cobro"
 import { Foto } from "@/components/cuenta/foto"
 import { Encabezado } from "@/components/panel/piezas"
 
@@ -96,6 +97,27 @@ export default async function CuentaPage() {
 
           <div className="border-t-2 border-tinta pt-8 lg:border-t-0 lg:border-l lg:border-tinta/15 lg:pt-0 lg:pl-12">
             <FormTienda cuenta={cuenta} />
+          </div>
+        </section>
+      ) : null}
+
+      {cuenta.tienda ? (
+        <section className="grid gap-10 border-t border-tinta/15 pt-12 lg:grid-cols-[0.9fr_1fr] lg:gap-16">
+          <div>
+            <Encabezado
+              etiqueta="Cómo te pagan"
+              titulo="El cobro de tus pedidos"
+            />
+            <p className="mt-4 max-w-[52ch] text-sm leading-relaxed opacity-70">
+              Venduo no cobra por ti: quien compra transfiere a tu QR y sube su
+              comprobante, y tú confirmas. Si no cargas el QR, esa pantalla
+              queda con un hueco y el comprador tiene que preguntarte por
+              WhatsApp.
+            </p>
+          </div>
+
+          <div className="border-t-2 border-tinta pt-8 lg:border-t-0 lg:border-l lg:border-tinta/15 lg:pt-0 lg:pl-12">
+            <FormCobro cuenta={cuenta} />
           </div>
         </section>
       ) : null}

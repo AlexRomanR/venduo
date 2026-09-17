@@ -9,9 +9,8 @@ import {
   getReferido,
 } from "@/lib/data/tienda-publica"
 import { formatMoney } from "@/lib/format"
-import { FormularioPedido } from "@/components/tienda/pedido"
-import { Cabecera, Pie } from "@/components/tienda/marco"
-import { crearPedido, type PedidoInput } from "../../acciones"
+import { AgregarAlCarrito } from "@/components/tienda/agregar"
+import { BarraDelCarrito, Cabecera, Pie } from "@/components/tienda/marco"
 
 const CONDICION: Record<string, string> = {
   nuevo: "Nuevo",
@@ -46,13 +45,6 @@ export default async function ProductoPublicoPage({
     ? `/t/${slug}?ref=${encodeURIComponent(codigo)}`
     : `/t/${slug}`
 
-  // La acción necesita el slug, que no viaja en el formulario: se ata acá, del
-  // lado del servidor, para que el cliente no pueda apuntar a otra tienda.
-  async function pedir(entrada: PedidoInput) {
-    "use server"
-    return crearPedido(slug, entrada)
-  }
-
   const descuento =
     producto.compare_at_price_cents &&
     producto.compare_at_price_cents > producto.price_cents
@@ -70,7 +62,7 @@ export default async function ProductoPublicoPage({
         referido={referido}
       />
 
-      <main className="mx-auto w-full max-w-5xl px-5 py-10 md:py-14">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:py-14">
         <Link
           href={volver}
           className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
@@ -176,17 +168,14 @@ export default async function ProductoPublicoPage({
             ) : null}
 
             <div className="mt-10">
-              <FormularioPedido
-                producto={producto}
-                referido={codigo}
-                crear={pedir}
-              />
+              <AgregarAlCarrito producto={producto} slug={slug} />
             </div>
           </div>
         </div>
       </main>
 
       <Pie nombre={tienda.nombre} />
+      <BarraDelCarrito slug={tienda.slug} />
     </>
   )
 }

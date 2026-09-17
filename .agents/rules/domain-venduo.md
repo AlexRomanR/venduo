@@ -174,6 +174,34 @@ que define la condición es `products.condition` (`nuevo`, `segunda_mano`,
 
 `compare_at_price_cents` es el precio anterior y es lo que produce el descuento destacado.
 
+## La compra de quien no tiene cuenta
+
+Todo el flujo público —catálogo, carrito, pedido, pago— lo hace un comprador anónimo. Y
+`orders` se lee solo `to authenticated`. **No se abre la tabla con una política**: eso
+expondría los pedidos de todas las tiendas. Se abren dos funciones `security definer`
+acotadas, y la llave es el identificador del pedido, que es un uuid y no se adivina:
+
+| Función                | Para qué                                                   |
+| ---------------------- | ---------------------------------------------------------- |
+| `pedido_publico`       | El pedido y los datos de pago de su tienda                 |
+| `adjuntar_comprobante` | El comprobante, **solo mientras el pedido siga pendiente** |
+
+`pedido_publico` nunca devuelve la comisión, el vendedor ni el neto del comercio: eso es
+de la tienda, no del comprador.
+
+**El carrito vive en el navegador**, por tienda. En la base obligaría a identificar a
+alguien que todavía no dio ningún dato. Lo que el carrito diga de los montos es solo para
+mostrar: `create_order` recalcula cada precio desde el catálogo.
+
+**El comprobante se guarda por ruta, no por URL.** Vive en un bucket privado, y firmar una
+URL exige permiso de lectura que el comprador anónimo no tiene — pedirla devuelve un 400 y
+la subida parece fallar cuando ya ocurrió. Quien necesite verlo lo firma del lado del
+servidor.
+
+**Venduo no cobra.** El comprador transfiere al QR del comercio —`stores.payment_qr_url`,
+que el emprendedor sube en `/cuenta`— y sube su captura. Sin ese QR cargado la pantalla de
+pago queda con un hueco y el comprador tiene que preguntar por WhatsApp.
+
 ## Entrega por WhatsApp
 
 **La gestión de envíos está fuera de alcance.** La entrega se coordina entre el

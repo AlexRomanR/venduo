@@ -19,7 +19,9 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/`                           | Portada pública                                         | Público         |
 | `/login`                      | Registro e ingreso                                      | Público         |
 | `/t/{slug}`                   | Tienda pública del emprendedor                          | Público         |
-| `/t/{slug}/p/{id}`            | Un producto de esa tienda, con su formulario de pedido  | Público         |
+| `/t/{slug}/p/{id}`            | Ficha de producto, con selector de cantidad             | Público         |
+| `/t/{slug}/carrito`           | Carrito y checkout                                      | Público         |
+| `/t/{slug}/pedido/{id}`       | Pago por QR, comprobante y confirmación                 | Público         |
 | `/v/{slug}`                   | Perfil público del vendedor                             | Público         |
 | `/crear`                      | Alta de la tienda, paso 1: elegir plantilla             | Requiere sesión |
 | `/crear/negocio`              | Alta de la tienda, paso 2: nombre y rubro               | Requiere sesión |
@@ -102,7 +104,7 @@ app/
     panel/            Resumen del emprendedor y sus secciones
     vendedor/         Panel del vendedor
     cuenta/           Ajustes de la persona, su tienda y su perfil
-  t/[slug]/           Tienda pública: portada, producto y pedido
+  t/[slug]/           Tienda pública: catálogo, producto, carrito y pago
   v/[slug]/           Historial laboral público del vendedor
   crear/              Alta de la tienda (layout propio)
     negocio/

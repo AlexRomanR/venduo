@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 
 import { getTiendaPublica } from "@/lib/data/tienda-publica"
 import { urlDeTienda } from "@/lib/tienda"
+import { ProveedorCarrito } from "@/components/tienda/carrito"
 
 /**
  * La tienda pública tiene su propio marco, sin el armazón del panel.
@@ -38,10 +39,20 @@ export async function generateMetadata({
   }
 }
 
-export default function TiendaLayout({
+export default async function TiendaLayout({
   children,
+  params,
 }: {
   children: React.ReactNode
+  params: Promise<{ slug: string }>
 }) {
-  return <div className="min-h-screen bg-papel text-tinta">{children}</div>
+  const { slug } = await params
+
+  return (
+    <ProveedorCarrito slug={slug}>
+      <div className="flex min-h-screen flex-col bg-papel text-tinta">
+        {children}
+      </div>
+    </ProveedorCarrito>
+  )
 }
