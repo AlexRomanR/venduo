@@ -30,6 +30,7 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/explorar/productos`         | Vitrina de productos abiertos a vendedores              | Requiere sesión |
 | `/panel`                      | Resumen del emprendedor                                 | Requiere sesión |
 | `/panel/{seccion}`            | Productos, pedidos, vendedores, estadísticas, marketing | Requiere sesión |
+| `/panel/pedidos/{id}`         | Un pedido: detalle, estados y comprobante               | Requiere sesión |
 | `/panel/productos/nuevo`      | Alta de un producto                                     | Requiere sesión |
 | `/panel/productos/{id}`       | Edición de un producto                                  | Requiere sesión |
 | `/panel/productos/categorias` | Las categorías del catálogo                             | Requiere sesión |
@@ -125,6 +126,7 @@ components/
   explorar/           Vitrinas: navegación, buscador, paginación y listas
   cuenta/             Formularios de ajustes y foto de perfil
   insights/           Cuaderno, tablero y gráficos SVG
+  pedidos/            Lista, estados y comprobante de un pedido
   productos/          Catálogo: lista, filtros, formulario, fotos y categorías
   tienda/             La tienda pública: bloques, marco y formulario de pedido
   panel/              Shell, cifras y piezas de los dos paneles
@@ -142,6 +144,7 @@ lib/
   estilos.ts          Clases del vestido editorial de los controles
   tienda.ts           El enlace de una tienda, y el slug que pide un subdominio
   format.ts           Moneda, fechas, slugs
+  pedidos.ts          Los estados de un pedido, sin dependencias de servidor
   qr.ts               Códigos QR
   env.ts              Entorno validado con zod
 

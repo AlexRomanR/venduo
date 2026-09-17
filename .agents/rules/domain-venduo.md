@@ -30,6 +30,20 @@ El punto más fácil de hacer mal de todo el sistema.
   **anula** la comisión; nunca la borra.
 - La crea un disparador cuando el pedido pasa a `pagado`. **No insertarla desde código.**
 
+### Confirmar el pago es lo que paga la comisión
+
+El panel de pedidos cambia un estado y **nada más**: todo lo que se sigue de ese
+cambio lo hace el disparador `handle_order_status_change`.
+
+| El estado pasa a | Y la base                                                |
+| ---------------- | -------------------------------------------------------- |
+| `pagado`         | Crea la comisión contra la base congelada, `confirmada`  |
+| `cancelado`      | Anula sus comisiones y **devuelve el stock** al catálogo |
+
+Nunca duplicar esto desde la aplicación: escribir en `commissions` o ajustar
+`products.stock` a mano daría comisiones dobles y stock inventado el día que
+alguien cambie dos veces de estado.
+
 ## El historial laboral del vendedor
 
 Es la promesa central de la plataforma y está sostenida por dos decisiones del esquema
