@@ -39,14 +39,30 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
 - **`types/database.ts` es generado.** Los alias van en `types/index.ts`.
 - **La IA propone, el sistema valida y ejecuta.** Toda salida del modelo se valida con zod
   antes de tocar la base o la pantalla.
+- **Una tienda se ve con su plantilla, y ningún componente pregunta cuál es.** La base
+  vive en código, la personalización en `stores.theme_overrides` y lo que se dibuja se
+  calcula. Todo en `docs/store-templates.md`.
+- **Hay una sola base de datos y es la de producción**, y cada push a `main` se publica
+  solo en Vercel. `npx supabase db push` cambia producción en el acto. Antes de migrar o
+  de subir a `main`, leer `workflow.md`.
 
 ## Lo que NO se construye
 
 Está en `VENDUO.md` §7 y vale tanto como la lista de lo que sí. Si una tarea pide algo de
-acá, frená y preguntá antes de escribir código:
+acá, frena y pregunta antes de escribir código:
 
-multi-tienda por usuario · gestión de envíos · cobro de la suscripción · notificaciones
-por email · app móvil nativa · **tests automatizados**.
+multi-tienda por usuario · gestión de envíos · recibir o guardar el dinero de una venta
+(lo hace PagoFácil) · cobro de la suscripción · notificaciones por correo · app móvil
+nativa · **tests automatizados**.
+
+## Documentos
+
+| Archivo                       | Qué es                                                       |
+| ----------------------------- | ------------------------------------------------------------ |
+| `VENDUO.md`                   | La especificación del producto. Fuente de verdad             |
+| `DESIGN.md`                   | El mundo visual de Venduo y la base editorial                |
+| `docs/estado-del-proyecto.md` | Qué está hecho y qué falta. **Leerlo antes de elegir tarea** |
+| `docs/store-templates.md`     | El sistema de plantillas de tienda                           |
 
 ## Reglas
 
@@ -61,6 +77,7 @@ Code desde `CLAUDE.md`, así que las dos herramientas aplican los mismos estánd
 | `ui-styling.md`    | Móvil primero, Tailwind v4, shadcn/ui, textos                    |
 | `ai-layer.md`      | Interfaz del proveedor, esquemas zod, modo mock                  |
 | `code-quality.md`  | TypeScript estricto, secretos, commits                           |
+| `workflow.md`      | Base compartida con producción, ramas, trampas del entorno       |
 
 ## Skills
 

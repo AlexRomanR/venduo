@@ -97,7 +97,7 @@ Esa función recalcula cada precio desde el catálogo, valida el stock, resuelve
 de referido comprobando que pertenezca a **esa** tienda y esté activo, congela la comisión
 y descuenta stock. Nada de eso puede quedar en manos del cliente.
 
-**Si alguna vez escribís `supabase.from("orders").insert(...)`, está mal.** Lo mismo para
+**Si alguna vez escribes `supabase.from("orders").insert(...)`, está mal.** Lo mismo para
 `commissions`: las crea un disparador cuando el pedido pasa a `pagado`, y los estados
 siguientes la mueven. Qué estado de pedido corresponde a qué estado de comisión está en
 `domain-venduo.md`, atado a la custodia del pago en PagoFácil.
