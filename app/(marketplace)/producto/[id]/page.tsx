@@ -11,13 +11,14 @@ import {
 } from "lucide-react"
 
 import { AgregarProductoMarketplace } from "@/components/marketplace/agregar-producto"
+import { PrecioConEntrega } from "@/components/marketplace/precio-con-entrega"
 import { TarjetaMarketplace } from "@/components/marketplace/producto"
 import {
   getProductoMarketplace,
   getReferidoProducto,
 } from "@/lib/data/marketplace"
 import { codigoDeReferido } from "@/lib/data/tienda-publica"
-import { formatMoney, formatNumber } from "@/lib/format"
+import { formatNumber } from "@/lib/format"
 
 export async function generateMetadata({
   params,
@@ -151,16 +152,10 @@ export default async function ProductoMarketplacePage({
             {producto.nombre}
           </h1>
 
-          <div className="mt-6 flex flex-wrap items-baseline gap-3">
-            <p className="tabular font-titular text-3xl font-extrabold tracking-[-0.04em] text-senal sm:text-4xl">
-              {formatMoney(producto.precioCents)}
-            </p>
-            {producto.precioAnteriorCents ? (
-              <p className="tabular text-sm line-through opacity-45">
-                {formatMoney(producto.precioAnteriorCents)}
-              </p>
-            ) : null}
-          </div>
+          <PrecioConEntrega
+            precioCents={producto.precioCents}
+            precioAnteriorCents={producto.precioAnteriorCents}
+          />
 
           <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs font-semibold uppercase opacity-55">
             <span>
