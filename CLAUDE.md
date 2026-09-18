@@ -28,7 +28,7 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
 ## Lo que hay que saber antes de tocar nada
 
 - **Una tienda por usuario**, impuesto por índice único. Un vendedor, en cambio, pertenece
-  a varias: ahí está toda la dificultad del aislamiento.
+  a varias: ahí está toda la dificultad del aislamiento..
 - **Dinero en centavos enteros, porcentajes en puntos básicos.** Nunca punto flotante. La
   moneda es el boliviano y es constante del sistema: no hay columna de moneda.
 - **Borrado lógico en todas partes.** Toda consulta filtra `deleted_at is null`, y los
