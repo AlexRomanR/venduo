@@ -170,10 +170,16 @@ const HACE = (dias: number) =>
 export interface ProductoVitrina {
   id: string
   name: string
+  description: string | null
   priceCents: number
   compareAtPriceCents: number | null
   imageUrl: string | null
+  images: string[]
   condition: string
+  conditionNote: string | null
+  category: string | null
+  publishedAt: string
+  featured: boolean
   storeName: string
   storeSlug: string
   categoria?: string
@@ -189,10 +195,17 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
     id: "demo-v-1",
     name: "Buzo oversize unisex",
+    description:
+      "Buzo de algodón grueso boliviano, corte amplio y terminación reforzada.",
     priceCents: 18000,
     compareAtPriceCents: null,
     imageUrl: null,
+    images: [],
     condition: "nuevo",
+    conditionNote: null,
+    category: "Ropa",
+    publishedAt: HACE(2),
+    featured: true,
     storeName: "Rosa Deportes",
     storeSlug: "rosa-deportes",
     categoria: "Ropa y Moda",
@@ -204,10 +217,17 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
     id: "demo-v-2",
     name: "Mochila urbana impermeable",
+    description:
+      "Mochila impermeable con compartimento acolchado para portátil.",
     priceCents: 24000,
     compareAtPriceCents: 30000,
     imageUrl: null,
+    images: [],
     condition: "nuevo",
+    conditionNote: null,
+    category: "Accesorios",
+    publishedAt: HACE(8),
+    featured: false,
     storeName: "Rosa Deportes",
     storeSlug: "rosa-deportes",
     categoria: "Calzados y Accesorios",
@@ -219,10 +239,16 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
     id: "demo-v-3",
     name: "Café de especialidad Yungas 250g",
+    description: "Café boliviano tostado en lotes pequeños, listo para moler.",
     priceCents: 8500,
     compareAtPriceCents: null,
     imageUrl: null,
+    images: [],
     condition: "nuevo",
+    conditionNote: null,
+    category: "Alimentos",
+    publishedAt: HACE(15),
+    featured: true,
     storeName: "Café Illimani",
     storeSlug: "cafe-illimani",
     categoria: "Café y Alimentos",
@@ -234,10 +260,17 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
     id: "demo-v-4",
     name: "Molinillo manual de muelas cónicas",
+    description:
+      "Molinillo revisado y calibrado, con muela de acero regulable.",
     priceCents: 14000,
     compareAtPriceCents: 24000,
     imageUrl: null,
+    images: [],
     condition: "reacondicionado",
+    conditionNote: "Revisado y probado; tiene marcas leves de uso.",
+    category: "Hogar",
+    publishedAt: HACE(45),
+    featured: false,
     storeName: "Café Illimani",
     storeSlug: "cafe-illimani",
     categoria: "Hogar y Café",
@@ -249,10 +282,16 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
     id: "demo-v-5",
     name: "Campera rompeviento técnica",
+    description: "Campera ultraligera resistente al viento y lluvia ligera.",
     priceCents: 26000,
     compareAtPriceCents: 32000,
     imageUrl: null,
+    images: [],
     condition: "nuevo",
+    conditionNote: null,
+    category: "Ropa",
+    publishedAt: HACE(5),
+    featured: false,
     storeName: "Rosa Deportes",
     storeSlug: "rosa-deportes",
     categoria: "Ropa y Moda",
@@ -264,10 +303,17 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
     id: "demo-v-6",
     name: "Sérum facial hidratante ácido hialurónico",
+    description:
+      "Hidratación profunda con ácido hialurónico puro de rápida absorción.",
     priceCents: 12500,
     compareAtPriceCents: 16000,
     imageUrl: null,
+    images: [],
     condition: "nuevo",
+    conditionNote: null,
+    category: "Belleza",
+    publishedAt: HACE(12),
+    featured: true,
     storeName: "Bella Piel",
     storeSlug: "bella-piel",
     categoria: "Cuidado Personal",
@@ -279,10 +325,17 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
     id: "demo-v-7",
     name: "Auriculares inalámbricos Bluetooth ANC",
+    description:
+      "Cancelación activa de ruido, 28 horas de batería y micrófono HD.",
     priceCents: 21000,
     compareAtPriceCents: 27000,
     imageUrl: null,
+    images: [],
     condition: "nuevo",
+    conditionNote: null,
+    category: "Tecnología",
+    publishedAt: HACE(20),
+    featured: false,
     storeName: "TecnoBolivia",
     storeSlug: "tecno-bolivia",
     categoria: "Tecnología",
@@ -294,10 +347,16 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
     id: "demo-v-8",
     name: "Miel pura de abeja silvestre 500g",
+    description: "Miel 100% pura cosechada de manera artesanal y sustentable.",
     priceCents: 6500,
     compareAtPriceCents: null,
     imageUrl: null,
+    images: [],
     condition: "nuevo",
+    conditionNote: null,
+    category: "Alimentos",
+    publishedAt: HACE(3),
+    featured: false,
     storeName: "Café Illimani",
     storeSlug: "cafe-illimani",
     categoria: "Café y Alimentos",
@@ -458,7 +517,7 @@ export const ENLACES_DEMO: Enlace[] = [
     gananciaCents: 2_880,
     negocio: "Rosa Deportes",
     negocioSlug: "rosa-deportes",
-    codigo: "ANA7K2M",
+    codigo: "BZ7K2M4Q",
     url: "",
     tomadoEn: HACE(64),
     unidades: 11,
@@ -475,7 +534,7 @@ export const ENLACES_DEMO: Enlace[] = [
     gananciaCents: 3_270,
     negocio: "Rosa Deportes",
     negocioSlug: "rosa-deportes",
-    codigo: "ANA7K2M",
+    codigo: "MH8P3R6T",
     url: "",
     tomadoEn: HACE(41),
     unidades: 4,
@@ -492,7 +551,7 @@ export const ENLACES_DEMO: Enlace[] = [
     gananciaCents: 1_360,
     negocio: "Café Illimani",
     negocioSlug: "cafe-illimani",
-    codigo: "ANA4QPW",
+    codigo: "CF9W4N7K",
     url: "",
     tomadoEn: HACE(23),
     unidades: 9,
@@ -509,7 +568,7 @@ export const ENLACES_DEMO: Enlace[] = [
     gananciaCents: 2_240,
     negocio: "Café Illimani",
     negocioSlug: "cafe-illimani",
-    codigo: "ANA4QPW",
+    codigo: "ML6Q8V3P",
     url: "",
     tomadoEn: HACE(9),
     unidades: 0,

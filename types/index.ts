@@ -57,7 +57,10 @@ export type AIGeneration = Tables<"ai_generations">
 export type SocialPost = Tables<"social_posts">
 
 // Enums
-export type OrderStatus = Enums<"order_status">
+// `en_disputa` entra en la migración de custodia. Se declara en el alias para
+// que la aplicación y la migración puedan publicarse de forma aditiva; al
+// regenerar `database.ts` la unión queda equivalente.
+export type OrderStatus = Enums<"order_status"> | "en_disputa"
 export type ProductCondition = Enums<"product_condition">
 export type SellerStatus = Enums<"seller_status">
 export type SellerJoinMode = Enums<"seller_join_mode">

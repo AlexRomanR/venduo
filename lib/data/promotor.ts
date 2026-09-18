@@ -47,7 +47,7 @@ export const getMisEnlaces = cache(async (): Promise<Enlace[]> => {
   const { data } = await actual.supabase
     .from("seller_products")
     .select(
-      "id, taken_at, product_id, seller_id, products(name, image_url, price_cents, base_cost_cents, take_bps, stock, is_active, seller_enabled, deleted_at), stores(name, slug), store_sellers(referral_code)"
+      "*, products(name, image_url, price_cents, base_cost_cents, take_bps, stock, is_active, seller_enabled, deleted_at), stores(name, slug), store_sellers(referral_code)"
     )
     .eq("user_id", actual.user.id)
     .is("deleted_at", null)
@@ -83,7 +83,12 @@ export const getMisEnlaces = cache(async (): Promise<Enlace[]> => {
 
   return filas.map((fila) => {
     const producto = fila.products
-    const codigo = fila.store_sellers?.referral_code ?? null
+    const codigoPropio = (fila as unknown as { referral_code?: unknown })
+      .referral_code
+    const codigo =
+      typeof codigoPropio === "string"
+        ? codigoPropio
+        : (fila.store_sellers?.referral_code ?? null)
     const slug = fila.stores?.slug ?? ""
     const venta = vendido.get(fila.product_id)
 

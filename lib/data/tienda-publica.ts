@@ -307,6 +307,18 @@ export async function getPedidoPublico(
     totalCents: Number(crudo.total_cents),
     comprador: String(crudo.comprador),
     tieneComprobante: Boolean(crudo.tiene_comprobante),
+    creado: crudo.creado ? String(crudo.creado) : null,
+    paymentReference: crudo.payment_reference
+      ? String(crudo.payment_reference)
+      : null,
+    pagadoEn: crudo.paid_at ? String(crudo.paid_at) : null,
+    enviadoEn: crudo.shipped_at ? String(crudo.shipped_at) : null,
+    entregadoEn: crudo.delivered_at ? String(crudo.delivered_at) : null,
+    liberaEn: crudo.release_due_at ? String(crudo.release_due_at) : null,
+    liberadoEn: crudo.released_at ? String(crudo.released_at) : null,
+    devueltoEn: crudo.refunded_at ? String(crudo.refunded_at) : null,
+    disputadoEn: crudo.disputed_at ? String(crudo.disputed_at) : null,
+    motivoDisputa: crudo.dispute_reason ? String(crudo.dispute_reason) : null,
     items: items.map((item) => {
       const fila = item as Record<string, Json>
       return {
@@ -334,6 +346,16 @@ export interface PedidoPublicoConTienda {
   totalCents: number
   comprador: string
   tieneComprobante: boolean
+  creado: string | null
+  paymentReference: string | null
+  pagadoEn: string | null
+  enviadoEn: string | null
+  entregadoEn: string | null
+  liberaEn: string | null
+  liberadoEn: string | null
+  devueltoEn: string | null
+  disputadoEn: string | null
+  motivoDisputa: string | null
   items: Array<{
     nombre: string
     cantidad: number

@@ -7,7 +7,6 @@ import {
   getMisEnlaces,
   getPerfilPromotor,
 } from "@/lib/data/promotor"
-import { getTramos } from "@/lib/data/precios"
 import { getProductosVitrina } from "@/lib/data/vitrina"
 import { BOTON_SECUNDARIO } from "@/lib/estilos"
 import { formatMoney, formatNumber } from "@/lib/format"
@@ -16,7 +15,7 @@ import { gananciaSemanal, resumirPromotor, type Enlace } from "@/lib/promotor"
 import { cn } from "@/lib/utils"
 import { Grafico } from "@/components/insights/grafico"
 import { Cifra, Encabezado, Vacio } from "@/components/panel/piezas"
-import { Bienvenida } from "@/components/promotor/bienvenida"
+import { GuiaInicialPromotor } from "@/components/promotor/guia-inicial"
 import {
   FilaComision,
   FilaComprador,
@@ -39,20 +38,18 @@ export default async function PromotorPage({
   searchParams: Promise<{ guia?: string }>
 }) {
   const { guia } = await searchParams
-  const [perfil, enlaces, comisiones, compradores, tramos] = await Promise.all([
+  const [perfil, enlaces, comisiones, compradores] = await Promise.all([
     getPerfilPromotor(),
     getMisEnlaces(),
     getMisComisiones(),
     getMisCompradores(),
-    getTramos(),
   ])
 
   if (enlaces.length === 0 || guia === "1") {
     const { items } = await getProductosVitrina({ porPagina: 6 })
     return (
-      <Bienvenida
+      <GuiaInicialPromotor
         nombre={perfil.nombre}
-        tramos={tramos}
         productos={items.slice(0, 6)}
       />
     )

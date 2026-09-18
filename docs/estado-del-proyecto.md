@@ -2,8 +2,9 @@
 
 Qué está construido y qué falta, medido contra el **modelo vigente**
 (`docs/modelo-de-negocio.md`) y el alcance del MVP de `VENDUO.md` §6.
-Actualizado el 18 de septiembre de 2026: panel del promotor, atribución del comprador y
-precio congelado en la venta.
+Actualizado el 18 de septiembre de 2026: Marketplace público, referido por producto y
+flujo simulado de pago con custodia. Las migraciones nuevas están preparadas, no aplicadas
+a producción.
 
 **Leyenda:** ✅ sirve tal cual · 🟡 existe pero hay que rehacerlo · ❌ falta · ⛔ fuera del
 modelo
@@ -36,17 +37,17 @@ es que responde a otras reglas. Abajo, qué se salva, qué se rehace y en qué o
 | 1   | Registro y login de los dos lados                                 | ✅     |
 | 2   | Productos con imagen, stock y condición, declarando el costo base | ✅     |
 | 3   | Precio calculado por rango: costo base + comisión + take-rate     | ✅     |
-| 4   | Marketplace navegable en móvil                                    | 🟡     |
+| 4   | Marketplace navegable en móvil                                    | ✅     |
 | 5   | El joven elige productos y obtiene su enlace y su QR              | ✅     |
 | 6   | Carrito y checkout con datos del comprador                        | ✅     |
-| 7   | Pago por PagoFácil con custodia, sobre una pasarela simulada      | 🟡     |
-| 8   | Reparto a tres: negocio, joven y plataforma                       | ❌     |
+| 7   | Pago por PagoFácil con custodia, sobre una pasarela simulada      | ✅     |
+| 8   | Reparto a tres: negocio, joven y plataforma                       | ✅     |
 | 9   | Atribución del comprador al promotor, con su ventana              | ✅     |
 | 10  | Comisión indirecta y retorno al negocio                           | ✅     |
 | 11  | Panel del joven: ventas, comisiones, materiales                   | ✅     |
 | 12  | Estadísticas en lenguaje natural                                  | ✅     |
 | 13  | Copys de marketing y publicación en redes                         | ❌     |
-| 14  | Entrega por WhatsApp con confirmación de envío y recepción        | 🟡     |
+| 14  | Entrega por WhatsApp con confirmación de envío y recepción        | ✅     |
 
 ---
 
@@ -83,10 +84,12 @@ es que responde a otras reglas. Abajo, qué se salva, qué se rehace y en qué o
   asociado al comprador (comisión **indirecta**, con `commissions.kind`) o nadie, y vuelve
   al negocio. Los pedidos anteriores conservan lo que se congeló entonces.
 - **El panel del promotor** (`/vendedor`): sin productos es una bienvenida con
-  calculadora de ganancias, los pasos, productos para empezar, los porcentajes y
-  preguntas; con productos, sus cifras, la ganancia por semana, un próximo paso calculado,
-  sus enlaces y sus compradores. Secciones: Catálogo, Mis enlaces (con WhatsApp, copiar y
-  QR), Compradores, Ganancias y Estadísticas.
+  un carrusel de tres pasos que lo lleva del filtro a su primer enlace; con productos, sus
+  cifras, la ganancia por semana, un próximo paso calculado, sus enlaces y sus compradores.
+  El catálogo filtra por búsqueda, categoría, condición, precio y fecha de publicación,
+  permite ordenar, y cada ficha compara ganancia, precio, stock y antigüedad antes de crear
+  el referido. Secciones: Catálogo, Mis enlaces (con WhatsApp, copiar y QR), Compradores,
+  Ganancias y Estadísticas.
 - **`/sumarme` y `/explorar/*` redirigen** al panel del promotor. Unirse a una tienda y
   las invitaciones ya no tienen pantalla.
 - **La pantalla de Promotores del negocio** muestra quién promociona qué y cuánto vendió,
@@ -94,6 +97,19 @@ es que responde a otras reglas. Abajo, qué se salva, qué se rehace y en qué o
   toda la red Venduo; ya no hay invitación ni aprobación. `/cuenta` dejó de ofrecer "acepto
   vendedores" y el porcentaje de comisión.
 - **La barra lateral** perdió Marketing, Apariencia y "Gana extra".
+- **El Marketplace público vive en `/`.** Tiene búsqueda, rubros, condición, ciudad,
+  orden, fichas de producto y negocio, carrito con productos de varios negocios y un
+  lateral útil para visitantes anónimos. La portada institucional pasó a `/unirse` y se
+  enlaza desde el pie del catálogo.
+- **Cada producto tomado tiene su propio referido.** `seller_products.referral_code`
+  identifica exactamente el producto promovido; `create_order` solo acredita comisión
+  directa cuando ese código corresponde al producto comprado.
+- **El checkout agrupa por negocio sin exponer esa complejidad al comprador.**
+  `create_marketplace_orders` crea todos los pedidos en una sola transacción y vuelve a
+  calcular precio, comisión y take-rate en la base.
+- **La custodia simulada reemplaza el QR bancario en el flujo público nuevo.** El cobro
+  pasa a `pagado`, la comisión queda pendiente, el negocio marca el envío, el comprador
+  confirma recepción o abre disputa y solo la entrega libera y confirma el reparto.
 
 ---
 
@@ -129,34 +145,13 @@ volvió a él.
 El panel del promotor ya separa lo vendido de lo generado por compradores traídos. Falta
 lo mismo en `/v/{slug}`: `seller_public_stats` todavía no mira `commissions.kind`.
 
-### 3. El Marketplace — prioridad alta
+### 3. Aplicar y validar Marketplace/custodia en producción — prioridad alta
 
-Hoy el catálogo vive dentro de la tienda de cada negocio (`/t/{slug}`). Falta el catálogo
-central: portada, búsqueda, filtros, ficha de producto y página del negocio.
-
-Buena parte se puede reusar: los filtros, el orden, la búsqueda, las tarjetas de producto y
-el carrito ya están escritos y no dependen de la tienda.
-
-### 4. El código por producto — prioridad baja
-
-`VENDUO.md` §8 pide un código por producto en `seller_products`. Hoy el código sigue siendo
-por promotor y negocio, en `store_sellers`, que quedó como un detalle interno que nadie
-aprueba: el carrito lleva un solo código por tienda y `orders.seller_id` apunta a ese
-vínculo. Para el promotor no cambia nada —cada producto tiene su enlace—, pero todos los
-productos de un mismo negocio comparten el código.
-
-### 5. El cobro con custodia y el reparto a tres — prioridad alta
-
-Sigue pendiente de antes, y ahora con un destinatario más.
-
-- Pasarela simulada de PagoFácil: cobrar, retener, liberar, devolver y **repartir entre
-  tres**.
-- Estados nuevos del pedido: marca de enviado, confirmación del comprador y `en_disputa`,
-  con sus fechas.
-- Cambiar el disparador de comisiones: hoy nace `confirmada` al pagar; tiene que nacer
-  `pendiente` y confirmarse en la entrega.
-- Pantalla de seguimiento para el comprador, con "lo recibí" y "tengo un problema".
-- Retirar el QR bancario y el comprobante.
+El código y las migraciones están preparados. Falta revisar el SQL contra una copia segura,
+aplicar `20260918170000_custodia_y_referido_por_producto.sql` y
+`20260918170100_checkout_marketplace_y_pago_simulado.sql`, regenerar
+`types/database.ts` y hacer una compra de punta a punta con datos reales. No se hizo
+`supabase db push` porque la única base enlazada es producción.
 
 ### 6. Marketing — prioridad baja
 
