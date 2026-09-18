@@ -11,6 +11,7 @@ import {
 import { createClient } from "@/lib/supabase/server"
 import { rpcMigrado } from "@/lib/supabase/rpc"
 import type { Referido } from "@/lib/data/tienda-publica"
+import { resolverImagenProducto } from "@/lib/imagenes-producto"
 
 const POR_PAGINA = 24
 
@@ -123,14 +124,23 @@ type FilaProducto = {
 }
 
 function mapearProducto(fila: FilaProducto): ProductoMarketplace {
+  const imagenUrl =
+    fila.image_url || resolverImagenProducto(fila.name, fila.category)
+  const imagenes =
+    fila.images && fila.images.length > 0
+      ? fila.images
+      : imagenUrl
+        ? [imagenUrl]
+        : []
+
   return {
     id: fila.id,
     nombre: fila.name,
     descripcion: fila.description,
     precioCents: fila.price_cents,
     precioAnteriorCents: fila.compare_at_price_cents,
-    imagenUrl: fila.image_url,
-    imagenes: fila.images,
+    imagenUrl,
+    imagenes,
     categoria: fila.category,
     condicion: fila.condition,
     notaCondicion: fila.condition_note,

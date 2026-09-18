@@ -14,6 +14,7 @@ import {
 } from "@/lib/promotor"
 import { createClient } from "@/lib/supabase/server"
 import { urlDeProducto } from "@/lib/tienda"
+import { resolverImagenProducto } from "@/lib/imagenes-producto"
 
 /**
  * Lo que ve el promotor. Cruza negocios por naturaleza: nada se resuelve
@@ -96,7 +97,9 @@ export const getMisEnlaces = cache(async (): Promise<Enlace[]> => {
       id: fila.id,
       productoId: fila.product_id,
       nombre: producto?.name ?? "Producto retirado",
-      imagenUrl: producto?.image_url ?? null,
+      imagenUrl:
+        producto?.image_url ||
+        (producto?.name ? resolverImagenProducto(producto.name, null) : null),
       precioCents: producto?.price_cents ?? 0,
       gananciaCents: producto
         ? gananciaPorUnidad(

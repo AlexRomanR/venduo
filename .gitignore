@@ -65,3 +65,7 @@ next-env.d.ts
 
 # Archivos de bloqueo que deja Word abierto.
 ~$*
+
+# Directorio temporal de trabajo / pruebas
+scratch/
+

@@ -199,8 +199,11 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
       "Buzo de algodón grueso boliviano, corte amplio y terminación reforzada.",
     priceCents: 18000,
     compareAtPriceCents: null,
-    imageUrl: null,
-    images: [],
+    imageUrl:
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1600&q=85",
+    images: [
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1600&q=85",
+    ],
     condition: "nuevo",
     conditionNote: null,
     category: "Ropa",
@@ -221,8 +224,11 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
       "Mochila impermeable con compartimento acolchado para portátil.",
     priceCents: 24000,
     compareAtPriceCents: 30000,
-    imageUrl: null,
-    images: [],
+    imageUrl:
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1600&q=85",
+    images: [
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1600&q=85",
+    ],
     condition: "nuevo",
     conditionNote: null,
     category: "Accesorios",
@@ -242,8 +248,11 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
     description: "Café boliviano tostado en lotes pequeños, listo para moler.",
     priceCents: 8500,
     compareAtPriceCents: null,
-    imageUrl: null,
-    images: [],
+    imageUrl:
+      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1600&q=85",
+    images: [
+      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1600&q=85",
+    ],
     condition: "nuevo",
     conditionNote: null,
     category: "Alimentos",
@@ -264,8 +273,11 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
       "Molinillo revisado y calibrado, con muela de acero regulable.",
     priceCents: 14000,
     compareAtPriceCents: 24000,
-    imageUrl: null,
-    images: [],
+    imageUrl:
+      "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1600&q=85",
+    images: [
+      "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1600&q=85",
+    ],
     condition: "reacondicionado",
     conditionNote: "Revisado y probado; tiene marcas leves de uso.",
     category: "Hogar",
@@ -285,8 +297,11 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
     description: "Campera ultraligera resistente al viento y lluvia ligera.",
     priceCents: 26000,
     compareAtPriceCents: 32000,
-    imageUrl: null,
-    images: [],
+    imageUrl:
+      "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1600&q=85",
+    images: [
+      "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1600&q=85",
+    ],
     condition: "nuevo",
     conditionNote: null,
     category: "Ropa",
@@ -307,8 +322,11 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
       "Hidratación profunda con ácido hialurónico puro de rápida absorción.",
     priceCents: 12500,
     compareAtPriceCents: 16000,
-    imageUrl: null,
-    images: [],
+    imageUrl:
+      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=1600&q=85",
+    images: [
+      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=1600&q=85",
+    ],
     condition: "nuevo",
     conditionNote: null,
     category: "Belleza",
@@ -329,8 +347,11 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
       "Cancelación activa de ruido, 28 horas de batería y micrófono HD.",
     priceCents: 21000,
     compareAtPriceCents: 27000,
-    imageUrl: null,
-    images: [],
+    imageUrl:
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1600&q=85",
+    images: [
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1600&q=85",
+    ],
     condition: "nuevo",
     conditionNote: null,
     category: "Tecnología",
@@ -350,8 +371,11 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
     description: "Miel 100% pura cosechada de manera artesanal y sustentable.",
     priceCents: 6500,
     compareAtPriceCents: null,
-    imageUrl: null,
-    images: [],
+    imageUrl:
+      "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1600&q=85",
+    images: [
+      "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1600&q=85",
+    ],
     condition: "nuevo",
     conditionNote: null,
     category: "Alimentos",
@@ -512,7 +536,8 @@ export const ENLACES_DEMO: Enlace[] = [
     id: "demo-e-1",
     productoId: "demo-v-1",
     nombre: "Buzo oversize",
-    imagenUrl: null,
+    imagenUrl:
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1600&q=85",
     precioCents: 18_000,
     gananciaCents: 2_880,
     negocio: "Rosa Deportes",
@@ -529,7 +554,8 @@ export const ENLACES_DEMO: Enlace[] = [
     id: "demo-e-2",
     productoId: "demo-v-2",
     nombre: "Mochila urbana",
-    imagenUrl: null,
+    imagenUrl:
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1600&q=85",
     precioCents: 24_000,
     gananciaCents: 3_270,
     negocio: "Rosa Deportes",
@@ -546,7 +572,8 @@ export const ENLACES_DEMO: Enlace[] = [
     id: "demo-e-3",
     productoId: "demo-v-3",
     nombre: "Café de especialidad 250g",
-    imagenUrl: null,
+    imagenUrl:
+      "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=1600&q=85",
     precioCents: 8_500,
     gananciaCents: 1_360,
     negocio: "Café Illimani",
@@ -563,7 +590,8 @@ export const ENLACES_DEMO: Enlace[] = [
     id: "demo-e-4",
     productoId: "demo-v-4",
     nombre: "Molinillo manual reacondicionado",
-    imagenUrl: null,
+    imagenUrl:
+      "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1600&q=85",
     precioCents: 14_000,
     gananciaCents: 2_240,
     negocio: "Café Illimani",

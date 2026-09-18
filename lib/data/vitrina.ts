@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { PRODUCTOS_VITRINA_DEMO, type ProductoVitrina } from "@/lib/demo-data"
 import { gananciaPorUnidad } from "@/lib/promotor"
+import { resolverImagenProducto } from "@/lib/imagenes-producto"
 
 export type { ProductoVitrina } from "@/lib/demo-data"
 
@@ -71,14 +72,24 @@ function rangoPrecio(precio?: PrecioVitrina) {
 }
 
 function mapearProducto(producto: FilaProducto, codigo: string | null) {
+  const imageUrl =
+    producto.image_url ||
+    resolverImagenProducto(producto.name, producto.category)
+  const images =
+    producto.images && producto.images.length > 0
+      ? producto.images
+      : imageUrl
+        ? [imageUrl]
+        : []
+
   return {
     id: producto.id,
     name: producto.name,
     description: producto.description,
     priceCents: producto.price_cents,
     compareAtPriceCents: producto.compare_at_price_cents,
-    imageUrl: producto.image_url,
-    images: producto.images,
+    imageUrl,
+    images,
     condition: producto.condition,
     conditionNote: producto.condition_note,
     category: producto.category,

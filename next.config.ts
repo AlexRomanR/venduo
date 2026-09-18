@@ -13,17 +13,27 @@ const nextConfig: NextConfig = {
 
   images: {
     remotePatterns: [
+      // Supabase Storage (permite cualquier proyecto de Supabase y el actual)
+      {
+        protocol: "https" as const,
+        hostname: "*.supabase.co",
+        pathname: "/**",
+      },
+      {
+        protocol: "https" as const,
+        hostname: "htcoobktimgztxomujvg.supabase.co",
+        pathname: "/**",
+      },
       ...(supabaseHost
         ? [
             {
               protocol: "https" as const,
               hostname: supabaseHost,
-              pathname: "/storage/v1/object/**",
+              pathname: "/**",
             },
           ]
         : []),
-      // Fotografía de uso libre para la portada, mientras no haya imágenes
-      // propias. Unsplash permite enlazar desde su CDN.
+      // Fotografía de uso libre para portada y catálogo
       {
         protocol: "https" as const,
         hostname: "images.unsplash.com",
