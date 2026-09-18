@@ -40,6 +40,7 @@ export type OrderItem = Tables<"order_items">
 // Red de vendedores
 export type StoreSeller = Tables<"store_sellers">
 export type Commission = Tables<"commissions">
+export type { PromotorRanking } from "@/lib/promotor"
 
 // Tienda visual
 export type StorePage = Tables<"store_pages">

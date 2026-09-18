@@ -16,7 +16,7 @@ import { getMiTienda, getResumenPanel } from "@/lib/data/panel"
 import { getTramos } from "@/lib/data/precios"
 import { urlDeTienda } from "@/lib/tienda"
 import { RESUMEN_DEMO } from "@/lib/demo-data"
-import { getSiteUrl, isSupabaseConfigured } from "@/lib/env"
+import { isSupabaseConfigured } from "@/lib/env"
 import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
 import { formatMoney, formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
@@ -48,8 +48,8 @@ const SECCIONES = [
   },
   {
     href: "/panel/vendedores",
-    titulo: "Promotores",
-    detalle: "Quién promociona tus productos y cuánto te vendió.",
+    titulo: "Promotores y Ranking",
+    detalle: "Quién promociona tus productos y líderes de ventas en Venduo.",
     icono: Users,
   },
   {

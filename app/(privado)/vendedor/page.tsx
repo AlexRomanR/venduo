@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowUpRight, Search, Sparkles } from "lucide-react"
+import { ArrowUpRight, FileDown, IdCard, Search, Sparkles } from "lucide-react"
 
 import {
   getMisComisiones,
@@ -101,13 +101,25 @@ export default async function PromotorPage({
             Buscar más productos
           </Link>
           {perfil.slug ? (
-            <Link
-              href={`/v/${perfil.slug}`}
-              className="flex min-h-12 items-center justify-center gap-2 px-3 font-semibold transition-colors hover:text-senal"
-            >
-              Mi perfil público
-              <ArrowUpRight aria-hidden="true" className="size-4" />
-            </Link>
+            <>
+              <Link
+                href={`/v/${perfil.slug}`}
+                className="flex min-h-12 items-center justify-center gap-2 px-3 font-semibold transition-colors hover:text-senal"
+              >
+                <IdCard aria-hidden="true" className="size-4" />
+                Mi CV comercial
+                <ArrowUpRight aria-hidden="true" className="size-4" />
+              </Link>
+              <a
+                href={`/v/${perfil.slug}/pdf`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm border border-tinta/25 px-4 font-semibold transition-colors hover:border-tinta"
+              >
+                <FileDown aria-hidden="true" className="size-4 text-senal" />
+                Descargar CV (PDF)
+              </a>
+            </>
           ) : null}
         </div>
       </div>

@@ -1,5 +1,11 @@
 import { createClient } from "@/lib/supabase/server"
-import type { ResumenPanel, Suscripcion } from "@/lib/demo-data"
+import {
+  RANKING_GLOBAL_DEMO,
+  RANKING_MI_NEGOCIO_DEMO,
+  type ResumenPanel,
+  type Suscripcion,
+} from "@/lib/demo-data"
+import type { PromotorLocal, PromotorRanking } from "@/lib/promotor"
 import type { SubscriptionStatus } from "@/types"
 
 export type { ResumenPanel, Suscripcion } from "@/lib/demo-data"
@@ -180,17 +186,7 @@ function resolverSuscripcion(
   }
 }
 
-export interface PromotorDeMiNegocio {
-  userId: string
-  nombre: string
-  /** Su perfil público, si lo armó. */
-  slug: string | null
-  productos: string[]
-  desde: string | null
-  ventas: number
-  indirectas: number
-  comisionCents: number
-}
+export type PromotorDeMiNegocio = PromotorLocal
 
 /**
  * Quién promociona lo mío, qué productos y cuánto me vendió.
@@ -203,13 +199,31 @@ export interface PromotorDeMiNegocio {
 export async function getPromotoresDeMiNegocio(): Promise<{
   promotores: PromotorDeMiNegocio[]
   productosPromocionados: number
+  esDemo: boolean
 }> {
-  const vacio = { promotores: [], productosPromocionados: 0 }
+  const vacioDemo = {
+    promotores: RANKING_MI_NEGOCIO_DEMO.map((p) => ({
+      userId: p.userId,
+      nombre: p.nombre,
+      slug: p.slug,
+      ciudad: p.ciudad,
+      avatarUrl: p.avatarUrl,
+      productos: p.productos ?? [],
+      desde: p.desde ?? null,
+      ventas: p.ventasDirectas ?? p.ventas,
+      indirectas: p.ventasIndirectas ?? 0,
+      comisionCents: p.comisionCents ?? 0,
+      volumenCents: p.volumenCents,
+    })),
+    productosPromocionados: 2,
+    esDemo: true,
+  }
+
   const supabase = await createClient()
-  if (!supabase) return vacio
+  if (!supabase) return vacioDemo
 
   const tienda = await getMiTienda()
-  if (!tienda) return vacio
+  if (!tienda) return vacioDemo
 
   const [tomados, comisiones] = await Promise.all([
     supabase
@@ -220,7 +234,7 @@ export async function getPromotoresDeMiNegocio(): Promise<{
       .order("taken_at"),
     supabase
       .from("commissions")
-      .select("seller_user_id, amount_cents, kind, status")
+      .select("seller_user_id, amount_cents, base_amount_cents, kind, status")
       .eq("store_id", tienda.id)
       .neq("status", "anulada"),
   ])
@@ -233,11 +247,14 @@ export async function getPromotoresDeMiNegocio(): Promise<{
         userId,
         nombre: "Promotor",
         slug: null,
+        ciudad: null,
+        avatarUrl: null,
         productos: [],
         desde: null,
         ventas: 0,
         indirectas: 0,
         comisionCents: 0,
+        volumenCents: 0,
       }
       porPromotor.set(userId, actual)
     }
@@ -255,12 +272,14 @@ export async function getPromotoresDeMiNegocio(): Promise<{
     if (c.kind === "directa") actual.ventas += 1
     else actual.indirectas += 1
     actual.comisionCents += c.amount_cents
+    actual.volumenCents =
+      (actual.volumenCents ?? 0) + (c.base_amount_cents ?? 0)
   }
 
   if (porPromotor.size > 0) {
     const { data: perfiles } = await supabase
       .from("seller_profiles")
-      .select("user_id, display_name, slug")
+      .select("user_id, display_name, slug, city")
       .in("user_id", [...porPromotor.keys()])
       .is("deleted_at", null)
 
@@ -269,6 +288,7 @@ export async function getPromotoresDeMiNegocio(): Promise<{
       if (!actual) continue
       actual.nombre = perfil.display_name
       actual.slug = perfil.slug
+      actual.ciudad = perfil.city ?? null
     }
   }
 
@@ -281,6 +301,92 @@ export async function getPromotoresDeMiNegocio(): Promise<{
     productosPromocionados: new Set(
       (tomados.data ?? []).map((t) => t.product_id)
     ).size,
+    esDemo: false,
+  }
+}
+
+/**
+ * Ranking global de promotores en toda la red Venduo.
+ *
+ * Expone a los mejores promotores por ventas y volumen a nivel plataforma,
+ * indicando para cada uno si ya promociona productos de la tienda actual.
+ */
+export async function getRankingPromotoresGlobal(): Promise<{
+  ranking: PromotorRanking[]
+  esDemo: boolean
+}> {
+  const supabase = await createClient()
+  if (!supabase) {
+    return { ranking: RANKING_GLOBAL_DEMO, esDemo: true }
+  }
+
+  const tienda = await getMiTienda()
+  const storeId = tienda?.id
+
+  // Obtener IDs de promotores que tomaron productos de esta tienda
+  let usuariosMiTienda = new Set<string>()
+  if (storeId) {
+    const { data: tomados } = await supabase
+      .from("seller_products")
+      .select("user_id")
+      .eq("store_id", storeId)
+      .is("deleted_at", null)
+
+    if (tomados) {
+      usuariosMiTienda = new Set(tomados.map((t) => t.user_id))
+    }
+  }
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.rpc as any)(
+      "ranking_promotores_global",
+      { p_limite: 50 }
+    )
+
+    if (error || !data || data.length === 0) {
+      return {
+        ranking: RANKING_GLOBAL_DEMO.map((p) => ({
+          ...p,
+          promocionaMiTienda:
+            usuariosMiTienda.has(p.userId) || p.promocionaMiTienda,
+        })),
+        esDemo: false,
+      }
+    }
+
+    interface FilaRanking {
+      user_id: string
+      display_name: string
+      slug: string | null
+      city: string | null
+      bio: string | null
+      avatar_url: string | null
+      ventas: number | string
+      volumen_cents: number | string
+      tiendas: number | string
+      desde: string | null
+    }
+
+    const ranking: PromotorRanking[] = (data as FilaRanking[]).map(
+      (f, idx) => ({
+        posicion: idx + 1,
+        userId: f.user_id,
+        nombre: f.display_name,
+        slug: f.slug,
+        ciudad: f.city ?? null,
+        avatarUrl: f.avatar_url ?? null,
+        ventas: Number(f.ventas) || 0,
+        volumenCents: Number(f.volumen_cents) || 0,
+        tiendasCount: Number(f.tiendas) || 0,
+        promocionaMiTienda: usuariosMiTienda.has(f.user_id),
+        desde: f.desde ?? null,
+      })
+    )
+
+    return { ranking, esDemo: false }
+  } catch {
+    return { ranking: RANKING_GLOBAL_DEMO, esDemo: true }
   }
 }
 

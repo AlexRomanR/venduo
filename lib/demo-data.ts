@@ -1,5 +1,11 @@
 import { CURRENCY } from "@/lib/format"
-import type { Comision, Comprador, Enlace, TipoComision } from "@/lib/promotor"
+import type {
+  Comision,
+  Comprador,
+  Enlace,
+  PromotorRanking,
+  TipoComision,
+} from "@/lib/promotor"
 import type { CommissionStatus, Product, SubscriptionStatus } from "@/types"
 
 export interface Suscripcion {
@@ -133,17 +139,29 @@ export function getDemoMetrics(): DashboardMetrics {
   }
 }
 
+export interface CategoriaVentas {
+  categoria: string
+  ventas: number
+  volumenCents: number
+  productos: string[]
+}
+
 export interface PerfilPublico {
+  userId?: string
   slug: string
   displayName: string
   city: string | null
   bio: string | null
   avatarUrl: string | null
+  phone: string | null
   ventas: number
   volumenCents: number
   tiendas: number
+  indirectas?: number
   desde: string | null
   historial: Array<{ storeName: string; ventas: number; desde: string | null }>
+  competencias?: string[]
+  categorias?: CategoriaVentas[]
 }
 
 const HACE = (dias: number) =>
@@ -158,6 +176,7 @@ export interface ProductoVitrina {
   condition: string
   storeName: string
   storeSlug: string
+  categoria?: string
   /** Lo que gana el promotor por unidad: el componente de comisión del precio. */
   gananciaCents: number
   stock: number
@@ -169,13 +188,14 @@ export interface ProductoVitrina {
 export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
     id: "demo-v-1",
-    name: "Buzo oversize",
+    name: "Buzo oversize unisex",
     priceCents: 18000,
     compareAtPriceCents: null,
     imageUrl: null,
     condition: "nuevo",
     storeName: "Rosa Deportes",
     storeSlug: "rosa-deportes",
+    categoria: "Ropa y Moda",
     gananciaCents: 2880,
     stock: 12,
     tomado: false,
@@ -183,13 +203,14 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   },
   {
     id: "demo-v-2",
-    name: "Mochila urbana",
+    name: "Mochila urbana impermeable",
     priceCents: 24000,
     compareAtPriceCents: 30000,
     imageUrl: null,
     condition: "nuevo",
     storeName: "Rosa Deportes",
     storeSlug: "rosa-deportes",
+    categoria: "Calzados y Accesorios",
     gananciaCents: 3270,
     stock: 12,
     tomado: false,
@@ -197,29 +218,91 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   },
   {
     id: "demo-v-3",
-    name: "Café de especialidad 250g",
+    name: "Café de especialidad Yungas 250g",
     priceCents: 8500,
     compareAtPriceCents: null,
     imageUrl: null,
     condition: "nuevo",
     storeName: "Café Illimani",
     storeSlug: "cafe-illimani",
+    categoria: "Café y Alimentos",
     gananciaCents: 1360,
-    stock: 12,
+    stock: 25,
     tomado: false,
     codigo: null,
   },
   {
     id: "demo-v-4",
-    name: "Molinillo manual reacondicionado",
+    name: "Molinillo manual de muelas cónicas",
     priceCents: 14000,
     compareAtPriceCents: 24000,
     imageUrl: null,
     condition: "reacondicionado",
     storeName: "Café Illimani",
     storeSlug: "cafe-illimani",
+    categoria: "Hogar y Café",
     gananciaCents: 2240,
-    stock: 12,
+    stock: 8,
+    tomado: false,
+    codigo: null,
+  },
+  {
+    id: "demo-v-5",
+    name: "Campera rompeviento técnica",
+    priceCents: 26000,
+    compareAtPriceCents: 32000,
+    imageUrl: null,
+    condition: "nuevo",
+    storeName: "Rosa Deportes",
+    storeSlug: "rosa-deportes",
+    categoria: "Ropa y Moda",
+    gananciaCents: 3500,
+    stock: 15,
+    tomado: false,
+    codigo: null,
+  },
+  {
+    id: "demo-v-6",
+    name: "Sérum facial hidratante ácido hialurónico",
+    priceCents: 12500,
+    compareAtPriceCents: 16000,
+    imageUrl: null,
+    condition: "nuevo",
+    storeName: "Bella Piel",
+    storeSlug: "bella-piel",
+    categoria: "Cuidado Personal",
+    gananciaCents: 1950,
+    stock: 30,
+    tomado: false,
+    codigo: null,
+  },
+  {
+    id: "demo-v-7",
+    name: "Auriculares inalámbricos Bluetooth ANC",
+    priceCents: 21000,
+    compareAtPriceCents: 27000,
+    imageUrl: null,
+    condition: "nuevo",
+    storeName: "TecnoBolivia",
+    storeSlug: "tecno-bolivia",
+    categoria: "Tecnología",
+    gananciaCents: 2900,
+    stock: 20,
+    tomado: false,
+    codigo: null,
+  },
+  {
+    id: "demo-v-8",
+    name: "Miel pura de abeja silvestre 500g",
+    priceCents: 6500,
+    compareAtPriceCents: null,
+    imageUrl: null,
+    condition: "nuevo",
+    storeName: "Café Illimani",
+    storeSlug: "cafe-illimani",
+    categoria: "Café y Alimentos",
+    gananciaCents: 980,
+    stock: 40,
     tomado: false,
     codigo: null,
   },
@@ -522,3 +605,486 @@ export const COMISIONES_PROMOTOR_DEMO: Comision[] = [
   COMISION(13, 52, "Rosa Deportes", 2_880, 14_400, "directa", "pagada"),
   COMISION(14, 60, "Rosa Deportes", 5_760, 28_800, "directa", "pagada"),
 ]
+
+export const AVATARES_DEMO = {
+  mateo:
+    "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&q=80&auto=format&fit=crop",
+  camila:
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80&auto=format&fit=crop",
+  jhoel:
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80&auto=format&fit=crop",
+  luciana:
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80&auto=format&fit=crop",
+  rodrigo:
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80&auto=format&fit=crop",
+  ana: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=80&auto=format&fit=crop",
+  carlos:
+    "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&q=80&auto=format&fit=crop",
+  valeria:
+    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=80&auto=format&fit=crop",
+  kevin:
+    "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&q=80&auto=format&fit=crop",
+  mariana:
+    "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=80&auto=format&fit=crop",
+} as const
+
+export const RANKING_GLOBAL_DEMO: PromotorRanking[] = [
+  {
+    posicion: 1,
+    userId: "demo-u-mateo",
+    nombre: "Mateo Flores",
+    slug: "mateo-flores",
+    ciudad: "La Paz",
+    avatarUrl: AVATARES_DEMO.mateo,
+    ventas: 52,
+    volumenCents: 4_890_000,
+    tiendasCount: 8,
+    promocionaMiTienda: true,
+    desde: HACE(120),
+  },
+  {
+    posicion: 2,
+    userId: "demo-u-camila",
+    nombre: "Camila Ramos",
+    slug: "camila-ramos",
+    ciudad: "Santa Cruz",
+    avatarUrl: AVATARES_DEMO.camila,
+    ventas: 44,
+    volumenCents: 3_920_000,
+    tiendasCount: 6,
+    promocionaMiTienda: false,
+    desde: HACE(95),
+  },
+  {
+    posicion: 3,
+    userId: "demo-u-jhoel",
+    nombre: "Jhoel Choque",
+    slug: "jhoel-choque",
+    ciudad: "El Alto",
+    avatarUrl: AVATARES_DEMO.jhoel,
+    ventas: 37,
+    volumenCents: 3_145_000,
+    tiendasCount: 5,
+    promocionaMiTienda: true,
+    desde: HACE(84),
+  },
+  {
+    posicion: 4,
+    userId: "demo-u-luciana",
+    nombre: "Luciana Méndez",
+    slug: "luciana-mendez",
+    ciudad: "Cochabamba",
+    avatarUrl: AVATARES_DEMO.luciana,
+    ventas: 29,
+    volumenCents: 2_610_000,
+    tiendasCount: 4,
+    promocionaMiTienda: false,
+    desde: HACE(70),
+  },
+  {
+    posicion: 5,
+    userId: "demo-u-rodrigo",
+    nombre: "Rodrigo Quispe",
+    slug: "rodrigo-quispe",
+    ciudad: "Sucre",
+    avatarUrl: AVATARES_DEMO.rodrigo,
+    ventas: 24,
+    volumenCents: 2_180_000,
+    tiendasCount: 3,
+    promocionaMiTienda: false,
+    desde: HACE(62),
+  },
+  {
+    posicion: 6,
+    userId: "demo-u-ana",
+    nombre: "Ana Mamani",
+    slug: "ana-mamani",
+    ciudad: "La Paz",
+    avatarUrl: AVATARES_DEMO.ana,
+    ventas: 19,
+    volumenCents: 1_750_000,
+    tiendasCount: 2,
+    promocionaMiTienda: true,
+    desde: HACE(45),
+  },
+  {
+    posicion: 7,
+    userId: "demo-u-carlos",
+    nombre: "Carlos Torrico",
+    slug: "carlos-torrico",
+    ciudad: "Cochabamba",
+    avatarUrl: AVATARES_DEMO.carlos,
+    ventas: 16,
+    volumenCents: 1_420_000,
+    tiendasCount: 3,
+    promocionaMiTienda: false,
+    desde: HACE(40),
+  },
+  {
+    posicion: 8,
+    userId: "demo-u-valeria",
+    nombre: "Valeria Vaca",
+    slug: "valeria-vaca",
+    ciudad: "Tarija",
+    avatarUrl: AVATARES_DEMO.valeria,
+    ventas: 13,
+    volumenCents: 1_190_000,
+    tiendasCount: 2,
+    promocionaMiTienda: false,
+    desde: HACE(35),
+  },
+  {
+    posicion: 9,
+    userId: "demo-u-kevin",
+    nombre: "Kevin Morales",
+    slug: "kevin-morales",
+    ciudad: "Santa Cruz",
+    avatarUrl: AVATARES_DEMO.kevin,
+    ventas: 11,
+    volumenCents: 940_000,
+    tiendasCount: 2,
+    promocionaMiTienda: false,
+    desde: HACE(28),
+  },
+  {
+    posicion: 10,
+    userId: "demo-u-mariana",
+    nombre: "Mariana Rocha",
+    slug: "mariana-rocha",
+    ciudad: "La Paz",
+    avatarUrl: AVATARES_DEMO.mariana,
+    ventas: 9,
+    volumenCents: 780_000,
+    tiendasCount: 1,
+    promocionaMiTienda: true,
+    desde: HACE(18),
+  },
+]
+
+export const RANKING_MI_NEGOCIO_DEMO: PromotorRanking[] = [
+  {
+    posicion: 1,
+    userId: "demo-u-mateo",
+    nombre: "Mateo Flores",
+    slug: "mateo-flores",
+    ciudad: "La Paz",
+    avatarUrl: AVATARES_DEMO.mateo,
+    ventas: 18,
+    ventasDirectas: 14,
+    ventasIndirectas: 4,
+    volumenCents: 1_620_000,
+    comisionCents: 245_000,
+    productos: ["Buzo oversize", "Mochila urbana"],
+    promocionaMiTienda: true,
+    desde: HACE(120),
+  },
+  {
+    posicion: 2,
+    userId: "demo-u-jhoel",
+    nombre: "Jhoel Choque",
+    slug: "jhoel-choque",
+    ciudad: "El Alto",
+    avatarUrl: AVATARES_DEMO.jhoel,
+    ventas: 12,
+    ventasDirectas: 9,
+    ventasIndirectas: 3,
+    volumenCents: 1_180_000,
+    comisionCents: 168_000,
+    productos: ["Mochila urbana"],
+    promocionaMiTienda: true,
+    desde: HACE(84),
+  },
+  {
+    posicion: 3,
+    userId: "demo-u-ana",
+    nombre: "Ana Mamani",
+    slug: "ana-mamani",
+    ciudad: "La Paz",
+    avatarUrl: AVATARES_DEMO.ana,
+    ventas: 8,
+    ventasDirectas: 7,
+    ventasIndirectas: 1,
+    volumenCents: 740_000,
+    comisionCents: 112_000,
+    productos: ["Buzo oversize"],
+    promocionaMiTienda: true,
+    desde: HACE(45),
+  },
+  {
+    posicion: 4,
+    userId: "demo-u-mariana",
+    nombre: "Mariana Rocha",
+    slug: "mariana-rocha",
+    ciudad: "La Paz",
+    avatarUrl: AVATARES_DEMO.mariana,
+    ventas: 4,
+    ventasDirectas: 4,
+    ventasIndirectas: 0,
+    volumenCents: 360_000,
+    comisionCents: 58_000,
+    productos: ["Buzo oversize"],
+    promocionaMiTienda: true,
+    desde: HACE(18),
+  },
+]
+
+export const PERFILES_PUBLICOS_DEMO: Record<string, PerfilPublico> = {
+  "mateo-flores": {
+    userId: "demo-u-mateo",
+    slug: "mateo-flores",
+    displayName: "Mateo Flores",
+    city: "La Paz",
+    bio: "Promotor comercial enfocado en indumentaria deportiva y café de especialidad. Especialista en campañas orgánicas de TikTok y atención personalizada por WhatsApp.",
+    avatarUrl: AVATARES_DEMO.mateo,
+    phone: "77218492",
+    ventas: 52,
+    volumenCents: 4_890_000,
+    tiendas: 8,
+    indirectas: 14,
+    desde: HACE(120),
+    historial: [
+      { storeName: "Rosa Deportes", ventas: 28, desde: HACE(120) },
+      { storeName: "Café Illimani", ventas: 14, desde: HACE(90) },
+      { storeName: "Pasarela Calzados", ventas: 6, desde: HACE(60) },
+      { storeName: "Arte Textil La Paz", ventas: 4, desde: HACE(35) },
+    ],
+    competencias: [
+      "Cierre de ventas por WhatsApp",
+      "Campañas orgánicas en TikTok y Reels",
+      "Fidelización y retención de clientes",
+      "Asesoramiento técnico de catálogo y tallas",
+      "Gestión de pedidos en tiempo real",
+    ],
+    categorias: [
+      {
+        categoria: "Ropa y Moda",
+        ventas: 32,
+        volumenCents: 3_120_000,
+        productos: ["Buzo oversize unisex", "Campera rompeviento técnica"],
+      },
+      {
+        categoria: "Café y Alimentos",
+        ventas: 14,
+        volumenCents: 1_190_000,
+        productos: [
+          "Café de especialidad Yungas 250g",
+          "Molinillo manual de muelas cónicas",
+        ],
+      },
+      {
+        categoria: "Calzados y Accesorios",
+        ventas: 6,
+        volumenCents: 580_000,
+        productos: ["Mochila urbana impermeable"],
+      },
+    ],
+  },
+  "camila-ramos": {
+    userId: "demo-u-camila",
+    slug: "camila-ramos",
+    displayName: "Camila Ramos",
+    city: "Santa Cruz",
+    bio: "Promotora de ventas digitales para marcas de moda y cuidado personal en Santa Cruz de la Sierra. Alto volumen de clientes recurrentes y venta consultiva.",
+    avatarUrl: AVATARES_DEMO.camila,
+    phone: "78451290",
+    ventas: 44,
+    volumenCents: 3_920_000,
+    tiendas: 6,
+    indirectas: 11,
+    desde: HACE(95),
+    historial: [
+      { storeName: "Rosa Deportes", ventas: 24, desde: HACE(95) },
+      { storeName: "Bella Piel", ventas: 12, desde: HACE(70) },
+      { storeName: "Santa Cruz Moda", ventas: 8, desde: HACE(40) },
+    ],
+    competencias: [
+      "Venta conversacional por WhatsApp",
+      "Catálogos digitales y curaduría de producto",
+      "Marketing de recomendación boca a boca",
+      "Seguimiento y recompra a 90 días",
+    ],
+    categorias: [
+      {
+        categoria: "Ropa y Moda",
+        ventas: 24,
+        volumenCents: 2_240_000,
+        productos: ["Buzo oversize unisex", "Campera rompeviento técnica"],
+      },
+      {
+        categoria: "Cuidado Personal",
+        ventas: 12,
+        volumenCents: 1_080_000,
+        productos: ["Sérum facial hidratante ácido hialurónico"],
+      },
+      {
+        categoria: "Calzados y Accesorios",
+        ventas: 8,
+        volumenCents: 600_000,
+        productos: ["Mochila urbana impermeable"],
+      },
+    ],
+  },
+  "jhoel-choque": {
+    userId: "demo-u-jhoel",
+    slug: "jhoel-choque",
+    displayName: "Jhoel Choque",
+    city: "El Alto",
+    bio: "Especialista en distribución de productos urbanos, mochilas y calzados en La Paz y El Alto. Alta velocidad de respuesta y coordinación de envíos.",
+    avatarUrl: AVATARES_DEMO.jhoel,
+    phone: "69842105",
+    ventas: 37,
+    volumenCents: 3_145_000,
+    tiendas: 5,
+    indirectas: 8,
+    desde: HACE(84),
+    historial: [
+      { storeName: "Rosa Deportes", ventas: 22, desde: HACE(84) },
+      { storeName: "Calzados Illimani", ventas: 10, desde: HACE(50) },
+      { storeName: "Equipos Andinos", ventas: 5, desde: HACE(30) },
+    ],
+    competencias: [
+      "Venta y coordinación logística",
+      "Activación de comunidades digitales",
+      "Manejo de stock en tiempo real",
+      "Atención postventa garantizada",
+    ],
+    categorias: [
+      {
+        categoria: "Calzados y Accesorios",
+        ventas: 22,
+        volumenCents: 1_840_000,
+        productos: ["Mochila urbana impermeable"],
+      },
+      {
+        categoria: "Ropa y Moda",
+        ventas: 10,
+        volumenCents: 920_000,
+        productos: ["Buzo oversize unisex"],
+      },
+      {
+        categoria: "Tecnología",
+        ventas: 5,
+        volumenCents: 385_000,
+        productos: ["Auriculares inalámbricos Bluetooth ANC"],
+      },
+    ],
+  },
+  "ana-mamani": {
+    userId: "demo-u-ana",
+    slug: "ana-mamani",
+    displayName: "Ana Mamani",
+    city: "La Paz",
+    bio: "Promotora activa de indumentaria deportiva y café de especialidad. Atención empática, cercana y asesoramiento detallado a cada comprador.",
+    avatarUrl: AVATARES_DEMO.ana,
+    phone: "71542389",
+    ventas: 19,
+    volumenCents: 1_750_000,
+    tiendas: 2,
+    indirectas: 5,
+    desde: HACE(45),
+    historial: [
+      { storeName: "Rosa Deportes", ventas: 14, desde: HACE(45) },
+      { storeName: "Café Illimani", ventas: 5, desde: HACE(25) },
+    ],
+    competencias: [
+      "Ventas por catálogo digital",
+      "Atención al cliente personalizada",
+      "Seguimiento de pedidos por WhatsApp",
+    ],
+    categorias: [
+      {
+        categoria: "Ropa y Moda",
+        ventas: 14,
+        volumenCents: 1_320_000,
+        productos: ["Buzo oversize unisex"],
+      },
+      {
+        categoria: "Café y Alimentos",
+        ventas: 5,
+        volumenCents: 430_000,
+        productos: [
+          "Café de especialidad Yungas 250g",
+          "Miel pura de abeja silvestre 500g",
+        ],
+      },
+    ],
+  },
+  ana: {
+    userId: "demo-u-ana",
+    slug: "ana",
+    displayName: "Ana Mamani",
+    city: "La Paz",
+    bio: "Promotora de Rosa Deportes y Café Illimani en Venduo. Atención personalizada a compradores de La Paz y todo el país.",
+    avatarUrl: AVATARES_DEMO.ana,
+    phone: "71542389",
+    ventas: 19,
+    volumenCents: 1_750_000,
+    tiendas: 2,
+    indirectas: 5,
+    desde: HACE(45),
+    historial: [
+      { storeName: "Rosa Deportes", ventas: 14, desde: HACE(45) },
+      { storeName: "Café Illimani", ventas: 5, desde: HACE(25) },
+    ],
+    competencias: [
+      "Ventas por catálogo digital",
+      "Atención al cliente personalizada",
+      "Seguimiento de pedidos por WhatsApp",
+    ],
+    categorias: [
+      {
+        categoria: "Ropa y Moda",
+        ventas: 14,
+        volumenCents: 1_320_000,
+        productos: ["Buzo oversize unisex"],
+      },
+      {
+        categoria: "Café y Alimentos",
+        ventas: 5,
+        volumenCents: 430_000,
+        productos: [
+          "Café de especialidad Yungas 250g",
+          "Miel pura de abeja silvestre 500g",
+        ],
+      },
+    ],
+  },
+}
+
+export function getDemoPerfilPublico(slug: string): PerfilPublico | null {
+  const encontrado = PERFILES_PUBLICOS_DEMO[slug]
+  if (encontrado) return encontrado
+
+  // Si no coincide exactamente con una clave, intentar buscar por slug en ranking global
+  const promotor = RANKING_GLOBAL_DEMO.find((p) => p.slug === slug)
+  if (promotor) {
+    return {
+      userId: promotor.userId,
+      slug: promotor.slug ?? slug,
+      displayName: promotor.nombre,
+      city: promotor.ciudad,
+      bio: `Promotor oficial en Venduo con historial verificado en ${promotor.ciudad ?? "Bolivia"}.`,
+      avatarUrl: promotor.avatarUrl,
+      phone: "70012345",
+      ventas: promotor.ventas,
+      volumenCents: promotor.volumenCents,
+      tiendas: promotor.tiendasCount ?? 1,
+      indirectas: Math.round(promotor.ventas * 0.25),
+      desde: promotor.desde ?? null,
+      historial: [
+        {
+          storeName: "Rosa Deportes",
+          ventas: Math.round(promotor.ventas * 0.7),
+          desde: promotor.desde ?? null,
+        },
+      ],
+      competencias: [
+        "Ventas digitales por WhatsApp",
+        "Difusión de catálogo en redes",
+        "Fidelización de compradores",
+      ],
+    }
+  }
+
+  return null
+}

@@ -1,27 +1,45 @@
 import Link from "next/link"
-import { ArrowUpRight, ImagePlus } from "lucide-react"
+import { ImagePlus } from "lucide-react"
 
 import { getCatalogo } from "@/lib/data/catalogo"
-import { getPromotoresDeMiNegocio } from "@/lib/data/panel"
+import {
+  getMiTienda,
+  getPromotoresDeMiNegocio,
+  getRankingPromotoresGlobal,
+} from "@/lib/data/panel"
 import { getTramos } from "@/lib/data/precios"
-import { formatDate, formatMoney, formatNumber } from "@/lib/format"
+import { formatMoney, formatNumber } from "@/lib/format"
 import { porcentaje } from "@/lib/precio"
-import { Cifra, Encabezado, Vacio } from "@/components/panel/piezas"
+import { transformarARankingMiNegocio } from "@/lib/promotor"
+import { Cifra, Encabezado } from "@/components/panel/piezas"
+import { RankingPromotores } from "@/components/panel/ranking-promotores"
 
-export const metadata = { title: "Promotores" }
+export const metadata = { title: "Promotores y Ranking" }
 
 /**
- * Quién promociona lo del negocio.
+ * Quién promociona lo del negocio y tabla de líderes.
  *
  * No hay nada que aprobar ni invitaciones que mandar: publicar un producto ya
  * es aceptar que cualquier promotor lo venda, y cada uno elige producto por
- * producto. Esta pantalla solo informa, y señala lo único que el negocio puede
- * hacer para tener más promotores: que sus productos den ganas de compartir.
+ * producto. Esta pantalla informa quién vende lo tuyo y muestra el ranking
+ * comparativo tanto dentro de tu negocio como en toda la red Venduo.
  */
 export default async function PromotoresPage() {
-  const [{ promotores, productosPromocionados }, catalogo, tramos] =
-    await Promise.all([getPromotoresDeMiNegocio(), getCatalogo(), getTramos()])
+  const [
+    { promotores, productosPromocionados },
+    { ranking: rankingGlobal },
+    catalogo,
+    tramos,
+    tienda,
+  ] = await Promise.all([
+    getPromotoresDeMiNegocio(),
+    getRankingPromotoresGlobal(),
+    getCatalogo(),
+    getTramos(),
+    getMiTienda(),
+  ])
 
+  const rankingMiNegocio = transformarARankingMiNegocio(promotores)
   const activos = catalogo.productos.filter((p) => p.is_active)
   const tomados = new Set(promotores.flatMap((p) => p.productos))
   const sinPromotor = activos.filter((p) => !tomados.has(p.name)).slice(0, 6)
@@ -70,77 +88,17 @@ export default async function PromotoresPage() {
       </section>
 
       <section>
-        <Encabezado etiqueta="Tus promotores" />
-        {promotores.length === 0 ? (
-          <div className="mt-6">
-            <Vacio
-              titulo="Todavía nadie eligió tus productos"
-              detalle="Ya están en el catálogo de los promotores. Lo que más ayuda a que alguien los tome: una buena foto, un nombre claro y stock disponible."
-              accion={{
-                href: "/panel/productos",
-                texto: "Revisar mis productos",
-              }}
-            />
-          </div>
-        ) : (
-          <ul className="mt-4 border-t-2 border-tinta">
-            {promotores.map((promotor) => (
-              <li
-                key={promotor.userId}
-                className="grid gap-4 border-b border-tinta/15 py-5 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-8"
-              >
-                <div className="min-w-0">
-                  <p className="flex items-center gap-2 font-titular text-lg font-bold tracking-[-0.02em]">
-                    {promotor.slug ? (
-                      <Link
-                        href={`/v/${promotor.slug}`}
-                        className="group inline-flex min-h-11 items-center gap-1.5 transition-colors hover:text-senal"
-                      >
-                        {promotor.nombre}
-                        <ArrowUpRight
-                          aria-hidden="true"
-                          className="size-4 opacity-40 transition-opacity group-hover:opacity-100"
-                        />
-                      </Link>
-                    ) : (
-                      promotor.nombre
-                    )}
-                  </p>
-                  <p className="mt-1 text-sm leading-relaxed opacity-60">
-                    {promotor.productos.length > 0
-                      ? promotor.productos.slice(0, 4).join(" · ") +
-                        (promotor.productos.length > 4
-                          ? ` y ${promotor.productos.length - 4} más`
-                          : "")
-                      : "Ya no promociona productos tuyos"}
-                  </p>
-                  {promotor.desde ? (
-                    <p className="mt-1 text-xs opacity-45">
-                      Desde el {formatDate(promotor.desde)}
-                    </p>
-                  ) : null}
-                </div>
-
-                <div className="flex items-baseline gap-6 sm:block sm:text-right">
-                  <p className="tabular font-titular text-xl font-extrabold tracking-[-0.03em]">
-                    {formatNumber(promotor.ventas + promotor.indirectas)}{" "}
-                    <span className="text-sm font-semibold opacity-55">
-                      {promotor.ventas + promotor.indirectas === 1
-                        ? "venta"
-                        : "ventas"}
-                    </span>
-                  </p>
-                  <p className="tabular text-xs opacity-55">
-                    {formatMoney(promotor.comisionCents)} de comisión
-                    {promotor.indirectas > 0
-                      ? ` · ${formatNumber(promotor.indirectas)} de compradores que volvieron`
-                      : ""}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        <Encabezado
+          etiqueta="Tabla de líderes"
+          titulo="Ranking de promotores"
+        />
+        <div className="mt-6">
+          <RankingPromotores
+            rankingMiNegocio={rankingMiNegocio}
+            rankingGlobal={rankingGlobal}
+            nombreNegocio={tienda?.name ?? "tu tienda"}
+          />
+        </div>
       </section>
 
       {sinPromotor.length > 0 ? (

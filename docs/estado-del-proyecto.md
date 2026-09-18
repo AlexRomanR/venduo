@@ -89,9 +89,10 @@ es que responde a otras reglas. Abajo, qué se salva, qué se rehace y en qué o
   QR), Compradores, Ganancias y Estadísticas.
 - **`/sumarme` y `/explorar/*` redirigen** al panel del promotor. Unirse a una tienda y
   las invitaciones ya no tienen pantalla.
-- **La pantalla de Promotores del negocio** muestra quién promociona qué y cuánto vendió;
-  ya no hay invitación ni aprobación. `/cuenta` dejó de ofrecer "acepto vendedores" y el
-  porcentaje de comisión.
+- **La pantalla de Promotores del negocio** muestra quién promociona qué y cuánto vendió,
+  con ranking interactivo y filtros para comparar el desempeño en el propio negocio y en
+  toda la red Venduo; ya no hay invitación ni aprobación. `/cuenta` dejó de ofrecer "acepto
+  vendedores" y el porcentaje de comisión.
 - **La barra lateral** perdió Marketing, Apariencia y "Gana extra".
 
 ---

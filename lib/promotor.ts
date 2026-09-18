@@ -57,6 +57,59 @@ export interface Comision {
   fecha: string
 }
 
+export interface PromotorRanking {
+  posicion: number
+  userId: string
+  nombre: string
+  slug: string | null
+  ciudad: string | null
+  avatarUrl: string | null
+  ventas: number
+  ventasDirectas?: number
+  ventasIndirectas?: number
+  volumenCents: number
+  comisionCents?: number
+  tiendasCount?: number
+  productos?: string[]
+  promocionaMiTienda?: boolean
+  desde?: string | null
+}
+
+export interface PromotorLocal {
+  userId: string
+  nombre: string
+  slug: string | null
+  ciudad?: string | null
+  avatarUrl?: string | null
+  productos: string[]
+  desde: string | null
+  ventas: number
+  indirectas: number
+  comisionCents: number
+  volumenCents?: number
+}
+
+export function transformarARankingMiNegocio(
+  promotores: PromotorLocal[]
+): PromotorRanking[] {
+  return promotores.map((p, idx) => ({
+    posicion: idx + 1,
+    userId: p.userId,
+    nombre: p.nombre,
+    slug: p.slug,
+    ciudad: p.ciudad ?? null,
+    avatarUrl: p.avatarUrl ?? null,
+    ventas: p.ventas + p.indirectas,
+    ventasDirectas: p.ventas,
+    ventasIndirectas: p.indirectas,
+    volumenCents: p.volumenCents ?? 0,
+    comisionCents: p.comisionCents,
+    productos: p.productos,
+    promocionaMiTienda: true,
+    desde: p.desde,
+  }))
+}
+
 export interface PerfilPromotor {
   nombre: string
   slug: string | null
