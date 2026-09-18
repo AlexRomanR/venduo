@@ -7,6 +7,12 @@ contra él sin romperlo.
 
 **Centavos enteros. Puntos básicos enteros. Nunca punto flotante.**
 
+**El precio de un producto no se escribe: se construye.** El negocio declara su costo base
+y el servidor suma la comisión del vendedor y el take-rate, los dos por rango de precio.
+Los tres componentes se congelan en el pedido y **suman exactamente el total**: redondear
+el total aparte descuadra el reparto por centavos. Las reglas están en `domain-venduo.md`
+y los porcentajes en `docs/modelo-de-negocio.md`.
+
 | Concepto | Columna          | Ejemplo                 |
 | -------- | ---------------- | ----------------------- |
 | Precio   | `price_cents`    | `8500` son Bs 85        |

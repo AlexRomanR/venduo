@@ -14,6 +14,9 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 
 ## Rutas
 
+> Estas son las rutas que existen hoy, del modelo anterior. Las del Marketplace están en
+> `VENDUO.md` §7 y todavía no se construyeron.
+
 | Ruta                          | Qué es                                                  | Acceso          |
 | ----------------------------- | ------------------------------------------------------- | --------------- |
 | `/`                           | Portada pública                                         | Público         |
@@ -170,7 +173,12 @@ docs/
   store-templates.md  El sistema de plantillas: capas, base de datos, cómo agregar una
 ```
 
-## Plantillas de tienda
+## Plantillas de tienda — fuera del modelo vigente
+
+> El canal pasó a ser un solo Marketplace, así que la tienda por negocio y sus plantillas
+> ya no son parte del producto (`docs/modelo-de-negocio.md`). Lo de abajo describe lo que
+> hay construido, que sigue funcionando. **No construir nada nuevo encima** sin que se
+> decida qué se hace con esto.
 
 Una tienda se dibuja con **el kit de su plantilla**. Las páginas de `app/t/[slug]` piden
 `kitDePlantilla(tienda.plantilla)` y componen sus piezas; nunca preguntan qué plantilla es.

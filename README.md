@@ -1,8 +1,14 @@
 # Venduo MVP
 
-Scaffold de tienda online: toda la infraestructura montada (Supabase, capa de
-IA intercambiable, QR, validación con zod) y solo el login como vista.
-Frontend y backend en un solo repositorio.
+Marketplace boliviano donde un negocio publica declarando solo su costo base y una
+red de jóvenes lo vende a comisión. El precio, la comisión y el reparto los calcula
+la plataforma. Frontend y backend en un solo repositorio.
+
+**El modelo de negocio está en [`docs/modelo-de-negocio.md`](docs/modelo-de-negocio.md)**
+y el producto en [`VENDUO.md`](VENDUO.md). Buena parte de lo construido responde al
+modelo anterior —una tienda online por negocio, con plantillas—: qué sigue en pie y qué
+hay que rehacer está en
+[`docs/estado-del-proyecto.md`](docs/estado-del-proyecto.md).
 
 ---
 
@@ -143,7 +149,7 @@ app/
   auth/sign-out/           Cierre de sesión
   (privado)/               Grupo de rutas: no aparece en la URL
     layout.tsx             Shell compartido de las áreas privadas
-    panel/                 Resumen del emprendedor y sus secciones, apariencia incluida
+    panel/                 Resumen del negocio y sus secciones, apariencia incluida
     vendedor/              Panel del vendedor
   api/
     health/                Estado del servidor y de las capas
@@ -165,12 +171,14 @@ components/
   onboarding/              Altas: marco, pasos y galería de plantillas
   plantillas/              Un kit de componentes por plantilla de tienda
   tienda/                  Lo que comparten todas las plantillas: carrito, checkout, pago
-  panel/                   Piezas del panel del emprendedor
+  panel/                   Piezas de los paneles del negocio y del joven
   landing/                 Piezas de la portada
   config-status.tsx        Checklist de capas configuradas
 
 supabase/migrations/       Esquema SQL, RLS y buckets
-docs/store-templates.md    El sistema de plantillas de tienda
+docs/modelo-de-negocio.md  El modelo vigente: precio, comisiones y reparto
+docs/estado-del-proyecto.md Qué está hecho y qué falta
+docs/store-templates.md    El sistema de plantillas de tienda (fuera del modelo vigente)
 types/database.ts          Tipos de la base (regenerables con npm run db:types)
 ```
 

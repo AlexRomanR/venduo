@@ -1,9 +1,9 @@
 # Venduo
 
-Plataforma boliviana donde un emprendedor elige una plantilla, describe su negocio y
-obtiene una tienda online que la IA edita por bloques. Esa tienda puede activar una red de
-vendedores jóvenes que colocan sus productos a comisión y construyen, con cada venta, un
-historial laboral verificable.
+Marketplace boliviano donde un negocio publica declarando **solo su costo base** y una red
+de jóvenes sin capital lo vende a comisión. La plataforma construye el precio sumando la
+comisión del joven y su take-rate, los dos escalados por rango de precio, y reparte al
+cobrar. Cada venta le arma al joven un historial laboral verificable.
 
 MVP de hackathon de 48 horas. **La especificación del producto es `VENDUO.md`** y es la
 fuente de verdad: si algo de acá la contradice, gana `VENDUO.md`.
@@ -35,13 +35,18 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
   índices únicos son parciales.
 - **El checkout no es una inserción del cliente.** `orders` no tiene política de INSERT: el
   pedido se crea con la función `create_order`, que recalcula los precios en el servidor.
+- **El negocio declara costo base, nunca precio final.** El precio lo construye el
+  servidor: costo base más comisión más take-rate, por rango. Los tres se congelan en la
+  venta y suman exactamente el total.
+- **El único ingreso es el take-rate.** La comisión del joven no es facturación de la
+  plataforma: es plata del negocio que pasa por el sistema.
 - **La comisión se congela al momento de la venta.** Nunca se recalcula después.
 - **`types/database.ts` es generado.** Los alias van en `types/index.ts`.
 - **La IA propone, el sistema valida y ejecuta.** Toda salida del modelo se valida con zod
   antes de tocar la base o la pantalla.
-- **Una tienda se ve con su plantilla, y ningún componente pregunta cuál es.** La base
-  vive en código, la personalización en `stores.theme_overrides` y lo que se dibuja se
-  calcula. Todo en `docs/store-templates.md`.
+- **Buena parte de lo construido responde al modelo anterior**: una tienda online por
+  negocio con plantillas, precio fijado por el negocio y suscripción. Antes de tocar algo,
+  mirar `docs/estado-del-proyecto.md` para saber si eso sigue en pie.
 - **Hay una sola base de datos y es la de producción**, y cada push a `main` se publica
   solo en Vercel. `npx supabase db push` cambia producción en el acto. Antes de migrar o
   de subir a `main`, leer `workflow.md`.
@@ -51,18 +56,20 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
 Está en `VENDUO.md` §7 y vale tanto como la lista de lo que sí. Si una tarea pide algo de
 acá, frena y pregunta antes de escribir código:
 
-multi-tienda por usuario · gestión de envíos · recibir o guardar el dinero de una venta
-(lo hace PagoFácil) · cobro de la suscripción · notificaciones por correo · app móvil
-nativa · **tests automatizados**.
+multi-negocio por usuario · que el negocio fije precios o porcentajes · tienda propia por
+negocio con plantillas · suscripción · aprobación de vendedores · gestión de envíos ·
+recibir o guardar el dinero ajeno (lo hace PagoFácil) · notificaciones por correo · app
+móvil nativa · **tests automatizados**.
 
 ## Documentos
 
-| Archivo                       | Qué es                                                       |
-| ----------------------------- | ------------------------------------------------------------ |
-| `VENDUO.md`                   | La especificación del producto. Fuente de verdad             |
-| `DESIGN.md`                   | El mundo visual de Venduo y la base editorial                |
-| `docs/estado-del-proyecto.md` | Qué está hecho y qué falta. **Leerlo antes de elegir tarea** |
-| `docs/store-templates.md`     | El sistema de plantillas de tienda                           |
+| Archivo                       | Qué es                                                          |
+| ----------------------------- | --------------------------------------------------------------- |
+| `docs/modelo-de-negocio.md`   | **El modelo vigente**: precio, comisiones, atribución y reparto |
+| `VENDUO.md`                   | La especificación del producto. Fuente de verdad                |
+| `DESIGN.md`                   | El mundo visual de Venduo y la base editorial                   |
+| `docs/estado-del-proyecto.md` | Qué está hecho y qué falta. **Leerlo antes de elegir tarea**    |
+| `docs/store-templates.md`     | El sistema de plantillas de tienda                              |
 
 ## Reglas
 

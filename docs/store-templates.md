@@ -3,6 +3,11 @@
 Cómo una tienda de Venduo toma su identidad visual, dónde vive cada parte, cómo se cambia
 de plantilla sin perder nada y qué hay que hacer para sumar una plantilla nueva.
 
+> **Fuera del modelo vigente.** El canal pasó a ser un solo Marketplace
+> (`docs/modelo-de-negocio.md`), así que la tienda online por negocio y sus plantillas
+> salieron del producto. El código sigue en el repositorio y funciona; qué se hace con él es
+> una decisión pendiente. Este documento queda como registro de cómo está construido.
+>
 > **La arquitectura y persistencia necesarias para la futura edición de plantillas mediante
 > IA ya están preparadas, pero la funcionalidad de edición en vivo mediante IA todavía NO
 > está implementada.**

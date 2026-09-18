@@ -12,6 +12,13 @@ description: >-
 Es la parte del sistema donde un error no se ve: produce código que compila, parece
 andar, y falla en silencio o corrompe el historial de alguien.
 
+> **El modelo vigente cambió** (`docs/modelo-de-negocio.md`): el negocio declara un costo
+> base y el precio se construye sumando la comisión del vendedor y el take-rate, escalados
+> por rango; el comprador que trae un joven le queda asociado por una ventana de tiempo y
+> genera comisión indirecta en sus compras directas; y el reparto es a tres. Lo que
+> describe esta skill es **lo construido**, que responde al modelo anterior. Las reglas que
+> mandan están en `domain-venduo.md`.
+
 ---
 
 ## Regla número uno: el pedido no se inserta
@@ -50,7 +57,10 @@ if (error) {
 La función, del lado del servidor:
 
 1. Comprueba que la tienda esté viva (`store_is_live`).
-2. **Recalcula cada precio desde el catálogo.** El cliente manda qué y cuánto, nunca a cuánto.
+2. **Recalcula cada precio desde el catálogo.** El cliente manda qué y cuánto, nunca a
+   cuánto. En el modelo vigente esto pasa a ser reconstruir el precio desde el costo base y
+   la tabla de rangos, y resolver quién cobra la comisión: el joven del enlace, el promotor
+   asociado al comprador, o el negocio.
 3. Valida stock y lo descuenta.
 4. Resuelve el código de referido comprobando que sea de **esa** tienda y esté `activo`.
 5. Congela `commission_bps` y `commission_cents` en el pedido.

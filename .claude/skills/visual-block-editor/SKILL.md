@@ -8,6 +8,12 @@ description: >-
 
 # Editor visual de bloques
 
+> **Fuera del modelo vigente.** La tienda por negocio y sus plantillas salieron del
+> producto cuando el canal pasó a ser un solo Marketplace (`docs/modelo-de-negocio.md`).
+> Esta skill describe lo construido, que sigue funcionando, y el patrón de edición asistida
+> —operaciones validadas contra un esquema, con el estado previo guardado— que conviene
+> reusar en lo que venga.
+
 La tienda de cada emprendedor es un árbol de bloques que la IA edita. El principio que
 gobierna todo: **la IA propone, el sistema valida y ejecuta.**
 

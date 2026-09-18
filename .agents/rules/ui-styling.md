@@ -12,6 +12,10 @@ cubre cómo se ve.
 
 ### El mundo de Venduo y el de cada tienda
 
+> **La identidad por tienda quedó fuera del modelo** cuando el canal pasó a ser un solo
+> Marketplace: lo que se dibuje de ahora en más va en el mundo editorial de Venduo. Lo de
+> abajo sigue describiendo lo construido, que funciona y no se tocó.
+
 **Venduo usa el mundo editorial de `DESIGN.md`**: papel, tinta y un rojo de señal. Portada,
 ingreso, altas, vitrinas del vendedor y su perfil público.
 
@@ -126,6 +130,9 @@ tienes cuenta?". Funciona en todo el país, en el altiplano y en el oriente.
 un boliviano con acento extranjero, y un jurado local lo nota.
 
 Preferir **"correo"** sobre "email", que es la palabra que usa la gente.
+
+**Quien promociona productos de otro es un "promotor", no un "vendedor".** En la base y en
+las rutas sigue diciendo `vendedor`; en pantalla, nunca.
 
 Los mensajes de error dicen qué hacer, no qué falló internamente:
 
