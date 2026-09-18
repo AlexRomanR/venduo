@@ -152,10 +152,16 @@ const HACE = (dias: number) =>
 export interface ProductoVitrina {
   id: string
   name: string
+  description: string | null
   priceCents: number
   compareAtPriceCents: number | null
   imageUrl: string | null
+  images: string[]
   condition: string
+  conditionNote: string | null
+  category: string | null
+  publishedAt: string
+  featured: boolean
   storeName: string
   storeSlug: string
   /** Lo que gana el promotor por unidad: el componente de comisión del precio. */
@@ -170,10 +176,17 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
     id: "demo-v-1",
     name: "Buzo oversize",
+    description:
+      "Buzo de algodón grueso, corte amplio y terminación reforzada.",
     priceCents: 18000,
     compareAtPriceCents: null,
     imageUrl: null,
+    images: [],
     condition: "nuevo",
+    conditionNote: null,
+    category: "Ropa",
+    publishedAt: HACE(2),
+    featured: true,
     storeName: "Rosa Deportes",
     storeSlug: "rosa-deportes",
     gananciaCents: 2880,
@@ -184,10 +197,17 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
     id: "demo-v-2",
     name: "Mochila urbana",
+    description:
+      "Mochila impermeable con compartimento acolchado para portátil.",
     priceCents: 24000,
     compareAtPriceCents: 30000,
     imageUrl: null,
+    images: [],
     condition: "nuevo",
+    conditionNote: null,
+    category: "Accesorios",
+    publishedAt: HACE(8),
+    featured: false,
     storeName: "Rosa Deportes",
     storeSlug: "rosa-deportes",
     gananciaCents: 3270,
@@ -198,10 +218,16 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
     id: "demo-v-3",
     name: "Café de especialidad 250g",
+    description: "Café boliviano tostado en lotes pequeños, listo para moler.",
     priceCents: 8500,
     compareAtPriceCents: null,
     imageUrl: null,
+    images: [],
     condition: "nuevo",
+    conditionNote: null,
+    category: "Alimentos",
+    publishedAt: HACE(15),
+    featured: true,
     storeName: "Café Illimani",
     storeSlug: "cafe-illimani",
     gananciaCents: 1360,
@@ -212,10 +238,17 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
     id: "demo-v-4",
     name: "Molinillo manual reacondicionado",
+    description:
+      "Molinillo revisado y calibrado, con muela de acero regulable.",
     priceCents: 14000,
     compareAtPriceCents: 24000,
     imageUrl: null,
+    images: [],
     condition: "reacondicionado",
+    conditionNote: "Revisado y probado; tiene marcas leves de uso.",
+    category: "Hogar",
+    publishedAt: HACE(45),
+    featured: false,
     storeName: "Café Illimani",
     storeSlug: "cafe-illimani",
     gananciaCents: 2240,
@@ -375,7 +408,7 @@ export const ENLACES_DEMO: Enlace[] = [
     gananciaCents: 2_880,
     negocio: "Rosa Deportes",
     negocioSlug: "rosa-deportes",
-    codigo: "ANA7K2M",
+    codigo: "BZ7K2M4Q",
     url: "",
     tomadoEn: HACE(64),
     unidades: 11,
@@ -392,7 +425,7 @@ export const ENLACES_DEMO: Enlace[] = [
     gananciaCents: 3_270,
     negocio: "Rosa Deportes",
     negocioSlug: "rosa-deportes",
-    codigo: "ANA7K2M",
+    codigo: "MH8P3R6T",
     url: "",
     tomadoEn: HACE(41),
     unidades: 4,
@@ -409,7 +442,7 @@ export const ENLACES_DEMO: Enlace[] = [
     gananciaCents: 1_360,
     negocio: "Café Illimani",
     negocioSlug: "cafe-illimani",
-    codigo: "ANA4QPW",
+    codigo: "CF9W4N7K",
     url: "",
     tomadoEn: HACE(23),
     unidades: 9,
@@ -426,7 +459,7 @@ export const ENLACES_DEMO: Enlace[] = [
     gananciaCents: 2_240,
     negocio: "Café Illimani",
     negocioSlug: "cafe-illimani",
-    codigo: "ANA4QPW",
+    codigo: "ML6Q8V3P",
     url: "",
     tomadoEn: HACE(9),
     unidades: 0,

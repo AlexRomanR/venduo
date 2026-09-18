@@ -17,7 +17,12 @@ export const metadata = { title: "Mis enlaces" }
  * El QR se dibuja acá, en el servidor: la biblioteca no viaja al teléfono y el
  * diálogo solo muestra una imagen.
  */
-export default async function EnlacesPage() {
+export default async function EnlacesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ creado?: string }>
+}) {
+  const { creado } = await searchParams
   const enlaces = await getMisEnlaces()
 
   const qrs = await Promise.all(
@@ -91,6 +96,7 @@ export default async function EnlacesPage() {
                 enlace={enlace}
                 qr={qrs[i]}
                 completa
+                destacada={creado === enlace.productoId}
               />
             ))}
           </ul>

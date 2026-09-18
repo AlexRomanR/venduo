@@ -1,12 +1,12 @@
 import Image from "next/image"
-import { Package } from "lucide-react"
+import Link from "next/link"
+import { ArrowRight, Package } from "lucide-react"
 
 import type { ProductoVitrina } from "@/lib/demo-data"
 import { formatMoney, formatNumber } from "@/lib/format"
 import { mensajeParaCompartir } from "@/lib/promotor"
 import { urlDeProducto } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
-import { TomarProducto } from "@/components/promotor/acciones"
 import { CompartirEnlace } from "@/components/promotor/compartir"
 
 /**
@@ -67,18 +67,21 @@ export function TarjetaProducto({
   const url = producto.codigo
     ? urlDeProducto(producto.storeSlug, producto.id, producto.codigo)
     : null
+  const detalle = `/vendedor/catalogo/${producto.id}`
 
   return (
     <article
       style={{ animationDelay: `${Math.min(indice, 8) * 60}ms` }}
       className="group flex animate-in flex-col duration-700 fill-mode-both fade-in slide-in-from-bottom-3 motion-reduce:animate-none"
     >
-      <FotoProducto
-        src={producto.imageUrl}
-        alt={producto.name}
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
-        className="aspect-[4/3] w-full"
-      />
+      <Link href={detalle} aria-label={`Ver ${producto.name}`}>
+        <FotoProducto
+          src={producto.imageUrl}
+          alt={producto.name}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
+          className="aspect-[4/3] w-full"
+        />
+      </Link>
 
       <div className="flex flex-1 flex-col border-b border-tinta/15 pt-4 pb-5">
         <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
@@ -91,7 +94,9 @@ export function TarjetaProducto({
           ) : null}
         </p>
         <h3 className="mt-1.5 line-clamp-2 font-titular text-lg leading-snug font-bold tracking-[-0.02em]">
-          {producto.name}
+          <Link href={detalle} className="transition-colors hover:text-senal">
+            {producto.name}
+          </Link>
         </h3>
 
         <div className="mt-4 flex items-end justify-between gap-4">
@@ -99,7 +104,7 @@ export function TarjetaProducto({
             <p className="text-xs tracking-[0.12em] uppercase opacity-55">
               Ganas por venta
             </p>
-            <p className="tabular mt-1 font-titular text-[1.75rem] leading-none font-extrabold tracking-[-0.04em] text-senal">
+            <p className="tabular mt-1 font-titular text-3xl leading-none font-extrabold tracking-[-0.04em] text-senal">
               {formatMoney(producto.gananciaCents)}
             </p>
           </div>
@@ -132,7 +137,13 @@ export function TarjetaProducto({
               />
             </div>
           ) : (
-            <TomarProducto productoId={producto.id} nombre={producto.name} />
+            <Link
+              href={detalle}
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
+            >
+              Ver y crear mi enlace
+              <ArrowRight aria-hidden="true" className="size-4" />
+            </Link>
           )}
         </div>
       </div>

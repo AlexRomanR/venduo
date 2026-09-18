@@ -18,10 +18,15 @@ import { cn } from "@/lib/utils"
 export function TomarProducto({
   productoId,
   nombre,
+  destino,
+  texto = "Promocionar",
   className,
 }: {
   productoId: string
   nombre: string
+  /** Después de crear, lleva a la lista donde el enlace queda guardado. */
+  destino?: string
+  texto?: string
   className?: string
 }) {
   const router = useRouter()
@@ -50,7 +55,8 @@ export function TomarProducto({
     }
 
     toast.success(`${nombre} ya es parte de lo que promocionas.`)
-    router.refresh()
+    if (destino) router.push(destino)
+    else router.refresh()
   }
 
   return (
@@ -68,7 +74,7 @@ export function TomarProducto({
       ) : (
         <Plus aria-hidden="true" className="size-4" />
       )}
-      Promocionar
+      {texto}
     </button>
   )
 }

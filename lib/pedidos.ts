@@ -12,5 +12,6 @@ export const ESTADOS: Array<{ valor: OrderStatus; etiqueta: string }> = [
   { valor: "pagado", etiqueta: "Pagado" },
   { valor: "enviado", etiqueta: "Enviado" },
   { valor: "entregado", etiqueta: "Entregado" },
+  { valor: "en_disputa", etiqueta: "En disputa" },
   { valor: "cancelado", etiqueta: "Cancelado" },
 ]

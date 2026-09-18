@@ -9,7 +9,7 @@ import { Foto } from "@/components/landing/foto"
 import { PrecioEjemplo } from "@/components/landing/precio-ejemplo"
 
 export const metadata = {
-  title: "Venduo — publica lo que vendes, nosotros ponemos quién lo venda",
+  title: "Únete a Venduo — publica o promociona productos",
 }
 
 /**
@@ -151,9 +151,12 @@ export default async function Inicio() {
     <div className="min-h-screen bg-papel text-tinta">
       <header className="sticky top-0 z-30 border-b border-tinta/15 bg-papel/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-5 py-3.5">
-          <span className="flex-1 font-titular text-lg font-extrabold tracking-[-0.02em]">
+          <Link
+            href="/"
+            className="flex-1 font-titular text-lg font-extrabold tracking-[-0.02em]"
+          >
             Venduo
-          </span>
+          </Link>
 
           <nav className="hidden items-center gap-6 text-sm md:flex">
             <a href="#como-funciona" className="opacity-70 hover:opacity-100">
@@ -524,6 +527,9 @@ export default async function Inicio() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-2 px-5 py-8 text-sm opacity-60">
           <span className="font-titular font-bold opacity-100">Venduo</span>
           <span className="flex-1">Santa Cruz · La Paz · Cochabamba</span>
+          <Link href="/" className="min-h-11 py-3 hover:opacity-100">
+            Ir al Marketplace
+          </Link>
           <a href="mailto:hola@venduo.bo" className="hover:opacity-100">
             hola@venduo.bo
           </a>

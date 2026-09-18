@@ -25,14 +25,23 @@ export function FilaEnlace({
   enlace,
   qr,
   completa = false,
+  destacada = false,
 }: {
   enlace: Enlace
   qr?: string | null
   /** Con las cifras de venta y la opción de dejar de promocionarlo. */
   completa?: boolean
+  /** Acaba de crearse: confirma visualmente dónde quedó guardado. */
+  destacada?: boolean
 }) {
   return (
-    <li className="group grid gap-4 border-b border-tinta/15 py-5 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-6">
+    <li
+      id={`enlace-${enlace.productoId}`}
+      className={cn(
+        "group grid scroll-mt-24 gap-4 border-b py-5 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-6",
+        destacada ? "border-senal" : "border-tinta/15"
+      )}
+    >
       <div className="flex min-w-0 items-center gap-4">
         <FotoProducto
           src={enlace.imagenUrl}
@@ -47,6 +56,11 @@ export function FilaEnlace({
           <h3 className="mt-1 truncate font-titular text-base font-bold tracking-[-0.02em] sm:text-lg">
             {enlace.nombre}
           </h3>
+          {destacada ? (
+            <p className="mt-1 text-xs font-semibold text-senal">
+              Enlace creado y guardado
+            </p>
+          ) : null}
           <p className="tabular mt-1 text-sm">
             <span className="font-semibold text-senal">
               {formatMoney(enlace.gananciaCents)}

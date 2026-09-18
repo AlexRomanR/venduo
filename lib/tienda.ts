@@ -43,10 +43,7 @@ export const SUBDOMINIOS_RESERVADOS = new Set([
 
 /** La URL pública de una tienda. Absoluta: se comparte y se imprime. */
 export function urlDeTienda(slug: string): string {
-  if (DOMINIO_DE_TIENDAS) {
-    return `https://${slug}.${DOMINIO_DE_TIENDAS}`
-  }
-  return `${getSiteUrl()}/t/${slug}`
+  return `${getSiteUrl()}/negocio/${slug}`
 }
 
 /**
@@ -66,7 +63,8 @@ export function urlDeProducto(
   productoId: string,
   codigo?: string | null
 ): string {
-  const base = `${urlDeTienda(slug)}/p/${productoId}`
+  void slug
+  const base = `${getSiteUrl()}/producto/${productoId}`
   return codigo ? `${base}?ref=${encodeURIComponent(codigo)}` : base
 }
 
