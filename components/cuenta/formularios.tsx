@@ -16,7 +16,6 @@ import {
   ERROR_CAMPO,
   ETIQUETA_CAMPO,
 } from "@/lib/estilos"
-import { formatMoney, formatPercent } from "@/lib/format"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import {
@@ -27,7 +26,6 @@ import {
   type TiendaInput,
   type VendedorInput,
 } from "@/lib/validation/cuenta"
-import { COMISION_MAXIMA_BPS, COMISIONES } from "@/lib/validation/tienda"
 import {
   Form,
   FormControl,
@@ -39,8 +37,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-
-const EJEMPLO_VENTA_CENTS = 20_000
 
 function Guardar({ enCurso }: { enCurso: boolean }) {
   return (
@@ -169,9 +165,6 @@ export function FormPersona({ cuenta }: { cuenta: Cuenta }) {
 export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
   const router = useRouter()
   const tienda = cuenta.tienda!
-  const [personalizada, setPersonalizada] = React.useState(
-    !COMISIONES.includes(tienda.commissionBps as (typeof COMISIONES)[number])
-  )
 
   const form = useForm<TiendaInput>({
     resolver: zodResolver(tiendaSchema),
@@ -190,9 +183,6 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
   })
 
   const publicada = form.watch("publicada")
-  const aceptaVendedores = form.watch("aceptaVendedores")
-  const comisionBps = form.watch("comisionBps")
-  const modoAlta = form.watch("modoAlta")
 
   async function onSubmit(values: TiendaInput) {
     const supabase = createClient()
@@ -205,11 +195,6 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
         tagline: values.tagline || null,
         description: values.descripcion || null,
         is_published: values.publicada,
-        seller_network_enabled: values.aceptaVendedores,
-        // Sin vendedores la comisión no significa nada: se guarda en cero para
-        // que no quede un número colgado que nadie va a cobrar.
-        commission_bps: values.aceptaVendedores ? values.comisionBps : 0,
-        seller_join_mode: values.modoAlta,
         updated_at: new Date().toISOString(),
       })
       .eq("id", tienda.id)
@@ -312,144 +297,11 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
           />
         </FormItem>
 
-        <FormItem>
-          <FormLabel className={ETIQUETA_CAMPO}>Red de vendedores</FormLabel>
-          <Par
-            valor={aceptaVendedores}
-            onChange={(v) => form.setValue("aceptaVendedores", v)}
-            opciones={[
-              {
-                valor: true,
-                titulo: "Acepto vendedores",
-                detalle: "Ganan comisión por lo que traen",
-              },
-              {
-                valor: false,
-                titulo: "Por ahora no",
-                detalle: "Vendes solo tú",
-              },
-            ]}
-          />
-        </FormItem>
-
-        <div
-          className={cn(
-            "grid transition-all duration-300 ease-out",
-            aceptaVendedores
-              ? "grid-rows-[1fr] opacity-100"
-              : "grid-rows-[0fr] opacity-0"
-          )}
-        >
-          <div className="overflow-hidden">
-            <div className="flex flex-col gap-7">
-              <FormItem>
-                <FormLabel className={ETIQUETA_CAMPO}>
-                  Comisión por venta
-                </FormLabel>
-                <div className="flex flex-wrap gap-2">
-                  {COMISIONES.map((bps) => (
-                    <button
-                      key={bps}
-                      type="button"
-                      onClick={() => {
-                        setPersonalizada(false)
-                        form.setValue("comisionBps", bps)
-                      }}
-                      aria-pressed={!personalizada && comisionBps === bps}
-                      className={cn(
-                        "tabular flex min-h-11 items-center border px-5 font-titular font-bold transition-colors duration-200",
-                        !personalizada && comisionBps === bps
-                          ? "border-senal bg-senal text-white"
-                          : "border-tinta/15 hover:border-tinta"
-                      )}
-                    >
-                      {formatPercent(bps)}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => setPersonalizada(true)}
-                    aria-pressed={personalizada}
-                    className={cn(
-                      "flex min-h-11 items-center border px-5 font-titular font-bold transition-colors duration-200",
-                      personalizada
-                        ? "border-senal bg-senal text-white"
-                        : "border-tinta/15 hover:border-tinta"
-                    )}
-                  >
-                    Otro
-                  </button>
-                </div>
-
-                {personalizada ? (
-                  <div className="mt-3 flex items-center gap-3">
-                    <input
-                      type="number"
-                      inputMode="decimal"
-                      min={0}
-                      max={COMISION_MAXIMA_BPS / 100}
-                      step={0.5}
-                      aria-label="Porcentaje de comisión"
-                      value={comisionBps / 100}
-                      onChange={(e) => {
-                        const pct = Number.parseFloat(e.target.value)
-                        if (Number.isNaN(pct))
-                          return form.setValue("comisionBps", 0)
-                        form.setValue(
-                          "comisionBps",
-                          Math.min(
-                            Math.max(Math.round(pct * 100), 0),
-                            COMISION_MAXIMA_BPS
-                          )
-                        )
-                      }}
-                      className="tabular h-12 w-28 rounded-none border-0 border-b border-tinta bg-transparent px-0 font-titular text-2xl font-bold outline-none focus:border-senal"
-                    />
-                    <span className="font-titular text-2xl font-bold opacity-40">
-                      %
-                    </span>
-                  </div>
-                ) : null}
-
-                <FormDescription className={AYUDA_CAMPO}>
-                  En una venta de {formatMoney(EJEMPLO_VENTA_CENTS)} el vendedor
-                  se lleva{" "}
-                  <span className="tabular font-semibold text-tinta">
-                    {formatMoney((EJEMPLO_VENTA_CENTS * comisionBps) / 10000)}
-                  </span>
-                  . Cambiarlo no afecta a las ventas ya hechas: la tasa se
-                  congela en cada una.
-                </FormDescription>
-              </FormItem>
-
-              <FormItem>
-                <FormLabel className={ETIQUETA_CAMPO}>
-                  ¿Quién puede sumarse?
-                </FormLabel>
-                <Par
-                  valor={modoAlta}
-                  onChange={(v) => form.setValue("modoAlta", v)}
-                  opciones={[
-                    {
-                      valor: "abierta" as const,
-                      titulo: "Cualquiera",
-                      detalle: "Entra activo al instante",
-                    },
-                    {
-                      valor: "con_aprobacion" as const,
-                      titulo: "Con aprobación",
-                      detalle: "Revisas cada solicitud",
-                    },
-                  ]}
-                />
-                <FormDescription className={AYUDA_CAMPO}>
-                  Tu enlace de invitación salta la aprobación: quien entra por
-                  ahí queda activo aunque elijas revisar.
-                </FormDescription>
-              </FormItem>
-            </div>
-          </div>
-        </div>
+        <p className="border-t border-tinta/15 pt-5 text-sm leading-relaxed opacity-70">
+          Tus productos publicados ya están abiertos a todos los promotores, y
+          su comisión la calcula Venduo según el precio de cada uno. No hay nada
+          que configurar ni que aprobar.
+        </p>
 
         <Guardar enCurso={form.formState.isSubmitting} />
       </form>

@@ -173,6 +173,68 @@ export type Database = {
         }
         Relationships: []
       }
+      buyer_attributions: {
+        Row: {
+          buyer_key: string
+          created_at: string
+          deleted_at: string | null
+          expires_at: string
+          first_order_id: string | null
+          id: string
+          seller_id: string | null
+          seller_user_id: string
+        }
+        Insert: {
+          buyer_key: string
+          created_at?: string
+          deleted_at?: string | null
+          expires_at: string
+          first_order_id?: string | null
+          id?: string
+          seller_id?: string | null
+          seller_user_id: string
+        }
+        Update: {
+          buyer_key?: string
+          created_at?: string
+          deleted_at?: string | null
+          expires_at?: string
+          first_order_id?: string | null
+          id?: string
+          seller_id?: string | null
+          seller_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buyer_attributions_first_order_id_fkey"
+            columns: ["first_order_id"]
+            isOneToOne: false
+            referencedRelation: "mis_ventas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_attributions_first_order_id_fkey"
+            columns: ["first_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_attributions_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "mis_vendedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_attributions_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "store_sellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       commissions: {
         Row: {
           amount_cents: number
@@ -180,6 +242,7 @@ export type Database = {
           confirmed_at: string | null
           created_at: string
           id: string
+          kind: Database["public"]["Enums"]["commission_kind"]
           order_id: string
           paid_at: string | null
           payment_reference: string | null
@@ -196,6 +259,7 @@ export type Database = {
           confirmed_at?: string | null
           created_at?: string
           id?: string
+          kind?: Database["public"]["Enums"]["commission_kind"]
           order_id: string
           paid_at?: string | null
           payment_reference?: string | null
@@ -212,6 +276,7 @@ export type Database = {
           confirmed_at?: string | null
           created_at?: string
           id?: string
+          kind?: Database["public"]["Enums"]["commission_kind"]
           order_id?: string
           paid_at?: string | null
           payment_reference?: string | null
@@ -378,7 +443,10 @@ export type Database = {
       }
       orders: {
         Row: {
+          attributed_seller_user_id: string | null
+          base_cost_cents: number
           buyer_email: string | null
+          buyer_key: string | null
           buyer_name: string
           buyer_phone: string
           commission_base_cents: number
@@ -395,11 +463,15 @@ export type Database = {
           status: Database["public"]["Enums"]["order_status"]
           store_id: string
           subtotal_cents: number
+          take_cents: number
           total_cents: number
           updated_at: string
         }
         Insert: {
+          attributed_seller_user_id?: string | null
+          base_cost_cents?: number
           buyer_email?: string | null
+          buyer_key?: string | null
           buyer_name: string
           buyer_phone: string
           commission_base_cents?: number
@@ -416,11 +488,15 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           store_id: string
           subtotal_cents: number
+          take_cents?: number
           total_cents: number
           updated_at?: string
         }
         Update: {
+          attributed_seller_user_id?: string | null
+          base_cost_cents?: number
           buyer_email?: string | null
+          buyer_key?: string | null
           buyer_name?: string
           buyer_phone?: string
           commission_base_cents?: number
@@ -437,6 +513,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           store_id?: string
           subtotal_cents?: number
+          take_cents?: number
           total_cents?: number
           updated_at?: string
         }
@@ -711,6 +788,78 @@ export type Database = {
           position?: number
         }
         Relationships: []
+      }
+      seller_products: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: string
+          product_id: string
+          seller_id: string | null
+          store_id: string
+          taken_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          product_id: string
+          seller_id?: string | null
+          store_id: string
+          taken_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          product_id?: string
+          seller_id?: string | null
+          store_id?: string
+          taken_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "mis_productos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_products_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "mis_vendedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_products_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "store_sellers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_products_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       seller_profiles: {
         Row: {
@@ -1126,6 +1275,7 @@ export type Database = {
           is_published: boolean
           logo_url: string | null
           name: string
+          onboarded_at: string | null
           owner_id: string
           payment_instructions: string | null
           payment_qr_url: string | null
@@ -1147,6 +1297,7 @@ export type Database = {
           is_published?: boolean
           logo_url?: string | null
           name: string
+          onboarded_at?: string | null
           owner_id: string
           payment_instructions?: string | null
           payment_qr_url?: string | null
@@ -1168,6 +1319,7 @@ export type Database = {
           is_published?: boolean
           logo_url?: string | null
           name?: string
+          onboarded_at?: string | null
           owner_id?: string
           payment_instructions?: string | null
           payment_qr_url?: string | null
@@ -1517,9 +1669,25 @@ export type Database = {
         Args: { p_invite_code?: string; p_store_slug: string }
         Returns: string
       }
+      mis_compradores: {
+        Args: never
+        Returns: {
+          comision_indirecta_cents: number
+          comprador: string
+          compras_indirectas: number
+          desde: string
+          id: string
+          primera_compra_cents: number
+          primera_tienda: string
+          registrado: boolean
+          vence: string
+          vigente: boolean
+        }[]
+      }
       my_seller_ids: { Args: never; Returns: string[] }
       my_seller_invite: { Args: never; Returns: string }
       my_store_id: { Args: never; Returns: string }
+      normalizar_telefono: { Args: { p_telefono: string }; Returns: string }
       pedido_publico: { Args: { p_order_id: string }; Returns: Json }
       precio_publicado: {
         Args: { p_base_cost_cents: number }
@@ -1538,6 +1706,7 @@ export type Database = {
           nombre: string
         }[]
       }
+      release_product: { Args: { p_product_id: string }; Returns: undefined }
       rotate_seller_invite: { Args: never; Returns: string }
       run_insight: {
         Args: {
@@ -1588,10 +1757,12 @@ export type Database = {
       }
       store_is_live: { Args: { p_store_id: string }; Returns: boolean }
       take_product: { Args: { p_product_id: string }; Returns: string }
+      ventana_de_atribucion: { Args: never; Returns: string }
     }
     Enums: {
       ai_generation_kind: "tienda" | "bloques" | "analisis" | "marketing"
       block_proposal_status: "propuesta" | "aplicada" | "rechazada" | "invalida"
+      commission_kind: "directa" | "indirecta"
       commission_status: "pendiente" | "confirmada" | "pagada" | "anulada"
       design_origin: "inicial" | "alta" | "antes_de_cambiar_plantilla"
       order_status:
@@ -1733,6 +1904,7 @@ export const Constants = {
     Enums: {
       ai_generation_kind: ["tienda", "bloques", "analisis", "marketing"],
       block_proposal_status: ["propuesta", "aplicada", "rechazada", "invalida"],
+      commission_kind: ["directa", "indirecta"],
       commission_status: ["pendiente", "confirmada", "pagada", "anulada"],
       design_origin: ["inicial", "alta", "antes_de_cambiar_plantilla"],
       order_status: [

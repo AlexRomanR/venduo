@@ -419,7 +419,7 @@ Sin marca de borrado: un pedido se cancela, no se borra.
 | `first_order_id`           | La venta con la que se creó                                                                               |
 | `created_at`, `expires_at` | La ventana de vigencia. Vencida, la comisión vuelve al negocio                                            |
 
-> Las dos tablas son del modelo vigente y **todavía no existen**: hoy están `store_sellers` y su aprobación. Ver `docs/estado-del-proyecto.md`.
+> Las dos tablas existen. Una diferencia con lo de arriba: el código de referido sigue en `store_sellers`, uno por promotor y negocio, porque el carrito lleva un solo código por tienda. En el pedido, el promotor de la comisión indirecta está en `attributed_seller_user_id`: es un usuario y no un vínculo, porque pudo haber traído al comprador con el producto de otro negocio. Ver `docs/estado-del-proyecto.md`.
 
 **`commissions`** — el ciclo de vida del pago al vendedor.
 

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import {
   ArrowUpRight,
   BarChart3,
-  Megaphone,
+  FileSpreadsheet,
   Package,
   Plus,
   ShoppingBag,
@@ -13,22 +13,25 @@ import {
 
 import { getCatalogo } from "@/lib/data/catalogo"
 import { getMiTienda, getResumenPanel } from "@/lib/data/panel"
+import { getTramos } from "@/lib/data/precios"
 import { urlDeTienda } from "@/lib/tienda"
 import { RESUMEN_DEMO } from "@/lib/demo-data"
 import { getSiteUrl, isSupabaseConfigured } from "@/lib/env"
+import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
 import { formatMoney, formatNumber } from "@/lib/format"
+import { cn } from "@/lib/utils"
 import { toDataURL } from "@/lib/qr"
-import { AvisoSuscripcion } from "@/components/panel/aviso-suscripcion"
 import { Cifra, Encabezado } from "@/components/panel/piezas"
-import { PrimerosPasos } from "@/components/panel/primeros-pasos"
+import { GuiaDeInicio } from "@/components/panel/guia-de-inicio"
 import { ListaProductos } from "@/components/productos/lista"
+import { terminarGuia } from "./acciones"
 import {
   ajustarStock,
   alternarProducto,
   borrarProducto,
 } from "./productos/acciones"
 
-export const metadata = { title: "Resumen" }
+export const metadata = { title: "Mi panel" }
 
 const SECCIONES = [
   {
@@ -46,7 +49,7 @@ const SECCIONES = [
   {
     href: "/panel/vendedores",
     titulo: "Promotores",
-    detalle: "Quiénes venden lo tuyo y cuánto generaron.",
+    detalle: "Quién promociona tus productos y cuánto te vendió.",
     icono: Users,
   },
   {
@@ -55,40 +58,53 @@ const SECCIONES = [
     detalle: "Qué se vende, cuándo y cuánto, preguntado en tus palabras.",
     icono: BarChart3,
   },
-  {
-    href: "/panel/marketing",
-    titulo: "Marketing",
-    detalle: "Textos para Facebook y WhatsApp hechos con tu catálogo.",
-    icono: Megaphone,
-  },
 ]
 
 /**
  * La pantalla de entrada del negocio.
  *
- * Tiene dos caras, y la decide el catálogo: **sin productos no hay nada que
- * resumir**, así que se explican los pasos —incluidos los que resuelve la
- * plataforma, que es lo que un negocio nuevo no tiene forma de adivinar—. Con
- * productos cargados, lo primero es el catálogo y su stock, que es lo que se
- * mira todos los días.
+ * Tiene dos caras. **La primera vez es una guía**: cargar lo que vende,
+ * agruparlo y cómo sigue el circuito sin que haga nada, en un carrusel que
+ * termina acá. La decide `stores.onboarded_at` y no el catálogo, porque un
+ * negocio puede cargar su primer producto sin haber terminado de entender cómo
+ * funciona el resto. Se puede volver a abrir con `?guia=1`.
+ *
+ * Terminada la guía, es su panel: los números de los últimos 30 días primero,
+ * lo que espera una acción después, y el catálogo con su stock.
  */
-export default async function PanelPage() {
+export default async function PanelPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ guia?: string; paso?: string }>
+}) {
   const tienda = await getMiTienda()
 
   // Sin credenciales el modo demo tiene que seguir siendo navegable: no hay
   // tienda que buscar ni alta que completar.
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
-  const [resumenReal, catalogo] = await Promise.all([
+  const { guia, paso } = await searchParams
+  const [resumenReal, catalogo, tramos] = await Promise.all([
     getResumenPanel(),
     getCatalogo(),
+    getTramos(),
   ])
   const resumen = resumenReal ?? RESUMEN_DEMO
 
-  // Sin un solo producto no hay catálogo, ni pedidos, ni nada que promocionar:
-  // lo único útil es explicar cómo sigue.
-  if (catalogo.productos.length === 0) {
-    return <PrimerosPasos nombre={resumen.tienda.name} />
+  // En modo demo no hay nadie que termine la guía: se muestra el panel, y la
+  // guía queda a un clic en la barra lateral.
+  const guiaPendiente = isSupabaseConfigured && !tienda?.onboarded_at
+  if (guiaPendiente || guia === "1" || paso) {
+    return (
+      <GuiaDeInicio
+        nombre={resumen.tienda.name}
+        pasoInicial={Number(paso) || 1}
+        productos={catalogo.productos.length}
+        categorias={catalogo.categorias.length}
+        tramos={tramos}
+        terminar={terminarGuia}
+      />
+    )
   }
 
   const url = urlDeTienda(resumen.tienda.slug)
@@ -159,16 +175,14 @@ export default async function PanelPage() {
           href={`/t/${resumen.tienda.slug}`}
           className="group inline-flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-5 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
         >
-          Ver mi tienda
+          Ver mi página
           <ArrowUpRight aria-hidden="true" className="size-4" />
         </Link>
       </div>
 
-      <AvisoSuscripcion suscripcion={resumen.suscripcion} />
-
       <section>
         <Encabezado
-          etiqueta="Últimos 30 días"
+          etiqueta="Tu negocio en los últimos 30 días"
           accion={{ href: "/panel/estadisticas", texto: "Ver estadísticas" }}
         />
         <div className="mt-6 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -213,37 +227,106 @@ export default async function PanelPage() {
         <Encabezado
           etiqueta="Tu catálogo"
           titulo={
-            catalogo.productos.length === 1
-              ? "1 producto publicado"
-              : `${formatNumber(catalogo.productos.length)} productos publicados`
+            catalogo.productos.length === 0
+              ? "Todavía sin productos"
+              : catalogo.productos.length === 1
+                ? "1 producto publicado"
+                : `${formatNumber(catalogo.productos.length)} productos publicados`
           }
-          accion={{ href: "/panel/productos", texto: "Ver todo" }}
+          accion={
+            catalogo.productos.length > 0
+              ? { href: "/panel/productos", texto: "Ver todo" }
+              : undefined
+          }
         />
         <p className="mt-3 max-w-[58ch] text-sm leading-relaxed opacity-70">
-          El precio que ve quien compra sale de lo que tú quieres recibir: le
-          sumamos la comisión del promotor y nuestra parte. Acá ajustas el stock
-          sin entrar a cada producto.
+          {catalogo.productos.length === 0
+            ? "Sin productos no hay nada que los promotores puedan elegir. Cárgalos uno por uno o todos juntos desde un Excel."
+            : "El precio que ve quien compra sale de lo que tú quieres recibir: le sumamos la comisión del promotor y nuestra parte. Acá ajustas el stock sin entrar a cada producto."}
         </p>
 
-        <div className="mt-8">
-          <ListaProductos
-            productos={ultimos}
-            soloLectura={catalogo.esDemo}
-            acciones={{
-              alternar: alternarProducto,
-              ajustarStock,
-              borrar: borrarProducto,
-            }}
-          />
-        </div>
+        {catalogo.productos.length > 0 ? (
+          <div className="mt-8">
+            <ListaProductos
+              productos={ultimos}
+              soloLectura={catalogo.esDemo}
+              acciones={{
+                alternar: alternarProducto,
+                ajustarStock,
+                borrar: borrarProducto,
+              }}
+            />
+          </div>
+        ) : null}
 
-        <Link
-          href="/panel/productos/nuevo"
-          className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-plantilla border-2 border-tinta px-5 font-semibold transition-colors hover:bg-tinta hover:text-papel"
-        >
-          <Plus aria-hidden="true" className="size-4" />
-          Cargar otro producto
-        </Link>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/panel/productos/nuevo"
+            className={cn(
+              catalogo.productos.length === 0
+                ? BOTON_PRIMARIO
+                : BOTON_SECUNDARIO,
+              "sm:w-auto"
+            )}
+          >
+            <Plus aria-hidden="true" className="size-4" />
+            {catalogo.productos.length === 0
+              ? "Cargar un producto"
+              : "Cargar otro producto"}
+          </Link>
+          <Link
+            href="/panel/productos/importar"
+            className={cn(BOTON_SECUNDARIO, "sm:w-auto")}
+          >
+            <FileSpreadsheet aria-hidden="true" className="size-4" />
+            Cargar desde un Excel
+          </Link>
+        </div>
+      </section>
+
+      <section className="border-t-2 border-tinta pt-8">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
+          <div>
+            <Encabezado
+              etiqueta="Tus números"
+              titulo="Pregúntale a tu negocio"
+            />
+            <p className="mt-3 max-w-[48ch] text-sm leading-relaxed opacity-70">
+              Escribes una pregunta como se la harías a alguien y te responde
+              con un gráfico hecho con tus ventas. Solo se leen tus datos.
+            </p>
+            <Link
+              href="/panel/estadisticas"
+              className={cn(BOTON_SECUNDARIO, "mt-6 w-full sm:w-auto")}
+            >
+              <BarChart3 aria-hidden="true" className="size-4" />
+              Abrir mis estadísticas
+            </Link>
+          </div>
+
+          <ul className="border-t border-tinta/15">
+            {[
+              "¿Qué producto se vendió más este mes?",
+              "¿Cuánto vendí por semana en los últimos tres meses?",
+              "¿Qué promotores me trajeron más ventas?",
+            ].map((pregunta) => (
+              <li key={pregunta}>
+                <Link
+                  href="/panel/estadisticas"
+                  className="group flex min-h-11 items-center justify-between gap-4 border-b border-tinta/15 py-4 text-sm transition-colors hover:text-senal"
+                >
+                  <span className="font-titular font-bold tracking-[-0.01em]">
+                    {pregunta}
+                  </span>
+                  <ArrowUpRight
+                    aria-hidden="true"
+                    className="size-4 shrink-0 opacity-40 transition-opacity group-hover:opacity-100"
+                  />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       {pendientes.length > 0 ? (
@@ -325,7 +408,7 @@ export default async function PanelPage() {
             />
           </div>
           <p className="mt-3 text-sm leading-relaxed opacity-55">
-            Imprímelo y pégalo donde vendes. Lleva directo a tu tienda.
+            Imprímelo y pégalo donde vendes. Lleva directo a tu página.
           </p>
         </div>
       </section>

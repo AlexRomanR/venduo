@@ -28,6 +28,15 @@ import { cn } from "@/lib/utils"
  * venir del color. Viene de la posición y de la etiqueta directa.
  */
 
+/**
+ * Lo que el dibujo necesita de una consulta. No pide el SQL ni las vistas: el
+ * panel del promotor dibuja series que calcula él, sin pasar por la IA.
+ */
+export type EspecGrafico = Pick<
+  InsightSql,
+  "titulo" | "explicacion" | "grafico" | "formato"
+>
+
 const ALTO = 260
 const MARGEN = { arriba: 16, derecha: 12, abajo: 28, izquierda: 56 }
 
@@ -76,7 +85,7 @@ function useAncho() {
 }
 
 interface Props {
-  spec: InsightSql
+  spec: EspecGrafico
   filas: FilaInsight[]
 }
 
@@ -139,7 +148,7 @@ function Numero({
   formato,
 }: {
   fila: FilaInsight
-  spec: InsightSql
+  spec: EspecGrafico
   formato: (v: number) => string
 }) {
   return (
@@ -164,7 +173,7 @@ function Serie({
   formatoCorto,
 }: {
   filas: FilaInsight[]
-  spec: InsightSql
+  spec: EspecGrafico
   formatoCompleto: (v: number) => string
   formatoCorto: (v: number) => string
 }) {
@@ -427,7 +436,7 @@ function Tabla({
   formato,
 }: {
   filas: FilaInsight[]
-  spec: InsightSql
+  spec: EspecGrafico
   formato: (v: number) => string
 }) {
   return (
@@ -479,7 +488,7 @@ function etiquetaCorta(valor: string) {
   return valor
 }
 
-export function Leyenda({ spec }: { spec: InsightSql }) {
+export function Leyenda({ spec }: { spec: EspecGrafico }) {
   return (
     <p className={cn("text-xs leading-relaxed opacity-45")}>
       {spec.explicacion}

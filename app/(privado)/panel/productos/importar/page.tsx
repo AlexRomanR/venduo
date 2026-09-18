@@ -3,23 +3,32 @@ import { redirect } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 
 import { getCatalogo } from "@/lib/data/catalogo"
-import { getTramos } from "@/lib/data/precios"
 import { getMiTienda } from "@/lib/data/panel"
+import { getTramos } from "@/lib/data/precios"
 import { isSupabaseConfigured } from "@/lib/env"
-import { FormularioProducto } from "@/components/productos/formulario"
-import { guardarProducto } from "../acciones"
+import { ImportarPlanilla } from "@/components/productos/importar"
+import { importarProductos } from "../acciones"
 
-export const metadata = { title: "Nuevo producto" }
+export const metadata = { title: "Cargar desde Excel" }
 
-export default async function NuevoProductoPage({
+/**
+ * Cargar el catálogo desde una planilla.
+ *
+ * Existe porque el negocio que llega con cuarenta productos no va a llenar
+ * cuarenta formularios, y probablemente ya los tiene anotados en un Excel. Se
+ * entra desde la guía del primer ingreso y desde la lista de productos; `desde`
+ * dice a cuál volver.
+ */
+export default async function ImportarPage({
   searchParams,
 }: {
   searchParams: Promise<{ desde?: string }>
 }) {
-  // Desde la guía del primer ingreso se vuelve a ella, al paso donde estaba.
-  const desdeGuia = (await searchParams).desde === "guia"
   const tienda = await getMiTienda()
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
+
+  const { desde } = await searchParams
+  const desdeGuia = desde === "guia"
 
   const [{ categorias }, tramos] = await Promise.all([
     getCatalogo(),
@@ -27,7 +36,7 @@ export default async function NuevoProductoPage({
   ])
 
   return (
-    <div className="mx-auto w-full max-w-3xl">
+    <div className="mx-auto w-full max-w-4xl">
       <Link
         href={desdeGuia ? "/panel?paso=1" : "/panel/productos"}
         className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
@@ -40,20 +49,20 @@ export default async function NuevoProductoPage({
       </Link>
 
       <h1 className="mt-6 max-w-[18ch] font-titular text-[clamp(1.75rem,5vw,2.5rem)] leading-[1.02] font-extrabold tracking-[-0.03em]">
-        Un producto nuevo.
+        Carga todo tu catálogo de una vez.
       </h1>
-      <p className="mt-3 max-w-[56ch] text-sm leading-relaxed opacity-70">
-        Lo mínimo es el nombre, cuánto quieres recibir por él y cuántas unidades
-        tienes. Lo demás hace que se venda mejor, y lo puedes completar después.
+      <p className="mt-3 max-w-[58ch] text-sm leading-relaxed opacity-70">
+        Llena la plantilla con lo que vendes y cuánto quieres recibir por cada
+        cosa. Nosotros calculamos el precio de cada uno y te lo mostramos antes
+        de cargar.
       </p>
 
       <div className="mt-12">
-        <FormularioProducto
-          tiendaId={tienda?.id ?? "demo"}
-          categorias={categorias}
+        <ImportarPlanilla
           tramos={tramos}
-          guardar={guardarProducto}
-          destino={desdeGuia ? "/panel?paso=1" : "/panel/productos"}
+          categoriasExistentes={categorias.map((c) => c.name)}
+          importar={importarProductos}
+          destino={desdeGuia ? "/panel?paso=2" : "/panel/productos"}
         />
       </div>
     </div>

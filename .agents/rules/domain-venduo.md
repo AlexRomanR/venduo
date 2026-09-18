@@ -30,8 +30,10 @@ Acá van las reglas que, si se ignoran, producen código que parece correcto y n
 `lib/precio.ts`, que recibe los tramos leídos de la base: no hay una copia de los
 porcentajes en el código.
 
-**Falta:** congelar los tres componentes en el pedido. `create_order` todavía calcula la
-comisión con `stores.commission_bps`, del modelo anterior.
+**Construido también:** `create_order` congela los tres componentes en el pedido
+(`base_cost_cents`, `take_cents`, `commission_cents`). Por línea, el take-rate se redondea
+al centavo y la comisión es lo que falta para llegar al precio, así suman exacto.
+`stores.commission_bps` ya no interviene.
 
 ## La asimetría que define el modelo
 
@@ -72,8 +74,12 @@ del precio cuando no hay vendedor: eso daría dos precios para el mismo producto
   se normaliza en un solo lugar; dos formas de escribir el mismo número son dos
   compradores distintos, y eso le roba la comisión a alguien.
 
-**Hoy en el repositorio:** la atribución no existe. El código de referido solo vale para la
-venta en la que se usó.
+**Construido:** `buyer_attributions`, con la llave de `normalizar_telefono()` y la ventana
+de `ventana_de_atribucion()` (90 días). La crea el disparador cuando se **cobra** el
+primer pedido que trajo un promotor —uno que se cancela no trajo a nadie—, con un candado
+por comprador. `create_order` la busca solo si no hay código válido, y la guarda en
+`orders.attributed_seller_user_id`. El dueño no cobra indirecta por lo que le compran a
+él.
 
 ## Comisiones: el congelamiento
 
@@ -111,7 +117,8 @@ inventado el día que alguien cambie dos veces de estado.
 
 > **Hoy el disparador no sigue esta tabla.** Crea la comisión directamente `confirmada` al
 > pasar a `pagado`, porque se escribió para el flujo provisorio sin custodia. Al construir
-> la pasarela hay que cambiarlo, sumar `en_disputa` al enum y sumar `kind` a la comisión.
+> la pasarela hay que cambiarlo y sumar `en_disputa` al enum. `commissions.kind` ya existe:
+> `directa` o `indirecta`.
 
 ## El historial laboral del vendedor
 
@@ -162,11 +169,15 @@ decide RLS. Sirve solo para elegir qué pantalla mostrar primero.
 - `products.seller_enabled` sigue mandando sobre si un producto se puede tomar. Nace en
   `true`.
 
-**Hoy en el repositorio:** está el modelo anterior completo —`store_sellers` con
-`pendiente`/`activo`, `seller_join_mode`, `store_invites`, `join_store()` y
-`take_product()`—. `take_product` es lo más cercano a lo vigente. Mientras siga ahí, sus
-reglas valen: el vínculo lo escriben esas funciones y no el cliente, y `store_invites`
-sigue sin políticas.
+**Construido:** `seller_products` registra qué tomó cada promotor. `take_product` no mira
+`seller_network_enabled` ni espera aprobación, y `release_product` lo saca de su lista sin
+invalidar el enlace que ya circula.
+
+El código de referido sigue viviendo en `store_sellers`, uno por promotor y negocio: es un
+detalle interno que nadie aprueba, y lo crea `take_product`. Lo del modelo anterior
+—`seller_join_mode`, `store_invites`, `join_store()`— sigue en la base sin pantalla. Sus
+reglas valen mientras esté: el vínculo lo escriben esas funciones y no el cliente, y
+`store_invites` sigue sin políticas.
 
 ### El código de referido se propaga, no se valida en el navegador
 

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 
-import { getMiTienda, getPerfil, getVinculosDeVendedor } from "@/lib/data/panel"
+import { getMiTienda, getPerfil } from "@/lib/data/panel"
 import { FormularioNegocio } from "@/components/onboarding/formulario-negocio"
 import { Pasos, PASOS_CREAR } from "@/components/onboarding/pasos"
 
@@ -30,8 +30,7 @@ export default async function CrearPage({
   // insistir con `?abrir=1`, porque el rol es una intención y no un permiso:
   // una misma persona puede terminar produciendo y promocionando.
   if (perfil?.primary_role === "vendedor" && abrir !== "1" && !tienda) {
-    const vinculos = await getVinculosDeVendedor()
-    redirect(vinculos.length > 0 ? "/vendedor" : "/sumarme")
+    redirect("/vendedor")
   }
 
   return (

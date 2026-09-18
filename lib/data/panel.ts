@@ -43,17 +43,18 @@ export async function getPerfil() {
  * el navegador navega una vez sola.
  */
 export async function resolverDestino(): Promise<string> {
-  const [tienda, vinculos, perfil] = await Promise.all([
+  const [tienda, promociona, perfil] = await Promise.all([
     getMiTienda(),
-    getVinculosDeVendedor(),
+    tieneEnlaces(),
     getPerfil(),
   ])
 
   // Ser dueño gana: es el vínculo más fuerte con la plataforma.
   if (tienda?.template_key) return "/panel"
   if (tienda) return "/crear"
-  if (vinculos.length > 0) return "/vendedor"
-  if (perfil?.primary_role === "vendedor") return "/sumarme"
+  // El promotor entra a su panel tenga o no productos: sin ellos, el panel es
+  // la bienvenida que le explica cómo empezar.
+  if (promociona || perfil?.primary_role === "vendedor") return "/vendedor"
 
   return "/crear"
 }
@@ -77,7 +78,7 @@ export async function getMiTienda() {
   const { data } = await supabase
     .from("stores")
     .select(
-      "id, name, slug, is_published, template_key, commission_bps, seller_network_enabled"
+      "id, name, slug, is_published, template_key, commission_bps, seller_network_enabled, onboarded_at"
     )
     .eq("owner_id", user.id)
     .is("deleted_at", null)
@@ -116,8 +117,8 @@ export async function getResumenPanel(): Promise<ResumenPanel | null> {
         .eq("store_id", tienda.id)
         .in("status", ["pendiente", "pagado"]),
       supabase
-        .from("store_sellers")
-        .select("status")
+        .from("seller_products")
+        .select("user_id")
         .eq("store_id", tienda.id)
         .is("deleted_at", null),
       supabase
@@ -134,7 +135,6 @@ export async function getResumenPanel(): Promise<ResumenPanel | null> {
 
   // Un pedido cancelado no es una venta: no suma al período ni al conteo.
   const vivos = (pedidos.data ?? []).filter((p) => p.status !== "cancelado")
-  const vinculos = vendedores.data ?? []
 
   return {
     tienda: {
@@ -147,9 +147,10 @@ export async function getResumenPanel(): Promise<ResumenPanel | null> {
     ventasCents: vivos.reduce((acc, p) => acc + p.total_cents, 0),
     pedidos: vivos.length,
     pedidosPendientes: pendientes.count ?? 0,
-    vendedoresActivos: vinculos.filter((v) => v.status === "activo").length,
-    vendedoresPendientes: vinculos.filter((v) => v.status === "pendiente")
-      .length,
+    // Nadie aprueba promotores: activo es quien tomó al menos un producto.
+    vendedoresActivos: new Set((vendedores.data ?? []).map((v) => v.user_id))
+      .size,
+    vendedoresPendientes: 0,
     productos: productos.count ?? 0,
     suscripcion: resolverSuscripcion(suscripcion.data),
     esDemo: false,
@@ -179,112 +180,125 @@ function resolverSuscripcion(
   }
 }
 
-/**
- * El código de invitación de mi tienda.
- *
- * Pasa por la función y no por un `select`: `store_invites` tiene RLS activo y
- * cero políticas, así que ni el dueño la lee directamente. Si fuera una
- * columna de `stores`, la política de lectura pública la expondría a
- * cualquiera que consulte una tienda publicada.
- */
-export async function getMiInvitacion(): Promise<string | null> {
-  const supabase = await createClient()
-  if (!supabase) return null
-
-  const { data } = await supabase.rpc("my_seller_invite")
-  return data ?? null
-}
-
-export interface VendedorDeMiTienda {
-  id: string
+export interface PromotorDeMiNegocio {
+  userId: string
   nombre: string
-  status: string
-  referralCode: string
-  joinedAt: string
+  /** Su perfil público, si lo armó. */
+  slug: string | null
+  productos: string[]
+  desde: string | null
+  ventas: number
+  indirectas: number
+  comisionCents: number
 }
 
-/** Los vendedores vinculados a mi tienda, para aprobarlos y seguirlos. */
-export async function getVendedoresDeMiTienda(): Promise<VendedorDeMiTienda[]> {
+/**
+ * Quién promociona lo mío, qué productos y cuánto me vendió.
+ *
+ * Nadie se suma al negocio entero ni espera aprobación: un promotor aparece
+ * acá cuando toma un producto, o cuando cobró una comisión de este negocio
+ * aunque ya no lo tenga en su lista. El nombre sale de `seller_profiles`, que
+ * es público a propósito; `profiles` solo deja leer el propio.
+ */
+export async function getPromotoresDeMiNegocio(): Promise<{
+  promotores: PromotorDeMiNegocio[]
+  productosPromocionados: number
+}> {
+  const vacio = { promotores: [], productosPromocionados: 0 }
   const supabase = await createClient()
-  if (!supabase) return []
+  if (!supabase) return vacio
 
   const tienda = await getMiTienda()
-  if (!tienda) return []
+  if (!tienda) return vacio
 
-  const { data } = await supabase
-    .from("store_sellers")
-    .select("id, user_id, status, referral_code, joined_at")
-    .eq("store_id", tienda.id)
-    .is("deleted_at", null)
-    .order("joined_at", { ascending: false })
+  const [tomados, comisiones] = await Promise.all([
+    supabase
+      .from("seller_products")
+      .select("user_id, product_id, taken_at, products(name)")
+      .eq("store_id", tienda.id)
+      .is("deleted_at", null)
+      .order("taken_at"),
+    supabase
+      .from("commissions")
+      .select("seller_user_id, amount_cents, kind, status")
+      .eq("store_id", tienda.id)
+      .neq("status", "anulada"),
+  ])
 
-  if (!data || data.length === 0) return []
+  const porPromotor = new Map<string, PromotorDeMiNegocio>()
+  const fila = (userId: string) => {
+    let actual = porPromotor.get(userId)
+    if (!actual) {
+      actual = {
+        userId,
+        nombre: "Promotor",
+        slug: null,
+        productos: [],
+        desde: null,
+        ventas: 0,
+        indirectas: 0,
+        comisionCents: 0,
+      }
+      porPromotor.set(userId, actual)
+    }
+    return actual
+  }
 
-  // El nombre sale de `seller_profiles` y no de `profiles`: la política de
-  // `profiles` solo deja leer el propio, mientras que el perfil de vendedor es
-  // público a propósito —es su historial laboral verificable—. Son dos
-  // consultas porque no hay relación declarada entre las tablas.
-  const { data: perfiles } = await supabase
-    .from("seller_profiles")
-    .select("user_id, display_name")
-    .in(
-      "user_id",
-      data.map((vinculo) => vinculo.user_id)
-    )
-    .is("deleted_at", null)
+  for (const t of tomados.data ?? []) {
+    const actual = fila(t.user_id)
+    if (t.products?.name) actual.productos.push(t.products.name)
+    actual.desde ??= t.taken_at
+  }
 
-  const nombres = new Map(
-    (perfiles ?? []).map((perfil) => [perfil.user_id, perfil.display_name])
-  )
+  for (const c of comisiones.data ?? []) {
+    const actual = fila(c.seller_user_id)
+    if (c.kind === "directa") actual.ventas += 1
+    else actual.indirectas += 1
+    actual.comisionCents += c.amount_cents
+  }
 
-  return data.map((vinculo) => ({
-    id: vinculo.id,
-    nombre: nombres.get(vinculo.user_id) ?? "Vendedor",
-    status: vinculo.status,
-    referralCode: vinculo.referral_code,
-    joinedAt: vinculo.joined_at,
-  }))
+  if (porPromotor.size > 0) {
+    const { data: perfiles } = await supabase
+      .from("seller_profiles")
+      .select("user_id, display_name, slug")
+      .in("user_id", [...porPromotor.keys()])
+      .is("deleted_at", null)
+
+    for (const perfil of perfiles ?? []) {
+      const actual = porPromotor.get(perfil.user_id)
+      if (!actual) continue
+      actual.nombre = perfil.display_name
+      actual.slug = perfil.slug
+    }
+  }
+
+  return {
+    promotores: [...porPromotor.values()].sort(
+      (a, b) =>
+        b.comisionCents - a.comisionCents ||
+        b.productos.length - a.productos.length
+    ),
+    productosPromocionados: new Set(
+      (tomados.data ?? []).map((t) => t.product_id)
+    ).size,
+  }
 }
 
-export interface VinculoVendedor {
-  id: string
-  storeId: string
-  storeName: string
-  storeSlug: string
-  status: string
-  referralCode: string
-}
-
-/**
- * Las tiendas donde la persona trabaja como vendedora.
- *
- * Acá es donde el modelo cruza tenants: un vendedor pertenece a varias
- * tiendas, así que esto no es una comparación contra `my_store_id()`.
- * Devuelve también los vínculos pendientes de aprobación, porque quien está
- * esperando necesita ver que su solicitud existe.
- */
-export async function getVinculosDeVendedor(): Promise<VinculoVendedor[]> {
+/** Si la persona promociona algún producto. Decide a dónde entra. */
+export async function tieneEnlaces(): Promise<boolean> {
   const supabase = await createClient()
-  if (!supabase) return []
+  if (!supabase) return false
 
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) return []
+  if (!user) return false
 
-  const { data } = await supabase
-    .from("store_sellers")
-    .select("id, store_id, status, referral_code, stores(name, slug)")
+  const { count } = await supabase
+    .from("seller_products")
+    .select("id", { count: "exact", head: true })
     .eq("user_id", user.id)
     .is("deleted_at", null)
-    .order("joined_at", { ascending: false })
 
-  return (data ?? []).map((vinculo) => ({
-    id: vinculo.id,
-    storeId: vinculo.store_id,
-    storeName: vinculo.stores?.name ?? "Tienda",
-    storeSlug: vinculo.stores?.slug ?? "",
-    status: vinculo.status,
-    referralCode: vinculo.referral_code,
-  }))
+  return (count ?? 0) > 0
 }

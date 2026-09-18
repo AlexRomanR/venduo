@@ -2,7 +2,8 @@
 
 Qué está construido y qué falta, medido contra el **modelo vigente**
 (`docs/modelo-de-negocio.md`) y el alcance del MVP de `VENDUO.md` §6.
-Actualizado el 17 de septiembre de 2026, con el cambio de enfoque a Marketplace.
+Actualizado el 18 de septiembre de 2026: panel del promotor, atribución del comprador y
+precio congelado en la venta.
 
 **Leyenda:** ✅ sirve tal cual · 🟡 existe pero hay que rehacerlo · ❌ falta · ⛔ fuera del
 modelo
@@ -34,15 +35,15 @@ es que responde a otras reglas. Abajo, qué se salva, qué se rehace y en qué o
 | --- | ----------------------------------------------------------------- | ------ |
 | 1   | Registro y login de los dos lados                                 | ✅     |
 | 2   | Productos con imagen, stock y condición, declarando el costo base | ✅     |
-| 3   | Precio calculado por rango: costo base + comisión + take-rate     | 🟡     |
+| 3   | Precio calculado por rango: costo base + comisión + take-rate     | ✅     |
 | 4   | Marketplace navegable en móvil                                    | 🟡     |
-| 5   | El joven elige productos y obtiene su enlace y su QR              | 🟡     |
+| 5   | El joven elige productos y obtiene su enlace y su QR              | ✅     |
 | 6   | Carrito y checkout con datos del comprador                        | ✅     |
 | 7   | Pago por PagoFácil con custodia, sobre una pasarela simulada      | 🟡     |
 | 8   | Reparto a tres: negocio, joven y plataforma                       | ❌     |
-| 9   | Atribución del comprador al promotor, con su ventana              | ❌     |
-| 10  | Comisión indirecta y retorno al negocio                           | ❌     |
-| 11  | Panel del joven: ventas, comisiones, materiales                   | 🟡     |
+| 9   | Atribución del comprador al promotor, con su ventana              | ✅     |
+| 10  | Comisión indirecta y retorno al negocio                           | ✅     |
+| 11  | Panel del joven: ventas, comisiones, materiales                   | ✅     |
 | 12  | Estadísticas en lenguaje natural                                  | ✅     |
 | 13  | Copys de marketing y publicación en redes                         | ❌     |
 | 14  | Entrega por WhatsApp con confirmación de envío y recepción        | 🟡     |
@@ -59,9 +60,39 @@ es que responde a otras reglas. Abajo, qué se salva, qué se rehace y en qué o
   recibes, cuánto gana el promotor, cuánto Venduo y a cuánto se publica.
 - **La portada** cuenta el modelo nuevo, con la cuenta hecha y los porcentajes reales.
 - **El alta del negocio es una sola pantalla**: ya no se elige plantilla.
-- **La entrada del panel tiene dos caras**: guía de primeros pasos sin productos, y el
-  catálogo con su stock cuando ya hay.
+- **El primer ingreso del negocio es una guía en carrusel** de cinco pasos: cargar lo
+  que vende, agruparlo en categorías, y los tres que resuelve Venduo —los promotores
+  eligen, avisamos la venta, la entrega va por WhatsApp—. La decide
+  `stores.onboarded_at`, no el catálogo; "Finalizar" la marca y lleva al panel con
+  cifras, catálogo con stock editable y acceso a las estadísticas. Se vuelve a abrir
+  desde "Cómo funciona Venduo" en la barra lateral (`/panel?guia=1`).
+- **Carga desde Excel** (`/panel/productos/importar`): plantilla descargable en
+  `public/plantillas/productos-venduo.xlsx`, revisión fila por fila con el precio
+  publicado antes de cargar, y las categorías nuevas se crean solas. Hasta 200 filas.
 - **Se dice "promotor"** en el panel, la portada y el registro.
+- **El promotor elige productos, no tiendas.** `seller_products` registra qué tomó cada
+  uno; `take_product` ya no mira si la tienda "acepta vendedores" ni espera aprobación, y
+  `release_product` lo saca de su lista sin invalidar el enlace que ya circula.
+- **La atribución del comprador existe.** `buyer_attributions`, por teléfono normalizado
+  (`normalizar_telefono`) y 90 días (`ventana_de_atribucion()`). Nace cuando se cobra el
+  primer pedido que trajo un promotor; el primero manda. Se reconstruyó desde los pedidos
+  cobrados que ya había. Sin políticas: el promotor la lee censurada por
+  `mis_compradores()`.
+- **`create_order` congela los tres componentes** (`orders.base_cost_cents`,
+  `take_cents`, `commission_cents`) y resuelve quién cobra: el promotor del enlace, el
+  asociado al comprador (comisión **indirecta**, con `commissions.kind`) o nadie, y vuelve
+  al negocio. Los pedidos anteriores conservan lo que se congeló entonces.
+- **El panel del promotor** (`/vendedor`): sin productos es una bienvenida con
+  calculadora de ganancias, los pasos, productos para empezar, los porcentajes y
+  preguntas; con productos, sus cifras, la ganancia por semana, un próximo paso calculado,
+  sus enlaces y sus compradores. Secciones: Catálogo, Mis enlaces (con WhatsApp, copiar y
+  QR), Compradores, Ganancias y Estadísticas.
+- **`/sumarme` y `/explorar/*` redirigen** al panel del promotor. Unirse a una tienda y
+  las invitaciones ya no tienen pantalla.
+- **La pantalla de Promotores del negocio** muestra quién promociona qué y cuánto vendió;
+  ya no hay invitación ni aprobación. `/cuenta` dejó de ofrecer "acepto vendedores" y el
+  porcentaje de comisión.
+- **La barra lateral** perdió Marketing, Apariencia y "Gana extra".
 
 ---
 
@@ -86,24 +117,16 @@ es que responde a otras reglas. Abajo, qué se salva, qué se rehace y en qué o
 
 ## Lo que hay que rehacer
 
-### 1. Congelar el precio en la venta — prioridad alta
+### 1. Mostrar el reparto — prioridad media
 
-El motor de precio **ya está construido** (ver más abajo). Lo que falta es que el pedido
-se quede con una copia:
+El pedido ya congela costo base, comisión y take-rate. Falta mostrarlo en el detalle del
+pedido del negocio: cuánto va a cada parte, y si la comisión fue directa, indirecta o
+volvió a él.
 
-- Congelar los tres componentes en `orders` y en `order_items`: costo base, comisión y
-  take-rate, con sus porcentajes.
-- Cambiar `create_order`, que todavía calcula la comisión con `stores.commission_bps`, del
-  modelo anterior.
-- Mostrar el reparto en el detalle del pedido: cuánto va a cada parte.
+### 2. Comisión indirecta en el perfil público — prioridad media
 
-### 2. Atribución del comprador y comisión indirecta — prioridad alta
-
-- Crear `buyer_attributions` y decidir **cómo se reconoce a un comprador** entre compras
-  (decisión abierta).
-- Sumar `kind` a `commissions` y resolver en `create_order` quién cobra: el joven del
-  enlace, el promotor asociado o el negocio.
-- Mostrar las dos clases por separado en el panel del joven y en su perfil público.
+El panel del promotor ya separa lo vendido de lo generado por compradores traídos. Falta
+lo mismo en `/v/{slug}`: `seller_public_stats` todavía no mira `commissions.kind`.
 
 ### 3. El Marketplace — prioridad alta
 
@@ -113,11 +136,13 @@ central: portada, búsqueda, filtros, ficha de producto y página del negocio.
 Buena parte se puede reusar: los filtros, el orden, la búsqueda, las tarjetas de producto y
 el carrito ya están escritos y no dependen de la tienda.
 
-### 4. El joven elige productos — prioridad media
+### 4. El código por producto — prioridad baja
 
-Reemplazar el vínculo con una tienda (`store_sellers`, aprobación, invitaciones) por
-`seller_products`: tomar un producto del Marketplace y recibir enlace y QR propios.
-`take_product()` es lo más parecido que ya existe.
+`VENDUO.md` §8 pide un código por producto en `seller_products`. Hoy el código sigue siendo
+por promotor y negocio, en `store_sellers`, que quedó como un detalle interno que nadie
+aprueba: el carrito lleva un solo código por tienda y `orders.seller_id` apunta a ese
+vínculo. Para el promotor no cambia nada —cada producto tiene su enlace—, pero todos los
+productos de un mismo negocio comparten el código.
 
 ### 5. El cobro con custodia y el reparto a tres — prioridad alta
 
@@ -134,8 +159,8 @@ Sigue pendiente de antes, y ahora con un destinatario más.
 
 ### 6. Marketing — prioridad baja
 
-`/panel/marketing` sigue siendo un marcador "Pronto". La tarea `generateCampaign` existe en
-la capa de IA y no se usa.
+Se sacó de la barra lateral y del panel. `/panel/marketing` sigue existiendo como marcador y
+la tarea `generateCampaign` de la capa de IA no se usa.
 
 ---
 
@@ -144,13 +169,13 @@ la capa de IA y no se usa.
 Está construido, funciona y **no se borró**. Qué se hace con cada cosa es una decisión
 pendiente; mientras tanto, no construir encima.
 
-| Qué                                                             | Dónde                                          |
-| --------------------------------------------------------------- | ---------------------------------------------- |
-| ⛔ Tienda online por negocio, con plantillas Pasarela y Esencia | `docs/store-templates.md`, `app/t/[slug]`      |
-| ⛔ Cambio de plantilla e historial de diseño                    | `/panel/apariencia`, `store_design_versions`   |
-| ⛔ Editor de bloques con IA (preparado, nunca implementado)     | skill `visual-block-editor`                    |
-| ⛔ Suscripción, planes y bloqueo al vencer la prueba            | `plans`, `subscriptions`                       |
-| ⛔ Red de vendedores por tienda, con aprobación e invitaciones  | `store_sellers`, `store_invites`, `join_store` |
+| Qué                                                             | Dónde                                             |
+| --------------------------------------------------------------- | ------------------------------------------------- |
+| ⛔ Tienda online por negocio, con plantillas Pasarela y Esencia | `docs/store-templates.md`, `app/t/[slug]`         |
+| ⛔ Cambio de plantilla e historial de diseño                    | `/panel/apariencia`, `store_design_versions`      |
+| ⛔ Editor de bloques con IA (preparado, nunca implementado)     | skill `visual-block-editor`                       |
+| ⛔ Suscripción, planes y bloqueo al vencer la prueba            | `plans`, `subscriptions`                          |
+| ⛔ Red de vendedores por tienda, con aprobación e invitaciones  | `store_invites`, `join_store`, `seller_join_mode` |
 
 Dos de esas piezas se pueden reciclar casi enteras: la **página del negocio** dentro del
 Marketplace puede salir de lo que hoy es la portada de su tienda, y el patrón de
@@ -164,12 +189,10 @@ se construya después.
 Ninguna frena empezar; todas frenan operar con dinero real. Las siete están en
 `docs/modelo-de-negocio.md` §8. Las tres que bloquean más código:
 
-1. **La tabla de rangos.** Sin los cortes y los porcentajes no se puede sembrar
-   `pricing_tiers`. Hay una propuesta lista para revisar.
-2. **Cómo se reconoce a un comprador** entre compras sin pedirle cuenta. Define la llave de
-   `buyer_attributions`, y cambiarla después es migrar datos reales.
-3. **La ventana de atribución**: se proponen 90 días. Al comprador se lo reconoce por su
-   teléfono, que ya está decidido.
+1. **La tabla de rangos.** Está sembrada con la propuesta; confirmarla o ajustarla es
+   editar `pricing_tiers`, y las ventas ya hechas no cambian.
+2. **La ventana de atribución**: se usan 90 días, en `ventana_de_atribucion()`. Cambiarla
+   es cambiar esa función; las atribuciones creadas conservan su vencimiento.
 
 ---
 
@@ -179,8 +202,9 @@ Ninguna frena empezar; todas frenan operar con dinero real. Las siete están en
   con ellas. Importante antes de la demostración.
 - **Los datos de ejemplo siguen el modelo anterior** en todo lo demás: ocho tiendas con su
   plantilla y una red de vendedores por tienda. Sus precios ya se migraron a costo base.
-- **El término "vendedor" sigue en pantalla** en el panel del promotor, las vitrinas de
-  `/explorar` y la tienda pública. Falta la pasada completa.
+- **El término "vendedor" sigue en pantalla** en la tienda pública y en las plantillas.
+- **No se vio el panel del promotor con datos reales** en el navegador: se probó con una
+  cuenta nueva. Revisarlo entrando como `ana@demo.venduo.bo`.
 - **`.env.example`** no tiene `NEXT_PUBLIC_DOMINIO_TIENDAS`.
 - **El rojo de Venduo** está a 4,35:1 contra el papel, apenas por debajo del mínimo AA para
   texto chico.

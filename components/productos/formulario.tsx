@@ -141,12 +141,15 @@ export function FormularioProducto({
   tramos,
   producto,
   guardar,
+  destino = "/panel/productos",
 }: {
   tiendaId: string
   categorias: ProductCategory[]
   /** Los tramos vigentes, para mostrar el desglose mientras se escribe. */
   tramos: Tramo[]
   producto?: Product
+  /** A dónde ir al guardar. La guía del primer ingreso lo usa para volver. */
+  destino?: string
   guardar: (
     entrada: ProductoInput,
     id?: string
@@ -194,7 +197,7 @@ export function FormularioProducto({
     }
 
     toast.success(producto ? "Producto actualizado." : "Producto creado.")
-    router.push("/panel/productos")
+    router.push(destino)
     router.refresh()
   }
 

@@ -1,4 +1,5 @@
 import { CURRENCY } from "@/lib/format"
+import type { Comision, Comprador, Enlace, TipoComision } from "@/lib/promotor"
 import type { CommissionStatus, Product, SubscriptionStatus } from "@/types"
 
 export interface Suscripcion {
@@ -132,34 +133,6 @@ export function getDemoMetrics(): DashboardMetrics {
   }
 }
 
-export interface ComisionItem {
-  id: string
-  storeName: string
-  amountCents: number
-  baseCents: number
-  rateBps: number
-  status: CommissionStatus
-  createdAt: string
-}
-
-export interface ResumenVendedor {
-  volumenCents: number
-  ventas: number
-  porEstado: Record<CommissionStatus, number>
-  ganadoCents: number
-  tiendasActivas: number
-  tiendasPendientes: number
-  tiendasEnHistorial: number
-  desde: string | null
-  perfil: {
-    slug: string
-    displayName: string
-    city: string | null
-    bio: string | null
-  } | null
-  esDemo: boolean
-}
-
 export interface PerfilPublico {
   slug: string
   displayName: string
@@ -176,78 +149,6 @@ export interface PerfilPublico {
 const HACE = (dias: number) =>
   new Date(Date.now() - dias * 86_400_000).toISOString()
 
-/** Panel del vendedor de ejemplo, con historial ya empezado. */
-export const RESUMEN_VENDEDOR_DEMO: ResumenVendedor = {
-  volumenCents: 412_000,
-  ventas: 17,
-  porEstado: {
-    pendiente: 8_400,
-    confirmada: 26_600,
-    pagada: 14_400,
-    anulada: 3_600,
-  },
-  ganadoCents: 41_000,
-  tiendasActivas: 2,
-  tiendasPendientes: 1,
-  tiendasEnHistorial: 3,
-  desde: HACE(94),
-  perfil: {
-    slug: "ana-quispe-4f2c1a",
-    displayName: "Ana Quispe",
-    city: "El Alto",
-    bio: "Vendo por WhatsApp y en ferias los fines de semana.",
-  },
-  esDemo: true,
-}
-
-export const COMISIONES_DEMO: ComisionItem[] = [
-  {
-    id: "demo-c-1",
-    storeName: "Rosa Deportes",
-    amountCents: 2_160,
-    baseCents: 18_000,
-    rateBps: 1200,
-    status: "confirmada",
-    createdAt: HACE(2),
-  },
-  {
-    id: "demo-c-2",
-    storeName: "Café Illimani",
-    amountCents: 850,
-    baseCents: 8_500,
-    rateBps: 1000,
-    status: "pendiente",
-    createdAt: HACE(4),
-  },
-  {
-    id: "demo-c-3",
-    storeName: "Rosa Deportes",
-    amountCents: 2_880,
-    baseCents: 24_000,
-    rateBps: 1200,
-    status: "pagada",
-    createdAt: HACE(11),
-  },
-  {
-    id: "demo-c-4",
-    storeName: "Panadería Doña Elsa",
-    amountCents: 3_600,
-    baseCents: 45_000,
-    rateBps: 800,
-    status: "anulada",
-    createdAt: HACE(19),
-  },
-]
-
-export interface TiendaAbierta {
-  id: string
-  name: string
-  slug: string
-  tagline: string | null
-  joinMode: string
-  commissionBps: number
-}
-
 export interface ProductoVitrina {
   id: string
   name: string
@@ -257,36 +158,13 @@ export interface ProductoVitrina {
   condition: string
   storeName: string
   storeSlug: string
-  commissionBps: number
+  /** Lo que gana el promotor por unidad: el componente de comisión del precio. */
+  gananciaCents: number
+  stock: number
+  /** Si este promotor ya lo tomó, y el código de su enlace. */
+  tomado: boolean
+  codigo: string | null
 }
-
-/** Tiendas de ejemplo para que la vitrina del vendedor no salga vacía. */
-export const TIENDAS_ABIERTAS_DEMO: TiendaAbierta[] = [
-  {
-    id: "demo-tienda-1",
-    name: "Rosa Deportes",
-    slug: "rosa-deportes",
-    tagline: "Ropa deportiva en Santa Cruz. Buzos, poleras y mochilas.",
-    joinMode: "abierta",
-    commissionBps: 1200,
-  },
-  {
-    id: "demo-tienda-2",
-    name: "Panadería Doña Elsa",
-    slug: "panaderia-dona-elsa",
-    tagline: "Cuñapés, empanadas y masitas por encargo en La Paz.",
-    joinMode: "con_aprobacion",
-    commissionBps: 800,
-  },
-  {
-    id: "demo-tienda-3",
-    name: "Café Illimani",
-    slug: "cafe-illimani",
-    tagline: "Café de especialidad y equipamiento para prepararlo.",
-    joinMode: "abierta",
-    commissionBps: 1000,
-  },
-]
 
 export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
   {
@@ -298,7 +176,10 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
     condition: "nuevo",
     storeName: "Rosa Deportes",
     storeSlug: "rosa-deportes",
-    commissionBps: 1200,
+    gananciaCents: 2880,
+    stock: 12,
+    tomado: false,
+    codigo: null,
   },
   {
     id: "demo-v-2",
@@ -309,7 +190,10 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
     condition: "nuevo",
     storeName: "Rosa Deportes",
     storeSlug: "rosa-deportes",
-    commissionBps: 1200,
+    gananciaCents: 3270,
+    stock: 12,
+    tomado: false,
+    codigo: null,
   },
   {
     id: "demo-v-3",
@@ -320,7 +204,10 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
     condition: "nuevo",
     storeName: "Café Illimani",
     storeSlug: "cafe-illimani",
-    commissionBps: 1000,
+    gananciaCents: 1360,
+    stock: 12,
+    tomado: false,
+    codigo: null,
   },
   {
     id: "demo-v-4",
@@ -331,7 +218,10 @@ export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
     condition: "reacondicionado",
     storeName: "Café Illimani",
     storeSlug: "cafe-illimani",
-    commissionBps: 1000,
+    gananciaCents: 2240,
+    stock: 12,
+    tomado: false,
+    codigo: null,
   },
 ]
 
@@ -466,4 +356,169 @@ export const DEMO_PRODUCTS: Product[] = [
     category: "Accesorios",
     is_active: false,
   },
+]
+
+// ----------------------------------------------------------------------------
+// El panel del promotor, con historial ya empezado.
+//
+// Las URL se arman en `lib/data/promotor.ts`: este archivo lo importan
+// componentes de cliente y no puede depender del entorno.
+// ----------------------------------------------------------------------------
+
+export const ENLACES_DEMO: Enlace[] = [
+  {
+    id: "demo-e-1",
+    productoId: "demo-v-1",
+    nombre: "Buzo oversize",
+    imagenUrl: null,
+    precioCents: 18_000,
+    gananciaCents: 2_880,
+    negocio: "Rosa Deportes",
+    negocioSlug: "rosa-deportes",
+    codigo: "ANA7K2M",
+    url: "",
+    tomadoEn: HACE(64),
+    unidades: 11,
+    ventasCents: 198_000,
+    stock: 14,
+    disponible: true,
+  },
+  {
+    id: "demo-e-2",
+    productoId: "demo-v-2",
+    nombre: "Mochila urbana",
+    imagenUrl: null,
+    precioCents: 24_000,
+    gananciaCents: 3_270,
+    negocio: "Rosa Deportes",
+    negocioSlug: "rosa-deportes",
+    codigo: "ANA7K2M",
+    url: "",
+    tomadoEn: HACE(41),
+    unidades: 4,
+    ventasCents: 96_000,
+    stock: 3,
+    disponible: true,
+  },
+  {
+    id: "demo-e-3",
+    productoId: "demo-v-3",
+    nombre: "Café de especialidad 250g",
+    imagenUrl: null,
+    precioCents: 8_500,
+    gananciaCents: 1_360,
+    negocio: "Café Illimani",
+    negocioSlug: "cafe-illimani",
+    codigo: "ANA4QPW",
+    url: "",
+    tomadoEn: HACE(23),
+    unidades: 9,
+    ventasCents: 76_500,
+    stock: 40,
+    disponible: true,
+  },
+  {
+    id: "demo-e-4",
+    productoId: "demo-v-4",
+    nombre: "Molinillo manual reacondicionado",
+    imagenUrl: null,
+    precioCents: 14_000,
+    gananciaCents: 2_240,
+    negocio: "Café Illimani",
+    negocioSlug: "cafe-illimani",
+    codigo: "ANA4QPW",
+    url: "",
+    tomadoEn: HACE(9),
+    unidades: 0,
+    ventasCents: 0,
+    stock: 0,
+    disponible: false,
+  },
+]
+
+export const COMPRADORES_DEMO: Comprador[] = [
+  {
+    id: "demo-b-1",
+    comprador: "7•••••48",
+    registrado: false,
+    desde: HACE(58),
+    vence: HACE(-32),
+    vigente: true,
+    primeraTienda: "Rosa Deportes",
+    primeraCompraCents: 18_000,
+    comprasIndirectas: 2,
+    comisionIndirectaCents: 2_590,
+  },
+  {
+    id: "demo-b-2",
+    comprador: "Valeria Quispe",
+    registrado: true,
+    desde: HACE(37),
+    vence: HACE(-53),
+    vigente: true,
+    primeraTienda: "Café Illimani",
+    primeraCompraCents: 17_000,
+    comprasIndirectas: 1,
+    comisionIndirectaCents: 850,
+  },
+  {
+    id: "demo-b-3",
+    comprador: "6•••••13",
+    registrado: false,
+    desde: HACE(12),
+    vence: HACE(-78),
+    vigente: true,
+    primeraTienda: "Rosa Deportes",
+    primeraCompraCents: 24_000,
+    comprasIndirectas: 0,
+    comisionIndirectaCents: 0,
+  },
+  {
+    id: "demo-b-4",
+    comprador: "7•••••91",
+    registrado: false,
+    desde: HACE(104),
+    vence: HACE(14),
+    vigente: false,
+    primeraTienda: "Rosa Deportes",
+    primeraCompraCents: 36_000,
+    comprasIndirectas: 1,
+    comisionIndirectaCents: 1_440,
+  },
+]
+
+const COMISION = (
+  id: number,
+  dias: number,
+  negocio: string,
+  montoCents: number,
+  baseCents: number,
+  tipo: TipoComision = "directa",
+  estado: CommissionStatus = "confirmada"
+): Comision => ({
+  id: `demo-k-${id}`,
+  negocio,
+  montoCents,
+  baseCents,
+  tasaBps: Math.round((montoCents * 10000) / baseCents),
+  estado,
+  tipo,
+  fecha: HACE(dias),
+})
+
+export const COMISIONES_PROMOTOR_DEMO: Comision[] = [
+  COMISION(1, 1, "Rosa Deportes", 2_880, 14_400, "directa", "pendiente"),
+  COMISION(2, 3, "Café Illimani", 1_360, 6_800),
+  COMISION(3, 5, "Rosa Deportes", 1_295, 16_190, "indirecta"),
+  COMISION(4, 9, "Rosa Deportes", 5_760, 28_800),
+  COMISION(5, 12, "Café Illimani", 2_720, 13_600),
+  COMISION(6, 16, "Rosa Deportes", 3_270, 19_230),
+  COMISION(7, 20, "Café Illimani", 850, 8_500, "indirecta"),
+  COMISION(8, 24, "Rosa Deportes", 2_880, 14_400, "directa", "pagada"),
+  COMISION(9, 29, "Café Illimani", 1_360, 6_800, "directa", "pagada"),
+  COMISION(10, 33, "Rosa Deportes", 2_880, 14_400, "directa", "anulada"),
+  COMISION(11, 38, "Rosa Deportes", 6_540, 38_460, "directa", "pagada"),
+  COMISION(12, 45, "Rosa Deportes", 1_295, 16_190, "indirecta", "pagada"),
+  COMISION(13, 52, "Rosa Deportes", 2_880, 14_400, "directa", "pagada"),
+  COMISION(14, 60, "Rosa Deportes", 5_760, 28_800, "directa", "pagada"),
 ]
