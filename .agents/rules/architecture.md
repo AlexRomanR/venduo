@@ -44,7 +44,8 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/vendedor/enlaces`           | Sus productos, con WhatsApp, copiar y QR                | Requiere sesión |
 | `/vendedor/compradores`       | Los compradores que trajo: ventas indirectas            | Requiere sesión |
 | `/vendedor/ganancias`         | Cada comisión, directa o indirecta, y su estado         | Requiere sesión |
-| `/vendedor/estadisticas`      | Sus números, calculados de sus comisiones               | Requiere sesión |
+| `/vendedor/estadisticas`      | Sus números. `?ver=preguntar`, en lenguaje natural      | Requiere sesión |
+| `/vendedor/estadisticas/pdf`  | Su tablero en PDF. `?g={id}` para uno solo              | Requiere sesión |
 | `/cuenta`                     | Datos de la persona, de su tienda y de su perfil        | Requiere sesión |
 | `/auth/destino`               | Resuelve a dónde entra la cuenta y redirige             | Requiere sesión |
 | `/auth/*`                     | Callback y cierre de sesión                             | —               |
@@ -153,7 +154,7 @@ lib/
   data/               Consultas de lectura
   validation/         Esquemas zod compartidos
   ai/                 Capa de IA
-  insights/           Lo que se puede preguntar, la lectura y el documento PDF
+  insights/           Lo que se puede preguntar, cómo se responde, la lectura y el PDF
   plantillas/         La base de cada plantilla: tokens, esquema de la apariencia,
                       registro y qué significa cada bloque
   demo-data.ts        Datos de ejemplo del modo demo

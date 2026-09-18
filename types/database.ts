@@ -220,6 +220,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "buyer_attributions_first_order_id_fkey"
+            columns: ["first_order_id"]
+            isOneToOne: false
+            referencedRelation: "promotor_ventas"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "buyer_attributions_seller_id_fkey"
             columns: ["seller_id"]
             isOneToOne: false
@@ -300,6 +307,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: true
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "promotor_ventas"
             referencedColumns: ["id"]
           },
           {
@@ -416,6 +430,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "promotor_ventas"
             referencedColumns: ["id"]
           },
           {
@@ -810,6 +831,42 @@ export type Database = {
           key?: string
           name?: string
           position?: number
+        }
+        Relationships: []
+      }
+      seller_insights: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: string
+          posicion: number
+          pregunta: string
+          spec: Json
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          posicion?: number
+          pregunta: string
+          spec: Json
+          titulo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          posicion?: number
+          pregunta?: string
+          spec?: Json
+          titulo?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1533,6 +1590,13 @@ export type Database = {
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "promotor_ventas"
+            referencedColumns: ["id"]
+          },
         ]
       }
       mis_productos: {
@@ -1641,6 +1705,100 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      promotor_comisiones: {
+        Row: {
+          amount_cents: number | null
+          base_amount_cents: number | null
+          created_at: string | null
+          id: string | null
+          negocio: string | null
+          rate_bps: number | null
+          status: Database["public"]["Enums"]["commission_status"] | null
+          tipo: Database["public"]["Enums"]["commission_kind"] | null
+        }
+        Insert: {
+          amount_cents?: number | null
+          base_amount_cents?: number | null
+          created_at?: string | null
+          id?: string | null
+          negocio?: string | null
+          rate_bps?: number | null
+          status?: Database["public"]["Enums"]["commission_status"] | null
+          tipo?: Database["public"]["Enums"]["commission_kind"] | null
+        }
+        Update: {
+          amount_cents?: number | null
+          base_amount_cents?: number | null
+          created_at?: string | null
+          id?: string | null
+          negocio?: string | null
+          rate_bps?: number | null
+          status?: Database["public"]["Enums"]["commission_status"] | null
+          tipo?: Database["public"]["Enums"]["commission_kind"] | null
+        }
+        Relationships: []
+      }
+      promotor_enlaces: {
+        Row: {
+          categoria: string | null
+          disponible: boolean | null
+          ganancia_cents: number | null
+          id: string | null
+          negocio: string | null
+          price_cents: number | null
+          producto: string | null
+          stock: number | null
+          taken_at: string | null
+        }
+        Relationships: []
+      }
+      promotor_items: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          negocio: string | null
+          order_id: string | null
+          product_name: string | null
+          quantity: number | null
+          status: Database["public"]["Enums"]["order_status"] | null
+          total_cents: number | null
+          unit_price_cents: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "mis_ventas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "promotor_ventas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promotor_ventas: {
+        Row: {
+          comprador: string | null
+          created_at: string | null
+          id: string | null
+          negocio: string | null
+          status: Database["public"]["Enums"]["order_status"] | null
+          total_cents: number | null
+        }
+        Relationships: []
       }
     }
     Functions: {

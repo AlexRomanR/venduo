@@ -201,6 +201,110 @@ function sqlDeDemostracion(pedido: string) {
   }
 }
 
+/** Lo mismo para el promotor, contra sus vistas. */
+function sqlDeDemostracionPromotor(pedido: string) {
+  const t = pedido.toLowerCase()
+
+  if (/producto|art[ií]culo|m[aá]s vendid|enlace/.test(t)) {
+    return {
+      titulo: "Tus productos más vendidos",
+      explicacion:
+        "Unidades vendidas con tus enlaces, sin contar las canceladas.",
+      grafico: "barra",
+      formato: "cantidad",
+      vistas: ["promotor_items"],
+      sql: "select product_name as etiqueta, sum(quantity) as valor from promotor_items where status <> 'cancelado' group by 1 order by 2 desc limit 15",
+    }
+  }
+
+  if (/negocio|tienda|marca/.test(t)) {
+    return {
+      titulo: "Ganancia por negocio",
+      explicacion:
+        "Lo que ganaste en cada negocio, sin las comisiones anuladas.",
+      grafico: "barra",
+      formato: "dinero",
+      vistas: ["promotor_comisiones"],
+      sql: "select negocio as etiqueta, sum(amount_cents) as valor from promotor_comisiones where status <> 'anulada' group by 1 order by 2 desc limit 15",
+    }
+  }
+
+  if (/comprador|cliente|persona/.test(t)) {
+    return {
+      titulo: "Compradores distintos",
+      explicacion: "Cuántas personas distintas compraron con tus enlaces.",
+      grafico: "numero",
+      formato: "cantidad",
+      vistas: ["promotor_ventas"],
+      sql: "select 'Total' as etiqueta, count(distinct comprador) as valor from promotor_ventas where status <> 'cancelado'",
+    }
+  }
+
+  if (/indirect|directa|tipo/.test(t)) {
+    return {
+      titulo: "Directas e indirectas",
+      explicacion: "Tu ganancia separada por cómo llegó la venta.",
+      grafico: "barra",
+      formato: "dinero",
+      vistas: ["promotor_comisiones"],
+      sql: "select tipo::text as etiqueta, sum(amount_cents) as valor from promotor_comisiones where status <> 'anulada' group by 1 order by 2 desc",
+    }
+  }
+
+  if (/semana/.test(t)) {
+    return {
+      titulo: "Ganancia por semana",
+      explicacion: "Tus comisiones por semana de los últimos 90 días.",
+      grafico: "linea",
+      formato: "dinero",
+      vistas: ["promotor_comisiones"],
+      sql: "select to_char(date_trunc('week', created_at), 'YYYY-MM-DD') as etiqueta, sum(amount_cents) as valor from promotor_comisiones where status <> 'anulada' and created_at >= now() - interval '90 days' group by 1 order by 1",
+    }
+  }
+
+  if (/mes|mensual/.test(t)) {
+    return {
+      titulo: "Ganancia por mes",
+      explicacion: "Tus comisiones por mes del último año.",
+      grafico: "columna",
+      formato: "dinero",
+      vistas: ["promotor_comisiones"],
+      sql: "select to_char(date_trunc('month', created_at), 'YYYY-MM') as etiqueta, sum(amount_cents) as valor from promotor_comisiones where status <> 'anulada' and created_at >= now() - interval '365 days' group by 1 order by 1",
+    }
+  }
+
+  if (/estado|pendiente|cobr/.test(t)) {
+    return {
+      titulo: "Comisiones por estado",
+      explicacion: "Cuánto tienes retenido, por cobrar y ya cobrado.",
+      grafico: "barra",
+      formato: "dinero",
+      vistas: ["promotor_comisiones"],
+      sql: "select status::text as etiqueta, sum(amount_cents) as valor from promotor_comisiones group by 1 order by 2 desc",
+    }
+  }
+
+  if (/cu[aá]nto gan|total|ganancia/.test(t)) {
+    return {
+      titulo: "Lo que ganaste",
+      explicacion: "Tus comisiones de los últimos 30 días, sin las anuladas.",
+      grafico: "numero",
+      formato: "dinero",
+      vistas: ["promotor_comisiones"],
+      sql: "select 'Total' as etiqueta, coalesce(sum(amount_cents), 0) as valor from promotor_comisiones where status <> 'anulada' and created_at >= now() - interval '30 days'",
+    }
+  }
+
+  return {
+    titulo: "Ganancia por día",
+    explicacion: "Tus comisiones diarias de los últimos 30 días.",
+    grafico: "linea",
+    formato: "dinero",
+    vistas: ["promotor_comisiones"],
+    sql: "select to_char(date_trunc('day', created_at), 'YYYY-MM-DD') as etiqueta, sum(amount_cents) as valor from promotor_comisiones where status <> 'anulada' and created_at >= now() - interval '30 days' group by 1 order by 1",
+  }
+}
+
 /**
  * Proveedor por defecto cuando no hay ninguna API key configurada.
  * Deriva la respuesta del propio esquema zod, así que siempre valida
@@ -233,9 +337,15 @@ export function createMockProvider(
       // La consulta de inteligencia de negocio necesita un caso aparte. Derivar
       // el ejemplo del esquema daría siempre la misma respuesta, y un chat que
       // contesta lo mismo a cualquier pregunta se lee como roto, no como demo.
-      if (options.schemaName === "InsightSql") {
+      if (
+        options.schemaName === "InsightSql" ||
+        options.schemaName === "InsightSqlPromotor"
+      ) {
         const pedido = options.messages.at(-1)?.content ?? ""
-        const sugerido = sqlDeDemostracion(pedido)
+        const sugerido =
+          options.schemaName === "InsightSqlPromotor"
+            ? sqlDeDemostracionPromotor(pedido)
+            : sqlDeDemostracion(pedido)
         const validado = options.schema.safeParse(sugerido)
 
         if (validado.success) {

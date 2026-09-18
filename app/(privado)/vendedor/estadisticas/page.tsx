@@ -1,3 +1,10 @@
+import Link from "next/link"
+
+import { getAIStatus } from "@/lib/ai"
+import {
+  getGraficoConDatos,
+  getGraficosGuardadosPromotor,
+} from "@/lib/data/insights"
 import {
   getMisComisiones,
   getMisCompradores,
@@ -12,19 +19,115 @@ import {
   unidadesPorEnlace,
   type Fila,
 } from "@/lib/promotor"
+import { cn } from "@/lib/utils"
+import { Estudio } from "@/components/insights/estudio"
 import { Grafico, type EspecGrafico } from "@/components/insights/grafico"
 import { Cifra, Encabezado, Vacio } from "@/components/panel/piezas"
+import { borrar, guardar, preguntar } from "./acciones"
 
 export const metadata = { title: "Mis estadísticas" }
 
+const SUGERENCIAS = [
+  "¿Cuánto gané en los últimos 30 días?",
+  "Mis productos más vendidos",
+  "Ganancia por semana de los últimos 3 meses",
+  "¿Qué negocio me deja más?",
+  "¿Cuántos compradores distintos tuve?",
+]
+
 /**
- * Los números del promotor.
+ * Los números del promotor, en dos pestañas.
  *
- * Todo se calcula de sus propias comisiones y enlaces, en el servidor: no pasa
- * por la IA ni por las vistas `mis_*`, que son del negocio. La lectura de cada
- * gráfico sale de las mismas filas que se dibujan, así no puede contradecirlo.
+ * El resumen se calcula de sus propias comisiones y enlaces, sin IA. La otra
+ * pestaña es la misma herramienta del negocio —preguntar en palabras, guardar
+ * en un tablero y bajarlo en PDF— contra las vistas `promotor_*`, que cruzan
+ * todos los negocios donde vende y ya están acotadas a él.
  */
-export default async function EstadisticasPromotorPage() {
+export default async function EstadisticasPromotorPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ver?: string }>
+}) {
+  const { ver } = await searchParams
+  const preguntando = ver === "preguntar"
+
+  return (
+    <div className="flex flex-col gap-10">
+      <Titulo />
+      <Pestanas preguntando={preguntando} />
+      {preguntando ? <Preguntale /> : <Resumen />}
+    </div>
+  )
+}
+
+function Pestanas({ preguntando }: { preguntando: boolean }) {
+  const pestanas = [
+    { href: "/vendedor/estadisticas", texto: "Resumen", activa: !preguntando },
+    {
+      href: "/vendedor/estadisticas?ver=preguntar",
+      texto: "Pregúntale a tus números",
+      activa: preguntando,
+    },
+  ]
+
+  return (
+    <nav
+      aria-label="Vistas de estadísticas"
+      className="-mt-4 flex gap-6 border-b border-tinta/15"
+    >
+      {pestanas.map((p) => (
+        <Link
+          key={p.href}
+          href={p.href}
+          aria-current={p.activa ? "page" : undefined}
+          className={cn(
+            "-mb-px flex min-h-11 items-center border-b-2 text-sm font-semibold transition-colors",
+            p.activa
+              ? "border-tinta"
+              : "border-transparent opacity-55 hover:opacity-100"
+          )}
+        >
+          {p.texto}
+        </Link>
+      ))}
+    </nav>
+  )
+}
+
+async function Preguntale() {
+  const guardados = await getGraficosGuardadosPromotor()
+  const graficos = await Promise.all(guardados.map(getGraficoConDatos))
+  const ai = getAIStatus()
+
+  return (
+    <section className="flex flex-col gap-10">
+      <p className="max-w-[58ch] text-sm leading-relaxed opacity-70">
+        Pregunta en palabras por tus ventas, ganancias, productos o negocios.
+        Solo se consultan tus datos como promotor, y solo se leen.
+        {ai.demo ? (
+          <>
+            {" "}
+            <span className="font-semibold">
+              Estás en modo demo: el modelo devuelve una respuesta simulada,
+              pero las cifras salen de tus datos reales.
+            </span>
+          </>
+        ) : null}
+      </p>
+
+      <Estudio
+        graficos={graficos}
+        preguntar={preguntar}
+        guardar={guardar}
+        borrar={borrar}
+        rutaPdf="/vendedor/estadisticas/pdf"
+        sugerencias={SUGERENCIAS}
+      />
+    </section>
+  )
+}
+
+async function Resumen() {
   const [enlaces, comisiones, compradores] = await Promise.all([
     getMisEnlaces(),
     getMisComisiones(),
@@ -33,14 +136,11 @@ export default async function EstadisticasPromotorPage() {
 
   if (comisiones.length === 0) {
     return (
-      <div className="flex flex-col gap-10">
-        <Titulo />
-        <Vacio
-          titulo="Tus números empiezan con tu primera venta"
-          detalle="Acá vas a ver cuánto ganas por semana, qué productos te funcionan y qué negocios te dejan más. Comparte tus enlaces para empezar."
-          accion={{ href: "/vendedor/enlaces", texto: "Compartir mis enlaces" }}
-        />
-      </div>
+      <Vacio
+        titulo="Tus números empiezan con tu primera venta"
+        detalle="Acá vas a ver cuánto ganas por semana, qué productos te funcionan y qué negocios te dejan más. Comparte tus enlaces para empezar."
+        accion={{ href: "/vendedor/enlaces", texto: "Compartir mis enlaces" }}
+      />
     )
   }
 
@@ -63,8 +163,6 @@ export default async function EstadisticasPromotorPage() {
 
   return (
     <div className="flex flex-col gap-14">
-      <Titulo />
-
       <section className="grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
         <Cifra
           etiqueta="Por venta, en promedio"

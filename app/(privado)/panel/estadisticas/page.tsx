@@ -51,6 +51,7 @@ export default async function EstadisticasPage() {
           preguntar={preguntar}
           guardar={guardar}
           borrar={borrar}
+          rutaPdf="/panel/estadisticas/pdf"
         />
       </section>
     </div>

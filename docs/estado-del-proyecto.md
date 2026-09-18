@@ -88,8 +88,10 @@ es que responde a otras reglas. Abajo, qué se salva, qué se rehace y en qué o
   cifras, la ganancia por semana, un próximo paso calculado, sus enlaces y sus compradores.
   El catálogo filtra por búsqueda, categoría, condición, precio y fecha de publicación,
   permite ordenar, y cada ficha compara ganancia, precio, stock y antigüedad antes de crear
-  el referido. Secciones: Catálogo, Mis enlaces (con WhatsApp, copiar y QR), Compradores,
-  Ganancias y Estadísticas.
+  el referido. Secciones: Catálogo, Mis enlaces (con WhatsApp, copiar y QR), Compradores
+  (cada compra hecha con su enlace), Ganancias y Estadísticas. Estadísticas tiene dos
+  pestañas: el resumen calculado y la misma herramienta en lenguaje natural del negocio,
+  con tablero y PDF, contra las vistas `promotor_*`.
 - **`/sumarme` y `/explorar/*` redirigen** al panel del promotor. Unirse a una tienda y
   las invitaciones ya no tienen pantalla.
 - **La pantalla de Promotores del negocio** muestra quién promociona qué y cuánto vendió,

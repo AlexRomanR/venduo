@@ -3,27 +3,28 @@
 import { revalidatePath } from "next/cache"
 
 import type { InsightSql } from "@/lib/ai/schemas"
-import { getMiTienda } from "@/lib/data/panel"
 import { responderPregunta, type Respuesta } from "@/lib/insights/responder"
 import { createClient } from "@/lib/supabase/server"
 
-/** Una pregunta en palabras, un gráfico, contra las vistas de su tienda. */
+/**
+ * Una pregunta del promotor, contra sus vistas `promotor_*`.
+ *
+ * No recibe ningún identificador: las vistas ya están acotadas a quien
+ * pregunta, y una acción que aceptara un usuario terminaría recibiendo uno
+ * ajeno.
+ */
 export async function preguntar(
   pregunta: string,
   anterior: InsightSql | null
 ): Promise<Respuesta> {
-  const tienda = await getMiTienda()
-  if (!tienda) return { ok: false, error: "Todavía no tienes una tienda." }
-
   return responderPregunta({
     pregunta,
     anterior,
-    publico: "tienda",
-    storeId: tienda.id,
+    publico: "promotor",
+    storeId: null,
   })
 }
 
-/** Guarda el gráfico en el tablero del emprendedor. */
 export async function guardar(consulta: InsightSql, pregunta: string) {
   const supabase = await createClient()
   if (!supabase) return { ok: false, error: "Supabase sin configurar." }
@@ -31,12 +32,9 @@ export async function guardar(consulta: InsightSql, pregunta: string) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const tienda = await getMiTienda()
+  if (!user) return { ok: false, error: "Tu sesión venció. Vuelve a ingresar." }
 
-  if (!user || !tienda) return { ok: false, error: "No tienes una tienda." }
-
-  const { error } = await supabase.from("insights").insert({
-    store_id: tienda.id,
+  const { error } = await supabase.from("seller_insights").insert({
     user_id: user.id,
     titulo: consulta.titulo,
     pregunta,
@@ -45,22 +43,21 @@ export async function guardar(consulta: InsightSql, pregunta: string) {
 
   if (error) return { ok: false, error: "No pudimos guardar el gráfico." }
 
-  revalidatePath("/panel/estadisticas")
+  revalidatePath("/vendedor/estadisticas")
   return { ok: true }
 }
 
-/** Borrado lógico, como todo en el sistema. */
 export async function borrar(id: string) {
   const supabase = await createClient()
   if (!supabase) return { ok: false, error: "Supabase sin configurar." }
 
   const { error } = await supabase
-    .from("insights")
+    .from("seller_insights")
     .update({ deleted_at: new Date().toISOString() })
     .eq("id", id)
 
   if (error) return { ok: false, error: "No pudimos borrar el gráfico." }
 
-  revalidatePath("/panel/estadisticas")
+  revalidatePath("/vendedor/estadisticas")
   return { ok: true }
 }

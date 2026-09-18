@@ -121,7 +121,8 @@ Las otras funciones del servidor son `take_product(p_product_id)` y
 excepción a todo lo demás y se sostiene en tres cosas que impone Postgres: corre con
 `security invoker` —RLS activa—, en una transacción de **solo lectura** que rechaza
 cualquier escritura, y solo contra las vistas `mis_*`, que ya están acotadas a
-`my_store_id()` y donde `store_id` ni siquiera aparece. Está explicado en `ai-layer.md`.
+`my_store_id()` y donde `store_id` ni siquiera aparece, o las `promotor_*`, acotadas
+a `auth.uid()`. Está explicado en `ai-layer.md`.
 
 **La tienda tampoco se inserta desde el cliente.** `create_store` resuelve tres
 cosas que no se pueden repartir: el slug único —comprobarlo desde el navegador es
