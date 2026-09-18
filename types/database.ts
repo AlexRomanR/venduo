@@ -491,6 +491,36 @@ export type Database = {
         }
         Relationships: []
       }
+      pricing_tiers: {
+        Row: {
+          commission_bps: number
+          created_at: string
+          id: string
+          indirect_bps: number
+          max_cost_cents: number | null
+          min_cost_cents: number
+          take_bps: number
+        }
+        Insert: {
+          commission_bps: number
+          created_at?: string
+          id?: string
+          indirect_bps: number
+          max_cost_cents?: number | null
+          min_cost_cents: number
+          take_bps: number
+        }
+        Update: {
+          commission_bps?: number
+          created_at?: string
+          id?: string
+          indirect_bps?: number
+          max_cost_cents?: number | null
+          min_cost_cents?: number
+          take_bps?: number
+        }
+        Relationships: []
+      }
       product_categories: {
         Row: {
           created_at: string
@@ -534,8 +564,10 @@ export type Database = {
       }
       products: {
         Row: {
+          base_cost_cents: number
           category: string | null
           category_id: string | null
+          commission_bps: number | null
           compare_at_price_cents: number | null
           condition: Database["public"]["Enums"]["product_condition"]
           condition_note: string | null
@@ -554,11 +586,14 @@ export type Database = {
           sku: string | null
           stock: number
           store_id: string
+          take_bps: number | null
           updated_at: string
         }
         Insert: {
+          base_cost_cents: number
           category?: string | null
           category_id?: string | null
+          commission_bps?: number | null
           compare_at_price_cents?: number | null
           condition?: Database["public"]["Enums"]["product_condition"]
           condition_note?: string | null
@@ -572,16 +607,19 @@ export type Database = {
           is_featured?: boolean
           low_stock_threshold?: number
           name: string
-          price_cents: number
+          price_cents?: number
           seller_enabled?: boolean
           sku?: string | null
           stock?: number
           store_id: string
+          take_bps?: number | null
           updated_at?: string
         }
         Update: {
+          base_cost_cents?: number
           category?: string | null
           category_id?: string | null
+          commission_bps?: number | null
           compare_at_price_cents?: number | null
           condition?: Database["public"]["Enums"]["product_condition"]
           condition_note?: string | null
@@ -600,6 +638,7 @@ export type Database = {
           sku?: string | null
           stock?: number
           store_id?: string
+          take_bps?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -1482,6 +1521,16 @@ export type Database = {
       my_seller_invite: { Args: never; Returns: string }
       my_store_id: { Args: never; Returns: string }
       pedido_publico: { Args: { p_order_id: string }; Returns: Json }
+      precio_publicado: {
+        Args: { p_base_cost_cents: number }
+        Returns: {
+          commission_bps: number
+          commission_cents: number
+          price_cents: number
+          take_bps: number
+          take_cents: number
+        }[]
+      }
       referido_publico: {
         Args: { p_codigo: string; p_store_id: string }
         Returns: {

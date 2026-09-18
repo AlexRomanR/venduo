@@ -28,6 +28,16 @@ export type ClavePlantilla = keyof typeof PLANTILLAS
 /** La base con la que se dibuja lo que no tiene base propia. */
 export const PLANTILLA_DE_RESPALDO: ClavePlantilla = "clasica"
 
+/**
+ * Con qué plantilla nace un negocio nuevo.
+ *
+ * Elegir plantilla salió del modelo cuando el canal pasó a ser un solo
+ * Marketplace, pero `create_store` siembra la página del negocio y pide una
+ * clave. Es la base editorial de Venduo: así el panel de un negocio nuevo se ve
+ * como Venduo y no como una identidad que nadie eligió.
+ */
+export const PLANTILLA_POR_DEFECTO: ClavePlantilla = "clasica"
+
 export function esClavePlantilla(valor: unknown): valor is ClavePlantilla {
   return typeof valor === "string" && Object.hasOwn(PLANTILLAS, valor)
 }

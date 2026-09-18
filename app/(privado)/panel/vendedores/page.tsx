@@ -30,9 +30,9 @@ export default async function VendedoresPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Vendedores</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Promotores</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Tu red y sus comisiones.
+          Quiénes promocionan lo tuyo y cuánto generaron.
         </p>
       </div>
 
@@ -47,8 +47,8 @@ export default async function VendedoresPage() {
       {vendedores.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8">
           <p className="max-w-[60ch] text-sm leading-relaxed text-muted-foreground">
-            Todavía no vende nadie para ti. Comparte tu enlace de invitación, o
-            espera a que alguien te encuentre en la lista de tiendas abiertas.
+            Todavía no promociona nadie lo tuyo. Tus productos ya están en el
+            catálogo: cualquier promotor puede tomarlos y empezar a venderlos.
           </p>
         </div>
       ) : (
@@ -56,7 +56,7 @@ export default async function VendedoresPage() {
           <table className="w-full min-w-[32rem] text-sm">
             <thead>
               <tr className="border-b text-left text-muted-foreground">
-                <th className="py-2 pr-4 font-medium">Vendedor</th>
+                <th className="py-2 pr-4 font-medium">Promotor</th>
                 <th className="py-2 pr-4 font-medium">Estado</th>
                 <th className="py-2 pr-4 font-medium">Código</th>
                 <th className="py-2 font-medium">Desde</th>
@@ -92,17 +92,15 @@ export default async function VendedoresPage() {
       <p className="max-w-[62ch] text-sm leading-relaxed text-muted-foreground">
         {tienda?.seller_network_enabled ? (
           <>
-            Tu tienda paga{" "}
-            <span className="font-medium text-foreground">
-              {formatPercent(tienda.commission_bps)}
-            </span>{" "}
-            por venta referida. La tasa se congela en cada venta, así que
-            cambiarla no reescribe lo ya vendido.{" "}
+            La comisión sale del precio y la calcula Venduo según el rango de
+            cada producto: más alta en lo barato, más baja en lo caro. Se
+            congela en cada venta, así que cambiarla no reescribe lo ya
+            vendido.{" "}
           </>
         ) : (
-          <>Tu tienda todavía no tiene la red de vendedores activada. </>
+          <>Tus productos todavía no están abiertos a promotores. </>
         )}
-        Aprobar solicitudes y seguir las comisiones todavía no está construido.
+        Seguir las comisiones de cada promotor todavía no está construido.
       </p>
     </div>
   )

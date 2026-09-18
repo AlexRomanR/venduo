@@ -1,14 +1,15 @@
 import Link from "next/link"
 import { Plus } from "lucide-react"
 
+import { getTramos } from "@/lib/data/precios"
 import { getUser } from "@/lib/supabase/server"
 import { Cifra } from "@/components/landing/cifra"
-import { DemoTienda } from "@/components/landing/demo-tienda"
 import { Entra } from "@/components/landing/entra"
 import { Foto } from "@/components/landing/foto"
+import { PrecioEjemplo } from "@/components/landing/precio-ejemplo"
 
 export const metadata = {
-  title: "Venduo — tu tienda online en minutos",
+  title: "Venduo — publica lo que vendes, nosotros ponemos quién lo venda",
 }
 
 /**
@@ -16,99 +17,135 @@ export const metadata = {
  *
  * La estrategia de esta superficie vive en `.impeccable/surfaces/app-page-tsx.md`.
  *
+ * El mecanismo que tiene que quedar claro en el primer viewport es el del
+ * modelo: **el negocio declara cuánto quiere recibir y el precio se arma
+ * encima**. Por eso lo primero que se ve no es una tienda dibujada, sino esa
+ * cuenta hecha con números reales de los tramos vigentes.
+ *
  * Las cifras y los ejemplos son ilustrativos de lo que el producto va a
  * mostrar, no medidas de uso real. Cada bloque que los usa lo dice al pie.
  */
 
-/*
- * PENDIENTE: la tienda de ejemplo todavía no existe. El equipo la crea
- * registrándose y cargando productos. Cuando exista, poner acá su slug.
- */
-const TIENDA_EJEMPLO: string | null = null
-
-const PASOS = [
+const PASOS_NEGOCIO = [
   {
     n: "01",
-    titulo: "Cuentas qué vendes",
+    titulo: "Cargas lo que vendes",
     detalle:
-      "Escribes o dictas un párrafo: qué productos, a qué precio, a quién le vendes. Puedes pegar las fotos que ya tienes.",
+      "Foto, nombre, stock y cuánto quieres recibir por cada unidad. Nada de calcular márgenes ni decidir a cuánto publicarlo.",
   },
   {
     n: "02",
-    titulo: "Eliges una plantilla",
+    titulo: "Los promotores lo eligen",
     detalle:
-      "La IA llena el catálogo, escribe las descripciones y ordena las categorías. Tú corriges lo que no te cuadra, con el mismo editor.",
+      "Tu producto entra al catálogo y cada promotor decide cuáles lleva a sus redes, con su propio enlace. No apruebas a nadie ni pagas por adelantado.",
   },
   {
     n: "03",
-    titulo: "Publicas y cobras",
+    titulo: "Te avisamos que vendiste",
     detalle:
-      "Compartes el enlace en tus mismos canales. El cliente paga por QR y cada venta entra sola a tus estadísticas.",
+      "Te llega el pedido con el WhatsApp de quien compró. El pago queda retenido hasta que el producto llegue.",
+  },
+  {
+    n: "04",
+    titulo: "Coordinas la entrega",
+    detalle:
+      "Te abrimos la conversación con el detalle ya escrito. Cuando el comprador confirma que lo recibió, cobras tu parte completa.",
   },
 ]
 
-const MODULOS = [
+const PASOS_PROMOTOR = [
   {
-    titulo: "Editor con IA",
+    n: "01",
+    titulo: "Eliges qué vender",
     detalle:
-      "Le hablas y la tienda cambia: precios, textos, categorías, portada. Sin tocar una línea de código.",
+      "Recorres el catálogo y tomas los productos que te gustan. Sin poner un peso, sin stock en tu casa y sin que nadie te apruebe.",
   },
   {
-    titulo: "Cobro por QR",
+    n: "02",
+    titulo: "Compartes tu enlace",
     detalle:
-      "El QR de tu banco o billetera en cada pedido, con el comprobante adjunto a la venta.",
+      "Cada producto te da un enlace y un QR propios, con textos listos para pegar en TikTok, Instagram o el grupo del barrio.",
   },
   {
-    titulo: "Inteligencia de negocio",
+    n: "03",
+    titulo: "Cobras tu comisión",
     detalle:
-      "Qué se vende, cuándo y cuánto. Le preguntas en tus palabras y te responde con un gráfico.",
+      "Sale del precio, no de tu bolsillo, y se calcula sola. Te la paga la pasarela cuando el comprador confirma que recibió.",
   },
   {
-    titulo: "Marketing con IA",
+    n: "04",
+    titulo: "Sigues ganando después",
     detalle:
-      "Textos para Facebook y WhatsApp, hechos con tu propio catálogo y tu forma de hablar.",
+      "Quien compra por tu enlace queda asociado a ti: si vuelve por su cuenta al catálogo, esa venta también te deja comisión.",
+  },
+]
+
+const RESUELVE = [
+  {
+    titulo: "El precio, calculado",
+    detalle:
+      "El negocio dice cuánto quiere recibir. Venduo suma la comisión del promotor y su parte, y publica.",
   },
   {
-    titulo: "Red de vendedores",
+    titulo: "Promotores sin contrato",
     detalle:
-      "Activas vendedores que trabajan a comisión. Cada uno con su enlace, su QR y su registro.",
+      "Nadie contrata a nadie ni paga sueldo fijo. Se gana por venta, y quien vende no arriesga nada.",
   },
   {
-    titulo: "Segunda mano",
+    titulo: "Pago retenido",
     detalle:
-      "Lo usado también se vende. Publicas reacondicionados en la misma tienda, con otra etiqueta.",
+      "La plata queda en la pasarela hasta que el pedido llega. Recién ahí se reparte entre las tres partes.",
+  },
+  {
+    titulo: "Entrega por WhatsApp",
+    detalle:
+      "Con el mensaje ya armado, por donde ya se habla. No inventamos una app de envíos.",
+  },
+  {
+    titulo: "Historial que sirve",
+    detalle:
+      "Cada venta queda a nombre de quien la hizo, en un perfil público que se manda con un enlace.",
+  },
+  {
+    titulo: "Tus números, preguntando",
+    detalle:
+      "Qué se vende, cuándo y cuánto. Se pregunta en tus palabras y responde con un gráfico.",
   },
 ]
 
 const PREGUNTAS = [
   {
-    p: "¿Necesito saber de computación?",
-    r: "No. Si sabes mandar un audio por WhatsApp, sabes usar Venduo. Describes tu negocio, la IA arma la tienda y tú corriges lo que no te guste.",
+    p: "¿Quién pone el precio?",
+    r: "Lo pone el sistema. Tú dices cuánto quieres recibir por tu producto y Venduo le suma la comisión de quien lo venda y su propia parte. Ese es el precio que ve el comprador, y lo que tú recibes no cambia.",
   },
   {
-    p: "¿Cuánto cuesta?",
-    r: "Crear la tienda y publicarla no cuesta nada. Los planes con dominio propio y más vendedores llegan después.",
+    p: "¿Cuánto cuesta publicar?",
+    r: "Nada. No hay mensualidad ni publicidad por adelantado: la plataforma solo gana un porcentaje cuando una venta se cierra, y ese porcentaje ya está sumado en el precio publicado.",
   },
   {
-    p: "¿Cómo me pagan mis clientes?",
-    r: "Con el QR de tu banco o billetera, en cada pedido. El cliente escanea, paga y sube su comprobante; tú confirmas y la venta entra a tus estadísticas.",
+    p: "¿Cuánto gana un promotor?",
+    r: "Un porcentaje del producto, más alto en lo barato y más bajo en lo caro, para que vender siempre valga el esfuerzo. Se calcula solo, sale del precio y nunca del bolsillo del promotor, que no paga nada nunca.",
   },
   {
-    p: "¿Qué gana el vendedor?",
-    r: "La comisión que define cada tienda, y un historial con su nombre que puede mostrar después. El vendedor no paga nada, nunca.",
+    p: "¿Qué pasa si el comprador vuelve solo?",
+    r: "Si llegó por el enlace de un promotor, queda asociado a él por un tiempo: aunque después compre por su cuenta en el catálogo, esa venta le deja comisión igual. Si nadie lo trajo, ese porcentaje vuelve al negocio.",
   },
   {
-    p: "¿Qué es el historial laboral verificable?",
-    r: "Una hoja de vida que se arma sola: cuántas ventas hiciste, con qué tiendas y desde cuándo. Nadie la edita a mano, y se comparte con un enlace.",
+    p: "¿Cuándo me pagan?",
+    r: "El comprador le paga a la pasarela y el dinero queda retenido. Cuando el negocio marca el pedido como enviado y el comprador confirma que lo recibió, se libera y se reparte: su parte al negocio, la comisión al promotor.",
   },
   {
-    p: "Ya me va bien por WhatsApp. ¿Para qué cambio?",
-    r: "No cambias: sigue vendiendo ahí. Venduo te pone el catálogo, el cobro y los números detrás, y el enlace de tu tienda lo pegas en el mismo chat.",
+    p: "¿Y si el producto no llega?",
+    r: "Mientras el pago está retenido, el comprador puede reclamar y la plata se congela hasta que Venduo revise el caso. Por eso comprarle a alguien que no conoces deja de ser una apuesta.",
+  },
+  {
+    p: "¿Tengo que dejar de vender por WhatsApp?",
+    r: "No. Sigue vendiendo donde ya vendes: Venduo suma un canal más, con gente promocionando tus productos y el cobro resuelto.",
   },
 ]
 
 export default async function Inicio() {
-  const user = await getUser()
+  const [user, tramos] = await Promise.all([getUser(), getTramos()])
 
   return (
     <div className="min-h-screen bg-papel text-tinta">
@@ -122,11 +159,11 @@ export default async function Inicio() {
             <a href="#como-funciona" className="opacity-70 hover:opacity-100">
               Cómo funciona
             </a>
-            <a href="#modulos" className="opacity-70 hover:opacity-100">
-              Módulos
+            <a href="#precio" className="opacity-70 hover:opacity-100">
+              El precio
             </a>
-            <a href="#vendedores" className="opacity-70 hover:opacity-100">
-              Vendedores
+            <a href="#promotores" className="opacity-70 hover:opacity-100">
+              Promotores
             </a>
             <a href="#preguntas" className="opacity-70 hover:opacity-100">
               Preguntas
@@ -146,64 +183,78 @@ export default async function Inicio() {
 
           <Link
             href={user ? "/auth/destino" : "/login?rol=emprendedor"}
-            className="flex min-h-11 items-center rounded-sm bg-senal px-4 text-sm font-semibold text-white transition-colors hover:bg-senal-alta"
+            className="flex min-h-11 items-center rounded-plantilla bg-senal px-4 text-sm font-semibold text-white transition-colors hover:bg-senal-alta"
           >
-            {user ? "Ir a mi panel" : "Crear mi tienda"}
+            {user ? "Ir a mi panel" : "Publicar mis productos"}
           </Link>
         </div>
       </header>
 
       <main>
-        {/* El mecanismo funcionando en el primer viewport, no explicado. */}
         <section className="mx-auto max-w-6xl px-5 pt-12 pb-16 sm:pt-16 sm:pb-20">
           <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
             <div>
-              <h1 className="max-w-[13ch] font-titular text-[clamp(2.5rem,8vw,4.5rem)] leading-[0.97] font-extrabold tracking-[-0.035em] text-balance">
-                Cuenta qué vendes. Venduo arma la tienda.
+              <h1 className="max-w-[14ch] font-titular text-[clamp(2.5rem,8vw,4.5rem)] leading-[0.97] font-extrabold tracking-[-0.035em] text-balance">
+                Tú pones el producto. Nosotros, quién lo venda.
               </h1>
               <p className="mt-6 max-w-[52ch] text-lg leading-relaxed opacity-70">
-                Ya vendes por TikTok, Facebook o WhatsApp. Describe tu negocio
-                en un párrafo, elige una plantilla y en minutos tienes tienda
-                online con catálogo, cobro por QR y estadísticas.
+                Publica lo que haces diciendo solo cuánto quieres recibir por
+                cada cosa. Una red de jóvenes promotores lo lleva a sus redes, y
+                a ti te avisamos cuando alguien compre para que coordines la
+                entrega.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/login?rol=emprendedor"
-                  className="rounded-sm bg-senal px-5 py-3 font-semibold text-white transition-colors hover:bg-senal-alta"
+                  className="rounded-plantilla bg-senal px-5 py-3 font-semibold text-white transition-colors hover:bg-senal-alta"
                 >
-                  Crear mi tienda
+                  Publicar mis productos
                 </Link>
                 <Link
-                  href="/login?rol=vendedor"
-                  className="rounded-sm border-2 border-tinta px-5 py-3 font-semibold transition-colors hover:bg-tinta hover:text-white"
+                  href="/login?rol=promotor"
+                  className="rounded-plantilla border-2 border-tinta px-5 py-3 font-semibold transition-colors hover:bg-tinta hover:text-papel"
                 >
-                  Quiero vender
+                  Ser promotor
                 </Link>
               </div>
+              <p className="mt-4 text-sm opacity-55">
+                Publicar no cuesta nada. Si no vendes, no pagas.
+              </p>
             </div>
 
-            <DemoTienda />
+            <Entra>
+              <PrecioEjemplo tramos={tramos} />
+            </Entra>
           </div>
         </section>
 
         <section className="border-y border-tinta/15">
           <div className="mx-auto grid max-w-6xl gap-9 px-5 py-12 sm:grid-cols-2 lg:grid-cols-4">
             <Cifra
-              valor={8}
-              sufijo=" min"
-              detalle="Promedio en publicar una tienda"
+              valor={0}
+              prefijo="Bs "
+              detalle="Para publicar tus productos"
             />
             <Cifra
-              valor={10}
-              sufijo="%"
-              detalle="Comisión para el vendedor, por venta"
+              valor={0}
+              prefijo="Bs "
+              detalle="De inversión para el promotor"
             />
-            <Cifra valor={4100} detalle="Vendedores con historial activo" />
-            <Cifra valor={0} prefijo="Bs " detalle="Para abrir y publicar" />
+            <Cifra
+              valor={16}
+              sufijo=" años"
+              detalle="Edad mínima para vender"
+            />
+            <Cifra
+              valor={96}
+              sufijo="%"
+              detalle="De los jóvenes que trabajan lo hacen en la informalidad"
+            />
           </div>
           <div className="mx-auto max-w-6xl px-5 pb-8">
             <p className="text-xs opacity-45">
-              Cifras ilustrativas de la demostración. Venduo está en desarrollo.
+              Venduo está en desarrollo. El dato de informalidad juvenil varía
+              según la fuente y el año.
             </p>
           </div>
         </section>
@@ -214,24 +265,24 @@ export default async function Inicio() {
             <Entra>
               <div className="border-t-2 border-tinta pt-6">
                 <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-                  Para quien ya vende
+                  Para quien produce
                 </p>
                 <h2 className="mt-5 max-w-[15ch] font-titular text-[clamp(1.75rem,4.5vw,2.4rem)] leading-[1.04] font-extrabold tracking-[-0.03em]">
-                  Monta tu tienda hablando, no programando.
+                  Vende sin poner un peso por adelantado.
                 </h2>
                 <p className="mt-4 max-w-[46ch] leading-relaxed opacity-70">
-                  Le cuentas a la IA qué vendes, a quién y a qué precio. Ella
-                  arma el catálogo, los textos y las promociones. Tú revisas y
-                  publicas.
+                  Cargas tus productos con cuánto quieres recibir y ahí termina
+                  tu trabajo hasta que alguien compre. Sin publicidad, sin
+                  contratar, sin negociar porcentajes con nadie.
                 </p>
                 <Link
                   href="/login?rol=emprendedor"
-                  className="mt-7 inline-block rounded-sm bg-senal px-5 py-3 font-semibold text-white transition-colors hover:bg-senal-alta"
+                  className="mt-7 inline-block rounded-plantilla bg-senal px-5 py-3 font-semibold text-white transition-colors hover:bg-senal-alta"
                 >
-                  Crear mi tienda gratis
+                  Publicar mis productos
                 </Link>
                 <p className="mt-3 text-sm opacity-55">
-                  Lista en menos de 10 minutos. No pedimos tarjeta.
+                  Cargas el primero en dos minutos. No pedimos tarjeta.
                 </p>
               </div>
             </Entra>
@@ -239,20 +290,21 @@ export default async function Inicio() {
             <Entra demora={90}>
               <div className="border-t-2 border-tinta pt-6">
                 <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-                  Para quien quiere vender
+                  Para quien quiere ganar
                 </p>
                 <h2 className="mt-5 max-w-[15ch] font-titular text-[clamp(1.75rem,4.5vw,2.4rem)] leading-[1.04] font-extrabold tracking-[-0.03em]">
-                  Súmate a una tienda y arma tu historial.
+                  Vende productos que no son tuyos y arma tu historial.
                 </h2>
                 <p className="mt-4 max-w-[46ch] leading-relaxed opacity-70">
-                  Eliges una tienda, vendes con tu propio enlace y ganas
-                  comisión. Cada venta queda registrada a tu nombre.
+                  Eliges del catálogo lo que te guste, lo compartes con tu
+                  enlace y ganas comisión por cada venta. Sin invertir, sin
+                  guardar mercadería y sin que nadie te apruebe.
                 </p>
                 <Link
-                  href="/login?rol=vendedor"
-                  className="mt-7 inline-block rounded-sm border-2 border-tinta px-5 py-3 font-semibold transition-colors hover:bg-tinta hover:text-white"
+                  href="/login?rol=promotor"
+                  className="mt-7 inline-block rounded-plantilla border-2 border-tinta px-5 py-3 font-semibold transition-colors hover:bg-tinta hover:text-papel"
                 >
-                  Sumarme como vendedor
+                  Ser promotor
                 </Link>
                 <p className="mt-3 text-sm opacity-55">
                   Desde los 16 años. Sin inversión inicial.
@@ -267,58 +319,77 @@ export default async function Inicio() {
           className="scroll-mt-20 border-t border-tinta/15"
         >
           <div className="mx-auto max-w-6xl px-5 py-20">
-            <div className="grid gap-12 lg:grid-cols-[1fr_0.8fr] lg:gap-16">
-              <div>
-                <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-                  Cómo funciona
-                </p>
-                <ol className="mt-8">
-                  {PASOS.map((paso, i) => (
-                    <Entra key={paso.n} demora={i * 70}>
-                      <li className="flex gap-5 border-t border-tinta/15 py-6">
-                        <span className="tabular pt-1 font-titular text-sm font-bold opacity-40">
-                          {paso.n}
-                        </span>
-                        <div>
-                          <h3 className="font-titular text-xl font-bold tracking-[-0.02em]">
-                            {paso.titulo}
-                          </h3>
-                          <p className="mt-2 max-w-[48ch] text-sm leading-relaxed opacity-70">
-                            {paso.detalle}
-                          </p>
-                        </div>
-                      </li>
-                    </Entra>
-                  ))}
-                </ol>
-              </div>
+            <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+              Cómo funciona
+            </p>
+            <h2 className="mt-5 max-w-[20ch] font-titular text-[clamp(1.9rem,5vw,2.75rem)] leading-[1.04] font-extrabold tracking-[-0.03em]">
+              Dos caminos que terminan en la misma venta.
+            </h2>
 
-              <Entra className="lg:pt-10">
-                <Foto
-                  id="1687422808248-f807f4ea2a2e"
-                  alt="Comerciante revisando pedidos en su teléfono"
-                  pie="El negocio que ya existe, con el celular como mostrador."
-                  ratio="aspect-[4/5]"
-                />
-              </Entra>
+            <div className="mt-12 grid gap-x-16 gap-y-12 lg:grid-cols-2">
+              <Pasos
+                titulo="Si produces o revendes"
+                pasos={PASOS_NEGOCIO}
+                acento
+              />
+              <Pasos titulo="Si vas a promocionar" pasos={PASOS_PROMOTOR} />
             </div>
           </div>
         </section>
 
-        <section
-          id="modulos"
-          className="scroll-mt-20 border-t border-tinta/15 py-20"
-        >
+        {/* El mecanismo económico, explicado con la cuenta hecha. */}
+        <section id="precio" className="scroll-mt-20 border-t border-tinta/15">
+          <div className="mx-auto grid max-w-6xl gap-12 px-5 py-20 lg:grid-cols-[1fr_0.85fr] lg:gap-16">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+                El precio
+              </p>
+              <h2 className="mt-5 max-w-[16ch] font-titular text-[clamp(1.9rem,5vw,2.75rem)] leading-[1.04] font-extrabold tracking-[-0.03em]">
+                Nadie negocia porcentajes.
+              </h2>
+              <p className="mt-6 max-w-[52ch] text-lg leading-relaxed opacity-70">
+                El negocio declara lo que quiere recibir. Encima se suman la
+                comisión del promotor y la parte de Venduo, las dos escalonadas
+                según el precio del producto: más altas en lo barato, donde una
+                venta chica tiene que valer el esfuerzo, y más bajas en lo caro.
+              </p>
+              <ul className="mt-8 flex max-w-[52ch] flex-col">
+                {[
+                  "El negocio recibe su monto completo, venda quien venda.",
+                  "El comprador paga lo mismo llegue por donde llegue.",
+                  "Si nadie promocionó la venta, esa comisión vuelve al negocio.",
+                ].map((linea) => (
+                  <li
+                    key={linea}
+                    className="border-t border-tinta/15 py-4 text-sm leading-relaxed opacity-75"
+                  >
+                    {linea}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <Entra className="lg:pt-6">
+              <PrecioEjemplo
+                tramos={tramos}
+                baseCents={4000}
+                nombre="Alfajor artesanal x6"
+              />
+            </Entra>
+          </div>
+        </section>
+
+        <section className="border-t border-tinta/15 py-20">
           <div className="mx-auto max-w-6xl px-5">
             <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-              Qué viene adentro
+              Qué resuelve
             </p>
             <h2 className="mt-5 max-w-[18ch] font-titular text-[clamp(1.9rem,5vw,2.75rem)] leading-[1.04] font-extrabold tracking-[-0.03em]">
-              Todo lo que antes hacías en cinco apps distintas.
+              Lo que antes había que armar a mano, cada semana.
             </h2>
 
             <div className="mt-12 grid gap-x-10 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
-              {MODULOS.map((m, i) => (
+              {RESUELVE.map((m, i) => (
                 <Entra key={m.titulo} demora={(i % 3) * 70}>
                   <div className="group border-t border-tinta/15 py-6 transition-colors hover:border-senal">
                     <h3 className="font-titular text-lg font-bold tracking-[-0.02em] transition-colors group-hover:text-senal">
@@ -341,7 +412,7 @@ export default async function Inicio() {
               <Foto
                 id="1573633509389-0e3075dea01b"
                 alt="Joven mostrando su teléfono"
-                pie="Vender por el mismo canal donde ya estás."
+                pie="Promocionar por el mismo canal donde ya estás."
                 ratio="aspect-[3/4]"
               />
             </Entra>
@@ -357,7 +428,7 @@ export default async function Inicio() {
               <Foto
                 id="1537511446984-935f663eb1f4"
                 alt="Taller pequeño con mercadería"
-                pie="El depósito de donde sale el pedido."
+                pie="El taller que produce y no tenía dónde vender."
                 ratio="aspect-[3/4]"
               />
             </Entra>
@@ -366,7 +437,7 @@ export default async function Inicio() {
 
         {/* El bloque rojo: la tesis del proyecto, dicha sin adorno. */}
         <section
-          id="vendedores"
+          id="promotores"
           className="campo-senal scroll-mt-20 bg-senal text-white"
         >
           <div className="mx-auto max-w-6xl px-5 py-20 sm:py-24">
@@ -379,10 +450,10 @@ export default async function Inicio() {
               monto. Eso, juntado, es un historial laboral.
             </p>
             <Link
-              href="/login?rol=vendedor"
-              className="mt-9 inline-block rounded-sm border-2 border-white px-5 py-3 font-semibold transition-colors hover:bg-white hover:text-senal"
+              href="/login?rol=promotor"
+              className="mt-9 inline-block rounded-plantilla border-2 border-white px-5 py-3 font-semibold transition-colors hover:bg-white hover:text-senal"
             >
-              Sumarme como vendedor
+              Ser promotor
             </Link>
             <p className="mt-8 max-w-[60ch] text-xs leading-relaxed text-white/65">
               Estimación propia de Venduo sobre empleo juvenil urbano; el dato
@@ -429,31 +500,22 @@ export default async function Inicio() {
         <section className="border-t border-tinta/15">
           <div className="mx-auto max-w-6xl px-5 py-20">
             <h2 className="max-w-[12ch] font-titular text-[clamp(2.25rem,7vw,4rem)] leading-[1] font-extrabold tracking-[-0.035em]">
-              Abre la tienda hoy. Vende esta semana.
+              Publica hoy. Vende esta semana.
             </h2>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link
                 href="/login?rol=emprendedor"
-                className="rounded-sm bg-senal px-5 py-3 font-semibold text-white transition-colors hover:bg-senal-alta"
+                className="rounded-plantilla bg-senal px-5 py-3 font-semibold text-white transition-colors hover:bg-senal-alta"
               >
-                Crear mi tienda gratis
+                Publicar mis productos
               </Link>
               <Link
-                href="/login?rol=vendedor"
-                className="rounded-sm border-2 border-tinta px-5 py-3 font-semibold transition-colors hover:bg-tinta hover:text-white"
+                href="/login?rol=promotor"
+                className="rounded-plantilla border-2 border-tinta px-5 py-3 font-semibold transition-colors hover:bg-tinta hover:text-papel"
               >
-                Sumarme como vendedor
+                Ser promotor
               </Link>
             </div>
-
-            {TIENDA_EJEMPLO ? (
-              <Link
-                href={`/t/${TIENDA_EJEMPLO}`}
-                className="mt-8 inline-block text-sm underline underline-offset-4 opacity-70 hover:opacity-100"
-              >
-                O mira primero una tienda hecha con Venduo
-              </Link>
-            ) : null}
           </div>
         </section>
       </main>
@@ -467,6 +529,50 @@ export default async function Inicio() {
           </a>
         </div>
       </footer>
+    </div>
+  )
+}
+
+/** Una columna de pasos numerados. El acento marca el camino del negocio. */
+function Pasos({
+  titulo,
+  pasos,
+  acento = false,
+}: {
+  titulo: string
+  pasos: Array<{ n: string; titulo: string; detalle: string }>
+  acento?: boolean
+}) {
+  return (
+    <div>
+      <h3
+        className={
+          acento
+            ? "font-titular text-xl font-bold tracking-[-0.02em] text-senal"
+            : "font-titular text-xl font-bold tracking-[-0.02em]"
+        }
+      >
+        {titulo}
+      </h3>
+      <ol className="mt-4">
+        {pasos.map((paso, i) => (
+          <Entra key={paso.n} demora={i * 70}>
+            <li className="flex gap-5 border-t border-tinta/15 py-6">
+              <span className="tabular pt-1 font-titular text-sm font-bold opacity-40">
+                {paso.n}
+              </span>
+              <div>
+                <h4 className="font-titular text-lg font-bold tracking-[-0.02em]">
+                  {paso.titulo}
+                </h4>
+                <p className="mt-2 max-w-[48ch] text-sm leading-relaxed opacity-70">
+                  {paso.detalle}
+                </p>
+              </div>
+            </li>
+          </Entra>
+        ))}
+      </ol>
     </div>
   )
 }

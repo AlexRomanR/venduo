@@ -23,10 +23,13 @@ export const productoSchema = z
       .trim()
       .max(600, "Máximo 600 caracteres.")
       .default(""),
-    precio: z
-      .number({ error: "Pon un precio." })
-      .nonnegative("El precio no puede ser negativo.")
-      .max(9_999_999, "Ese precio es demasiado alto."),
+    // El negocio declara lo que quiere recibir. El precio publicado lo
+    // construye la base sumando la comisión del promotor y el take-rate:
+    // ninguna pantalla deja escribirlo. Ver `docs/modelo-de-negocio.md`.
+    costoBase: z
+      .number({ error: "Pon cuánto quieres recibir por el producto." })
+      .positive("Tiene que ser mayor que cero.")
+      .max(9_999_999, "Ese monto es demasiado alto."),
     precioAnterior: z
       .number()
       .nonnegative("El precio anterior no puede ser negativo.")
@@ -52,16 +55,19 @@ export const productoSchema = z
     aceptaVendedores: z.boolean().default(true),
   })
   .superRefine((valores, ctx) => {
-    // El precio anterior es lo que produce el descuento tachado. Si no es mayor
-    // que el actual no hay descuento, hay un error de carga.
+    // El precio anterior es lo que produce el descuento tachado, y se compara
+    // contra el precio **publicado**, no contra el costo base. Como el
+    // publicado siempre es mayor que el costo, exigir que lo supere es el
+    // mínimo que se puede comprobar sin los tramos a mano; la base rechaza el
+    // resto.
     if (
       valores.precioAnterior !== null &&
-      valores.precioAnterior <= valores.precio
+      valores.precioAnterior <= valores.costoBase
     ) {
       ctx.addIssue({
         code: "custom",
         path: ["precioAnterior"],
-        message: "El precio anterior tiene que ser mayor que el actual.",
+        message: "El precio anterior tiene que ser mayor que el publicado.",
       })
     }
 

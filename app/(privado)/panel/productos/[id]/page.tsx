@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react"
 
 import { getCatalogo, getProducto } from "@/lib/data/catalogo"
 import { getMiTienda } from "@/lib/data/panel"
+import { getTramos } from "@/lib/data/precios"
 import { isSupabaseConfigured } from "@/lib/env"
 import { formatDate } from "@/lib/format"
 import { FormularioProducto } from "@/components/productos/formulario"
@@ -27,7 +28,10 @@ export default async function EditarProductoPage({
   // quien lo pide, y no confirma que ese producto exista en algún lado.
   if (!producto) notFound()
 
-  const { categorias } = await getCatalogo()
+  const [{ categorias }, tramos] = await Promise.all([
+    getCatalogo(),
+    getTramos(),
+  ])
 
   return (
     <div className="mx-auto w-full max-w-3xl">
@@ -56,6 +60,7 @@ export default async function EditarProductoPage({
         <FormularioProducto
           tiendaId={tienda?.id ?? "demo"}
           categorias={categorias}
+          tramos={tramos}
           producto={producto}
           guardar={guardarProducto}
         />

@@ -4,10 +4,10 @@ export interface Paso {
   nombre: string
 }
 
-/** Los pasos del alta de una tienda, en un solo lugar para que no se desfasen. */
+/** Los pasos del alta, en un solo lugar para que no se desfasen. */
 export const PASOS_CREAR: Paso[] = [
-  { nombre: "Elige plantilla" },
   { nombre: "Cuenta tu negocio" },
+  { nombre: "Carga tu primer producto" },
 ]
 
 /**

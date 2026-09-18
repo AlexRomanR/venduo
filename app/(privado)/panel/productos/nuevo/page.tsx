@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 
 import { getCatalogo } from "@/lib/data/catalogo"
+import { getTramos } from "@/lib/data/precios"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
 import { FormularioProducto } from "@/components/productos/formulario"
@@ -14,7 +15,10 @@ export default async function NuevoProductoPage() {
   const tienda = await getMiTienda()
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
-  const { categorias } = await getCatalogo()
+  const [{ categorias }, tramos] = await Promise.all([
+    getCatalogo(),
+    getTramos(),
+  ])
 
   return (
     <div className="mx-auto w-full max-w-3xl">
@@ -33,14 +37,15 @@ export default async function NuevoProductoPage() {
         Un producto nuevo.
       </h1>
       <p className="mt-3 max-w-[56ch] text-sm leading-relaxed opacity-70">
-        Lo mínimo es el nombre, el precio y cuántas unidades tienes. Lo demás
-        hace que se venda mejor, y lo puedes completar después.
+        Lo mínimo es el nombre, cuánto quieres recibir por él y cuántas unidades
+        tienes. Lo demás hace que se venda mejor, y lo puedes completar después.
       </p>
 
       <div className="mt-12">
         <FormularioProducto
           tiendaId={tienda?.id ?? "demo"}
           categorias={categorias}
+          tramos={tramos}
           guardar={guardarProducto}
         />
       </div>

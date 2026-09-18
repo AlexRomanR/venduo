@@ -6,10 +6,12 @@ import {
   BarChart3,
   Megaphone,
   Package,
+  Plus,
   ShoppingBag,
   Users,
 } from "lucide-react"
 
+import { getCatalogo } from "@/lib/data/catalogo"
 import { getMiTienda, getResumenPanel } from "@/lib/data/panel"
 import { urlDeTienda } from "@/lib/tienda"
 import { RESUMEN_DEMO } from "@/lib/demo-data"
@@ -18,6 +20,13 @@ import { formatMoney, formatNumber } from "@/lib/format"
 import { toDataURL } from "@/lib/qr"
 import { AvisoSuscripcion } from "@/components/panel/aviso-suscripcion"
 import { Cifra, Encabezado } from "@/components/panel/piezas"
+import { PrimerosPasos } from "@/components/panel/primeros-pasos"
+import { ListaProductos } from "@/components/productos/lista"
+import {
+  ajustarStock,
+  alternarProducto,
+  borrarProducto,
+} from "./productos/acciones"
 
 export const metadata = { title: "Resumen" }
 
@@ -31,13 +40,13 @@ const SECCIONES = [
   {
     href: "/panel/pedidos",
     titulo: "Pedidos",
-    detalle: "Confirma pagos y coordina la entrega por WhatsApp.",
+    detalle: "Confirma el envío y coordina la entrega por WhatsApp.",
     icono: ShoppingBag,
   },
   {
     href: "/panel/vendedores",
-    titulo: "Vendedores",
-    detalle: "Aprueba solicitudes y sigue las comisiones de tu red.",
+    titulo: "Promotores",
+    detalle: "Quiénes venden lo tuyo y cuánto generaron.",
     icono: Users,
   },
   {
@@ -55,11 +64,13 @@ const SECCIONES = [
 ]
 
 /**
- * Resumen del emprendedor: la pantalla de entrada del panel.
+ * La pantalla de entrada del negocio.
  *
- * Quien todavía no eligió plantilla no tiene nada que resumir acá. La
- * comprobación es sobre `template_key` y no sobre la existencia de la tienda
- * porque es lo que marca que el alta terminó.
+ * Tiene dos caras, y la decide el catálogo: **sin productos no hay nada que
+ * resumir**, así que se explican los pasos —incluidos los que resuelve la
+ * plataforma, que es lo que un negocio nuevo no tiene forma de adivinar—. Con
+ * productos cargados, lo primero es el catálogo y su stock, que es lo que se
+ * mira todos los días.
  */
 export default async function PanelPage() {
   const tienda = await getMiTienda()
@@ -68,9 +79,22 @@ export default async function PanelPage() {
   // tienda que buscar ni alta que completar.
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
-  const resumen = (await getResumenPanel()) ?? RESUMEN_DEMO
+  const [resumenReal, catalogo] = await Promise.all([
+    getResumenPanel(),
+    getCatalogo(),
+  ])
+  const resumen = resumenReal ?? RESUMEN_DEMO
+
+  // Sin un solo producto no hay catálogo, ni pedidos, ni nada que promocionar:
+  // lo único útil es explicar cómo sigue.
+  if (catalogo.productos.length === 0) {
+    return <PrimerosPasos nombre={resumen.tienda.name} />
+  }
+
   const url = urlDeTienda(resumen.tienda.slug)
   const qr = await toDataURL(url, { size: 320, margin: 1, dark: "#16171a" })
+  const ultimos = catalogo.productos.slice(0, 5)
+  const sinStock = catalogo.productos.filter((p) => p.stock === 0).length
 
   // Lo que espera una acción. Se arma acá y no en la interfaz porque el orden
   // importa: primero lo que bloquea vender, después lo que lo mejora.
@@ -84,9 +108,9 @@ export default async function PanelPage() {
       urgente: true,
     })
   }
-  if (resumen.productos === 0) {
+  if (sinStock > 0) {
     pendientes.push({
-      texto: "No cargaste ningún producto todavía.",
+      texto: `${formatNumber(sinStock)} ${sinStock === 1 ? "producto se quedó" : "productos se quedaron"} sin stock: nadie puede comprarlos.`,
       href: "/panel/productos",
       urgente: true,
     })
@@ -102,7 +126,7 @@ export default async function PanelPage() {
   }
   if (resumen.vendedoresPendientes > 0) {
     pendientes.push({
-      texto: `${formatNumber(resumen.vendedoresPendientes)} ${resumen.vendedoresPendientes === 1 ? "persona quiere" : "personas quieren"} vender para ti.`,
+      texto: `${formatNumber(resumen.vendedoresPendientes)} ${resumen.vendedoresPendientes === 1 ? "promotor quiere" : "promotores quieren"} vender lo tuyo.`,
       href: "/panel/vendedores",
       urgente: false,
     })
@@ -164,23 +188,62 @@ export default async function PanelPage() {
             alerta={resumen.pedidosPendientes > 0}
           />
           <Cifra
-            etiqueta="Vendedores activos"
+            etiqueta="Promotores activos"
             valor={formatNumber(resumen.vendedoresActivos)}
             detalle={
-              resumen.vendedoresPendientes > 0
-                ? `${formatNumber(resumen.vendedoresPendientes)} esperando aprobación`
-                : "Sin solicitudes pendientes"
+              resumen.vendedoresActivos > 0
+                ? "Promocionando lo tuyo"
+                : "Todavía ninguno"
             }
-            alerta={resumen.vendedoresPendientes > 0}
           />
           <Cifra
             etiqueta="Productos"
-            valor={formatNumber(resumen.productos)}
+            valor={formatNumber(catalogo.productos.length)}
             detalle={
-              resumen.productos > 0 ? "En tu catálogo" : "Todavía ninguno"
+              sinStock > 0
+                ? `${formatNumber(sinStock)} sin stock`
+                : "Todos con stock"
             }
+            alerta={sinStock > 0}
           />
         </div>
+      </section>
+
+      <section>
+        <Encabezado
+          etiqueta="Tu catálogo"
+          titulo={
+            catalogo.productos.length === 1
+              ? "1 producto publicado"
+              : `${formatNumber(catalogo.productos.length)} productos publicados`
+          }
+          accion={{ href: "/panel/productos", texto: "Ver todo" }}
+        />
+        <p className="mt-3 max-w-[58ch] text-sm leading-relaxed opacity-70">
+          El precio que ve quien compra sale de lo que tú quieres recibir: le
+          sumamos la comisión del promotor y nuestra parte. Acá ajustas el stock
+          sin entrar a cada producto.
+        </p>
+
+        <div className="mt-8">
+          <ListaProductos
+            productos={ultimos}
+            soloLectura={catalogo.esDemo}
+            acciones={{
+              alternar: alternarProducto,
+              ajustarStock,
+              borrar: borrarProducto,
+            }}
+          />
+        </div>
+
+        <Link
+          href="/panel/productos/nuevo"
+          className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-plantilla border-2 border-tinta px-5 font-semibold transition-colors hover:bg-tinta hover:text-papel"
+        >
+          <Plus aria-hidden="true" className="size-4" />
+          Cargar otro producto
+        </Link>
       </section>
 
       {pendientes.length > 0 ? (

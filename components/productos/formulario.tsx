@@ -14,7 +14,8 @@ import {
   CAMPO_LINEA,
   ETIQUETA_CAMPO,
 } from "@/lib/estilos"
-import { CURRENCY_SYMBOL } from "@/lib/format"
+import { CURRENCY_SYMBOL, formatMoney } from "@/lib/format"
+import { construirPrecio, porcentaje, type Tramo } from "@/lib/precio"
 import { cn } from "@/lib/utils"
 import {
   CONDICIONES,
@@ -73,6 +74,62 @@ function Bloque({
 }
 
 /**
+ * Lo que el negocio recibe, lo que gana quien venda y a cuánto se publica.
+ *
+ * Se muestra mientras se escribe porque es la pregunta que aparece sola al
+ * declarar un costo base: "¿y en cuánto lo van a ver?". Esconderlo hasta
+ * guardar hace que la primera carga se sienta una apuesta.
+ */
+function Desglose({ precio }: { precio: ReturnType<typeof construirPrecio> }) {
+  return (
+    <div className="border-t-2 border-tinta pt-5">
+      <dl className="flex flex-col gap-2 text-sm">
+        <div className="flex items-baseline justify-between gap-4">
+          <dt className="opacity-70">Recibes</dt>
+          <dd className="tabular font-semibold">
+            {formatMoney(precio.baseCents)}
+          </dd>
+        </div>
+        <div className="flex items-baseline justify-between gap-4">
+          <dt className="opacity-70">
+            Comisión del promotor
+            <span className="tabular ml-2 opacity-55">
+              {porcentaje(precio.comisionBps)}
+            </span>
+          </dt>
+          <dd className="tabular opacity-70">
+            {formatMoney(precio.comisionCents)}
+          </dd>
+        </div>
+        <div className="flex items-baseline justify-between gap-4">
+          <dt className="opacity-70">
+            Venduo
+            <span className="tabular ml-2 opacity-55">
+              {porcentaje(precio.takeBps)}
+            </span>
+          </dt>
+          <dd className="tabular opacity-70">
+            {formatMoney(precio.takeCents)}
+          </dd>
+        </div>
+        <div className="mt-2 flex items-baseline justify-between gap-4 border-t border-tinta/15 pt-3">
+          <dt className="font-titular text-lg font-bold tracking-[-0.02em]">
+            Se publica en
+          </dt>
+          <dd className="tabular font-titular text-2xl font-extrabold tracking-[-0.03em] text-senal">
+            {formatMoney(precio.precioCents)}
+          </dd>
+        </div>
+      </dl>
+      <p className="mt-3 max-w-[58ch] text-xs leading-relaxed opacity-55">
+        Si nadie lo promociona y el comprador llega solo al catálogo, la
+        comisión también es tuya.
+      </p>
+    </div>
+  )
+}
+
+/**
  * Alta y edición de un producto.
  *
  * Es el mismo formulario para los dos casos: las reglas no cambian entre crear
@@ -81,11 +138,14 @@ function Bloque({
 export function FormularioProducto({
   tiendaId,
   categorias,
+  tramos,
   producto,
   guardar,
 }: {
   tiendaId: string
   categorias: ProductCategory[]
+  /** Los tramos vigentes, para mostrar el desglose mientras se escribe. */
+  tramos: Tramo[]
   producto?: Product
   guardar: (
     entrada: ProductoInput,
@@ -99,7 +159,7 @@ export function FormularioProducto({
     defaultValues: {
       nombre: producto?.name ?? "",
       descripcion: producto?.description ?? "",
-      precio: producto ? producto.price_cents / 100 : undefined,
+      costoBase: producto ? producto.base_cost_cents / 100 : undefined,
       precioAnterior: aMonto(producto?.compare_at_price_cents ?? null),
       stock: producto?.stock ?? 0,
       avisoStock: producto?.low_stock_threshold ?? 3,
@@ -115,7 +175,15 @@ export function FormularioProducto({
   })
 
   const condicion = form.watch("condicion")
+  const costoBase = form.watch("costoBase")
   const enCurso = form.formState.isSubmitting
+
+  // El desglose se calcula acá con los mismos tramos que usa la base. Es para
+  // mostrar: al guardar, Postgres lo vuelve a calcular y ese es el que vale.
+  const precio = construirPrecio(
+    Math.max(Number(costoBase) || 0, 0) * 100,
+    tramos
+  )
 
   async function alEnviar(valores: ProductoInput) {
     const resultado = await guardar(valores, producto?.id)
@@ -269,15 +337,18 @@ export function FormularioProducto({
           />
         </Bloque>
 
-        <Bloque titulo="Precio">
+        <Bloque
+          titulo="Precio"
+          detalle="Tú pones cuánto quieres recibir. Venduo suma encima la comisión del promotor que venda y su propia parte, y ese es el precio que ve quien compra."
+        >
           <div className="grid gap-6 sm:grid-cols-2">
             <FormField
               control={form.control}
-              name="precio"
+              name="costoBase"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className={ETIQUETA_CAMPO}>
-                    Precio en {CURRENCY_SYMBOL}
+                    Cuánto quieres recibir, en {CURRENCY_SYMBOL}
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -297,6 +368,9 @@ export function FormularioProducto({
                       }
                     />
                   </FormControl>
+                  <FormDescription className={AYUDA_CAMPO}>
+                    Es lo que te llega por cada venta, sin descuentos.
+                  </FormDescription>
                   <FormMessage className="text-senal" />
                 </FormItem>
               )}
@@ -327,13 +401,15 @@ export function FormularioProducto({
                     />
                   </FormControl>
                   <FormDescription className={AYUDA_CAMPO}>
-                    Opcional. Si lo pones, tu tienda muestra el descuento.
+                    Opcional. Si lo pones, se muestra el descuento.
                   </FormDescription>
                   <FormMessage className="text-senal" />
                 </FormItem>
               )}
             />
           </div>
+
+          <Desglose precio={precio} />
         </Bloque>
 
         <Bloque titulo="Stock">

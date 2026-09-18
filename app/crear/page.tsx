@@ -1,20 +1,20 @@
 import { redirect } from "next/navigation"
 
 import { getMiTienda, getPerfil, getVinculosDeVendedor } from "@/lib/data/panel"
-import {
-  getNombresDeBloque,
-  getPlantillasPorRubro,
-} from "@/lib/data/plantillas"
-import { GaleriaPlantillas } from "@/components/onboarding/galeria-plantillas"
+import { FormularioNegocio } from "@/components/onboarding/formulario-negocio"
 import { Pasos, PASOS_CREAR } from "@/components/onboarding/pasos"
 
-export const metadata = { title: "Elige tu plantilla" }
+export const metadata = { title: "Crea tu negocio" }
 
 /**
- * Paso 1 del alta: la galería de plantillas.
+ * El alta del negocio, en una sola pantalla.
  *
- * Quien ya eligió plantilla no vuelve acá: su tienda existe y lo que
- * corresponde es el panel.
+ * Antes eran dos pasos y el primero era elegir una plantilla para su tienda.
+ * El canal pasó a ser un solo Marketplace, así que esa decisión ya no existe:
+ * lo único que hace falta para empezar es el nombre del negocio y qué vende.
+ *
+ * Quien ya lo completó no vuelve acá: su negocio existe y lo que corresponde
+ * es el panel.
  */
 export default async function CrearPage({
   searchParams,
@@ -26,39 +26,70 @@ export default async function CrearPage({
 
   if (tienda?.template_key) redirect("/panel")
 
-  // Quien se registró como vendedor no cae acá por accidente. Pero puede
+  // Quien se registró como promotor no cae acá por accidente. Pero puede
   // insistir con `?abrir=1`, porque el rol es una intención y no un permiso:
-  // una misma persona puede terminar siendo dueña y vendedora.
+  // una misma persona puede terminar produciendo y promocionando.
   if (perfil?.primary_role === "vendedor" && abrir !== "1" && !tienda) {
     const vinculos = await getVinculosDeVendedor()
     redirect(vinculos.length > 0 ? "/vendedor" : "/sumarme")
   }
 
-  const [rubros, nombresDeBloque] = await Promise.all([
-    getPlantillasPorRubro(),
-    getNombresDeBloque(),
-  ])
-
   return (
-    <div className="mx-auto max-w-6xl px-5 py-12 lg:py-16">
+    <div className="mx-auto max-w-5xl px-5 py-12 lg:py-16">
       <div className="grid gap-10 lg:grid-cols-[1fr_0.8fr] lg:items-end lg:gap-16">
         <div>
-          <h1 className="max-w-[15ch] font-titular text-[clamp(2.25rem,7vw,3.75rem)] leading-[0.98] font-extrabold tracking-[-0.035em] text-balance">
-            Elige por dónde empieza tu tienda.
+          <h1 className="max-w-[15ch] font-titular text-[clamp(2.25rem,7vw,3.5rem)] leading-[0.98] font-extrabold tracking-[-0.035em] text-balance">
+            Cuéntanos qué vendes.
           </h1>
           <p className="mt-5 max-w-[52ch] text-lg leading-relaxed opacity-70">
-            Cada plantilla tiene su propia forma de verse —la letra, los
-            colores, cómo muestra tus productos— y trae las secciones que ese
-            rubro necesita. No es definitiva: puedes cambiarla después desde tu
-            panel sin perder nada.
+            Con esto alcanza para empezar. Después cargas tus productos diciendo
+            cuánto quieres recibir por cada uno, y nosotros nos encargamos de
+            que alguien los venda.
           </p>
         </div>
 
         <Pasos pasos={PASOS_CREAR} actual={1} />
       </div>
 
-      <div className="mt-14 border-t border-tinta/15 pt-12">
-        <GaleriaPlantillas rubros={rubros} nombresDeBloque={nombresDeBloque} />
+      <div className="mt-14 grid gap-12 border-t border-tinta/15 pt-12 lg:grid-cols-[1fr_0.8fr] lg:gap-16">
+        <FormularioNegocio />
+
+        <aside className="lg:pt-2">
+          <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+            Lo que sigue
+          </p>
+          <ul className="mt-5 border-t-2 border-tinta">
+            {[
+              {
+                titulo: "Cargas tus productos",
+                detalle:
+                  "Foto, stock y cuánto quieres recibir. El precio lo calculamos nosotros.",
+              },
+              {
+                titulo: "Los promotores los toman",
+                detalle:
+                  "Eligen qué promocionar en sus redes. Tú no pagas nada por adelantado.",
+              },
+              {
+                titulo: "Te avisamos de cada venta",
+                detalle:
+                  "Coordinas la entrega por WhatsApp y cobras cuando el pedido llega.",
+              },
+            ].map((paso) => (
+              <li
+                key={paso.titulo}
+                className="border-b border-tinta/15 py-4 text-sm"
+              >
+                <p className="font-titular font-bold tracking-[-0.01em]">
+                  {paso.titulo}
+                </p>
+                <p className="mt-1 leading-relaxed opacity-70">
+                  {paso.detalle}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </aside>
       </div>
     </div>
   )

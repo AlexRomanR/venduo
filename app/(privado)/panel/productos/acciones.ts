@@ -76,7 +76,9 @@ export async function guardarProducto(
     store_id: tiendaId,
     name: v.nombre,
     description: v.descripcion || null,
-    price_cents: aCentavos(v.precio),
+    // `price_cents` no se escribe: lo deriva el disparador `producto_precio`
+    // del costo base, sumando comisión y take-rate del tramo.
+    base_cost_cents: aCentavos(v.costoBase),
     compare_at_price_cents:
       v.precioAnterior === null ? null : aCentavos(v.precioAnterior),
     stock: v.stock,
@@ -282,7 +284,7 @@ function mensajeDeError(crudo: string) {
     return "Ya usaste ese código en otro producto."
   }
   if (crudo.includes("compare_at_price_cents")) {
-    return "El precio anterior tiene que ser mayor que el actual."
+    return "El precio anterior tiene que ser mayor que el precio publicado."
   }
   return "No pudimos guardar. Revisa los datos e intenta de nuevo."
 }

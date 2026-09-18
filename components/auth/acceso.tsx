@@ -37,61 +37,64 @@ type Contenido = {
 }
 
 /**
- * Cada rol llega con su propia promesa: quien ya vende quiere una tienda, y
- * quien quiere vender quiere un historial. Es el mismo formulario, pero lo que
- * se lee al lado cambia entero.
+ * Cada rol llega con su propia promesa: quien produce quiere vender sin poner
+ * plata por adelantado, y quien promociona quiere ganar sin invertir. Es el
+ * mismo formulario, pero lo que se lee al lado cambia entero.
+ *
+ * El valor `vendedor` es el que guarda la base; en pantalla se dice
+ * **promotor**, que es como se llama en el modelo.
  */
 const CONTENIDO: Record<Rol, Contenido> = {
   emprendedor: {
     icono: Store,
     opcion: "Tengo un negocio",
-    detalleOpcion: "Quiero mi tienda online",
-    etiqueta: "Para quien ya vende",
-    titular: "Tu tienda abierta esta semana.",
+    detalleOpcion: "Quiero vender lo que produzco",
+    etiqueta: "Para quien produce o revende",
+    titular: "Carga tus productos y listo.",
     entrada:
-      "Describe en un párrafo qué vendes y a qué precio. La IA arma el catálogo, escribe los textos y ordena las categorías; tú corriges lo que no te cuadre.",
+      "Pones lo que vendes y cuánto quieres recibir por cada cosa. Nosotros calculamos el precio, los promotores lo llevan a sus redes y a ti te avisamos cuando alguien compre.",
     puntos: [
       {
-        titulo: "Editor con IA",
+        titulo: "Tú no fijas el precio",
         detalle:
-          "Le hablas y la tienda cambia: precios, textos, categorías, portada.",
+          "Dices cuánto quieres recibir y el sistema suma la comisión y su parte encima.",
       },
       {
-        titulo: "Cobro por QR",
+        titulo: "Promotores sin contratar a nadie",
         detalle:
-          "El QR de tu banco en cada pedido, con el comprobante adjunto a la venta.",
+          "Eligen tus productos y los promocionan. Si no venden, no pagas nada.",
       },
       {
-        titulo: "Tu red de vendedores",
+        titulo: "Cobro protegido",
         detalle:
-          "Activas vendedores a comisión, cada uno con su enlace y su registro.",
+          "El pago queda retenido hasta que el comprador confirma que recibió.",
       },
     ],
-    pie: "Abrir y publicar no cuesta nada. No pedimos tarjeta.",
+    pie: "Publicar no cuesta nada. No pedimos tarjeta.",
   },
   vendedor: {
     icono: Users,
-    opcion: "Quiero vender",
+    opcion: "Quiero promocionar",
     detalleOpcion: "Gano comisión por cada venta",
-    etiqueta: "Para quien quiere vender",
+    etiqueta: "Para quien quiere ganar",
     titular: "Cada venta queda a tu nombre.",
     entrada:
-      "Te sumas a una tienda, vendes con tu propio enlace y ganas comisión. Lo que vendas se registra con tu nombre, la fecha y el monto.",
+      "Eliges del catálogo lo que quieras vender, lo compartes con tu enlace y ganas comisión. Sin invertir, sin stock en tu casa y sin que nadie te apruebe.",
     puntos: [
       {
-        titulo: "Comisión por cada venta",
+        titulo: "Comisión calculada sola",
         detalle:
-          "La tienda define el porcentaje, y queda congelado al momento de la venta.",
+          "Sale del precio, no de tu bolsillo, y queda congelada al momento de la venta.",
       },
       {
         titulo: "Tu enlace y tu código",
         detalle:
-          "Compartes los tuyos. Lo que se venda con ellos entra a tu nombre.",
+          "Uno por producto. Lo que se venda con ellos entra a tu nombre.",
       },
       {
-        titulo: "Historial que se arma solo",
+        titulo: "Quien traes, sigue siendo tuyo",
         detalle:
-          "Ventas, tiendas y fechas en un enlace que puedes mostrar después.",
+          "Si tu comprador vuelve y compra solo, esa venta también te deja comisión.",
       },
     ],
     pie: "Desde los 16 años. Sin inversión inicial.",

@@ -61,7 +61,7 @@ export default async function CuentaPage() {
         <div>
           <Encabezado etiqueta="Tú" titulo="Quién eres en Venduo" />
           <p className="mt-3 max-w-[44ch] text-sm leading-relaxed opacity-70">
-            Tu foto se ve en tu perfil de vendedor y en el panel. Tu nombre es
+            Tu foto se ve en tu perfil de promotor y en el panel. Tu nombre es
             con el que te saluda la plataforma.
           </p>
           <div className="mt-8">
@@ -126,7 +126,7 @@ export default async function CuentaPage() {
         <section className="grid gap-10 border-t border-tinta/15 pt-12 lg:grid-cols-[0.9fr_1fr] lg:gap-16">
           <div>
             <Encabezado
-              etiqueta="Tu perfil de vendedor"
+              etiqueta="Tu perfil de promotor"
               titulo="Tu historial laboral"
             />
             <p className="mt-3 max-w-[44ch] text-sm leading-relaxed opacity-70">

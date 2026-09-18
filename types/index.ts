@@ -31,6 +31,7 @@ export type ProductInsert = TablesInsert<"products">
 export type ProductUpdate = TablesUpdate<"products">
 export type ProductCategory = Tables<"product_categories">
 export type ProductCategoryInsert = TablesInsert<"product_categories">
+export type PricingTier = Tables<"pricing_tiers">
 
 // Venta
 export type Order = Tables<"orders">

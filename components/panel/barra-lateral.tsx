@@ -170,14 +170,14 @@ function Contenido({
         },
         {
           href: "/panel/vendedores",
-          nombre: "Vendedores",
+          nombre: "Promotores",
           icono: Users,
           contador:
             c.vendedoresPendientes > 0
               ? {
                   valor: c.vendedoresPendientes,
                   urgente: true,
-                  etiqueta: `${c.vendedoresPendientes} solicitudes`,
+                  etiqueta: `${c.vendedoresPendientes} solicitudes de promotores`,
                 }
               : undefined,
         },
@@ -452,7 +452,7 @@ function Contenido({
 
         {deVendedor.length > 0 && vendedor ? (
           <Grupo
-            titulo="Como vendedor"
+            titulo="Como promotor"
             plegada={plegada}
             detalle={
               c.comisionesPorCobrarCents > 0
