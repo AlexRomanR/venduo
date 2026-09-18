@@ -453,13 +453,21 @@ export type Database = {
           commission_bps: number
           commission_cents: number
           created_at: string
+          delivered_at: string | null
+          dispute_reason: string | null
+          disputed_at: string | null
           id: string
           net_to_store_cents: number
           order_number: number
           paid_at: string | null
           payment_proof_url: string | null
+          payment_reference: string | null
           referral_code: string | null
+          refunded_at: string | null
+          release_due_at: string | null
+          released_at: string | null
           seller_id: string | null
+          shipped_at: string | null
           status: Database["public"]["Enums"]["order_status"]
           store_id: string
           subtotal_cents: number
@@ -478,13 +486,21 @@ export type Database = {
           commission_bps?: number
           commission_cents?: number
           created_at?: string
+          delivered_at?: string | null
+          dispute_reason?: string | null
+          disputed_at?: string | null
           id?: string
           net_to_store_cents?: number
           order_number?: number
           paid_at?: string | null
           payment_proof_url?: string | null
+          payment_reference?: string | null
           referral_code?: string | null
+          refunded_at?: string | null
+          release_due_at?: string | null
+          released_at?: string | null
           seller_id?: string | null
+          shipped_at?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           store_id: string
           subtotal_cents: number
@@ -503,13 +519,21 @@ export type Database = {
           commission_bps?: number
           commission_cents?: number
           created_at?: string
+          delivered_at?: string | null
+          dispute_reason?: string | null
+          disputed_at?: string | null
           id?: string
           net_to_store_cents?: number
           order_number?: number
           paid_at?: string | null
           payment_proof_url?: string | null
+          payment_reference?: string | null
           referral_code?: string | null
+          refunded_at?: string | null
+          release_due_at?: string | null
+          released_at?: string | null
           seller_id?: string | null
+          shipped_at?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           store_id?: string
           subtotal_cents?: number
@@ -795,6 +819,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           product_id: string
+          referral_code: string
           seller_id: string | null
           store_id: string
           taken_at: string
@@ -806,6 +831,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           product_id: string
+          referral_code: string
           seller_id?: string | null
           store_id: string
           taken_at?: string
@@ -817,6 +843,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           product_id?: string
+          referral_code?: string
           seller_id?: string | null
           store_id?: string
           taken_at?: string
@@ -1637,6 +1664,16 @@ export type Database = {
         Args: { p_keep_sections?: boolean; p_template_key: string }
         Returns: string
       }
+      confirm_order_received: { Args: { p_order_id: string }; Returns: boolean }
+      create_marketplace_orders: {
+        Args: {
+          p_buyer_email: string
+          p_buyer_name: string
+          p_buyer_phone: string
+          p_items: Json
+        }
+        Returns: string[]
+      }
       create_order: {
         Args: {
           p_buyer_email: string
@@ -1660,6 +1697,7 @@ export type Database = {
       }
       ensure_seller_profile: { Args: { p_user_id: string }; Returns: undefined }
       generate_invite_code: { Args: never; Returns: string }
+      generate_product_referral_code: { Args: never; Returns: string }
       generate_referral_code: { Args: never; Returns: string }
       insight_filtro: {
         Args: { p_dataset: string; p_fecha: string }
@@ -1688,6 +1726,10 @@ export type Database = {
       my_seller_invite: { Args: never; Returns: string }
       my_store_id: { Args: never; Returns: string }
       normalizar_telefono: { Args: { p_telefono: string }; Returns: string }
+      open_order_dispute: {
+        Args: { p_order_id: string; p_reason: string }
+        Returns: boolean
+      }
       pedido_publico: { Args: { p_order_id: string }; Returns: Json }
       precio_publicado: {
         Args: { p_base_cost_cents: number }
@@ -1697,6 +1739,28 @@ export type Database = {
           price_cents: number
           take_bps: number
           take_cents: number
+        }[]
+      }
+      ranking_promotores_global: {
+        Args: { p_limite?: number }
+        Returns: {
+          avatar_url: string
+          bio: string
+          city: string
+          desde: string
+          display_name: string
+          slug: string
+          tiendas: number
+          user_id: string
+          ventas: number
+          volumen_cents: number
+        }[]
+      }
+      referido_producto_publico: {
+        Args: { p_codigo: string; p_product_id: string }
+        Returns: {
+          codigo: string
+          nombre: string
         }[]
       }
       referido_publico: {
@@ -1755,6 +1819,10 @@ export type Database = {
           ventas: number
         }[]
       }
+      simulate_pagofacil_payment: {
+        Args: { p_order_id: string }
+        Returns: boolean
+      }
       store_is_live: { Args: { p_store_id: string }; Returns: boolean }
       take_product: { Args: { p_product_id: string }; Returns: string }
       ventana_de_atribucion: { Args: never; Returns: string }
@@ -1766,7 +1834,12 @@ export type Database = {
       commission_status: "pendiente" | "confirmada" | "pagada" | "anulada"
       design_origin: "inicial" | "alta" | "antes_de_cambiar_plantilla"
       order_status:
-        "pendiente" | "pagado" | "enviado" | "entregado" | "cancelado"
+        | "pendiente"
+        | "pagado"
+        | "enviado"
+        | "entregado"
+        | "en_disputa"
+        | "cancelado"
       page_status: "borrador" | "publicada"
       product_condition: "nuevo" | "segunda_mano" | "reacondicionado"
       seller_join_mode: "abierta" | "con_aprobacion"
@@ -1912,6 +1985,7 @@ export const Constants = {
         "pagado",
         "enviado",
         "entregado",
+        "en_disputa",
         "cancelado",
       ],
       page_status: ["borrador", "publicada"],

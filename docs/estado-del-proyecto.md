@@ -3,8 +3,8 @@
 Qué está construido y qué falta, medido contra el **modelo vigente**
 (`docs/modelo-de-negocio.md`) y el alcance del MVP de `VENDUO.md` §6.
 Actualizado el 18 de septiembre de 2026: Marketplace público, referido por producto y
-flujo simulado de pago con custodia. Las migraciones nuevas están preparadas, no aplicadas
-a producción.
+flujo simulado de pago con custodia. Las migraciones están aplicadas a la base de datos y
+`types/database.ts` regenerado.
 
 **Leyenda:** ✅ sirve tal cual · 🟡 existe pero hay que rehacerlo · ❌ falta · ⛔ fuera del
 modelo
@@ -145,13 +145,13 @@ volvió a él.
 El panel del promotor ya separa lo vendido de lo generado por compradores traídos. Falta
 lo mismo en `/v/{slug}`: `seller_public_stats` todavía no mira `commissions.kind`.
 
-### 3. Aplicar y validar Marketplace/custodia en producción — prioridad alta
+### 3. Validar Marketplace/custodia en producción — prioridad alta
 
-El código y las migraciones están preparados. Falta revisar el SQL contra una copia segura,
-aplicar `20260918170000_custodia_y_referido_por_producto.sql` y
-`20260918170100_checkout_marketplace_y_pago_simulado.sql`, regenerar
-`types/database.ts` y hacer una compra de punta a punta con datos reales. No se hizo
-`supabase db push` porque la única base enlazada es producción.
+Las migraciones `20260918160000_ranking_promotores_global.sql`,
+`20260918170000_custodia_y_referido_por_producto.sql` y
+`20260918170100_checkout_marketplace_y_pago_simulado.sql` ya fueron aplicadas a la
+base (`supabase db push`) y `types/database.ts` fue regenerado. Falta hacer una
+compra de prueba de punta a punta con datos reales.
 
 ### 6. Marketing — prioridad baja
 
