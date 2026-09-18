@@ -24,7 +24,7 @@ const FOTOS = {
   gorra:
     "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1200&q=85",
   shortDeportivo:
-    "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1200&q=85",
+    "https://htcoobktimgztxomujvg.supabase.co/storage/v1/object/public/product-images/short-entrenamiento-dryfit.jpg",
 
   // Tecnología
   auriculares:
