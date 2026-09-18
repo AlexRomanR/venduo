@@ -10,7 +10,7 @@ de plantilla sin perder nada y qué hay que hacer para sumar una plantilla nueva
 >
 > **La arquitectura y persistencia necesarias para la futura edición de plantillas mediante
 > IA ya están preparadas, pero la funcionalidad de edición en vivo mediante IA todavía NO
-> está implementada.**
+> está implementada.**.
 
 ---
 
