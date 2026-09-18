@@ -3,11 +3,14 @@ import { cache } from "react"
 import {
   COMISIONES_PROMOTOR_DEMO,
   COMPRADORES_DEMO,
+  COMPRAS_CON_ENLACE_DEMO,
   ENLACES_DEMO,
 } from "@/lib/demo-data"
 import {
+  censurarTelefono,
   gananciaPorUnidad,
   type Comision,
+  type CompraConEnlace,
   type Comprador,
   type Enlace,
   type PerfilPromotor,
@@ -154,6 +157,79 @@ export const getMisComisiones = cache(async (): Promise<Comision[]> => {
     fecha: c.created_at,
   }))
 })
+
+/**
+ * Cada compra hecha con uno de sus enlaces, sin las canceladas.
+ *
+ * RLS ya le deja leer esos pedidos enteros, pero acá se reducen al nombre de
+ * pila y al teléfono censurado antes de salir del servidor: el comprador dio
+ * sus datos para la entrega, no para que los tenga un tercero.
+ */
+export const getMisComprasConEnlace = cache(
+  async (): Promise<CompraConEnlace[]> => {
+    const supabase = await createClient()
+    if (!supabase) return COMPRAS_CON_ENLACE_DEMO
+
+    const actual = await sesion()
+    if (!actual) return []
+
+    // Filtrar por sus vínculos y no confiar solo en RLS: si además es dueño de
+    // un negocio, la política de su tienda le devolvería pedidos sin enlace.
+    const { data: vinculos } = await actual.supabase
+      .from("store_sellers")
+      .select("id")
+      .eq("user_id", actual.user.id)
+    const ids = (vinculos ?? []).map((v) => v.id)
+    if (ids.length === 0) return []
+
+    const [{ data: pedidos }, { data: comisiones }] = await Promise.all([
+      actual.supabase
+        .from("orders")
+        .select(
+          "id, created_at, status, total_cents, buyer_name, buyer_phone, stores(name), order_items(product_name, quantity)"
+        )
+        .in("seller_id", ids)
+        .neq("status", "cancelado")
+        .order("created_at", { ascending: false })
+        .limit(500),
+      actual.supabase
+        .from("commissions")
+        .select("order_id, amount_cents, status")
+        .eq("seller_user_id", actual.user.id)
+        .eq("kind", "directa"),
+    ])
+
+    const porPedido = new Map(
+      (comisiones ?? []).map((c) => [
+        c.order_id,
+        { montoCents: c.amount_cents, estado: c.status },
+      ])
+    )
+    const claves = new Map<string, string>()
+
+    return (pedidos ?? []).map((p) => {
+      const llave = p.buyer_phone.replace(/\D/g, "")
+      if (!claves.has(llave)) claves.set(llave, `c${claves.size + 1}`)
+
+      return {
+        id: p.id,
+        compradorClave: claves.get(llave) ?? p.id,
+        comprador: p.buyer_name.trim().split(/\s+/)[0] || "Comprador",
+        telefono: censurarTelefono(p.buyer_phone),
+        fecha: p.created_at,
+        negocio: p.stores?.name ?? "Negocio",
+        productos: p.order_items
+          .map((i) =>
+            i.quantity > 1 ? `${i.product_name} ×${i.quantity}` : i.product_name
+          )
+          .join(", "),
+        totalCents: p.total_cents,
+        estado: p.status,
+        comision: porPedido.get(p.id) ?? null,
+      }
+    })
+  }
+)
 
 /**
  * Los compradores que trajo.

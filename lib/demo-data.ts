@@ -1,6 +1,7 @@
 import { CURRENCY } from "@/lib/format"
 import type {
   Comision,
+  CompraConEnlace,
   Comprador,
   Enlace,
   PromotorRanking,
@@ -603,6 +604,57 @@ export const ENLACES_DEMO: Enlace[] = [
     ventasCents: 0,
     stock: 0,
     disponible: false,
+  },
+]
+
+export const COMPRAS_CON_ENLACE_DEMO: CompraConEnlace[] = [
+  {
+    id: "demo-c-1",
+    compradorClave: "c1",
+    comprador: "Valeria",
+    telefono: "7•••••48",
+    fecha: HACE(2),
+    negocio: "Café Illimani",
+    productos: "Café de especialidad 250g ×2",
+    totalCents: 17_000,
+    estado: "pagado",
+    comision: { montoCents: 2_720, estado: "pendiente" },
+  },
+  {
+    id: "demo-c-2",
+    compradorClave: "c2",
+    comprador: "Jorge",
+    telefono: "6•••••13",
+    fecha: HACE(5),
+    negocio: "Rosa Deportes",
+    productos: "Mochila urbana",
+    totalCents: 24_000,
+    estado: "entregado",
+    comision: { montoCents: 3_270, estado: "confirmada" },
+  },
+  {
+    id: "demo-c-3",
+    compradorClave: "c3",
+    comprador: "Mariela",
+    telefono: "7•••••91",
+    fecha: HACE(9),
+    negocio: "Rosa Deportes",
+    productos: "Short de entrenamiento",
+    totalCents: 12_000,
+    estado: "pendiente",
+    comision: null,
+  },
+  {
+    id: "demo-c-4",
+    compradorClave: "c2",
+    comprador: "Jorge",
+    telefono: "6•••••13",
+    fecha: HACE(21),
+    negocio: "Café Illimani",
+    productos: "Café de especialidad 250g",
+    totalCents: 8_500,
+    estado: "entregado",
+    comision: { montoCents: 1_360, estado: "pagada" },
   },
 ]
 

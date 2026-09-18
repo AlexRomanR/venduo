@@ -4,6 +4,7 @@ import { ArrowUpRight, FileDown, IdCard, Search, Sparkles } from "lucide-react"
 import {
   getMisComisiones,
   getMisCompradores,
+  getMisComprasConEnlace,
   getMisEnlaces,
   getPerfilPromotor,
 } from "@/lib/data/promotor"
@@ -11,14 +12,19 @@ import { getProductosVitrina } from "@/lib/data/vitrina"
 import { BOTON_SECUNDARIO } from "@/lib/estilos"
 import { formatMoney, formatNumber } from "@/lib/format"
 import { leerGrafico } from "@/lib/insights/lectura"
-import { gananciaSemanal, resumirPromotor, type Enlace } from "@/lib/promotor"
+import {
+  gananciaSemanal,
+  resumirCompras,
+  resumirPromotor,
+  type Enlace,
+} from "@/lib/promotor"
 import { cn } from "@/lib/utils"
 import { Grafico } from "@/components/insights/grafico"
 import { Cifra, Encabezado, Vacio } from "@/components/panel/piezas"
 import { GuiaInicialPromotor } from "@/components/promotor/guia-inicial"
 import {
   FilaComision,
-  FilaComprador,
+  FilaCompra,
   FilaEnlace,
 } from "@/components/promotor/piezas"
 
@@ -38,12 +44,15 @@ export default async function PromotorPage({
   searchParams: Promise<{ guia?: string }>
 }) {
   const { guia } = await searchParams
-  const [perfil, enlaces, comisiones, compradores] = await Promise.all([
-    getPerfilPromotor(),
-    getMisEnlaces(),
-    getMisComisiones(),
-    getMisCompradores(),
-  ])
+  const [perfil, enlaces, comisiones, compradores, compras] = await Promise.all(
+    [
+      getPerfilPromotor(),
+      getMisEnlaces(),
+      getMisComisiones(),
+      getMisCompradores(),
+      getMisComprasConEnlace(),
+    ]
+  )
 
   if (enlaces.length === 0 || guia === "1") {
     const { items } = await getProductosVitrina({ porPagina: 6 })
@@ -56,6 +65,7 @@ export default async function PromotorPage({
   }
 
   const resumen = resumirPromotor(enlaces, comisiones, compradores)
+  const resumenCompras = resumirCompras(compras)
   const semanas = gananciaSemanal(comisiones, 12)
   const estaSemana = semanas[semanas.length - 1]?.valor ?? 0
   const hayGanancia = semanas.some((s) => s.valor > 0)
@@ -150,9 +160,9 @@ export default async function PromotorPage({
           }
         />
         <Cifra
-          etiqueta="Compradores que trajiste"
-          valor={formatNumber(resumen.compradoresVigentes)}
-          detalle={`Siguen contigo · ${formatNumber(resumen.compradores)} en total`}
+          etiqueta="Compraron con tu enlace"
+          valor={formatNumber(resumenCompras.compradores)}
+          detalle={`${resumenCompras.compradores === 1 ? "Persona" : "Personas"} · ${formatNumber(resumenCompras.compras)} ${resumenCompras.compras === 1 ? "compra" : "compras"}`}
         />
       </section>
 
@@ -232,20 +242,20 @@ export default async function PromotorPage({
       <section className="grid gap-12 lg:grid-cols-2 lg:gap-14">
         <div>
           <Encabezado
-            etiqueta="Compradores que trajiste"
+            etiqueta="Compraron con tu enlace"
             accion={{ href: "/vendedor/compradores", texto: "Ver todos" }}
           />
-          {compradores.length === 0 ? (
+          {compras.length === 0 ? (
             <div className="mt-6">
               <Vacio
-                titulo="Todavía no trajiste a nadie"
-                detalle="Cuando alguien compra por primera vez con tu enlace, queda contigo 90 días: si vuelve a comprar por su cuenta, ganas igual."
+                titulo="Todavía nadie compró con tu enlace"
+                detalle="Cuando alguien compre usando uno de tus enlaces, aparece acá con lo que te dejó."
               />
             </div>
           ) : (
             <ul className="mt-4 border-t-2 border-tinta">
-              {compradores.slice(0, 3).map((comprador) => (
-                <FilaComprador key={comprador.id} comprador={comprador} />
+              {compras.slice(0, 3).map((compra) => (
+                <FilaCompra key={compra.id} compra={compra} />
               ))}
             </ul>
           )}

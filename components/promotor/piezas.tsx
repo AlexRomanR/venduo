@@ -1,11 +1,9 @@
-import { BadgeCheck } from "lucide-react"
-
 import { formatDate, formatMoney, formatNumber } from "@/lib/format"
+import { ESTADOS } from "@/lib/pedidos"
 import {
-  diasHasta,
   mensajeParaCompartir,
   type Comision,
-  type Comprador,
+  type CompraConEnlace,
   type Enlace,
 } from "@/lib/promotor"
 import { cn } from "@/lib/utils"
@@ -109,88 +107,6 @@ export function FilaEnlace({
   )
 }
 
-/**
- * Cuánto le queda a la asociación, como un trazo que se vacía.
- *
- * Un número de días solo no dice si es mucho o poco; contra los 90 sí.
- */
-function Vigencia({ comprador }: { comprador: Comprador }) {
-  const total = Math.max(
-    (new Date(comprador.vence).getTime() -
-      new Date(comprador.desde).getTime()) /
-      86_400_000,
-    1
-  )
-  const quedan = diasHasta(comprador.vence)
-  const proporcion = comprador.vigente ? Math.min(quedan / total, 1) : 0
-
-  return (
-    <div className="w-full sm:w-36">
-      <p
-        className={cn(
-          "tabular text-xs font-semibold",
-          comprador.vigente ? "" : "opacity-45"
-        )}
-      >
-        {comprador.vigente
-          ? `${formatNumber(quedan)} ${quedan === 1 ? "día" : "días"} más`
-          : "Vencido"}
-      </p>
-      <div className="mt-1.5 h-0.5 w-full bg-tinta/15">
-        <div
-          className="h-full bg-senal transition-[width] duration-700"
-          style={{ width: `${proporcion * 100}%` }}
-        />
-      </div>
-    </div>
-  )
-}
-
-export function FilaComprador({ comprador }: { comprador: Comprador }) {
-  return (
-    <li className="grid gap-4 border-b border-tinta/15 py-5 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-8">
-      <div className="min-w-0">
-        <p className="flex items-center gap-2 font-titular text-base font-bold tracking-[-0.01em] sm:text-lg">
-          <span
-            className={cn(
-              "truncate",
-              !comprador.registrado && "tabular tracking-[0.08em]"
-            )}
-          >
-            {comprador.comprador}
-          </span>
-          {comprador.registrado ? (
-            <BadgeCheck
-              aria-label="Tiene cuenta en Venduo"
-              className="size-4 shrink-0 text-senal"
-            />
-          ) : null}
-        </p>
-        <p className="mt-1 text-sm opacity-60">
-          Llegó el {formatDate(comprador.desde)}
-          {comprador.primeraTienda ? ` · ${comprador.primeraTienda}` : ""}
-          {comprador.primeraCompraCents > 0
-            ? ` · ${formatMoney(comprador.primeraCompraCents)}`
-            : ""}
-        </p>
-      </div>
-
-      <div className="flex items-baseline gap-6 sm:block sm:text-right">
-        <p className="tabular font-titular text-lg font-extrabold tracking-[-0.03em]">
-          {formatMoney(comprador.comisionIndirectaCents)}
-        </p>
-        <p className="text-xs opacity-55">
-          {comprador.comprasIndirectas === 0
-            ? "Todavía no volvió"
-            : `${formatNumber(comprador.comprasIndirectas)} ${comprador.comprasIndirectas === 1 ? "compra" : "compras"} sin tu enlace`}
-        </p>
-      </div>
-
-      <Vigencia comprador={comprador} />
-    </li>
-  )
-}
-
 export const ESTADO_COMISION: Record<
   CommissionStatus,
   { texto: string; clase: string }
@@ -212,6 +128,55 @@ export function EstadoComision({ estado }: { estado: CommissionStatus }) {
     >
       {e.texto}
     </span>
+  )
+}
+
+/**
+ * Una compra hecha con su enlace.
+ *
+ * Mientras el pago no entra no hay comisión todavía: se dice en qué estado
+ * está el pedido en vez de mostrar un cero que parece definitivo.
+ */
+export function FilaCompra({ compra }: { compra: CompraConEnlace }) {
+  const estadoPedido =
+    ESTADOS.find((e) => e.valor === compra.estado)?.etiqueta ?? compra.estado
+
+  return (
+    <li className="grid gap-3 border-b border-tinta/15 py-5 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-8">
+      <div className="min-w-0">
+        <p className="flex items-baseline gap-2 font-titular text-base font-bold tracking-[-0.01em] sm:text-lg">
+          <span className="truncate">{compra.comprador}</span>
+          <span className="tabular text-xs font-normal tracking-[0.08em] opacity-55">
+            {compra.telefono}
+          </span>
+        </p>
+        <p className="mt-1 truncate text-sm opacity-70">{compra.productos}</p>
+        <p className="mt-0.5 text-xs opacity-55">
+          {formatDate(compra.fecha)} · {compra.negocio}
+        </p>
+      </div>
+
+      <p className="tabular text-sm opacity-70 sm:text-right">
+        {formatMoney(compra.totalCents)}
+      </p>
+
+      <div className="flex items-center justify-between gap-3 sm:w-40 sm:flex-col sm:items-end sm:justify-center">
+        {compra.comision ? (
+          <>
+            <p className="tabular font-titular text-lg font-extrabold tracking-[-0.03em]">
+              {formatMoney(compra.comision.montoCents)}
+            </p>
+            <EstadoComision estado={compra.comision.estado} />
+          </>
+        ) : (
+          <p className="text-xs opacity-55">
+            {compra.estado === "pendiente"
+              ? "Pago pendiente · tu ganancia aparece al pagarse"
+              : `${estadoPedido} · sin comisión`}
+          </p>
+        )}
+      </div>
+    </li>
   )
 }
 

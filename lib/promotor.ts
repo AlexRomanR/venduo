@@ -5,7 +5,7 @@
  * cliente. Las consultas viven en `lib/data/promotor.ts`.
  */
 
-import type { CommissionStatus } from "@/types"
+import type { CommissionStatus, OrderStatus } from "@/types"
 
 /** Un producto que el promotor tomó, con su enlace. */
 export interface Enlace {
@@ -42,6 +42,47 @@ export interface Comprador {
   primeraCompraCents: number
   comprasIndirectas: number
   comisionIndirectaCents: number
+}
+
+/** Una compra hecha con uno de sus enlaces. */
+export interface CompraConEnlace {
+  id: string
+  /** Distingue compradores sin mandar su teléfono al navegador. */
+  compradorClave: string
+  /** Solo el nombre de pila: el promotor no necesita el nombre completo. */
+  comprador: string
+  telefono: string
+  fecha: string
+  negocio: string
+  productos: string
+  totalCents: number
+  estado: OrderStatus
+  /** Nace cuando el pago entra: antes de eso es `null`. */
+  comision: { montoCents: number; estado: CommissionStatus } | null
+}
+
+/** Primer dígito y los dos últimos, como hace `mis_compradores()`. */
+export function censurarTelefono(telefono: string): string {
+  const digitos = telefono.replace(/\D/g, "")
+  const local =
+    digitos.length > 8 && digitos.startsWith("591") ? digitos.slice(3) : digitos
+  if (local.length < 4) return "•••"
+  return local[0] + "•".repeat(Math.max(local.length - 3, 3)) + local.slice(-2)
+}
+
+export function resumirCompras(compras: CompraConEnlace[]) {
+  return {
+    compras: compras.length,
+    compradores: new Set(compras.map((c) => c.compradorClave)).size,
+    vendidoCents: compras.reduce((acc, c) => acc + c.totalCents, 0),
+    ganadoCents: compras.reduce(
+      (acc, c) =>
+        c.comision && c.comision.estado !== "anulada"
+          ? acc + c.comision.montoCents
+          : acc,
+      0
+    ),
+  }
 }
 
 export type TipoComision = "directa" | "indirecta"
@@ -276,12 +317,4 @@ export function mensajeParaCompartir(
   url: string
 ): string {
   return `Mira esto: ${producto}, de ${negocio}, a ${precio}. Lo pides acá y te lo entregan coordinando por WhatsApp: ${url}`
-}
-
-/** Cuántos días faltan hasta una fecha, redondeado hacia arriba. */
-export function diasHasta(fecha: string, hoy = new Date()): number {
-  return Math.max(
-    Math.ceil((new Date(fecha).getTime() - hoy.getTime()) / 86_400_000),
-    0
-  )
 }
