@@ -6,7 +6,6 @@ import {
   Line,
   Page,
   Path,
-  renderToBuffer,
   StyleSheet,
   Svg,
   Text,
@@ -14,18 +13,12 @@ import {
 } from "@react-pdf/renderer"
 
 import type { InsightSql } from "@/lib/ai/schemas"
+import type { FilaInsight } from "@/lib/data/insights"
 import {
-  getGraficoConDatos,
-  type FilaInsight,
-  type GraficoGuardado,
-} from "@/lib/data/insights"
-import {
-  formatDate,
   formatMoney,
   formatMoneyCompact,
   formatNumber,
   formatNumberCompact,
-  slugify,
 } from "@/lib/format"
 import { leerGrafico } from "@/lib/insights/lectura"
 
@@ -486,52 +479,4 @@ export function construirInforme({
       </Page>
     </Document>
   )
-}
-
-/**
- * El informe como respuesta HTTP. Lo sirven la ruta del negocio y la del
- * promotor, cada una con su tablero y su nombre.
- *
- * `?g={id}` limita el informe a un gráfico. Las consultas corren con la sesión
- * de quien pide, así que RLS sigue puesta: el PDF no ve nada que no vea el panel.
- */
-export async function responderInforme({
-  peticion,
-  guardados,
-  nombre,
-}: {
-  peticion: Request
-  guardados: GraficoGuardado[]
-  /** El que va en la cabecera: la tienda o el promotor. */
-  nombre: string
-}) {
-  const uno = new URL(peticion.url).searchParams.get("g")
-  const elegidos = uno ? guardados.filter((g) => g.id === uno) : guardados
-
-  if (elegidos.length === 0) {
-    return new Response("No hay gráficos guardados todavía.", { status: 404 })
-  }
-
-  const graficos = await Promise.all(elegidos.map(getGraficoConDatos))
-  const cuerpo = await renderToBuffer(
-    construirInforme({
-      graficos,
-      tienda: nombre,
-      fecha: formatDate(new Date()),
-    })
-  )
-
-  const archivo =
-    (uno ? slugify(graficos[0].titulo) : `venduo-${slugify(nombre)}`) ||
-    "informe"
-
-  return new Response(new Uint8Array(cuerpo), {
-    headers: {
-      "Content-Type": "application/pdf",
-      // `inline` es lo que hace que la pestaña muestre el visor del navegador
-      // en vez de bajar el archivo de una: desde ahí se descarga si se quiere.
-      "Content-Disposition": `inline; filename="${archivo}.pdf"`,
-      "Cache-Control": "no-store",
-    },
-  })
 }

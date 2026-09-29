@@ -93,11 +93,8 @@ export type SalesInsight = z.infer<typeof salesInsightSchema>
  *
  * El contrato de columnas es lo que permite dibujar sin adivinar: toda consulta
  * devuelve `etiqueta` y `valor`.
- *
- * Hay dos variantes que solo cambian en qué vistas se pueden nombrar: las del
- * negocio y las del promotor. Todo lo demás del contrato es el mismo.
  */
-const consultaBase = {
+export const insightSqlSchema = z.object({
   titulo: z.string().min(1).max(60),
   /** Qué se va a mostrar y de dónde sale, en una frase. */
   explicacion: z.string().min(1).max(300),
@@ -105,12 +102,6 @@ const consultaBase = {
   grafico: z.enum(["linea", "area", "columna", "barra", "numero", "tabla"]),
   /** Si `valor` son centavos o un conteo. Decide cómo se formatea. */
   formato: z.enum(["dinero", "cantidad"]),
-  /** Paso 3: la consulta. Devuelve `etiqueta` y `valor`, nada más. */
-  sql: z.string().min(10).max(2000),
-}
-
-export const insightSqlSchema = z.object({
-  ...consultaBase,
   /** Paso 2: qué vistas hacen falta. Se pide explícito para poder auditarlo. */
   vistas: z
     .array(
@@ -124,25 +115,10 @@ export const insightSqlSchema = z.object({
     )
     .min(1)
     .max(5),
+  /** Paso 3: la consulta. Devuelve `etiqueta` y `valor`, nada más. */
+  sql: z.string().min(10).max(2000),
 })
-
-export const insightSqlPromotorSchema = z.object({
-  ...consultaBase,
-  vistas: z
-    .array(
-      z.enum([
-        "promotor_ventas",
-        "promotor_items",
-        "promotor_comisiones",
-        "promotor_enlaces",
-      ])
-    )
-    .min(1)
-    .max(4),
-})
-
-export type InsightSql =
-  z.infer<typeof insightSqlSchema> | z.infer<typeof insightSqlPromotorSchema>
+export type InsightSql = z.infer<typeof insightSqlSchema>
 
 export const marketingCampaignSchema = z.object({
   objective: z.string().min(1).max(200),

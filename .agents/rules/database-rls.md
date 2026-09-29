@@ -7,12 +7,6 @@ contra él sin romperlo.
 
 **Centavos enteros. Puntos básicos enteros. Nunca punto flotante.**
 
-**El precio de un producto no se escribe: se construye.** El negocio declara su costo base
-y el servidor suma la comisión del vendedor y el take-rate, los dos por rango de precio.
-Los tres componentes se congelan en el pedido y **suman exactamente el total**: redondear
-el total aparte descuadra el reparto por centavos. Las reglas están en `domain-venduo.md`
-y los porcentajes en `docs/modelo-de-negocio.md`.
-
 | Concepto | Columna          | Ejemplo                 |
 | -------- | ---------------- | ----------------------- |
 | Precio   | `price_cents`    | `8500` son Bs 85        |
@@ -108,9 +102,8 @@ y descuenta stock. Nada de eso puede quedar en manos del cliente.
 siguientes la mueven. Qué estado de pedido corresponde a qué estado de comisión está en
 `domain-venduo.md`, atado a la custodia del pago en PagoFácil.
 
-Las otras funciones del servidor son `take_product(p_product_id)` y
-`release_product(p_product_id)` —tomar y soltar un producto—, `mis_compradores()`,
-`join_store(p_store_slug, p_invite_code)`, `my_seller_invite()`, `rotate_seller_invite()`,
+Las otras funciones del servidor son `join_store(p_store_slug, p_invite_code)`,
+`take_product(p_product_id)`, `my_seller_invite()`, `rotate_seller_invite()`,
 `apply_template(p_store_id, p_template_key)`,
 `change_store_template(p_template_key, p_keep_sections)`,
 `create_store(p_name, p_description, p_template_key, p_sellers, p_commission_bps)`,
@@ -121,8 +114,7 @@ Las otras funciones del servidor son `take_product(p_product_id)` y
 excepción a todo lo demás y se sostiene en tres cosas que impone Postgres: corre con
 `security invoker` —RLS activa—, en una transacción de **solo lectura** que rechaza
 cualquier escritura, y solo contra las vistas `mis_*`, que ya están acotadas a
-`my_store_id()` y donde `store_id` ni siquiera aparece, o las `promotor_*`, acotadas
-a `auth.uid()`. Está explicado en `ai-layer.md`.
+`my_store_id()` y donde `store_id` ni siquiera aparece. Está explicado en `ai-layer.md`.
 
 **La tienda tampoco se inserta desde el cliente.** `create_store` resuelve tres
 cosas que no se pueden repartir: el slug único —comprobarlo desde el navegador es
@@ -190,11 +182,7 @@ Las políticas RLS van juntas en su propio archivo, para poder auditarlas de una
 
 ## Tablas sin políticas
 
-Tres tablas tienen RLS activo y **cero políticas**, a propósito. No agregarles.
-
-`buyer_attributions` guarda el teléfono completo del comprador. El checkout la lee como
-`security definer`, y el promotor llega a sus compradores por `mis_compradores()`, que
-devuelve el número censurado —o el nombre, si esa persona tiene cuenta en Venduo—.
+Dos tablas tienen RLS activo y **cero políticas**, a propósito. No agregarles.
 
 `social_connections` guarda tokens de Meta y solo se accede con la clave de servicio.
 

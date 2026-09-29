@@ -15,7 +15,7 @@ import { formatMoney, formatNumber } from "@/lib/format"
  * que se está dibujando.
  */
 export function leerGrafico(
-  consulta: Pick<InsightSql, "formato">,
+  consulta: InsightSql,
   filas: FilaInsight[]
 ): string | null {
   if (filas.length === 0) return null

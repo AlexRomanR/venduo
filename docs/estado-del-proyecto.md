@@ -1,211 +1,184 @@
 # Estado del proyecto
 
-Qué está construido y qué falta, medido contra el **modelo vigente**
-(`docs/modelo-de-negocio.md`) y el alcance del MVP de `VENDUO.md` §6.
-Actualizado el 18 de septiembre de 2026: Marketplace público, referido por producto y
-flujo simulado de pago con custodia. Las migraciones están aplicadas a la base de datos y
-`types/database.ts` regenerado.
+Qué está construido en Venduo y qué falta, contra el alcance del MVP de `VENDUO.md` §6.
+Actualizado el 17 de septiembre de 2026.
 
-**Leyenda:** ✅ sirve tal cual · 🟡 existe pero hay que rehacerlo · ❌ falta · ⛔ fuera del
-modelo
+**Leyenda:** ✅ hecho · 🟡 hecho con un flujo provisorio o a medias · ❌ falta
 
 ---
 
-## Lo primero que hay que entender
+## Resumen
 
-El producto cambió de modelo después de construir buena parte del MVP. Lo que hay en el
-repositorio responde al modelo anterior:
-
-| Antes                                           | Ahora                                               |
-| ----------------------------------------------- | --------------------------------------------------- |
-| Cada negocio tenía su tienda online             | Un solo **Marketplace**                             |
-| El negocio fijaba el precio                     | Declara **costo base**; el precio se construye      |
-| Cada negocio ofrecía su porcentaje de comisión  | Comisión **escalonada por rango**, igual para todos |
-| El ingreso era la suscripción                   | El ingreso es el **take-rate**                      |
-| El joven se sumaba a una tienda, con aprobación | Toma productos del catálogo, sin permiso            |
-| El referido valía para esa venta                | El comprador **queda asociado** por una ventana     |
-
-**Nada de lo construido está roto**: el flujo de compra completo funciona hoy. Lo que pasa
-es que responde a otras reglas. Abajo, qué se salva, qué se rehace y en qué orden.
-
----
-
-## Resumen contra el alcance del MVP
-
-| #   | Punto del MVP (`VENDUO.md` §6)                                    | Estado |
-| --- | ----------------------------------------------------------------- | ------ |
-| 1   | Registro y login de los dos lados                                 | ✅     |
-| 2   | Productos con imagen, stock y condición, declarando el costo base | ✅     |
-| 3   | Precio calculado por rango: costo base + comisión + take-rate     | ✅     |
-| 4   | Marketplace navegable en móvil                                    | ✅     |
-| 5   | El joven elige productos y obtiene su enlace y su QR              | ✅     |
-| 6   | Carrito y checkout con datos del comprador                        | ✅     |
-| 7   | Pago por PagoFácil con custodia, sobre una pasarela simulada      | ✅     |
-| 8   | Reparto a tres: negocio, joven y plataforma                       | ✅     |
-| 9   | Atribución del comprador al promotor, con su ventana              | ✅     |
-| 10  | Comisión indirecta y retorno al negocio                           | ✅     |
-| 11  | Panel del joven: ventas, comisiones, materiales                   | ✅     |
-| 12  | Estadísticas en lenguaje natural                                  | ✅     |
-| 13  | Copys de marketing y publicación en redes                         | ❌     |
-| 14  | Entrega por WhatsApp con confirmación de envío y recepción        | ✅     |
+| #   | Punto del MVP (`VENDUO.md` §6)                           | Estado |
+| --- | -------------------------------------------------------- | ------ |
+| 1   | Registro e ingreso del emprendedor                       | ✅     |
+| 2   | Selección de plantilla según rubro                       | ✅     |
+| 3   | Edición de la tienda asistida por IA                     | ❌     |
+| 4   | Tienda pública real, navegable en móvil, con URL propia  | ✅     |
+| 5   | Productos con imagen, stock y condición                  | ✅     |
+| 6   | Carrito y checkout con datos del cliente                 | ✅     |
+| 7   | Pago por PagoFácil con custodia (simulada)               | 🟡     |
+| 8   | Alta de vendedor, con código y enlace propios            | ✅     |
+| 9   | Atribución de la venta al vendedor por el enlace         | ✅     |
+| 10  | Cálculo automático de comisión                           | ✅     |
+| 11  | Panel del vendedor: ventas, comisiones, materiales       | ✅     |
+| 12  | Estadísticas en lenguaje natural                         | ✅     |
+| 13  | Copys de marketing y publicación en Facebook y WhatsApp  | ❌     |
+| 14  | Entrega por WhatsApp y confirmación de envío y recepción | 🟡     |
 
 ---
 
-## Hecho con el cambio de enfoque
+## Lo que está hecho
 
-- **El precio se construye.** `pricing_tiers` sembrada, `products.base_cost_cents` como
-  única cifra que escribe el negocio, y `price_cents`, `commission_bps` y `take_bps`
-  derivados por el disparador `producto_precio`. Los productos que ya existían conservaron
-  su precio publicado.
-- **El formulario de producto pide costo base** y muestra en vivo el desglose: cuánto
-  recibes, cuánto gana el promotor, cuánto Venduo y a cuánto se publica.
-- **La portada** cuenta el modelo nuevo, con la cuenta hecha y los porcentajes reales.
-- **El alta del negocio es una sola pantalla**: ya no se elige plantilla.
-- **El primer ingreso del negocio es una guía en carrusel** de cinco pasos: cargar lo
-  que vende, agruparlo en categorías, y los tres que resuelve Venduo —los promotores
-  eligen, avisamos la venta, la entrega va por WhatsApp—. La decide
-  `stores.onboarded_at`, no el catálogo; "Finalizar" la marca y lleva al panel con
-  cifras, catálogo con stock editable y acceso a las estadísticas. Se vuelve a abrir
-  desde "Cómo funciona Venduo" en la barra lateral (`/panel?guia=1`).
-- **Carga desde Excel** (`/panel/productos/importar`): plantilla descargable en
-  `public/plantillas/productos-venduo.xlsx`, revisión fila por fila con el precio
-  publicado antes de cargar, y las categorías nuevas se crean solas. Hasta 200 filas.
-- **Se dice "promotor"** en el panel, la portada y el registro.
-- **El promotor elige productos, no tiendas.** `seller_products` registra qué tomó cada
-  uno; `take_product` ya no mira si la tienda "acepta vendedores" ni espera aprobación, y
-  `release_product` lo saca de su lista sin invalidar el enlace que ya circula.
-- **La atribución del comprador existe.** `buyer_attributions`, por teléfono normalizado
-  (`normalizar_telefono`) y 90 días (`ventana_de_atribucion()`). Nace cuando se cobra el
-  primer pedido que trajo un promotor; el primero manda. Se reconstruyó desde los pedidos
-  cobrados que ya había. Sin políticas: el promotor la lee censurada por
-  `mis_compradores()`.
-- **`create_order` congela los tres componentes** (`orders.base_cost_cents`,
-  `take_cents`, `commission_cents`) y resuelve quién cobra: el promotor del enlace, el
-  asociado al comprador (comisión **indirecta**, con `commissions.kind`) o nadie, y vuelve
-  al negocio. Los pedidos anteriores conservan lo que se congeló entonces.
-- **El panel del promotor** (`/vendedor`): sin productos es una bienvenida con
-  un carrusel de tres pasos que lo lleva del filtro a su primer enlace; con productos, sus
-  cifras, la ganancia por semana, un próximo paso calculado, sus enlaces y sus compradores.
-  El catálogo filtra por búsqueda, categoría, condición, precio y fecha de publicación,
-  permite ordenar, y cada ficha compara ganancia, precio, stock y antigüedad antes de crear
-  el referido. Secciones: Catálogo, Mis enlaces (con WhatsApp, copiar y QR), Compradores
-  (cada compra hecha con su enlace), Ganancias y Estadísticas. Estadísticas tiene dos
-  pestañas: el resumen calculado y la misma herramienta en lenguaje natural del negocio,
-  con tablero y PDF, contra las vistas `promotor_*`.
-- **`/sumarme` y `/explorar/*` redirigen** al panel del promotor. Unirse a una tienda y
-  las invitaciones ya no tienen pantalla.
-- **La pantalla de Promotores del negocio** muestra quién promociona qué y cuánto vendió,
-  con ranking interactivo y filtros para comparar el desempeño en el propio negocio y en
-  toda la red Venduo; ya no hay invitación ni aprobación. `/cuenta` dejó de ofrecer "acepto
-  vendedores" y el porcentaje de comisión.
-- **La barra lateral** perdió Marketing, Apariencia y "Gana extra".
-- **El Marketplace público vive en `/`.** Tiene búsqueda, rubros, condición, ciudad,
-  orden, fichas de producto y negocio, carrito con productos de varios negocios y un
-  lateral útil para visitantes anónimos. La portada institucional pasó a `/unirse` y se
-  enlaza desde el pie del catálogo.
-- **Cada producto tomado tiene su propio referido.** `seller_products.referral_code`
-  identifica exactamente el producto promovido; `create_order` solo acredita comisión
-  directa cuando ese código corresponde al producto comprado.
-- **El checkout agrupa por negocio sin exponer esa complejidad al comprador.**
-  `create_marketplace_orders` crea todos los pedidos en una sola transacción y vuelve a
-  calcular precio, comisión y take-rate en la base.
-- **La custodia simulada reemplaza el QR bancario en el flujo público nuevo.** El cobro
-  pasa a `pagado`, la comisión queda pendiente, el negocio marca el envío, el comprador
-  confirma recepción o abre disputa y solo la entrega libera y confirma el reparto.
+### Cuentas y altas
 
----
+- Registro e ingreso con correo y contraseña, eligiendo el rol: emprendedor o vendedor.
+- `/auth/destino` decide a dónde entra cada cuenta según sus datos, no según el rol.
+- Alta de la tienda en dos pasos (`/crear`): elegir plantilla y contar el negocio. Nace
+  con suscripción de prueba, invitación para vendedores y su versión inicial de diseño.
+- Alta del vendedor (`/sumarme`) por tres caminos: sumarse a una tienda, entrar con un
+  código de invitación o tomar un producto suelto.
 
-## Lo que sirve tal cual
+### Plantillas de tienda
 
-- **Cuentas.** Registro e ingreso con correo y contraseña; el destino de cada cuenta lo
-  deciden los datos, no el rol.
-- **Catálogo por negocio.** Alta y edición de productos con fotos, stock, umbral de aviso,
-  condición, precio anterior, código y destacado. Categorías propias por negocio.
-- **Carrito y checkout.** El carrito vive en el navegador y el pedido solo lo crea
-  `create_order` en el servidor, que recalcula todo.
-- **Pedidos.** Lista, detalle, cambio de estado y el botón que abre WhatsApp con el pedido
-  ya armado.
-- **Estadísticas en lenguaje natural**, con gráficos guardados e informe en PDF.
-- **Historial laboral del vendedor**, con su perfil público, y el diseño de base que lo hace
-  sobrevivir a la baja de un negocio.
-- **Base y seguridad.** RLS en todas las tablas, borrado lógico, la IA de estadísticas
-  acotada a vistas de solo lectura de la propia tienda.
-- **Modo demo**, que funciona sin credenciales.
+- Dos plantillas con identidad propia: **Pasarela** (moda) y **Esencia** (perfumería).
+- La identidad llega a toda la tienda pública **y al panel del emprendedor**.
+- Cambio de plantilla desde `/panel/apariencia` sin perder productos, pedidos ni
+  vendedores, con historial de versiones.
+- Base de datos preparada para personalizar la apariencia y para editarla con IA más
+  adelante.
+- Todo documentado en `docs/store-templates.md`.
+
+### Tienda pública (`/t/{slug}`)
+
+- Portada armada con bloques, catálogo con filtros, búsqueda y orden, ficha de producto
+  con galería y sugerencias.
+- Filtro de segunda mano, reacondicionado y ofertas.
+- Carrito en el navegador y checkout con nombre, WhatsApp y correo opcional.
+- Pantallas de carga, error y "no encontrado".
+- Enlace propio por tienda, con subdominio listo detrás de un interruptor
+  (`NEXT_PUBLIC_DOMINIO_TIENDAS`).
+- Tarjeta para WhatsApp al compartir la tienda o un producto.
+
+### Panel del emprendedor (`/panel`)
+
+- **Resumen** con cifras y pendientes.
+- **Productos**: alta y edición con fotos, stock, umbral de aviso, condición, precio
+  anterior, código y destacado. Categorías propias.
+- **Pedidos**: lista, detalle, cambio de estado, comprobante, y un botón que abre WhatsApp
+  con el pedido ya armado.
+- **Vendedores**: la red, sus solicitudes y la invitación.
+- **Estadísticas**: preguntas en lenguaje natural, gráficos guardados, edición del gráfico
+  por texto e informe en PDF (completo o de un gráfico).
+- **Apariencia**: la plantilla, cambiarla y el historial.
+- Barra lateral con contadores de lo que pide atención; se puede plegar y recuerda cómo
+  quedó.
+
+### Vendedores
+
+- Panel del vendedor (`/vendedor`) con sus tiendas, ventas y comisiones.
+- Vitrinas para buscar tiendas y productos (`/explorar`).
+- Enlace de referido por tienda: la venta se le atribuye aunque el comprador navegue sin
+  el código.
+- Comisión congelada al momento de la venta, una por pedido.
+- Perfil público con historial laboral verificable (`/v/{slug}`).
+
+### Base y seguridad
+
+- Supabase con RLS en todas las tablas y borrado lógico.
+- El pedido solo se crea en el servidor (`create_order`), que recalcula los precios.
+- La IA de estadísticas solo lee, en una transacción de solo lectura y contra vistas de la
+  propia tienda.
+- Modo demo que funciona sin credenciales.
 
 ---
 
-## Lo que hay que rehacer
+## Lo que falta
 
-### 1. Mostrar el reparto — prioridad media
+### 1. El cobro con PagoFácil y la custodia — prioridad alta
 
-El pedido ya congela costo base, comisión y take-rate. Falta mostrarlo en el detalle del
-pedido del negocio: cuánto va a cada parte, y si la comisión fue directa, indirecta o
-volvió a él.
+Es lo que más cambia el producto. El modelo está decidido y documentado en `VENDUO.md` §5,
+pero **lo que está construido es provisorio**: el comprador transfiere al QR del comercio,
+sube una captura y el emprendedor confirma a mano. El dinero va directo, sin custodia.
 
-### 2. Comisión indirecta en el perfil público — prioridad media
+Falta:
 
-El panel del promotor ya separa lo vendido de lo generado por compradores traídos. Falta
-lo mismo en `/v/{slug}`: `seller_public_stats` todavía no mira `commissions.kind`.
+- La pasarela simulada de PagoFácil: cobrar, retener, liberar y devolver.
+- Estados nuevos del pedido: marca de enviado, confirmación de recibido por el comprador y
+  `en_disputa`, con sus columnas (`shipped_at`, `delivered_at`, `release_due_at`…).
+- Cambiar el disparador de comisiones: hoy nace `confirmada` al pagar; tiene que nacer
+  `pendiente` y confirmarse en la entrega.
+- Pantalla de seguimiento del pedido para el comprador, con "lo recibí" y "tengo un
+  problema".
+- Liberación automática pasado un plazo.
+- Retirar el QR y el comprobante, y actualizar el texto de "Cómo te pagan" en `/cuenta`.
 
-### 3. Validar Marketplace/custodia en producción — prioridad alta
+**Decisiones pendientes antes de construirlo:**
 
-Las migraciones `20260918160000_ranking_promotores_global.sql`,
-`20260918170000_custodia_y_referido_por_producto.sql` y
-`20260918170100_checkout_marketplace_y_pago_simulado.sql` ya fueron aplicadas a la
-base (`supabase db push`) y `types/database.ts` fue regenerado. Falta hacer una
-compra de prueba de punta a punta con datos reales.
+- Con PagoFácil: si admite retener y liberar por orden de Venduo, si puede pagarle al
+  vendedor como tercero y qué identificación le exige.
+- Del producto: el plazo de liberación automática (se propone 7 días) y qué pasa si el
+  emprendedor nunca marca el envío.
 
-### 6. Marketing — prioridad baja
+### 2. Edición de la tienda con IA — prioridad alta
 
-Se sacó de la barra lateral y del panel. `/panel/marketing` sigue existiendo como marcador y
-la tarea `generateCampaign` de la capa de IA no se usa.
+Está en el alcance (punto 3) y es parte central de la promesa. La base está lista —bloques
+con esquema, propuestas con estado previo, historial de versiones, esquema validado de la
+apariencia—, pero **no hay ninguna pantalla ni tarea de IA que edite la tienda**.
 
----
+Falta:
 
-## Lo que quedó fuera del modelo
+- La tarea de IA que devuelva operaciones sobre bloques y apariencia.
+- La función que valide y aplique la propuesta en una transacción, guardando una versión.
+- Deshacer, rehacer y restaurar versiones desde la interfaz.
+- Vista previa antes de aplicar.
+- Que el paso 2 del alta use la descripción del negocio para ajustar la plantilla: hoy
+  solo crea la tienda. La tarea `generateStoreBlueprint` existe pero no se usa.
 
-Está construido, funciona y **no se borró**. Qué se hace con cada cosa es una decisión
-pendiente; mientras tanto, no construir encima.
+### 3. Marketing — prioridad media
 
-| Qué                                                             | Dónde                                             |
-| --------------------------------------------------------------- | ------------------------------------------------- |
-| ⛔ Tienda online por negocio, con plantillas Pasarela y Esencia | `docs/store-templates.md`, `app/t/[slug]`         |
-| ⛔ Cambio de plantilla e historial de diseño                    | `/panel/apariencia`, `store_design_versions`      |
-| ⛔ Editor de bloques con IA (preparado, nunca implementado)     | skill `visual-block-editor`                       |
-| ⛔ Suscripción, planes y bloqueo al vencer la prueba            | `plans`, `subscriptions`                          |
-| ⛔ Red de vendedores por tienda, con aprobación e invitaciones  | `store_invites`, `join_store`, `seller_join_mode` |
+`/panel/marketing` es un marcador "Pronto". La tarea `generateCampaign` existe en la capa
+de IA pero no se usa.
 
-Dos de esas piezas se pueden reciclar casi enteras: la **página del negocio** dentro del
-Marketplace puede salir de lo que hoy es la portada de su tienda, y el patrón de
-**propuestas de IA validadas contra un esquema** sirve para cualquier edición asistida que
-se construya después.
+Falta:
 
----
+- Generar copys para Facebook y WhatsApp desde un producto.
+- Publicar: plan A por API de Meta, plan B con enlaces de compartir y copiar. Se recomienda
+  ir directo al plan B por el tiempo de revisión de Meta.
 
-## Decisiones abiertas
+### 4. Plantillas — prioridad baja
 
-Ninguna frena empezar; todas frenan operar con dinero real. Las siete están en
-`docs/modelo-de-negocio.md` §8. Las tres que bloquean más código:
+- Más plantillas para los rubros que quedaron en la base editorial (tecnología, hogar,
+  comida).
+- Personalizar colores y letra desde el panel (la base de datos ya lo soporta).
+- Atributos por rubro: talla y color en moda, mililitros o familia olfativa en
+  perfumería. Piden variantes en el carrito y en `create_order`.
 
-1. **La tabla de rangos.** Está sembrada con la propuesta; confirmarla o ajustarla es
-   editar `pricing_tiers`, y las ventas ya hechas no cambian.
-2. **La ventana de atribución**: se usan 90 días, en `ventana_de_atribucion()`. Cambiarla
-   es cambiar esa función; las atribuciones creadas conservan su vencimiento.
+### 5. Suscripción — prioridad baja
 
----
+Se modela el estado, no el cobro. Falta el bloqueo real al vencer la prueba (panel en
+solo lectura con exportación a CSV) y la purga a los 90 días.
 
-## Pendientes chicos
+### 6. Pendientes chicos
 
-- **Fotos en los datos de ejemplo.** Casi ningún producto tiene foto y el catálogo se luce
-  con ellas. Importante antes de la demostración.
-- **Los datos de ejemplo siguen el modelo anterior** en todo lo demás: ocho tiendas con su
-  plantilla y una red de vendedores por tienda. Sus precios ya se migraron a costo base.
-- **El término "vendedor" sigue en pantalla** en la tienda pública y en las plantillas.
-- **No se vio el panel del promotor con datos reales** en el navegador: se probó con una
-  cuenta nueva. Revisarlo entrando como `ana@demo.venduo.bo`.
+- **Fotos en los datos de ejemplo.** Casi ningún producto tiene foto, y las plantillas se
+  lucen con ellas. Importante antes de la demostración.
+- **Textos de ejemplo visibles** en tiendas con plantillas retiradas (p. ej. "Cuenta aquí
+  de dónde salen tus piezas" en Casa Illimani). Reemplazarlos o pasar esas tiendas a una
+  plantilla nueva.
 - **`.env.example`** no tiene `NEXT_PUBLIC_DOMINIO_TIENDAS`.
-- **El rojo de Venduo** está a 4,35:1 contra el papel, apenas por debajo del mínimo AA para
-  texto chico.
-- **Avisos de Next.js** por `quality="90"` en imágenes de la portada: configurar
-  `images.qualities` antes de pasar a Next 16.
-- 191 avisos de lint, casi todos variables sin usar.
+- **Dominio propio** para las tiendas con subdominio: comprar el dominio, crear el
+  registro DNS comodín y darlo de alta en Vercel.
+- **El rojo de Venduo** está a 4,35:1 contra el papel, un poco por debajo del mínimo AA
+  para texto chico.
+- **Avisos de Next.js** por `quality="90"` en imágenes de la portada: hace falta
+  configurar `images.qualities` antes de pasar a Next 16.
+- 191 avisos de lint, en su mayoría variables sin usar.
+
+---
+
+## Fuera de alcance
+
+No se construye, según `VENDUO.md` §7: multi-tienda por usuario, gestión de envíos,
+recibir o guardar el dinero de una venta, cobro de la suscripción, notificaciones por
+correo, app móvil nativa y tests automatizados.

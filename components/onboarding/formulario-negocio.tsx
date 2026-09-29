@@ -1,14 +1,18 @@
 "use client"
 
+import * as React from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-import { PLANTILLA_POR_DEFECTO } from "@/lib/plantillas"
+import { formatMoney, formatPercent } from "@/lib/format"
 import { createClient } from "@/lib/supabase/client"
+import { cn } from "@/lib/utils"
 import {
+  COMISION_MAXIMA_BPS,
+  COMISIONES,
   crearTiendaSchema,
   type CrearTiendaInput,
 } from "@/lib/validation/tienda"
@@ -30,19 +34,10 @@ const ETIQUETA_CAMPO =
 const CAMPO =
   "rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-senal focus-visible:ring-0 aria-invalid:border-senal aria-invalid:ring-0 md:text-base"
 
-/**
- * El alta del negocio.
- *
- * Ya no se elige plantilla: el canal es el Marketplace y todos los catálogos
- * se ven igual. `create_store` sigue pidiendo una clave porque siembra la
- * página del negocio, así que recibe la base editorial y nadie la ve como una
- * decisión.
- */
-export function FormularioNegocio({
-  plantilla = PLANTILLA_POR_DEFECTO,
-}: {
-  plantilla?: string
-}) {
+/** Venta típica con la que se ilustra la comisión, en centavos. */
+const EJEMPLO_VENTA_CENTS = 20_000
+
+export function FormularioNegocio({ plantilla }: { plantilla: string }) {
   const router = useRouter()
 
   const form = useForm<CrearTiendaInput>({
@@ -50,12 +45,16 @@ export function FormularioNegocio({
     defaultValues: {
       nombre: "",
       descripcion: "",
-      // Siempre encendido: en el modelo vigente cualquier promotor puede tomar
-      // un producto del catálogo, y el porcentaje lo decide la tabla de tramos.
+      // Encendido por defecto: la red de vendedores es la promesa que
+      // distingue a Venduo, y una tienda que nace sin ella la descubre tarde.
       aceptaVendedores: true,
       comisionBps: 1000,
     },
   })
+
+  const aceptaVendedores = form.watch("aceptaVendedores")
+  const comisionBps = form.watch("comisionBps")
+  const [personalizada, setPersonalizada] = React.useState(false)
 
   async function onSubmit(values: CrearTiendaInput) {
     const supabase = createClient()
@@ -137,28 +136,161 @@ export function FormularioNegocio({
                 />
               </FormControl>
               <FormDescription className="text-xs text-tinta/55">
-                Escríbelo como se lo contarías a un cliente: es lo que van a
-                leer los promotores para decidir si te promocionan.
+                Escríbelo como se lo contarías a un cliente. Con esto la IA arma
+                tu catálogo y tus textos.
               </FormDescription>
               <FormMessage className="text-sm text-senal" />
             </FormItem>
           )}
         />
 
-        {/* Ni interruptor de vendedores ni porcentaje: en el modelo vigente
-            cualquier promotor puede tomar un producto del catálogo, y la
-            comisión la decide la tabla de tramos según el precio. Lo que antes
-            era una decisión del alta hoy es una regla del sistema. */}
-        <div className="border-l-2 border-senal pl-5">
-          <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-            Cómo se venden tus productos
-          </p>
-          <p className="mt-3 max-w-[52ch] text-sm leading-relaxed opacity-75">
-            Al cargar cada producto dices cuánto quieres recibir por él.
-            Nosotros le sumamos la comisión de quien lo venda y nuestra parte, y
-            así queda el precio publicado. Si nadie lo promocionó, esa comisión
-            también es tuya.
-          </p>
+        <FormItem>
+          <FormLabel className={ETIQUETA_CAMPO}>
+            ¿Quieres que otros vendan tus productos?
+          </FormLabel>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              {
+                valor: true,
+                titulo: "Sí, activar vendedores",
+                detalle: "Ganan comisión por cada venta que traen",
+              },
+              {
+                valor: false,
+                titulo: "Por ahora no",
+                detalle: "Lo puedes activar después",
+              },
+            ].map((opcion) => {
+              const elegida = aceptaVendedores === opcion.valor
+
+              return (
+                <button
+                  key={String(opcion.valor)}
+                  type="button"
+                  onClick={() =>
+                    form.setValue("aceptaVendedores", opcion.valor)
+                  }
+                  aria-pressed={elegida}
+                  className={cn(
+                    "flex min-h-11 flex-col gap-1.5 border p-4 text-left transition-colors duration-200",
+                    elegida
+                      ? "border-tinta bg-tinta text-papel"
+                      : "border-tinta/15 hover:border-tinta"
+                  )}
+                >
+                  <span className="font-titular text-sm leading-tight font-bold tracking-[-0.01em]">
+                    {opcion.titulo}
+                  </span>
+                  <span
+                    className={cn(
+                      "text-xs leading-tight",
+                      elegida ? "text-papel/70" : "opacity-55"
+                    )}
+                  >
+                    {opcion.detalle}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        </FormItem>
+
+        {/* La comisión solo tiene sentido si hay vendedores. Se revela en vez
+            de deshabilitarse: un campo apagado ocupa lugar sin decir nada. */}
+        <div
+          className={cn(
+            "grid transition-all duration-300 ease-out",
+            aceptaVendedores
+              ? "grid-rows-[1fr] opacity-100"
+              : "grid-rows-[0fr] opacity-0"
+          )}
+        >
+          <div className="overflow-hidden">
+            <FormItem>
+              <FormLabel className={ETIQUETA_CAMPO}>
+                ¿Cuánto les pagas por venta?
+              </FormLabel>
+              <div className="flex flex-wrap gap-2">
+                {COMISIONES.map((bps) => (
+                  <button
+                    key={bps}
+                    type="button"
+                    onClick={() => {
+                      setPersonalizada(false)
+                      form.setValue("comisionBps", bps)
+                    }}
+                    aria-pressed={!personalizada && comisionBps === bps}
+                    className={cn(
+                      "tabular flex min-h-11 items-center border px-5 font-titular font-bold transition-colors duration-200",
+                      !personalizada && comisionBps === bps
+                        ? "border-senal bg-senal text-white"
+                        : "border-tinta/15 hover:border-tinta"
+                    )}
+                  >
+                    {formatPercent(bps)}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() => setPersonalizada(true)}
+                  aria-pressed={personalizada}
+                  className={cn(
+                    "flex min-h-11 items-center border px-5 font-titular font-bold transition-colors duration-200",
+                    personalizada
+                      ? "border-senal bg-senal text-white"
+                      : "border-tinta/15 hover:border-tinta"
+                  )}
+                >
+                  Otro
+                </button>
+              </div>
+
+              {personalizada ? (
+                <div className="mt-3 flex items-center gap-3">
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    max={COMISION_MAXIMA_BPS / 100}
+                    step={0.5}
+                    autoFocus
+                    aria-label="Porcentaje de comisión"
+                    value={comisionBps / 100}
+                    onChange={(e) => {
+                      const pct = Number.parseFloat(e.target.value)
+                      if (Number.isNaN(pct))
+                        return form.setValue("comisionBps", 0)
+                      // A puntos básicos enteros: el sistema nunca guarda
+                      // porcentajes en punto flotante.
+                      form.setValue(
+                        "comisionBps",
+                        Math.min(
+                          Math.max(Math.round(pct * 100), 0),
+                          COMISION_MAXIMA_BPS
+                        )
+                      )
+                    }}
+                    className="tabular h-12 w-28 rounded-none border-0 border-b border-tinta bg-transparent px-0 font-titular text-2xl font-bold outline-none focus:border-senal"
+                  />
+                  <span className="font-titular text-2xl font-bold opacity-40">
+                    %
+                  </span>
+                </div>
+              ) : null}
+
+              <FormDescription className="text-xs text-tinta/55">
+                En una venta de {formatMoney(EJEMPLO_VENTA_CENTS)} el vendedor
+                se lleva{" "}
+                <span className="tabular font-semibold text-tinta">
+                  {formatMoney((EJEMPLO_VENTA_CENTS * comisionBps) / 10000)}
+                </span>
+                . Se descuenta de cada venta que traiga y va íntegra para él:
+                Venduo no cobra comisión. Puedes cambiarlo después, pero no
+                afecta a las ventas ya hechas.
+              </FormDescription>
+            </FormItem>
+          </div>
         </div>
 
         <button

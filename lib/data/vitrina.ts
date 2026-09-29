@@ -1,348 +1,212 @@
 import { createClient } from "@/lib/supabase/server"
-import { PRODUCTOS_VITRINA_DEMO, type ProductoVitrina } from "@/lib/demo-data"
-import { gananciaPorUnidad } from "@/lib/promotor"
-import { resolverImagenProducto } from "@/lib/imagenes-producto"
+import { PRODUCTOS_VITRINA_DEMO, TIENDAS_ABIERTAS_DEMO } from "@/lib/demo-data"
+import type { ProductoVitrina, TiendaAbierta } from "@/lib/demo-data"
 
-export type { ProductoVitrina } from "@/lib/demo-data"
+export type { ProductoVitrina, TiendaAbierta } from "@/lib/demo-data"
 
 /** Cuántos se traen por página. Alto para el pulgar, bajo para la consulta. */
 export const POR_PAGINA = 12
 
-export type OrdenVitrina =
-  "recientes" | "precio_asc" | "precio_desc" | "stock_desc" | "ofertas"
-export type PrecioVitrina = "hasta_100" | "100_300" | "300_700" | "700_mas"
-export type PublicadoVitrina = "7" | "30" | "90"
-
-export interface FiltrosVitrina {
-  q?: string
-  pagina?: number
-  porPagina?: number
-  categoria?: string
-  condicion?: "nuevo" | "segunda_mano" | "reacondicionado"
-  precio?: PrecioVitrina
-  publicado?: PublicadoVitrina
-  orden?: OrdenVitrina
-}
-
-export interface PaginaVitrina {
-  items: ProductoVitrina[]
+export interface Pagina<T> {
+  items: T[]
   total: number
   pagina: number
   paginas: number
-  categorias: string[]
-}
-
-type FilaProducto = {
-  id: string
-  name: string
-  description: string | null
-  price_cents: number
-  base_cost_cents: number
-  take_bps: number | null
-  compare_at_price_cents: number | null
-  image_url: string | null
-  images: string[]
-  condition: ProductoVitrina["condition"]
-  condition_note: string | null
-  category: string | null
-  created_at: string
-  is_featured: boolean
-  stock: number
-  stores: {
-    name: string
-    slug: string
-    owner_id: string
-  } | null
 }
 
 /** Las búsquedas llegan de la URL, así que se limpian antes de usarse. */
-function normalizar(q?: string, largo = 60) {
-  const limpio = (q ?? "").trim().slice(0, largo)
+function normalizar(q?: string) {
+  const limpio = (q ?? "").trim().slice(0, 60)
   // `%` y `_` son comodines de LIKE: sin escaparlos, buscar "100%" devuelve
   // cualquier cosa.
   return limpio.replace(/[%_\\]/g, (c) => `\\${c}`)
 }
 
-function rangoPrecio(precio?: PrecioVitrina) {
-  if (precio === "hasta_100") return { max: 10_000 }
-  if (precio === "100_300") return { min: 10_000, max: 30_000 }
-  if (precio === "300_700") return { min: 30_000, max: 70_000 }
-  if (precio === "700_mas") return { min: 70_000 }
-  return null
+function vacia<T>(pagina: number): Pagina<T> {
+  return { items: [], total: 0, pagina, paginas: 0 }
 }
 
-function mapearProducto(producto: FilaProducto, codigo: string | null) {
-  const imageUrl =
-    producto.image_url ||
-    resolverImagenProducto(producto.name, producto.category)
-  const images =
-    producto.images && producto.images.length > 0
-      ? producto.images
-      : imageUrl
-        ? [imageUrl]
-        : []
-
+function paginaDemo<T>(items: T[], pagina: number): Pagina<T> {
+  const desde = (pagina - 1) * POR_PAGINA
   return {
-    id: producto.id,
-    name: producto.name,
-    description: producto.description,
-    priceCents: producto.price_cents,
-    compareAtPriceCents: producto.compare_at_price_cents,
-    imageUrl,
-    images,
-    condition: producto.condition,
-    conditionNote: producto.condition_note,
-    category: producto.category,
-    publishedAt: producto.created_at,
-    featured: producto.is_featured,
-    storeName: producto.stores?.name ?? "Negocio",
-    storeSlug: producto.stores?.slug ?? "",
-    gananciaCents: gananciaPorUnidad(
-      producto.price_cents,
-      producto.base_cost_cents,
-      producto.take_bps
-    ),
-    stock: producto.stock,
-    tomado: codigo !== null,
-    codigo,
-  } satisfies ProductoVitrina
-}
-
-function filtrarDemo(filtros: FiltrosVitrina): PaginaVitrina {
-  const q = normalizar(filtros.q).toLocaleLowerCase("es")
-  const rango = rangoPrecio(filtros.precio)
-  const limitePublicado = filtros.publicado
-    ? Date.now() - Number(filtros.publicado) * 86_400_000
-    : null
-
-  let items = PRODUCTOS_VITRINA_DEMO.filter((producto) => {
-    if (
-      q &&
-      ![producto.name, producto.storeName, producto.category]
-        .filter(Boolean)
-        .some((valor) => valor?.toLocaleLowerCase("es").includes(q))
-    ) {
-      return false
-    }
-    if (filtros.categoria && producto.category !== filtros.categoria)
-      return false
-    if (filtros.condicion && producto.condition !== filtros.condicion)
-      return false
-    if (rango?.min !== undefined && producto.priceCents < rango.min)
-      return false
-    if (rango?.max !== undefined && producto.priceCents > rango.max)
-      return false
-    if (
-      limitePublicado !== null &&
-      new Date(producto.publishedAt).getTime() < limitePublicado
-    ) {
-      return false
-    }
-    return true
-  })
-
-  items = [...items].sort((a, b) => {
-    if (filtros.orden === "precio_asc") return a.priceCents - b.priceCents
-    if (filtros.orden === "precio_desc") return b.priceCents - a.priceCents
-    if (filtros.orden === "stock_desc") return b.stock - a.stock
-    if (filtros.orden === "ofertas") {
-      return (
-        Number(Boolean(b.compareAtPriceCents)) -
-        Number(Boolean(a.compareAtPriceCents))
-      )
-    }
-    return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-  })
-
-  const pagina = filtros.pagina ?? 1
-  const porPagina = filtros.porPagina ?? POR_PAGINA
-  const desde = (pagina - 1) * porPagina
-  return {
-    items: items.slice(desde, desde + porPagina),
+    items: items.slice(desde, desde + POR_PAGINA),
     total: items.length,
     pagina,
-    paginas: Math.max(1, Math.ceil(items.length / porPagina)),
-    categorias: [
-      ...new Set(
-        PRODUCTOS_VITRINA_DEMO.map((producto) => producto.category).filter(
-          (categoria): categoria is string => Boolean(categoria)
-        )
-      ),
-    ].sort((a, b) => a.localeCompare(b, "es")),
+    paginas: Math.max(1, Math.ceil(items.length / POR_PAGINA)),
   }
 }
 
 /**
- * El catálogo que puede promocionar cualquier promotor.
+ * Las tiendas que aceptan vendedores.
  *
- * Cruza todos los negocios: publicar un producto ya es el consentimiento del
- * negocio a que se venda. Búsqueda, filtros, orden y página viven en la URL
- * para que volver atrás conserve exactamente la exploración.
+ * Consulta pública que cruza todos los tenants a propósito: un vendedor
+ * pertenece a varias tiendas y para elegir la primera necesita ver las que
+ * hay. RLS la permite porque solo expone tiendas publicadas.
+ *
+ * Se excluyen la tienda propia —nadie vende para sí mismo— y aquellas donde ya
+ * hay vínculo, que no son un descubrimiento sino su panel. Ese filtro se hace
+ * después de traer la página, así que el total es el del catálogo y no el de
+ * lo que queda: es una diferencia asumida a cambio de no arrastrar la lista de
+ * exclusiones a cada consulta.
  */
-export async function getProductosVitrina(
-  filtros: FiltrosVitrina = {}
-): Promise<PaginaVitrina> {
+export async function getTiendasAbiertas({
+  q,
+  pagina = 1,
+}: { q?: string; pagina?: number } = {}): Promise<Pagina<TiendaAbierta>> {
   const supabase = await createClient()
-  if (!supabase) return filtrarDemo(filtros)
+  if (!supabase) return paginaDemo(TIENDAS_ABIERTAS_DEMO, pagina)
 
-  const pagina = filtros.pagina ?? 1
-  const porPagina = filtros.porPagina ?? POR_PAGINA
-  const busqueda = normalizar(filtros.q)
-  const categoria = normalizar(filtros.categoria, 80)
-  const desde = (pagina - 1) * porPagina
-  const rango = rangoPrecio(filtros.precio)
+  const busqueda = normalizar(q)
+  const desde = (pagina - 1) * POR_PAGINA
 
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const base = () =>
-    supabase
-      .from("products")
-      .select(
-        "id, name, description, price_cents, base_cost_cents, take_bps, compare_at_price_cents, image_url, images, condition, condition_note, category, created_at, is_featured, stock, stores!inner(name, slug, is_published, owner_id, deleted_at)",
-        { count: "exact" }
-      )
-      .eq("is_active", true)
-      .eq("seller_enabled", true)
-      .is("deleted_at", null)
-      .eq("stores.is_published", true)
-      .is("stores.deleted_at", null)
-      .gt("stock", 0)
-
-  let consulta = base()
-  if (user) consulta = consulta.neq("stores.owner_id", user.id)
-  if (busqueda) {
-    consulta = consulta.or(
-      `name.ilike.%${busqueda}%,description.ilike.%${busqueda}%`
+  let consulta = supabase
+    .from("stores")
+    .select(
+      "id, name, slug, tagline, description, seller_join_mode, commission_bps",
+      { count: "exact" }
     )
-  }
-  if (categoria) consulta = consulta.eq("category", categoria)
-  if (filtros.condicion) {
-    consulta = consulta.eq("condition", filtros.condicion)
-  }
-  if (rango?.min !== undefined) {
-    consulta = consulta.gte("price_cents", rango.min)
-  }
-  if (rango?.max !== undefined) {
-    consulta = consulta.lte("price_cents", rango.max)
-  }
-  if (filtros.publicado) {
-    const desdeFecha = new Date(
-      Date.now() - Number(filtros.publicado) * 86_400_000
-    ).toISOString()
-    consulta = consulta.gte("created_at", desdeFecha)
-  }
+    .eq("is_published", true)
+    .eq("seller_network_enabled", true)
+    .is("deleted_at", null)
 
-  if (filtros.orden === "precio_asc") {
-    consulta = consulta.order("price_cents", { ascending: true })
-  } else if (filtros.orden === "precio_desc") {
-    consulta = consulta.order("price_cents", { ascending: false })
-  } else if (filtros.orden === "stock_desc") {
-    consulta = consulta.order("stock", { ascending: false })
-  } else if (filtros.orden === "ofertas") {
-    consulta = consulta
-      .order("compare_at_price_cents", { ascending: false, nullsFirst: false })
+  if (busqueda) consulta = consulta.ilike("name", `%${busqueda}%`)
+
+  const [tiendasResult, miTiendaResult, vinculosResult] = await Promise.all([
+    consulta
       .order("created_at", { ascending: false })
-  } else {
-    consulta = consulta.order("created_at", { ascending: false })
-  }
-
-  let categoriasQuery = base()
-  if (user) categoriasQuery = categoriasQuery.neq("stores.owner_id", user.id)
-
-  const [{ data, count }, tomados, categoriasData] = await Promise.all([
-    consulta.range(desde, desde + porPagina - 1),
+      .range(desde, desde + POR_PAGINA - 1),
     user
       ? supabase
-          .from("seller_products")
-          .select("*, store_sellers(referral_code)")
+          .from("stores")
+          .select("id")
+          .eq("owner_id", user.id)
+          .is("deleted_at", null)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    user
+      ? supabase
+          .from("store_sellers")
+          .select("store_id")
           .eq("user_id", user.id)
           .is("deleted_at", null)
       : Promise.resolve({ data: [] }),
-    categoriasQuery,
   ])
 
-  if (!data) {
-    return { items: [], total: 0, pagina, paginas: 1, categorias: [] }
-  }
+  if (!tiendasResult.data) return vacia(pagina)
 
-  const codigos = new Map<string, string | null>()
-  for (const fila of tomados.data ?? []) {
-    const codigoProducto = (fila as unknown as { referral_code?: unknown })
-      .referral_code
-    codigos.set(
-      fila.product_id,
-      typeof codigoProducto === "string"
-        ? codigoProducto
-        : (fila.store_sellers?.referral_code ?? null)
-    )
-  }
+  const excluidas = new Set<string>()
+  if (miTiendaResult.data?.id) excluidas.add(miTiendaResult.data.id)
+  for (const vinculo of vinculosResult.data ?? [])
+    excluidas.add(vinculo.store_id)
 
-  const categorias = [
-    ...new Set(
-      ((categoriasData.data ?? []) as Array<{ category: string | null }>)
-        .map((producto) => producto.category?.trim())
-        .filter((valor): valor is string => Boolean(valor))
-    ),
-  ].sort((a, b) => a.localeCompare(b, "es"))
+  const total = tiendasResult.count ?? 0
 
-  const total = count ?? 0
   return {
-    items: (data as FilaProducto[]).map((producto) =>
-      mapearProducto(producto, codigos.get(producto.id) ?? null)
-    ),
+    items: tiendasResult.data
+      .filter((tienda) => !excluidas.has(tienda.id))
+      .map((tienda) => ({
+        id: tienda.id,
+        name: tienda.name,
+        slug: tienda.slug,
+        tagline: tienda.tagline ?? tienda.description,
+        joinMode: tienda.seller_join_mode,
+        commissionBps: tienda.commission_bps,
+      })),
     total,
     pagina,
-    paginas: Math.max(1, Math.ceil(total / porPagina)),
-    categorias,
+    paginas: Math.max(1, Math.ceil(total / POR_PAGINA)),
   }
 }
 
-/** Una ficha del catálogo, con el enlace actual del promotor si ya la tomó. */
-export const getProductoVitrina = cache(async function getProductoVitrina(
-  id: string
-): Promise<ProductoVitrina | null> {
-  const demo = PRODUCTOS_VITRINA_DEMO.find((producto) => producto.id === id)
+/**
+ * El nombre de una tienda publicada, por su slug.
+ *
+ * Buscar por slug no filtra nada: el slug ya es público, está impreso en el
+ * código QR. Por eso el enlace de invitación lleva la tienda y el código
+ * juntos, y no hace falta traducir código a tienda — ese sí sería el endpoint
+ * para averiguar por descarte qué códigos valen.
+ */
+export async function getNombreDeTienda(slug: string): Promise<string | null> {
   const supabase = await createClient()
-  if (!supabase) return demo ?? null
+  if (!supabase) return null
+
+  const { data } = await supabase
+    .from("stores")
+    .select("name")
+    .eq("slug", slug)
+    .eq("is_published", true)
+    .is("deleted_at", null)
+    .maybeSingle()
+
+  return data?.name ?? null
+}
+
+/**
+ * La vitrina de productos abiertos a vendedores.
+ *
+ * Cruza todas las tiendas: lo que la arma no es una tienda sino la decisión
+ * por producto de cada emprendedor. El `!inner` sobre `stores` deja fuera los
+ * productos de tiendas despublicadas o con la red apagada sin traerlos para
+ * descartarlos después.
+ */
+export async function getProductosVitrina({
+  q,
+  pagina = 1,
+}: { q?: string; pagina?: number } = {}): Promise<Pagina<ProductoVitrina>> {
+  const supabase = await createClient()
+  if (!supabase) return paginaDemo(PRODUCTOS_VITRINA_DEMO, pagina)
+
+  const busqueda = normalizar(q)
+  const desde = (pagina - 1) * POR_PAGINA
 
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) return null
 
-  const { data } = await supabase
+  let consulta = supabase
     .from("products")
     .select(
-      "id, name, description, price_cents, base_cost_cents, take_bps, compare_at_price_cents, image_url, images, condition, condition_note, category, created_at, is_featured, stock, seller_enabled, is_active, deleted_at, stores!inner(name, slug, is_published, owner_id, deleted_at)"
+      "id, name, price_cents, compare_at_price_cents, image_url, condition, store_id, stores!inner(name, slug, commission_bps, is_published, seller_network_enabled, owner_id, deleted_at)",
+      { count: "exact" }
     )
-    .eq("id", id)
     .eq("is_active", true)
     .eq("seller_enabled", true)
     .is("deleted_at", null)
     .eq("stores.is_published", true)
+    .eq("stores.seller_network_enabled", true)
     .is("stores.deleted_at", null)
     .gt("stock", 0)
-    .maybeSingle()
 
-  if (!data || data.stores?.owner_id === user.id) return null
+  if (busqueda) consulta = consulta.ilike("name", `%${busqueda}%`)
 
-  const { data: tomado } = await supabase
-    .from("seller_products")
-    .select("*, store_sellers(referral_code)")
-    .eq("product_id", id)
-    .eq("user_id", user.id)
-    .is("deleted_at", null)
-    .maybeSingle()
+  const { data, count } = await consulta
+    .order("created_at", { ascending: false })
+    .range(desde, desde + POR_PAGINA - 1)
 
-  const codigoPropio = (tomado as unknown as { referral_code?: unknown } | null)
-    ?.referral_code
-  const codigo =
-    typeof codigoPropio === "string"
-      ? codigoPropio
-      : (tomado?.store_sellers?.referral_code ?? null)
+  if (!data) return vacia(pagina)
 
-  return mapearProducto(data as FilaProducto, codigo)
-})
-import { cache } from "react"
+  const total = count ?? 0
+
+  return {
+    items: data
+      .filter((producto) => producto.stores?.owner_id !== user?.id)
+      .map((producto) => ({
+        id: producto.id,
+        name: producto.name,
+        priceCents: producto.price_cents,
+        compareAtPriceCents: producto.compare_at_price_cents,
+        imageUrl: producto.image_url,
+        condition: producto.condition,
+        storeName: producto.stores?.name ?? "Tienda",
+        storeSlug: producto.stores?.slug ?? "",
+        commissionBps: producto.stores?.commission_bps ?? 0,
+      })),
+    total,
+    pagina,
+    paginas: Math.max(1, Math.ceil(total / POR_PAGINA)),
+  }
+}

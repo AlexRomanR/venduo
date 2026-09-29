@@ -11,6 +11,8 @@ export interface Contadores {
   pedidosConComprobante: number
   productosSinStock: number
   productosPocoStock: number
+  /** Solicitudes de vendedores esperando aprobación. */
+  vendedoresPendientes: number
   /** Comisiones confirmadas que la tienda todavía no le pagó al vendedor. */
   comisionesPorCobrarCents: number
 }
@@ -29,16 +31,11 @@ export interface BarraLateral {
     publicada: boolean
     url: string
   } | null
-  /**
-   * La sección del promotor. Está si ya tomó algún producto, y también para
-   * quien no tiene negocio: un promotor recién llegado necesita su panel
-   * para empezar, aunque todavía no haya tomado nada.
-   */
   vendedor: {
     /** El historial público, si ya armó su perfil. */
     perfilSlug: string | null
-    /** Cuántos productos promociona. */
-    enlaces: number
+    tiendas: number
+    pendientes: number
   } | null
   contadores: Contadores
   /**
@@ -54,6 +51,7 @@ const SIN_CONTADORES: Contadores = {
   pedidosConComprobante: 0,
   productosSinStock: 0,
   productosPocoStock: 0,
+  vendedoresPendientes: 0,
   comisionesPorCobrarCents: 0,
 }
 
@@ -88,8 +86,8 @@ function barraDeDemostracion(): BarraLateral {
  * columnas, cosa que el filtro de PostgREST no sabe hacer, y un catálogo de
  * MVP son decenas de filas.
  *
- * Lo que muestra lo deciden los datos y no `primary_role`: quien tiene negocio y
- * además promociona productos ve las dos secciones.
+ * Lo que muestra lo deciden los datos y no `primary_role`: quien tiene tienda y
+ * además vende para otras ve las dos secciones.
  */
 export async function getBarraLateral(): Promise<BarraLateral> {
   if (!isSupabaseConfigured) return barraDeDemostracion()
@@ -102,7 +100,7 @@ export async function getBarraLateral(): Promise<BarraLateral> {
   } = await supabase.auth.getUser()
   if (!user) return barraDeDemostracion()
 
-  const [perfilRes, tiendaRes, enlacesRes, perfilVendedorRes] =
+  const [perfilRes, tiendaRes, vinculosRes, perfilVendedorRes] =
     await Promise.all([
       supabase
         .from("profiles")
@@ -118,8 +116,8 @@ export async function getBarraLateral(): Promise<BarraLateral> {
         .is("deleted_at", null)
         .maybeSingle(),
       supabase
-        .from("seller_products")
-        .select("id", { count: "exact", head: true })
+        .from("store_sellers")
+        .select("status")
         .eq("user_id", user.id)
         .is("deleted_at", null),
       supabase
@@ -131,31 +129,37 @@ export async function getBarraLateral(): Promise<BarraLateral> {
     ])
 
   const tiendaFila = tiendaRes.data?.template_key ? tiendaRes.data : null
-  const enlaces = enlacesRes.count ?? 0
-  const esPromotor = enlaces > 0 || !tiendaFila
+  const vinculos = vinculosRes.data ?? []
 
   const contadores: Contadores = { ...SIN_CONTADORES }
 
   if (tiendaFila) {
-    const [pendientes, conComprobante, productos] = await Promise.all([
-      supabase
-        .from("orders")
-        .select("id", { count: "exact", head: true })
-        .eq("store_id", tiendaFila.id)
-        .eq("status", "pendiente"),
-      supabase
-        .from("orders")
-        .select("id", { count: "exact", head: true })
-        .eq("store_id", tiendaFila.id)
-        .eq("status", "pendiente")
-        .not("payment_proof_url", "is", null),
-      supabase
-        .from("products")
-        .select("stock, low_stock_threshold")
-        .eq("store_id", tiendaFila.id)
-        .eq("is_active", true)
-        .is("deleted_at", null),
-    ])
+    const [pendientes, conComprobante, productos, solicitudes] =
+      await Promise.all([
+        supabase
+          .from("orders")
+          .select("id", { count: "exact", head: true })
+          .eq("store_id", tiendaFila.id)
+          .eq("status", "pendiente"),
+        supabase
+          .from("orders")
+          .select("id", { count: "exact", head: true })
+          .eq("store_id", tiendaFila.id)
+          .eq("status", "pendiente")
+          .not("payment_proof_url", "is", null),
+        supabase
+          .from("products")
+          .select("stock, low_stock_threshold")
+          .eq("store_id", tiendaFila.id)
+          .eq("is_active", true)
+          .is("deleted_at", null),
+        supabase
+          .from("store_sellers")
+          .select("id", { count: "exact", head: true })
+          .eq("store_id", tiendaFila.id)
+          .eq("status", "pendiente")
+          .is("deleted_at", null),
+      ])
 
     const catalogo = productos.data ?? []
     contadores.pedidosPendientes = pendientes.count ?? 0
@@ -164,9 +168,10 @@ export async function getBarraLateral(): Promise<BarraLateral> {
     contadores.productosPocoStock = catalogo.filter(
       (p) => p.stock > 0 && p.stock <= p.low_stock_threshold
     ).length
+    contadores.vendedoresPendientes = solicitudes.count ?? 0
   }
 
-  if (esPromotor) {
+  if (vinculos.length > 0) {
     const { data: comisiones } = await supabase
       .from("commissions")
       .select("amount_cents")
@@ -199,9 +204,14 @@ export async function getBarraLateral(): Promise<BarraLateral> {
           url: urlDeTienda(tiendaFila.slug),
         }
       : null,
-    vendedor: esPromotor
-      ? { perfilSlug: perfilVendedorRes.data?.slug ?? null, enlaces }
-      : null,
+    vendedor:
+      vinculos.length > 0
+        ? {
+            perfilSlug: perfilVendedorRes.data?.slug ?? null,
+            tiendas: vinculos.filter((v) => v.status === "activo").length,
+            pendientes: vinculos.filter((v) => v.status === "pendiente").length,
+          }
+        : null,
     contadores,
     apariencia: tiendaFila
       ? aparienciaDeTienda(tiendaFila.template_key, tiendaFila.theme_overrides)

@@ -1,12 +1,6 @@
-import {
-  ESQUEMA,
-  ESQUEMA_PROMOTOR,
-  REGLAS_SQL,
-  REGLAS_SQL_PROMOTOR,
-} from "@/lib/insights/esquema"
+import { ESQUEMA, REGLAS_SQL } from "@/lib/insights/esquema"
 import { getAIProvider } from "./index"
 import {
-  insightSqlPromotorSchema,
   insightSqlSchema,
   marketingCampaignSchema,
   salesInsightSchema,
@@ -91,15 +85,12 @@ export async function buildInsightSql(input: {
   pregunta: string
   anterior?: InsightSql | null
   hoy: string
-  /** A quién se le responde: cambia qué vistas puede nombrar la consulta. */
-  publico?: "tienda" | "promotor"
 }): Promise<{ consulta: InsightSql; provider: string; model: string }> {
   const ai = getAIProvider()
-  const promotor = input.publico === "promotor"
 
-  const { object, provider, model } = await ai.generateObject<InsightSql>({
-    schema: promotor ? insightSqlPromotorSchema : insightSqlSchema,
-    schemaName: promotor ? "InsightSqlPromotor" : "InsightSql",
+  const { object, provider, model } = await ai.generateObject({
+    schema: insightSqlSchema,
+    schemaName: "InsightSql",
     system: [
       BASE_SYSTEM,
       "Traduces preguntas sobre el negocio a una consulta SQL de PostgreSQL.",
@@ -119,10 +110,10 @@ export async function buildInsightSql(input: {
       "3. La consulta.",
       "",
       "Esquema disponible:",
-      promotor ? ESQUEMA_PROMOTOR : ESQUEMA,
+      ESQUEMA,
       "",
       "Reglas de la consulta:",
-      promotor ? REGLAS_SQL_PROMOTOR : REGLAS_SQL,
+      REGLAS_SQL,
     ].join("\n"),
     messages: [
       {

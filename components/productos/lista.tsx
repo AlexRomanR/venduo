@@ -197,7 +197,7 @@ function Fila({
 
             {!producto.is_active ? <Marca texto="Oculto" /> : null}
             {producto.is_featured ? <Marca texto="Destacado" senal /> : null}
-            {producto.seller_enabled ? <Marca texto="Promotores" /> : null}
+            {producto.seller_enabled ? <Marca texto="Vendedores" /> : null}
 
             <div className="ml-auto flex items-center gap-1">
               <Link

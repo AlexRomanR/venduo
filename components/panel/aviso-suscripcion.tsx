@@ -34,7 +34,7 @@ export function AvisoSuscripcion({
           Tu tienda dejó de verse y el panel quedó en solo lectura.
         </h2>
         <p className="mt-3 max-w-[54ch] text-sm leading-relaxed text-white/75">
-          Puedes exportar todo —catálogo, pedidos, promotores y comisiones— en
+          Puedes exportar todo —catálogo, pedidos, vendedores y comisiones— en
           CSV. Tus datos se conservan 90 días desde el bloqueo.
         </p>
         {/* La exportación en CSV es la única acción que queda habilitada con la

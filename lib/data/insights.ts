@@ -78,40 +78,6 @@ export function normalizarForma(
   return consulta
 }
 
-/**
- * Si la consulta nombra vistas del otro panel.
- *
- * `run_insight_sql` acepta las dos familias porque es una sola función. Quien
- * es dueño y promotor a la vez podría recibir una respuesta que mezcla su
- * tienda con sus ventas como promotor: no es una fuga, pero es una respuesta
- * equivocada.
- */
-export function nombraVistasAjenas(
-  sql: string,
-  publico: "tienda" | "promotor"
-): boolean {
-  const ajenas = publico === "promotor" ? /\bmis_\w+/i : /\bpromotor_\w+/i
-  return ajenas.test(sql)
-}
-
-interface FilaGuardada {
-  id: string
-  titulo: string
-  pregunta: string
-  spec: unknown
-  created_at: string
-}
-
-function aGuardado(fila: FilaGuardada): GraficoGuardado {
-  return {
-    id: fila.id,
-    titulo: fila.titulo,
-    pregunta: fila.pregunta,
-    consulta: fila.spec as InsightSql,
-    createdAt: fila.created_at,
-  }
-}
-
 /** Los gráficos que el emprendedor dejó guardados. */
 export async function getGraficosGuardados(): Promise<GraficoGuardado[]> {
   const supabase = await createClient()
@@ -124,24 +90,13 @@ export async function getGraficosGuardados(): Promise<GraficoGuardado[]> {
     .order("posicion")
     .order("created_at", { ascending: false })
 
-  return (data ?? []).map(aGuardado)
-}
-
-/** Los del promotor. RLS los acota a quien pregunta. */
-export async function getGraficosGuardadosPromotor(): Promise<
-  GraficoGuardado[]
-> {
-  const supabase = await createClient()
-  if (!supabase) return []
-
-  const { data } = await supabase
-    .from("seller_insights")
-    .select("id, titulo, pregunta, spec, created_at")
-    .is("deleted_at", null)
-    .order("posicion")
-    .order("created_at", { ascending: false })
-
-  return (data ?? []).map(aGuardado)
+  return (data ?? []).map((fila) => ({
+    id: fila.id,
+    titulo: fila.titulo,
+    pregunta: fila.pregunta,
+    consulta: fila.spec as InsightSql,
+    createdAt: fila.created_at,
+  }))
 }
 
 /**

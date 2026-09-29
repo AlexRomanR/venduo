@@ -13,16 +13,21 @@ export interface Resultado {
   error?: string
 }
 
-const VALIDOS: OrderStatus[] = ["enviado", "cancelado"]
+const VALIDOS: OrderStatus[] = [
+  "pendiente",
+  "pagado",
+  "enviado",
+  "entregado",
+  "cancelado",
+]
 
 /**
  * Cambia el estado de un pedido.
  *
  * Es la acción con más consecuencias del panel, y ninguna la escribe este
  * código: las hace el disparador `handle_order_status_change`. Pasar a
- * **enviado** abre la espera de recepción. Pasar a **cancelado** anula la
- * comisión y devuelve el stock. `pagado` solo lo mueve el aviso simulado de
- * PagoFácil, y `entregado` solo lo confirma el comprador.
+ * **pagado** crea la comisión del vendedor contra la base congelada. Pasar a
+ * **cancelado** la anula y devuelve el stock al catálogo.
  *
  * Por eso acá no se toca `commissions` ni `products`: duplicarlo desde la
  * aplicación daría comisiones dobles el día que alguien cambie dos veces de
@@ -32,14 +37,7 @@ export async function cambiarEstado(
   id: string,
   estado: OrderStatus
 ): Promise<Resultado> {
-  const permitido =
-    estado === "enviado"
-      ? "enviado"
-      : estado === "cancelado"
-        ? "cancelado"
-        : null
-
-  if (!permitido || !VALIDOS.includes(estado)) {
+  if (!VALIDOS.includes(estado)) {
     return { ok: false, error: "Ese estado no existe." }
   }
 
@@ -63,7 +61,10 @@ export async function cambiarEstado(
   const { error } = await supabase
     .from("orders")
     .update({
-      status: permitido,
+      status: estado,
+      // `paid_at` marca cuándo entró la plata. Se pone una sola vez: volver a
+      // pagado después de un enviado no debería reescribir la fecha.
+      ...(estado === "pagado" ? { paid_at: new Date().toISOString() } : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)

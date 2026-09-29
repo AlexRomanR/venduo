@@ -50,8 +50,6 @@ interface Props {
     spec: InsightSql,
     pregunta: string
   ) => Promise<{ ok: boolean; error?: string }>
-  /** Las preguntas de ejemplo. Las del negocio si no se pasan otras. */
-  sugerencias?: string[]
   /** Un gráfico del tablero que se acaba de mandar a editar, o nada. */
   paraEditar: GraficoEnTablero | null
   alConsumirEdicion: () => void
@@ -71,7 +69,6 @@ interface Props {
 export function Consola({
   preguntar,
   guardar,
-  sugerencias = SUGERENCIAS,
   paraEditar,
   alConsumirEdicion,
 }: Props) {
@@ -218,7 +215,7 @@ export function Consola({
             Prueba con
           </p>
           <ul className="mt-2 grid gap-x-10 sm:grid-cols-2">
-            {sugerencias.map((sugerencia) => (
+            {SUGERENCIAS.map((sugerencia) => (
               <li key={sugerencia}>
                 <button
                   type="button"

@@ -160,26 +160,6 @@ Por eso la IA escribe contra cinco vistas ya acotadas a `my_store_id()`:
 **En esas vistas no existe `store_id`.** El alcance deja de depender de que el
 modelo se acuerde de filtrar. Nombrar una tabla base corta la consulta.
 
-### Y las del promotor
-
-El promotor no tiene tienda: con `mis_*` vería todo vacío. Tiene la misma
-herramienta en `/vendedor/estadisticas?ver=preguntar`, contra cuatro vistas
-acotadas a `auth.uid()` que cruzan todos los negocios donde vende:
-
-| Vista                 | Qué trae                                      |
-| --------------------- | --------------------------------------------- |
-| `promotor_ventas`     | Pedidos con su código; `comprador` es un hash |
-| `promotor_items`      | Las líneas de esos pedidos                    |
-| `promotor_comisiones` | Lo que ganó, directa e indirecta              |
-| `promotor_enlaces`    | Lo que tomó, con su ganancia por unidad       |
-
-`buildInsightSql` recibe `publico: "tienda" | "promotor"`, que elige esquema,
-reglas y zod. `run_insight_sql` es una sola y acepta las dos familias, así que
-`responderPregunta` (`lib/insights/responder.ts`) rechaza la consulta que nombra
-las del otro panel: a quien es dueño y promotor le mezclaría los datos. Sus
-gráficos van en `seller_insights`, por usuario, y no en `insights`, que es por
-tienda.
-
 El contrato de salida es fijo: toda consulta devuelve `etiqueta` y `valor`. Eso
 es lo que permite dibujar sin adivinar qué vino.
 

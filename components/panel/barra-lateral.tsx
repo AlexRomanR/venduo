@@ -6,25 +6,26 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   ChartColumn,
+  Compass,
   Copy,
   ExternalLink,
-  FileSpreadsheet,
+  Handshake,
   IdCard,
   LayoutGrid,
-  Lightbulb,
-  Link2,
   LogOut,
+  Megaphone,
   Menu,
   Package,
   PanelLeftClose,
   PanelLeftOpen,
+  Palette,
   Plus,
   Receipt,
   Search,
   Settings,
   Store,
   Tags,
-  UserPlus,
+  Ticket,
   Users,
   Wallet,
   X,
@@ -55,8 +56,6 @@ interface Item {
   icono: LucideIcon
   /** Coincidencia exacta: `/panel` coincidiría con todas sus secciones. */
   exacto?: boolean
-  /** Una ayuda y no una sección: no hay pantalla propia que marcar. */
-  ayuda?: boolean
   contador?: { valor: number; urgente: boolean; etiqueta: string }
   pronto?: boolean
   hijos?: Array<{ href: string; nombre: string; icono: LucideIcon }>
@@ -64,9 +63,8 @@ interface Item {
 
 function estaActivo(
   pathname: string,
-  item: { href: string; exacto?: boolean; ayuda?: boolean }
+  item: { href: string; exacto?: boolean }
 ) {
-  if (item.ayuda) return false
   const ruta = item.href.split("?")[0]
   return item.exacto ? pathname === ruta : pathname.startsWith(ruta)
 }
@@ -133,7 +131,7 @@ function Contenido({
 
   const deTienda: Item[] = tienda
     ? [
-        { href: "/panel", nombre: "Mi panel", icono: LayoutGrid, exacto: true },
+        { href: "/panel", nombre: "Resumen", icono: LayoutGrid, exacto: true },
         {
           href: "/panel/pedidos",
           nombre: "Pedidos",
@@ -168,30 +166,36 @@ function Contenido({
               nombre: "Categorías",
               icono: Tags,
             },
-            {
-              href: "/panel/productos/importar",
-              nombre: "Cargar desde Excel",
-              icono: FileSpreadsheet,
-            },
           ],
         },
         {
           href: "/panel/vendedores",
-          nombre: "Promotores",
+          nombre: "Vendedores",
           icono: Users,
+          contador:
+            c.vendedoresPendientes > 0
+              ? {
+                  valor: c.vendedoresPendientes,
+                  urgente: true,
+                  etiqueta: `${c.vendedoresPendientes} solicitudes`,
+                }
+              : undefined,
         },
         {
           href: "/panel/estadisticas",
           nombre: "Estadísticas",
           icono: ChartColumn,
         },
-        // La guía del primer ingreso, para volver a verla. Queda al final:
-        // es ayuda, no una sección de trabajo.
         {
-          href: "/panel?guia=1",
-          nombre: "Cómo funciona Venduo",
-          icono: Lightbulb,
-          ayuda: true,
+          href: "/panel/apariencia",
+          nombre: "Apariencia",
+          icono: Palette,
+        },
+        {
+          href: "/panel/marketing",
+          nombre: "Marketing",
+          icono: Megaphone,
+          pronto: true,
         },
       ]
     : []
@@ -200,42 +204,15 @@ function Contenido({
     ? [
         {
           href: "/vendedor",
-          nombre: tienda ? "Panel de promotor" : "Mi panel",
-          icono: LayoutGrid,
+          nombre: "Lo que vendo",
+          icono: Wallet,
           exacto: true,
         },
+        { href: "/explorar/tiendas", nombre: "Buscar tiendas", icono: Compass },
         {
-          href: "/vendedor/catalogo",
-          nombre: "Catálogo",
+          href: "/explorar/productos",
+          nombre: "Buscar productos",
           icono: Search,
-        },
-        {
-          href: "/vendedor/enlaces",
-          nombre: "Mis enlaces",
-          icono: Link2,
-          contador:
-            vendedor.enlaces > 0
-              ? {
-                  valor: vendedor.enlaces,
-                  urgente: false,
-                  etiqueta: `${vendedor.enlaces} productos promocionados`,
-                }
-              : undefined,
-        },
-        {
-          href: "/vendedor/compradores",
-          nombre: "Compradores",
-          icono: UserPlus,
-        },
-        {
-          href: "/vendedor/ganancias",
-          nombre: "Ganancias",
-          icono: Wallet,
-        },
-        {
-          href: "/vendedor/estadisticas",
-          nombre: "Estadísticas",
-          icono: ChartColumn,
         },
         ...(vendedor.perfilSlug
           ? [
@@ -246,12 +223,7 @@ function Contenido({
               },
             ]
           : []),
-        {
-          href: "/vendedor?guia=1",
-          nombre: "Cómo funciona",
-          icono: Lightbulb,
-          ayuda: true,
-        },
+        { href: "/sumarme", nombre: "Entrar con un código", icono: Ticket },
       ]
     : []
 
@@ -259,7 +231,7 @@ function Contenido({
     if (!tienda) return
     try {
       await navigator.clipboard.writeText(tienda.url)
-      toast.success("Enlace de tu página copiado.")
+      toast.success("Enlace de tu tienda copiado.")
     } catch {
       toast.error("No pudimos copiarlo. Cópialo desde tu resumen.")
     }
@@ -441,7 +413,7 @@ function Contenido({
                 className="flex min-h-11 items-center justify-center gap-1.5 border border-tinta/25 text-xs font-semibold transition-colors hover:border-tinta"
               >
                 <ExternalLink aria-hidden="true" className="size-3.5" />
-                Ver mi página
+                Ver tienda
               </a>
               <button
                 type="button"
@@ -464,50 +436,8 @@ function Contenido({
           </div>
         ) : null}
 
-        {/* Quien solo promociona: su nombre, lo que tiene por cobrar y el
-            atajo al catálogo, que es lo que abre todos los días */}
-        {!tienda && vendedor && plegada ? (
-          <div className="flex flex-col items-center gap-2 border-t-2 border-tinta pt-4">
-            <ConNombre nombre="Buscar productos" plegada>
-              <Link
-                href="/vendedor/catalogo"
-                aria-label="Buscar productos para promocionar"
-                className="flex size-11 items-center justify-center border-2 border-tinta transition-colors hover:bg-tinta hover:text-papel"
-              >
-                <Search aria-hidden="true" className="size-4" />
-              </Link>
-            </ConNombre>
-          </div>
-        ) : null}
-
-        {!tienda && vendedor && !plegada ? (
-          <div className="mx-2 border-t-2 border-tinta pt-4">
-            <p className="text-[11px] font-semibold tracking-[0.12em] text-senal uppercase">
-              Promotor
-            </p>
-            <p className="mt-1 truncate font-titular text-base font-bold tracking-[-0.01em]">
-              {persona.nombre}
-            </p>
-            <p className="tabular mt-0.5 text-xs opacity-55">
-              {c.comisionesPorCobrarCents > 0
-                ? `${formatMoney(c.comisionesPorCobrarCents)} por cobrar`
-                : vendedor.enlaces > 0
-                  ? `${vendedor.enlaces} ${vendedor.enlaces === 1 ? "producto" : "productos"} en tu lista`
-                  : "Elige tu primer producto"}
-            </p>
-            <Link
-              href="/vendedor/catalogo"
-              onClick={alNavegar}
-              className="mt-3 flex min-h-11 items-center justify-center gap-2 rounded-plantilla border-2 border-tinta text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
-            >
-              <Search aria-hidden="true" className="size-4" />
-              Buscar productos
-            </Link>
-          </div>
-        ) : null}
-
         {deTienda.length > 0 ? (
-          <Grupo titulo="Tu negocio" plegada={plegada}>
+          <Grupo titulo="Tu tienda" plegada={plegada}>
             {deTienda.map((item) => (
               <Entrada
                 key={item.href}
@@ -522,18 +452,18 @@ function Contenido({
 
         {deVendedor.length > 0 && vendedor ? (
           <Grupo
-            titulo="Como promotor"
+            titulo="Como vendedor"
             plegada={plegada}
-            // Sin negocio, la tarjeta de arriba ya dice esto mismo.
             detalle={
-              !tienda
-                ? undefined
-                : c.comisionesPorCobrarCents > 0
-                  ? `Por cobrar ${formatMoney(c.comisionesPorCobrarCents)}`
-                  : vendedor.enlaces === 1
-                    ? "1 producto promocionado"
-                    : `${vendedor.enlaces} productos promocionados`
+              c.comisionesPorCobrarCents > 0
+                ? `Te deben ${formatMoney(c.comisionesPorCobrarCents)}`
+                : `${vendedor.tiendas} ${vendedor.tiendas === 1 ? "tienda activa" : "tiendas activas"}${
+                    vendedor.pendientes > 0
+                      ? ` · ${vendedor.pendientes} esperando`
+                      : ""
+                  }`
             }
+            detalleUrgente={c.comisionesPorCobrarCents > 0}
           >
             {deVendedor.map((item) => (
               <Entrada
@@ -547,12 +477,28 @@ function Contenido({
           </Grupo>
         ) : null}
 
+        {/* La otra mitad del producto, para quien todavía no la usa */}
+        {tienda && !vendedor ? (
+          <Grupo titulo="Gana extra" plegada={plegada}>
+            <Entrada
+              item={{
+                href: "/sumarme",
+                nombre: "Vender para otras tiendas",
+                icono: Handshake,
+              }}
+              pathname={pathname}
+              alNavegar={alNavegar}
+              plegada={plegada}
+            />
+          </Grupo>
+        ) : null}
+
         {!tienda && vendedor ? (
           <Grupo titulo="Tu propio negocio" plegada={plegada}>
             <Entrada
               item={{
                 href: "/crear?abrir=1",
-                nombre: "Publicar mis productos",
+                nombre: "Abrir mi tienda",
                 icono: Store,
               }}
               pathname={pathname}
@@ -929,7 +875,10 @@ export function BarraLateralMovil({ datos }: { datos: BarraLateral }) {
   }, [pathname])
 
   const c = datos.contadores
-  const urgente = c.pedidosConComprobante > 0 || c.productosSinStock > 0
+  const urgente =
+    c.pedidosConComprobante > 0 ||
+    c.productosSinStock > 0 ||
+    c.vendedoresPendientes > 0
 
   return (
     <header className="sticky top-0 z-30 border-b border-tinta/15 bg-papel/92 backdrop-blur lg:hidden">

@@ -23,13 +23,10 @@ export const productoSchema = z
       .trim()
       .max(600, "Máximo 600 caracteres.")
       .default(""),
-    // El negocio declara lo que quiere recibir. El precio publicado lo
-    // construye la base sumando la comisión del promotor y el take-rate:
-    // ninguna pantalla deja escribirlo. Ver `docs/modelo-de-negocio.md`.
-    costoBase: z
-      .number({ error: "Pon cuánto quieres recibir por el producto." })
-      .positive("Tiene que ser mayor que cero.")
-      .max(9_999_999, "Ese monto es demasiado alto."),
+    precio: z
+      .number({ error: "Pon un precio." })
+      .nonnegative("El precio no puede ser negativo.")
+      .max(9_999_999, "Ese precio es demasiado alto."),
     precioAnterior: z
       .number()
       .nonnegative("El precio anterior no puede ser negativo.")
@@ -55,19 +52,16 @@ export const productoSchema = z
     aceptaVendedores: z.boolean().default(true),
   })
   .superRefine((valores, ctx) => {
-    // El precio anterior es lo que produce el descuento tachado, y se compara
-    // contra el precio **publicado**, no contra el costo base. Como el
-    // publicado siempre es mayor que el costo, exigir que lo supere es el
-    // mínimo que se puede comprobar sin los tramos a mano; la base rechaza el
-    // resto.
+    // El precio anterior es lo que produce el descuento tachado. Si no es mayor
+    // que el actual no hay descuento, hay un error de carga.
     if (
       valores.precioAnterior !== null &&
-      valores.precioAnterior <= valores.costoBase
+      valores.precioAnterior <= valores.precio
     ) {
       ctx.addIssue({
         code: "custom",
         path: ["precioAnterior"],
-        message: "El precio anterior tiene que ser mayor que el publicado.",
+        message: "El precio anterior tiene que ser mayor que el actual.",
       })
     }
 
@@ -84,55 +78,6 @@ export const productoSchema = z
 
 export type ProductoInput = z.input<typeof productoSchema>
 export type ProductoValidado = z.output<typeof productoSchema>
-
-/**
- * Un producto cargado desde una planilla.
- *
- * Son menos campos que en el formulario: lo que una persona llena cómodo en una
- * fila de Excel. Las fotos no van —se agregan después desde cada producto— y
- * la categoría llega por nombre: si no existe todavía, se crea al cargar.
- *
- * Lo valida el navegador para mostrar cada fila con su error, y lo vuelve a
- * validar la acción del servidor: la planilla viene de afuera.
- */
-export const filaImportadaSchema = z
-  .object({
-    nombre: z
-      .string()
-      .trim()
-      .min(2, "Falta el nombre, o es muy corto.")
-      .max(120, "El nombre es muy largo."),
-    descripcion: z.string().trim().max(600, "Máximo 600 caracteres."),
-    costoBase: z
-      .number({ error: "Falta cuánto quieres recibir." })
-      .positive("Lo que quieres recibir tiene que ser mayor que cero.")
-      .max(9_999_999, "Ese monto es demasiado alto."),
-    stock: z
-      .number({ error: "Falta el stock." })
-      .int("El stock va en unidades enteras.")
-      .min(0, "El stock no puede ser negativo.")
-      .max(999_999),
-    categoria: z
-      .string()
-      .trim()
-      .max(60, "El nombre de la categoría es muy largo."),
-    condicion: z.enum(["nuevo", "segunda_mano", "reacondicionado"], {
-      error: "La condición es nuevo, segunda mano o reacondicionado.",
-    }),
-    notaCondicion: z.string().trim().max(300),
-    sku: z.string().trim().max(40, "El código es muy largo."),
-  })
-  .superRefine((valores, ctx) => {
-    if (valores.condicion !== "nuevo" && valores.notaCondicion.length < 10) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["notaCondicion"],
-        message: "Si no es nuevo, cuenta en qué estado está.",
-      })
-    }
-  })
-
-export type FilaImportada = z.output<typeof filaImportadaSchema>
 
 /** Las categorías del catálogo. */
 export const categoriaSchema = z.object({

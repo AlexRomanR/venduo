@@ -19,6 +19,7 @@ const ASPECTO: Record<OrderStatus, string> = {
   pagado: "border-tinta text-tinta",
   enviado: "border-tinta/40 text-tinta/70",
   entregado: "border-tinta/25 text-tinta/45",
+  // Quedó en el enum de la base y nada lo escribe; si apareciera, pide acción.
   en_disputa: "border-senal text-senal",
   cancelado: "border-tinta/25 text-tinta/40 line-through",
 }
@@ -108,8 +109,8 @@ export function BotonComprobante({
  * Cambiar el estado.
  *
  * Cada paso avisa qué va a pasar además de cambiar la etiqueta, porque lo que
- * pasa no es obvio: marcar enviado abre la espera de recepción, y cancelar
- * devuelve el stock al catálogo.
+ * pasa no es obvio: marcar pagado le acredita la comisión al vendedor, y
+ * cancelar devuelve el stock al catálogo.
  */
 export function CambiarEstado({
   pedido,
@@ -192,6 +193,12 @@ interface Paso {
 /** El camino de un pedido. Un entregado o cancelado ya no se mueve. */
 const PASOS: Record<OrderStatus, Paso[]> = {
   pendiente: [
+    {
+      estado: "pagado",
+      texto: "Confirmar el pago",
+      aviso: "Pago confirmado. Si vino de un vendedor, su comisión ya está.",
+      principal: true,
+    },
     { estado: "cancelado", texto: "Cancelar", aviso: "Pedido cancelado." },
   ],
   pagado: [
@@ -203,9 +210,18 @@ const PASOS: Record<OrderStatus, Paso[]> = {
     },
     { estado: "cancelado", texto: "Cancelar", aviso: "Pedido cancelado." },
   ],
-  enviado: [],
+  enviado: [
+    {
+      estado: "entregado",
+      texto: "Marcar como entregado",
+      aviso: "Entregado. Pedido cerrado.",
+      principal: true,
+    },
+  ],
   entregado: [],
-  en_disputa: [],
+  en_disputa: [
+    { estado: "cancelado", texto: "Cancelar", aviso: "Pedido cancelado." },
+  ],
   cancelado: [],
 }
 

@@ -4,34 +4,22 @@ import { redirect } from "next/navigation"
 import {
   ArrowUpRight,
   BarChart3,
-  FileSpreadsheet,
+  Megaphone,
   Package,
-  Plus,
   ShoppingBag,
   Users,
 } from "lucide-react"
 
-import { getCatalogo } from "@/lib/data/catalogo"
 import { getMiTienda, getResumenPanel } from "@/lib/data/panel"
-import { getTramos } from "@/lib/data/precios"
 import { urlDeTienda } from "@/lib/tienda"
 import { RESUMEN_DEMO } from "@/lib/demo-data"
-import { isSupabaseConfigured } from "@/lib/env"
-import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
+import { getSiteUrl, isSupabaseConfigured } from "@/lib/env"
 import { formatMoney, formatNumber } from "@/lib/format"
-import { cn } from "@/lib/utils"
 import { toDataURL } from "@/lib/qr"
+import { AvisoSuscripcion } from "@/components/panel/aviso-suscripcion"
 import { Cifra, Encabezado } from "@/components/panel/piezas"
-import { GuiaDeInicio } from "@/components/panel/guia-de-inicio"
-import { ListaProductos } from "@/components/productos/lista"
-import { terminarGuia } from "./acciones"
-import {
-  ajustarStock,
-  alternarProducto,
-  borrarProducto,
-} from "./productos/acciones"
 
-export const metadata = { title: "Mi panel" }
+export const metadata = { title: "Resumen" }
 
 const SECCIONES = [
   {
@@ -43,13 +31,13 @@ const SECCIONES = [
   {
     href: "/panel/pedidos",
     titulo: "Pedidos",
-    detalle: "Confirma el envío y coordina la entrega por WhatsApp.",
+    detalle: "Confirma pagos y coordina la entrega por WhatsApp.",
     icono: ShoppingBag,
   },
   {
     href: "/panel/vendedores",
-    titulo: "Promotores y Ranking",
-    detalle: "Quién promociona tus productos y líderes de ventas en Venduo.",
+    titulo: "Vendedores",
+    detalle: "Aprueba solicitudes y sigue las comisiones de tu red.",
     icono: Users,
   },
   {
@@ -58,59 +46,31 @@ const SECCIONES = [
     detalle: "Qué se vende, cuándo y cuánto, preguntado en tus palabras.",
     icono: BarChart3,
   },
+  {
+    href: "/panel/marketing",
+    titulo: "Marketing",
+    detalle: "Textos para Facebook y WhatsApp hechos con tu catálogo.",
+    icono: Megaphone,
+  },
 ]
 
 /**
- * La pantalla de entrada del negocio.
+ * Resumen del emprendedor: la pantalla de entrada del panel.
  *
- * Tiene dos caras. **La primera vez es una guía**: cargar lo que vende,
- * agruparlo y cómo sigue el circuito sin que haga nada, en un carrusel que
- * termina acá. La decide `stores.onboarded_at` y no el catálogo, porque un
- * negocio puede cargar su primer producto sin haber terminado de entender cómo
- * funciona el resto. Se puede volver a abrir con `?guia=1`.
- *
- * Terminada la guía, es su panel: los números de los últimos 30 días primero,
- * lo que espera una acción después, y el catálogo con su stock.
+ * Quien todavía no eligió plantilla no tiene nada que resumir acá. La
+ * comprobación es sobre `template_key` y no sobre la existencia de la tienda
+ * porque es lo que marca que el alta terminó.
  */
-export default async function PanelPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ guia?: string; paso?: string }>
-}) {
+export default async function PanelPage() {
   const tienda = await getMiTienda()
 
   // Sin credenciales el modo demo tiene que seguir siendo navegable: no hay
   // tienda que buscar ni alta que completar.
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
-  const { guia, paso } = await searchParams
-  const [resumenReal, catalogo, tramos] = await Promise.all([
-    getResumenPanel(),
-    getCatalogo(),
-    getTramos(),
-  ])
-  const resumen = resumenReal ?? RESUMEN_DEMO
-
-  // En modo demo no hay nadie que termine la guía: se muestra el panel, y la
-  // guía queda a un clic en la barra lateral.
-  const guiaPendiente = isSupabaseConfigured && !tienda?.onboarded_at
-  if (guiaPendiente || guia === "1" || paso) {
-    return (
-      <GuiaDeInicio
-        nombre={resumen.tienda.name}
-        pasoInicial={Number(paso) || 1}
-        productos={catalogo.productos.length}
-        categorias={catalogo.categorias.length}
-        tramos={tramos}
-        terminar={terminarGuia}
-      />
-    )
-  }
-
+  const resumen = (await getResumenPanel()) ?? RESUMEN_DEMO
   const url = urlDeTienda(resumen.tienda.slug)
   const qr = await toDataURL(url, { size: 320, margin: 1, dark: "#16171a" })
-  const ultimos = catalogo.productos.slice(0, 5)
-  const sinStock = catalogo.productos.filter((p) => p.stock === 0).length
 
   // Lo que espera una acción. Se arma acá y no en la interfaz porque el orden
   // importa: primero lo que bloquea vender, después lo que lo mejora.
@@ -124,9 +84,9 @@ export default async function PanelPage({
       urgente: true,
     })
   }
-  if (sinStock > 0) {
+  if (resumen.productos === 0) {
     pendientes.push({
-      texto: `${formatNumber(sinStock)} ${sinStock === 1 ? "producto se quedó" : "productos se quedaron"} sin stock: nadie puede comprarlos.`,
+      texto: "No cargaste ningún producto todavía.",
       href: "/panel/productos",
       urgente: true,
     })
@@ -142,7 +102,7 @@ export default async function PanelPage({
   }
   if (resumen.vendedoresPendientes > 0) {
     pendientes.push({
-      texto: `${formatNumber(resumen.vendedoresPendientes)} ${resumen.vendedoresPendientes === 1 ? "promotor quiere" : "promotores quieren"} vender lo tuyo.`,
+      texto: `${formatNumber(resumen.vendedoresPendientes)} ${resumen.vendedoresPendientes === 1 ? "persona quiere" : "personas quieren"} vender para ti.`,
       href: "/panel/vendedores",
       urgente: false,
     })
@@ -175,14 +135,16 @@ export default async function PanelPage({
           href={`/t/${resumen.tienda.slug}`}
           className="group inline-flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-5 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
         >
-          Ver mi página
+          Ver mi tienda
           <ArrowUpRight aria-hidden="true" className="size-4" />
         </Link>
       </div>
 
+      <AvisoSuscripcion suscripcion={resumen.suscripcion} />
+
       <section>
         <Encabezado
-          etiqueta="Tu negocio en los últimos 30 días"
+          etiqueta="Últimos 30 días"
           accion={{ href: "/panel/estadisticas", texto: "Ver estadísticas" }}
         />
         <div className="mt-6 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -202,130 +164,22 @@ export default async function PanelPage({
             alerta={resumen.pedidosPendientes > 0}
           />
           <Cifra
-            etiqueta="Promotores activos"
+            etiqueta="Vendedores activos"
             valor={formatNumber(resumen.vendedoresActivos)}
             detalle={
-              resumen.vendedoresActivos > 0
-                ? "Promocionando lo tuyo"
-                : "Todavía ninguno"
+              resumen.vendedoresPendientes > 0
+                ? `${formatNumber(resumen.vendedoresPendientes)} esperando aprobación`
+                : "Sin solicitudes pendientes"
             }
+            alerta={resumen.vendedoresPendientes > 0}
           />
           <Cifra
             etiqueta="Productos"
-            valor={formatNumber(catalogo.productos.length)}
+            valor={formatNumber(resumen.productos)}
             detalle={
-              sinStock > 0
-                ? `${formatNumber(sinStock)} sin stock`
-                : "Todos con stock"
+              resumen.productos > 0 ? "En tu catálogo" : "Todavía ninguno"
             }
-            alerta={sinStock > 0}
           />
-        </div>
-      </section>
-
-      <section>
-        <Encabezado
-          etiqueta="Tu catálogo"
-          titulo={
-            catalogo.productos.length === 0
-              ? "Todavía sin productos"
-              : catalogo.productos.length === 1
-                ? "1 producto publicado"
-                : `${formatNumber(catalogo.productos.length)} productos publicados`
-          }
-          accion={
-            catalogo.productos.length > 0
-              ? { href: "/panel/productos", texto: "Ver todo" }
-              : undefined
-          }
-        />
-        <p className="mt-3 max-w-[58ch] text-sm leading-relaxed opacity-70">
-          {catalogo.productos.length === 0
-            ? "Sin productos no hay nada que los promotores puedan elegir. Cárgalos uno por uno o todos juntos desde un Excel."
-            : "El precio que ve quien compra sale de lo que tú quieres recibir: le sumamos la comisión del promotor y nuestra parte. Acá ajustas el stock sin entrar a cada producto."}
-        </p>
-
-        {catalogo.productos.length > 0 ? (
-          <div className="mt-8">
-            <ListaProductos
-              productos={ultimos}
-              soloLectura={catalogo.esDemo}
-              acciones={{
-                alternar: alternarProducto,
-                ajustarStock,
-                borrar: borrarProducto,
-              }}
-            />
-          </div>
-        ) : null}
-
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link
-            href="/panel/productos/nuevo"
-            className={cn(
-              catalogo.productos.length === 0
-                ? BOTON_PRIMARIO
-                : BOTON_SECUNDARIO,
-              "sm:w-auto"
-            )}
-          >
-            <Plus aria-hidden="true" className="size-4" />
-            {catalogo.productos.length === 0
-              ? "Cargar un producto"
-              : "Cargar otro producto"}
-          </Link>
-          <Link
-            href="/panel/productos/importar"
-            className={cn(BOTON_SECUNDARIO, "sm:w-auto")}
-          >
-            <FileSpreadsheet aria-hidden="true" className="size-4" />
-            Cargar desde un Excel
-          </Link>
-        </div>
-      </section>
-
-      <section className="border-t-2 border-tinta pt-8">
-        <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
-          <div>
-            <Encabezado
-              etiqueta="Tus números"
-              titulo="Pregúntale a tu negocio"
-            />
-            <p className="mt-3 max-w-[48ch] text-sm leading-relaxed opacity-70">
-              Escribes una pregunta como se la harías a alguien y te responde
-              con un gráfico hecho con tus ventas. Solo se leen tus datos.
-            </p>
-            <Link
-              href="/panel/estadisticas"
-              className={cn(BOTON_SECUNDARIO, "mt-6 w-full sm:w-auto")}
-            >
-              <BarChart3 aria-hidden="true" className="size-4" />
-              Abrir mis estadísticas
-            </Link>
-          </div>
-
-          <ul className="border-t border-tinta/15">
-            {[
-              "¿Qué producto se vendió más este mes?",
-              "¿Cuánto vendí por semana en los últimos tres meses?",
-              "¿Qué promotores me trajeron más ventas?",
-            ].map((pregunta) => (
-              <li key={pregunta}>
-                <Link
-                  href="/panel/estadisticas"
-                  className="group flex min-h-11 items-center justify-between gap-4 border-b border-tinta/15 py-4 text-sm transition-colors hover:text-senal"
-                >
-                  <span className="font-titular font-bold tracking-[-0.01em]">
-                    {pregunta}
-                  </span>
-                  <ArrowUpRight
-                    aria-hidden="true"
-                    className="size-4 shrink-0 opacity-40 transition-opacity group-hover:opacity-100"
-                  />
-                </Link>
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
 
@@ -408,7 +262,7 @@ export default async function PanelPage({
             />
           </div>
           <p className="mt-3 text-sm leading-relaxed opacity-55">
-            Imprímelo y pégalo donde vendes. Lleva directo a tu página.
+            Imprímelo y pégalo donde vendes. Lleva directo a tu tienda.
           </p>
         </div>
       </section>

@@ -14,14 +14,8 @@ export default async function LoginPage({
   const { next, error, rol } = await searchParams
 
   // La portada manda el rol ya elegido; cualquier otro valor se ignora.
-  // `promotor` es como se llama en pantalla lo que la base guarda como
-  // `vendedor`: se acepta el nombre nuevo sin migrar el enum.
   const rolInicial =
-    rol === "emprendedor"
-      ? "emprendedor"
-      : rol === "vendedor" || rol === "promotor"
-        ? "vendedor"
-        : undefined
+    rol === "emprendedor" || rol === "vendedor" ? rol : undefined
 
   return (
     <div className="flex min-h-screen flex-col bg-papel text-tinta">

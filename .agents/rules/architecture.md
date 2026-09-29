@@ -14,9 +14,6 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 
 ## Rutas
 
-> Estas son las rutas que existen hoy, del modelo anterior. Las del Marketplace están en
-> `VENDUO.md` §7 y todavía no se construyeron.
-
 | Ruta                          | Qué es                                                  | Acceso          |
 | ----------------------------- | ------------------------------------------------------- | --------------- |
 | `/`                           | Portada pública                                         | Público         |
@@ -29,23 +26,18 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/v/{slug}`                   | Perfil público del vendedor                             | Público         |
 | `/crear`                      | Alta de la tienda, paso 1: elegir plantilla             | Requiere sesión |
 | `/crear/negocio`              | Alta de la tienda, paso 2: nombre y rubro               | Requiere sesión |
-| `/sumarme`, `/explorar/*`     | Del modelo anterior: redirigen al panel del promotor    | Requiere sesión |
-| `/panel`                      | Guía del primer ingreso, después el panel. `?guia=1`    | Requiere sesión |
+| `/sumarme`                    | Alta del vendedor: reparte los tres caminos             | Requiere sesión |
+| `/explorar/tiendas`           | Vitrina de tiendas que aceptan vendedores               | Requiere sesión |
+| `/explorar/productos`         | Vitrina de productos abiertos a vendedores              | Requiere sesión |
+| `/panel`                      | Resumen del emprendedor                                 | Requiere sesión |
 | `/panel/{seccion}`            | Productos, pedidos, vendedores, estadísticas, marketing | Requiere sesión |
 | `/panel/pedidos/{id}`         | Un pedido: detalle y estados                            | Requiere sesión |
 | `/panel/productos/nuevo`      | Alta de un producto                                     | Requiere sesión |
-| `/panel/productos/importar`   | Carga del catálogo desde Excel                          | Requiere sesión |
 | `/panel/productos/{id}`       | Edición de un producto                                  | Requiere sesión |
 | `/panel/productos/categorias` | Las categorías del catálogo                             | Requiere sesión |
 | `/panel/apariencia`           | La plantilla de la tienda, cambiarla y su historial     | Requiere sesión |
 | `/panel/estadisticas/pdf`     | El informe del tablero en PDF. `?g={id}` para uno solo  | Requiere sesión |
-| `/vendedor`                   | Bienvenida sin productos; si no, su panel. `?guia=1`    | Requiere sesión |
-| `/vendedor/catalogo`          | Todo lo que puede promocionar                           | Requiere sesión |
-| `/vendedor/enlaces`           | Sus productos, con WhatsApp, copiar y QR                | Requiere sesión |
-| `/vendedor/compradores`       | Los compradores que trajo: ventas indirectas            | Requiere sesión |
-| `/vendedor/ganancias`         | Cada comisión, directa o indirecta, y su estado         | Requiere sesión |
-| `/vendedor/estadisticas`      | Sus números. `?ver=preguntar`, en lenguaje natural      | Requiere sesión |
-| `/vendedor/estadisticas/pdf`  | Su tablero en PDF. `?g={id}` para uno solo              | Requiere sesión |
+| `/vendedor`                   | Panel del vendedor y su historial                       | Requiere sesión |
 | `/cuenta`                     | Datos de la persona, de su tienda y de su perfil        | Requiere sesión |
 | `/auth/destino`               | Resuelve a dónde entra la cuenta y redirige             | Requiere sesión |
 | `/auth/*`                     | Callback y cierre de sesión                             | —               |
@@ -60,7 +52,8 @@ estado de los datos, y lo resuelve un `redirect()` en el componente de servidor:
 | -------------------------------------------------- | ----------- |
 | Emprendedor sin tienda, o con tienda sin plantilla | `/crear`    |
 | Emprendedor con plantilla elegida                  | `/panel`    |
-| Promotor, o quien tomó al menos un producto        | `/vendedor` |
+| Vendedor sin ningún vínculo a una tienda           | `/sumarme`  |
+| Vendedor con al menos un vínculo                   | `/vendedor` |
 
 La comprobación del emprendedor es sobre `stores.template_key` y no sobre la
 existencia de la fila: es lo que marca que el alta terminó.
@@ -112,16 +105,17 @@ app/
   (privado)/          Grupo de rutas: no aparece en la URL
     layout.tsx        Shell compartido de las áreas privadas
     panel/            Resumen del emprendedor y sus secciones
-    vendedor/         Panel del promotor: catálogo, enlaces, compradores,
-                      ganancias y estadísticas
+    vendedor/         Panel del vendedor
     cuenta/           Ajustes de la persona, su tienda y su perfil
   t/[slug]/           Tienda pública: portada, catálogo, producto, carrito y pago.
                       Compone el kit de la plantilla; no sabe cuál es
   v/[slug]/           Historial laboral público del vendedor
   crear/              Alta de la tienda (layout propio)
     negocio/
-  sumarme/            Del modelo anterior: redirige a /vendedor
-  explorar/           Del modelo anterior: redirige a /vendedor/catalogo
+  sumarme/            Alta del vendedor: reparte los tres caminos
+  explorar/           Vitrinas del vendedor (layout propio)
+    tiendas/
+    productos/
   login/
   auth/callback/      Intercambio de código por sesión
   auth/destino/       Resuelve a dónde entra la cuenta
@@ -132,8 +126,7 @@ components/
   ui/                 shadcn/ui. No editar a mano: se regeneran
   auth/               Ingreso y registro
   onboarding/         Altas: marco, pasos y carrusel de plantillas
-  promotor/           Bienvenida, calculadora, tarjeta de producto, compartir,
-                      tomar y soltar, filas del panel, buscador y paginación
+  explorar/           Vitrinas: navegación, buscador, paginación y listas
   cuenta/             Formularios de ajustes y foto de perfil
   insights/           Cuaderno, tablero y gráficos SVG
   pedidos/            Lista, detalle y estados de un pedido
@@ -154,7 +147,7 @@ lib/
   data/               Consultas de lectura
   validation/         Esquemas zod compartidos
   ai/                 Capa de IA
-  insights/           Lo que se puede preguntar, cómo se responde, la lectura y el PDF
+  insights/           Lo que se puede preguntar, la lectura y el documento PDF
   plantillas/         La base de cada plantilla: tokens, esquema de la apariencia,
                       registro y qué significa cada bloque
   demo-data.ts        Datos de ejemplo del modo demo
@@ -163,9 +156,6 @@ lib/
   catalogo.ts         Filtrar y ordenar el catálogo público, sin dependencias de servidor
   fuentes.ts          Todas las tipografías, con next/font
   format.ts           Moneda, fechas, slugs
-  precio.ts           Construir el precio desde el costo base y los tramos
-  importar.ts         Leer la planilla de productos, sin dependencias de servidor
-  promotor.ts         Tipos y cuentas del panel del promotor, sin dependencias de servidor
   pedidos.ts          Los estados de un pedido, sin dependencias de servidor
   qr.ts               Códigos QR
   env.ts              Entorno validado con zod
@@ -180,12 +170,7 @@ docs/
   store-templates.md  El sistema de plantillas: capas, base de datos, cómo agregar una
 ```
 
-## Plantillas de tienda — fuera del modelo vigente
-
-> El canal pasó a ser un solo Marketplace, así que la tienda por negocio y sus plantillas
-> ya no son parte del producto (`docs/modelo-de-negocio.md`). Lo de abajo describe lo que
-> hay construido, que sigue funcionando. **No construir nada nuevo encima** sin que se
-> decida qué se hace con esto.
+## Plantillas de tienda
 
 Una tienda se dibuja con **el kit de su plantilla**. Las páginas de `app/t/[slug]` piden
 `kitDePlantilla(tienda.plantilla)` y componen sus piezas; nunca preguntan qué plantilla es.

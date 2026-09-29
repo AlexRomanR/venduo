@@ -25,9 +25,6 @@ interface Props {
     pregunta: string
   ) => Promise<{ ok: boolean; error?: string }>
   borrar: (id: string) => Promise<{ ok: boolean; error?: string }>
-  /** La ruta del informe de este panel: cada tablero tiene la suya. */
-  rutaPdf: string
-  sugerencias?: string[]
 }
 
 /**
@@ -37,14 +34,7 @@ interface Props {
  * al cuaderno como la entrada más reciente, y desde ahí se lo modifica con
  * otra frase. Ese estado no puede vivir en ninguna de las dos por separado.
  */
-export function Estudio({
-  graficos,
-  preguntar,
-  guardar,
-  borrar,
-  rutaPdf,
-  sugerencias,
-}: Props) {
+export function Estudio({ graficos, preguntar, guardar, borrar }: Props) {
   const [paraEditar, setParaEditar] = React.useState<GraficoEnTablero | null>(
     null
   )
@@ -55,7 +45,9 @@ export function Estudio({
   // abrir una pestaña: el visor del navegador ya trae descargar e imprimir, y
   // no hay que construir ninguno de los dos.
   function abrirPdf(id?: string) {
-    const url = id ? `${rutaPdf}?g=${encodeURIComponent(id)}` : rutaPdf
+    const url = id
+      ? `/panel/estadisticas/pdf?g=${encodeURIComponent(id)}`
+      : "/panel/estadisticas/pdf"
 
     window.open(url, "_blank", "noopener,noreferrer")
   }
@@ -65,7 +57,6 @@ export function Estudio({
       <Consola
         preguntar={preguntar}
         guardar={guardar}
-        sugerencias={sugerencias}
         paraEditar={paraEditar}
         alConsumirEdicion={olvidarEdicion}
       />

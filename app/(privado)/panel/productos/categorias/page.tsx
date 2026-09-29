@@ -10,12 +10,7 @@ import { borrarCategoria, guardarCategoria } from "../acciones"
 
 export const metadata = { title: "Categorías" }
 
-export default async function CategoriasPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ desde?: string }>
-}) {
-  const desdeGuia = (await searchParams).desde === "guia"
+export default async function CategoriasPage() {
   const tienda = await getMiTienda()
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
@@ -24,14 +19,14 @@ export default async function CategoriasPage({
   return (
     <div className="mx-auto w-full max-w-3xl">
       <Link
-        href={desdeGuia ? "/panel?paso=2" : "/panel/productos"}
+        href="/panel/productos"
         className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
       >
         <ArrowLeft
           aria-hidden="true"
           className="size-4 transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transform-none"
         />
-        {desdeGuia ? "Volver a la guía" : "Tu catálogo"}
+        Tu catálogo
       </Link>
 
       <h1 className="mt-6 max-w-[18ch] font-titular text-[clamp(1.75rem,5vw,2.5rem)] leading-[1.02] font-extrabold tracking-[-0.03em]">

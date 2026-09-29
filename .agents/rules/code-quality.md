@@ -71,18 +71,12 @@ No agregar dependencias sin necesidad. Todo lo que hace falta para el MVP ya est
 instalado; una biblioteca nueva es peso que alguien tiene que entender a las tres de la
 mañana.
 
-Se sumaron dos después del arranque. La primera es **`@react-pdf/renderer`**, para el informe
+La única que se sumó después del arranque es **`@react-pdf/renderer`**, para el informe
 del tablero: el PDF tiene que ser un archivo de verdad —que se abra en su pestaña, se
 guarde y se mande por WhatsApp— y eso no lo da imprimir la pantalla. Corre solo en el
 servidor y está declarada en `serverExternalPackages`. Arrastra un `postcss` con un aviso
 de seguridad por escapado de CSS; acá el CSS lo escribe el propio documento y la salida es
 un PDF, así que no aplica.
-
-La segunda es **`read-excel-file`**, para cargar el catálogo desde una planilla: el
-negocio que llega con cuarenta productos ya los tiene anotados en un Excel y no va a
-llenar cuarenta formularios. Corre solo en el navegador, se importa de forma dinámica
-—no pesa hasta que alguien sube un archivo— y la acción del servidor vuelve a validar
-cada fila con zod.
 
 No construir para requisitos hipotéticos. Si algo está en la lista de lo que no entra, no
 se escribe el andamiaje "por si acaso".
