@@ -49,6 +49,12 @@ export const mensajeAlaVistaPrevia = z.discriminatedUnion("tipo", [
 export const mensajeAlEditor = z.discriminatedUnion("tipo", [
   z.object({ tipo: z.literal("lista") }),
   z.object({ tipo: z.literal("seleccionar"), seccion: z.string() }),
+  /** Se tocó una parte que dibuja la plantilla por su cuenta, no una sección. */
+  z.object({
+    tipo: z.literal("fija"),
+    nombre: z.string().max(80),
+    ayuda: z.string().max(300),
+  }),
   z.object({
     tipo: z.literal("soltar-imagen"),
     seccion: z.string(),

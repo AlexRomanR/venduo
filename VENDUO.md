@@ -472,7 +472,7 @@ Las tres llamadas pasan por una capa propia que traduce el pedido al formato del
 
 ### Edición de la tienda
 
-El emprendedor edita su tienda en `/editor`: un recorrido de seis pasos —su marca, la portada, el catálogo, la ficha de producto, el carrito y publicar— con la tienda de verdad en una vista previa al lado. Puede hacerlo a mano, arrastrando secciones y tocando textos, colores, letra, logo y fotos, o pidiéndoselo a la IA en sus palabras.
+El emprendedor edita su tienda en `/editor`: un recorrido de seis pasos —su marca, la portada, el catálogo, la ficha de producto, el carrito y publicar— con la tienda de verdad en una vista previa al lado. Puede hacerlo a mano, arrastrando secciones y tocando textos, colores, letra, logo y fotos, o pidiéndoselo a la IA en sus palabras. La ficha de producto y el carrito se eligen entre formas cerradas —la ficha dividida o en vitrina, el carrito en dos columnas, como boleta o por pasos— con lo que los acompaña: botón de compra fijo en el celular, consulta por WhatsApp, productos parecidos, sugerencias en el carrito.
 
 Se le entrega a la IA el catálogo de tipos de bloque con sus campos, la apariencia actual y las secciones de la portada. La IA devuelve una **lista de operaciones**: cambiar un ajuste de la apariencia, agregar un bloque, quitarlo, ocultarlo, editar sus propiedades o moverlo de posición. Son las mismas operaciones que usa el editor a mano.
 

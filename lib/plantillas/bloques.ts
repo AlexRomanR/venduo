@@ -118,19 +118,44 @@ export function categoriasConFoto(
     }))
 }
 
-/** La foto de la portada: la del bloque, o la del primer producto que tenga. */
+/**
+ * La foto de la portada: la del bloque, o la del primer producto que tenga.
+ *
+ * Los productos de ejemplo del editor no cuentan. Llenan las vitrinas para que
+ * se vea cómo quedan, pero la foto de la portada es lo primero que ve el
+ * comprador, y el comprador nunca ve los de ejemplo.
+ */
 export function fotoDePortada(
   bloque: BloquePublico | null,
-  productos: Product[]
+  tienda: Pick<TiendaPublica, "productos" | "productosDeEjemplo">
 ): string | null {
   const propia = bloque ? texto(bloque, "imageUrl") : undefined
   if (propia) return propia
+  if (tienda.productosDeEjemplo) return null
 
+  const productos = tienda.productos
   return (
     productos.find((p) => p.is_featured && p.image_url)?.image_url ??
     productos.find((p) => p.image_url)?.image_url ??
     null
   )
+}
+
+/**
+ * El enlace para preguntar por un producto por WhatsApp, con el mensaje ya
+ * escrito. `null` si la tienda apagó la consulta o no tiene número: un botón
+ * que abre WhatsApp sin destinatario deja a la persona sin saber a quién
+ * escribirle.
+ */
+export function enlaceDeConsulta(
+  tienda: Pick<TiendaPublica, "nombre" | "whatsapp" | "apariencia">,
+  producto: Pick<Product, "name">
+): string | null {
+  const numero = tienda.whatsapp?.replace(/D/g, "")
+  if (!tienda.apariencia.ficha.consulta || !numero) return null
+
+  const mensaje = `Hola ${tienda.nombre}, quisiera saber más sobre ${producto.name}.`
+  return `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`
 }
 
 /** El porcentaje de descuento, si el producto tiene precio anterior. */

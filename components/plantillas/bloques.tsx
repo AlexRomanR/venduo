@@ -46,6 +46,7 @@ export function Bloques({
         key={bloque.id}
         data-seccion={bloque.id}
         data-nombre={SECCIONES[bloque.tipo].nombre}
+        data-vacia={SECCIONES[bloque.tipo].vacia}
         className="relative"
       >
         {dibujado}
@@ -54,4 +55,33 @@ export function Bloques({
       dibujado
     )
   })
+}
+
+/**
+ * Una parte de la portada que el kit dibuja por su cuenta, fuera de los
+ * bloques: "Sobre la tienda", "La casa", el catálogo de la base editorial.
+ *
+ * No se mueve ni se quita, porque es parte de la plantilla. En el editor se
+ * marca igual: tocarla explica de dónde sale lo que muestra, en vez de no
+ * responder y parecer una sección rota. Afuera del editor no agrega nada.
+ */
+export function ParteFija({
+  tienda,
+  nombre,
+  ayuda,
+  children,
+}: {
+  tienda: TiendaPublica
+  nombre: string
+  /** De dónde sale lo que muestra y dónde se cambia. */
+  ayuda: string
+  children: React.ReactNode
+}) {
+  if (!tienda.enEdicion) return children
+
+  return (
+    <div data-fija={nombre} data-ayuda={ayuda} className="relative">
+      {children}
+    </div>
+  )
 }

@@ -260,6 +260,7 @@ export async function proponerCambios(entrada: {
       nombre: diseno.tienda.nombre,
       descripcion: diseno.tienda.descripcion,
       plantilla: diseno.tienda.nombrePlantilla,
+      tieneWhatsapp: Boolean(diseno.tienda.whatsapp),
     },
     apariencia: combinarApariencia(diseno.base, borrador.personalizacion),
     secciones: borrador.secciones,

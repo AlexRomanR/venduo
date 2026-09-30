@@ -10,6 +10,9 @@ import { cn } from "@/lib/utils"
 import type { Product } from "@/types"
 import { useCarrito } from "@/components/tienda/carrito"
 
+/** Dónde está el botón de agregar: la barra de compra lo mira para no repetirlo. */
+export const ANCLA_DE_COMPRA = "agregar-al-carrito"
+
 /**
  * Cantidad y agregar al carrito.
  *
@@ -62,7 +65,7 @@ export function AgregarAlCarrito({
 
   if (agotado) {
     return (
-      <div className="border-t-2 border-tinta pt-7">
+      <div id={ANCLA_DE_COMPRA} className="border-t-2 border-tinta pt-7">
         <p className="font-titular text-lg font-bold tracking-[-0.02em]">
           Sin stock por ahora
         </p>
@@ -75,7 +78,7 @@ export function AgregarAlCarrito({
   }
 
   return (
-    <div className="border-t-2 border-tinta pt-7">
+    <div id={ANCLA_DE_COMPRA} className="border-t-2 border-tinta pt-7">
       <div className="flex flex-wrap items-end justify-between gap-5">
         <div>
           <span className="text-xs font-semibold tracking-[0.12em] uppercase opacity-45">

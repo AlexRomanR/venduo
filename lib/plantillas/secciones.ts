@@ -58,6 +58,11 @@ export interface DefinicionDeSeccion {
   descripcion: string
   /** Cuántas puede haber en la portada. `null` es sin límite. */
   maximo: number | null
+  /**
+   * Qué le falta para verse, dicho para quien edita. En la vista previa, una
+   * sección que no dibuja nada muestra esto en vez de desaparecer.
+   */
+  vacia: string
   campos: Campo[]
   /** Con qué nace al agregarla: un ejemplo que se entiende, no un vacío. */
   inicial: Record<string, unknown>
@@ -77,6 +82,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
     nombre: "Portada",
     descripcion: "Lo primero que ve tu cliente: un título grande y una foto.",
     maximo: 1,
+    vacia: "Ponle un título.",
     campos: [
       { ...TITULO, ejemplo: "Nueva temporada" },
       {
@@ -112,6 +118,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
     nombre: "Categorías",
     descripcion: "Tus categorías con una foto cada una, para comprar por tipo.",
     maximo: 1,
+    vacia: "Aparece cuando tus productos tengan categoría.",
     campos: [
       { ...TITULO, ejemplo: "Compra por categoría" },
       { clave: "subtitle", etiqueta: "Bajada", tipo: "parrafo", max: 240 },
@@ -132,6 +139,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
     descripcion:
       "Una vitrina de tus productos: lo nuevo, ofertas o una categoría.",
     maximo: null,
+    vacia: "Se llena sola con tus productos. Si ya tienes, revisa su filtro.",
     campos: [
       { ...TITULO, ejemplo: "Lo más pedido" },
       {
@@ -187,6 +195,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
     descripcion:
       "Tu historia en pocas líneas: quién está detrás y qué te distingue.",
     maximo: null,
+    vacia: "Escríbele un texto o ponle una foto.",
     campos: [
       { ...TITULO, ejemplo: "Quiénes somos" },
       {
@@ -210,6 +219,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
     descripcion:
       "Lo que dicen tus clientes. Da confianza a quien compra por primera vez.",
     maximo: 1,
+    vacia: "Agrégale al menos un testimonio.",
     campos: [
       { ...TITULO, ejemplo: "Lo que dicen" },
       {
@@ -252,6 +262,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
     nombre: "Llamado a la acción",
     descripcion: "Un cierre con un botón grande que lleva a tu catálogo.",
     maximo: null,
+    vacia: "Ponle un título.",
     campos: [
       { ...TITULO, ejemplo: "¿Hacemos negocio?" },
       { clave: "body", etiqueta: "Texto", tipo: "parrafo", max: 400 },
@@ -275,6 +286,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
     nombre: "Contacto",
     descripcion: "Dónde encontrarte y en qué horario.",
     maximo: 1,
+    vacia: "Completa tu WhatsApp, tu dirección o tu horario.",
     campos: [
       { ...TITULO, ejemplo: "Contacto" },
       {
@@ -295,6 +307,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
     nombre: "Preguntas frecuentes",
     descripcion: "Responde antes de que pregunten: entregas, cambios, pagos.",
     maximo: 1,
+    vacia: "Agrégale al menos una pregunta.",
     campos: [
       { ...TITULO, ejemplo: "Antes de comprar" },
       {

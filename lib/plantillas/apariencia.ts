@@ -76,6 +76,30 @@ export const aparienciaSchema = z.object({
     /** Cuántas columnas tiene la grilla de productos en escritorio. */
     columnas: z.union([z.literal(2), z.literal(3), z.literal(4)]),
   }),
+  /**
+   * La ficha de producto. Cada kit la dibuja a su manera; esto elige entre
+   * formas que los tres saben dibujar, así que ningún valor queda sin efecto
+   * en una plantilla.
+   */
+  ficha: z.object({
+    /** `dividida`: la foto al lado del texto. `vitrina`: todo centrado. */
+    diseno: z.enum(["dividida", "vitrina"]),
+    /** En el celular, una barra con el precio y el botón que sigue al pulgar. */
+    barraFija: z.boolean(),
+    /** Un enlace para preguntar por WhatsApp. Sin número en la tienda no sale. */
+    consulta: z.boolean(),
+    /** "También te puede gustar", al pie. */
+    relacionados: z.boolean(),
+  }),
+  /** El carrito, que es el mismo componente en todas las plantillas. */
+  carrito: z.object({
+    /** `columnas`: pedido y datos lado a lado. `boleta` y `pasos`: una columna. */
+    diseno: z.enum(["columnas", "boleta", "pasos"]),
+    /** Otros productos de la tienda para sumar al pedido. */
+    sugerencias: z.boolean(),
+    /** El campo de correo, que es opcional para quien compra. */
+    correo: z.boolean(),
+  }),
 })
 
 export type Apariencia = z.infer<typeof aparienciaSchema>
@@ -91,6 +115,8 @@ export const personalizacionSchema = z.object({
   tipografia: aparienciaSchema.shape.tipografia.partial().optional(),
   forma: aparienciaSchema.shape.forma.partial().optional(),
   disposicion: aparienciaSchema.shape.disposicion.partial().optional(),
+  ficha: aparienciaSchema.shape.ficha.partial().optional(),
+  carrito: aparienciaSchema.shape.carrito.partial().optional(),
 })
 
 export type Personalizacion = z.infer<typeof personalizacionSchema>
@@ -143,6 +169,8 @@ export function combinarApariencia(
     tipografia: { ...base.tipografia, ...cambios.tipografia },
     forma: { ...base.forma, ...cambios.forma },
     disposicion: { ...base.disposicion, ...cambios.disposicion },
+    ficha: { ...base.ficha, ...cambios.ficha },
+    carrito: { ...base.carrito, ...cambios.carrito },
   }
 }
 
@@ -318,6 +346,13 @@ export const NOMBRES_DE_AJUSTE = {
   "forma.radio": "Forma de los botones",
   "disposicion.tarjeta": "Foto de los productos",
   "disposicion.columnas": "Columnas del catálogo",
+  "ficha.diseno": "Diseño de la ficha",
+  "ficha.barraFija": "Botón de compra siempre a mano",
+  "ficha.consulta": "Preguntar por WhatsApp",
+  "ficha.relacionados": "Productos parecidos",
+  "carrito.diseno": "Diseño del carrito",
+  "carrito.sugerencias": "Sugerencias en el carrito",
+  "carrito.correo": "Pedir el correo",
 } as const
 
 export type RutaDeAjuste = keyof typeof NOMBRES_DE_AJUSTE
@@ -337,6 +372,11 @@ export const NOMBRES_DE_VALOR: Record<string, string> = {
   apretado: "Apretado",
   normal: "Normal",
   abierto: "Abierto",
+  dividida: "Dividida",
+  vitrina: "Vitrina",
+  columnas: "Dos columnas",
+  boleta: "Boleta",
+  pasos: "Por pasos",
 }
 
 /**

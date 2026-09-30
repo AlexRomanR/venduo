@@ -32,5 +32,12 @@ export const clasica: DefinicionDePlantilla = {
     },
     forma: { radio: "suave" },
     disposicion: { tarjeta: "cuadrada", columnas: 4 },
+    ficha: {
+      diseno: "dividida",
+      barraFija: false,
+      consulta: false,
+      relacionados: true,
+    },
+    carrito: { diseno: "columnas", sugerencias: false, correo: true },
   },
 }

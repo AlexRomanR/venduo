@@ -198,3 +198,68 @@ export function Aviso({
     </div>
   )
 }
+
+/**
+ * Un ajuste que se prende o se apaga, con lo que hace dicho al lado.
+ *
+ * Toda la fila es el interruptor: se toca en cualquier parte, no solo en la
+ * perilla, y mide 44 px o más. La perilla es cuadrada, como el resto del
+ * mundo editorial, que no tiene formas redondeadas.
+ */
+export function Interruptor({
+  etiqueta,
+  ayuda,
+  activo,
+  alCambiar,
+  deshabilitado = false,
+}: {
+  etiqueta: string
+  ayuda?: string
+  activo: boolean
+  alCambiar: (activo: boolean) => void
+  deshabilitado?: boolean
+}) {
+  const id = React.useId()
+
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={activo}
+      aria-labelledby={`${id}-etiqueta`}
+      aria-describedby={ayuda ? `${id}-ayuda` : undefined}
+      disabled={deshabilitado}
+      onClick={() => alCambiar(!activo)}
+      className="flex min-h-14 w-full items-center gap-4 border-b border-tinta/15 py-3 text-left transition-colors enabled:hover:bg-tinta/[0.03] disabled:cursor-not-allowed"
+    >
+      <span className={cn("min-w-0 flex-1", deshabilitado && "opacity-55")}>
+        <span id={`${id}-etiqueta`} className="block text-sm font-semibold">
+          {etiqueta}
+        </span>
+        {ayuda ? (
+          <span
+            id={`${id}-ayuda`}
+            className="mt-0.5 block text-xs leading-relaxed opacity-65"
+          >
+            {ayuda}
+          </span>
+        ) : null}
+      </span>
+      <span
+        aria-hidden="true"
+        className={cn(
+          "relative h-6 w-11 shrink-0 border-2 transition-colors",
+          activo ? "border-tinta bg-tinta" : "border-tinta/40",
+          deshabilitado && "opacity-40"
+        )}
+      >
+        <span
+          className={cn(
+            "absolute top-0.5 size-4 transition-[left] duration-200 motion-reduce:transition-none",
+            activo ? "left-[1.375rem] bg-papel" : "left-0.5 bg-tinta/45"
+          )}
+        />
+      </span>
+    </button>
+  )
+}

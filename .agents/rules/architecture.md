@@ -143,7 +143,7 @@ components/
     fashion/          Pasarela
     perfume/          Esencia
   tienda/             Lo compartido por todas las plantillas: carrito, checkout,
-                      pago, agregar, filtros y buscador
+                      pago, agregar, barra de compra, filtros y buscador
   panel/              Shell, cifras y piezas de los dos paneles
   landing/            Piezas de la portada
   config-status.tsx   Checklist de capas configuradas

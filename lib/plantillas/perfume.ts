@@ -33,5 +33,13 @@ export const perfume: DefinicionDePlantilla = {
     },
     forma: { radio: "redondo" },
     disposicion: { tarjeta: "retrato", columnas: 3 },
+    // Un aroma no se elige leyendo: la consulta por WhatsApp viene puesta.
+    ficha: {
+      diseno: "dividida",
+      barraFija: false,
+      consulta: true,
+      relacionados: true,
+    },
+    carrito: { diseno: "columnas", sugerencias: false, correo: true },
   },
 }

@@ -282,8 +282,26 @@ app/(privado)/panel/apariencia/   La pantalla y la acción de cambiar plantilla
   disposicion: {
     ;(tarjeta, columnas)
   } // cuadrada | retrato; 2 | 3 | 4
+  ficha: {
+    ;(diseno, // dividida | vitrina
+      barraFija,
+      consulta,
+      relacionados)
+  } // los tres últimos, true | false
+  carrito: {
+    ;(diseno, // columnas | boleta | pasos
+      sugerencias,
+      correo)
+  }
 }
 ```
+
+`ficha` y `carrito` no llegan al CSS: los leen los componentes. Son **formas cerradas
+que los tres kits saben dibujar**, cada uno con su estilo —la vitrina de Esencia es su arco
+al centro; la de Pasarela, la prenda chica con aire—, así que ningún valor queda sin efecto
+en una plantilla. El carrito es un solo componente compartido y ordena las mismas piezas de
+tres maneras. `consulta` solo se dibuja si la tienda tiene WhatsApp, y la barra de compra
+(`BarraDeCompra`) reemplaza en la ficha a la barra del carrito: nunca hay dos abajo.
 
 **Todo es un token cerrado, nunca CSS libre.** No es prolijidad: la apariencia termina
 dentro de una etiqueta `<style>` en la tienda pública, y un valor libre ahí es una
@@ -484,7 +502,8 @@ y la plantilla nueva las dibuja a su manera. Elegir "Empezar con las de {plantil
 siembra las secciones de ejemplo.
 
 **La personalización se descarta** porque unos colores elegidos contra una base no tienen
-por qué funcionar sobre otra. No se pierde: está en la versión.
+por qué funcionar sobre otra. Eso incluye cómo se ordenan la ficha y el carrito: la tienda
+arranca con los de la plantilla nueva. No se pierde: está en la versión.
 
 ---
 
@@ -632,11 +651,20 @@ con el kit de su plantilla. El editor le manda el borrador por `postMessage`
   no se lee, la persona lo ve y lee por qué, en vez de ver otros colores sin entender.
 - Cada sección lleva `data-seccion` solo en el editor (`TiendaPublica.enEdicion`): tocarla
   la selecciona y soltar una foto encima la usa. La tienda pública no cambia en nada.
+- **Una sección que no dibuja nada no desaparece.** Sin contenido, el envoltorio queda
+  vacío y el CSS de la vista previa (`:empty`) lo muestra como un recuadro con lo que le
+  falta, que sale de `SECCIONES[tipo].vacia`. Se toca y se arrastra como cualquier otra.
+- **Lo que el kit dibuja por su cuenta se marca con `ParteFija`** —"Sobre la tienda",
+  "La casa", el catálogo de la editorial—. No se mueve ni se quita; tocarla explica de dónde
+  sale lo que muestra y dónde se cambia. Antes no respondía y parecía una sección rota.
 - Nada navega ni crea pedidos: los toques y los envíos de formulario se interceptan.
-- **Sin productos propios**, el catálogo, la ficha y el carrito se llenan con productos de
-  ejemplo del rubro de la plantilla (`lib/editor/muestras.ts`), con un aviso de que lo
-  son. La portada no: su foto sale del primer producto, y una de ejemplo ahí haría creer
-  que la portada real la tiene.
+- **Sin productos propios**, todas las pantallas se llenan con productos de ejemplo del
+  rubro de la plantilla (`lib/editor/muestras.ts`), con un aviso de que lo son. También la
+  portada: sin ellos sus vitrinas no dibujaban nada, y moverlas o editarlas no cambiaba la
+  vista previa. Su foto, en cambio, sigue siendo la real: `fotoDePortada` ignora los
+  productos de ejemplo (`TiendaPublica.productosDeEjemplo`), porque el comprador no los ve.
+- **El celular o la computadora lo elige el editor**, no el marco: la barra de compra solo
+  existe en el celular, y prenderla mirando la computadora cambia a celular para que se vea.
 
 ### Publicar y restaurar
 
@@ -674,7 +702,8 @@ A propósito, **no existe**:
 - CSS, HTML o colores escritos a mano fuera de los tokens.
 - Colores por sección: los colores son de toda la tienda.
 - Subir fuentes: solo las que compila `next/font`.
-- Páginas aparte de la portada, o cambiar la estructura del catálogo, la ficha o el carrito.
+- Páginas aparte de la portada. La ficha y el carrito se eligen entre formas cerradas
+  (`ficha.diseno`, `carrito.diseno`); no se arman pieza por pieza.
 - Que la IA publique sola.
 
 ---

@@ -11,8 +11,7 @@ import {
   type Vista,
 } from "@/lib/editor/protocolo"
 import { cn } from "@/lib/utils"
-
-type Dispositivo = "celular" | "computadora"
+import type { Dispositivo } from "@/components/editor/contexto"
 
 const ANCHO_DE_CELULAR = 390
 const ANCHO_DE_COMPUTADORA = 1280
@@ -67,17 +66,21 @@ export function MarcoDeVistaPrevia({
   estado,
   enfoque,
   alMensaje,
+  dispositivo,
+  setDispositivo,
 }: {
   estado: EstadoParaLaVistaPrevia
   /** Cada vez que cambia, la vista previa trae esa sección a la vista. */
   enfoque: { seccion: string; vez: number } | null
   alMensaje: (mensaje: MensajeAlEditor) => void
+  /** Vive en el editor: hay ajustes que solo se ven en uno de los dos. */
+  dispositivo: Dispositivo
+  setDispositivo: (dispositivo: Dispositivo) => void
 }) {
   const marco = React.useRef<HTMLIFrameElement>(null)
   const lienzo = React.useRef<HTMLDivElement>(null)
   const { ancho, alto } = useTamano(lienzo)
   const [lista, setLista] = React.useState(false)
-  const [dispositivo, setDispositivo] = React.useState<Dispositivo>("celular")
 
   const ultimo = React.useRef(estado)
   const alMensajeActual = React.useRef(alMensaje)

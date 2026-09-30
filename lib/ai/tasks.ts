@@ -172,7 +172,13 @@ export async function generateCampaign(input: {
 
 /** Lo que la IA ve de la tienda. Nunca datos de otras tiendas. */
 export interface TiendaParaLaIa {
-  tienda: { nombre: string; descripcion: string | null; plantilla: string }
+  tienda: {
+    nombre: string
+    descripcion: string | null
+    plantilla: string
+    /** Sin número, la ficha no puede ofrecer preguntar por WhatsApp. */
+    tieneWhatsapp: boolean
+  }
   /** La apariencia del borrador, ya combinada con la base de la plantilla. */
   apariencia: Apariencia
   secciones: Array<{
@@ -256,6 +262,16 @@ const REGLAS_DE_EDICION = [
   "- forma.radio: recto | suave | redondo",
   "- disposicion.tarjeta: cuadrada | retrato",
   "- disposicion.columnas: 2 | 3 | 4",
+  "- ficha.diseno: dividida (foto al lado del texto) | vitrina (todo centrado)",
+  "- ficha.barraFija: true | false (en el celular, barra con el precio y el botón de",
+  "  compra siempre a la vista)",
+  "- ficha.consulta: true | false (enlace para preguntar por WhatsApp; solo si",
+  "  tienda.tieneWhatsapp es true: si no, explica en el resumen que primero agregue",
+  "  su WhatsApp en Cuenta)",
+  '- ficha.relacionados: true | false ("También te puede gustar")',
+  "- carrito.diseno: columnas | boleta | pasos",
+  "- carrito.sugerencias: true | false (tres productos más para sumar al pedido)",
+  "- carrito.correo: true | false (pedir el correo, que es opcional)",
   "",
   "Tipos de sección y sus campos:",
   TIPOS_DE_SECCION,

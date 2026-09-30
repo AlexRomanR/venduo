@@ -2,7 +2,11 @@
 
 import * as React from "react"
 
-import { filtrarCatalogo, leerFiltros } from "@/lib/catalogo"
+import {
+  filtrarCatalogo,
+  leerFiltros,
+  sugerenciasDelCarrito,
+} from "@/lib/catalogo"
 import {
   mensajeAlaVistaPrevia,
   type MensajeAlaVistaPrevia,
@@ -16,9 +20,11 @@ import type {
   MarcoDeTienda,
   TiendaPublica,
 } from "@/lib/data/tienda-publica"
+import { cn } from "@/lib/utils"
 import type { Json, Product } from "@/types"
 import { kitDePlantilla } from "@/components/plantillas"
 import { EstiloDePlantilla } from "@/components/plantillas/estilo"
+import { BarraDeCompra } from "@/components/tienda/barra-de-compra"
 import {
   ProveedorCarrito,
   type LineaCarrito,
@@ -29,6 +35,8 @@ type Estado = Extract<MensajeAlaVistaPrevia, { tipo: "estado" }>
 
 /** El color con el que el editor marca lo que se toca: el rojo de Venduo. */
 const MARCA = "#d62d12"
+/** Lo que no se edita desde acá se marca en tinta, no en rojo. */
+const NEUTRO = "#16171a"
 
 const SIN_FILTROS = leerFiltros({})
 
@@ -161,14 +169,20 @@ export function VistaPrevia({
 
   const vista = estado?.vista ?? "inicio"
 
-  // Sin productos propios, el catálogo, la ficha y el carrito se llenan con los
-  // de ejemplo. La portada no: su foto sale del primer producto con foto, y
-  // mostrar una de ejemplo ahí haría creer que la portada real la tiene.
-  const conEjemplos = actual.productos.length === 0 && vista !== "inicio"
+  // Sin productos propios, todas las pantallas se llenan con los de ejemplo.
+  // También la portada: sin ellos, sus vitrinas no dibujaban nada, y moverlas
+  // o editarlas no cambiaba la vista previa. La foto de la portada sí sigue
+  // siendo la real: `fotoDePortada` no toma la de un producto de ejemplo.
+  const conEjemplos = actual.productos.length === 0
   const paraVista = React.useMemo<TiendaPublica>(
     () =>
       conEjemplos
-        ? { ...actual, productos: ejemplos, categorias: categoriasDe(ejemplos) }
+        ? {
+            ...actual,
+            productos: ejemplos,
+            categorias: categoriasDe(ejemplos),
+            productosDeEjemplo: true,
+          }
         : actual,
     [actual, conEjemplos, ejemplos]
   )
@@ -191,6 +205,8 @@ export function VistaPrevia({
     paraVista.productos.find((p) => p.image_url) ??
     paraVista.productos[0]
 
+  const conBarra = vista === "producto" && paraVista.apariencia.ficha.barraFija
+
   const seleccion = estado?.seleccion ?? null
   const marcas = estado?.marcas ?? []
 
@@ -199,10 +215,18 @@ export function VistaPrevia({
   function alTocar(evento: React.MouseEvent) {
     evento.preventDefault()
     evento.stopPropagation()
-    const seccion = (evento.target as HTMLElement).closest<HTMLElement>(
-      "[data-seccion]"
-    )?.dataset.seccion
-    if (seccion) enviar({ tipo: "seleccionar", seccion })
+    const tocado = (evento.target as HTMLElement).closest<HTMLElement>(
+      "[data-seccion], [data-fija]"
+    )
+    if (tocado?.dataset.seccion) {
+      enviar({ tipo: "seleccionar", seccion: tocado.dataset.seccion })
+    } else if (tocado?.dataset.fija) {
+      enviar({
+        tipo: "fija",
+        nombre: tocado.dataset.fija,
+        ayuda: tocado.dataset.ayuda ?? "",
+      })
+    }
   }
 
   function seccionBajo(evento: React.DragEvent) {
@@ -235,6 +259,16 @@ export function VistaPrevia({
     `[data-seccion]:hover{outline:2px dashed ${MARCA}8c;outline-offset:-2px}`,
     `[data-seccion]::before{content:attr(data-nombre);position:absolute;top:10px;left:10px;z-index:45;display:none;padding:4px 8px;background:${MARCA};color:#fff;font:600 11px/1.2 var(--fuente-geist),sans-serif;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}`,
     `[data-seccion]:hover::before{display:block}`,
+    // Una sección que no dibuja nada no desaparece: queda un recuadro que dice
+    // qué le falta, y se puede tocar y arrastrar como las demás.
+    `[data-seccion]:empty{display:flex;align-items:center;justify-content:center;min-height:104px;margin:16px 20px;border:2px dashed ${MARCA}66;background:${MARCA}0d}`,
+    `[data-seccion]:empty::after{content:attr(data-nombre) " · " attr(data-vacia);max-width:40ch;padding:0 16px;color:${MARCA};font:600 12px/1.45 var(--fuente-geist),sans-serif;text-align:center}`,
+    // Lo que la plantilla dibuja por su cuenta se marca en tinta: se puede
+    // tocar para saber de dónde sale, pero no se edita desde acá.
+    `[data-fija]{cursor:help}`,
+    `[data-fija]:hover{outline:2px dashed ${NEUTRO}59;outline-offset:-2px}`,
+    `[data-fija]::before{content:attr(data-fija) " · viene con la plantilla";position:absolute;top:10px;left:10px;z-index:45;display:none;padding:4px 8px;background:${NEUTRO};color:#fff;font:600 11px/1.2 var(--fuente-geist),sans-serif;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}`,
+    `[data-fija]:hover::before{display:block}`,
     ...(seleccion
       ? [
           `${marcada(seleccion)}{outline:3px solid ${MARCA};outline-offset:-3px}`,
@@ -296,7 +330,11 @@ export function VistaPrevia({
 
         <main className="flex-1">
           {vista === "inicio" ? (
-            <kit.Inicio tienda={actual} codigo={null} filtros={SIN_FILTROS} />
+            <kit.Inicio
+              tienda={paraVista}
+              codigo={null}
+              filtros={SIN_FILTROS}
+            />
           ) : null}
 
           {vista === "catalogo" ? (
@@ -334,6 +372,8 @@ export function VistaPrevia({
                   slug={actual.slug}
                   nombreTienda={actual.nombre}
                   crear={sinPedidos}
+                  opciones={actual.apariencia.carrito}
+                  sugeridos={sugerenciasDelCarrito(paraVista.productos)}
                 />
               </div>
             </div>
@@ -341,12 +381,20 @@ export function VistaPrevia({
         </main>
 
         {/* Sin la barra flotante del carrito: en una vista previa chica tapaba
-            justo lo que se está editando. El contador de la cabecera queda. */}
+            justo lo que se está editando. El contador de la cabecera queda.
+            La barra de compra sí va, si la tienda la eligió: es parte de
+            cómo se ve su ficha. */}
         <kit.Pie marco={marco} codigo={null} />
+        {conBarra && producto ? (
+          <BarraDeCompra producto={producto} slug={actual.slug} />
+        ) : null}
 
         {conEjemplos ? (
           <p
-            className="pointer-events-none fixed inset-x-0 bottom-2 z-50 mx-auto w-fit rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.08em] text-white uppercase sm:bottom-3 sm:px-3 sm:py-1.5 sm:text-[11px]"
+            className={cn(
+              "pointer-events-none fixed inset-x-0 z-50 mx-auto w-fit rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.08em] text-white uppercase sm:px-3 sm:py-1.5 sm:text-[11px]",
+              conBarra ? "bottom-[5.5rem] md:bottom-3" : "bottom-2 sm:bottom-3"
+            )}
             style={{
               background: MARCA,
               fontFamily: "var(--fuente-geist), sans-serif",

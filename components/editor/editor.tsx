@@ -35,6 +35,7 @@ import { Bienvenida, Recuperar } from "@/components/editor/avisos"
 import {
   ProveedorDelEditor,
   useEditor,
+  type Dispositivo,
   type Propuesta,
   type ValorDelEditor,
 } from "@/components/editor/contexto"
@@ -74,6 +75,13 @@ function seccionesTocadas(
   return [...new Set([...nuevas, ...cambiadas])]
 }
 
+/** Qué ajustes de la apariencia se ven en qué pantalla de la tienda. */
+const VISTA_DE_AJUSTE: Array<[prefijo: string, vista: Vista]> = [
+  ["disposicion.", "catalogo"],
+  ["ficha.", "producto"],
+  ["carrito.", "carrito"],
+]
+
 /** En qué pantalla de la tienda se ve mejor lo que cambia una propuesta. */
 function vistaDeLaPropuesta(operaciones: Operacion[]): Vista | null {
   if (
@@ -83,16 +91,14 @@ function vistaDeLaPropuesta(operaciones: Operacion[]): Vista | null {
   ) {
     return "inicio"
   }
-  if (
-    operaciones.length > 0 &&
-    operaciones.every(
-      (operacion) =>
-        "ruta" in operacion && operacion.ruta.startsWith("disposicion.")
-    )
-  ) {
-    return "catalogo"
-  }
-  return null
+  const rutas = operaciones.flatMap((operacion) =>
+    "ruta" in operacion ? [operacion.ruta] : []
+  )
+  if (rutas.length === 0 || rutas.length < operaciones.length) return null
+  const lugar = VISTA_DE_AJUSTE.find(([prefijo]) =>
+    rutas.every((ruta) => ruta.startsWith(prefijo))
+  )
+  return lugar?.[1] ?? null
 }
 
 /**
@@ -142,6 +148,7 @@ export function Editor({
   )
   const [vistaForzada, setVistaForzada] = React.useState<Vista | null>(null)
   const [comparar, setComparar] = React.useState<"antes" | "despues">("despues")
+  const [dispositivo, setDispositivo] = React.useState<Dispositivo>("celular")
   const [propuesta, setPropuesta] = React.useState<Propuesta | null>(null)
   const [ultimoColor, setUltimoColor] = React.useState<TokenDeColor | null>(
     null
@@ -272,6 +279,11 @@ export function Editor({
         setPaso("portada")
         setVistaForzada(null)
         setPanelAbierto(true)
+      } else if (mensaje.tipo === "fija") {
+        toast(`«${mensaje.nombre}» viene con tu plantilla`, {
+          id: "parte-fija",
+          description: mensaje.ayuda || undefined,
+        })
       } else if (mensaje.tipo === "soltar-imagen") {
         void soltarImagen(mensaje.seccion, mensaje.archivo)
       }
@@ -390,6 +402,12 @@ export function Editor({
     ) {
       pasos.add("catalogo")
     }
+    if (distinto(a.personalizacion.ficha, b.personalizacion.ficha)) {
+      pasos.add("producto")
+    }
+    if (distinto(a.personalizacion.carrito, b.personalizacion.carrito)) {
+      pasos.add("carrito")
+    }
     return pasos
   }, [borrador.presente, borrador.publicado])
 
@@ -433,6 +451,8 @@ export function Editor({
     setVistaForzada,
     comparar,
     setComparar,
+    dispositivo,
+    setDispositivo,
     propuesta,
     setPropuesta,
     acciones: { publicar, proponer, decidir },
@@ -475,6 +495,8 @@ export function Editor({
             estado={estadoDeLaVista}
             enfoque={enfoque}
             alMensaje={alMensaje}
+            dispositivo={dispositivo}
+            setDispositivo={setDispositivo}
           />
         </main>
 

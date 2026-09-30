@@ -95,3 +95,36 @@ export function filtrarCatalogo(
       return salida
   }
 }
+
+/** Lo justo de un producto para sugerirlo en el carrito, que es de cliente. */
+export interface ProductoSugerido {
+  id: string
+  nombre: string
+  precioCents: number
+  imagen: string | null
+  stock: number
+}
+
+/**
+ * Productos para ofrecer en el carrito, destacados primero.
+ *
+ * Van de más: el carrito descarta los que ya tiene y muestra tres. Se mandan
+ * pocos y recortados porque viajan al navegador dentro de la página, y el
+ * catálogo entero no hace falta para sugerir tres cosas.
+ */
+export function sugerenciasDelCarrito(
+  productos: Product[],
+  cantidad = 8
+): ProductoSugerido[] {
+  return productos
+    .filter((p) => p.stock > 0 && p.image_url)
+    .sort((a, b) => Number(b.is_featured) - Number(a.is_featured))
+    .slice(0, cantidad)
+    .map((p) => ({
+      id: p.id,
+      nombre: p.name,
+      precioCents: p.price_cents,
+      imagen: p.image_url,
+      stock: p.stock,
+    }))
+}

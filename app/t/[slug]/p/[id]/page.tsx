@@ -8,6 +8,7 @@ import {
   marcoDeTienda,
 } from "@/lib/data/tienda-publica"
 import { kitDePlantilla } from "@/components/plantillas"
+import { BarraDeCompra } from "@/components/tienda/barra-de-compra"
 import { BarraDelCarrito } from "@/components/tienda/barra-del-carrito"
 
 export async function generateMetadata({
@@ -72,7 +73,12 @@ export default async function ProductoPublicoPage({
       </main>
 
       <kit.Pie marco={marco} codigo={codigo} />
-      <BarraDelCarrito slug={tienda.slug} />
+      {/* Una sola barra abajo: la de compra ya lleva al carrito. */}
+      {tienda.apariencia.ficha.barraFija ? (
+        <BarraDeCompra producto={producto} slug={tienda.slug} />
+      ) : (
+        <BarraDelCarrito slug={tienda.slug} />
+      )}
     </>
   )
 }

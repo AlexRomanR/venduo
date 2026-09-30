@@ -18,7 +18,7 @@ interface SeccionLeida {
 }
 
 interface ContextoLeido {
-  tienda: { nombre: string; descripcion: string | null }
+  tienda: { nombre: string; descripcion: string | null; tieneWhatsapp: boolean }
   secciones: SeccionLeida[]
 }
 
@@ -32,11 +32,15 @@ function leerContexto(mensaje: string): ContextoLeido {
       tienda: {
         nombre: leido.tienda?.nombre ?? "tu tienda",
         descripcion: leido.tienda?.descripcion ?? null,
+        tieneWhatsapp: leido.tienda?.tieneWhatsapp === true,
       },
       secciones: Array.isArray(leido.secciones) ? leido.secciones : [],
     }
   } catch {
-    return { tienda: { nombre: "tu tienda", descripcion: null }, secciones: [] }
+    return {
+      tienda: { nombre: "tu tienda", descripcion: null, tieneWhatsapp: false },
+      secciones: [],
+    }
   }
 }
 
@@ -53,6 +57,8 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
   const contexto = leerContexto(mensaje)
   const operaciones: Operacion[] = []
   const partes: string[] = []
+  /** Lo que no se pudo hacer, dicho al final del resumen. */
+  let nota: string | null = null
 
   const quiere = (...raices: string[]) =>
     raices.some((raiz) => pedido.includes(raiz))
@@ -171,6 +177,101 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
     partes.push("dejo dos columnas para que los productos se vean más grandes")
   }
 
+  // Ficha de producto
+  const sin = quiere("sin ", "quita", "saca", "no ")
+  if (quiere("vitrina") || (quiere("centrad") && quiere("ficha", "producto"))) {
+    operaciones.push({
+      op: "apariencia",
+      ruta: "ficha.diseno",
+      valor: "vitrina",
+    })
+    partes.push("centro la ficha de producto, como una vitrina")
+  } else if (quiere("dividida", "al costado", "al lado")) {
+    operaciones.push({
+      op: "apariencia",
+      ruta: "ficha.diseno",
+      valor: "dividida",
+    })
+    partes.push("pongo la foto al lado del texto en la ficha")
+  }
+  if (quiere("siempre a la vista", "siempre a mano", "barra", "botón fijo")) {
+    operaciones.push({
+      op: "apariencia",
+      ruta: "ficha.barraFija",
+      valor: true,
+    })
+    partes.push("dejo el botón de compra siempre a la vista en el celular")
+  }
+  if (quiere("parecid", "relacionad")) {
+    operaciones.push({
+      op: "apariencia",
+      ruta: "ficha.relacionados",
+      valor: !sin,
+    })
+    partes.push(
+      sin
+        ? "saco los productos parecidos del pie de la ficha"
+        : "muestro productos parecidos al pie de la ficha"
+    )
+  }
+  if (quiere("whatsapp") && !quiere("contacto")) {
+    if (contexto.tienda.tieneWhatsapp) {
+      operaciones.push({
+        op: "apariencia",
+        ruta: "ficha.consulta",
+        valor: true,
+      })
+      partes.push("agrego un enlace para que te pregunten por WhatsApp")
+    } else {
+      nota =
+        "Para que te pregunten por WhatsApp, primero agrega el número de tu tienda en Cuenta."
+    }
+  }
+
+  // Carrito
+  if (quiere("boleta", "recibo", "nota de")) {
+    operaciones.push({
+      op: "apariencia",
+      ruta: "carrito.diseno",
+      valor: "boleta",
+    })
+    partes.push("armo el carrito como una boleta")
+  } else if (quiere("por pasos", "paso a paso")) {
+    operaciones.push({
+      op: "apariencia",
+      ruta: "carrito.diseno",
+      valor: "pasos",
+    })
+    partes.push("ordeno el carrito en tres pasos numerados")
+  } else if (quiere("carrito") && quiere("columna")) {
+    operaciones.push({
+      op: "apariencia",
+      ruta: "carrito.diseno",
+      valor: "columnas",
+    })
+    partes.push("pongo el carrito en dos columnas")
+  }
+  if (quiere("sugier", "sugerenc", "otros productos")) {
+    operaciones.push({
+      op: "apariencia",
+      ruta: "carrito.sugerencias",
+      valor: true,
+    })
+    partes.push("sugiero otros productos en el carrito")
+  }
+  if (quiere("correo", "email")) {
+    operaciones.push({
+      op: "apariencia",
+      ruta: "carrito.correo",
+      valor: !sin,
+    })
+    partes.push(
+      sin
+        ? "dejo de pedir el correo en el carrito"
+        : "pido el correo en el carrito"
+    )
+  }
+
   // Secciones
   if (quiere("pregunta", "faq")) {
     const faq = seccion("faq")
@@ -273,6 +374,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
   if (operaciones.length === 0) {
     return {
       resumen:
+        nota ??
         "No encontré qué cambiar en tu pedido. Prueba con algo como «colores más cálidos», «hazla más elegante» o «sube las preguntas frecuentes».",
       operaciones: [],
     }
@@ -283,7 +385,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
       ? `${partes.slice(0, -1).join(", ")} y ${partes.at(-1)}`
       : partes[0]
   return {
-    resumen: `${texto.charAt(0).toUpperCase()}${texto.slice(1)}.`,
+    resumen: `${texto.charAt(0).toUpperCase()}${texto.slice(1)}.${nota ? ` ${nota}` : ""}`,
     operaciones,
   }
 }

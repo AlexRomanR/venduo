@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 
+import { sugerenciasDelCarrito } from "@/lib/catalogo"
 import { getTiendaPublica, marcoDeTienda } from "@/lib/data/tienda-publica"
 import { kitDePlantilla } from "@/components/plantillas"
 import { Checkout } from "@/components/tienda/checkout"
@@ -12,7 +13,7 @@ export const metadata = { title: "Tu carrito" }
  *
  * El marco y el título son de la plantilla; el formulario es el mismo en todas,
  * porque lo que pide —quién eres y cómo te contactan— no cambia con el rubro.
- * Toma la identidad de los tokens.
+ * Toma la identidad de los tokens, y cómo se ordena lo elige la tienda.
  */
 export default async function CarritoPage({
   params,
@@ -46,7 +47,17 @@ export default async function CarritoPage({
         <kit.Encabezado titulo="Tu pedido" />
 
         <div className="mt-10">
-          <Checkout slug={slug} nombreTienda={tienda.nombre} crear={pedir} />
+          <Checkout
+            slug={slug}
+            nombreTienda={tienda.nombre}
+            crear={pedir}
+            opciones={tienda.apariencia.carrito}
+            sugeridos={
+              tienda.apariencia.carrito.sugerencias
+                ? sugerenciasDelCarrito(tienda.productos)
+                : []
+            }
+          />
         </div>
       </main>
 

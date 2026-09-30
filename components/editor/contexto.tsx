@@ -20,6 +20,9 @@ import type { EstadoDelBorrador } from "@/components/editor/estado"
 
 export type { ClaveDePaso } from "@/lib/editor/pasos"
 
+/** Cómo se mira la vista previa en la computadora. En el celular, siempre celular. */
+export type Dispositivo = "celular" | "computadora"
+
 /** Lo que la IA propuso y todavía no se aplicó. */
 export interface Propuesta {
   id: string | null
@@ -54,6 +57,8 @@ export interface ValorDelEditor {
   /** Lo que muestra la vista previa cuando no es el paso actual. */
   vistaForzada: Vista | null
   setVistaForzada: (vista: Vista | null) => void
+  dispositivo: Dispositivo
+  setDispositivo: (dispositivo: Dispositivo) => void
   /** Antes o después, en el paso de publicar. */
   comparar: "antes" | "despues"
   setComparar: (valor: "antes" | "despues") => void

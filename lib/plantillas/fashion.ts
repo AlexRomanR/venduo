@@ -33,5 +33,12 @@ export const fashion: DefinicionDePlantilla = {
     },
     forma: { radio: "recto" },
     disposicion: { tarjeta: "retrato", columnas: 4 },
+    ficha: {
+      diseno: "dividida",
+      barraFija: false,
+      consulta: false,
+      relacionados: true,
+    },
+    carrito: { diseno: "columnas", sugerencias: false, correo: true },
   },
 }

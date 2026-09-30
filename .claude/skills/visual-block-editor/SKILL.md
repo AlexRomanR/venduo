@@ -117,6 +117,25 @@ un ejemplo inicial. De esa tabla salen **los formularios, los esquemas zod y lo 
 sabe de cada sección**. Un campo nuevo se agrega ahí y en `block_types.props_schema`, con
 los mismos límites.
 
+### Un ajuste nuevo de la apariencia
+
+Como `ficha.diseno` o `carrito.sugerencias`. No lleva migración —`theme_overrides` es un
+jsonb y lo valida zod—, pero sí todos estos lugares, o el ajuste existe a medias:
+
+- [ ] El esquema en `aparienciaSchema` y su grupo en `personalizacionSchema` y
+      `combinarApariencia` (`lib/plantillas/apariencia.ts`). **Un valor cerrado**, nunca
+      texto libre.
+- [ ] El valor de la base en las tres plantillas (`lib/plantillas/{clave}.ts`): el que
+      reproduce cómo se veían antes, para no cambiar ninguna tienda sin que lo pida.
+- [ ] Su nombre en `NOMBRES_DE_AJUSTE` y el de sus valores en `NOMBRES_DE_VALOR`: de ahí
+      salen el resumen de publicar y lo que la IA dice que cambia.
+- [ ] Los **tres kits** lo dibujan. Si uno lo ignora, el control no hace nada en esa
+      plantilla.
+- [ ] El control en su paso, y el punto de "con cambios" y la pantalla de la propuesta en
+      `components/editor/editor.tsx` (`conCambios`, `VISTA_DE_AJUSTE`).
+- [ ] La línea en `REGLAS_DE_EDICION` (`lib/ai/tasks.ts`) y una palabra clave en
+      `mock-propuesta.ts`, para que el modo demo también lo sepa hacer.
+
 ### La propuesta de la IA
 
 1. `proponerEdicion` recibe el pedido, la apariencia, las secciones, las categorías y las

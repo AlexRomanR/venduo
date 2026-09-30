@@ -1,14 +1,18 @@
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, ImageOff } from "lucide-react"
+import { ArrowLeft, ImageOff, MessageCircle } from "lucide-react"
 
 import { filtrarCatalogo } from "@/lib/catalogo"
-import { CONDICIONES, descuento } from "@/lib/plantillas/bloques"
+import {
+  CONDICIONES,
+  descuento,
+  enlaceDeConsulta,
+} from "@/lib/plantillas/bloques"
 import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
 import type { TiendaPublica } from "@/lib/data/tienda-publica"
-import { Bloques } from "@/components/plantillas/bloques"
+import { Bloques, ParteFija } from "@/components/plantillas/bloques"
 import {
   BLOQUES_CLASICOS,
   Tarjeta,
@@ -64,41 +68,53 @@ export function Inicio({ tienda, codigo, filtros }: PropsInicio) {
         />
       )}
 
-      <DatosDeLaTienda
+      <ParteFija
         tienda={tienda}
-        // Con bloques, la descripción puede no aparecer en ninguno: se muestra
-        // acá. Sin bloques ya salió en la portada de respaldo.
-        conDescripcion={
-          tienda.bloques.length > 0 &&
-          !tienda.bloques.some((b) => b.tipo === "about")
-        }
-      />
-
-      <section
-        id="catalogo"
-        className="scroll-mt-20 border-t-2 border-tinta py-14 md:py-16"
+        nombre="Sobre la tienda"
+        ayuda="Tu descripción, cuántos productos tienes y cómo se entrega. La descripción se cambia en Cuenta, desde tu panel."
       >
-        <div className="mx-auto w-full max-w-6xl px-5">
-          <h2 className="font-titular text-[clamp(1.75rem,5vw,2.75rem)] leading-tight font-extrabold tracking-[-0.03em]">
-            El catálogo
-          </h2>
+        <DatosDeLaTienda
+          tienda={tienda}
+          // Con bloques, la descripción puede no aparecer en ninguno: se muestra
+          // acá. Sin bloques ya salió en la portada de respaldo.
+          conDescripcion={
+            tienda.bloques.length > 0 &&
+            !tienda.bloques.some((b) => b.tipo === "about")
+          }
+        />
+      </ParteFija>
 
-          <div className="mt-8">
-            <FiltrosTienda
-              categorias={tienda.categorias}
-              usados={usados}
-              total={tienda.productos.length}
-              mostrando={catalogo.length}
+      <ParteFija
+        tienda={tienda}
+        nombre="El catálogo"
+        ayuda="Todos tus productos con su filtro, siempre al final de la portada. Se llena con lo que cargas en Productos."
+      >
+        <section
+          id="catalogo"
+          className="scroll-mt-20 border-t-2 border-tinta py-14 md:py-16"
+        >
+          <div className="mx-auto w-full max-w-6xl px-5">
+            <h2 className="font-titular text-[clamp(1.75rem,5vw,2.75rem)] leading-tight font-extrabold tracking-[-0.03em]">
+              El catálogo
+            </h2>
+
+            <div className="mt-8">
+              <FiltrosTienda
+                categorias={tienda.categorias}
+                usados={usados}
+                total={tienda.productos.length}
+                mostrando={catalogo.length}
+              />
+            </div>
+
+            <GrillaDelCatalogo
+              tienda={tienda}
+              codigo={codigo}
+              productos={catalogo}
             />
           </div>
-
-          <GrillaDelCatalogo
-            tienda={tienda}
-            codigo={codigo}
-            productos={catalogo}
-          />
-        </div>
-      </section>
+        </section>
+      </ParteFija>
     </>
   )
 }
@@ -271,6 +287,9 @@ export function Catalogo({
 }
 
 export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
+  const { ficha } = tienda.apariencia
+  const vitrina = ficha.diseno === "vitrina"
+  const consulta = enlaceDeConsulta(tienda, producto)
   const rebaja = descuento(producto)
 
   return (
@@ -286,8 +305,15 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
         Seguir viendo
       </Link>
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-14">
-        <div>
+      <div
+        className={cn(
+          "mt-8",
+          vitrina
+            ? "mx-auto flex max-w-2xl flex-col items-center gap-10 text-center"
+            : "grid gap-10 lg:grid-cols-2 lg:gap-14"
+        )}
+      >
+        <div className={cn(vitrina && "w-full max-w-[18rem] sm:max-w-sm")}>
           <div className="relative aspect-square w-full overflow-hidden border border-tinta/15 bg-tinta/5">
             {producto.image_url ? (
               <Image
@@ -296,7 +322,11 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
                 fill
                 unoptimized
                 priority
-                sizes="(max-width: 1024px) 100vw, 480px"
+                sizes={
+                  vitrina
+                    ? "(max-width: 640px) 288px, 384px"
+                    : "(max-width: 1024px) 100vw, 480px"
+                }
                 className="object-cover"
               />
             ) : (
@@ -327,16 +357,26 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
           ) : null}
         </div>
 
-        <div>
+        <div className={cn(vitrina && "w-full")}>
           <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-45">
             {producto.category ?? tienda.nombre}
           </p>
 
-          <h1 className="mt-2 max-w-[20ch] font-titular text-[clamp(1.75rem,5vw,2.75rem)] leading-[1.03] font-extrabold tracking-[-0.03em]">
+          <h1
+            className={cn(
+              "mt-2 max-w-[20ch] font-titular text-[clamp(1.75rem,5vw,2.75rem)] leading-[1.03] font-extrabold tracking-[-0.03em]",
+              vitrina && "mx-auto"
+            )}
+          >
             {producto.name}
           </h1>
 
-          <div className="mt-5 flex flex-wrap items-baseline gap-x-4 gap-y-2">
+          <div
+            className={cn(
+              "mt-5 flex flex-wrap items-baseline gap-x-4 gap-y-2",
+              vitrina && "justify-center"
+            )}
+          >
             <span className="tabular font-titular text-3xl font-extrabold tracking-[-0.03em]">
               {formatMoney(producto.price_cents)}
             </span>
@@ -352,7 +392,12 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
             ) : null}
           </div>
 
-          <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm opacity-55">
+          <p
+            className={cn(
+              "mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm opacity-55",
+              vitrina && "justify-center"
+            )}
+          >
             <span>{CONDICIONES[producto.condition] ?? producto.condition}</span>
             <span aria-hidden="true">·</span>
             <span>
@@ -363,13 +408,23 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
           </p>
 
           {producto.description ? (
-            <p className="mt-6 max-w-[56ch] leading-relaxed opacity-75">
+            <p
+              className={cn(
+                "mt-6 max-w-[56ch] leading-relaxed opacity-75",
+                vitrina && "mx-auto"
+              )}
+            >
               {producto.description}
             </p>
           ) : null}
 
           {producto.condition !== "nuevo" && producto.condition_note ? (
-            <div className="mt-6 border-l-2 border-senal pl-4">
+            <div
+              className={cn(
+                "mt-6 border-l-2 border-senal pl-4",
+                vitrina && "mx-auto max-w-md text-left"
+              )}
+            >
               <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
                 Estado del artículo
               </p>
@@ -379,13 +434,25 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
             </div>
           ) : null}
 
-          <div className="mt-10">
+          <div className={cn("mt-10", vitrina && "mx-auto max-w-md text-left")}>
             <AgregarAlCarrito producto={producto} slug={tienda.slug} />
+
+            {consulta ? (
+              <a
+                href={consulta}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="mt-4 flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+              >
+                <MessageCircle aria-hidden="true" className="size-4" />
+                ¿Tienes dudas? Pregúntanos por WhatsApp
+              </a>
+            ) : null}
           </div>
         </div>
       </div>
 
-      {relacionados.length > 0 ? (
+      {ficha.relacionados && relacionados.length > 0 ? (
         <section className="mt-20 border-t-2 border-tinta pt-10">
           <h2 className="font-titular text-[clamp(1.5rem,4vw,2.25rem)] leading-tight font-extrabold tracking-[-0.03em]">
             También te puede gustar

@@ -101,7 +101,9 @@ export function BarraDePasos({
       aria-label="Pasos del editor"
       className="overflow-x-auto border-b border-tinta/15 bg-papel px-2"
     >
-      <ol className="flex min-w-max items-center">
+      {/* Centrados, pero la regla de abajo va de lado a lado. Con `w-max` y
+          márgenes automáticos, si no entran se desplazan en vez de cortarse. */}
+      <ol className="mx-auto flex w-max items-center">
         {PASOS.map((paso, indice) => {
           const activo = paso.clave === actual
           return (

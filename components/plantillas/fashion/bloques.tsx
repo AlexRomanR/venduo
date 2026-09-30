@@ -31,7 +31,7 @@ import type { KitDeTienda, PropsBloque } from "@/components/plantillas/kit"
  */
 
 function Portada({ bloque, tienda, codigo }: PropsBloque) {
-  const foto = fotoDePortada(bloque, tienda.productos)
+  const foto = fotoDePortada(bloque, tienda)
   const titulo = texto(bloque, "title") ?? tienda.nombre
   const bajada = texto(bloque, "subtitle")
   const accion = accionDePortada(bloque) ?? "Ver la colección"

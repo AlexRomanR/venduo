@@ -24,6 +24,7 @@ import {
   ArrowUp,
   ChevronRight,
   CircleHelp,
+  Info,
   Eye,
   EyeOff,
   GripVertical,
@@ -84,7 +85,8 @@ function resumen(seccion: Seccion): string {
  * previa abre su formulario directamente.
  */
 export function PasoPortada() {
-  const { borrador, seleccion, seleccionar, irAPaso, tienda, ia } = useEditor()
+  const { borrador, seleccion, seleccionar, irAPaso, tienda, ia, productos } =
+    useEditor()
   const [agregando, setAgregando] = React.useState(false)
   const secciones = borrador.presente.secciones
   const elegida = secciones.find((seccion) => seccion.id === seleccion)
@@ -138,6 +140,14 @@ export function PasoPortada() {
               </button>
             </div>
           ) : null}
+          {productos.length === 0 ? (
+            <div className="px-5 pb-4">
+              <Aviso>
+                Todavía no cargaste productos: tus vitrinas se ven con unos de
+                ejemplo, para que veas cómo quedan con los tuyos.
+              </Aviso>
+            </div>
+          ) : null}
           <ListaDeSecciones />
           <div className="px-5 pt-4 pb-2">
             <button
@@ -149,6 +159,14 @@ export function PasoPortada() {
               Agregar una sección
             </button>
           </div>
+          <p className="flex gap-2 px-5 pt-4 text-xs leading-relaxed opacity-60">
+            <Info aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
+            <span>
+              Debajo de tus secciones, la plantilla suma partes fijas con tu
+              nombre, tu descripción y tu WhatsApp. Tócalas en la vista previa
+              para ver de dónde sale cada una.
+            </span>
+          </p>
           {tienda.plantilla === "clasica" &&
           secciones.some((s) => s.tipo === "product_grid") ? (
             <div className="px-5 pt-3">

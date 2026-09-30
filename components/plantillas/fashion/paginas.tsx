@@ -1,12 +1,16 @@
 import Link from "next/link"
 import { ArrowRight, MessageCircle, Repeat, Truck } from "lucide-react"
 
-import { CONDICIONES, descuento } from "@/lib/plantillas/bloques"
+import {
+  CONDICIONES,
+  descuento,
+  enlaceDeConsulta,
+} from "@/lib/plantillas/bloques"
 import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
 import type { TiendaPublica } from "@/lib/data/tienda-publica"
-import { Bloques } from "@/components/plantillas/bloques"
+import { Bloques, ParteFija } from "@/components/plantillas/bloques"
 import { BLOQUES_FASHION } from "@/components/plantillas/fashion/bloques"
 import { Galeria } from "@/components/plantillas/fashion/galeria"
 import {
@@ -70,29 +74,41 @@ export function Inicio({ tienda, codigo }: PropsInicio) {
       )}
 
       {tienda.productos.length > 0 ? (
-        <Link
-          href={catalogo}
-          className="group block border-y-2 border-tinta transition-colors hover:bg-tinta hover:text-papel"
+        <ParteFija
+          tienda={tienda}
+          nombre="Ver todo"
+          ayuda="Lleva a tu catálogo completo. Viene con la plantilla y aparece cuando tienes productos."
         >
-          <span className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-8 md:py-12">
-            <span className="font-titular text-[clamp(2.25rem,9vw,5.5rem)] leading-none">
-              Ver todo
-            </span>
-            <span className="flex items-center gap-3 text-xs font-semibold tracking-[0.16em] uppercase">
-              <span className="tabular hidden sm:inline">
-                {tienda.productos.length}{" "}
-                {tienda.productos.length === 1 ? "producto" : "productos"}
+          <Link
+            href={catalogo}
+            className="group block border-y-2 border-tinta transition-colors hover:bg-tinta hover:text-papel"
+          >
+            <span className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-8 md:py-12">
+              <span className="font-titular text-[clamp(2.25rem,9vw,5.5rem)] leading-none">
+                Ver todo
               </span>
-              <ArrowRight
-                aria-hidden="true"
-                className="size-6 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transform-none"
-              />
+              <span className="flex items-center gap-3 text-xs font-semibold tracking-[0.16em] uppercase">
+                <span className="tabular hidden sm:inline">
+                  {tienda.productos.length}{" "}
+                  {tienda.productos.length === 1 ? "producto" : "productos"}
+                </span>
+                <ArrowRight
+                  aria-hidden="true"
+                  className="size-6 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transform-none"
+                />
+              </span>
             </span>
-          </span>
-        </Link>
+          </Link>
+        </ParteFija>
       ) : null}
 
-      <SobreLaTienda tienda={tienda} />
+      <ParteFija
+        tienda={tienda}
+        nombre="Sobre la tienda"
+        ayuda="Muestra el nombre, la descripción y el WhatsApp de tu tienda. Se cambian en Cuenta, desde tu panel."
+      >
+        <SobreLaTienda tienda={tienda} />
+      </ParteFija>
     </>
   )
 }
@@ -268,6 +284,9 @@ export function Catalogo({
 }
 
 export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
+  const { ficha } = tienda.apariencia
+  const vitrina = ficha.diseno === "vitrina"
+  const consulta = enlaceDeConsulta(tienda, producto)
   const rebaja = descuento(producto)
   const pocas =
     producto.stock > 0 && producto.stock <= producto.low_stock_threshold
@@ -282,7 +301,10 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
     <div className="mx-auto w-full max-w-7xl pb-16 md:px-5 md:pt-4">
       <nav
         aria-label="Estás en"
-        className="flex items-center gap-2 overflow-hidden px-5 text-[11px] tracking-[0.16em] whitespace-nowrap uppercase md:px-0"
+        className={cn(
+          "flex items-center gap-2 overflow-hidden px-5 text-[11px] tracking-[0.16em] whitespace-nowrap uppercase md:px-0",
+          vitrina && "justify-center"
+        )}
       >
         <Link
           href={rutaDeTienda(tienda.slug, "/catalogo", { ref: codigo })}
@@ -308,19 +330,40 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
         ) : null}
       </nav>
 
-      <div className="grid gap-8 md:grid-cols-[1.3fr_1fr] md:gap-12">
-        <Galeria
-          imagenes={imagenes}
-          nombre={producto.name}
-          retrato={tienda.apariencia.disposicion.tarjeta === "retrato"}
-        />
+      {/* Vitrina: la prenda sola al centro, más chica y con aire, y todo lo
+          demás debajo. Dividida: la foto manda a lo ancho y el texto la
+          acompaña al costado. */}
+      <div
+        className={cn(
+          vitrina
+            ? "mx-auto flex max-w-2xl flex-col items-center gap-8"
+            : "grid gap-8 md:grid-cols-[1.3fr_1fr] md:gap-12"
+        )}
+      >
+        <div className={cn(vitrina && "w-full max-w-[18rem] sm:max-w-sm")}>
+          <Galeria
+            imagenes={imagenes}
+            nombre={producto.name}
+            retrato={tienda.apariencia.disposicion.tarjeta === "retrato"}
+          />
+        </div>
 
-        <div className="px-5 md:sticky md:top-36 md:self-start md:px-0">
+        <div
+          className={cn(
+            "px-5 md:px-0",
+            vitrina ? "w-full text-center" : "md:sticky md:top-36 md:self-start"
+          )}
+        >
           <h1 className="font-titular text-[clamp(2rem,6vw,3.25rem)] leading-[0.95]">
             {producto.name}
           </h1>
 
-          <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-2">
+          <div
+            className={cn(
+              "mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-2",
+              vitrina && "justify-center"
+            )}
+          >
             <span className="tabular text-2xl font-semibold">
               {formatMoney(producto.price_cents)}
             </span>
@@ -336,7 +379,12 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
             ) : null}
           </div>
 
-          <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold tracking-[0.12em] uppercase">
+          <p
+            className={cn(
+              "mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold tracking-[0.12em] uppercase",
+              vitrina && "justify-center"
+            )}
+          >
             <span className="opacity-60">
               {CONDICIONES[producto.condition] ?? producto.condition}
             </span>
@@ -352,11 +400,28 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
             </span>
           </p>
 
-          <div className="mt-8">
+          <div className={cn("mt-8 text-left", vitrina && "mx-auto max-w-md")}>
             <AgregarAlCarrito producto={producto} slug={tienda.slug} />
+
+            {consulta ? (
+              <a
+                href={consulta}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="mt-4 flex min-h-11 items-center gap-2 text-sm font-semibold underline-offset-4 transition-colors hover:text-senal hover:underline"
+              >
+                <MessageCircle aria-hidden="true" className="size-4" />
+                ¿Dudas con la talla o el color? Pregúntanos
+              </a>
+            ) : null}
           </div>
 
-          <dl className="mt-10 border-t-2 border-tinta">
+          <dl
+            className={cn(
+              "mt-10 border-t-2 border-tinta text-left",
+              vitrina && "mx-auto max-w-md"
+            )}
+          >
             {producto.description ? (
               <Detalle titulo="Descripción">
                 <p className="leading-relaxed whitespace-pre-line opacity-80">
@@ -386,7 +451,7 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
         </div>
       </div>
 
-      {relacionados.length > 0 ? (
+      {ficha.relacionados && relacionados.length > 0 ? (
         <section className="mt-16 px-5 md:mt-24 md:px-0">
           <TituloDeSeccion titulo="También te puede gustar" />
           <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 md:gap-x-5 lg:grid-cols-4">

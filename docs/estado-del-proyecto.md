@@ -64,9 +64,16 @@ Actualizado el 29 de septiembre de 2026.
   ocultan, se quitan y se agregan desde una galería. Formulario de cada sección armado
   desde su definición, con fotos subidas o de la biblioteca (lo subido y las fotos de los
   productos).
-- **Catálogo:** foto cuadrada o vertical y columnas. **Producto** y **Carrito** muestran
-  cómo quedan con un producto real y un carrito de muestra. Una tienda sin productos los
-  ve con **productos de ejemplo** de su rubro, avisados como tales.
+- **Catálogo:** foto cuadrada o vertical y columnas.
+- **Producto:** ficha **dividida** o **vitrina**, botón de compra que sigue al pulgar en el
+  celular, enlace para preguntar por WhatsApp y productos parecidos. Las tres plantillas
+  dibujan cada forma con su estilo.
+- **Carrito:** en **dos columnas**, como **boleta** o **por pasos**; sugerencias para sumar
+  al pedido y pedir o no el correo.
+- Una tienda sin productos ve todo —portada incluida— con **productos de ejemplo** de su
+  rubro, avisados como tales; la foto de la portada sigue siendo la real. Una sección sin
+  contenido se ve como un recuadro que dice qué le falta, y las partes fijas de la
+  plantilla ("Sobre la tienda") explican de dónde salen al tocarlas.
 - **Forma de los botones:** rectos, suaves o redondos, en todos los botones y controles de
   las tres plantillas, filtros y buscador del catálogo incluidos.
 - **Borrador en el navegador** con deshacer y rehacer (Ctrl+Z), guardado en el

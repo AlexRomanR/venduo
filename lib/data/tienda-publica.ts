@@ -43,6 +43,11 @@ export interface TiendaPublica {
    * entonces una marca con su id, para que tocarla la seleccione.
    */
   enEdicion?: boolean
+  /**
+   * Los productos son los de ejemplo del editor: la tienda todavía no cargó
+   * los suyos. Llenan las vitrinas de la vista previa, nunca la tienda real.
+   */
+  productosDeEjemplo?: boolean
 }
 
 /**

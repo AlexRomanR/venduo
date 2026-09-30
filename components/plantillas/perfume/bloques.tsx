@@ -34,7 +34,7 @@ import {
  */
 
 function Portada({ bloque, tienda, codigo }: PropsBloque) {
-  const foto = fotoDePortada(bloque, tienda.productos)
+  const foto = fotoDePortada(bloque, tienda)
   const titulo = texto(bloque, "title") ?? tienda.nombre
   const bajada = texto(bloque, "subtitle")
   const accion = accionDePortada(bloque) ?? "Descubrir la colección"

@@ -39,6 +39,8 @@ export interface DisenoParaEditar {
     slug: string
     nombre: string
     descripcion: string | null
+    /** Sin número, la ficha no puede ofrecer preguntar por WhatsApp. */
+    whatsapp: string | null
     url: string
     plantilla: ClavePlantilla
     nombrePlantilla: string
@@ -104,6 +106,7 @@ async function disenoDeDemostracion(): Promise<DisenoParaEditar | null> {
       slug: tienda.slug,
       nombre: tienda.nombre,
       descripcion: tienda.descripcion,
+      whatsapp: tienda.whatsapp,
       url: urlDeTienda(tienda.slug),
       plantilla: tienda.plantilla,
       nombrePlantilla: PLANTILLAS[tienda.plantilla].nombre,
@@ -153,7 +156,7 @@ export async function leerDisenoParaEditar(): Promise<DisenoParaEditar | null> {
   const { data: tienda } = await supabase
     .from("stores")
     .select(
-      "id, slug, name, description, logo_url, template_key, theme_overrides"
+      "id, slug, name, description, whatsapp, logo_url, template_key, theme_overrides"
     )
     .eq("owner_id", user.id)
     .is("deleted_at", null)
@@ -221,6 +224,7 @@ export async function leerDisenoParaEditar(): Promise<DisenoParaEditar | null> {
       slug: tienda.slug,
       nombre: tienda.name,
       descripcion: tienda.description,
+      whatsapp: tienda.whatsapp,
       url: urlDeTienda(tienda.slug),
       plantilla,
       nombrePlantilla: fichaRes.data?.name ?? PLANTILLAS[plantilla].nombre,

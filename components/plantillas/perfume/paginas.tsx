@@ -1,12 +1,16 @@
 import Link from "next/link"
 import { MessageCircle, Sparkles, Truck } from "lucide-react"
 
-import { CONDICIONES, descuento } from "@/lib/plantillas/bloques"
+import {
+  CONDICIONES,
+  descuento,
+  enlaceDeConsulta,
+} from "@/lib/plantillas/bloques"
 import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
 import type { TiendaPublica } from "@/lib/data/tienda-publica"
-import { Bloques } from "@/components/plantillas/bloques"
+import { Bloques, ParteFija } from "@/components/plantillas/bloques"
 import type {
   PropsCatalogo,
   PropsFicha,
@@ -67,7 +71,13 @@ export function Inicio({ tienda, codigo }: PropsInicio) {
         </section>
       )}
 
-      <LaCasa tienda={tienda} />
+      <ParteFija
+        tienda={tienda}
+        nombre="La casa"
+        ayuda="Muestra el nombre, la descripción y el WhatsApp de tu tienda. Se cambian en Cuenta, desde tu panel."
+      >
+        <LaCasa tienda={tienda} />
+      </ParteFija>
     </>
   )
 }
@@ -226,6 +236,9 @@ export function Catalogo({
 }
 
 export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
+  const { ficha } = tienda.apariencia
+  const vitrina = ficha.diseno === "vitrina"
+  const consulta = enlaceDeConsulta(tienda, producto)
   const rebaja = descuento(producto)
   const imagenes =
     producto.images.length > 0
@@ -234,18 +247,27 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
         ? [producto.image_url]
         : []
 
-  const consulta = tienda.whatsapp
-    ? `https://wa.me/${tienda.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(
-        `Hola ${tienda.nombre}, quisiera saber más sobre ${producto.name}.`
-      )}`
-    : null
-
   return (
     <div className="mx-auto w-full max-w-6xl px-5 pt-8 pb-20 md:pt-14">
-      <div className="grid gap-12 md:grid-cols-2 md:gap-16">
-        <Galeria imagenes={imagenes} nombre={producto.name} />
+      {/* Vitrina: el frasco solo, en su arco, y todo centrado debajo, como en
+          un mostrador. Dividida: foto y texto lado a lado en la computadora. */}
+      <div
+        className={cn(
+          vitrina
+            ? "mx-auto flex max-w-2xl flex-col items-center gap-12"
+            : "grid gap-12 md:grid-cols-2 md:gap-16"
+        )}
+      >
+        <div className={cn(vitrina && "w-full max-w-[16rem] sm:max-w-xs")}>
+          <Galeria imagenes={imagenes} nombre={producto.name} />
+        </div>
 
-        <div className="text-center md:pt-8 md:text-left">
+        <div
+          className={cn(
+            "text-center",
+            vitrina ? "w-full" : "md:pt-8 md:text-left"
+          )}
+        >
           {producto.category ? (
             <Link
               href={rutaDeTienda(tienda.slug, "/catalogo", {
@@ -262,7 +284,12 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
             {producto.name}
           </h1>
 
-          <p className="mt-5 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-2 text-xl tracking-[0.03em] md:justify-start">
+          <p
+            className={cn(
+              "mt-5 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-2 text-xl tracking-[0.03em]",
+              !vitrina && "md:justify-start"
+            )}
+          >
             <span className="tabular">{formatMoney(producto.price_cents)}</span>
             {producto.compare_at_price_cents ? (
               <span className="tabular text-base line-through opacity-45">
@@ -278,26 +305,44 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
 
           <span
             aria-hidden="true"
-            className="mx-auto mt-7 block h-px w-12 bg-senal md:mx-0"
+            className={cn(
+              "mx-auto mt-7 block h-px w-12 bg-senal",
+              !vitrina && "md:mx-0"
+            )}
           />
 
           {producto.description ? (
-            <p className="mx-auto mt-7 max-w-[50ch] leading-loose whitespace-pre-line opacity-80 md:mx-0">
+            <p
+              className={cn(
+                "mx-auto mt-7 max-w-[50ch] leading-loose whitespace-pre-line opacity-80",
+                !vitrina && "md:mx-0"
+              )}
+            >
               {producto.description}
             </p>
           ) : null}
 
           {producto.condition !== "nuevo" && producto.condition_note ? (
-            <p className="mx-auto mt-5 max-w-[50ch] text-sm leading-relaxed italic opacity-70 md:mx-0">
+            <p
+              className={cn(
+                "mx-auto mt-5 max-w-[50ch] text-sm leading-relaxed italic opacity-70",
+                !vitrina && "md:mx-0"
+              )}
+            >
               {CONDICIONES[producto.condition]}: {producto.condition_note}
             </p>
           ) : null}
 
-          <div className="mt-10 text-left">
+          <div className={cn("mt-10 text-left", vitrina && "mx-auto max-w-md")}>
             <AgregarAlCarrito producto={producto} slug={tienda.slug} />
           </div>
 
-          <dl className="mt-10 grid grid-cols-2 gap-px border border-tinta/10 bg-tinta/10 text-center">
+          <dl
+            className={cn(
+              "mt-10 grid grid-cols-2 gap-px border border-tinta/10 bg-tinta/10 text-center",
+              vitrina && "mx-auto max-w-md"
+            )}
+          >
             <div className="bg-papel px-4 py-5">
               <dt className="text-[10px] tracking-[0.24em] uppercase opacity-55">
                 Condición
@@ -337,7 +382,7 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
         </div>
       </div>
 
-      {relacionados.length > 0 ? (
+      {ficha.relacionados && relacionados.length > 0 ? (
         <section className="mt-20 border-t border-tinta/10 pt-16 md:mt-28">
           <TituloDeSeccion titulo="Quizás también te guste" />
           <div className="mt-12">
