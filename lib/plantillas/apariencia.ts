@@ -116,18 +116,34 @@ export function resolverApariencia(
   if (!leida.success) return base
 
   const cambios = leida.data
-  const resultado: Apariencia = {
-    colores: { ...base.colores, ...cambios.colores },
-    tipografia: { ...base.tipografia, ...cambios.tipografia },
-    forma: { ...base.forma, ...cambios.forma },
-    disposicion: { ...base.disposicion, ...cambios.disposicion },
-  }
+  const resultado = combinarApariencia(base, cambios)
 
   if (cambios.colores && !coloresLegibles(resultado.colores)) {
     resultado.colores = base.colores
   }
 
   return resultado
+}
+
+/**
+ * La base con una personalización ya validada encima, **sin** mirar el
+ * contraste.
+ *
+ * Es lo que dibuja la vista previa del editor. Ahí el contraste no se corrige
+ * en silencio: si una combinación no se lee, la persona tiene que verla así y
+ * leer por qué, en vez de ver otros colores sin entender qué pasó. Lo que llega
+ * al comprador sigue pasando por `resolverApariencia`.
+ */
+export function combinarApariencia(
+  base: Apariencia,
+  cambios: Personalizacion
+): Apariencia {
+  return {
+    colores: { ...base.colores, ...cambios.colores },
+    tipografia: { ...base.tipografia, ...cambios.tipografia },
+    forma: { ...base.forma, ...cambios.forma },
+    disposicion: { ...base.disposicion, ...cambios.disposicion },
+  }
 }
 
 function luminancia(hex: string): number {
@@ -155,11 +171,172 @@ export function contraste(a: string, b: string): number {
  * que se mide en las dos direcciones.
  */
 export function coloresLegibles(colores: Apariencia["colores"]): boolean {
-  return (
-    contraste(colores.tinta, colores.papel) >= 7 &&
-    contraste(colores.senal, colores.papel) >= 4.5 &&
-    contraste("#ffffff", colores.senal) >= 4.5
+  return problemasDeContraste(colores).length === 0
+}
+
+export type TokenDeColor = keyof Apariencia["colores"]
+
+export interface ProblemaDeContraste {
+  /** Qué no se lee, dicho para una persona. */
+  mensaje: string
+  /** Los colores que intervienen: cambiar cualquiera lo arregla. */
+  colores: TokenDeColor[]
+  contraste: number
+  minimo: number
+}
+
+/**
+ * Qué no se lee de una paleta, y por qué.
+ *
+ * Son las mismas tres comprobaciones de `coloresLegibles`, contadas para que el
+ * editor pueda decir "el texto no se lee sobre este fondo" en vez de rechazar
+ * un color sin explicación.
+ */
+export function problemasDeContraste(
+  colores: Apariencia["colores"]
+): ProblemaDeContraste[] {
+  const problemas: ProblemaDeContraste[] = []
+
+  const texto = contraste(colores.tinta, colores.papel)
+  if (texto < 7) {
+    problemas.push({
+      mensaje: "El texto no se lee bien sobre el fondo.",
+      colores: ["tinta", "papel"],
+      contraste: texto,
+      minimo: 7,
+    })
+  }
+
+  const botones = contraste(colores.senal, colores.papel)
+  if (botones < 4.5) {
+    problemas.push({
+      mensaje: "Los botones se pierden contra el fondo.",
+      colores: ["senal", "papel"],
+      contraste: botones,
+      minimo: 4.5,
+    })
+  }
+
+  const letraDelBoton = contraste("#ffffff", colores.senal)
+  if (letraDelBoton < 4.5) {
+    problemas.push({
+      mensaje: "La letra blanca de los botones no se lee.",
+      colores: ["senal"],
+      contraste: letraDelBoton,
+      minimo: 4.5,
+    })
+  }
+
+  return problemas
+}
+
+/**
+ * El color más parecido a `token` con el que la paleta se lee.
+ *
+ * Conserva el tono y la saturación y mueve solo la luz, un punto por vez hacia
+ * los dos lados: la primera que pasa es la más cercana a lo que la persona
+ * eligió. Devuelve `null` si ninguna luz alcanza —un fondo oscuro con botones
+ * que tienen que llevar letra blanca, por ejemplo—; entonces lo que hay que
+ * cambiar es otro color.
+ */
+export function colorLegibleCercano(
+  colores: Apariencia["colores"],
+  token: TokenDeColor
+): string | null {
+  const [tono, saturacion, luz] = hexAHsl(colores[token])
+
+  for (let paso = 1; paso <= 100; paso++) {
+    for (const candidata of [luz - paso, luz + paso]) {
+      if (candidata < 0 || candidata > 100) continue
+
+      const hex = hslAHex(tono, saturacion, candidata)
+      if (coloresLegibles({ ...colores, [token]: hex })) return hex
+    }
+  }
+
+  return null
+}
+
+/** El tono de acento al pasar el cursor, derivado de la señal. */
+export function senalAltaDe(senal: string): string {
+  const [tono, saturacion, luz] = hexAHsl(senal)
+  return hslAHex(tono, saturacion, Math.min(luz + 8, 92))
+}
+
+function hexAHsl(hex: string): [number, number, number] {
+  const [r, g, b] = [1, 3, 5].map(
+    (inicio) => parseInt(hex.slice(inicio, inicio + 2), 16) / 255
   )
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const luz = (max + min) / 2
+
+  if (max === min) return [0, 0, Math.round(luz * 100)]
+
+  const delta = max - min
+  const saturacion = luz > 0.5 ? delta / (2 - max - min) : delta / (max + min)
+  const tono =
+    max === r
+      ? ((g - b) / delta + (g < b ? 6 : 0)) * 60
+      : max === g
+        ? ((b - r) / delta + 2) * 60
+        : ((r - g) / delta + 4) * 60
+
+  return [tono, saturacion * 100, Math.round(luz * 100)]
+}
+
+function hslAHex(tono: number, saturacion: number, luz: number): string {
+  const s = saturacion / 100
+  const l = luz / 100
+  const a = s * Math.min(l, 1 - l)
+  const canal = (n: number) => {
+    const k = (n + tono / 30) % 12
+    const valor = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))
+    return Math.round(valor * 255)
+      .toString(16)
+      .padStart(2, "0")
+  }
+  return `#${canal(0)}${canal(8)}${canal(4)}`
+}
+
+/**
+ * Cómo se llama cada ajuste para quien edita su tienda.
+ *
+ * La base de datos dice `papel`, `tinta` y `senal`; una persona dice fondo,
+ * texto y botones. Lo usan el editor y el resumen de lo que cambió.
+ */
+export const NOMBRES_DE_AJUSTE = {
+  "colores.papel": "Fondo",
+  "colores.tinta": "Texto",
+  "colores.senal": "Botones y acentos",
+  "colores.senalAlta": "Botones al pasar el cursor",
+  "tipografia.titular": "Letra de los títulos",
+  "tipografia.cuerpo": "Letra del texto",
+  "tipografia.pesoTitular": "Grosor de los títulos",
+  "tipografia.espaciadoTitular": "Espacio entre letras de los títulos",
+  "tipografia.mayusculas": "Títulos en mayúsculas",
+  "forma.radio": "Forma de los botones",
+  "disposicion.tarjeta": "Foto de los productos",
+  "disposicion.columnas": "Columnas del catálogo",
+} as const
+
+export type RutaDeAjuste = keyof typeof NOMBRES_DE_AJUSTE
+
+export const RUTAS_DE_AJUSTE = Object.keys(NOMBRES_DE_AJUSTE) as [
+  RutaDeAjuste,
+  ...RutaDeAjuste[],
+]
+
+/** El nombre de cada valor cerrado, para mostrarlo. */
+export const NOMBRES_DE_VALOR: Record<string, string> = {
+  recto: "Rectos",
+  suave: "Suaves",
+  redondo: "Redondos",
+  cuadrada: "Cuadrada",
+  retrato: "Vertical",
+  apretado: "Apretado",
+  normal: "Normal",
+  abierto: "Abierto",
 }
 
 /**

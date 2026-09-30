@@ -55,3 +55,45 @@ export async function cambiarPlantilla(
   revalidatePath("/", "layout")
   return { ok: true }
 }
+
+const restauracionSchema = z.object({ version: z.uuid() })
+
+/**
+ * Volver a una versión del historial.
+ *
+ * `restaurar_version` comprueba que la versión sea de la tienda del usuario y
+ * guarda antes cómo estaba: restaurar nunca pierde nada, y deshacerlo es
+ * restaurar la versión que acaba de guardarse.
+ */
+export async function restaurarVersion(entrada: {
+  version: string
+}): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient()
+  if (!supabase) {
+    return {
+      ok: false,
+      error: "En modo demo no se puede restaurar una versión.",
+    }
+  }
+
+  const datos = restauracionSchema.safeParse(entrada)
+  if (!datos.success) {
+    return { ok: false, error: "Esa versión no existe." }
+  }
+
+  const { error } = await supabase.rpc("restaurar_version", {
+    p_version_id: datos.data.version,
+  })
+
+  if (error) {
+    return {
+      ok: false,
+      error: error.message.includes("no existe")
+        ? "Esa versión ya no está en tu historial."
+        : "No pudimos restaurar esa versión. Inténtalo de nuevo.",
+    }
+  }
+
+  revalidatePath("/", "layout")
+  return { ok: true }
+}

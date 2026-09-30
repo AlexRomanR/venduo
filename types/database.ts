@@ -94,6 +94,7 @@ export type Database = {
           snapshot_before: Json
           status: Database["public"]["Enums"]["block_proposal_status"]
           store_id: string
+          theme_before: Json | null
           validation_errors: Json | null
         }
         Insert: {
@@ -106,6 +107,7 @@ export type Database = {
           snapshot_before: Json
           status?: Database["public"]["Enums"]["block_proposal_status"]
           store_id: string
+          theme_before?: Json | null
           validation_errors?: Json | null
         }
         Update: {
@@ -118,6 +120,7 @@ export type Database = {
           snapshot_before?: Json
           status?: Database["public"]["Enums"]["block_proposal_status"]
           store_id?: string
+          theme_before?: Json | null
           validation_errors?: Json | null
         }
         Relationships: [
@@ -897,6 +900,7 @@ export type Database = {
           created_by: string | null
           deleted_at: string | null
           id: string
+          logo_url: string | null
           note: string | null
           number: number
           origin: Database["public"]["Enums"]["design_origin"]
@@ -911,6 +915,7 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           id?: string
+          logo_url?: string | null
           note?: string | null
           number: number
           origin: Database["public"]["Enums"]["design_origin"]
@@ -925,6 +930,7 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           id?: string
+          logo_url?: string | null
           note?: string | null
           number?: number
           origin?: Database["public"]["Enums"]["design_origin"]
@@ -1482,6 +1488,11 @@ export type Database = {
       my_seller_invite: { Args: never; Returns: string }
       my_store_id: { Args: never; Returns: string }
       pedido_publico: { Args: { p_order_id: string }; Returns: Json }
+      portada_de_tienda: { Args: { p_store_id: string }; Returns: string }
+      publicar_diseno: {
+        Args: { p_bloques: Json; p_logo_url: string; p_theme_overrides: Json }
+        Returns: string
+      }
       referido_publico: {
         Args: { p_codigo: string; p_store_id: string }
         Returns: {
@@ -1489,6 +1500,7 @@ export type Database = {
           nombre: string
         }[]
       }
+      restaurar_version: { Args: { p_version_id: string }; Returns: string }
       rotate_seller_invite: { Args: never; Returns: string }
       run_insight: {
         Args: {
@@ -1544,7 +1556,12 @@ export type Database = {
       ai_generation_kind: "tienda" | "bloques" | "analisis" | "marketing"
       block_proposal_status: "propuesta" | "aplicada" | "rechazada" | "invalida"
       commission_status: "pendiente" | "confirmada" | "pagada" | "anulada"
-      design_origin: "inicial" | "alta" | "antes_de_cambiar_plantilla"
+      design_origin:
+        | "inicial"
+        | "alta"
+        | "antes_de_cambiar_plantilla"
+        | "antes_de_publicar"
+        | "antes_de_restaurar"
       order_status:
         | "pendiente"
         | "pagado"
@@ -1690,7 +1707,13 @@ export const Constants = {
       ai_generation_kind: ["tienda", "bloques", "analisis", "marketing"],
       block_proposal_status: ["propuesta", "aplicada", "rechazada", "invalida"],
       commission_status: ["pendiente", "confirmada", "pagada", "anulada"],
-      design_origin: ["inicial", "alta", "antes_de_cambiar_plantilla"],
+      design_origin: [
+        "inicial",
+        "alta",
+        "antes_de_cambiar_plantilla",
+        "antes_de_publicar",
+        "antes_de_restaurar",
+      ],
       order_status: [
         "pendiente",
         "pagado",

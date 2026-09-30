@@ -9,9 +9,10 @@ import { isSupabaseConfigured } from "@/lib/env"
 import { formatDate } from "@/lib/format"
 import { CambiarPlantilla } from "@/components/panel/cambiar-plantilla"
 import { Encabezado } from "@/components/panel/piezas"
+import { RestaurarVersion } from "@/components/panel/restaurar-version"
 import { Miniatura } from "@/components/plantillas/miniatura"
 import type { DesignOrigin } from "@/types"
-import { cambiarPlantilla } from "./acciones"
+import { cambiarPlantilla, restaurarVersion } from "./acciones"
 
 export const metadata = { title: "Apariencia" }
 
@@ -19,6 +20,8 @@ const ORIGENES: Record<DesignOrigin, string> = {
   alta: "Al crear la tienda",
   inicial: "Diseño que tenía la tienda",
   antes_de_cambiar_plantilla: "Antes de cambiar de plantilla",
+  antes_de_publicar: "Antes de publicar cambios",
+  antes_de_restaurar: "Antes de restaurar una versión",
 }
 
 /**
@@ -150,7 +153,8 @@ export default async function AparienciaPage() {
         <Encabezado etiqueta="Historial de diseño" />
         <p className="mt-3 max-w-[58ch] text-sm leading-relaxed opacity-70">
           Antes de cada cambio guardamos cómo estaba tu tienda: la plantilla,
-          las secciones y sus textos. Nada de lo que armaste se pierde.
+          los colores, el logo, las secciones y sus textos. Puedes volver a
+          cualquiera de estas versiones, y lo de ahora también queda guardado.
         </p>
 
         {versiones.length === 0 ? (
@@ -160,7 +164,7 @@ export default async function AparienciaPage() {
             {versiones.map((version) => (
               <li
                 key={version.id}
-                className="grid grid-cols-[auto_1fr_auto] items-baseline gap-x-4 gap-y-1 border-b border-tinta/15 py-4"
+                className="grid grid-cols-[auto_1fr] items-baseline gap-x-4 gap-y-1 border-b border-tinta/15 py-3 sm:grid-cols-[auto_1fr_auto_auto] sm:items-center"
               >
                 <span className="tabular font-titular text-lg font-bold">
                   {String(version.numero).padStart(2, "0")}
@@ -173,9 +177,16 @@ export default async function AparienciaPage() {
                     {version.nota ?? version.plantilla}
                   </span>
                 </span>
-                <span className="tabular text-xs opacity-55">
+                <span className="tabular col-start-2 text-xs opacity-55 sm:col-start-auto">
                   {formatDate(version.fecha)}
                 </span>
+                <RestaurarVersion
+                  version={version.id}
+                  numero={version.numero}
+                  descripcion={`${ORIGENES[version.origen]} · ${formatDate(version.fecha)}`}
+                  restaurar={restaurarVersion}
+                  className="col-start-2 -my-1 sm:col-start-auto sm:ml-4"
+                />
               </li>
             ))}
           </ol>
