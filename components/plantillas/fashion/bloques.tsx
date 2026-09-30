@@ -240,7 +240,38 @@ function Grilla({ bloque, tienda, codigo }: PropsBloque) {
 function Texto({ bloque }: PropsBloque) {
   const titulo = texto(bloque, "title")
   const cuerpo = texto(bloque, "body")
-  if (!titulo && !cuerpo) return null
+  const foto = texto(bloque, "imageUrl")
+  if (!titulo && !cuerpo && !foto) return null
+
+  // Con foto, la foto manda: vertical y grande, como en una revista de moda.
+  if (foto) {
+    return (
+      <section className="mx-auto grid w-full max-w-7xl gap-8 px-5 py-14 md:grid-cols-2 md:items-center md:gap-16 md:py-20">
+        <div className="relative aspect-[4/5] overflow-hidden bg-tinta/5">
+          <Image
+            src={foto}
+            alt=""
+            fill
+            unoptimized
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover"
+          />
+        </div>
+        <div>
+          {titulo ? (
+            <h2 className="font-titular text-[clamp(2rem,7vw,4rem)] leading-[0.92]">
+              {titulo}
+            </h2>
+          ) : null}
+          {cuerpo ? (
+            <p className="mt-6 max-w-[58ch] text-lg leading-relaxed opacity-75">
+              {cuerpo}
+            </p>
+          ) : null}
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="mx-auto grid w-full max-w-7xl gap-6 px-5 py-14 md:grid-cols-[1fr_1.4fr] md:gap-16 md:py-20">

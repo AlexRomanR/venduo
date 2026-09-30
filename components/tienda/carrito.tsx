@@ -41,21 +41,30 @@ const Contexto = React.createContext<EstadoCarrito | null>(null)
  */
 export function ProveedorCarrito({
   slug,
+  muestra,
   children,
 }: {
   slug: string
+  /**
+   * Un carrito de ejemplo que vive solo en memoria: ni se lee ni se escribe
+   * el del navegador. Es el de la vista previa del editor, donde el dueño mira
+   * su tienda y no tiene que encontrarse después su propio carrito tocado.
+   */
+  muestra?: LineaCarrito[]
   children: React.ReactNode
 }) {
   const clave = `venduo:carrito:${slug}`
 
-  const [lineas, setLineas] = React.useState<LineaCarrito[]>([])
+  const [lineas, setLineas] = React.useState<LineaCarrito[]>(muestra ?? [])
   const [referido, setReferido] = React.useState<string | null>(null)
   // Hasta que no se leyó el almacenamiento no se dibuja el contador: pintar
   // cero y corregirlo un instante después se ve como un parpadeo, y en la
   // primera pantalla de una tienda eso parece un error.
-  const [listo, setListo] = React.useState(false)
+  const [listo, setListo] = React.useState(Boolean(muestra))
+  const deMuestra = Boolean(muestra)
 
   React.useEffect(() => {
+    if (deMuestra) return
     try {
       const crudo = window.localStorage.getItem(clave)
       if (crudo) {
@@ -71,16 +80,16 @@ export function ProveedorCarrito({
       // carrito perdido es molesto; una tienda que no abre es peor.
     }
     setListo(true)
-  }, [clave])
+  }, [clave, deMuestra])
 
   React.useEffect(() => {
-    if (!listo) return
+    if (!listo || deMuestra) return
     try {
       window.localStorage.setItem(clave, JSON.stringify({ lineas, referido }))
     } catch {
       // Sin almacenamiento el carrito dura lo que dure la pestaña.
     }
-  }, [clave, lineas, referido, listo])
+  }, [clave, lineas, referido, listo, deMuestra])
 
   const valor = React.useMemo<EstadoCarrito>(() => {
     const unidades = lineas.reduce((total, l) => total + l.cantidad, 0)

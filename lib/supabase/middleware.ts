@@ -7,6 +7,7 @@ import { slugDesdeHost } from "@/lib/tienda"
 /** Rutas que exigen sesión iniciada. */
 const PROTECTED_PREFIXES = [
   "/panel",
+  "/editor",
   "/vendedor",
   "/cuenta",
   "/crear",

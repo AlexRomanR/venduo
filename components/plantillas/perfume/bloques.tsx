@@ -207,10 +207,24 @@ function Categorias({ bloque, tienda, codigo }: PropsBloque) {
 function Texto({ bloque }: PropsBloque) {
   const titulo = texto(bloque, "title")
   const cuerpo = texto(bloque, "body")
-  if (!titulo && !cuerpo) return null
+  const foto = texto(bloque, "imageUrl")
+  if (!titulo && !cuerpo && !foto) return null
 
   return (
     <section className="mx-auto w-full max-w-3xl px-5 py-16 text-center md:py-24">
+      {/* En arco, como las demás fotos de Esencia. */}
+      {foto ? (
+        <div className="relative mx-auto mb-10 aspect-[4/5] w-full max-w-xs overflow-hidden rounded-t-full bg-tinta/[0.045]">
+          <Image
+            src={foto}
+            alt=""
+            fill
+            unoptimized
+            sizes="320px"
+            className="object-cover"
+          />
+        </div>
+      ) : null}
       <TituloDeSeccion titulo={titulo ?? ""} />
       {cuerpo ? (
         <p className="mx-auto mt-8 max-w-[56ch] text-lg leading-loose opacity-75">

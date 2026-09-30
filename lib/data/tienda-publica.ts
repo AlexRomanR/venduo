@@ -38,6 +38,11 @@ export interface TiendaPublica {
   productos: Product[]
   categorias: CategoriaPublica[]
   esDemo: boolean
+  /**
+   * Se está dibujando dentro del editor. Cada sección de la portada lleva
+   * entonces una marca con su id, para que tocarla la seleccione.
+   */
+  enEdicion?: boolean
 }
 
 /**
@@ -138,9 +143,7 @@ export const getTiendaPublica = cache(async function getTiendaPublica(
 
   const { data: tienda } = await supabase
     .from("stores")
-    .select(
-      "id, slug, name, description, logo_url, whatsapp, seller_network_enabled, commission_bps, is_published, template_key, theme_overrides"
-    )
+    .select(COLUMNAS_DE_TIENDA)
     .eq("slug", slug)
     .is("deleted_at", null)
     .maybeSingle()
@@ -152,6 +155,39 @@ export const getTiendaPublica = cache(async function getTiendaPublica(
   // leer la suya aunque esté despublicada, y no tiene que verla como pública.
   if (!tienda.is_published) return null
 
+  return completarTienda(supabase, tienda)
+})
+
+type Cliente = NonNullable<Awaited<ReturnType<typeof createClient>>>
+
+/** Lo que se lee de `stores` para armar una tienda. */
+export const COLUMNAS_DE_TIENDA =
+  "id, slug, name, description, logo_url, whatsapp, seller_network_enabled, commission_bps, is_published, template_key, theme_overrides"
+
+type FilaDeTienda = {
+  id: string
+  slug: string
+  name: string
+  description: string | null
+  logo_url: string | null
+  whatsapp: string | null
+  seller_network_enabled: boolean
+  commission_bps: number
+  template_key: string | null
+  theme_overrides: Json
+}
+
+/**
+ * Una tienda con su portada, su catálogo y sus categorías.
+ *
+ * Aparte de `getTiendaPublica` porque la vista previa del editor arma la misma
+ * tienda para su dueño, publicada o no: lo que ve tiene que ser exactamente lo
+ * que va a ver su comprador.
+ */
+export async function completarTienda(
+  supabase: Cliente,
+  tienda: FilaDeTienda
+): Promise<TiendaPublica> {
   const [{ data: pagina }, { data: productos }, { data: categorias }] =
     await Promise.all([
       supabase
@@ -217,7 +253,7 @@ export const getTiendaPublica = cache(async function getTiendaPublica(
     })),
     esDemo: false,
   }
-})
+}
 
 /** Un producto de la tienda pública. Devuelve `null` si no se sirve. */
 export async function getProductoPublico(

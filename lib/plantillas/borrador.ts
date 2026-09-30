@@ -15,6 +15,7 @@ import {
 import { TIPOS_DE_BLOQUE, type TipoDeBloque } from "@/lib/plantillas/bloques"
 import { FUENTES } from "@/lib/plantillas/fuentes"
 import {
+  camposVacios,
   esquemaDeSeccion,
   SECCIONES,
   type ReglasDeLaTienda,
@@ -55,6 +56,50 @@ export interface ContextoDeDiseno extends ReglasDeLaTienda {
 }
 
 export const MAXIMO_DE_SECCIONES = 30
+
+/** Lo que el servidor sabe de la tienda y el contexto necesita. */
+export interface DatosDeContexto {
+  /**
+   * `…/storage/v1/object/public/store-assets/{tienda}/`: de acá salen el logo
+   * y las fotos que sube la persona. `null` en modo demo, donde no se sube.
+   */
+  prefijoDeImagenes: string | null
+  /** Las fotos de sus productos, que también puede usar en una sección. */
+  fotosDeProductos: string[]
+  categorias: string[]
+}
+
+/**
+ * Las reglas del borrador para una tienda concreta.
+ *
+ * Lo arman el editor y el servidor con los mismos datos, así que lo que el
+ * editor deja pasar es lo que el servidor acepta al publicar. El servidor no
+ * confía en el que armó el navegador: lo vuelve a armar con lo que lee de la
+ * base.
+ */
+export function contextoDeDiseno(
+  base: Apariencia,
+  datos: DatosDeContexto
+): ContextoDeDiseno {
+  const fotos = new Set(datos.fotosDeProductos)
+  const categorias = new Set(
+    datos.categorias.map((nombre) => nombre.trim().toLowerCase())
+  )
+  // La misma forma que exige `publicar_diseno`: la carpeta de la tienda y sin
+  // nada después del nombre del archivo.
+  const deLaTienda = (url: string) =>
+    datos.prefijoDeImagenes !== null &&
+    url.length < 500 &&
+    url.startsWith(datos.prefijoDeImagenes) &&
+    !/[?#]|\.\./.test(url.slice(datos.prefijoDeImagenes.length))
+
+  return {
+    base,
+    imagenPermitida: (url) => deLaTienda(url) || fotos.has(url),
+    logoPermitido: deLaTienda,
+    categoriaExiste: (nombre) => categorias.has(nombre.trim().toLowerCase()),
+  }
+}
 
 /* -------------------------------------------------------------------------
  * Operaciones
@@ -372,13 +417,16 @@ export function problemasParaPublicar(
 
   const secciones: Seccion[] = []
   for (const seccion of leido.secciones) {
-    const definicion = SECCIONES[seccion.tipo]
     const props = esquemaDeSeccion(seccion.tipo, contexto).safeParse(
       seccion.props
     )
     if (!props.success) {
       problemas.push(...mensajes(props.error, seccion.tipo))
       continue
+    }
+    // Lo oculto no lo ve nadie: puede quedar a medio escribir.
+    if (seccion.visible) {
+      problemas.push(...camposVacios(seccion.tipo, props.data))
     }
     secciones.push({ ...seccion, props: props.data })
   }
@@ -497,6 +545,8 @@ export function cambiosEntre(
   const despues = combinarApariencia(base, borrador.personalizacion)
 
   for (const ruta of RUTAS_DE_AJUSTE) {
+    // Sale solo del color de los botones: contarlo aparte es ruido.
+    if (ruta === "colores.senalAlta") continue
     const [grupo, clave] = ruta.split(".") as [keyof Apariencia, string]
     const valorAntes = (antes[grupo] as Record<string, unknown>)[clave]
     const valorDespues = (despues[grupo] as Record<string, unknown>)[clave]

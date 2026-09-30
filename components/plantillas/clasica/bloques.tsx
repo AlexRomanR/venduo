@@ -57,26 +57,50 @@ function Titulo({ children }: { children: React.ReactNode }) {
 function Portada({ bloque }: PropsBloque) {
   const accion = accionDePortada(bloque)
   const bajada = texto(bloque, "subtitle")
+  // Solo la foto propia: sin ella, la portada editorial sigue siendo
+  // tipográfica, como siempre fue.
+  const foto = texto(bloque, "imageUrl")
 
   return (
     <section className="py-20 md:py-28">
-      <div className="mx-auto w-full max-w-5xl px-5">
-        <h1 className="max-w-[16ch] font-titular text-[clamp(2.5rem,9vw,5rem)] leading-[0.98] font-extrabold tracking-[-0.04em]">
-          {texto(bloque, "title") ?? "Bienvenido"}
-        </h1>
-        {bajada ? (
-          <p className="mt-6 max-w-[52ch] text-lg leading-relaxed opacity-70">
-            {bajada}
-          </p>
-        ) : null}
-        {accion ? (
-          <a
-            href="#catalogo"
-            className="mt-10 inline-flex min-h-12 items-center gap-2 rounded-plantilla bg-senal px-6 font-semibold text-white transition-colors hover:bg-senal-alta"
-          >
-            {accion}
-            <ArrowRight aria-hidden="true" className="size-4" />
-          </a>
+      <div
+        className={cn(
+          "mx-auto w-full max-w-5xl px-5",
+          foto &&
+            "grid gap-10 md:grid-cols-[1.3fr_1fr] md:items-center md:gap-14"
+        )}
+      >
+        <div>
+          <h1 className="max-w-[16ch] font-titular text-[clamp(2.5rem,9vw,5rem)] leading-[0.98] font-extrabold tracking-[-0.04em]">
+            {texto(bloque, "title") ?? "Bienvenido"}
+          </h1>
+          {bajada ? (
+            <p className="mt-6 max-w-[52ch] text-lg leading-relaxed opacity-70">
+              {bajada}
+            </p>
+          ) : null}
+          {accion ? (
+            <a
+              href="#catalogo"
+              className="mt-10 inline-flex min-h-12 items-center gap-2 rounded-plantilla bg-senal px-6 font-semibold text-white transition-colors hover:bg-senal-alta"
+            >
+              {accion}
+              <ArrowRight aria-hidden="true" className="size-4" />
+            </a>
+          ) : null}
+        </div>
+        {foto ? (
+          <div className="relative aspect-[4/5] overflow-hidden border border-tinta/15 bg-tinta/5">
+            <Image
+              src={foto}
+              alt=""
+              fill
+              priority
+              unoptimized
+              sizes="(max-width: 768px) 100vw, 400px"
+              className="object-cover"
+            />
+          </div>
         ) : null}
       </div>
     </section>
@@ -226,16 +250,38 @@ function Categorias({ bloque, tienda, codigo }: PropsBloque) {
 function Texto({ bloque }: PropsBloque) {
   const titulo = texto(bloque, "title")
   const cuerpo = texto(bloque, "body")
-  if (!cuerpo && !titulo) return null
+  const foto = texto(bloque, "imageUrl")
+  if (!cuerpo && !titulo && !foto) return null
 
   return (
     <Seccion>
-      {titulo ? <Titulo>{titulo}</Titulo> : null}
-      {cuerpo ? (
-        <p className="mt-6 max-w-[62ch] text-lg leading-relaxed opacity-75">
-          {cuerpo}
-        </p>
-      ) : null}
+      <div
+        className={cn(
+          foto &&
+            "grid gap-10 md:grid-cols-[1.2fr_1fr] md:items-center md:gap-14"
+        )}
+      >
+        <div>
+          {titulo ? <Titulo>{titulo}</Titulo> : null}
+          {cuerpo ? (
+            <p className="mt-6 max-w-[62ch] text-lg leading-relaxed opacity-75">
+              {cuerpo}
+            </p>
+          ) : null}
+        </div>
+        {foto ? (
+          <div className="relative aspect-[4/5] overflow-hidden border border-tinta/15 bg-tinta/5">
+            <Image
+              src={foto}
+              alt=""
+              fill
+              unoptimized
+              sizes="(max-width: 768px) 100vw, 420px"
+              className="object-cover"
+            />
+          </div>
+        ) : null}
+      </div>
     </Seccion>
   )
 }

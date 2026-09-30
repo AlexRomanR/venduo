@@ -347,10 +347,13 @@ export interface ReglasDeLaTienda {
   categoriaExiste: (nombre: string) => boolean
 }
 
+/**
+ * Sin `.trim()` a propósito: el editor valida en cada tecla, y recortar ahí se
+ * comía el espacio entre dos palabras mientras se escribían.
+ */
 function esquemaDeTexto(campo: CampoDeTexto) {
   const texto = z
     .string()
-    .trim()
     .max(campo.max, `«${campo.etiqueta}» admite hasta ${campo.max} caracteres.`)
   return campo.requerido ? texto : texto.optional()
 }
@@ -379,7 +382,6 @@ function esquemaDeCampo(campo: Campo, reglas: ReglasDeLaTienda): z.ZodType {
     case "categoria":
       return z
         .string()
-        .trim()
         .max(60)
         .refine(
           (nombre) => nombre === "" || reglas.categoriaExiste(nombre),
@@ -474,6 +476,49 @@ export function leerPropiedades(
   }
 
   return salida
+}
+
+/**
+ * Lo obligatorio que quedó vacío, dicho para la persona.
+ *
+ * Mientras se edita, un campo vacío tiene que poder existir: se borra un
+ * título para escribir otro. Recién al publicar se pide completarlo, porque
+ * una pregunta sin respuesta en la tienda se ve rota.
+ */
+export function camposVacios(
+  tipo: TipoDeBloque,
+  props: Record<string, unknown>
+): string[] {
+  const definicion = SECCIONES[tipo]
+  const vacio = (valor: unknown) =>
+    typeof valor !== "string" || valor.trim() === ""
+  const faltan: string[] = []
+
+  for (const campo of definicion.campos) {
+    if (
+      (campo.tipo === "texto" || campo.tipo === "parrafo") &&
+      campo.requerido &&
+      vacio(props[campo.clave])
+    ) {
+      faltan.push(`${definicion.nombre}: completa «${campo.etiqueta}».`)
+    }
+
+    if (campo.tipo === "lista" && Array.isArray(props[campo.clave])) {
+      ;(props[campo.clave] as Array<Record<string, unknown>>).forEach(
+        (elemento, indice) => {
+          for (const sub of campo.campos) {
+            if (sub.requerido && vacio(elemento?.[sub.clave])) {
+              faltan.push(
+                `${definicion.nombre}: completa «${sub.etiqueta}» de ${campo.elemento} ${indice + 1}.`
+              )
+            }
+          }
+        }
+      )
+    }
+  }
+
+  return faltan
 }
 
 function leerElemento(

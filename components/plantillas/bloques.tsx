@@ -1,4 +1,5 @@
 import { esTipoDeBloque, type TipoDeBloque } from "@/lib/plantillas/bloques"
+import { SECCIONES } from "@/lib/plantillas/secciones"
 import type { TiendaPublica } from "@/lib/data/tienda-publica"
 import type { KitDeTienda } from "@/components/plantillas/kit"
 
@@ -7,6 +8,11 @@ import type { KitDeTienda } from "@/components/plantillas/kit"
  *
  * Un tipo desconocido no se dibuja: puede llegar un bloque sembrado antes de
  * que exista su componente, y eso no tiene que romper la tienda.
+ *
+ * Dentro del editor cada bloque va envuelto en una marca con su id y su
+ * nombre: es lo que permite tocar una sección de la vista previa para
+ * editarla. Afuera del editor no se agrega nada, y la tienda pública queda
+ * exactamente igual.
  */
 export function Bloques({
   componentes,
@@ -26,13 +32,26 @@ export function Bloques({
     }
 
     const Componente = componentes[bloque.tipo]
-    return (
+    const dibujado = (
       <Componente
         key={bloque.id}
         bloque={bloque}
         tienda={tienda}
         codigo={codigo}
       />
+    )
+
+    return tienda.enEdicion ? (
+      <div
+        key={bloque.id}
+        data-seccion={bloque.id}
+        data-nombre={SECCIONES[bloque.tipo].nombre}
+        className="relative"
+      >
+        {dibujado}
+      </div>
+    ) : (
+      dibujado
     )
   })
 }
