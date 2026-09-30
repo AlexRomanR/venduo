@@ -6,6 +6,7 @@ import {
   BarChart3,
   Megaphone,
   Package,
+  Palette,
   ShoppingBag,
   Users,
 } from "lucide-react"
@@ -100,6 +101,21 @@ export default async function PanelPage() {
       urgente: true,
     })
   }
+  // Mejora, no bloquea: una tienda que todavía luce igual a la plantilla.
+  const sinEstilo =
+    tienda &&
+    !tienda.logo_url &&
+    (!tienda.theme_overrides ||
+      (typeof tienda.theme_overrides === "object" &&
+        Object.keys(tienda.theme_overrides).length === 0))
+  if (sinEstilo) {
+    pendientes.push({
+      texto:
+        "Tu tienda todavía luce igual a la plantilla: dale tu logo y tus colores.",
+      href: "/editor",
+      urgente: false,
+    })
+  }
   if (resumen.vendedoresPendientes > 0) {
     pendientes.push({
       texto: `${formatNumber(resumen.vendedoresPendientes)} ${resumen.vendedoresPendientes === 1 ? "persona quiere" : "personas quieren"} vender para ti.`,
@@ -131,13 +147,22 @@ export default async function PanelPage() {
           </p>
         </div>
 
-        <Link
-          href={`/t/${resumen.tienda.slug}`}
-          className="group inline-flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-5 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
-        >
-          Ver mi tienda
-          <ArrowUpRight aria-hidden="true" className="size-4" />
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/editor"
+            className="inline-flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-5 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
+          >
+            <Palette aria-hidden="true" className="size-4" />
+            Editar mi tienda
+          </Link>
+          <Link
+            href={`/t/${resumen.tienda.slug}`}
+            className="group inline-flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-5 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
+          >
+            Ver mi tienda
+            <ArrowUpRight aria-hidden="true" className="size-4" />
+          </Link>
+        </div>
       </div>
 
       <AvisoSuscripcion suscripcion={resumen.suscripcion} />

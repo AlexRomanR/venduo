@@ -26,6 +26,9 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/v/{slug}`                   | Perfil público del vendedor                             | Público         |
 | `/crear`                      | Alta de la tienda, paso 1: elegir plantilla             | Requiere sesión |
 | `/crear/negocio`              | Alta de la tienda, paso 2: nombre y rubro               | Requiere sesión |
+| `/crear/listo`                | Alta de la tienda, paso 3: ofrece el editor             | Requiere sesión |
+| `/editor`                     | Editor de la tienda, a pantalla completa. `?paso=`      | Requiere sesión |
+| `/editor/vista-previa`        | La tienda del dueño con su borrador, para el `iframe`   | Requiere sesión |
 | `/sumarme`                    | Alta del vendedor: reparte los tres caminos             | Requiere sesión |
 | `/explorar/tiendas`           | Vitrina de tiendas que aceptan vendedores               | Requiere sesión |
 | `/explorar/productos`         | Vitrina de productos abiertos a vendedores              | Requiere sesión |
@@ -35,7 +38,7 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/panel/productos/nuevo`      | Alta de un producto                                     | Requiere sesión |
 | `/panel/productos/{id}`       | Edición de un producto                                  | Requiere sesión |
 | `/panel/productos/categorias` | Las categorías del catálogo                             | Requiere sesión |
-| `/panel/apariencia`           | La plantilla de la tienda, cambiarla y su historial     | Requiere sesión |
+| `/panel/apariencia`           | La puerta al editor, la plantilla y el historial        | Requiere sesión |
 | `/panel/estadisticas/pdf`     | El informe del tablero en PDF. `?g={id}` para uno solo  | Requiere sesión |
 | `/vendedor`                   | Panel del vendedor y su historial                       | Requiere sesión |
 | `/cuenta`                     | Datos de la persona, de su tienda y de su perfil        | Requiere sesión |
@@ -112,6 +115,9 @@ app/
   v/[slug]/           Historial laboral público del vendedor
   crear/              Alta de la tienda (layout propio)
     negocio/
+    listo/            El último paso: ofrece el editor
+  editor/             El editor de la tienda, a pantalla completa, y sus acciones
+    vista-previa/     La tienda con el borrador, dentro del iframe del editor
   sumarme/            Alta del vendedor: reparte los tres caminos
   explorar/           Vitrinas del vendedor (layout propio)
     tiendas/
@@ -127,6 +133,7 @@ components/
   auth/               Ingreso y registro
   onboarding/         Altas: marco, pasos y carrusel de plantillas
   explorar/           Vitrinas: navegación, buscador, paginación y listas
+  editor/             El editor: pasos, vista previa, secciones, imágenes y la IA
   cuenta/             Formularios de ajustes y foto de perfil
   insights/           Cuaderno, tablero y gráficos SVG
   pedidos/            Lista, detalle y estados de un pedido
@@ -148,8 +155,12 @@ lib/
   validation/         Esquemas zod compartidos
   ai/                 Capa de IA
   insights/           Lo que se puede preguntar, la lectura y el documento PDF
+  editor/             Del editor, sin dependencias de servidor: el protocolo con la
+                      vista previa, las paletas y letras sugeridas, los pasos y las
+                      imágenes (comprimir y subir, solo navegador)
   plantillas/         La base de cada plantilla: tokens, esquema de la apariencia,
-                      registro y qué significa cada bloque
+                      registro, qué significa cada bloque, los campos de cada
+                      sección y el borrador del editor con sus operaciones
   demo-data.ts        Datos de ejemplo del modo demo
   estilos.ts          Clases del vestido editorial de los controles
   tienda.ts           El enlace de una tienda, sus rutas internas y el slug de un subdominio

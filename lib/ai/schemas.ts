@@ -1,6 +1,8 @@
 import { z } from "zod"
 
 import { CURRENCY } from "@/lib/format"
+import { RUTAS_DE_AJUSTE } from "@/lib/plantillas/apariencia"
+import { TIPOS_DE_BLOQUE } from "@/lib/plantillas/bloques"
 
 /* -------------------------------------------------------------------------
  * Entradas (formularios y cuerpos de request)
@@ -135,3 +137,53 @@ export const marketingCampaignSchema = z.object({
     .max(4),
 })
 export type MarketingCampaign = z.infer<typeof marketingCampaignSchema>
+
+/**
+ * Lo que la IA propone para la tienda: operaciones, nunca el estado final.
+ *
+ * Son las mismas operaciones que usa el editor a mano, salvo el logo, que la
+ * IA no puede subir. Este esquema solo mira la forma: si una sección existe,
+ * si un color se lee o si una categoría es de la tienda lo decide
+ * `aplicarOperaciones`, que corre después y es todo o nada.
+ */
+const propiedadesDeSeccion = z
+  .record(z.string(), z.unknown())
+  .describe("Solo los campos que cambian, con sus claves exactas.")
+
+export const operacionDeIaSchema = z.discriminatedUnion("op", [
+  z.object({
+    op: z.literal("apariencia"),
+    ruta: z.enum(RUTAS_DE_AJUSTE),
+    valor: z.union([z.string(), z.number(), z.boolean(), z.null()]),
+  }),
+  z.object({ op: z.literal("restablecer"), ruta: z.enum(RUTAS_DE_AJUSTE) }),
+  z.object({
+    op: z.literal("agregar"),
+    tipo: z.enum(TIPOS_DE_BLOQUE),
+    posicion: z.number().int().min(0),
+    props: propiedadesDeSeccion,
+  }),
+  z.object({
+    op: z.literal("editar"),
+    seccion: z.string().describe("El id exacto de la sección."),
+    props: propiedadesDeSeccion,
+  }),
+  z.object({
+    op: z.literal("mover"),
+    seccion: z.string(),
+    posicion: z.number().int().min(0),
+  }),
+  z.object({
+    op: z.literal("mostrar"),
+    seccion: z.string(),
+    visible: z.boolean(),
+  }),
+  z.object({ op: z.literal("quitar"), seccion: z.string() }),
+])
+
+export const propuestaDeDisenoSchema = z.object({
+  /** Qué va a cambiar, en una frase y en primera persona. */
+  resumen: z.string().min(1).max(280),
+  operaciones: z.array(operacionDeIaSchema).max(20),
+})
+export type PropuestaDeDiseno = z.infer<typeof propuestaDeDisenoSchema>

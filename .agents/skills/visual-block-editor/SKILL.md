@@ -85,48 +85,55 @@ todos los kits heredan de la base editorial; cada kit lo reemplaza cuando quiera
 
 ---
 
-## El ciclo de edición con IA
+## El editor y la IA
 
-### 1. Se le da contexto
+El editor vive en `/editor` y todo lo que hace pasa por un **borrador** en el navegador:
+`{ personalizacion, logoUrl, secciones }`. El recorrido completo está en
+`docs/store-templates.md` §11; acá va lo que hay que respetar al tocarlo.
 
-Los tipos activos con su `props_schema`, y el estado actual de la página.
+### Un solo camino para cambiar el borrador
 
-### 2. La IA devuelve operaciones, no HTML
+Todo cambio es una lista de operaciones de `lib/plantillas/borrador.ts`:
 
-Una lista de `{ op, ... }` donde `op` es `add`, `remove`, `update` o `move`. Nunca el
-estado final de la página ni marcado: operaciones discretas que se pueden validar una por
-una y revertir.
+| `op`          | Qué hace                                               |
+| ------------- | ------------------------------------------------------ |
+| `apariencia`  | Un ajuste por su ruta: `colores.senal`, `forma.radio`… |
+| `restablecer` | Vuelve un ajuste al valor de la plantilla              |
+| `logo`        | Pone o quita el logo (la IA no puede)                  |
+| `agregar`     | Una sección nueva en una posición                      |
+| `editar`      | Solo los campos que cambian de una sección             |
+| `mover`       | Una sección a otra posición                            |
+| `mostrar`     | Ocultarla o mostrarla                                  |
+| `quitar`      | Sacarla de la portada                                  |
 
-### 3. Se guarda la propuesta con el estado previo
+`aplicarOperaciones` las aplica **todas o ninguna** y devuelve los motivos en palabras.
+La usa el editor a mano y la usa la IA: nunca escribir el borrador de otra forma, o lo que
+hace una persona y lo que hace la IA dejarían de validarse igual.
 
-```ts
-await supabase.from("block_edit_proposals").insert({
-  store_id: storeId,
-  page_id: pageId,
-  prompt: loQuePidioElUsuario, // not null
-  operations, // jsonb
-  snapshot_before: bloquesActuales,
-})
-```
+### Los campos de cada sección
 
-Las columnas son `prompt`, `operations` y **`snapshot_before`**. Guardar el estado previo
-es lo que habilita deshacer, y en una demostración en vivo eso vale mucho.
+`lib/plantillas/secciones.ts` dice qué campos tiene cada tipo, con su etiqueta, su largo y
+un ejemplo inicial. De esa tabla salen **los formularios, los esquemas zod y lo que la IA
+sabe de cada sección**. Un campo nuevo se agrega ahí y en `block_types.props_schema`, con
+los mismos límites.
 
-### 4. Se valida antes de aplicar
+### La propuesta de la IA
 
-Cada operación se comprueba contra el esquema del tipo de bloque correspondiente:
+1. `proponerEdicion` recibe el pedido, la apariencia, las secciones, las categorías y las
+   imágenes que puede usar. Devuelve operaciones, nunca HTML ni el estado final.
+2. `proponerCambios` las aplica al borrador de prueba con el contraste exigido. Si fallan,
+   el modelo recibe los motivos para **un** segundo intento.
+3. Se registra en `block_edit_proposals`: `prompt`, `operations`, **`snapshot_before`** y
+   `theme_before`, con estado `propuesta` o `invalida` y los errores en
+   `validation_errors`.
+4. La persona la ve en la vista previa y decide. `aplicada` quiere decir que entró a su
+   borrador —un solo paso de deshacer—; `rechazada`, que la descartó.
 
-- ¿El `block_type_key` existe y está activo?
-- ¿Las propiedades cumplen su `props_schema`?
-- ¿La página pertenece a la tienda del usuario?
-- ¿La posición está dentro de rango?
+### Publicar
 
-Si algo falla, la propuesta queda como `invalida` con los errores en
-`validation_errors`. **No se aplica parcialmente.**
-
-### 5. Se aplica en una transacción
-
-Estados: `propuesta` → `aplicada`, o `rechazada` / `invalida`.
+Nada llega a la tienda hasta **publicar**: `publicar_diseno` guarda una versión y escribe
+apariencia, logo y secciones en una transacción. Nunca escribir `store_blocks` ni
+`theme_overrides` con `update` sueltos desde el editor.
 
 ---
 
@@ -152,9 +159,12 @@ La tienda pública es lo que ve un comprador desde el celular: arrancar el dise�
 
 - [ ] El tipo nuevo tiene fila en `block_types` **y** componente en `BLOQUES_CLASICOS`.
 - [ ] El bloque se ve bien en cada plantilla, no solo en la editorial.
-- [ ] La propuesta guarda `prompt`, `operations` y `snapshot_before`.
+- [ ] El campo nuevo está en `secciones.ts` **y** en `block_types.props_schema`, con los
+      mismos límites.
+- [ ] La propuesta guarda `prompt`, `operations`, `snapshot_before` y `theme_before`.
 - [ ] Una operación inválida no se aplica ni a medias.
+- [ ] La sección se puede tocar en la vista previa del editor y editar en su formulario.
 - [ ] Un `block_type_key` desconocido se omite sin romper la tienda.
-- [ ] Deshacer restaura el estado previo.
+- [ ] Deshacer revierte una propuesta de la IA entera, en un paso.
 - [ ] La página se ve bien en 375 px.
 - [ ] Los bloques ocultos no aparecen en la tienda pública.

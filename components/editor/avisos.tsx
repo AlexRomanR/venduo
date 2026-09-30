@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight, History } from "lucide-react"
+import { ArrowRight, History, WandSparkles } from "lucide-react"
 
 import { formatDate } from "@/lib/format"
 import { useEditor } from "@/components/editor/contexto"
@@ -51,7 +51,7 @@ export function Recuperar() {
  * que nada llega al cliente sin publicar.
  */
 export function Bienvenida({ alEmpezar }: { alEmpezar: () => void }) {
-  const { tienda } = useEditor()
+  const { tienda, ia, irAPaso } = useEditor()
 
   return (
     <div className="mx-5 mt-5 border-2 border-tinta p-4 motion-safe:animate-in motion-safe:duration-500 motion-safe:fade-in motion-safe:slide-in-from-bottom-2">
@@ -66,14 +66,32 @@ export function Bienvenida({ alEmpezar }: { alEmpezar: () => void }) {
         <li>Toca una sección de la vista previa para editarla.</li>
         <li>Tus clientes no ven nada hasta que publiques.</li>
       </ul>
-      <button
-        type="button"
-        onClick={alEmpezar}
-        className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
-      >
-        Empezar
-        <ArrowRight aria-hidden="true" className="size-4" />
-      </button>
+      <div className="mt-3 flex flex-wrap gap-x-5">
+        <button
+          type="button"
+          onClick={alEmpezar}
+          className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+        >
+          Empezar
+          <ArrowRight aria-hidden="true" className="size-4" />
+        </button>
+        {tienda.descripcion ? (
+          <button
+            type="button"
+            onClick={() => {
+              alEmpezar()
+              irAPaso("portada")
+              ia.pedir(
+                "Escribe los textos de mi portada con lo que conté de mi negocio"
+              )
+            }}
+            className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-senal transition-colors hover:text-senal-alta"
+          >
+            <WandSparkles aria-hidden="true" className="size-4" />
+            Que la IA escriba mi portada
+          </button>
+        ) : null}
+      </div>
     </div>
   )
 }

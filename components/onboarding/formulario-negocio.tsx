@@ -84,7 +84,9 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
     }
 
     toast.success("Tu tienda está creada.")
-    router.push("/panel")
+    // El último paso del alta ofrece el editor, sin obligar: quien tiene
+    // apuro puede ir directo a cargar productos.
+    router.push("/crear/listo")
     router.refresh()
   }
 
@@ -136,8 +138,8 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
                 />
               </FormControl>
               <FormDescription className="text-xs text-tinta/55">
-                Escríbelo como se lo contarías a un cliente. Con esto la IA arma
-                tu catálogo y tus textos.
+                Escríbelo como se lo contarías a un cliente. Con esto la IA
+                escribe los textos de tu portada.
               </FormDescription>
               <FormMessage className="text-sm text-senal" />
             </FormItem>

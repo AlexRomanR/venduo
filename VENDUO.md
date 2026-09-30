@@ -472,11 +472,13 @@ Las tres llamadas pasan por una capa propia que traduce el pedido al formato del
 
 ### Edición de la tienda
 
-Sobre la plantilla que eligió el emprendedor, se le entrega a la IA el catálogo de tipos de bloque disponibles con sus esquemas de propiedades, y el estado actual de la página. La IA devuelve una **lista de operaciones**: agregar un bloque, quitarlo, editar sus propiedades o moverlo de posición.
+El emprendedor edita su tienda en `/editor`: un recorrido de seis pasos —su marca, la portada, el catálogo, la ficha de producto, el carrito y publicar— con la tienda de verdad en una vista previa al lado. Puede hacerlo a mano, arrastrando secciones y tocando textos, colores, letra, logo y fotos, o pidiéndoselo a la IA en sus palabras.
 
-El sistema guarda esa propuesta junto con el estado previo, valida cada operación contra el esquema del tipo de bloque correspondiente, y recién entonces la aplica en una transacción. Guardar el estado previo habilita deshacer, que en una demostración en vivo vale mucho.
+Se le entrega a la IA el catálogo de tipos de bloque con sus campos, la apariencia actual y las secciones de la portada. La IA devuelve una **lista de operaciones**: cambiar un ajuste de la apariencia, agregar un bloque, quitarlo, ocultarlo, editar sus propiedades o moverlo de posición. Son las mismas operaciones que usa el editor a mano.
 
-La misma lógica alcanza a la apariencia: una personalización de colores, letra o disposición sobre la plantilla se valida contra `personalizacionSchema` —incluido el contraste— y cada cambio deja una versión en `store_design_versions`. **La arquitectura y persistencia para esa edición ya están preparadas; la edición en vivo con IA todavía no está implementada.**
+El sistema las valida **todas o ninguna** —cada propiedad contra su tipo de bloque, cada color contra el contraste mínimo— y, si no pasan, le devuelve los motivos a la IA para un segundo intento. La propuesta se ve en la vista previa con lo que cambia marcado, y el emprendedor decide si la aplica: aplicarla es un solo paso de deshacer. Cada propuesta queda registrada con el estado previo.
+
+Nada llega al comprador hasta **publicar**, que guarda una versión del diseño anterior en `store_design_versions` y escribe todo en una sola transacción. Cualquier versión se puede restaurar desde Apariencia.
 
 ### Inteligencia de negocio
 

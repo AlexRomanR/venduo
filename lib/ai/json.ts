@@ -11,7 +11,7 @@ export function buildJsonInstruction(schema: ZodType, schemaName: string) {
   const jsonSchema = z.toJSONSchema(schema, { io: "output" })
 
   return [
-    `Respondé únicamente con un JSON válido que represente un objeto "${schemaName}".`,
+    `Responde únicamente con un JSON válido que represente un objeto "${schemaName}".`,
     "No incluyas explicaciones, comentarios ni bloques de código markdown.",
     "El JSON debe cumplir exactamente este JSON Schema:",
     JSON.stringify(jsonSchema, null, 2),

@@ -36,6 +36,7 @@ import {
   ShoppingBag,
   Text,
   Trash2,
+  WandSparkles,
   type LucideIcon,
 } from "lucide-react"
 import { toast } from "sonner"
@@ -51,6 +52,10 @@ import {
   EncabezadoDePaso,
   SiguientePaso,
 } from "@/components/editor/piezas"
+
+/** Lo que se le pide a la IA para el primer empujón. */
+export const ESCRIBIR_PORTADA =
+  "Escribe los textos de mi portada con lo que conté de mi negocio"
 
 export const ICONOS_DE_SECCION: Record<TipoDeBloque, LucideIcon> = {
   hero: IconoImagen,
@@ -79,7 +84,7 @@ function resumen(seccion: Seccion): string {
  * previa abre su formulario directamente.
  */
 export function PasoPortada() {
-  const { borrador, seleccion, seleccionar, irAPaso, tienda } = useEditor()
+  const { borrador, seleccion, seleccionar, irAPaso, tienda, ia } = useEditor()
   const [agregando, setAgregando] = React.useState(false)
   const secciones = borrador.presente.secciones
   const elegida = secciones.find((seccion) => seccion.id === seleccion)
@@ -110,6 +115,29 @@ export function PasoPortada() {
         />
       ) : (
         <>
+          {tienda.descripcion ? (
+            <div className="px-5 pb-4">
+              <button
+                type="button"
+                onClick={() => ia.pedir(ESCRIBIR_PORTADA)}
+                disabled={ia.cargando}
+                className="group flex w-full items-center gap-3 border-2 border-tinta p-3 text-left transition-colors hover:bg-tinta hover:text-papel disabled:opacity-50"
+              >
+                <WandSparkles
+                  aria-hidden="true"
+                  className="size-6 shrink-0 text-senal"
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold">
+                    Que la IA escriba tu portada
+                  </span>
+                  <span className="mt-0.5 block text-xs leading-relaxed opacity-65">
+                    Con lo que contaste de tu negocio al crear la tienda.
+                  </span>
+                </span>
+              </button>
+            </div>
+          ) : null}
           <ListaDeSecciones />
           <div className="px-5 pt-4 pb-2">
             <button

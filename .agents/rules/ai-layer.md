@@ -34,7 +34,7 @@ Se obtiene con `getAIProvider()` de `lib/ai/index.ts`. `getAIStatus()` devuelve
 
 ## Las tareas que existen
 
-En `lib/ai/tasks.ts` hay **cuatro**, y todas siguen el mismo molde:
+En `lib/ai/tasks.ts` hay **cinco**, y todas siguen el mismo molde:
 
 | Tarea                    | Devuelve                         |
 | ------------------------ | -------------------------------- |
@@ -42,8 +42,9 @@ En `lib/ai/tasks.ts` hay **cuatro**, y todas siguen el mismo molde:
 | `analyzeSales`           | `{ insight, provider, model }`   |
 | `generateCampaign`       | `{ campaign, provider, model }`  |
 | `buildInsightSql`        | `{ consulta, provider, model }`  |
+| `proponerEdicion`        | `{ propuesta, provider, model }` |
 
-Para agregar una cuarta:
+Para agregar otra:
 
 1. Escribir el esquema zod en `lib/ai/schemas.ts`.
 2. Escribir la tarea en `lib/ai/tasks.ts`: obtener el proveedor, llamar `generateObject`
@@ -195,9 +196,21 @@ comenta en palabras. No genera consultas.
 
 ## Edición de la tienda
 
-La IA devuelve una **lista de operaciones** sobre bloques (agregar, quitar, editar,
-mover), no HTML ni el estado final de la página. El sistema las valida contra el esquema
-de propiedades de cada tipo de bloque y recién entonces las aplica en una transacción,
-guardando el estado previo en `block_edit_proposals.snapshot_before` para poder deshacer.
+`proponerEdicion` devuelve una **lista de operaciones** —cambiar un ajuste de la
+apariencia, agregar, editar, mover, ocultar o quitar una sección—, nunca HTML ni el
+estado final. Son las mismas que usa el editor a mano (`lib/plantillas/borrador.ts`).
+
+`proponerCambios` (Server Action) las aplica sobre el borrador **todas o ninguna**, con el
+contraste exigido. Si no pasan, le devuelve los motivos al modelo para **un** segundo
+intento; si en ese intento solo fallan los colores, ofrece el resto y lo dice. La
+propuesta nunca se aplica sola: se ve en la vista previa y la persona decide. Queda en
+`block_edit_proposals` —con `snapshot_before` y `theme_before`— y en `ai_generations`.
+
+Lo que el modelo sabe de cada sección sale de `lib/plantillas/secciones.ts`, la misma
+tabla que arma los formularios: un campo nuevo ahí es un campo que la IA conoce.
+
+El modo demo lee el pedido por palabras clave y responde con los ids reales de la
+tienda (`lib/ai/providers/mock-propuesta.ts`): colores, letra, orden, secciones nuevas,
+textos de temporada y catálogo.
 
 Ver la skill `visual-block-editor` para el procedimiento completo.

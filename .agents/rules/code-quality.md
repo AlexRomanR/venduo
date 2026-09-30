@@ -71,12 +71,17 @@ No agregar dependencias sin necesidad. Todo lo que hace falta para el MVP ya est
 instalado; una biblioteca nueva es peso que alguien tiene que entender a las tres de la
 mañana.
 
-La única que se sumó después del arranque es **`@react-pdf/renderer`**, para el informe
+Se sumaron dos después del arranque. La primera es **`@react-pdf/renderer`**, para el informe
 del tablero: el PDF tiene que ser un archivo de verdad —que se abra en su pestaña, se
 guarde y se mande por WhatsApp— y eso no lo da imprimir la pantalla. Corre solo en el
 servidor y está declarada en `serverExternalPackages`. Arrastra un `postcss` con un aviso
 de seguridad por escapado de CSS; acá el CSS lo escribe el propio documento y la salida es
 un PDF, así que no aplica.
+
+La segunda es **`@dnd-kit`** (`core`, `sortable` y `utilities`), para reordenar las
+secciones en el editor. El arrastre nativo del navegador no funciona con el dedo, y
+hacerlo a mano con eventos de puntero es justo lo que falla en una demostración; esta
+trae el dedo, el teclado y los anuncios para lector de pantalla. Solo la carga `/editor`.
 
 No construir para requisitos hipotéticos. Si algo está en la lista de lo que no entra, no
 se escribe el andamiaje "por si acaso".

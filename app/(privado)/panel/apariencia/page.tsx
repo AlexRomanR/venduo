@@ -1,12 +1,15 @@
+import Link from "next/link"
 import { redirect } from "next/navigation"
-import { ArrowUpRight } from "lucide-react"
+import { ArrowRight, ArrowUpRight, WandSparkles } from "lucide-react"
 
 import {
   getAparienciaDeMiTienda,
   type PlantillaElegible,
 } from "@/lib/data/apariencia"
 import { isSupabaseConfigured } from "@/lib/env"
+import { BOTON_PRIMARIO } from "@/lib/estilos"
 import { formatDate } from "@/lib/format"
+import { cn } from "@/lib/utils"
 import { CambiarPlantilla } from "@/components/panel/cambiar-plantilla"
 import { Encabezado } from "@/components/panel/piezas"
 import { RestaurarVersion } from "@/components/panel/restaurar-version"
@@ -25,11 +28,10 @@ const ORIGENES: Record<DesignOrigin, string> = {
 }
 
 /**
- * La apariencia de la tienda: la plantilla que usa y a cuál puede pasarse.
+ * La apariencia de la tienda: la puerta al editor, la plantilla que usa y a
+ * cuál puede pasarse, y el historial para volver atrás.
  *
- * No hay editor acá, a propósito. La personalización por tienda y el historial
- * ya existen en la base —es lo que va a usar la edición con IA—, pero esta
- * pantalla solo elige plantilla y muestra qué quedó guardado.
+ * El editor vive aparte, en `/editor`, a pantalla completa: acá se entra.
  */
 export default async function AparienciaPage() {
   const datos = await getAparienciaDeMiTienda()
@@ -60,6 +62,29 @@ export default async function AparienciaPage() {
           ) : null}
         </p>
       </div>
+
+      <section className="flex flex-col gap-6 border-2 border-tinta p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+        <div className="max-w-[46ch]">
+          <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+            Editor de tu tienda
+          </p>
+          <h2 className="mt-2 font-titular text-[clamp(1.5rem,4vw,2rem)] leading-tight font-extrabold tracking-[-0.03em]">
+            Tu logo, tus colores y tu portada.
+          </h2>
+          <p className="mt-2 flex items-start gap-2 text-sm leading-relaxed opacity-70">
+            <WandSparkles
+              aria-hidden="true"
+              className="mt-0.5 size-4 shrink-0 text-senal"
+            />
+            Con tu tienda de verdad al lado, deshacer cuando quieras y la IA
+            para pedirle cambios en tus palabras.
+          </p>
+        </div>
+        <Link href="/editor" className={cn(BOTON_PRIMARIO, "shrink-0 px-7")}>
+          Abrir el editor
+          <ArrowRight aria-hidden="true" className="size-4" />
+        </Link>
+      </section>
 
       <section className="grid gap-8 lg:grid-cols-[1.15fr_1fr] lg:gap-14">
         <Miniatura clave={actual.clave} className="border-2 border-tinta" />

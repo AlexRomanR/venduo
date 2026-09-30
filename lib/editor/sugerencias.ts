@@ -1,3 +1,4 @@
+import type { ClaveDePaso } from "@/lib/editor/pasos"
 import {
   senalAltaDe,
   type Apariencia,
@@ -162,4 +163,31 @@ export function sinCambios(
 ): boolean {
   const propio = personalizacion[grupo]
   return !propio || Object.keys(propio).length === 0
+}
+
+/**
+ * Pedidos para tocar en la barra de la IA, según el paso. Son también la mejor
+ * explicación de qué se le puede pedir: nadie sabe qué escribirle a un campo
+ * vacío.
+ */
+export const PEDIDOS_SUGERIDOS: Record<ClaveDePaso, string[]> = {
+  marca: [
+    "Colores más cálidos",
+    "Hazla más elegante",
+    "Un estilo moderno y limpio",
+    "Botones redondos",
+  ],
+  portada: [
+    "Escribe los textos de mi portada",
+    "Sube las preguntas frecuentes",
+    "Agrega testimonios",
+    "Portada para el Día de la Madre",
+  ],
+  catalogo: [
+    "Fotos cuadradas en 4 columnas",
+    "Que los productos se vean más grandes",
+  ],
+  producto: ["Colores más cálidos", "Hazla más elegante"],
+  carrito: ["Colores más frescos", "Botones redondos"],
+  publicar: [],
 }

@@ -1,9 +1,14 @@
 import { redirect } from "next/navigation"
 
+import { getAIStatus } from "@/lib/ai"
 import { getDisenoParaEditar } from "@/lib/data/editor"
 import { esClaveDePaso } from "@/lib/editor/pasos"
 import { Editor } from "@/components/editor/editor"
-import { publicarDiseno } from "./acciones"
+import { decidirPropuesta, proponerCambios, publicarDiseno } from "./acciones"
+
+// Pedirle un cambio a la IA puede llevar dos vueltas al modelo: la segunda
+// corrige lo que la primera no pudo aplicar.
+export const maxDuration = 60
 
 export const metadata = {
   title: "Editar tu tienda",
@@ -34,6 +39,9 @@ export default async function EditorPage({
       pasoInicial={esClaveDePaso(paso) ? paso : "marca"}
       bienvenida={bienvenida === "1"}
       publicar={publicarDiseno}
+      proponer={proponerCambios}
+      decidir={decidirPropuesta}
+      iaDemo={getAIStatus().demo}
     />
   )
 }

@@ -106,6 +106,7 @@ Las otras funciones del servidor son `join_store(p_store_slug, p_invite_code)`,
 `take_product(p_product_id)`, `my_seller_invite()`, `rotate_seller_invite()`,
 `apply_template(p_store_id, p_template_key)`,
 `change_store_template(p_template_key, p_keep_sections)`,
+`publicar_diseno(p_theme_overrides, p_logo_url, p_bloques)`, `restaurar_version(p_version_id)`,
 `create_store(p_name, p_description, p_template_key, p_sellers, p_commission_bps)`,
 `run_insight(...)` y las dos del historial público, `seller_public_stats(p_slug)` y
 `seller_public_stores(p_slug)`.
@@ -161,6 +162,17 @@ comprueban dueño y por eso no se exponen: tienen `revoke` para `anon` y `authen
 
 Las páginas que siembra una plantilla nacen **`publicada`**: en borrador, la política de
 lectura se las escondía al comprador anónimo mientras el dueño sí las veía.
+
+**Lo que arma el editor se publica con `publicar_diseno`**, no con `update` sueltos sobre
+`stores` y `store_blocks`: la función guarda antes una versión y escribe apariencia, logo
+y secciones en una sola transacción. La validación fina la hace zod en el servidor; la
+función impone dueño, tipos de bloque activos, el máximo de cada tipo y que el logo sea
+de la carpeta de esa tienda. `restaurar_version` es la vuelta, y también guarda antes.
+`portada_de_tienda` es interna, como `capture_design_version`.
+
+Las imágenes de la tienda van al bucket **`store-assets`**, no a `product-images`: cada
+tienda escribe y lista solo su carpeta —`{store_id}/…`— y el bucket rechaza lo que no sea
+JPG, PNG o WebP o pase de 5 MB. SVG no: puede traer código.
 
 ## Migraciones
 

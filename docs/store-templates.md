@@ -21,7 +21,7 @@ de plantilla sin perder nada y qué hay que hacer para sumar una plantilla nueva
 8. [Cambiar de plantilla](#8-cambiar-de-plantilla)
 9. [Las plantillas iniciales](#9-las-plantillas-iniciales)
 10. [Agregar una plantilla](#10-agregar-una-plantilla)
-11. [Preparado para versiones y para la IA](#11-preparado-para-versiones-y-para-la-ia)
+11. [El editor de la tienda](#11-el-editor-de-la-tienda)
 12. [Lo que no se construyó](#12-lo-que-no-se-construyó)
 13. [Límites conocidos](#13-límites-conocidos)
 
@@ -150,17 +150,18 @@ creer que ahí vivía la base.
 
 ### `store_design_versions`
 
-| Columna            | Qué es                                                                        |
-| ------------------ | ----------------------------------------------------------------------------- |
-| `store_id`         | La tienda. `on delete cascade`: la purga de una tienda se lleva su historial  |
-| `number`           | 1, 2, 3… por tienda. Nunca se reusa, ni siquiera después de un borrado lógico |
-| `origin`           | Por qué se guardó: `inicial`, `alta`, `antes_de_cambiar_plantilla`            |
-| `note`             | Texto para mostrar, p. ej. "Pasarela → Esencia"                               |
-| `template_key`     | La plantilla que tenía                                                        |
-| `template_version` | Contra qué versión de la base se guardó                                       |
-| `theme_overrides`  | La personalización que tenía                                                  |
-| `pages`            | Las páginas con sus bloques: `key`, `title`, `is_home`, `status`, `blocks[]`  |
-| `created_by`       | Quién hizo el cambio                                                          |
+| Columna            | Qué es                                                                                                        |
+| ------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `store_id`         | La tienda. `on delete cascade`: la purga de una tienda se lleva su historial                                  |
+| `number`           | 1, 2, 3… por tienda. Nunca se reusa, ni siquiera después de un borrado lógico                                 |
+| `origin`           | Por qué se guardó: `inicial`, `alta`, `antes_de_cambiar_plantilla`, `antes_de_publicar`, `antes_de_restaurar` |
+| `note`             | Texto para mostrar, p. ej. "Pasarela → Esencia"                                                               |
+| `template_key`     | La plantilla que tenía                                                                                        |
+| `template_version` | Contra qué versión de la base se guardó                                                                       |
+| `theme_overrides`  | La personalización que tenía                                                                                  |
+| `logo_url`         | El logo que tenía. Nulo en las versiones anteriores al editor, y es exacto: ninguna tienda tenía logo         |
+| `pages`            | Las páginas con sus bloques: `key`, `title`, `is_home`, `status`, `blocks[]`                                  |
+| `created_by`       | Quién hizo el cambio                                                                                          |
 
 **RLS:** el dueño lee las de su tienda. **No hay políticas de escritura**: las versiones
 las escriben solo las funciones. Una versión editable desde el cliente dejaría de ser un
@@ -184,12 +185,15 @@ que sea un objeto.
 
 ### Funciones
 
-| Función                                                  | Acceso      | Qué hace                                                                                                         |
-| -------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------- |
-| `change_store_template(p_template_key, p_keep_sections)` | Dueño       | Guarda una versión, cambia la plantilla, descarta la personalización y, si se pide, siembra las secciones nuevas |
-| `apply_template(p_store_id, p_template_key)`             | Dueño       | La usa `create_store` en el alta. Siembra y deja la versión 1                                                    |
-| `capture_design_version(p_store_id, p_origin, p_note)`   | **Interna** | Toma el punto de restauración. No comprueba dueño, así que no se expone                                          |
-| `seed_template_pages(p_store_id, p_template_key)`        | **Interna** | Siembra páginas **publicadas** y reemplaza los bloques de las que ya existían                                    |
+| Función                                                     | Acceso      | Qué hace                                                                                                         |
+| ----------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------- |
+| `change_store_template(p_template_key, p_keep_sections)`    | Dueño       | Guarda una versión, cambia la plantilla, descarta la personalización y, si se pide, siembra las secciones nuevas |
+| `apply_template(p_store_id, p_template_key)`                | Dueño       | La usa `create_store` en el alta. Siembra y deja la versión 1                                                    |
+| `capture_design_version(p_store_id, p_origin, p_note)`      | **Interna** | Toma el punto de restauración. No comprueba dueño, así que no se expone                                          |
+| `seed_template_pages(p_store_id, p_template_key)`           | **Interna** | Siembra páginas **publicadas** y reemplaza los bloques de las que ya existían                                    |
+| `publicar_diseno(p_theme_overrides, p_logo_url, p_bloques)` | Dueño       | Lo que publica el editor. Guarda una versión y escribe apariencia, logo y secciones en una transacción           |
+| `restaurar_version(p_version_id)`                           | Dueño       | Vuelve a una versión del historial. Guarda antes la que había                                                    |
+| `portada_de_tienda(p_store_id)`                             | **Interna** | La portada de la tienda; la crea si no existe                                                                    |
 
 Las internas tienen `revoke all ... from public, anon, authenticated`: solo las llaman otras
 funciones `security definer` que ya comprobaron la tienda.
@@ -444,12 +448,12 @@ perfil público y **el informe PDF de estadísticas**, que tiene su propia marca
 
 ### `/panel/apariencia`
 
+- **La puerta al editor**, arriba de todo: el editor vive aparte, en `/editor`, a pantalla
+  completa.
 - La plantilla actual, con su miniatura, rubro, descripción y rasgos. Si es una plantilla
   retirada, lo dice.
 - Las otras plantillas, cada una con **Usar {nombre}**.
-- El historial de diseño: las últimas ocho versiones, con su origen y fecha.
-
-No hay editor en esta pantalla, a propósito.
+- El historial de diseño: las últimas ocho versiones, con su origen, fecha y **Restaurar**.
 
 ---
 
@@ -588,52 +592,84 @@ ahí todas las plantillas lo dibujan. Cada kit lo reemplaza cuando quiera.
 
 ---
 
-## 11. Preparado para versiones y para la IA
+## 11. El editor de la tienda
 
-### Lo que ya existe
+`/editor`, a pantalla completa y fuera del armazón del panel. Seis pasos —Tu marca,
+Portada, Catálogo, Producto, Carrito y Publicar— con la tienda de verdad al lado. Se entra
+desde `/panel/apariencia`, desde el resumen del panel y al terminar el alta
+(`/crear/listo`).
 
-| Necesidad futura                | Lo que ya está                                                                                                                                    |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Guardar cambios                 | `capture_design_version` guarda plantilla, versión de la base, personalización y páginas con bloques                                              |
-| Deshacer / rehacer              | Versiones numeradas e inmutables por tienda                                                                                                       |
-| Restaurar una versión           | La fila tiene todo lo necesario para volver a ese estado sin otra consulta                                                                        |
-| Vista previa antes de publicar  | `store_pages.status` (`borrador` / `publicada`), y `resolverApariencia` acepta cualquier personalización: la de una versión o la de una propuesta |
-| Validar lo que proponga la IA   | `personalizacionSchema` (zod) y `props_schema` de cada bloque                                                                                     |
-| Rechazar colores ilegibles      | `coloresLegibles()` dentro del resolver                                                                                                           |
-| Operar sobre bloques sueltos    | `store_blocks` en filas, con `block_edit_proposals` y su `snapshot_before`                                                                        |
-| Que la IA no pueda inyectar CSS | Todo token es cerrado; `cssDeApariencia` solo arma texto desde tablas fijas                                                                       |
+### El borrador
 
-### Cómo se construiría encima
+**Nada de lo que se edita llega al comprador hasta publicar.** El editor trabaja sobre un
+**borrador en el navegador** —`{ personalizacion, logoUrl, secciones }`— con deshacer y
+rehacer (`components/editor/estado.ts`). Escribir seguido en un mismo campo es un solo
+paso. El borrador se guarda en el dispositivo y, al volver, se ofrece recuperarlo si lo
+publicado sigue siendo el mismo del que partió.
 
-1. **Sumar orígenes** al enum `design_origin`: `manual`, `antes_de_editar_con_ia`,
-   `antes_de_restaurar`.
-2. **Una tarea de IA** (`lib/ai/tasks.ts`) que reciba la apariencia resuelta, el esquema y
-   los bloques, y devuelva **operaciones** —`{ op: "set", ruta: "colores.senal", valor }`
-   o las de bloques que ya describe la skill `visual-block-editor`—, nunca el estado final.
-3. **Una función** `apply_design_proposal` que capture una versión, valide y aplique en una
-   transacción. La validación ya está escrita en zod.
-4. **Un cursor** en `stores` —la versión vigente— para que deshacer y rehacer se muevan
-   entre versiones sin crear una por cada paso.
-5. **La vista previa**: dibujar con `resolverApariencia(base, propuesta)` en una ruta que
-   solo vea el dueño, sin escribir nada.
+Todo cambio es una lista de **operaciones** (`lib/plantillas/borrador.ts`): `apariencia`,
+`restablecer`, `logo`, `agregar`, `editar`, `mover`, `mostrar` y `quitar`.
+`aplicarOperaciones` las aplica **todas o ninguna** y devuelve los motivos en palabras. Las
+usa el editor a mano y las usa la IA: lo que puede hacer una es exactamente lo que puede
+hacer la otra, validado igual.
 
-> **La arquitectura y persistencia necesarias para la futura edición de plantillas mediante
-> IA ya están preparadas, pero la funcionalidad de edición en vivo mediante IA todavía NO
-> está implementada.**
+Qué campos tiene cada sección, con su etiqueta, su largo y su ejemplo inicial, vive en
+`lib/plantillas/secciones.ts`. De esa tabla salen los formularios **y** los esquemas zod: no
+pueden desencontrarse.
+
+### La vista previa
+
+Un `<iframe>` a `/editor/vista-previa`, que dibuja la tienda del dueño —publicada o no—
+con el kit de su plantilla. El editor le manda el borrador por `postMessage`
+(`lib/editor/protocolo.ts`) y los dos lados validan cada mensaje con zod.
+
+- **Por qué un `iframe`:** las media queries responden a su ancho, así que el modo celular
+  es un celular de verdad; y los colores del borrador tiñen la tienda sin teñir los
+  controles del editor, que quedan en el mundo de Venduo.
+- **La apariencia se dibuja con `combinarApariencia`**, sin corregir el contraste: si algo
+  no se lee, la persona lo ve y lee por qué, en vez de ver otros colores sin entender.
+- Cada sección lleva `data-seccion` solo en el editor (`TiendaPublica.enEdicion`): tocarla
+  la selecciona y soltar una foto encima la usa. La tienda pública no cambia en nada.
+- Nada navega ni crea pedidos: los toques y los envíos de formulario se interceptan.
+
+### Publicar y restaurar
+
+`publicarDiseno` (Server Action) vuelve a armar las reglas con lo que lee de la base y
+valida el borrador entero —contraste y campos obligatorios incluidos— antes de llamar a
+`publicar_diseno`, que guarda una versión `antes_de_publicar` y escribe todo en una
+transacción. Las secciones que ya existían conservan su id; las quitadas se dan de baja.
+
+`restaurar_version` vuelve a cualquier versión y guarda antes la que había
+(`antes_de_restaurar`): restaurar nunca pierde nada.
+
+### La IA
+
+`proponerEdicion` (`lib/ai/tasks.ts`) recibe el pedido, la apariencia, las secciones, las
+categorías y las imágenes que puede usar, y devuelve operaciones. `proponerCambios` las
+prueba sobre el borrador —con el contraste exigido— y, si no pasan, le devuelve los motivos
+para un segundo intento. La propuesta se ve en la vista previa con lo que cambia marcado;
+aplicarla es un solo paso de deshacer. Todo queda en `block_edit_proposals` (con
+`theme_before`) y en `ai_generations`.
+
+### Las imágenes
+
+El logo y las fotos se comprimen en el navegador a WebP y van a `store-assets`, donde cada
+tienda escribe solo en su carpeta. El bucket rechaza lo que no sea JPG, PNG o WebP o pase
+de 5 MB. Una imagen de una sección solo puede salir de ese bucket o de las fotos de los
+productos de la tienda.
 
 ---
 
 ## 12. Lo que no se construyó
 
-Por pedido explícito, **no existe**:
+A propósito, **no existe**:
 
-- Editor visual.
-- Asistente de IA para la apariencia.
-- Generación automática de diseños.
-- Edición por lenguaje natural.
-- Vista previa en vivo de propuestas de IA.
-- Deshacer y rehacer completos, ni restaurar una versión desde la interfaz.
-- Ninguna pantalla que escriba `theme_overrides`: hoy toda tienda tiene `{}`.
+- Un lienzo libre, con elementos en posiciones de píxel. Arrastrar es reordenar secciones.
+- CSS, HTML o colores escritos a mano fuera de los tokens.
+- Colores por sección: los colores son de toda la tienda.
+- Subir fuentes: solo las que compila `next/font`.
+- Páginas aparte de la portada, o cambiar la estructura del catálogo, la ficha o el carrito.
+- Que la IA publique sola.
 
 ---
 
@@ -648,7 +684,9 @@ Por pedido explícito, **no existe**:
 - **El informe PDF no toma la plantilla.** Tiene su propia marca y sus fuentes se leen del
   disco.
 - **La vista previa de la galería es un dibujo**, no la tienda real con los productos de
-  quien la elige.
+  quien la elige. La del editor, en cambio, sí es la tienda real.
+- **La plantilla editorial no dibuja las grillas de productos de su portada**: muestra su
+  catálogo completo. El editor lo avisa en esas tiendas.
 - **No hay atributos por rubro** —talla para moda, mililitros o familia olfativa para
   perfumería—. Pedirían variantes en el carrito y en `create_order`, y eso es otro trabajo.
 - **El rojo de la base editorial está a 4,35:1 contra el papel**, un poco por debajo de lo

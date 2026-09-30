@@ -31,6 +31,11 @@ Tres reglas que se desprenden:
 - **El panel cambia la piel, no la estructura.** Las pantallas de trabajo son las mismas
   en todas las plantillas.
 
+**El editor de la tienda (`/editor`) es la excepción que confirma la regla:** sus
+controles van en el mundo de Venduo y solo la vista previa lleva la identidad de la
+tienda. Si los controles tomaran los colores del borrador, cambiarían bajo el dedo de
+quien está eligiendo un color.
+
 Esto reemplaza la regla anterior de "un solo mundo", que a su vez había reemplazado la de
 "dos mundos". Lo que se mantiene de las dos: quien trabaja y quien compra en la misma
 tienda ven la misma identidad, sin costuras entre pantallas.

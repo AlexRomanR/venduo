@@ -1,5 +1,6 @@
 ﻿import { z } from "zod"
 
+import { propuestaDeDemostracion } from "./mock-propuesta"
 import {
   AIError,
   type AIProvider,
@@ -242,6 +243,23 @@ export function createMockProvider(
           return {
             object: validado.data,
             raw: JSON.stringify(sugerido, null, 2),
+            provider: "mock",
+            model,
+          }
+        }
+      }
+
+      // Lo mismo para la edición de la tienda: la propuesta sale del pedido y
+      // de los ids reales de sus secciones, que vienen en el mensaje.
+      if (options.schemaName === "PropuestaDeDiseno") {
+        const pedido = options.messages.at(-1)?.content ?? ""
+        const sugerida = propuestaDeDemostracion(pedido)
+        const validada = options.schema.safeParse(sugerida)
+
+        if (validada.success) {
+          return {
+            object: validada.data,
+            raw: JSON.stringify(sugerida, null, 2),
             provider: "mock",
             model,
           }

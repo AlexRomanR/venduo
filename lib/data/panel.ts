@@ -77,7 +77,7 @@ export async function getMiTienda() {
   const { data } = await supabase
     .from("stores")
     .select(
-      "id, name, slug, is_published, template_key, commission_bps, seller_network_enabled"
+      "id, name, slug, is_published, template_key, commission_bps, seller_network_enabled, logo_url, theme_overrides"
     )
     .eq("owner_id", user.id)
     .is("deleted_at", null)

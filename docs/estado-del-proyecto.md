@@ -1,7 +1,7 @@
 # Estado del proyecto
 
 Qué está construido en Venduo y qué falta, contra el alcance del MVP de `VENDUO.md` §6.
-Actualizado el 17 de septiembre de 2026.
+Actualizado el 29 de septiembre de 2026.
 
 **Leyenda:** ✅ hecho · 🟡 hecho con un flujo provisorio o a medias · ❌ falta
 
@@ -13,7 +13,7 @@ Actualizado el 17 de septiembre de 2026.
 | --- | -------------------------------------------------------- | ------ |
 | 1   | Registro e ingreso del emprendedor                       | ✅     |
 | 2   | Selección de plantilla según rubro                       | ✅     |
-| 3   | Edición de la tienda asistida por IA                     | ❌     |
+| 3   | Edición de la tienda asistida por IA                     | ✅     |
 | 4   | Tienda pública real, navegable en móvil, con URL propia  | ✅     |
 | 5   | Productos con imagen, stock y condición                  | ✅     |
 | 6   | Carrito y checkout con datos del cliente                 | ✅     |
@@ -34,8 +34,9 @@ Actualizado el 17 de septiembre de 2026.
 
 - Registro e ingreso con correo y contraseña, eligiendo el rol: emprendedor o vendedor.
 - `/auth/destino` decide a dónde entra cada cuenta según sus datos, no según el rol.
-- Alta de la tienda en dos pasos (`/crear`): elegir plantilla y contar el negocio. Nace
-  con suscripción de prueba, invitación para vendedores y su versión inicial de diseño.
+- Alta de la tienda en tres pasos (`/crear`): elegir plantilla, contar el negocio y, en
+  `/crear/listo`, la oferta de personalizarla en el editor o hacerlo más tarde. Nace con
+  suscripción de prueba, invitación para vendedores y su versión inicial de diseño.
 - Alta del vendedor (`/sumarme`) por tres caminos: sumarse a una tienda, entrar con un
   código de invitación o tomar un producto suelto.
 
@@ -44,10 +45,35 @@ Actualizado el 17 de septiembre de 2026.
 - Dos plantillas con identidad propia: **Pasarela** (moda) y **Esencia** (perfumería).
 - La identidad llega a toda la tienda pública **y al panel del emprendedor**.
 - Cambio de plantilla desde `/panel/apariencia` sin perder productos, pedidos ni
-  vendedores, con historial de versiones.
-- Base de datos preparada para personalizar la apariencia y para editarla con IA más
-  adelante.
+  vendedores, con historial de versiones que se pueden **restaurar**.
 - Todo documentado en `docs/store-templates.md`.
+
+### Editor de la tienda (`/editor`)
+
+- Pantalla completa, en seis pasos: **Tu marca**, **Portada**, **Catálogo**, **Producto**,
+  **Carrito** y **Publicar**. Se puede saltar a cualquiera.
+- **Vista previa real** en un `iframe`: la tienda con el kit de su plantilla y sus
+  productos. En la computadora se mira como celular (390 px) o como computadora; en el
+  celular, la vista previa es la pantalla. Tocar una sección la abre para editarla y
+  soltar una foto encima la usa.
+- **Tu marca:** logo (se sube comprimido a `store-assets`), diez paletas que se leen,
+  colores propios con medidor de contraste y el tono legible más cercano, seis
+  combinaciones de letra, mayúsculas y forma de los botones.
+- **Portada:** secciones que se arrastran con el dedo o el teclado (`@dnd-kit`), se
+  ocultan, se quitan y se agregan desde una galería. Formulario de cada sección armado
+  desde su definición, con fotos subidas o de la biblioteca (lo subido y las fotos de los
+  productos).
+- **Catálogo:** foto cuadrada o vertical y columnas. **Producto** y **Carrito** muestran
+  cómo quedan con un producto real y un carrito de muestra.
+- **Borrador en el navegador** con deshacer y rehacer (Ctrl+Z), guardado en el
+  dispositivo y recuperable al volver. Nada llega al comprador hasta publicar.
+- **Publicar:** los cambios contados en palabras, antes y después, y `publicar_diseno`,
+  que guarda una versión y escribe todo en una transacción. Lo que no se lee o quedó vacío
+  no se publica, y se dice dónde se arregla.
+- **La IA:** una barra con sugerencias por paso. Devuelve operaciones que se validan todas
+  o ninguna, con un segundo intento si fallan; la propuesta se ve marcada en la vista
+  previa y se aplica o se descarta. "Que la IA escriba tu portada" usa la descripción del
+  alta. Funciona con el modo demo.
 
 ### Tienda pública (`/t/{slug}`)
 
@@ -70,7 +96,9 @@ Actualizado el 17 de septiembre de 2026.
 - **Vendedores**: la red, sus solicitudes y la invitación.
 - **Estadísticas**: preguntas en lenguaje natural, gráficos guardados, edición del gráfico
   por texto e informe en PDF (completo o de un gráfico).
-- **Apariencia**: la plantilla, cambiarla y el historial.
+- **Apariencia**: la puerta al editor, la plantilla, cambiarla y el historial, con
+  **Restaurar** en cada versión. El resumen también lleva al editor, y pide darle estilo
+  mientras la tienda luzca igual a la plantilla.
 - Barra lateral con contadores de lo que pide atención; se puede plegar y recuerda cómo
   quedó.
 
@@ -120,22 +148,7 @@ Falta:
 - Del producto: el plazo de liberación automática (se propone 7 días) y qué pasa si el
   emprendedor nunca marca el envío.
 
-### 2. Edición de la tienda con IA — prioridad alta
-
-Está en el alcance (punto 3) y es parte central de la promesa. La base está lista —bloques
-con esquema, propuestas con estado previo, historial de versiones, esquema validado de la
-apariencia—, pero **no hay ninguna pantalla ni tarea de IA que edite la tienda**.
-
-Falta:
-
-- La tarea de IA que devuelva operaciones sobre bloques y apariencia.
-- La función que valide y aplique la propuesta en una transacción, guardando una versión.
-- Deshacer, rehacer y restaurar versiones desde la interfaz.
-- Vista previa antes de aplicar.
-- Que el paso 2 del alta use la descripción del negocio para ajustar la plantilla: hoy
-  solo crea la tienda. La tarea `generateStoreBlueprint` existe pero no se usa.
-
-### 3. Marketing — prioridad media
+### 2. Marketing — prioridad media
 
 `/panel/marketing` es un marcador "Pronto". La tarea `generateCampaign` existe en la capa
 de IA pero no se usa.
@@ -146,20 +159,27 @@ Falta:
 - Publicar: plan A por API de Meta, plan B con enlaces de compartir y copiar. Se recomienda
   ir directo al plan B por el tiempo de revisión de Meta.
 
-### 4. Plantillas — prioridad baja
+### 3. Plantillas — prioridad baja
 
 - Más plantillas para los rubros que quedaron en la base editorial (tecnología, hogar,
   comida).
-- Personalizar colores y letra desde el panel (la base de datos ya lo soporta).
 - Atributos por rubro: talla y color en moda, mililitros o familia olfativa en
   perfumería. Piden variantes en el carrito y en `create_order`.
 
-### 5. Suscripción — prioridad baja
+### 4. Suscripción — prioridad baja
 
 Se modela el estado, no el cobro. Falta el bloqueo real al vencer la prueba (panel en
 solo lectura con exportación a CSV) y la purga a los 90 días.
 
-### 6. Pendientes chicos
+### 5. Pendientes chicos
+
+- **La plantilla editorial no dibuja las grillas de productos de su portada**: muestra
+  su catálogo completo. El editor lo avisa en esas tiendas, pero editar una grilla ahí no
+  se ve.
+- **Una propuesta de la IA puede tardar** entre 6 y 45 segundos: si la primera no pasa la
+  validación, hay un segundo intento. El editor lo dice mientras espera.
+- **`generateStoreBlueprint` sigue sin usarse**: inventa una tienda entera, con slug y
+  productos. "Que la IA escriba tu portada" se resolvió con la tarea del editor.
 
 - **Fotos en los datos de ejemplo.** Casi ningún producto tiene foto, y las plantillas se
   lucen con ellas. Importante antes de la demostración.

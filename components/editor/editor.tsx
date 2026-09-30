@@ -5,7 +5,10 @@ import Link from "next/link"
 import { ChevronDown, Redo2, Send, Undo2, X } from "lucide-react"
 import { toast } from "sonner"
 
-import type { ResultadoDePublicar } from "@/app/editor/acciones"
+import type {
+  ResultadoDePropuesta,
+  ResultadoDePublicar,
+} from "@/app/editor/acciones"
 import { ErrorDeImagen, subirImagen } from "@/lib/editor/imagenes"
 import type { ClaveDePaso } from "@/lib/editor/pasos"
 import type {
@@ -17,10 +20,17 @@ import {
   combinarApariencia,
   type TokenDeColor,
 } from "@/lib/plantillas/apariencia"
-import { contextoDeDiseno, type Borrador } from "@/lib/plantillas/borrador"
+import {
+  aplicarOperaciones,
+  contextoDeDiseno,
+  describirOperacion,
+  type Borrador,
+  type Operacion,
+} from "@/lib/plantillas/borrador"
 import { SECCIONES } from "@/lib/plantillas/secciones"
 import { cn } from "@/lib/utils"
 import type { DisenoParaEditar } from "@/lib/data/editor"
+import { Asistente } from "@/components/editor/asistente"
 import { Bienvenida, Recuperar } from "@/components/editor/avisos"
 import {
   ProveedorDelEditor,
@@ -47,6 +57,44 @@ function distinto(a: unknown, b: unknown) {
   return JSON.stringify(a) !== JSON.stringify(b)
 }
 
+/** Las secciones que toca una propuesta: las que cambia y las que agrega. */
+function seccionesTocadas(
+  antes: Borrador,
+  despues: Borrador,
+  operaciones: Operacion[]
+): string[] {
+  const nuevas = despues.secciones
+    .map((seccion) => seccion.id)
+    .filter((id) => !antes.secciones.some((s) => s.id === id))
+  const cambiadas = operaciones.flatMap((operacion) =>
+    "seccion" in operacion && operacion.op !== "quitar"
+      ? [operacion.seccion]
+      : []
+  )
+  return [...new Set([...nuevas, ...cambiadas])]
+}
+
+/** En qué pantalla de la tienda se ve mejor lo que cambia una propuesta. */
+function vistaDeLaPropuesta(operaciones: Operacion[]): Vista | null {
+  if (
+    operaciones.some(
+      (operacion) => "seccion" in operacion || operacion.op === "agregar"
+    )
+  ) {
+    return "inicio"
+  }
+  if (
+    operaciones.length > 0 &&
+    operaciones.every(
+      (operacion) =>
+        "ruta" in operacion && operacion.ruta.startsWith("disposicion.")
+    )
+  ) {
+    return "catalogo"
+  }
+  return null
+}
+
 /**
  * El editor de la tienda.
  *
@@ -62,11 +110,20 @@ export function Editor({
   pasoInicial,
   bienvenida,
   publicar,
+  proponer,
+  decidir,
+  iaDemo,
 }: {
   diseno: DisenoParaEditar
   pasoInicial: ClaveDePaso
   bienvenida: boolean
   publicar: (borrador: Borrador) => Promise<ResultadoDePublicar>
+  proponer: (entrada: {
+    pedido: string
+    borrador: Borrador
+  }) => Promise<ResultadoDePropuesta>
+  decidir: (entrada: { id: string; aplicada: boolean }) => Promise<void>
+  iaDemo: boolean
 }) {
   const contexto = React.useMemo(
     () => contextoDeDiseno(diseno.base, diseno.datos),
@@ -92,6 +149,17 @@ export function Editor({
   const [panelAbierto, setPanelAbierto] = React.useState(true)
   const panel = React.useRef<HTMLDivElement>(null)
   const [conBienvenida, setConBienvenida] = React.useState(bienvenida)
+  const [cargandoIa, setCargandoIa] = React.useState(false)
+  const [ultimoPedido, setUltimoPedido] = React.useState("")
+  const [errorIa, setErrorIa] = React.useState<string | null>(null)
+  const [mirandoAntes, setMirandoAntes] = React.useState(false)
+
+  // El borrador de este momento, para lo que llega de forma asíncrona: la
+  // persona pudo seguir editando mientras la IA pensaba.
+  const presente = React.useRef(borrador.presente)
+  React.useEffect(() => {
+    presente.current = borrador.presente
+  })
 
   const apariencia = React.useMemo(
     () => combinarApariencia(diseno.base, borrador.presente.personalizacion),
@@ -209,6 +277,99 @@ export function Editor({
     [soltarImagen]
   )
 
+  const pedirALaIa = React.useCallback(
+    async (pedido: string) => {
+      const limpio = pedido.trim()
+      if (limpio.length < 3) return
+
+      setUltimoPedido(limpio)
+      setCargandoIa(true)
+      setErrorIa(null)
+      setPropuesta(null)
+      setMirandoAntes(false)
+
+      const resultado = await proponer({
+        pedido: limpio,
+        borrador: presente.current,
+      })
+      setCargandoIa(false)
+
+      if (!resultado.ok) {
+        setErrorIa(resultado.error)
+        return
+      }
+
+      // Se aplica sobre el borrador de ahora y no sobre el que se mandó. Si
+      // ya no encaja, se dice en vez de pisar lo que la persona hizo.
+      const antes = presente.current
+      const aplicado = aplicarOperaciones(
+        antes,
+        resultado.operaciones,
+        contexto,
+        { exigirContraste: true }
+      )
+      if (!aplicado.ok) {
+        setErrorIa(
+          "Cambiaste algo mientras la IA pensaba y su propuesta ya no encaja. Pídeselo de nuevo."
+        )
+        if (resultado.id) void decidir({ id: resultado.id, aplicada: false })
+        return
+      }
+
+      setPropuesta({
+        id: resultado.id,
+        resumen: resultado.resumen,
+        aviso: resultado.aviso,
+        operaciones: resultado.operaciones,
+        // El tono al pasar el cursor sale solo del de los botones.
+        cambios: resultado.operaciones
+          .filter(
+            (operacion) =>
+              !("ruta" in operacion && operacion.ruta === "colores.senalAlta")
+          )
+          .map((operacion) => ({
+            texto: describirOperacion(operacion, antes),
+            color:
+              operacion.op === "apariencia" &&
+              operacion.ruta.startsWith("colores.") &&
+              typeof operacion.valor === "string"
+                ? operacion.valor
+                : undefined,
+          })),
+        borrador: aplicado.borrador,
+        marcas: seccionesTocadas(
+          antes,
+          aplicado.borrador,
+          resultado.operaciones
+        ),
+      })
+
+      const lugar = vistaDeLaPropuesta(resultado.operaciones)
+      if (lugar) setVistaForzada(lugar)
+      setPanelAbierto(true)
+    },
+    [proponer, decidir, contexto]
+  )
+
+  const aplicarPropuesta = React.useCallback(() => {
+    if (!propuesta) return
+    borrador.poner(propuesta.borrador)
+    if (propuesta.id) void decidir({ id: propuesta.id, aplicada: true })
+    setPropuesta(null)
+    setMirandoAntes(false)
+    toast.success("Listo, ya está en tu borrador.", {
+      description: "Si no te convence, deshazlo.",
+      action: { label: "Deshacer", onClick: () => borrador.deshacer() },
+    })
+  }, [propuesta, borrador, decidir])
+
+  const descartarPropuesta = React.useCallback(() => {
+    if (propuesta?.id) void decidir({ id: propuesta.id, aplicada: false })
+    setPropuesta(null)
+    setMirandoAntes(false)
+    setVistaForzada(null)
+  }, [propuesta, decidir])
+
   const conCambios = React.useMemo(() => {
     const pasos = new Set<ClaveDePaso>()
     const a = borrador.presente
@@ -231,10 +392,11 @@ export function Editor({
   }, [borrador.presente, borrador.publicado])
 
   const visible =
-    propuesta?.borrador ??
-    (paso === "publicar" && comparar === "antes"
-      ? borrador.publicado
-      : borrador.presente)
+    propuesta && !mirandoAntes
+      ? propuesta.borrador
+      : paso === "publicar" && comparar === "antes"
+        ? borrador.publicado
+        : borrador.presente
 
   const vista = vistaForzada ?? pasoDe(paso).vista
 
@@ -245,9 +407,9 @@ export function Editor({
       vista,
       productoId,
       seleccion: paso === "portada" ? seleccion : null,
-      marcas: propuesta?.marcas ?? [],
+      marcas: propuesta && !mirandoAntes ? propuesta.marcas : [],
     }),
-    [visible, vista, productoId, seleccion, paso, propuesta]
+    [visible, vista, productoId, seleccion, paso, propuesta, mirandoAntes]
   )
 
   const valor: ValorDelEditor = {
@@ -271,7 +433,18 @@ export function Editor({
     setComparar,
     propuesta,
     setPropuesta,
-    acciones: { publicar },
+    acciones: { publicar, proponer, decidir },
+    ia: {
+      pedir: (pedido: string) => void pedirALaIa(pedido),
+      pedido: ultimoPedido,
+      cargando: cargandoIa,
+      error: errorIa,
+      demo: iaDemo,
+      aplicar: aplicarPropuesta,
+      descartar: descartarPropuesta,
+      mirandoAntes,
+      setMirandoAntes,
+    },
     ultimoColor,
     setUltimoColor,
   }
@@ -370,6 +543,11 @@ export function Editor({
               {paso === "carrito" ? <PasoCarrito /> : null}
               {paso === "publicar" ? <PasoPublicar /> : null}
             </div>
+          </div>
+
+          {/* Fuera del desplazamiento: la IA queda a mano en todos los pasos. */}
+          <div className={cn(!panelAbierto && "hidden lg:block")}>
+            <Asistente />
           </div>
         </section>
 

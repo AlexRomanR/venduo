@@ -46,8 +46,8 @@ export default async function NegocioPage({
             Cuéntanos qué vendes.
           </h1>
           <p className="mt-5 max-w-[50ch] text-lg leading-relaxed opacity-70">
-            Con un párrafo alcanza. Es lo que la IA va a usar para llenar tu
-            catálogo, escribir las descripciones y ordenar las categorías.
+            Con un párrafo alcanza. Con esto la IA escribe los textos de tu
+            portada, y tú los ajustas a tu gusto.
           </p>
 
           <div className="mt-10">
