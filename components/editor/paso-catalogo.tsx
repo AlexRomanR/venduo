@@ -1,5 +1,7 @@
 "use client"
 
+import Link from "next/link"
+
 import { useEditor } from "@/components/editor/contexto"
 import {
   Aviso,
@@ -100,8 +102,14 @@ export function PasoCatalogo() {
       {productos.length === 0 ? (
         <div className="px-5 pb-5">
           <Aviso>
-            Todavía no cargaste productos. Cuando lo hagas, los vas a ver acá
-            con este diseño.
+            Todavía no cargaste productos: en la vista previa te mostramos unos
+            de ejemplo para que veas cómo quedan.{" "}
+            <Link
+              href="/panel/productos/nuevo"
+              className="font-semibold underline underline-offset-4"
+            >
+              Cargar los míos
+            </Link>
           </Aviso>
         </div>
       ) : null}

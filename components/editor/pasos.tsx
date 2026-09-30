@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  ChevronRight,
   LayoutGrid,
   LayoutTemplate,
   Package,
@@ -81,11 +82,12 @@ export function pasoDe(clave: ClaveDePaso): Paso {
 }
 
 /**
- * El recorrido en escritorio: los seis pasos a la vista, con el número y qué
- * se edita en cada uno. Se puede saltar a cualquiera; el orden es una
- * sugerencia, no una puerta.
+ * El recorrido en escritorio: los seis pasos en una fila, arriba, como las
+ * pestañas de un documento. Se puede saltar a cualquiera; el orden es una
+ * sugerencia, no una puerta. Arriba y no a un costado, para dejarle todo el
+ * ancho al panel y a la tienda.
  */
-export function RielDePasos({
+export function BarraDePasos({
   actual,
   conCambios,
   alElegir,
@@ -95,45 +97,52 @@ export function RielDePasos({
   alElegir: (paso: ClaveDePaso) => void
 }) {
   return (
-    <nav aria-label="Pasos del editor" className="flex flex-col py-4">
-      <ol>
+    <nav
+      aria-label="Pasos del editor"
+      className="overflow-x-auto border-b border-tinta/15 bg-papel px-2"
+    >
+      <ol className="flex min-w-max items-center">
         {PASOS.map((paso, indice) => {
           const activo = paso.clave === actual
           return (
-            <li key={paso.clave}>
+            <li key={paso.clave} className="flex items-center">
+              {indice > 0 ? (
+                <ChevronRight
+                  aria-hidden="true"
+                  className="size-3.5 shrink-0 opacity-25"
+                />
+              ) : null}
               <button
                 type="button"
                 onClick={() => alElegir(paso.clave)}
                 aria-current={activo ? "step" : undefined}
+                title={paso.bajada}
                 className={cn(
-                  "group relative flex w-full items-start gap-3 border-l-2 py-3 pr-4 pl-5 text-left transition-colors",
-                  activo
-                    ? "border-senal bg-tinta/[0.04]"
-                    : "border-transparent hover:bg-tinta/[0.03]"
+                  "relative flex h-12 items-center gap-2 px-3 text-sm font-semibold transition-colors xl:px-4",
+                  activo ? "text-tinta" : "opacity-55 hover:opacity-100"
                 )}
               >
                 <span
                   className={cn(
-                    "tabular mt-0.5 font-titular text-sm font-bold",
-                    activo ? "text-senal" : "opacity-45"
+                    "tabular font-titular text-xs font-bold",
+                    activo ? "text-senal" : "opacity-70"
                   )}
                 >
                   {String(indice + 1).padStart(2, "0")}
                 </span>
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-2 text-sm font-semibold">
-                    {paso.nombre}
-                    {conCambios.has(paso.clave) ? (
-                      <span
-                        aria-label="con cambios sin publicar"
-                        className="size-1.5 rounded-full bg-senal"
-                      />
-                    ) : null}
-                  </span>
-                  <span className="mt-0.5 block text-xs leading-snug opacity-55">
-                    {paso.bajada}
-                  </span>
-                </span>
+                {paso.nombre}
+                {conCambios.has(paso.clave) ? (
+                  <span
+                    aria-label="con cambios sin publicar"
+                    className="size-1.5 rounded-full bg-senal"
+                  />
+                ) : null}
+                {activo ? (
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-2 bottom-0 h-0.5 bg-senal motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in"
+                  />
+                ) : null}
               </button>
             </li>
           )

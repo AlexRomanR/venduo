@@ -51,7 +51,8 @@ Actualizado el 29 de septiembre de 2026.
 ### Editor de la tienda (`/editor`)
 
 - Pantalla completa, en seis pasos: **Tu marca**, **Portada**, **Catálogo**, **Producto**,
-  **Carrito** y **Publicar**. Se puede saltar a cualquiera.
+  **Carrito** y **Publicar**, en una barra arriba (abajo en el celular). Se puede saltar a
+  cualquiera.
 - **Vista previa real** en un `iframe`: la tienda con el kit de su plantilla y sus
   productos. En la computadora se mira como celular (390 px) o como computadora; en el
   celular, la vista previa es la pantalla. Tocar una sección la abre para editarla y
@@ -64,7 +65,10 @@ Actualizado el 29 de septiembre de 2026.
   desde su definición, con fotos subidas o de la biblioteca (lo subido y las fotos de los
   productos).
 - **Catálogo:** foto cuadrada o vertical y columnas. **Producto** y **Carrito** muestran
-  cómo quedan con un producto real y un carrito de muestra.
+  cómo quedan con un producto real y un carrito de muestra. Una tienda sin productos los
+  ve con **productos de ejemplo** de su rubro, avisados como tales.
+- **Forma de los botones:** rectos, suaves o redondos, en todos los botones y controles de
+  las tres plantillas, filtros y buscador del catálogo incluidos.
 - **Borrador en el navegador** con deshacer y rehacer (Ctrl+Z), guardado en el
   dispositivo y recuperable al volver. Nada llega al comprador hasta publicar.
 - **Publicar:** los cambios contados en palabras, antes y después, y `publicar_diseno`,

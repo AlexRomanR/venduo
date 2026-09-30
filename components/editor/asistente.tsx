@@ -1,7 +1,15 @@
 "use client"
 
 import * as React from "react"
-import { ArrowUp, Check, Eye, EyeOff, Sparkles, X } from "lucide-react"
+import {
+  ArrowUp,
+  Check,
+  Eye,
+  EyeOff,
+  Lightbulb,
+  Sparkles,
+  X,
+} from "lucide-react"
 
 import { PEDIDOS_SUGERIDOS } from "@/lib/editor/sugerencias"
 import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
@@ -19,6 +27,10 @@ const MIENTRAS_PIENSA = [
 /**
  * La IA del editor: un pedido en palabras y una propuesta para mirar.
  *
+ * En reposo es una sola línea, para no competir con los controles del paso.
+ * Las ideas aparecen al tocarla, hacia arriba y en una lista que se lee
+ * entera; lo que la IA está haciendo o propone, solo cuando existe.
+ *
  * La propuesta nunca se aplica sola. Se ve en la vista previa, con lo que
  * cambia marcado, y la persona decide: aplicarla —que es un solo paso de
  * deshacer— o descartarla. Mientras decide puede mirar cómo estaba.
@@ -26,35 +38,64 @@ const MIENTRAS_PIENSA = [
 export function Asistente() {
   const { ia, propuesta, paso } = useEditor()
   const [texto, setTexto] = React.useState("")
-  const sugerencias = PEDIDOS_SUGERIDOS[paso]
+  const [conIdeas, setConIdeas] = React.useState(false)
+  const caja = React.useRef<HTMLDivElement>(null)
+  const ideas = PEDIDOS_SUGERIDOS[paso]
+
+  // Las ideas se cierran al tocar afuera o con Escape, como cualquier menú.
+  React.useEffect(() => {
+    if (!conIdeas) return
+    function afuera(evento: PointerEvent) {
+      if (!caja.current?.contains(evento.target as Node)) setConIdeas(false)
+    }
+    function tecla(evento: KeyboardEvent) {
+      if (evento.key === "Escape") setConIdeas(false)
+    }
+    document.addEventListener("pointerdown", afuera)
+    document.addEventListener("keydown", tecla)
+    return () => {
+      document.removeEventListener("pointerdown", afuera)
+      document.removeEventListener("keydown", tecla)
+    }
+  }, [conIdeas])
 
   function pedir(pedido: string) {
     if (pedido.trim().length < 3 || ia.cargando) return
     // Lo pedido se muestra arriba, en la tarjeta; el campo queda libre para
     // lo siguiente.
     setTexto("")
+    setConIdeas(false)
     ia.pedir(pedido)
   }
 
+  const ocupado = ia.cargando || Boolean(propuesta) || Boolean(ia.error)
+  const mostrarIdeas =
+    conIdeas && !ia.cargando && !propuesta && !texto && ideas.length > 0
+
   return (
     <section
+      ref={caja}
       aria-label="Pídele a la IA"
-      className="border-t-2 border-tinta bg-papel"
+      className="relative border-t border-tinta/15 bg-papel"
     >
-      <div aria-live="polite">
-        {ia.cargando ? (
-          <Pensando />
-        ) : propuesta ? (
-          <TarjetaDePropuesta />
-        ) : ia.error ? (
-          <p
-            role="alert"
-            className="mx-4 mt-3 border-l-2 border-senal py-1 pl-3 text-sm leading-relaxed"
-          >
-            {ia.error}
-          </p>
-        ) : null}
-      </div>
+      {mostrarIdeas ? <Ideas ideas={ideas} alElegir={pedir} /> : null}
+
+      {ocupado ? (
+        <div aria-live="polite" className="border-b border-tinta/15">
+          {ia.cargando ? (
+            <Pensando />
+          ) : propuesta ? (
+            <TarjetaDePropuesta />
+          ) : ia.error ? (
+            <p
+              role="alert"
+              className="mx-4 my-3 border-l-2 border-senal py-1 pl-3 text-sm leading-relaxed"
+            >
+              {ia.error}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       <form
         onSubmit={(evento) => {
@@ -71,53 +112,94 @@ export function Asistente() {
           )}
         />
         <label htmlFor="pedido-a-la-ia" className="sr-only">
-          Dile a la IA qué quieres cambiar
+          Pídele un cambio a la IA
         </label>
         <input
           id="pedido-a-la-ia"
           value={texto}
           onChange={(evento) => setTexto(evento.target.value)}
-          placeholder="Dile a la IA qué quieres cambiar…"
+          onFocus={() => setConIdeas(true)}
+          placeholder={
+            ia.cargando ? "La IA está pensando…" : "Pídele un cambio a la IA"
+          }
           maxLength={500}
           disabled={ia.cargando}
           autoComplete="off"
-          className="h-11 min-w-0 flex-1 bg-transparent text-base placeholder:text-tinta/45 focus-visible:outline-none disabled:opacity-60"
+          aria-describedby={mostrarIdeas ? "ideas-para-la-ia" : undefined}
+          className="h-11 min-w-0 flex-1 bg-transparent text-base placeholder:text-tinta/50 focus-visible:outline-none disabled:opacity-60"
         />
+        {ideas.length > 0 && !texto && !ia.cargando ? (
+          <button
+            type="button"
+            onClick={() => setConIdeas((abiertas) => !abiertas)}
+            aria-label="Ver ideas"
+            aria-pressed={mostrarIdeas}
+            title="Ideas"
+            className={cn(
+              "flex size-11 shrink-0 items-center justify-center transition-colors hover:text-senal",
+              mostrarIdeas && "text-senal"
+            )}
+          >
+            <Lightbulb aria-hidden="true" className="size-5" />
+          </button>
+        ) : null}
         <button
           type="submit"
           aria-label="Pedir"
           disabled={ia.cargando || texto.trim().length < 3}
-          className="flex size-11 shrink-0 items-center justify-center rounded-plantilla bg-senal text-white transition-colors hover:bg-senal-alta disabled:bg-tinta/20 disabled:text-tinta/50"
+          className="flex size-11 shrink-0 items-center justify-center rounded-plantilla bg-senal text-white transition-colors hover:bg-senal-alta disabled:bg-tinta/15 disabled:text-tinta/45"
         >
           <ArrowUp aria-hidden="true" className="size-5" />
         </button>
       </form>
-
-      {!propuesta && !ia.cargando && sugerencias.length > 0 ? (
-        <ul
-          aria-label="Ideas para pedirle"
-          className="flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-3"
-        >
-          {sugerencias.map((sugerencia) => (
-            <li key={sugerencia} className="shrink-0">
-              <button
-                type="button"
-                onClick={() => pedir(sugerencia)}
-                className="min-h-11 border border-tinta/25 px-3 text-xs font-semibold whitespace-nowrap transition-colors hover:border-tinta hover:bg-tinta hover:text-papel"
-              >
-                {sugerencia}
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-
-      {ia.demo ? (
-        <p className="px-4 pb-2 text-[11px] opacity-50">
-          IA en modo demo: las respuestas son simuladas.
-        </p>
-      ) : null}
     </section>
+  )
+}
+
+/**
+ * Las ideas para el paso, hacia arriba del campo. Una lista que se lee entera
+ * y no una fila que se corta: con desplazamiento lateral, en una computadora
+ * las últimas quedaban escondidas sin forma de llegar a ellas.
+ */
+function Ideas({
+  ideas,
+  alElegir,
+}: {
+  ideas: string[]
+  alElegir: (idea: string) => void
+}) {
+  const { ia } = useEditor()
+
+  return (
+    <div
+      id="ideas-para-la-ia"
+      className="absolute inset-x-0 bottom-full z-20 max-h-[60vh] overflow-y-auto border-t-2 border-tinta bg-papel motion-safe:animate-in motion-safe:duration-200 motion-safe:fade-in motion-safe:slide-in-from-bottom-1"
+    >
+      <p className="px-4 pt-3 pb-1 text-xs font-semibold tracking-[0.12em] uppercase opacity-60">
+        Ideas para empezar
+      </p>
+      <ul>
+        {ideas.map((idea) => (
+          <li key={idea}>
+            <button
+              type="button"
+              onClick={() => alElegir(idea)}
+              className="flex min-h-11 w-full items-center gap-3 border-b border-tinta/10 px-4 py-2 text-left text-sm transition-colors hover:bg-tinta/[0.04]"
+            >
+              <Sparkles
+                aria-hidden="true"
+                className="size-4 shrink-0 text-senal"
+              />
+              <span className="min-w-0 flex-1">{idea}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      <p className="px-4 py-2 text-xs leading-relaxed opacity-55">
+        O escríbele con tus palabras lo que quieres.
+        {ia.demo ? " IA en modo demo: las respuestas son simuladas." : ""}
+      </p>
+    </div>
   )
 }
 
@@ -143,7 +225,7 @@ function Pensando() {
   }, [])
 
   return (
-    <div className="px-4 pt-3">
+    <div className="px-4 py-3">
       <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
         La IA está pensando
       </p>
@@ -176,7 +258,7 @@ function TarjetaDePropuesta() {
   const hayCambios = propuesta.operaciones.length > 0
 
   return (
-    <div className="max-h-[30svh] overflow-y-auto px-4 pt-4 motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in motion-safe:slide-in-from-bottom-2 lg:max-h-[46vh]">
+    <div className="max-h-[30svh] overflow-y-auto px-4 pt-3 motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in motion-safe:slide-in-from-bottom-2 lg:max-h-[46vh]">
       <p className="flex items-center gap-2 text-xs font-semibold tracking-[0.12em] text-senal uppercase">
         <Sparkles aria-hidden="true" className="size-3.5" />
         {hayCambios ? "La IA propone" : "La IA dice"}
@@ -233,7 +315,7 @@ function TarjetaDePropuesta() {
         </button>
       ) : null}
 
-      <div className="flex gap-2 pt-2 pb-2">
+      <div className="flex gap-2 pt-2 pb-3">
         {hayCambios ? (
           <>
             <button

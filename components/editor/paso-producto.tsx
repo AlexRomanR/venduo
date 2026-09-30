@@ -32,14 +32,14 @@ export function PasoProducto() {
       {productos.length === 0 ? (
         <div className="px-5 pb-5">
           <Aviso>
-            Todavía no cargaste productos.{" "}
+            Todavía no cargaste productos: la vista previa usa uno de ejemplo
+            para que veas cómo queda la ficha.{" "}
             <Link
               href="/panel/productos/nuevo"
               className="font-semibold underline underline-offset-4"
             >
-              Carga el primero
-            </Link>{" "}
-            y vuelve para ver su ficha.
+              Cargar el primero
+            </Link>
           </Aviso>
         </div>
       ) : (

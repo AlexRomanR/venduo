@@ -111,7 +111,7 @@ function BotonDePortada({
     <Link
       href={href}
       className={cn(
-        "group mt-8 inline-flex min-h-12 items-center gap-3 px-7 text-xs font-semibold tracking-[0.16em] uppercase transition-colors hover:bg-senal hover:text-white",
+        "group mt-8 inline-flex min-h-12 items-center gap-3 rounded-plantilla px-7 text-xs font-semibold tracking-[0.16em] uppercase transition-colors hover:bg-senal hover:text-white",
         oscuro ? "bg-tinta text-papel" : "bg-papel text-tinta"
       )}
     >
@@ -337,7 +337,7 @@ function Cierre({ bloque, tienda, codigo }: PropsBloque) {
         </div>
         <Link
           href={rutaDeTienda(tienda.slug, "/catalogo", { ref: codigo })}
-          className="inline-flex min-h-12 shrink-0 items-center gap-3 bg-papel px-7 text-xs font-semibold tracking-[0.16em] text-tinta uppercase transition-colors hover:bg-senal hover:text-white"
+          className="inline-flex min-h-12 shrink-0 items-center gap-3 rounded-plantilla bg-papel px-7 text-xs font-semibold tracking-[0.16em] text-tinta uppercase transition-colors hover:bg-senal hover:text-white"
         >
           {texto(bloque, "buttonLabel") ?? "Ver la colección"}
           <ArrowRight aria-hidden="true" className="size-4" />

@@ -11,8 +11,12 @@ import {
 import { PLANTILLAS } from "@/lib/plantillas"
 import { combinarApariencia } from "@/lib/plantillas/apariencia"
 import { relacionados } from "@/lib/plantillas/bloques"
-import type { MarcoDeTienda, TiendaPublica } from "@/lib/data/tienda-publica"
-import type { Json } from "@/types"
+import type {
+  CategoriaPublica,
+  MarcoDeTienda,
+  TiendaPublica,
+} from "@/lib/data/tienda-publica"
+import type { Json, Product } from "@/types"
 import { kitDePlantilla } from "@/components/plantillas"
 import { EstiloDePlantilla } from "@/components/plantillas/estilo"
 import {
@@ -61,12 +65,27 @@ async function sinPedidos() {
  * publicado. Nada acá navega ni crea pedidos: un toque sobre una sección la
  * selecciona para editarla, y una foto que se suelta encima se usa en ella.
  */
+/** Las categorías de los productos de ejemplo, contadas como las reales. */
+function categoriasDe(productos: Product[]): CategoriaPublica[] {
+  const nombres = [...new Set(productos.map((p) => p.category ?? ""))].filter(
+    Boolean
+  )
+  return nombres.map((nombre) => ({
+    id: `ejemplo-${nombre}`,
+    nombre,
+    productos: productos.filter((p) => p.category === nombre).length,
+  }))
+}
+
 export function VistaPrevia({
   tienda,
   muestra,
+  ejemplos,
 }: {
   tienda: TiendaPublica
   muestra: LineaCarrito[]
+  /** Para llenar catálogo, ficha y carrito de una tienda todavía sin productos. */
+  ejemplos: Product[]
 }) {
   const [estado, setEstado] = React.useState<Estado | null>(null)
   const [destello, setDestello] = React.useState<string | null>(null)
@@ -140,15 +159,27 @@ export function VistaPrevia({
     }
   }, [borrador, plantilla, tienda])
 
-  const marco: MarcoDeTienda = {
-    slug: actual.slug,
-    nombre: actual.nombre,
-    logoUrl: actual.logoUrl,
-    whatsapp: actual.whatsapp,
-    categorias: actual.categorias.filter((c) => c.productos > 0),
-  }
-
   const vista = estado?.vista ?? "inicio"
+
+  // Sin productos propios, el catálogo, la ficha y el carrito se llenan con los
+  // de ejemplo. La portada no: su foto sale del primer producto con foto, y
+  // mostrar una de ejemplo ahí haría creer que la portada real la tiene.
+  const conEjemplos = actual.productos.length === 0 && vista !== "inicio"
+  const paraVista = React.useMemo<TiendaPublica>(
+    () =>
+      conEjemplos
+        ? { ...actual, productos: ejemplos, categorias: categoriasDe(ejemplos) }
+        : actual,
+    [actual, conEjemplos, ejemplos]
+  )
+
+  const marco: MarcoDeTienda = {
+    slug: paraVista.slug,
+    nombre: paraVista.nombre,
+    logoUrl: paraVista.logoUrl,
+    whatsapp: paraVista.whatsapp,
+    categorias: paraVista.categorias.filter((c) => c.productos > 0),
+  }
 
   // Cambiar de pantalla empieza arriba, como en la tienda de verdad.
   React.useEffect(() => {
@@ -156,9 +187,9 @@ export function VistaPrevia({
   }, [vista, estado?.productoId])
 
   const producto =
-    actual.productos.find((p) => p.id === estado?.productoId) ??
-    actual.productos.find((p) => p.image_url) ??
-    actual.productos[0]
+    paraVista.productos.find((p) => p.id === estado?.productoId) ??
+    paraVista.productos.find((p) => p.image_url) ??
+    paraVista.productos[0]
 
   const seleccion = estado?.seleccion ?? null
   const marcas = estado?.marcas ?? []
@@ -231,7 +262,14 @@ export function VistaPrevia({
   ].join("\n")
 
   return (
-    <ProveedorCarrito slug={tienda.slug} muestra={muestra}>
+    // El carrito de muestra, solo en su paso: en la portada de una tienda
+    // nueva, un "2" en el ícono del carrito confundía. La clave lo rearma al
+    // entrar y al salir del carrito.
+    <ProveedorCarrito
+      key={vista === "carrito" ? "con-muestra" : "vacio"}
+      slug={tienda.slug}
+      muestra={vista === "carrito" ? muestra : []}
+    >
       <EstiloDePlantilla apariencia={actual.apariencia} />
       <style dangerouslySetInnerHTML={{ __html: reglas }} />
 
@@ -263,20 +301,20 @@ export function VistaPrevia({
 
           {vista === "catalogo" ? (
             <kit.Catalogo
-              tienda={actual}
+              tienda={paraVista}
               codigo={null}
               filtros={SIN_FILTROS}
-              productos={filtrarCatalogo(actual.productos, SIN_FILTROS)}
+              productos={filtrarCatalogo(paraVista.productos, SIN_FILTROS)}
             />
           ) : null}
 
           {vista === "producto" ? (
             producto ? (
               <kit.Ficha
-                tienda={actual}
+                tienda={paraVista}
                 producto={producto}
                 codigo={null}
-                relacionados={relacionados(producto, actual.productos)}
+                relacionados={relacionados(producto, paraVista.productos)}
               />
             ) : (
               <div className="mx-auto w-full max-w-6xl px-5 py-12">
@@ -305,6 +343,18 @@ export function VistaPrevia({
         {/* Sin la barra flotante del carrito: en una vista previa chica tapaba
             justo lo que se está editando. El contador de la cabecera queda. */}
         <kit.Pie marco={marco} codigo={null} />
+
+        {conEjemplos ? (
+          <p
+            className="pointer-events-none fixed inset-x-0 bottom-2 z-50 mx-auto w-fit rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.08em] text-white uppercase sm:bottom-3 sm:px-3 sm:py-1.5 sm:text-[11px]"
+            style={{
+              background: MARCA,
+              fontFamily: "var(--fuente-geist), sans-serif",
+            }}
+          >
+            Productos de ejemplo · así se verán los tuyos
+          </p>
+        ) : null}
       </div>
     </ProveedorCarrito>
   )

@@ -36,6 +36,10 @@ controles van en el mundo de Venduo y solo la vista previa lleva la identidad de
 tienda. Si los controles tomaran los colores del borrador, cambiarían bajo el dedo de
 quien está eligiendo un color.
 
+**Todo lo que se toca en una plantilla usa `rounded-plantilla`**: botones, filtros,
+buscador. Es lo que hace cumplir "Forma de los botones" en el editor; un botón con su
+radio fijo, o sin radio, ignora lo que eligió la persona.
+
 Esto reemplaza la regla anterior de "un solo mundo", que a su vez había reemplazado la de
 "dos mundos". Lo que se mantiene de las dos: quien trabaja y quien compra en la misma
 tienda ven la misma identidad, sin costuras entre pantallas.

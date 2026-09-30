@@ -156,8 +156,9 @@ lib/
   ai/                 Capa de IA
   insights/           Lo que se puede preguntar, la lectura y el documento PDF
   editor/             Del editor, sin dependencias de servidor: el protocolo con la
-                      vista previa, las paletas y letras sugeridas, los pasos y las
-                      imágenes (comprimir y subir, solo navegador)
+                      vista previa, las paletas y letras sugeridas, los pasos, los
+                      productos de ejemplo y las imágenes (comprimir y subir, solo
+                      navegador)
   plantillas/         La base de cada plantilla: tokens, esquema de la apariencia,
                       registro, qué significa cada bloque, los campos de cada
                       sección y el borrador del editor con sus operaciones

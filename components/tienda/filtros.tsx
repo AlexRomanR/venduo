@@ -149,8 +149,8 @@ function FichaDeFiltro({
       onClick={onClick}
       aria-pressed={activa}
       className={cn(
-        "flex min-h-11 shrink-0 items-center border px-4 text-sm font-semibold transition-colors",
-        redondeada && "rounded-plantilla px-5",
+        "flex min-h-11 shrink-0 items-center rounded-plantilla border px-4 text-sm font-semibold transition-colors",
+        redondeada && "px-5",
         activa
           ? "border-senal bg-senal text-white"
           : "border-tinta/25 hover:border-tinta"

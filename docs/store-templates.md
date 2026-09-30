@@ -595,7 +595,9 @@ ahí todas las plantillas lo dibujan. Cada kit lo reemplaza cuando quiera.
 ## 11. El editor de la tienda
 
 `/editor`, a pantalla completa y fuera del armazón del panel. Seis pasos —Tu marca,
-Portada, Catálogo, Producto, Carrito y Publicar— con la tienda de verdad al lado. Se entra
+Portada, Catálogo, Producto, Carrito y Publicar— en una barra arriba (abajo en el celular),
+los controles del paso a la izquierda y la tienda de verdad a la derecha. La IA es una sola
+línea al pie de los controles: las ideas aparecen al tocarla. Se entra
 desde `/panel/apariencia`, desde el resumen del panel y al terminar el alta
 (`/crear/listo`).
 
@@ -631,6 +633,10 @@ con el kit de su plantilla. El editor le manda el borrador por `postMessage`
 - Cada sección lleva `data-seccion` solo en el editor (`TiendaPublica.enEdicion`): tocarla
   la selecciona y soltar una foto encima la usa. La tienda pública no cambia en nada.
 - Nada navega ni crea pedidos: los toques y los envíos de formulario se interceptan.
+- **Sin productos propios**, el catálogo, la ficha y el carrito se llenan con productos de
+  ejemplo del rubro de la plantilla (`lib/editor/muestras.ts`), con un aviso de que lo
+  son. La portada no: su foto sale del primer producto, y una de ejemplo ahí haría creer
+  que la portada real la tiene.
 
 ### Publicar y restaurar
 

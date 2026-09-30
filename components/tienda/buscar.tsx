@@ -64,8 +64,7 @@ export function BuscarYOrdenar({
     >
       <label
         className={cn(
-          "flex min-h-12 items-center gap-3 border border-tinta/25 px-4 transition-colors focus-within:border-tinta sm:w-80",
-          redondeado && "rounded-plantilla"
+          "flex min-h-12 items-center gap-3 rounded-plantilla border border-tinta/25 px-4 transition-colors focus-within:border-tinta sm:w-80"
         )}
       >
         <Search aria-hidden="true" className="size-4 shrink-0 opacity-45" />
@@ -102,8 +101,8 @@ export function BuscarYOrdenar({
             })
           }
           className={cn(
-            "min-h-12 flex-1 border border-tinta/25 bg-papel px-3 text-sm font-semibold transition-colors outline-none hover:border-tinta focus-visible:border-tinta sm:flex-none",
-            redondeado && "rounded-plantilla px-4"
+            "min-h-12 flex-1 rounded-plantilla border border-tinta/25 bg-papel px-3 text-sm font-semibold transition-colors outline-none hover:border-tinta focus-visible:border-tinta sm:flex-none",
+            redondeado && "px-4"
           )}
         >
           {Object.entries(ORDENES_DE_CATALOGO).map(([valor, nombre]) => (

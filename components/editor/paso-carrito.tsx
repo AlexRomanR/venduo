@@ -1,5 +1,7 @@
 "use client"
 
+import { ArrowRight } from "lucide-react"
+
 import { useEditor } from "@/components/editor/contexto"
 import {
   Aviso,
@@ -21,30 +23,30 @@ export function PasoCarrito() {
       <EncabezadoDePaso
         numero={5}
         titulo="Carrito y pago"
-        bajada="Así ve tu cliente su pedido antes de confirmarlo. Lo armamos con dos de tus productos para que veas cómo queda."
+        bajada="Así ve tu cliente su pedido antes de confirmarlo. Lo armamos con dos productos para que veas cómo queda."
       />
 
       <Grupo titulo="Lo que ya tiene tu estilo">
         <p className="text-sm leading-relaxed opacity-80">
           Los colores, la letra y la forma de los botones son los que elegiste
-          en{" "}
-          <button
-            type="button"
-            onClick={() => irAPaso("marca")}
-            className="min-h-11 font-semibold underline underline-offset-4 hover:text-senal"
-          >
-            Tu marca
-          </button>
-          . El formulario es el mismo en todas las tiendas de Venduo: pide lo
-          justo para que el pedido te llegue por WhatsApp.
+          en Tu marca. El formulario es el mismo en todas las tiendas de Venduo:
+          pide lo justo para que el pedido te llegue por WhatsApp.
         </p>
+        <button
+          type="button"
+          onClick={() => irAPaso("marca")}
+          className="mt-1 inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+        >
+          Cambiar colores y letra
+          <ArrowRight aria-hidden="true" className="size-4" />
+        </button>
       </Grupo>
 
       {productos.length === 0 ? (
         <div className="px-5 pb-5">
           <Aviso>
-            Sin productos cargados, el carrito se ve vacío. Así lo va a ver un
-            cliente hasta que cargues el primero.
+            Todavía no cargaste productos: el carrito de la vista previa usa dos
+            de ejemplo.
           </Aviso>
         </div>
       ) : null}

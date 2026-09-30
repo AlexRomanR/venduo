@@ -178,7 +178,7 @@ export function Vacio({ titulo, texto, accion }: PropsVacio) {
       {accion ? (
         <Link
           href={accion.href}
-          className="mt-8 inline-flex min-h-12 items-center gap-3 bg-tinta px-7 text-xs font-semibold tracking-[0.16em] text-papel uppercase transition-colors hover:bg-senal hover:text-white"
+          className="mt-8 inline-flex min-h-12 items-center gap-3 rounded-plantilla bg-tinta px-7 text-xs font-semibold tracking-[0.16em] text-papel uppercase transition-colors hover:bg-senal hover:text-white"
         >
           {accion.etiqueta}
           <ArrowRight aria-hidden="true" className="size-4" />

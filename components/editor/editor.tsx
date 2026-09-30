@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { ChevronDown, Redo2, Send, Undo2, X } from "lucide-react"
+import { ChevronDown, ExternalLink, Redo2, Send, Undo2, X } from "lucide-react"
 import { toast } from "sonner"
 
 import type {
@@ -47,10 +47,10 @@ import { PasoPortada } from "@/components/editor/paso-portada"
 import { PasoProducto } from "@/components/editor/paso-producto"
 import { PasoPublicar } from "@/components/editor/paso-publicar"
 import {
+  BarraDePasos,
   pasoDe,
   PASOS,
   PestanasDePasos,
-  RielDePasos,
 } from "@/components/editor/pasos"
 
 function distinto(a: unknown, b: unknown) {
@@ -170,6 +170,8 @@ export function Editor({
     setPaso(siguiente)
     setVistaForzada(null)
     setPanelAbierto(true)
+    // Quien ya se movió de paso empezó: la bienvenida solo estorba.
+    setConBienvenida(false)
   }, [])
 
   const seleccionar = React.useCallback(
@@ -457,29 +459,18 @@ export function Editor({
       {/* Una columna de `minmax(0,1fr)` en el celular: sin ella, la columna
           implícita crecía hasta el contenido más ancho y la pantalla entera
           se desbordaba a los costados. */}
-      <div className="grid h-dvh grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)_auto_auto] overflow-hidden bg-papel text-tinta lg:grid-cols-[13.5rem_25rem_minmax(0,1fr)] lg:grid-rows-[auto_minmax(0,1fr)]">
+      <div className="grid h-dvh grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)_auto_auto] overflow-hidden bg-papel text-tinta lg:grid-cols-[26rem_minmax(0,1fr)] lg:grid-rows-[auto_auto_minmax(0,1fr)]">
         <BarraDelEditor />
 
-        <aside className="hidden overflow-y-auto border-r border-tinta/15 lg:col-start-1 lg:row-start-2 lg:block">
-          <RielDePasos
+        <div className="hidden lg:col-span-2 lg:row-start-2 lg:block">
+          <BarraDePasos
             actual={paso}
             conCambios={conCambios}
             alElegir={irAPaso}
           />
-          <div className="border-t border-tinta/15 px-5 py-4">
-            <p className="text-xs opacity-55">Tu tienda</p>
-            <a
-              href={diseno.tienda.url}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="mt-1 block min-h-11 truncate py-2 text-sm font-semibold underline-offset-4 hover:text-senal hover:underline"
-            >
-              {diseno.tienda.url.replace(/^https?:\/\//, "")}
-            </a>
-          </div>
-        </aside>
+        </div>
 
-        <main className="row-start-2 min-h-0 lg:col-start-3">
+        <main className="row-start-2 min-h-0 lg:col-start-2 lg:row-start-3">
           <MarcoDeVistaPrevia
             estado={estadoDeLaVista}
             enfoque={enfoque}
@@ -490,7 +481,7 @@ export function Editor({
         <section
           aria-label={`Paso ${numero}: ${actual.nombre}`}
           className={cn(
-            "row-start-3 flex min-h-0 flex-col border-t border-tinta/15 bg-papel lg:col-start-2 lg:row-start-2 lg:border-t-0 lg:border-r",
+            "row-start-3 flex min-h-0 flex-col border-t border-tinta/15 bg-papel lg:col-start-1 lg:row-start-3 lg:border-t-0 lg:border-r",
             panelAbierto ? "max-h-[44svh] lg:max-h-none" : ""
           )}
         >
@@ -567,7 +558,7 @@ function BarraDelEditor() {
   const { tienda, borrador, esDemo, irAPaso, paso } = useEditor()
 
   return (
-    <header className="flex h-14 items-center gap-1 border-b border-tinta/15 px-2 sm:px-3 lg:col-span-3">
+    <header className="flex h-14 items-center gap-1 border-b border-tinta/15 px-2 sm:px-3 lg:col-span-2">
       <Link
         href="/panel/apariencia"
         className="flex min-h-11 min-w-11 items-center justify-center gap-2 px-2 text-sm font-semibold transition-colors hover:text-senal"
@@ -588,6 +579,16 @@ function BarraDelEditor() {
               : "Todo publicado"}
         </p>
       </div>
+
+      <a
+        href={tienda.url}
+        target="_blank"
+        rel="noreferrer noopener"
+        className="mr-2 hidden min-h-11 items-center gap-1.5 px-2 text-sm font-semibold transition-colors hover:text-senal lg:flex"
+      >
+        Ver mi tienda
+        <ExternalLink aria-hidden="true" className="size-4" />
+      </a>
 
       <button
         type="button"
