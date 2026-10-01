@@ -63,10 +63,33 @@ una portada y un panel no es la paleta ni la tipografía, es el ritmo:
 "Rojo" en esta regla quiere decir **la señal**: en Venduo es rojo, en Pasarela azul y en
 Esencia oro viejo. La regla de usarla poco no cambia con el color.
 
+### Cuándo aparece la barra
+
+**Desde que una persona tiene panel —una tienda o un vínculo de vendedor—, toda pantalla
+de su cuenta lleva la barra.** Si la barra enlaza a una pantalla, esa pantalla la muestra:
+antes "Buscar tiendas" o "Vender para otras tiendas" la hacían desaparecer, porque esas
+rutas vivían fuera de `app/(privado)`.
+
+| Pantalla                                  | Barra                                      |
+| ----------------------------------------- | ------------------------------------------ |
+| `/panel/*`, `/vendedor`, `/cuenta`        | Siempre                                    |
+| `/explorar/*`, `/sumarme`                 | Con panel sí; sin panel, el marco del alta |
+| `/crear/*` (el alta de la tienda)         | No. Con panel, ofrece "Volver a mi panel"  |
+| `/editor`                                 | No: es pantalla completa, con su "Salir"   |
+| Lo público: `/`, `/login`, `/t/*`, `/v/*` | No                                         |
+
+Quien recién se registró y no tiene nada todavía está en su alta: una barra vacía no le
+sirve, y ve el marco del alta (`Marco`) hasta tener algo a qué volver.
+
+**Nadie arma esto a mano.** El armazón con la barra es `ArmazonDelPanel` y la decisión
+entre los dos marcos es `MarcoDeCuenta`, los dos en `components/panel/armazon.tsx`; si
+la persona tiene panel lo dice `tienePanel()`. Una pantalla nueva de la cuenta va dentro
+de `app/(privado)` o usa `MarcoDeCuenta`; nunca un layout propio con otra cabecera.
+Una pantalla sin barra tiene que ofrecer siempre una salida visible al panel.
+
 ### La barra lateral de los paneles
 
-`/panel`, `/vendedor` y `/cuenta` comparten una barra lateral fija desde `lg` y un cajón
-por debajo: una columna de 272 px en una pantalla de 375 deja 100 px para trabajar. El
+Las pantallas del panel comparten una barra lateral fija desde `lg` y un cajón por debajo: una columna de 272 px en una pantalla de 375 deja 100 px para trabajar. El
 cajón es el `Sheet` de shadcn con `showCloseButton={false}` y `shadow-none` —el suyo mide
 28 px y dice "Close"— y un cierre propio de 44 px.
 

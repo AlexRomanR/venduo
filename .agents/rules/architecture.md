@@ -46,6 +46,9 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/auth/*`                     | Callback y cierre de sesión                             | —               |
 | `/api/health`                 | Estado del servidor y sus capas                         | Público         |
 
+**Qué pantallas llevan la barra lateral** está en `ui-styling.md`, "Cuándo aparece la
+barra": en corto, toda pantalla de la cuenta de quien ya tiene panel.
+
 ## A dónde entra cada cuenta
 
 El destino no lo decide `primary_role`, que es solo una intención. Lo decide el
@@ -144,7 +147,8 @@ components/
     perfume/          Esencia
   tienda/             Lo compartido por todas las plantillas: carrito, checkout,
                       pago, agregar, barra de compra, filtros y buscador
-  panel/              Shell, cifras y piezas de los dos paneles
+  panel/              Shell, cifras y piezas de los dos paneles. `armazon.tsx` es
+                      la barra con su contenido y decide cuándo va
     tablero/          El Resumen: sus secciones, el gráfico de ventas, el sello de
                       la tienda y compartirla
   landing/            Piezas de la portada

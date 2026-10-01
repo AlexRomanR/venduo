@@ -39,6 +39,8 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
 - **`types/database.ts` es generado.** Los alias van en `types/index.ts`.
 - **La IA propone, el sistema valida y ejecuta.** Toda salida del modelo se valida con zod
   antes de tocar la base o la pantalla.
+- **Toda pantalla de la cuenta lleva la barra lateral** desde que la persona tiene panel.
+  Se decide en `components/panel/armazon.tsx`, no en cada layout. Detalle en `ui-styling.md`.
 - **Una tienda se ve con su plantilla, y ningún componente pregunta cuál es.** La base
   vive en código, la personalización en `stores.theme_overrides` y lo que se dibuja se
   calcula. Todo en `docs/store-templates.md`.

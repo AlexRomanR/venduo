@@ -113,6 +113,11 @@ vendedor sin ventas son el estado normal durante la demostración.
 Montos siempre por `formatMoney`. Textos en español neutro boliviano, tratando de "tú".
 Arrancar el diseño en 375 px.
 
+**Decidir si la pantalla lleva la barra lateral**, con la tabla de `ui-styling.md`
+("Cuándo aparece la barra"). Una pantalla de la cuenta va dentro de `app/(privado)` o se
+envuelve en `MarcoDeCuenta`; si la barra enlaza a ella, tiene que mostrarla. Una pantalla
+sin barra ofrece una salida visible al panel.
+
 ---
 
 ## Paso 5 — Verificar

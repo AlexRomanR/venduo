@@ -236,3 +236,11 @@ export const getBarraLateral = cache(
     }
   }
 )
+
+/**
+ * Si la persona ya tiene un panel al que volver: una tienda o un vínculo de
+ * vendedor. Es lo que decide si una pantalla de la cuenta lleva la barra.
+ */
+export function tienePanel(barra: BarraLateral): boolean {
+  return Boolean(barra.tienda || barra.vendedor)
+}

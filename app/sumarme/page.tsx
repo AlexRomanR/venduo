@@ -6,7 +6,7 @@ import { getNombreDeTienda } from "@/lib/data/vitrina"
 import { slugify } from "@/lib/format"
 import { FormularioSumarme } from "@/components/onboarding/formulario-sumarme"
 import { Invitacion } from "@/components/onboarding/invitacion"
-import { Marco } from "@/components/onboarding/marco"
+import { MarcoDeCuenta } from "@/components/panel/armazon"
 
 export const metadata = { title: "Empezar a vender" }
 
@@ -55,7 +55,7 @@ export default async function SumarmePage({
   const invitacion = slug && codigo ? { slug, codigo, nombreTienda } : null
 
   return (
-    <Marco>
+    <MarcoDeCuenta>
       {invitacion ? (
         <Invitacion
           slug={invitacion.slug}
@@ -64,8 +64,8 @@ export default async function SumarmePage({
         />
       ) : null}
 
-      <div className="mx-auto max-w-6xl px-5 pb-12 lg:pb-16">
-        <div className={invitacion ? "" : "pt-12 lg:pt-16"}>
+      <div>
+        <div>
           <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
             Empezar a vender
           </p>
@@ -149,6 +149,6 @@ export default async function SumarmePage({
           </Link>
         </div>
       </div>
-    </Marco>
+    </MarcoDeCuenta>
   )
 }

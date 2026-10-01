@@ -1,14 +1,26 @@
 import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
 
 /**
- * Chrome de las pantallas de alta: `/crear` y `/sumarme`.
+ * El marco de las altas: `/crear`, y `/sumarme` con las vitrinas para quien
+ * todavía no tiene panel.
  *
- * Están en el mundo editorial y no en el de los paneles a propósito. Son la
- * continuación directa del ingreso —nadie ha empezado a trabajar todavía— y
- * es donde una persona decide si sigue o se va. Los paneles empiezan después,
- * con los tokens de shadcn.
+ * Sin la barra del panel a propósito: son la continuación directa del
+ * ingreso, nadie ha empezado a trabajar todavía, y es donde una persona
+ * decide si sigue o se va. Cuándo va este marco y cuándo la barra está en
+ * `.agents/rules/ui-styling.md`, "Cuándo aparece la barra".
  */
-export function Marco({ children }: { children: React.ReactNode }) {
+export function Marco({
+  children,
+  conPanel = false,
+}: {
+  children: React.ReactNode
+  /**
+   * Quien ya tiene panel y entró a un alta desde él —un vendedor que abre su
+   * tienda— necesita una salida que no sea cerrar sesión.
+   */
+  conPanel?: boolean
+}) {
   return (
     <div className="flex min-h-screen flex-col bg-papel text-tinta">
       <header className="border-b border-tinta/15">
@@ -19,6 +31,15 @@ export function Marco({ children }: { children: React.ReactNode }) {
           >
             Venduo
           </Link>
+          {conPanel ? (
+            <Link
+              href="/auth/destino"
+              className="flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+            >
+              <ArrowLeft aria-hidden="true" className="size-4" />
+              Volver a mi panel
+            </Link>
+          ) : null}
           <form action="/auth/sign-out" method="post">
             <button
               type="submit"
