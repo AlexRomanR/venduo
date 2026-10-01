@@ -73,22 +73,29 @@ function Portada({ bloque, tienda, codigo }: PropsBloque) {
         sizes="100vw"
         className="-z-10 object-cover"
       />
-      {/* Un velo solo abajo, donde va el texto: la foto se sigue viendo entera
-          y el titular se lee sobre cualquier prenda. */}
+      {/* El velo va donde está el texto: fuerte abajo y, en la computadora,
+          también a la izquierda, donde se alinea el titular. Con uno solo
+          abajo, una foto clara —la que sube una tienda no siempre es de
+          estudio— dejaba el nombre blanco sobre crema, sin leerse. Arriba a la
+          derecha queda casi limpio, y la foto se sigue viendo. */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-gradient-to-t from-tinta/85 via-tinta/30 to-transparent"
+        className="absolute inset-0 -z-10 bg-gradient-to-t from-tinta/90 via-tinta/60 via-55% to-tinta/10"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 hidden bg-gradient-to-r from-tinta/55 via-tinta/20 via-50% to-transparent md:block"
       />
 
       <div className="mx-auto w-full max-w-7xl px-5 pb-10 text-papel md:pb-16">
-        <p className="text-[11px] font-semibold tracking-[0.2em] uppercase opacity-80">
+        <p className="text-[11px] font-semibold tracking-[0.2em] uppercase">
           {tienda.nombre}
         </p>
         <h1 className="mt-3 max-w-[12ch] font-titular text-[clamp(3.25rem,14vw,9rem)] leading-[0.88]">
           {titulo}
         </h1>
         {bajada ? (
-          <p className="mt-5 max-w-[46ch] leading-relaxed opacity-85 md:text-lg">
+          <p className="mt-5 max-w-[46ch] leading-relaxed opacity-95 md:text-lg">
             {bajada}
           </p>
         ) : null}
