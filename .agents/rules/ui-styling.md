@@ -394,7 +394,9 @@ Lo que no se negocia, porque cada punto rompió un PDF de verdad:
   antes (`tamanoQueEntra`, `tamanoDeTitular`) o se achica la letra.
 - **Los titulares se achican hasta que entre su palabra más larga**: el PDF no
   parte palabras, y la vista previa tampoco.
-- **Las fotos van a JPEG con `sharp`**: el PDF no lee WebP.
+- **Las fotos van a JPEG con `sharp`**: el PDF no lee WebP. Sus binarios los
+  nombra `binariosDeSharp()`, porque el rastreo de Turbopack no los ve y en
+  Vercel la ruta daba 500.
 
 Los controles del editor van en el mundo de Venduo y solo las hojas llevan el de
 la tienda, como en el editor de la tienda. Todo el sistema, con el porqué de

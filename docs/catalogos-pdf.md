@@ -131,6 +131,16 @@ Cada una rompió un PDF antes de tener su arreglo.
 5. **No lee WebP**, que es como se guardan las fotos de la tienda. El servidor las
    convierte a JPEG con `sharp`, achicadas a 1000 px: un catálogo de catorce fotos pesa
    medio mega. Una foto que no baja deja su campo vacío en vez de tumbar el PDF.
+
+   **En Vercel, `sharp` necesita binarios que el rastreo no ve.** En Linux carga
+   libvips desde otro paquete con el enlazador del sistema, y su versión WebAssembly
+   lee el `.wasm` de al lado: ninguno pasa por un `require`, y el primer despliegue
+   dio 500 con "Could not load the sharp module". `binariosDeSharp()` nombra esas
+   carpetas con `process.cwd()`, que es lo que Turbopack sí sigue —como las
+   letras—, y `sharp` se carga recién al usarlo: si igual falla, el PDF sale con las
+   fotos JPEG y PNG tal como vienen. Al subir de versión `sharp`, mirar que
+   `.next/server/app/c/[token]/route.js.nft.json` siga nombrando el `.wasm`.
+
 6. **Las letras salen del disco**, de `public/fuentes`, con los mismos pesos que
    `lib/fuentes.ts` (`PESOS`). Un peso que no está lo inventaría el lector. La única
    cursiva es la de Cormorant: la cita usa cursiva solo con esa letra.
