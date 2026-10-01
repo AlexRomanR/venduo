@@ -4,6 +4,7 @@ import {
   plantillaDeTienda,
   type ClavePlantilla,
 } from "@/lib/plantillas"
+import { getMiTienda } from "@/lib/data/panel"
 import { createClient } from "@/lib/supabase/server"
 import { urlDeTienda } from "@/lib/tienda"
 import type { DesignOrigin } from "@/types"
@@ -101,18 +102,7 @@ export async function getAparienciaDeMiTienda(): Promise<AparienciaDeMiTienda | 
   const supabase = await createClient()
   if (!supabase) return aparienciaDeDemostracion()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return null
-
-  const { data: tienda } = await supabase
-    .from("stores")
-    .select("id, name, slug, template_key, theme_overrides")
-    .eq("owner_id", user.id)
-    .is("deleted_at", null)
-    .maybeSingle()
-
+  const tienda = await getMiTienda()
   if (!tienda?.template_key) return null
 
   const [plantillasRes, rubrosRes, versionesRes] = await Promise.all([

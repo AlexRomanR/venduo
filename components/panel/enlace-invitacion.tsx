@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { Copy, Loader2, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 
@@ -23,6 +24,7 @@ export function EnlaceInvitacion({
   codigo: string | null
   siteUrl: string
 }) {
+  const router = useRouter()
   const [actual, setActual] = React.useState(codigo)
   const [rotando, setRotando] = React.useState(false)
 
@@ -56,6 +58,9 @@ export function EnlaceInvitacion({
 
     setActual(String(data))
     toast.success("Enlace nuevo. El anterior dejó de servir.")
+    // El navegador guarda la pantalla un rato: sin esto, volver a ella
+    // mostraría el enlace que acaba de dejar de servir.
+    router.refresh()
   }
 
   if (!enlace) return null

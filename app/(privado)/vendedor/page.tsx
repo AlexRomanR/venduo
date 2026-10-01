@@ -57,14 +57,18 @@ const ESTADO: Record<CommissionStatus, { texto: string; clase: string }> = {
  * pantalla tiene que decirlo antes que ninguna otra cosa.
  */
 export default async function VendedorPage() {
-  const vinculos = await getVinculosDeVendedor()
+  // Las tres lecturas no dependen entre sí: en serie eran tres viajes a la
+  // base antes de dibujar nada. Si no hay vínculos se redirige igual, y lo
+  // leído de más es poco.
+  const [vinculos, resumenLeido, comisiones] = await Promise.all([
+    getVinculosDeVendedor(),
+    getResumenVendedor(),
+    isSupabaseConfigured ? getComisionesDeVendedor() : COMISIONES_DEMO,
+  ])
 
   if (isSupabaseConfigured && vinculos.length === 0) redirect("/sumarme")
 
-  const resumen = (await getResumenVendedor()) ?? getResumenVendedorDemo()
-  const comisiones = isSupabaseConfigured
-    ? await getComisionesDeVendedor()
-    : COMISIONES_DEMO
+  const resumen = resumenLeido ?? getResumenVendedorDemo()
 
   const sitio = getSiteUrl()
   const activos = vinculos.filter((v) => v.status === "activo")

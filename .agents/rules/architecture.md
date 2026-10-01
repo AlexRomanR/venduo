@@ -226,6 +226,10 @@ interfaz sigue teniendo qué mostrar.
 
 `createAdminClient()` nunca se llama desde código que llegue al navegador.
 
+**Quién es la persona lo dice `getUsuario()`**, del mismo archivo: verifica el token sin
+ir a Supabase y una sola vez por pedido. `supabase.auth.getUser()` no se llama en el
+código de la app; el porqué está en `performance.md`.
+
 ## Tipos de la base
 
 `types/database.ts` lo **genera** la CLI con `npm run db:types` y se sobrescribe entero.
@@ -240,7 +244,9 @@ es escrito a mano. Importar desde `@/types`, no desde `@/types/database`.
 refresca el token de Supabase en cada request, y redirige a `/login` a quien pida una
 ruta de `PROTECTED_PREFIXES` sin sesión.
 
-**No poner lógica entre `createServerClient` y `getUser()`:** rompe el refresco del token.
+**No poner lógica entre `createServerClient` y `getClaims()`:** rompe el refresco del
+token. Es `getClaims` y no `getUser` porque verifica la firma ahí mismo, sin un viaje a
+Supabase en cada pedido.
 
 Sin credenciales configuradas el middleware deja pasar todo, para que el modo demo sea
 navegable.

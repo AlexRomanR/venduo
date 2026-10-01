@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient, getUsuario } from "@/lib/supabase/server"
 
 export interface Cuenta {
   userId: string
@@ -39,9 +39,7 @@ export async function getCuenta(): Promise<Cuenta | null> {
   const supabase = await createClient()
   if (!supabase) return null
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return null
 
   const [perfilResult, tiendaResult, vendedorResult] = await Promise.all([

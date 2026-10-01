@@ -1,9 +1,10 @@
 import { cache } from "react"
 
+import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
 import { aparienciaDeTienda } from "@/lib/plantillas"
 import type { Apariencia } from "@/lib/plantillas/apariencia"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, getUsuario } from "@/lib/supabase/server"
 import { urlDeTienda } from "@/lib/tienda"
 
 export interface Contadores {
@@ -83,10 +84,11 @@ function barraDeDemostracion(): BarraLateral {
 }
 
 /**
- * Todo lo que necesita la barra lateral, en un solo viaje.
+ * Todo lo que necesita la barra lateral, en dos tandas: lo de la persona, y
+ * después los contadores de su tienda, que necesitan saber cuál es.
  *
  * La barra se dibuja en todas las pantallas privadas, así que lo que cueste se
- * paga en cada navegación. Por eso los contadores son `count` sin traer filas,
+ * paga en cada carga. Por eso los contadores son `count` sin traer filas,
  * salvo el stock: comparar `stock` contra `low_stock_threshold` es comparar dos
  * columnas, cosa que el filtro de PostgREST no sabe hacer, y un catálogo de
  * MVP son decenas de filas.
@@ -102,29 +104,21 @@ export const getBarraLateral = cache(
   async function getBarraLateral(): Promise<BarraLateral> {
     if (!isSupabaseConfigured) return barraDeDemostracion()
 
-    const supabase = await createClient()
+    const [supabase, user] = await Promise.all([createClient(), getUsuario()])
     if (!supabase) return barraDeDemostracion()
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
     if (!user) return barraDeDemostracion()
 
-    const [perfilRes, tiendaRes, vinculosRes, perfilVendedorRes] =
+    // Las comisiones van en la primera tanda aunque la persona no venda: una
+    // consulta vacía en paralelo cuesta menos que esperar a saberlo para
+    // pedirla después. La tienda es la misma lectura que hace la página.
+    const [perfilRes, tienda, vinculosRes, perfilVendedorRes, comisionesRes] =
       await Promise.all([
         supabase
           .from("profiles")
           .select("full_name, avatar_url")
           .eq("id", user.id)
           .maybeSingle(),
-        supabase
-          .from("stores")
-          .select(
-            "id, name, slug, logo_url, is_published, template_key, theme_overrides"
-          )
-          .eq("owner_id", user.id)
-          .is("deleted_at", null)
-          .maybeSingle(),
+        getMiTienda(),
         supabase
           .from("store_sellers")
           .select("status")
@@ -136,9 +130,14 @@ export const getBarraLateral = cache(
           .eq("user_id", user.id)
           .is("deleted_at", null)
           .maybeSingle(),
+        supabase
+          .from("commissions")
+          .select("amount_cents")
+          .eq("seller_user_id", user.id)
+          .eq("status", "confirmada"),
       ])
 
-    const tiendaFila = tiendaRes.data?.template_key ? tiendaRes.data : null
+    const tiendaFila = tienda?.template_key ? tienda : null
     const vinculos = vinculosRes.data ?? []
 
     const contadores: Contadores = { ...SIN_CONTADORES }
@@ -184,13 +183,7 @@ export const getBarraLateral = cache(
     }
 
     if (vinculos.length > 0) {
-      const { data: comisiones } = await supabase
-        .from("commissions")
-        .select("amount_cents")
-        .eq("seller_user_id", user.id)
-        .eq("status", "confirmada")
-
-      contadores.comisionesPorCobrarCents = (comisiones ?? []).reduce(
+      contadores.comisionesPorCobrarCents = (comisionesRes.data ?? []).reduce(
         (total, c) => total + c.amount_cents,
         0
       )

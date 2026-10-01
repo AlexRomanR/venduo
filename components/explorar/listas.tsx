@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { Check, Copy, Loader2, Store, Tag } from "lucide-react"
 import { toast } from "sonner"
 
@@ -10,6 +11,7 @@ import { formatMoney, formatPercent } from "@/lib/format"
 import { createClient } from "@/lib/supabase/client"
 
 export function ListaTiendas({ tiendas }: { tiendas: TiendaAbierta[] }) {
+  const router = useRouter()
   const [enCurso, setEnCurso] = React.useState<string | null>(null)
   const [hechas, setHechas] = React.useState<Record<string, string>>({})
 
@@ -49,6 +51,9 @@ export function ListaTiendas({ tiendas }: { tiendas: TiendaAbierta[] }) {
         ? `Ya vendes para ${tienda.name}.`
         : `Solicitud enviada a ${tienda.name}.`
     )
+    // El vínculo nuevo cambia la barra y el panel del vendedor, que el
+    // navegador guarda un rato: sin esto se verían como antes de sumarse.
+    router.refresh()
   }
 
   return (
@@ -129,6 +134,7 @@ export function ListaProductos({
   productos: ProductoVitrina[]
   siteUrl: string
 }) {
+  const router = useRouter()
   const [enCurso, setEnCurso] = React.useState<string | null>(null)
   const [codigos, setCodigos] = React.useState<Record<string, string>>({})
 
@@ -158,6 +164,7 @@ export function ListaProductos({
 
     setCodigos((previos) => ({ ...previos, [producto.id]: String(data) }))
     toast.success("Tu enlace está listo.")
+    router.refresh()
   }
 
   async function copiar(enlace: string) {

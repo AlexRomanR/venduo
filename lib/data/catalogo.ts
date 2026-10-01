@@ -1,3 +1,4 @@
+import { getMiTienda } from "@/lib/data/panel"
 import { createClient } from "@/lib/supabase/server"
 import type { Product, ProductCategory, ProductCondition } from "@/types"
 
@@ -161,19 +162,7 @@ export async function getCatalogo(
   const supabase = await createClient()
   if (!supabase) return catalogoDeDemostracion()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return catalogoDeDemostracion()
-
-  // Una tienda por usuario: el índice único lo garantiza.
-  const { data: tienda } = await supabase
-    .from("stores")
-    .select("id")
-    .eq("owner_id", user.id)
-    .is("deleted_at", null)
-    .maybeSingle()
-
+  const tienda = await getMiTienda()
   if (!tienda) return catalogoDeDemostracion()
 
   const [{ data: productos }, { data: categorias }] = await Promise.all([
@@ -284,18 +273,7 @@ export async function getProducto(id: string): Promise<Product | null> {
   const supabase = await createClient()
   if (!supabase) return null
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return null
-
-  const { data: tienda } = await supabase
-    .from("stores")
-    .select("id")
-    .eq("owner_id", user.id)
-    .is("deleted_at", null)
-    .maybeSingle()
-
+  const tienda = await getMiTienda()
   if (!tienda) return null
 
   const { data } = await supabase

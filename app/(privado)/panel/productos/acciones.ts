@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 
-import { createClient } from "@/lib/supabase/server"
+import { createClient, getUsuario } from "@/lib/supabase/server"
 import {
   categoriaSchema,
   productoSchema,
@@ -31,9 +31,7 @@ async function miTienda() {
   const supabase = await createClient()
   if (!supabase) return { supabase: null, tiendaId: null }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return { supabase, tiendaId: null }
 
   const { data } = await supabase

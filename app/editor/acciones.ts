@@ -15,7 +15,7 @@ import {
   type Borrador,
   type Operacion,
 } from "@/lib/plantillas/borrador"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, getUsuario } from "@/lib/supabase/server"
 import type { Json } from "@/types"
 
 export type ResultadoDePublicar =
@@ -171,9 +171,7 @@ async function registrarPropuesta(
   const supabase = await createClient()
   if (!supabase || diseno.esDemo) return null
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return null
 
   const { data: portada } = await supabase

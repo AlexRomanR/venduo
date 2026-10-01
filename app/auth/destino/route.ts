@@ -1,7 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server"
 
 import { resolverDestino } from "@/lib/data/panel"
-import { createClient } from "@/lib/supabase/server"
+import { isSupabaseConfigured } from "@/lib/env"
+import { getUsuario } from "@/lib/supabase/server"
 
 /**
  * Resuelve a dónde entra una cuenta y redirige una sola vez.
@@ -12,19 +13,16 @@ import { createClient } from "@/lib/supabase/server"
  * era suya.
  */
 export async function GET(request: NextRequest) {
-  const supabase = await createClient()
   const url = request.nextUrl.clone()
   const pedido = url.searchParams.get("next")
 
   // Sin credenciales no hay a quién resolverle nada: el modo demo entra al
   // panel, que es lo que tiene datos de ejemplo que mostrar.
-  if (!supabase) {
+  if (!isSupabaseConfigured) {
     return NextResponse.redirect(new URL("/panel", request.url))
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
 
   if (!user) {
     return NextResponse.redirect(new URL("/login", request.url))

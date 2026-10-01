@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient, getUsuario } from "@/lib/supabase/server"
 import {
   getDemoMetrics,
   type DashboardMetrics,
@@ -19,9 +19,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   const supabase = await createClient()
   if (!supabase) return getDemoMetrics()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return getDemoMetrics()
 
   // Una tienda por usuario: el índice único sobre owner_id lo garantiza.

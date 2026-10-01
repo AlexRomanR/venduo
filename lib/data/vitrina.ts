@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient, getUsuario } from "@/lib/supabase/server"
 import { PRODUCTOS_VITRINA_DEMO, TIENDAS_ABIERTAS_DEMO } from "@/lib/demo-data"
 import type { ProductoVitrina, TiendaAbierta } from "@/lib/demo-data"
 
@@ -59,9 +59,7 @@ export async function getTiendasAbiertas({
   const busqueda = normalizar(q)
   const desde = (pagina - 1) * POR_PAGINA
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
 
   let consulta = supabase
     .from("stores")
@@ -163,9 +161,7 @@ export async function getProductosVitrina({
   const busqueda = normalizar(q)
   const desde = (pagina - 1) * POR_PAGINA
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
 
   let consulta = supabase
     .from("products")

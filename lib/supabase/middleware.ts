@@ -75,15 +75,17 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // No poner lógica entre createServerClient y getUser: rompe el refresh.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // No poner lógica entre createServerClient y getClaims: rompe el refresh.
+  // `getClaims` y no `getUser`: verifica la firma del token acá mismo, sin
+  // viajar a Supabase en cada pedido. Si el token está por vencer, lo renueva
+  // y las cookies nuevas salen por `setAll`, igual que antes.
+  const { data } = await supabase.auth.getClaims()
+  const conSesion = Boolean(data?.claims?.sub)
 
   const { pathname } = request.nextUrl
   const needsAuth = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
 
-  if (!user && needsAuth) {
+  if (!conSesion && needsAuth) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
     url.searchParams.set("next", pathname)

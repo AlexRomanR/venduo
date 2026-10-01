@@ -1,3 +1,4 @@
+import { getMiTienda } from "@/lib/data/panel"
 import { createClient } from "@/lib/supabase/server"
 import { formatMoney } from "@/lib/format"
 import { numeroDeWhatsApp } from "@/lib/pedidos"
@@ -135,18 +136,7 @@ export async function getPedidos(filtro?: string): Promise<Pedidos> {
   const supabase = await createClient()
   if (!supabase) return pedidosDeDemostracion()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return pedidosDeDemostracion()
-
-  const { data: tienda } = await supabase
-    .from("stores")
-    .select("id")
-    .eq("owner_id", user.id)
-    .is("deleted_at", null)
-    .maybeSingle()
-
+  const tienda = await getMiTienda()
   if (!tienda) return pedidosDeDemostracion()
 
   const { data: filas } = await supabase

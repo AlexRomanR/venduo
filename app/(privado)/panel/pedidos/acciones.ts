@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache"
 
 import { BUCKETS } from "@/lib/supabase/storage"
-import { createAdminClient, createClient } from "@/lib/supabase/server"
+import {
+  createAdminClient,
+  createClient,
+  getUsuario,
+} from "@/lib/supabase/server"
 import type { OrderStatus } from "@/types"
 
 const RUTA = "/panel/pedidos"
@@ -44,9 +48,7 @@ export async function cambiarEstado(
   const supabase = await createClient()
   if (!supabase) return { ok: false, error: "Supabase sin configurar." }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return { ok: false, error: "Necesitas iniciar sesión." }
 
   const { data: tienda } = await supabase
@@ -96,9 +98,7 @@ export async function verComprobante(
   const supabase = await createClient()
   if (!supabase) return { ok: false, error: "Supabase sin configurar." }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return { ok: false, error: "Necesitas iniciar sesión." }
 
   const { data: tienda } = await supabase

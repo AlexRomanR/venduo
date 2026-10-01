@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Image from "next/image"
-import Link from "next/link"
+import Link, { useLinkStatus } from "next/link"
 import { usePathname } from "next/navigation"
 import {
   ChartColumn,
@@ -673,6 +673,29 @@ function Grupo({
   )
 }
 
+/**
+ * El trazo del enlace que se tocó, latiendo mientras se abre su pantalla.
+ *
+ * Una pantalla que no estaba en memoria tarda lo que tarda la base, y en ese
+ * rato la anterior seguía quieta: parecía que el toque no había entrado. Va
+ * dentro del `Link`, que es lo que le dice si su navegación está pendiente, y
+ * se dibuja sobre el trazo que el enlace ya tiene.
+ */
+function Abriendo({ className }: { className: string }) {
+  const { pending } = useLinkStatus()
+
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        "pointer-events-none absolute opacity-0",
+        className,
+        pending && "abriendo"
+      )}
+    />
+  )
+}
+
 function Entrada({
   item,
   pathname,
@@ -704,6 +727,7 @@ function Entrada({
         <ConNombre nombre={nombre} plegada>
           <Link
             href={item.href}
+            prefetch
             aria-label={nombre}
             aria-current={actual}
             className={cn(
@@ -713,6 +737,7 @@ function Entrada({
                 : "border-transparent hover:bg-tinta/[0.04]"
             )}
           >
+            <Abriendo className="inset-y-0 -left-0.5 w-0.5 bg-tinta" />
             <Icono
               aria-hidden="true"
               className={cn("size-[18px]", activo ? "" : "opacity-60")}
@@ -740,17 +765,19 @@ function Entrada({
     <li>
       <Link
         href={item.href}
+        prefetch
         onClick={alNavegar}
         aria-current={actual}
         className={cn(
           // La regla de 2 px a la izquierda es el mismo trazo que abre un tema
           // en el resto del sistema, girado para una columna.
-          "flex min-h-11 items-center gap-3 border-l-2 px-3 text-sm transition-colors",
+          "relative flex min-h-11 items-center gap-3 border-l-2 px-3 text-sm transition-colors",
           activo
             ? "border-tinta bg-tinta/[0.06] font-semibold"
             : "border-transparent hover:border-tinta/25 hover:bg-tinta/[0.03]"
         )}
       >
+        <Abriendo className="inset-y-0 -left-0.5 w-0.5 bg-tinta" />
         <Icono
           aria-hidden="true"
           className={cn("size-4 shrink-0", activo ? "" : "opacity-55")}
@@ -790,15 +817,17 @@ function Entrada({
               <li key={hijo.href}>
                 <Link
                   href={hijo.href}
+                  prefetch
                   onClick={alNavegar}
                   aria-current={hijoActivo ? "page" : undefined}
                   className={cn(
-                    "flex min-h-11 items-center gap-2.5 pl-4 text-xs transition-colors",
+                    "relative flex min-h-11 items-center gap-2.5 pl-4 text-xs transition-colors",
                     hijoActivo
                       ? "font-semibold"
                       : "opacity-60 hover:opacity-100"
                   )}
                 >
+                  <Abriendo className="inset-y-0 -left-px w-0.5 bg-tinta" />
                   <Hijo aria-hidden="true" className="size-3.5 shrink-0" />
                   {hijo.nombre}
                 </Link>

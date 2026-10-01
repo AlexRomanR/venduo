@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient, getUsuario } from "@/lib/supabase/server"
 import {
   COMISIONES_DEMO,
   RESUMEN_VENDEDOR_DEMO,
@@ -29,9 +29,7 @@ export async function getResumenVendedor(): Promise<ResumenVendedor | null> {
   const supabase = await createClient()
   if (!supabase) return null
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return null
 
   const [comisionesResult, vinculosResult, perfilResult] = await Promise.all([
@@ -99,9 +97,7 @@ export async function getComisionesDeVendedor(
   const supabase = await createClient()
   if (!supabase) return COMISIONES_DEMO.slice(0, limite)
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return []
 
   const { data } = await supabase

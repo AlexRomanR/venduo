@@ -193,14 +193,20 @@ export async function completarTienda(
   supabase: Cliente,
   tienda: FilaDeTienda
 ): Promise<TiendaPublica> {
+  // Las secciones viajan dentro de su página: pedirlas aparte obligaba a
+  // esperar la página para recién preguntar por ellas, un viaje más en cada
+  // visita a la tienda.
   const [{ data: pagina }, { data: productos }, { data: categorias }] =
     await Promise.all([
       supabase
         .from("store_pages")
-        .select("id")
+        .select("id, store_blocks(id, block_type_key, props)")
         .eq("store_id", tienda.id)
         .eq("is_home", true)
         .is("deleted_at", null)
+        .eq("store_blocks.is_visible", true)
+        .is("store_blocks.deleted_at", null)
+        .order("position", { referencedTable: "store_blocks" })
         .maybeSingle(),
       supabase
         .from("products")
@@ -219,22 +225,13 @@ export async function completarTienda(
         .order("name"),
     ])
 
-  let bloques: BloquePublico[] = []
-  if (pagina) {
-    const { data } = await supabase
-      .from("store_blocks")
-      .select("id, block_type_key, props")
-      .eq("page_id", pagina.id)
-      .eq("is_visible", true)
-      .is("deleted_at", null)
-      .order("position")
-
-    bloques = (data ?? []).map((bloque) => ({
+  const bloques: BloquePublico[] = (pagina?.store_blocks ?? []).map(
+    (bloque) => ({
       id: bloque.id,
       tipo: bloque.block_type_key,
       props: (bloque.props ?? {}) as Record<string, Json | undefined>,
-    }))
-  }
+    })
+  )
 
   const catalogo = productos ?? []
 

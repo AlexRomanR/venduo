@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient, getUsuario } from "@/lib/supabase/server"
 import { DEMO_PRODUCTS } from "@/lib/demo-data"
 import { CURRENCY } from "@/lib/format"
 import type { Product } from "@/types"
@@ -26,9 +26,7 @@ export async function getProducts(): Promise<ProductsResult> {
 
   if (!supabase) return demo
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return demo
 
   // Una tienda por usuario: el índice único sobre owner_id lo garantiza.

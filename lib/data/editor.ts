@@ -18,7 +18,7 @@ import {
   type Seccion,
 } from "@/lib/plantillas/borrador"
 import { leerPropiedades } from "@/lib/plantillas/secciones"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, getUsuario } from "@/lib/supabase/server"
 import { urlDeTienda } from "@/lib/tienda"
 import {
   COLUMNAS_DE_TIENDA,
@@ -148,9 +148,7 @@ export async function leerDisenoParaEditar(): Promise<DisenoParaEditar | null> {
   const supabase = await createClient()
   if (!supabase) return disenoDeDemostracion()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return null
 
   const { data: tienda } = await supabase
@@ -257,9 +255,7 @@ export async function getTiendaParaVistaPrevia(): Promise<TiendaPublica | null> 
     return demo ? { ...demo, enEdicion: true } : null
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return null
 
   const { data: tienda } = await supabase

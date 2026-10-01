@@ -16,18 +16,20 @@ export default async function EditarProductoPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  const tienda = await getMiTienda()
-  if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
-
   const { id } = await params
-  const producto = await getProducto(id)
+  // Las tres a la vez: el producto y las categorías esperan a la misma
+  // tienda, que se lee una sola vez por pedido.
+  const [tienda, producto, { categorias }] = await Promise.all([
+    getMiTienda(),
+    getProducto(id),
+    getCatalogo(),
+  ])
+  if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
   // `getProducto` ya filtra por tienda, así que un identificador de otro
   // comercio llega acá como inexistente y no como prohibido: es lo mismo para
   // quien lo pide, y no confirma que ese producto exista en algún lado.
   if (!producto) notFound()
-
-  const { categorias } = await getCatalogo()
 
   return (
     <div className="mx-auto w-full max-w-3xl">

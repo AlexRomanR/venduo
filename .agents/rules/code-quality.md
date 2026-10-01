@@ -48,7 +48,7 @@ Vale la pena comentar una restricción no obvia, una decisión que sorprendería
 o el motivo de algo que parece innecesario:
 
 ```ts
-// No poner lógica entre createServerClient y getUser: rompe el refresh.
+// No poner lógica entre createServerClient y getClaims: rompe el refresh.
 ```
 
 No comentar lo evidente, ni dejar rastros de la tarea que originó el cambio ("agregado

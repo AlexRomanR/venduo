@@ -40,16 +40,20 @@ export const metadata = { title: "Resumen" }
  * porque es lo que marca que el alta terminó.
  */
 export default async function PanelPage() {
-  const tienda = await getMiTienda()
+  // El tablero arranca ya, sin esperar a la cabecera: antes empezaba recién
+  // cuando ella terminaba, y sus consultas se sumaban a las de arriba en vez
+  // de correr a la vez. Llega por el `Suspense` de abajo.
+  const tablero = getTablero().catch(() => null)
+
+  const [tienda, resumen, barra] = await Promise.all([
+    getMiTienda(),
+    getResumenPanel(),
+    getBarraLateral(),
+  ])
 
   // Sin credenciales el modo demo tiene que seguir siendo navegable: no hay
   // tienda que buscar ni alta que completar.
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
-
-  const [resumen, barra] = await Promise.all([
-    getResumenPanel(),
-    getBarraLateral(),
-  ])
   const datos = resumen ?? RESUMEN_DEMO
   const clave = plantillaDeTienda(datos.tienda.templateKey)
 
@@ -76,6 +80,7 @@ export default async function PanelPage() {
 
       <Suspense fallback={<EsqueletoDelTablero />}>
         <ContenidoDelTablero
+          tablero={tablero}
           contadores={barra.contadores}
           tienda={deLaTienda}
         />
@@ -89,13 +94,15 @@ export default async function PanelPage() {
  * instante y el resto llega en cuanto está, con su esqueleto mientras tanto.
  */
 async function ContenidoDelTablero({
+  tablero: lectura,
   contadores,
   tienda,
 }: {
+  tablero: Promise<Tablero | null>
   contadores: Contadores
   tienda: { nombre: string; slug: string; url: string; publicada: boolean }
 }) {
-  const tablero = (await getTablero()) ?? tableroDeDemostracion()
+  const tablero = (await lectura) ?? tableroDeDemostracion()
   const pendientes = armarPendientes(tablero, contadores, tienda.publicada)
   const faltanPasos = pasosPendientes(tablero.pasos) > 0
 

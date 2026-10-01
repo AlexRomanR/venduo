@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Plus } from "lucide-react"
 
-import { getUser } from "@/lib/supabase/server"
+import { getUsuario } from "@/lib/supabase/server"
 import { Cifra } from "@/components/landing/cifra"
 import { DemoTienda } from "@/components/landing/demo-tienda"
 import { Entra } from "@/components/landing/entra"
@@ -108,7 +108,7 @@ const PREGUNTAS = [
 ]
 
 export default async function Inicio() {
-  const user = await getUser()
+  const user = await getUsuario()
 
   return (
     <div className="min-h-screen bg-papel text-tinta">

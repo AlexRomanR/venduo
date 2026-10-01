@@ -11,6 +11,20 @@ const nextConfig: NextConfig = {
   // lo cargue tal cual desde node_modules.
   serverExternalPackages: ["@react-pdf/renderer"],
 
+  experimental: {
+    // Cuánto reutiliza el navegador una pantalla ya traída antes de volver a
+    // pedirla. `dynamic` es la que se visitó: ir y volver entre dos secciones
+    // dentro de medio minuto no espera a la base. `static` es la que se trajo
+    // de antemano —los enlaces de la barra lo hacen con `prefetch`—: un
+    // minuto y no los cinco de fábrica, para que un pedido que llega mientras
+    // tanto se vea pronto. Lo que cambia la propia persona se ve al instante:
+    // cada acción que guarda revalida o refresca, y eso vacía esta memoria.
+    staleTimes: {
+      dynamic: 30,
+      static: 60,
+    },
+  },
+
   images: {
     remotePatterns: [
       ...(supabaseHost

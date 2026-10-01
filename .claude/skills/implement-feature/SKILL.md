@@ -63,36 +63,29 @@ export async function getPedidos(): Promise<PedidosResult> {
   const supabase = await createClient()
   if (!supabase) return demo // modo demo: sin credenciales
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return demo
-
-  // Una tienda por usuario: el índice único lo garantiza
-  const { data: store } = await supabase
-    .from("stores")
-    .select("id")
-    .eq("owner_id", user.id)
-    .is("deleted_at", null)
-    .maybeSingle()
-
-  if (!store) return demo
+  // La tienda del dueño, con memoria por pedido: la barra y la página la
+  // comparten. Sin sesión o sin tienda, null.
+  const tienda = await getMiTienda()
+  if (!tienda) return demo
 
   const { data } = await supabase
     .from("orders")
     .select("*")
-    .eq("store_id", store.id)
+    .eq("store_id", tienda.id)
     .order("created_at", { ascending: false })
 
   return { pedidos: data ?? [], isDemo: false }
 }
 ```
 
-Tres cosas que se repiten en todas:
+Lo que se repite en todas:
 
 - **El `null` del cliente es el modo demo**, no un caso imposible.
 - **`.is("deleted_at", null)`** en toda tabla que lo tenga.
-- **`maybeSingle()`** para la tienda: hay una sola por usuario.
+- **La sesión sale de `getUsuario()` y la tienda de `getMiTienda()`**, nunca de
+  `supabase.auth.getUser()`, que es un viaje a Supabase cada vez.
+- **Lo que no depende de otra consulta va en el mismo `Promise.all`.** Cada consulta en
+  fila es un viaje más que la pantalla espera. Todo esto está en `performance.md`.
 
 Las escrituras sensibles no van acá: el checkout pasa por `create_order`, el alta de
 vendedor por `join_store`. Ver la skill `sales-and-commissions`.
@@ -109,6 +102,10 @@ compartido entre el formulario y lo que lo procesa.
 
 Escribir los tres estados: con datos, vacío y cargando. Una tienda recién creada y un
 vendedor sin ventas son el estado normal durante la demostración.
+
+**Una sección nueva del panel lleva su `loading.tsx`**, con `EsqueletoDePantalla` de
+`components/panel/esqueleto.tsx`: sin él, mientras carga se ve el esqueleto del Resumen.
+Si la barra lateral la enlaza, el enlace lleva `prefetch`.
 
 Montos siempre por `formatMoney`. Textos en español neutro boliviano, tratando de "tú".
 Arrancar el diseño en 375 px.

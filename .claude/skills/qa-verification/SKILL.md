@@ -69,7 +69,9 @@ npm run build
 - [ ] ¿No existe scroll horizontal indeseado en la vista móvil?
 - [ ] ¿Los botones y áreas interactivas miden al menos 44px x 44px?
 - [ ] ¿Los campos de formulario muestran mensajes de error legibles y accesibles?
-- [ ] ¿Se añadieron estados de carga (`loading.tsx` o `Skeleton`) para datos asíncronos?
+- [ ] ¿Se añadieron estados de carga para datos asíncronos? Una sección del panel lleva su `loading.tsx` con `EsqueletoDePantalla`.
+- [ ] ¿Las consultas de la pantalla salen en paralelo, con la sesión de `getUsuario()` y la tienda de `getMiTienda()`, sin `auth.getUser()`? Ver `performance.md`.
+- [ ] ¿Cada escritura vacía la memoria del navegador, con `revalidatePath` en una Server Action o `router.refresh()` desde el cliente?
 
 ### Resiliencia y Modo Demo
 

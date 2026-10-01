@@ -1,6 +1,6 @@
 import { cache } from "react"
 
-import { createClient } from "@/lib/supabase/server"
+import { createClient, getUsuario } from "@/lib/supabase/server"
 import type { ResumenPanel, Suscripcion } from "@/lib/demo-data"
 import type { SubscriptionStatus } from "@/types"
 
@@ -22,9 +22,7 @@ export async function getPerfil() {
   const supabase = await createClient()
   if (!supabase) return null
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return null
 
   const { data } = await supabase
@@ -73,9 +71,7 @@ export const getMiTienda = cache(async function getMiTienda() {
   const supabase = await createClient()
   if (!supabase) return null
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return null
 
   // Una tienda por usuario: el índice único sobre owner_id lo garantiza.
@@ -272,9 +268,7 @@ export async function getVinculosDeVendedor(): Promise<VinculoVendedor[]> {
   const supabase = await createClient()
   if (!supabase) return []
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return []
 
   const { data } = await supabase

@@ -18,10 +18,14 @@ export const metadata = { title: "Estadísticas" }
  * alcance no depende de que el modelo se acuerde de filtrar.
  */
 export default async function EstadisticasPage() {
-  const tienda = await getMiTienda()
+  // Los guardados no esperan a la tienda: RLS ya los acota a la suya, y
+  // pedirlos en serie era un viaje más antes de ejecutar cada gráfico.
+  const [tienda, guardados] = await Promise.all([
+    getMiTienda(),
+    getGraficosGuardados(),
+  ])
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
-  const guardados = await getGraficosGuardados()
   const graficos = await Promise.all(guardados.map(getGraficoConDatos))
   const ai = getAIStatus()
 

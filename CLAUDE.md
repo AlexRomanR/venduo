@@ -44,6 +44,9 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
 - **Una tienda se ve con su plantilla, y ningún componente pregunta cuál es.** La base
   vive en código, la personalización en `stores.theme_overrides` y lo que se dibuja se
   calcula. Todo en `docs/store-templates.md`.
+- **Lo que hace lenta una pantalla es esperar a la base en fila.** La sesión sale de
+  `getUsuario()`, nunca de `auth.getUser()`; las consultas van en paralelo, y las
+  funciones corren en São Paulo, junto a la base. Detalle en `performance.md`.
 - **Hay una sola base de datos y es la de producción**, y cada push a `main` se publica
   solo en Vercel. `npx supabase db push` cambia producción en el acto. Antes de migrar o
   de subir a `main`, leer `workflow.md`.
@@ -76,6 +79,7 @@ Se cargan solas. Son la misma fuente que lee Antigravity desde `.agents/rules/`.
 @.agents/rules/ui-styling.md
 @.agents/rules/ai-layer.md
 @.agents/rules/code-quality.md
+@.agents/rules/performance.md
 @.agents/rules/workflow.md
 
 ## Skills

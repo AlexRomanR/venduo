@@ -1,7 +1,7 @@
 # Estado del proyecto
 
 Qué está construido en Venduo y qué falta, contra el alcance del MVP de `VENDUO.md` §6.
-Actualizado el 29 de septiembre de 2026.
+Actualizado el 1 de octubre de 2026.
 
 **Leyenda:** ✅ hecho · 🟡 hecho con un flujo provisorio o a medias · ❌ falta
 
@@ -135,6 +135,17 @@ Actualizado el 29 de septiembre de 2026.
 - La IA de estadísticas solo lee, en una transacción de solo lectura y contra vistas de la
   propia tienda.
 - Modo demo que funciona sin credenciales.
+
+### Rendimiento
+
+- Las funciones de Vercel corren en São Paulo (`gru1`), junto a la base. Antes corrían en
+  Washington y cada consulta cruzaba el continente.
+- La sesión se verifica sin ir a Supabase (`getUsuario()`), una vez por pedido, y las
+  pantallas piden sus datos en paralelo: las del panel pasaron de unos seis viajes en
+  fila a dos.
+- Cada sección del panel muestra su esqueleto al instante, la barra lateral precarga sus
+  pantallas y el enlace tocado late mientras se abre.
+- Reglas en `.agents/rules/performance.md`.
 
 ---
 

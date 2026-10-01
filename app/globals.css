@@ -227,4 +227,32 @@
       transform: none;
     }
   }
+
+  /*
+   * El trazo de un enlace mientras se abre su pantalla: late hasta que llega.
+   * Espera 120 ms antes de aparecer, así una pantalla que ya estaba en memoria
+   * se abre antes y no deja un parpadeo. Con menos movimiento queda fijo.
+   */
+  .abriendo {
+    animation: abriendo 1.1s ease-in-out 120ms infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .abriendo {
+      animation: abriendo-fijo 1ms linear 120ms forwards;
+    }
+  }
+  @keyframes abriendo {
+    0%,
+    100% {
+      opacity: 0.25;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @keyframes abriendo-fijo {
+    to {
+      opacity: 1;
+    }
+  }
 }

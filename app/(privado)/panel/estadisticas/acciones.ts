@@ -10,7 +10,7 @@ import {
   type FilaInsight,
 } from "@/lib/data/insights"
 import { getMiTienda } from "@/lib/data/panel"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, getUsuario } from "@/lib/supabase/server"
 
 export interface Respuesta {
   ok: boolean
@@ -120,9 +120,7 @@ export async function guardar(consulta: InsightSql, pregunta: string) {
   const supabase = await createClient()
   if (!supabase) return { ok: false, error: "Supabase sin configurar." }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   const tienda = await getMiTienda()
 
   if (!user || !tienda) return { ok: false, error: "No tienes una tienda." }
@@ -174,9 +172,7 @@ async function registrar(
   const supabase = await createClient()
   if (!supabase) return
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getUsuario()
   if (!user) return
 
   await supabase.from("ai_generations").insert({
