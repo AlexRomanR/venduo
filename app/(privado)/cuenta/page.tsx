@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { ArrowUpRight } from "lucide-react"
+import { ArrowUpRight, IdCard, QrCode, Store, UserRound } from "lucide-react"
 
 import { getCuenta } from "@/lib/data/cuenta"
 import { isSupabaseConfigured } from "@/lib/env"
@@ -11,9 +11,22 @@ import {
 } from "@/components/cuenta/formularios"
 import { FormCobro } from "@/components/cuenta/cobro"
 import { Foto } from "@/components/cuenta/foto"
-import { Encabezado } from "@/components/panel/piezas"
+import { Cabecera, Seccion, SinDatos } from "@/components/panel/piezas"
 
 export const metadata = { title: "Mi cuenta" }
+
+/** El enlace que va a la derecha del título de un panel. */
+function Ver({ href, children }: { href: string; children: string }) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+    >
+      {children}
+      <ArrowUpRight aria-hidden="true" className="size-4" />
+    </Link>
+  )
+}
 
 /**
  * Ajustes de la cuenta.
@@ -21,7 +34,7 @@ export const metadata = { title: "Mi cuenta" }
  * Una sola pantalla para las tres identidades que puede tener una persona: la
  * suya, la de su tienda y la de vendedora. Se muestran las que existen, porque
  * quien tiene tienda y además vende para otras necesita editar las dos sin
- * cambiar de lugar.
+ * cambiar de lugar. Cada una en su panel, y cada panel se guarda por su lado.
  */
 export default async function CuentaPage() {
   const cuenta = await getCuenta()
@@ -31,14 +44,20 @@ export default async function CuentaPage() {
     if (isSupabaseConfigured) redirect("/login")
 
     return (
-      <div className="max-w-[52ch]">
-        <h1 className="font-titular text-[clamp(1.75rem,5vw,2.5rem)] leading-none font-extrabold tracking-[-0.03em]">
-          Mi cuenta
-        </h1>
-        <p className="mt-4 leading-relaxed opacity-70">
-          En modo demo no hay una cuenta real que editar. Configura Supabase en{" "}
-          <code className="font-mono">.env.local</code> y vuelve a entrar.
-        </p>
+      <div className="flex flex-col gap-6 md:gap-8">
+        <Cabecera titulo="Mi cuenta" />
+        <Seccion
+          id="persona"
+          icono={UserRound}
+          titulo="Quién eres en Venduo"
+          bajada="Tus datos, los de tu tienda y tu perfil de vendedor."
+        >
+          <SinDatos
+            icono={UserRound}
+            titulo="En modo demo no hay una cuenta que editar"
+            texto="Configura Supabase en .env.local y vuelve a entrar: acá vas a cambiar tu nombre, tu foto, los datos de tu tienda y cómo te pagan."
+          />
+        </Seccion>
       </div>
     )
   }
@@ -46,106 +65,67 @@ export default async function CuentaPage() {
   const nombre = cuenta.perfil.fullName ?? "tu cuenta"
 
   return (
-    <div className="flex flex-col gap-14">
-      <div>
-        <h1 className="font-titular text-[clamp(1.75rem,5vw,2.5rem)] leading-none font-extrabold tracking-[-0.03em]">
-          Mi cuenta
-        </h1>
-        <p className="mt-3 max-w-[54ch] text-sm leading-relaxed opacity-70">
-          Tus datos, y los de las identidades que uses en Venduo. Los cambios se
-          guardan por separado en cada bloque.
-        </p>
-      </div>
+    <div className="flex flex-col gap-6 md:gap-8">
+      <Cabecera
+        titulo="Mi cuenta"
+        bajada="Tus datos y los de las identidades que uses en Venduo. Cada panel se guarda por separado."
+      />
 
-      <section className="grid gap-10 lg:grid-cols-[0.9fr_1fr] lg:gap-16">
-        <div>
-          <Encabezado etiqueta="Tú" titulo="Quién eres en Venduo" />
-          <p className="mt-3 max-w-[44ch] text-sm leading-relaxed opacity-70">
-            Tu foto se ve en tu perfil de vendedor y en el panel. Tu nombre es
-            con el que te saluda la plataforma.
-          </p>
-          <div className="mt-8">
-            <Foto
-              userId={cuenta.userId}
-              urlActual={cuenta.perfil.avatarUrl}
-              nombre={nombre}
-            />
-          </div>
-        </div>
-
-        <div className="border-t-2 border-tinta pt-8 lg:border-t-0 lg:border-l lg:border-tinta/15 lg:pt-0 lg:pl-12">
+      <Seccion
+        id="persona"
+        icono={UserRound}
+        titulo="Quién eres en Venduo"
+        bajada="Tu foto se ve en tu perfil de vendedor y en el panel; con tu nombre te saluda la plataforma."
+        relleno
+      >
+        <div className="grid items-start gap-8 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-12">
+          <Foto
+            userId={cuenta.userId}
+            urlActual={cuenta.perfil.avatarUrl}
+            nombre={nombre}
+          />
           <FormPersona cuenta={cuenta} />
         </div>
-      </section>
+      </Seccion>
 
       {cuenta.tienda ? (
-        <section className="grid gap-10 border-t border-tinta/15 pt-12 lg:grid-cols-[0.9fr_1fr] lg:gap-16">
-          <div>
-            <Encabezado etiqueta="Tu tienda" titulo={cuenta.tienda.name} />
-            <p className="mt-3 max-w-[44ch] text-sm leading-relaxed opacity-70">
-              Cómo te ven tus compradores y bajo qué condiciones trabajan tus
-              vendedores.
-            </p>
-            <Link
-              href={`/t/${cuenta.tienda.slug}`}
-              className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
-            >
-              Ver mi tienda
-              <ArrowUpRight aria-hidden="true" className="size-4" />
-            </Link>
-          </div>
-
-          <div className="border-t-2 border-tinta pt-8 lg:border-t-0 lg:border-l lg:border-tinta/15 lg:pt-0 lg:pl-12">
-            <FormTienda cuenta={cuenta} />
-          </div>
-        </section>
+        <Seccion
+          id="tienda"
+          icono={Store}
+          titulo={cuenta.tienda.name}
+          bajada="Cómo te ven tus compradores y bajo qué condiciones trabajan tus vendedores."
+          extra={<Ver href={`/t/${cuenta.tienda.slug}`}>Ver mi tienda</Ver>}
+          relleno
+        >
+          <FormTienda cuenta={cuenta} />
+        </Seccion>
       ) : null}
 
       {cuenta.tienda ? (
-        <section className="grid gap-10 border-t border-tinta/15 pt-12 lg:grid-cols-[0.9fr_1fr] lg:gap-16">
-          <div>
-            <Encabezado
-              etiqueta="Cómo te pagan"
-              titulo="El cobro de tus pedidos"
-            />
-            <p className="mt-4 max-w-[52ch] text-sm leading-relaxed opacity-70">
-              Venduo no cobra por ti: quien compra transfiere a tu QR y sube su
-              comprobante, y tú confirmas. Si no cargas el QR, esa pantalla
-              queda con un hueco y el comprador tiene que preguntarte por
-              WhatsApp.
-            </p>
-          </div>
-
-          <div className="border-t-2 border-tinta pt-8 lg:border-t-0 lg:border-l lg:border-tinta/15 lg:pt-0 lg:pl-12">
-            <FormCobro cuenta={cuenta} />
-          </div>
-        </section>
+        <Seccion
+          id="cobro"
+          icono={QrCode}
+          titulo="Cómo te pagan"
+          bajada="Quien compra transfiere a tu QR y sube su comprobante. Sin el QR, tiene que preguntarte por WhatsApp."
+          relleno
+        >
+          <FormCobro cuenta={cuenta} />
+        </Seccion>
       ) : null}
 
       {cuenta.vendedor ? (
-        <section className="grid gap-10 border-t border-tinta/15 pt-12 lg:grid-cols-[0.9fr_1fr] lg:gap-16">
-          <div>
-            <Encabezado
-              etiqueta="Tu perfil de vendedor"
-              titulo="Tu historial laboral"
-            />
-            <p className="mt-3 max-w-[44ch] text-sm leading-relaxed opacity-70">
-              Esto es lo que ve quien recibe tu currículum. Las ventas se suman
-              solas; acá editas cómo te presentas.
-            </p>
-            <Link
-              href={`/v/${cuenta.vendedor.slug}`}
-              className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
-            >
-              Ver mi perfil público
-              <ArrowUpRight aria-hidden="true" className="size-4" />
-            </Link>
-          </div>
-
-          <div className="border-t-2 border-tinta pt-8 lg:border-t-0 lg:border-l lg:border-tinta/15 lg:pt-0 lg:pl-12">
-            <FormVendedor cuenta={cuenta} />
-          </div>
-        </section>
+        <Seccion
+          id="perfil-vendedor"
+          icono={IdCard}
+          titulo="Tu perfil de vendedor"
+          bajada="Lo que ve quien recibe tu historial. Las ventas se suman solas; acá editas cómo te presentas."
+          extra={
+            <Ver href={`/v/${cuenta.vendedor.slug}`}>Ver mi perfil público</Ver>
+          }
+          relleno
+        >
+          <FormVendedor cuenta={cuenta} />
+        </Seccion>
       ) : null}
     </div>
   )

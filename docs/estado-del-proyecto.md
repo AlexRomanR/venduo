@@ -110,12 +110,15 @@ Actualizado el 1 de octubre de 2026.
   anterior, código y destacado. Categorías propias.
 - **Pedidos**: lista, detalle, cambio de estado, comprobante, y un botón que abre WhatsApp
   con el pedido ya armado.
-- **Vendedores**: la red, sus solicitudes y la invitación.
+- **Vendedores**: la red con lo que vendió cada uno y su comisión, aprobar o rechazar
+  solicitudes, y la invitación.
 - **Estadísticas**: preguntas en lenguaje natural, gráficos guardados, edición del gráfico
   por texto e informe en PDF (completo o de un gráfico).
 - **Apariencia**: la puerta al editor, la plantilla, cambiarla y el historial, con
   **Restaurar** en cada versión. El resumen también lleva al editor, y pide darle estilo
   mientras la tienda luzca igual a la plantilla.
+- Todas las pantallas se arman como el Resumen: cada cosa en su panel con borde, un
+  título que dice para qué sirve y su estado vacío dentro.
 - Barra lateral con contadores de lo que pide atención; se puede plegar y recuerda cómo
   quedó.
 

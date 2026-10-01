@@ -4,11 +4,7 @@ import { ArrowRight, Flame, Package, PackageOpen } from "lucide-react"
 import { formatMoney, formatNumber } from "@/lib/format"
 import type { ProductoPorAcabarse, ProductoVendido } from "@/lib/tablero"
 import { cn } from "@/lib/utils"
-import {
-  Miniatura,
-  Seccion,
-  SinDatos,
-} from "@/components/panel/tablero/seccion"
+import { Miniatura, Seccion, SinDatos } from "@/components/panel/piezas"
 
 /**
  * Los productos que más se vendieron en 30 días, por unidades.

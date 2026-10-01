@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation"
 import { Copy, Loader2, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 
+import { BOTON_SECUNDARIO } from "@/lib/estilos"
 import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 /**
- * El enlace de invitación de la tienda.
+ * El enlace de invitación de la tienda, como cuerpo de su panel.
  *
  * Lleva la tienda y el código juntos (`?t=slug&inv=codigo`) para que aceptar
  * la invitación no necesite traducir código a tienda: ese endpoint sería justo
@@ -19,19 +20,20 @@ export function EnlaceInvitacion({
   slug,
   codigo,
   siteUrl,
+  soloLectura = false,
 }: {
   slug: string
-  codigo: string | null
+  codigo: string
   siteUrl: string
+  soloLectura?: boolean
 }) {
   const router = useRouter()
   const [actual, setActual] = React.useState(codigo)
   const [rotando, setRotando] = React.useState(false)
 
-  const enlace = actual ? `${siteUrl}/sumarme?t=${slug}&inv=${actual}` : null
+  const enlace = `${siteUrl}/sumarme?t=${slug}&inv=${actual}`
 
   async function copiar() {
-    if (!enlace) return
     try {
       await navigator.clipboard.writeText(enlace)
       toast.success("Enlace copiado.")
@@ -42,8 +44,8 @@ export function EnlaceInvitacion({
 
   async function rotar() {
     const supabase = createClient()
-    if (!supabase) {
-      toast.error("Falta configurar Supabase en .env.local")
+    if (!supabase || soloLectura) {
+      toast.info("Estás en modo demo: los cambios no se guardan.")
       return
     }
 
@@ -63,41 +65,40 @@ export function EnlaceInvitacion({
     router.refresh()
   }
 
-  if (!enlace) return null
-
   return (
-    <div className="rounded-lg border p-4">
-      <h2 className="font-medium">Tu enlace de invitación</h2>
-      <p className="mt-1 max-w-[62ch] text-sm leading-relaxed text-muted-foreground">
-        Quien entre por aquí queda activo al instante, sin pasar por tu
-        aprobación. Compártelo solo con quienes quieres que vendan para ti.
-      </p>
-
-      <p className="mt-4 rounded-md bg-muted/50 p-3 font-mono text-xs break-all">
+    <>
+      <p className="border border-tinta/15 bg-tinta/[0.03] px-3 py-3 font-mono text-xs leading-relaxed break-all">
         {enlace}
       </p>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Button type="button" size="sm" onClick={copiar}>
-          <Copy />
-          Copiar enlace
-        </Button>
-        <Button
+      <div className="flex flex-wrap gap-2">
+        <button
           type="button"
-          size="sm"
-          variant="outline"
+          onClick={copiar}
+          className={cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")}
+        >
+          <Copy aria-hidden="true" className="size-4" />
+          Copiar enlace
+        </button>
+        <button
+          type="button"
           onClick={rotar}
           disabled={rotando}
+          className="flex min-h-11 items-center gap-2 px-2 text-sm font-semibold transition-colors hover:text-senal disabled:opacity-60"
         >
-          {rotando ? <Loader2 className="animate-spin" /> : <RefreshCw />}
+          {rotando ? (
+            <Loader2 aria-hidden="true" className="size-4 animate-spin" />
+          ) : (
+            <RefreshCw aria-hidden="true" className="size-4" />
+          )}
           Generar uno nuevo
-        </Button>
+        </button>
       </div>
 
-      <p className="mt-3 text-xs text-muted-foreground">
-        Si el enlace se filtró, genera uno nuevo: el anterior deja de funcionar
-        de inmediato y quienes ya entraron siguen dentro.
+      <p className="text-xs leading-relaxed opacity-70">
+        Si se filtró, genera uno nuevo: el anterior deja de funcionar en el acto
+        y quienes ya entraron siguen dentro.
       </p>
-    </div>
+    </>
   )
 }

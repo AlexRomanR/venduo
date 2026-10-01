@@ -18,7 +18,7 @@ export interface GraficoEnTablero {
 }
 
 const ACCION =
-  "flex size-11 items-center justify-center opacity-40 transition-colors hover:text-senal hover:opacity-100 disabled:opacity-20"
+  "flex size-11 items-center justify-center opacity-65 transition-colors hover:text-senal hover:opacity-100 disabled:opacity-30"
 
 /**
  * Los gráficos guardados.
@@ -26,6 +26,10 @@ const ACCION =
  * Se recalculan en cada carga contra los datos de hoy: lo que se guardó es la
  * pregunta, no el resultado. Un gráfico congelado el día que se creó deja de
  * ser un tablero y pasa a ser una captura de pantalla.
+ *
+ * Cada gráfico es una celda del panel "Tu tablero", separada de las demás
+ * por una regla de un píxel. Si quedan impares, el último ocupa el ancho
+ * entero: una celda vacía dejaría ver el gris de las reglas como un bloque.
  */
 export function Tablero({
   graficos,
@@ -54,12 +58,15 @@ export function Tablero({
   }
 
   return (
-    <div className="grid gap-x-10 gap-y-12 lg:grid-cols-2">
+    <div className="grid gap-px bg-tinta/15 lg:grid-cols-2 lg:[&>*:last-child:nth-child(odd)]:col-span-2">
       {graficos.map((grafico) => {
         const lectura = leerGrafico(grafico.consulta, grafico.filas)
 
         return (
-          <section key={grafico.id} className="min-w-0">
+          <section
+            key={grafico.id}
+            className="min-w-0 bg-papel px-4 pt-4 pb-6 sm:px-5"
+          >
             <div className="flex flex-wrap items-start gap-x-4 gap-y-2">
               <div className="min-w-0 flex-1">
                 <h3 className="font-titular text-lg font-bold tracking-[-0.02em]">

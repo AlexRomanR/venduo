@@ -1,5 +1,10 @@
 import { CURRENCY, diaEnBolivia } from "@/lib/format"
 import { diasVacios, type Tablero } from "@/lib/tablero"
+import type {
+  RedDeMiTienda,
+  VendedorEnRed,
+  VinculoVendedor,
+} from "@/lib/data/panel"
 import type { CommissionStatus, Product, SubscriptionStatus } from "@/types"
 
 export interface Suscripcion {
@@ -648,3 +653,120 @@ export function tableroDeDemostracion(): Tablero {
     esDemo: true,
   }
 }
+
+/**
+ * La red de Rosa Deportes, para el modo demo.
+ *
+ * Los mismos nombres y cifras que muestra el Resumen de demostración, para
+ * que las dos pantallas no se contradigan, y dos solicitudes esperando.
+ */
+export function redDeDemostracion(): RedDeMiTienda {
+  const comisionBps = 1200
+  const vendedor = (
+    id: string,
+    nombre: string,
+    status: string,
+    referralCode: string,
+    dias: number,
+    pedidos: number,
+    ventasCents: number
+  ): VendedorEnRed => ({
+    id,
+    nombre,
+    status,
+    referralCode,
+    joinedAt: new Date(Date.now() - dias * 86_400_000).toISOString(),
+    pedidos,
+    ventasCents,
+    comisionCents: Math.round((ventasCents * comisionBps) / 10_000),
+  })
+
+  return {
+    slug: "rosa-deportes",
+    comisionBps,
+    activa: true,
+    modo: "con_aprobacion",
+    vendedores: [
+      vendedor("demo-camila", "Camila Vargas", "pendiente", "CVG2HX", 0, 0, 0),
+      vendedor(
+        "demo-rodrigo",
+        "Rodrigo Céspedes",
+        "pendiente",
+        "RCS5MJ",
+        1,
+        0,
+        0
+      ),
+      vendedor("demo-ana", "Ana Gutiérrez", "activo", "ANA7K2", 64, 9, 234_000),
+      vendedor(
+        "demo-luis",
+        "Luis Fernando Vaca",
+        "activo",
+        "FVA9HM",
+        41,
+        5,
+        118_500
+      ),
+      vendedor(
+        "demo-micaela",
+        "Micaela Suárez",
+        "activo",
+        "MSU4RP",
+        33,
+        3,
+        64_000
+      ),
+      vendedor(
+        "demo-jorge",
+        "Jorge Mamani Quispe",
+        "activo",
+        "JMQ8TX",
+        20,
+        2,
+        31_500
+      ),
+      vendedor(
+        "demo-valeria",
+        "Valeria Rocha",
+        "activo",
+        "VRC3WN",
+        12,
+        1,
+        18_000
+      ),
+      vendedor("demo-diego", "Diego Antezana", "activo", "DAZ6PE", 4, 0, 0),
+    ],
+    esDemo: true,
+  }
+}
+
+/**
+ * Las tiendas de la vendedora de ejemplo: las mismas de su resumen, dos
+ * activas y una esperando que el dueño la apruebe.
+ */
+export const VINCULOS_DEMO: VinculoVendedor[] = [
+  {
+    id: "demo-v-rosa",
+    storeId: "demo-rosa",
+    storeName: "Rosa Deportes",
+    storeSlug: "rosa-deportes",
+    status: "activo",
+    referralCode: "ANQ4RX",
+  },
+  {
+    id: "demo-v-cafe",
+    storeId: "demo-cafe",
+    storeName: "Café Illimani",
+    storeSlug: "cafe-illimani",
+    status: "activo",
+    referralCode: "ANQ7KM",
+  },
+  {
+    id: "demo-v-tecno",
+    storeId: "demo-tecno",
+    storeName: "Tecno Sur",
+    storeSlug: "tecno-sur",
+    status: "pendiente",
+    referralCode: "ANQ9WP",
+  },
+]

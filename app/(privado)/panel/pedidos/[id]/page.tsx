@@ -1,11 +1,13 @@
-import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
-import { ArrowLeft, MessageCircle } from "lucide-react"
+import { ListChecks, MessageCircle, ShoppingBag, UserRound } from "lucide-react"
 
 import { getPedido, mensajeDeEntrega } from "@/lib/data/pedidos"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
 import { formatDate, formatMoney } from "@/lib/format"
+import { numeroDeWhatsApp } from "@/lib/pedidos"
+import type { OrderStatus } from "@/types"
+import { Cabecera, Seccion, Volver } from "@/components/panel/piezas"
 import {
   BotonComprobante,
   CambiarEstado,
@@ -15,92 +17,105 @@ import { cambiarEstado, verComprobante } from "../acciones"
 
 export const metadata = { title: "Pedido" }
 
+/** Qué toca hacer con el pedido, según dónde está. */
+const QUE_SIGUE: Record<OrderStatus, string> = {
+  pendiente:
+    "Cuando veas el pago en tu cuenta, confírmalo: si lo trajo un vendedor, su comisión se acredita en ese momento.",
+  pagado:
+    "Coordina la entrega por WhatsApp y márcalo como enviado cuando salga.",
+  enviado: "Cuando llegue a su dueño, márcalo como entregado y se cierra.",
+  entregado: "Este pedido ya se cerró. No hay nada más que hacer.",
+  en_disputa:
+    "Hay un reclamo abierto. Mientras se resuelve, el pago queda congelado.",
+  cancelado: "Este pedido se canceló y su stock volvió a tu catálogo.",
+}
+
 export default async function PedidoPage({
   params,
 }: {
   params: Promise<{ id: string }>
 }) {
-  const tienda = await getMiTienda()
-  if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
-
   const { id } = await params
-  const pedido = await getPedido(id)
+  const [tienda, pedido] = await Promise.all([getMiTienda(), getPedido(id)])
+  if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
   // `getPedido` solo devuelve pedidos de mi tienda, así que uno ajeno llega acá
   // como inexistente y no como prohibido: es lo mismo para quien lo pide.
   if (!pedido) notFound()
 
   const nombreTienda = tienda?.name ?? "tu tienda"
+  const whatsapp = `https://wa.me/${numeroDeWhatsApp(pedido.telefono)}`
 
   return (
-    <div className="mx-auto w-full max-w-4xl">
-      <Link
-        href="/panel/pedidos"
-        className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
-      >
-        <ArrowLeft
-          aria-hidden="true"
-          className="size-4 transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transform-none"
-        />
-        Tus pedidos
-      </Link>
+    <div className="flex flex-col gap-6 md:gap-8">
+      <Volver href="/panel/pedidos">Tus pedidos</Volver>
 
-      <div className="mt-6 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-        <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="tabular font-titular text-[clamp(1.75rem,5vw,2.5rem)] leading-none font-extrabold tracking-[-0.03em]">
-              #{pedido.numero}
-            </h1>
+      <Cabecera
+        etiqueta="Pedido"
+        titulo={
+          <span className="flex flex-wrap items-center gap-3">
+            <span className="tabular">#{pedido.numero}</span>
             <Estado estado={pedido.estado} />
-          </div>
-          <p className="mt-3 text-sm opacity-55">
-            {formatDate(pedido.creado)}
+          </span>
+        }
+        bajada={
+          <>
+            Llegó el {formatDate(pedido.creado)}
             {pedido.pagado ? ` · pagado el ${formatDate(pedido.pagado)}` : ""}
-          </p>
-        </div>
-
+          </>
+        }
+      >
         <p className="tabular font-titular text-[clamp(1.5rem,5vw,2rem)] leading-none font-extrabold tracking-[-0.03em]">
           {formatMoney(pedido.totalCents)}
         </p>
-      </div>
+      </Cabecera>
 
       {/* Lo primero es qué hacer con el pedido, no leerlo. */}
-      <div className="mt-8 flex flex-wrap items-center gap-3 border-t-2 border-tinta pt-6">
-        <CambiarEstado pedido={pedido} cambiar={cambiarEstado} />
+      <Seccion
+        id="que-sigue"
+        icono={ListChecks}
+        titulo="Qué sigue"
+        bajada={QUE_SIGUE[pedido.estado]}
+        relleno
+      >
+        <div className="flex flex-wrap items-center gap-3">
+          <CambiarEstado pedido={pedido} cambiar={cambiarEstado} />
 
-        <a
-          href={mensajeDeEntrega(pedido, nombreTienda)}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
+          <a
+            href={mensajeDeEntrega(pedido, nombreTienda)}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
+          >
+            <MessageCircle aria-hidden="true" className="size-4" />
+            Coordinar la entrega
+          </a>
+
+          {pedido.comprobante ? (
+            <BotonComprobante pedidoId={pedido.id} ver={verComprobante} />
+          ) : null}
+        </div>
+      </Seccion>
+
+      <div className="grid gap-6 md:gap-8 lg:grid-cols-[1.3fr_1fr]">
+        <Seccion
+          id="que-compro"
+          icono={ShoppingBag}
+          titulo="Qué compró"
+          bajada="Los precios con los que se cobró, aunque después cambien."
         >
-          <MessageCircle aria-hidden="true" className="size-4" />
-          Coordinar la entrega
-        </a>
-
-        {pedido.comprobante ? (
-          <BotonComprobante pedidoId={pedido.id} ver={verComprobante} />
-        ) : null}
-      </div>
-
-      <div className="mt-12 grid gap-12 lg:grid-cols-[1.3fr_1fr] lg:gap-16">
-        <section>
-          <h2 className="text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
-            Qué compró
-          </h2>
-
-          <ul className="mt-6 border-t-2 border-tinta">
-            {pedido.items.map((item, i) => (
+          <ul>
+            {pedido.items.map((item, indice) => (
               <li
-                key={i}
-                className="flex items-baseline justify-between gap-4 border-b border-tinta/15 py-4"
+                key={indice}
+                className="flex items-baseline justify-between gap-4 border-t border-tinta/15 px-4 py-3.5 first:border-t-0 sm:px-5"
               >
                 <span className="min-w-0 flex-1">
-                  <span className="tabular mr-2 opacity-45">
+                  <span className="tabular mr-2 opacity-65">
                     {item.cantidad}×
                   </span>
-                  {item.nombre}
-                  <span className="tabular ml-2 text-xs opacity-45">
+                  <span className="font-semibold">{item.nombre}</span>
+                  <span className="tabular mt-0.5 block text-xs opacity-65">
                     {formatMoney(item.precioCents)} c/u
                   </span>
                 </span>
@@ -111,9 +126,9 @@ export default async function PedidoPage({
             ))}
           </ul>
 
-          <dl className="mt-5">
-            <div className="flex items-baseline justify-between py-1">
-              <dt className="text-sm opacity-60">Total del pedido</dt>
+          <dl className="mt-auto border-t border-tinta/15 px-4 py-4 sm:px-5">
+            <div className="flex items-baseline justify-between gap-4 py-1">
+              <dt className="text-sm opacity-70">Total del pedido</dt>
               <dd className="tabular font-semibold">
                 {formatMoney(pedido.totalCents)}
               </dd>
@@ -121,15 +136,15 @@ export default async function PedidoPage({
 
             {pedido.vendedor ? (
               <>
-                <div className="flex items-baseline justify-between py-1">
-                  <dt className="text-sm opacity-60">
+                <div className="flex items-baseline justify-between gap-4 py-1">
+                  <dt className="text-sm opacity-70">
                     Comisión de {pedido.vendedor.nombre}
                   </dt>
-                  <dd className="tabular text-senal">
+                  <dd className="tabular">
                     −{formatMoney(pedido.comisionCents)}
                   </dd>
                 </div>
-                <div className="mt-2 flex items-baseline justify-between border-t border-tinta/15 pt-3">
+                <div className="mt-2 flex items-baseline justify-between gap-4 border-t border-tinta/15 pt-3">
                   <dt className="font-semibold">Te queda</dt>
                   <dd className="tabular font-titular text-lg font-bold">
                     {formatMoney(pedido.netoCents)}
@@ -138,46 +153,34 @@ export default async function PedidoPage({
               </>
             ) : null}
           </dl>
-        </section>
+        </Seccion>
 
-        <section>
-          <h2 className="text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
-            Quién compró
-          </h2>
-
-          <dl className="mt-6 border-t-2 border-tinta pt-5">
-            <dt className="text-xs font-semibold tracking-[0.12em] uppercase opacity-45">
-              Nombre
-            </dt>
-            <dd className="mt-1 font-semibold">{pedido.comprador}</dd>
-
-            <dt className="mt-5 text-xs font-semibold tracking-[0.12em] uppercase opacity-45">
-              WhatsApp
-            </dt>
-            <dd className="mt-1">
+        <Seccion
+          id="quien-compro"
+          icono={UserRound}
+          titulo="Quién compró"
+          bajada="Sus datos para coordinar la entrega."
+        >
+          <dl>
+            <Dato etiqueta="Nombre">
+              <span className="font-semibold">{pedido.comprador}</span>
+            </Dato>
+            <Dato etiqueta="WhatsApp">
               <a
-                href={`https://wa.me/${pedido.telefono.replace(/\D/g, "")}`}
+                href={whatsapp}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="tabular inline-flex min-h-11 items-center font-semibold transition-colors hover:text-senal"
+                className="tabular inline-flex min-h-11 items-center font-semibold underline-offset-4 transition-colors hover:text-senal hover:underline"
               >
                 {pedido.telefono}
               </a>
-            </dd>
-
+            </Dato>
             {pedido.correo ? (
-              <>
-                <dt className="mt-5 text-xs font-semibold tracking-[0.12em] uppercase opacity-45">
-                  Correo
-                </dt>
-                <dd className="mt-1 break-all">{pedido.correo}</dd>
-              </>
+              <Dato etiqueta="Correo">
+                <span className="break-all">{pedido.correo}</span>
+              </Dato>
             ) : null}
-
-            <dt className="mt-5 text-xs font-semibold tracking-[0.12em] uppercase opacity-45">
-              Cómo llegó
-            </dt>
-            <dd className="mt-1 leading-relaxed">
+            <Dato etiqueta="Cómo llegó">
               {pedido.vendedor ? (
                 <>
                   Por{" "}
@@ -185,33 +188,45 @@ export default async function PedidoPage({
                     {pedido.vendedor.nombre}
                   </span>
                   {pedido.vendedor.codigo ? (
-                    <span className="tabular block text-xs opacity-45">
+                    <span className="tabular block text-xs opacity-65">
                       código {pedido.vendedor.codigo}
                     </span>
                   ) : null}
                 </>
               ) : (
-                <span className="opacity-60">
+                <span className="opacity-70">
                   Venta directa, sin vendedor de por medio
                 </span>
               )}
-            </dd>
-
-            <dt className="mt-5 text-xs font-semibold tracking-[0.12em] uppercase opacity-45">
-              Comprobante
-            </dt>
-            <dd className="mt-1">
+            </Dato>
+            <Dato etiqueta="Comprobante">
               {pedido.comprobante ? (
-                <span className="text-sm">Subido por el comprador</span>
+                "Subido por quien compró"
               ) : (
-                <span className="text-sm opacity-55">
-                  Todavía no subió ninguno
-                </span>
+                <span className="opacity-70">Todavía no subió ninguno</span>
               )}
-            </dd>
+            </Dato>
           </dl>
-        </section>
+        </Seccion>
       </div>
+    </div>
+  )
+}
+
+/** Un dato de quien compró: rótulo en versalita y el valor debajo. */
+function Dato({
+  etiqueta,
+  children,
+}: {
+  etiqueta: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="border-t border-tinta/15 px-4 py-3 first:border-t-0 sm:px-5">
+      <dt className="text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
+        {etiqueta}
+      </dt>
+      <dd className="mt-1 text-sm leading-relaxed">{children}</dd>
     </div>
   )
 }

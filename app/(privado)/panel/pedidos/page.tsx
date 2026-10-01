@@ -1,14 +1,22 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import { ShoppingBag, Wallet } from "lucide-react"
 
 import { getPedidos } from "@/lib/data/pedidos"
 import { ESTADOS } from "@/lib/pedidos"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
+import { FICHA, FICHA_ELEGIDA, FICHA_LIBRE } from "@/lib/estilos"
 import { formatMoney, formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
-import { Cifra, Encabezado, Vacio } from "@/components/panel/piezas"
-import { FilaPedido } from "@/components/pedidos/piezas"
+import {
+  Cabecera,
+  Cifra,
+  Cifras,
+  Seccion,
+  SinDatos,
+} from "@/components/panel/piezas"
+import { FilaPedido } from "@/components/pedidos/fila"
 import { verComprobante } from "./acciones"
 
 export const metadata = { title: "Pedidos" }
@@ -34,64 +42,78 @@ export default async function PedidosPage({
     typeof consulta.estado === "string" ? consulta.estado : undefined
 
   const { pedidos, resumen, esDemo } = await getPedidos(filtro)
+  const confirmados = resumen.pagados + resumen.enCamino + resumen.entregados
 
   return (
-    <div className="flex flex-col gap-12">
-      <div>
-        <h1 className="max-w-[18ch] font-titular text-[clamp(1.75rem,5vw,2.5rem)] leading-[1.02] font-extrabold tracking-[-0.03em]">
-          Tus pedidos.
-        </h1>
-        <p className="mt-3 max-w-[58ch] text-sm leading-relaxed opacity-70">
-          Confirma los pagos, coordina las entregas y lleva cada pedido hasta el
-          final. Al confirmar un pago se acredita sola la comisión de quien lo
-          trajo.
-          {esDemo ? (
-            <>
-              {" "}
-              <span className="font-semibold">
-                Estás en modo demo: los pedidos son de ejemplo y los cambios no
-                se guardan.
-              </span>
-            </>
-          ) : null}
-        </p>
-      </div>
+    <div className="flex flex-col gap-6 md:gap-8">
+      <Cabecera
+        titulo="Tus pedidos."
+        bajada="Confirma los pagos, coordina las entregas y lleva cada pedido hasta el final."
+        demo={
+          esDemo &&
+          "Estás en modo demo: los pedidos son de ejemplo y los cambios no se guardan."
+        }
+      />
 
-      <div className="grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-        <Cifra
-          etiqueta="Esperando pago"
-          valor={formatNumber(resumen.pendientes)}
-          detalle={
-            resumen.conComprobante > 0
-              ? `${resumen.conComprobante} ya subieron su comprobante`
-              : "Ninguno subió comprobante todavía"
-          }
-          alerta={resumen.conComprobante > 0}
-        />
-        <Cifra
-          etiqueta="Por cobrar"
-          valor={formatMoney(resumen.porCobrarCents)}
-          detalle="Pedidos que todavía no confirmaste"
-        />
-        <Cifra
-          etiqueta="Cobrado"
-          valor={formatMoney(resumen.cobradoCents)}
-          detalle={`${resumen.pagados + resumen.enCamino + resumen.entregados} pedidos confirmados`}
-        />
-        <Cifra
-          etiqueta="En camino"
-          valor={formatNumber(resumen.enCamino)}
-          detalle={`${resumen.entregados} ya entregados`}
-        />
-      </div>
+      <Seccion
+        id="cobros"
+        icono={Wallet}
+        titulo="Cómo van tus cobros"
+        bajada="Lo que falta confirmar y lo que ya entró, sin los cancelados."
+      >
+        <Cifras>
+          <Cifra
+            etiqueta="Esperan pago"
+            valor={formatNumber(resumen.pendientes)}
+            detalle={
+              resumen.conComprobante > 0
+                ? `${formatNumber(resumen.conComprobante)} ya subieron su comprobante`
+                : "Ninguno subió comprobante todavía"
+            }
+            alerta={resumen.conComprobante > 0}
+          />
+          <Cifra
+            etiqueta="Por cobrar"
+            valor={formatMoney(resumen.porCobrarCents)}
+            detalle="De los que esperan pago"
+          />
+          <Cifra
+            etiqueta="Cobrado"
+            valor={formatMoney(resumen.cobradoCents)}
+            detalle={`${formatNumber(confirmados)} ${confirmados === 1 ? "pedido confirmado" : "pedidos confirmados"}`}
+          />
+          <Cifra
+            etiqueta="En camino"
+            valor={formatNumber(resumen.enCamino)}
+            detalle={`${formatNumber(resumen.entregados)} ya ${resumen.entregados === 1 ? "entregado" : "entregados"}`}
+          />
+        </Cifras>
+      </Seccion>
 
-      <section className="border-t border-tinta/15 pt-10">
-        <div className="flex flex-wrap items-center gap-2">
+      <Seccion
+        id="lista"
+        icono={ShoppingBag}
+        titulo="Todos tus pedidos"
+        bajada="Filtra por estado y toca uno para ver el detalle y cambiar su estado."
+        extra={
+          pedidos.length > 0 ? (
+            <span className="tabular text-sm opacity-70">
+              {formatNumber(pedidos.length)}{" "}
+              {pedidos.length === 1 ? "pedido" : "pedidos"}
+            </span>
+          ) : null
+        }
+      >
+        <nav
+          aria-label="Filtrar por estado"
+          className="flex flex-wrap gap-2 border-b border-tinta/15 px-4 py-3 sm:px-5"
+        >
           <Ficha href="/panel/pedidos" activa={!filtro}>
             Todos
-            <span className="tabular ml-1.5 opacity-45">{resumen.total}</span>
+            <span className="tabular ml-1.5 opacity-65">
+              {formatNumber(resumen.total)}
+            </span>
           </Ficha>
-
           {ESTADOS.map((estado) => (
             <Ficha
               key={estado.valor}
@@ -101,42 +123,48 @@ export default async function PedidosPage({
               {estado.etiqueta}
             </Ficha>
           ))}
-        </div>
+        </nav>
 
-        <div className="mt-10">
-          {pedidos.length === 0 ? (
-            filtro ? (
-              <Vacio
-                titulo="No hay pedidos en ese estado"
-                detalle="Prueba con otro filtro, o mira todos los pedidos de tu tienda."
-                accion={{ href: "/panel/pedidos", texto: "Ver todos" }}
-              />
-            ) : (
-              <Vacio
-                titulo="Todavía no llegó ningún pedido"
-                detalle="Cuando alguien compre en tu tienda aparece acá, con sus datos de contacto y su comprobante. Comparte el enlace de tu tienda para que empiecen a llegar."
-                accion={{ href: "/panel", texto: "Ver mi enlace" }}
-              />
-            )
+        {pedidos.length === 0 ? (
+          filtro ? (
+            <SinDatos
+              icono={ShoppingBag}
+              titulo="No hay pedidos en ese estado"
+              texto="Prueba con otro filtro, o mira todos los pedidos de tu tienda."
+            >
+              <Link
+                href="/panel/pedidos"
+                className="inline-flex min-h-11 items-center text-sm font-semibold transition-colors hover:text-senal"
+              >
+                Ver todos
+              </Link>
+            </SinDatos>
           ) : (
-            <>
-              <Encabezado
-                etiqueta={`${pedidos.length} ${pedidos.length === 1 ? "pedido" : "pedidos"}`}
+            <SinDatos
+              icono={ShoppingBag}
+              titulo="Todavía no llegó ningún pedido"
+              texto="Cuando alguien compre en tu tienda aparece acá, con su WhatsApp para coordinar la entrega. Comparte el enlace de tu tienda para que empiecen a llegar."
+            >
+              <Link
+                href="/panel"
+                className="inline-flex min-h-11 items-center text-sm font-semibold transition-colors hover:text-senal"
+              >
+                Compartir mi tienda
+              </Link>
+            </SinDatos>
+          )
+        ) : (
+          <ul>
+            {pedidos.map((pedido) => (
+              <FilaPedido
+                key={pedido.id}
+                pedido={pedido}
+                ver={verComprobante}
               />
-
-              <ul className="mt-6 flex flex-col">
-                {pedidos.map((pedido) => (
-                  <FilaPedido
-                    key={pedido.id}
-                    pedido={pedido}
-                    ver={verComprobante}
-                  />
-                ))}
-              </ul>
-            </>
-          )}
-        </div>
-      </section>
+            ))}
+          </ul>
+        )}
+      </Seccion>
     </div>
   )
 }
@@ -153,12 +181,8 @@ function Ficha({
   return (
     <Link
       href={href}
-      className={cn(
-        "flex min-h-11 items-center border px-4 text-sm font-semibold transition-colors",
-        activa
-          ? "border-tinta bg-tinta text-papel"
-          : "border-tinta/25 hover:border-tinta"
-      )}
+      aria-current={activa ? "page" : undefined}
+      className={cn(FICHA, activa ? FICHA_ELEGIDA : FICHA_LIBRE)}
     >
       {children}
     </Link>

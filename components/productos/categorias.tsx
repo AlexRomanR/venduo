@@ -2,13 +2,23 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Check, Loader2, Pencil, Plus, Trash2, X } from "lucide-react"
+import {
+  Check,
+  FolderPlus,
+  Loader2,
+  Pencil,
+  Plus,
+  Tags,
+  Trash2,
+  X,
+} from "lucide-react"
 import { toast } from "sonner"
 
 import { BOTON_PRIMARIO, CAMPO_LINEA, ETIQUETA_CAMPO } from "@/lib/estilos"
 import { cn } from "@/lib/utils"
 import type { CategoriaConUso } from "@/lib/data/catalogo"
 import type { CategoriaInput } from "@/lib/validation/producto"
+import { Seccion, SinDatos } from "@/components/panel/piezas"
 
 interface Props {
   categorias: CategoriaConUso[]
@@ -65,9 +75,18 @@ export function Categorias({
   }
 
   return (
-    <div className="flex flex-col gap-10">
-      <form onSubmit={crear} className="border-t-2 border-tinta pt-6">
-        <div className="grid gap-5 sm:grid-cols-[1fr_1.4fr_auto] sm:items-end">
+    <>
+      <Seccion
+        id="nueva-categoria"
+        icono={FolderPlus}
+        titulo="Una categoría nueva"
+        bajada="Un nombre corto, como lo buscaría quien compra."
+        relleno
+      >
+        <form
+          onSubmit={crear}
+          className="grid gap-5 sm:grid-cols-[1fr_1.4fr_auto] sm:items-end"
+        >
           <div>
             <label htmlFor="cat-nombre" className={ETIQUETA_CAMPO}>
               Nombre
@@ -110,98 +129,115 @@ export function Categorias({
             )}
             Crear
           </button>
-        </div>
-      </form>
+        </form>
+      </Seccion>
 
-      {categorias.length === 0 ? (
-        <p className="max-w-[60ch] leading-relaxed opacity-70">
-          Todavía no tienes categorías. Sirven para que quien entre a tu tienda
-          encuentre lo que busca sin recorrer todo el catálogo, y para filtrar
-          tus propios productos acá.
-        </p>
-      ) : (
-        <ul className="flex flex-col">
-          {categorias.map((categoria) => (
-            <li
-              key={categoria.id}
-              className="border-t border-tinta/15 py-4 first:border-t-0"
-            >
-              {editando === categoria.id ? (
-                <Edicion
-                  categoria={categoria}
-                  cancelar={() => setEditando(null)}
-                  guardar={async (entrada) => {
-                    if (bloqueado()) return
-                    const resultado = await guardar(entrada, categoria.id)
-                    if (!resultado.ok) {
-                      toast.error(resultado.error ?? "No pudimos guardarla.")
-                      return
-                    }
-                    setEditando(null)
-                    toast.success("Categoría actualizada.")
-                    router.refresh()
-                  }}
-                />
-              ) : (
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-titular text-base font-bold tracking-[-0.01em]">
-                      {categoria.name}
-                    </h3>
-                    <p className="mt-0.5 text-xs opacity-55">
-                      {categoria.productos === 0
-                        ? "Sin productos todavía"
-                        : `${categoria.productos} ${categoria.productos === 1 ? "producto" : "productos"}`}
-                      {categoria.description
-                        ? ` · ${categoria.description}`
-                        : ""}
-                    </p>
+      <Seccion
+        id="tus-categorias"
+        icono={Tags}
+        titulo="Tus categorías"
+        bajada="Renombrar una arrastra a sus productos; borrarla no borra ninguno."
+        extra={
+          categorias.length > 0 ? (
+            <span className="tabular text-sm opacity-70">
+              {categorias.length}{" "}
+              {categorias.length === 1 ? "categoría" : "categorías"}
+            </span>
+          ) : null
+        }
+      >
+        {categorias.length === 0 ? (
+          <SinDatos
+            icono={Tags}
+            titulo="Todavía no tienes categorías"
+            texto="Sirven para que quien entre a tu tienda encuentre lo que busca sin recorrer todo el catálogo, y para filtrar tus propios productos."
+          />
+        ) : (
+          <ul className="flex flex-col">
+            {categorias.map((categoria) => (
+              <li
+                key={categoria.id}
+                className="border-t border-tinta/15 px-4 py-3 first:border-t-0 sm:px-5"
+              >
+                {editando === categoria.id ? (
+                  <Edicion
+                    categoria={categoria}
+                    cancelar={() => setEditando(null)}
+                    guardar={async (entrada) => {
+                      if (bloqueado()) return
+                      const resultado = await guardar(entrada, categoria.id)
+                      if (!resultado.ok) {
+                        toast.error(resultado.error ?? "No pudimos guardarla.")
+                        return
+                      }
+                      setEditando(null)
+                      toast.success("Categoría actualizada.")
+                      router.refresh()
+                    }}
+                  />
+                ) : (
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-titular text-base font-bold tracking-[-0.01em]">
+                        {categoria.name}
+                      </h3>
+                      <p className="mt-0.5 text-xs opacity-70">
+                        {categoria.productos === 0
+                          ? "Sin productos todavía"
+                          : `${categoria.productos} ${categoria.productos === 1 ? "producto" : "productos"}`}
+                        {categoria.description
+                          ? ` · ${categoria.description}`
+                          : ""}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setEditando(categoria.id)}
+                        aria-label={`Editar ${categoria.name}`}
+                        className="flex size-11 items-center justify-center opacity-65 transition-colors hover:text-senal hover:opacity-100"
+                      >
+                        <Pencil aria-hidden="true" className="size-4" />
+                      </button>
+
+                      <button
+                        type="button"
+                        aria-label={`Borrar ${categoria.name}`}
+                        onClick={async () => {
+                          if (bloqueado()) return
+                          if (
+                            !window.confirm(
+                              categoria.productos > 0
+                                ? `"${categoria.name}" tiene ${categoria.productos} producto(s). Se quedan en tu catálogo, pero sin categoría. ¿Borrarla?`
+                                : `¿Borrar "${categoria.name}"?`
+                            )
+                          ) {
+                            return
+                          }
+                          const resultado = await borrar(categoria.id)
+                          if (!resultado.ok) {
+                            toast.error(
+                              resultado.error ?? "No pudimos borrarla."
+                            )
+                            return
+                          }
+                          toast.success("Categoría borrada.")
+                          router.refresh()
+                        }}
+                        className="flex size-11 items-center justify-center opacity-65 transition-colors hover:text-senal hover:opacity-100"
+                      >
+                        <Trash2 aria-hidden="true" className="size-4" />
+                      </button>
+                    </div>
                   </div>
-
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setEditando(categoria.id)}
-                      aria-label={`Editar ${categoria.name}`}
-                      className="flex size-11 items-center justify-center opacity-45 transition-colors hover:text-senal hover:opacity-100"
-                    >
-                      <Pencil aria-hidden="true" className="size-4" />
-                    </button>
-
-                    <button
-                      type="button"
-                      aria-label={`Borrar ${categoria.name}`}
-                      onClick={async () => {
-                        if (bloqueado()) return
-                        if (
-                          !window.confirm(
-                            categoria.productos > 0
-                              ? `"${categoria.name}" tiene ${categoria.productos} producto(s). Se quedan en tu catálogo, pero sin categoría. ¿Borrarla?`
-                              : `¿Borrar "${categoria.name}"?`
-                          )
-                        ) {
-                          return
-                        }
-                        const resultado = await borrar(categoria.id)
-                        if (!resultado.ok) {
-                          toast.error(resultado.error ?? "No pudimos borrarla.")
-                          return
-                        }
-                        toast.success("Categoría borrada.")
-                        router.refresh()
-                      }}
-                      className="flex size-11 items-center justify-center opacity-45 transition-colors hover:text-senal hover:opacity-100"
-                    >
-                      <Trash2 aria-hidden="true" className="size-4" />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Seccion>
+    </>
   )
 }
 

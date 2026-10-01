@@ -4,7 +4,7 @@ import { ArrowRight, Users } from "lucide-react"
 import { formatMoney, formatNumber } from "@/lib/format"
 import type { Tablero } from "@/lib/tablero"
 import { cn } from "@/lib/utils"
-import { Seccion, SinDatos } from "@/components/panel/tablero/seccion"
+import { Seccion, SinDatos } from "@/components/panel/piezas"
 
 const ENLACE =
   "inline-flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"

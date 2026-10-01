@@ -147,8 +147,9 @@ components/
     perfume/          Esencia
   tienda/             Lo compartido por todas las plantillas: carrito, checkout,
                       pago, agregar, barra de compra, filtros y buscador
-  panel/              Shell, cifras y piezas de los dos paneles. `armazon.tsx` es
-                      la barra con su contenido y decide cuándo va
+  panel/              Shell y piezas de los dos paneles. `piezas.tsx` son los
+                      paneles, cifras y estados vacíos de toda pantalla;
+                      `armazon.tsx` es la barra con su contenido y decide cuándo va
     tablero/          El Resumen: sus secciones, el gráfico de ventas, el sello de
                       la tienda y compartirla
   landing/            Piezas de la portada

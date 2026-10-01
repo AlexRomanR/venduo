@@ -91,7 +91,7 @@ function Par<T extends string | boolean>({
             <span
               className={cn(
                 "text-xs leading-tight",
-                elegida ? "text-papel/70" : "opacity-55"
+                elegida ? "text-papel/75" : "opacity-70"
               )}
             >
               {opcion.detalle}
@@ -151,7 +151,7 @@ export function FormPersona({ cuenta }: { cuenta: Cuenta }) {
 
         <div>
           <p className={ETIQUETA_CAMPO}>Correo</p>
-          <p className="mt-2 border-b border-tinta/15 pb-3 text-base opacity-55">
+          <p className="mt-2 border-b border-tinta/15 pb-3 text-base opacity-70">
             {cuenta.email ?? "—"}
           </p>
           <p className={cn(AYUDA_CAMPO, "mt-2")}>
@@ -244,7 +244,7 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
 
         <div>
           <p className={ETIQUETA_CAMPO}>Enlace de tu tienda</p>
-          <p className="mt-2 border-b border-tinta/15 pb-3 font-mono text-sm break-all opacity-55">
+          <p className="mt-2 border-b border-tinta/15 pb-3 font-mono text-sm break-all opacity-70">
             /t/{tienda.slug}
           </p>
           <p className={cn(AYUDA_CAMPO, "mt-2")}>
@@ -405,7 +405,7 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
                       }}
                       className="tabular h-12 w-28 rounded-none border-0 border-b border-tinta bg-transparent px-0 font-titular text-2xl font-bold outline-none focus:border-senal"
                     />
-                    <span className="font-titular text-2xl font-bold opacity-40">
+                    <span className="font-titular text-2xl font-bold opacity-65">
                       %
                     </span>
                   </div>
@@ -519,7 +519,7 @@ export function FormVendedor({ cuenta }: { cuenta: Cuenta }) {
 
         <div>
           <p className={ETIQUETA_CAMPO}>Tu enlace público</p>
-          <p className="mt-2 border-b border-tinta/15 pb-3 font-mono text-sm break-all opacity-55">
+          <p className="mt-2 border-b border-tinta/15 pb-3 font-mono text-sm break-all opacity-70">
             /v/{vendedor.slug}
           </p>
           <p className={cn(AYUDA_CAMPO, "mt-2")}>

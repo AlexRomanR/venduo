@@ -27,21 +27,62 @@ function Titular({ conVolver = false }: { conVolver?: boolean }) {
   )
 }
 
+/** Un panel con su cabecera —ícono, título y bajada— mientras carga. */
+function Panel({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
+  return (
+    <div className={cn("border border-tinta/25", className)}>
+      <div className="flex items-start gap-3 border-b border-tinta/15 px-4 py-3.5 sm:px-5">
+        <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-0.5 size-5")} />
+        <div className="flex-1">
+          <Skeleton className={cn(BLOQUE_ESQUELETO, "h-5 w-40")} />
+          <Skeleton
+            className={cn(BLOQUE_ESQUELETO, "mt-1.5 h-3.5 w-64 max-w-full")}
+          />
+        </div>
+      </div>
+      {children}
+    </div>
+  )
+}
+
+function Filas({ cuantas }: { cuantas: number }) {
+  return Array.from({ length: cuantas }, (_, indice) => (
+    <div
+      key={indice}
+      className="flex items-center gap-3 border-t border-tinta/15 px-4 py-3.5 first:border-t-0 sm:px-5"
+    >
+      <div className="flex-1">
+        <Skeleton className={cn(BLOQUE_ESQUELETO, "h-4 w-1/2")} />
+        <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-2 h-3 w-1/3")} />
+      </div>
+      <Skeleton className={cn(BLOQUE_ESQUELETO, "h-4 w-16")} />
+    </div>
+  ))
+}
+
 function Lista() {
   return (
     <>
-      <div className="grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }, (_, indice) => (
-          <div key={indice} className="border-t-2 border-tinta/15 pt-4">
-            <Skeleton className={cn(BLOQUE_ESQUELETO, "h-3 w-24")} />
-            <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-3 h-8 w-28")} />
-            <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-2 h-3 w-36")} />
-          </div>
-        ))}
-      </div>
+      <Panel>
+        <div className="grid grid-cols-2 gap-px bg-tinta/10 lg:grid-cols-4">
+          {Array.from({ length: 4 }, (_, indice) => (
+            <div key={indice} className="bg-papel px-4 py-4 sm:px-5">
+              <Skeleton className={cn(BLOQUE_ESQUELETO, "h-3 w-16")} />
+              <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-3 h-7 w-24")} />
+              <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-2 h-3 w-28")} />
+            </div>
+          ))}
+        </div>
+      </Panel>
 
-      <div className="border-t border-tinta/15 pt-10">
-        <div className="flex flex-wrap gap-2">
+      <Panel>
+        <div className="flex flex-wrap gap-2 border-b border-tinta/15 px-4 py-3 sm:px-5">
           {Array.from({ length: 4 }, (_, indice) => (
             <Skeleton
               key={indice}
@@ -49,37 +90,56 @@ function Lista() {
             />
           ))}
         </div>
-        <div className="mt-10 flex flex-col">
-          {Array.from({ length: 5 }, (_, indice) => (
-            <div
-              key={indice}
-              className="flex items-center gap-4 border-b border-tinta/15 py-4"
-            >
-              <Skeleton className={cn(BLOQUE_ESQUELETO, "size-11 shrink-0")} />
-              <div className="flex-1">
-                <Skeleton className={cn(BLOQUE_ESQUELETO, "h-4 w-1/2")} />
-                <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-2 h-3 w-1/3")} />
-              </div>
-              <Skeleton className={cn(BLOQUE_ESQUELETO, "h-4 w-16")} />
-            </div>
-          ))}
-        </div>
-      </div>
+        <Filas cuantas={5} />
+      </Panel>
     </>
   )
 }
 
 function Formulario() {
   return (
-    <div className="flex flex-col gap-6">
-      {Array.from({ length: 5 }, (_, indice) => (
-        <div key={indice}>
-          <Skeleton className={cn(BLOQUE_ESQUELETO, "h-4 w-28")} />
-          <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-2 h-11 w-full")} />
-        </div>
+    <>
+      {Array.from({ length: 3 }, (_, panel) => (
+        <Panel key={panel}>
+          <div className="flex flex-col gap-5 px-4 py-5 sm:px-5">
+            {Array.from({ length: 2 }, (_, campo) => (
+              <div key={campo}>
+                <Skeleton className={cn(BLOQUE_ESQUELETO, "h-3 w-28")} />
+                <Skeleton
+                  className={cn(BLOQUE_ESQUELETO, "mt-3 h-11 w-full")}
+                />
+              </div>
+            ))}
+          </div>
+        </Panel>
       ))}
-      <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-2 h-11 w-40")} />
-    </div>
+      <Skeleton className={cn(BLOQUE_ESQUELETO, "h-12 w-40")} />
+    </>
+  )
+}
+
+function Detalle() {
+  return (
+    <>
+      <Panel>
+        <div className="flex flex-wrap gap-3 px-4 py-5 sm:px-5">
+          {Array.from({ length: 3 }, (_, indice) => (
+            <Skeleton
+              key={indice}
+              className={cn(BLOQUE_ESQUELETO, "h-11 w-36")}
+            />
+          ))}
+        </div>
+      </Panel>
+      <div className="grid gap-6 md:gap-8 lg:grid-cols-[1.3fr_1fr]">
+        <Panel>
+          <Filas cuantas={3} />
+        </Panel>
+        <Panel>
+          <Filas cuantas={4} />
+        </Panel>
+      </div>
+    </>
   )
 }
 
@@ -89,28 +149,37 @@ function Formulario() {
  * Existe para que tocar la barra responda en el acto: sin esto la pantalla
  * anterior se quedaba quieta hasta que la nueva estuviera entera, y parecía
  * que el toque no había entrado. Va en el `loading.tsx` de cada sección, con
- * la forma de lo que viene —una lista con sus cifras, o un formulario— y no
- * una rueda girando.
+ * la forma de lo que viene —sus paneles con sus cifras y su lista, un
+ * formulario o el detalle de un pedido— y no una rueda girando.
  */
 export function EsqueletoDePantalla({
   forma = "lista",
   volver = false,
+  angosta = false,
 }: {
-  forma?: "lista" | "formulario"
-  /** Una pantalla de detalle: centrada, con su enlace de vuelta arriba. */
+  forma?: "lista" | "formulario" | "detalle"
+  /** Una pantalla de detalle, con su enlace de vuelta arriba. */
   volver?: boolean
+  /** Centrada y con un ancho de lectura, como los formularios largos. */
+  angosta?: boolean
 }) {
   return (
     <div
       aria-busy="true"
       aria-label="Cargando"
       className={cn(
-        "flex flex-col gap-12",
-        volver && "mx-auto w-full max-w-3xl"
+        "flex flex-col gap-6 md:gap-8",
+        angosta && "mx-auto w-full max-w-3xl"
       )}
     >
       <Titular conVolver={volver} />
-      {forma === "lista" ? <Lista /> : <Formulario />}
+      {forma === "lista" ? (
+        <Lista />
+      ) : forma === "detalle" ? (
+        <Detalle />
+      ) : (
+        <Formulario />
+      )}
     </div>
   )
 }

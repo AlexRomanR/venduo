@@ -26,6 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Insignia } from "@/components/panel/piezas"
 
 const CONDICION: Record<string, string> = {
   nuevo: "Nuevo",
@@ -119,7 +120,7 @@ function Fila({
   return (
     <li
       className={cn(
-        "border-t border-tinta/15 py-5 transition-opacity first:border-t-0",
+        "border-t border-tinta/15 px-4 py-4 transition-opacity first:border-t-0 sm:px-5",
         ocupado && "opacity-50",
         !producto.is_active && "opacity-60"
       )}
@@ -154,7 +155,7 @@ function Fila({
                 </Link>
               </h3>
 
-              <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs opacity-55">
+              <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs opacity-70">
                 <span>{producto.category ?? "Sin categoría"}</span>
                 <span aria-hidden="true">·</span>
                 <span>
@@ -174,7 +175,7 @@ function Fila({
                 {formatMoney(producto.price_cents)}
               </p>
               {producto.compare_at_price_cents ? (
-                <p className="tabular text-xs line-through opacity-45">
+                <p className="tabular text-xs line-through opacity-65">
                   {formatMoney(producto.compare_at_price_cents)}
                 </p>
               ) : null}
@@ -195,15 +196,19 @@ function Fila({
               }
             />
 
-            {!producto.is_active ? <Marca texto="Oculto" /> : null}
-            {producto.is_featured ? <Marca texto="Destacado" senal /> : null}
-            {producto.seller_enabled ? <Marca texto="Vendedores" /> : null}
+            {!producto.is_active ? (
+              <Insignia tono="suave">Oculto</Insignia>
+            ) : null}
+            {producto.is_featured ? <Insignia>Destacado</Insignia> : null}
+            {producto.seller_enabled ? (
+              <Insignia tono="suave">Vendedores</Insignia>
+            ) : null}
 
             <div className="ml-auto flex items-center gap-1">
               <Link
                 href={`/panel/productos/${producto.id}`}
                 aria-label={`Editar ${producto.name}`}
-                className="flex size-11 items-center justify-center opacity-45 transition-colors hover:text-senal hover:opacity-100"
+                className="flex size-11 items-center justify-center opacity-65 transition-colors hover:text-senal hover:opacity-100"
               >
                 <Pencil aria-hidden="true" className="size-4" />
               </Link>
@@ -211,7 +216,7 @@ function Fila({
               <DropdownMenu>
                 <DropdownMenuTrigger
                   aria-label={`Más acciones para ${producto.name}`}
-                  className="flex size-11 items-center justify-center opacity-45 transition-colors hover:text-senal hover:opacity-100"
+                  className="flex size-11 items-center justify-center opacity-65 transition-colors hover:text-senal hover:opacity-100"
                 >
                   <MoreHorizontal aria-hidden="true" className="size-4" />
                 </DropdownMenuTrigger>
@@ -376,18 +381,5 @@ function Stock({
         )}
       />
     </label>
-  )
-}
-
-function Marca({ texto, senal = false }: { texto: string; senal?: boolean }) {
-  return (
-    <span
-      className={cn(
-        "border px-2 py-0.5 text-[10px] font-semibold tracking-[0.1em] uppercase",
-        senal ? "border-senal text-senal" : "border-tinta/25 opacity-55"
-      )}
-    >
-      {texto}
-    </span>
   )
 }

@@ -103,6 +103,11 @@ compartido entre el formulario y lo que lo procesa.
 Escribir los tres estados: con datos, vacío y cargando. Una tienda recién creada y un
 vendedor sin ventas son el estado normal durante la demostración.
 
+**Una pantalla del panel se arma con las piezas de `components/panel/piezas.tsx`**:
+`Cabecera` arriba y una columna de `Seccion`, cada una con su ícono, un título que dice
+para qué sirve y su estado vacío con `SinDatos`. Nada de cifras o listas sueltas bajo un
+rótulo: el porqué está en `ui-styling.md`, "Las pantallas del panel".
+
 **Una sección nueva del panel lleva su `loading.tsx`**, con `EsqueletoDePantalla` de
 `components/panel/esqueleto.tsx`: sin él, mientras carga se ve el esqueleto del Resumen.
 Si la barra lateral la enlaza, el enlace lleva `prefetch`.

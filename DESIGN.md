@@ -346,8 +346,9 @@ cómo se visten en el mundo público.
 No hay tarjetas. Lo que cumple ese papel es el **panel de demostración**: campo
 papel encerrado por una regla estructural de 1 px, esquina viva, `16px` de relleno
 interno, y cabecera y pie separados por la misma regla. Sin sombra y sin radio. En el
-Resumen del panel, cada sección es uno de estos, con su título y un pie que lleva a la
-pantalla completa.
+panel, cada cosa de cada pantalla es uno de estos —sus cifras, su lista, cada bloque
+de un formulario—, con un ícono, un título que dice para qué sirve y, si hace falta,
+un pie que lleva adonde se sigue.
 
 ### Navigation
 

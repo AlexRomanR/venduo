@@ -5,6 +5,7 @@ import { getGraficoConDatos, getGraficosGuardados } from "@/lib/data/insights"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
 import { Estudio } from "@/components/insights/estudio"
+import { Cabecera } from "@/components/panel/piezas"
 import { borrar, guardar, preguntar } from "./acciones"
 
 export const metadata = { title: "Estadísticas" }
@@ -30,33 +31,22 @@ export default async function EstadisticasPage() {
   const ai = getAIStatus()
 
   return (
-    <div className="flex flex-col gap-14">
-      <div>
-        <h1 className="max-w-[20ch] font-titular text-[clamp(1.75rem,5vw,2.5rem)] leading-[1.02] font-extrabold tracking-[-0.03em]">
-          Pregúntale a tus números.
-        </h1>
-        <p className="mt-3 max-w-[58ch] text-sm leading-relaxed opacity-70">
-          Solo se consultan los datos de tu tienda, y solo se leen.
-          {ai.demo ? (
-            <>
-              {" "}
-              <span className="font-semibold">
-                Estás en modo demo: el modelo devuelve una respuesta simulada,
-                pero las cifras salen de tus datos reales.
-              </span>
-            </>
-          ) : null}
-        </p>
-      </div>
+    <div className="flex flex-col gap-6 md:gap-8">
+      <Cabecera
+        titulo="Pregúntale a tus números."
+        bajada="Solo se consultan los datos de tu tienda, y solo se leen."
+        demo={
+          ai.demo &&
+          "Estás en modo demo: el modelo devuelve una respuesta simulada, pero las cifras salen de tus datos reales."
+        }
+      />
 
-      <section>
-        <Estudio
-          graficos={graficos}
-          preguntar={preguntar}
-          guardar={guardar}
-          borrar={borrar}
-        />
-      </section>
+      <Estudio
+        graficos={graficos}
+        preguntar={preguntar}
+        guardar={guardar}
+        borrar={borrar}
+      />
     </div>
   )
 }

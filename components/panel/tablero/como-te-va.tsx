@@ -25,7 +25,7 @@ import {
 } from "@/lib/tablero"
 import { cn } from "@/lib/utils"
 import { GraficoDeVentas } from "@/components/panel/tablero/grafico-de-ventas"
-import { Seccion, SinDatos } from "@/components/panel/tablero/seccion"
+import { Seccion, SinDatos } from "@/components/panel/piezas"
 
 /**
  * Cómo vienen las ventas: cuatro cifras, contra qué compararlas y el gráfico.

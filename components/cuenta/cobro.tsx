@@ -156,7 +156,7 @@ export function FormCobro({ cuenta }: { cuenta: Cuenta }) {
                     router.refresh()
                   }
                 }}
-                className="flex min-h-11 items-center gap-2 text-sm font-semibold opacity-55 transition-colors hover:text-senal hover:opacity-100"
+                className="flex min-h-11 items-center gap-2 text-sm font-semibold opacity-70 transition-colors hover:text-senal hover:opacity-100"
               >
                 <Trash2 aria-hidden="true" className="size-4" />
                 Quitarlo

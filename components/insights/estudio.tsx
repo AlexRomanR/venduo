@@ -1,13 +1,13 @@
 "use client"
 
 import * as React from "react"
-import { FileText } from "lucide-react"
+import { FileText, LayoutDashboard, MessageSquareText } from "lucide-react"
 
 import type { InsightSql } from "@/lib/ai/schemas"
 import type { FilaInsight } from "@/lib/data/insights"
 import { Consola } from "@/components/insights/consola"
 import { Tablero, type GraficoEnTablero } from "@/components/insights/tablero"
-import { Encabezado, Vacio } from "@/components/panel/piezas"
+import { Seccion, SinDatos } from "@/components/panel/piezas"
 
 interface Props {
   graficos: GraficoEnTablero[]
@@ -54,18 +54,27 @@ export function Estudio({ graficos, preguntar, guardar, borrar }: Props) {
 
   return (
     <>
-      <Consola
-        preguntar={preguntar}
-        guardar={guardar}
-        paraEditar={paraEditar}
-        alConsumirEdicion={olvidarEdicion}
-      />
+      <Seccion
+        id="preguntar"
+        icono={MessageSquareText}
+        titulo="Haz una pregunta"
+        bajada="Con tus palabras: te armo el gráfico con los datos de tu tienda."
+      >
+        <Consola
+          preguntar={preguntar}
+          guardar={guardar}
+          paraEditar={paraEditar}
+          alConsumirEdicion={olvidarEdicion}
+        />
+      </Seccion>
 
-      <section className="mt-14 border-t border-tinta/15 pt-12">
-        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-          <Encabezado etiqueta="Tu tablero" />
-
-          {graficos.length > 0 ? (
+      <Seccion
+        id="tablero"
+        icono={LayoutDashboard}
+        titulo="Tu tablero"
+        bajada="Los gráficos que guardaste, recalculados con los datos de hoy."
+        extra={
+          graficos.length > 0 ? (
             <button
               type="button"
               onClick={() => abrirPdf()}
@@ -74,33 +83,32 @@ export function Estudio({ graficos, preguntar, guardar, borrar }: Props) {
               <FileText aria-hidden="true" className="size-4" />
               Descargar todo en PDF
             </button>
-          ) : null}
-        </div>
-
-        <div className="mt-8">
-          {graficos.length === 0 ? (
-            <Vacio
-              titulo="Todavía no guardaste ningún gráfico"
-              detalle="Cuando uno te sirva, dale a Guardar y queda aquí. Se vuelve a calcular con los datos de cada día, así que no envejece."
+          ) : null
+        }
+      >
+        {graficos.length === 0 ? (
+          <SinDatos
+            icono={LayoutDashboard}
+            titulo="Todavía no guardaste ningún gráfico"
+            texto="Cuando una respuesta te sirva, dale a Guardar y queda aquí. Se vuelve a calcular con los datos de cada día, así que no envejece."
+          />
+        ) : (
+          <>
+            <Tablero
+              graficos={graficos}
+              borrar={borrar}
+              alEditar={setParaEditar}
+              alDescargar={(grafico) => abrirPdf(grafico.id)}
             />
-          ) : (
-            <>
-              <Tablero
-                graficos={graficos}
-                borrar={borrar}
-                alEditar={setParaEditar}
-                alDescargar={(grafico) => abrirPdf(grafico.id)}
-              />
 
-              <p className="mt-10 max-w-[64ch] text-xs leading-relaxed opacity-45">
-                El PDF se abre en otra pestaña, con los datos del momento en que
-                lo pides. Sale en vectores, así que se puede imprimir en grande
-                sin que se pixele.
-              </p>
-            </>
-          )}
-        </div>
-      </section>
+            <p className="border-t border-tinta/15 px-4 py-3 text-xs leading-relaxed opacity-70 sm:px-5">
+              El PDF se abre en otra pestaña, con los datos del momento en que
+              lo pides. Sale en vectores, así que se puede imprimir en grande
+              sin que se pixele.
+            </p>
+          </>
+        )}
+      </Seccion>
     </>
   )
 }

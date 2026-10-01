@@ -1,6 +1,7 @@
 import { cache } from "react"
 
 import { createClient, getUsuario } from "@/lib/supabase/server"
+import { redDeDemostracion, VINCULOS_DEMO } from "@/lib/demo-data"
 import type { ResumenPanel, Suscripcion } from "@/lib/demo-data"
 import type { SubscriptionStatus } from "@/types"
 
@@ -78,7 +79,7 @@ export const getMiTienda = cache(async function getMiTienda() {
   const { data } = await supabase
     .from("stores")
     .select(
-      "id, name, slug, is_published, template_key, commission_bps, seller_network_enabled, logo_url, theme_overrides"
+      "id, name, slug, is_published, template_key, commission_bps, seller_network_enabled, seller_join_mode, logo_url, theme_overrides"
     )
     .eq("owner_id", user.id)
     .is("deleted_at", null)
@@ -247,6 +248,83 @@ export async function getVendedoresDeMiTienda(): Promise<VendedorDeMiTienda[]> {
   }))
 }
 
+export interface VendedorEnRed extends VendedorDeMiTienda {
+  /** Lo que vendió para la tienda. Solo pedidos ya pagados, sin cancelados. */
+  pedidos: number
+  ventasCents: number
+  /** Lo que la tienda le debe o le pagó, con la tasa congelada de cada venta. */
+  comisionCents: number
+}
+
+export interface RedDeMiTienda {
+  slug: string
+  comisionBps: number
+  activa: boolean
+  /** Cómo entra quien se suma: al instante o esperando que el dueño apruebe. */
+  modo: "abierta" | "con_aprobacion"
+  vendedores: VendedorEnRed[]
+  esDemo: boolean
+}
+
+/**
+ * La red de vendedores de mi tienda, con lo que vendió cada uno.
+ *
+ * Las ventas salen de los pedidos y no de las comisiones: un pedido guarda
+ * cuál vínculo lo trajo y la comisión congelada, así que la cuenta no
+ * depende de que la comisión exista todavía. Cuentan los pagados en adelante;
+ * uno pendiente puede no cobrarse nunca.
+ */
+export async function getRedDeMiTienda(): Promise<RedDeMiTienda | null> {
+  const supabase = await createClient()
+  if (!supabase) return redDeDemostracion()
+
+  const tienda = await getMiTienda()
+  if (!tienda) return null
+
+  const [vendedores, { data: ventas }] = await Promise.all([
+    getVendedoresDeMiTienda(),
+    supabase
+      .from("orders")
+      .select("seller_id, total_cents, commission_cents")
+      .eq("store_id", tienda.id)
+      .not("seller_id", "is", null)
+      .in("status", ["pagado", "enviado", "entregado"]),
+  ])
+
+  const porVendedor = new Map<
+    string,
+    { pedidos: number; ventasCents: number; comisionCents: number }
+  >()
+  for (const venta of ventas ?? []) {
+    if (!venta.seller_id) continue
+    const suma = porVendedor.get(venta.seller_id) ?? {
+      pedidos: 0,
+      ventasCents: 0,
+      comisionCents: 0,
+    }
+    suma.pedidos += 1
+    suma.ventasCents += venta.total_cents
+    suma.comisionCents += venta.commission_cents
+    porVendedor.set(venta.seller_id, suma)
+  }
+
+  return {
+    slug: tienda.slug,
+    comisionBps: tienda.commission_bps,
+    activa: tienda.seller_network_enabled,
+    modo: tienda.seller_join_mode,
+    vendedores: vendedores.map((vendedor) => ({
+      ...vendedor,
+      ...(porVendedor.get(vendedor.id) ?? {
+        pedidos: 0,
+        ventasCents: 0,
+        comisionCents: 0,
+      }),
+    })),
+    esDemo: false,
+  }
+}
+
 export interface VinculoVendedor {
   id: string
   storeId: string
@@ -266,7 +344,7 @@ export interface VinculoVendedor {
  */
 export async function getVinculosDeVendedor(): Promise<VinculoVendedor[]> {
   const supabase = await createClient()
-  if (!supabase) return []
+  if (!supabase) return VINCULOS_DEMO
 
   const user = await getUsuario()
   if (!user) return []

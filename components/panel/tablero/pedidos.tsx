@@ -5,7 +5,7 @@ import { formatMoney, formatNumber, formatRelative } from "@/lib/format"
 import { numeroDeWhatsApp } from "@/lib/pedidos"
 import type { PedidoReciente } from "@/lib/tablero"
 import { Estado } from "@/components/pedidos/piezas"
-import { Seccion, SinDatos } from "@/components/panel/tablero/seccion"
+import { Seccion, SinDatos } from "@/components/panel/piezas"
 
 /**
  * Los cinco pedidos más nuevos, con su estado y un atajo a WhatsApp.

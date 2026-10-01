@@ -6,9 +6,14 @@
  * repetían cuatro formularios y una corrección se olvidaba en dos.
  */
 
-/** Etiqueta en versalita, que pasa a rojo cuando el campo tiene error. */
+/**
+ * Etiqueta en versalita, que pasa a rojo cuando el campo tiene error.
+ *
+ * Al 65% y no menos: al 55% la tinta queda en 3,8:1 contra el papel y no
+ * llega al contraste AA para un texto de este tamaño.
+ */
 export const ETIQUETA_CAMPO =
-  "text-xs font-semibold tracking-[0.12em] uppercase opacity-55 data-[error=true]:text-senal data-[error=true]:opacity-100"
+  "text-xs font-semibold tracking-[0.12em] uppercase opacity-65 data-[error=true]:text-senal data-[error=true]:opacity-100"
 
 /** Campo sin caja: una regla abajo que se pone roja al enfocar o al fallar. */
 export const CAMPO =
@@ -29,4 +34,13 @@ export const BOTON_SECUNDARIO =
 export const ERROR_CAMPO = "text-sm text-senal"
 
 /** Ayuda bajo un campo. */
-export const AYUDA_CAMPO = "text-xs text-tinta/55"
+export const AYUDA_CAMPO = "text-xs text-tinta/65"
+
+/**
+ * Una ficha de filtro. La elegida va en tinta llena, nunca en rojo: en el
+ * panel el rojo es para lo que pide una acción, y un filtro solo ordena.
+ */
+export const FICHA =
+  "flex min-h-11 items-center border px-3 text-xs font-semibold transition-colors"
+export const FICHA_ELEGIDA = "border-tinta bg-tinta text-papel"
+export const FICHA_LIBRE = "border-tinta/25 hover:border-tinta"

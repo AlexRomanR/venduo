@@ -3,7 +3,16 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
+import {
+  Banknote,
+  Boxes,
+  Eye,
+  FileText,
+  Images,
+  Loader2,
+  Tag,
+  type LucideIcon,
+} from "lucide-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -41,6 +50,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { Seccion } from "@/components/panel/piezas"
 import { Fotos } from "@/components/productos/fotos"
 
 /** Centavos a bolivianos, para que el campo muestre lo que la persona escribió. */
@@ -48,27 +58,24 @@ function aMonto(centavos: number | null) {
   return centavos === null ? null : centavos / 100
 }
 
+/** Un bloque del formulario, en su panel como toda pantalla del panel. */
 function Bloque({
+  id,
+  icono,
   titulo,
   detalle,
   children,
 }: {
+  id: string
+  icono: LucideIcon
   titulo: string
   detalle?: string
   children: React.ReactNode
 }) {
   return (
-    <section className="border-t border-tinta/15 pt-8">
-      <h2 className="text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
-        {titulo}
-      </h2>
-      {detalle ? (
-        <p className="mt-2 max-w-[62ch] text-sm leading-relaxed opacity-55">
-          {detalle}
-        </p>
-      ) : null}
-      <div className="mt-6 grid gap-6">{children}</div>
-    </section>
+    <Seccion id={id} icono={icono} titulo={titulo} bajada={detalle} relleno>
+      <div className="grid gap-6">{children}</div>
+    </Seccion>
   )
 }
 
@@ -134,9 +141,14 @@ export function FormularioProducto({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(alEnviar)}
-        className="flex flex-col gap-10"
+        className="flex flex-col gap-6 md:gap-8"
       >
-        <Bloque titulo="Lo básico">
+        <Bloque
+          id="basico"
+          icono={FileText}
+          titulo="Qué es"
+          detalle="El nombre y lo que lee quien está por comprar."
+        >
           <FormField
             control={form.control}
             name="nombre"
@@ -179,7 +191,7 @@ export function FormularioProducto({
             )}
           />
 
-          <div className="grid gap-6 sm:grid-cols-2">
+          <div className="grid items-start gap-6 sm:grid-cols-2">
             <FormField
               control={form.control}
               name="categoriaId"
@@ -248,6 +260,8 @@ export function FormularioProducto({
         </Bloque>
 
         <Bloque
+          id="fotos"
+          icono={Images}
           titulo="Fotos"
           detalle="Lo primero que mira quien compra desde el celular."
         >
@@ -269,8 +283,13 @@ export function FormularioProducto({
           />
         </Bloque>
 
-        <Bloque titulo="Precio">
-          <div className="grid gap-6 sm:grid-cols-2">
+        <Bloque
+          id="precio"
+          icono={Banknote}
+          titulo="Cuánto cuesta"
+          detalle="Con un precio anterior, tu tienda muestra el descuento."
+        >
+          <div className="grid items-start gap-6 sm:grid-cols-2">
             <FormField
               control={form.control}
               name="precio"
@@ -336,8 +355,13 @@ export function FormularioProducto({
           </div>
         </Bloque>
 
-        <Bloque titulo="Stock">
-          <div className="grid gap-6 sm:grid-cols-2">
+        <Bloque
+          id="stock"
+          icono={Boxes}
+          titulo="Cuántas tienes"
+          detalle="Las unidades que puedes vender ahora mismo."
+        >
+          <div className="grid items-start gap-6 sm:grid-cols-2">
             <FormField
               control={form.control}
               name="stock"
@@ -394,7 +418,12 @@ export function FormularioProducto({
           </div>
         </Bloque>
 
-        <Bloque titulo="Estado del artículo">
+        <Bloque
+          id="condicion"
+          icono={Tag}
+          titulo="En qué estado está"
+          detalle="Nuevo, de segunda mano o reacondicionado."
+        >
           <FormField
             control={form.control}
             name="condicion"
@@ -452,7 +481,12 @@ export function FormularioProducto({
           ) : null}
         </Bloque>
 
-        <Bloque titulo="Dónde aparece">
+        <Bloque
+          id="donde"
+          icono={Eye}
+          titulo="Dónde se ve"
+          detalle="En tu tienda, en su portada y en tu red de vendedores."
+        >
           {(
             [
               {
@@ -502,7 +536,7 @@ export function FormularioProducto({
           ))}
         </Bloque>
 
-        <div className="flex flex-wrap gap-3 border-t-2 border-tinta pt-6">
+        <div className="flex flex-wrap gap-3">
           <button type="submit" disabled={enCurso} className={BOTON_PRIMARIO}>
             {enCurso ? (
               <Loader2 aria-hidden="true" className="size-4 animate-spin" />

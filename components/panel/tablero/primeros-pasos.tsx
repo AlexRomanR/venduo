@@ -5,7 +5,7 @@ import type { Tablero } from "@/lib/tablero"
 import { cn } from "@/lib/utils"
 import { enlaceLegible } from "@/lib/tienda"
 import { CompartirTienda } from "@/components/panel/tablero/compartir"
-import { Seccion } from "@/components/panel/tablero/seccion"
+import { Seccion } from "@/components/panel/piezas"
 
 const BOTON_DEL_PASO =
   "inline-flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"

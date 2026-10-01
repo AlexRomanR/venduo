@@ -65,6 +65,10 @@ interface Props {
  *
  * La entrada más reciente va arriba, pegada al campo: es la que se acaba de
  * pedir, y en móvil es la única que entra en pantalla.
+ *
+ * Es el cuerpo del panel "Haz una pregunta": el campo arriba y cada entrada
+ * en su franja, separada por una regla de lado a lado, como las filas del
+ * resto del panel.
  */
 export function Consola({
   preguntar,
@@ -160,38 +164,40 @@ export function Consola({
           e.preventDefault()
           enviar(texto)
         }}
-        className="flex items-center gap-3 border-b-2 border-tinta pb-3"
+        className="px-4 py-4 sm:px-5"
       >
-        <label htmlFor="pregunta" className="sr-only">
-          Pregunta sobre tu negocio
-        </label>
-        <input
-          id="pregunta"
-          ref={campo}
-          value={texto}
-          onChange={(e) => setTexto(e.target.value)}
-          placeholder="¿Cuánto vendí esta semana?"
-          autoComplete="off"
-          className="h-12 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-tinta/35 sm:text-lg"
-        />
-        <button
-          type="submit"
-          disabled={enCurso || texto.trim().length === 0}
-          aria-label="Preguntar"
-          className="flex size-12 shrink-0 items-center justify-center rounded-plantilla bg-senal text-white transition-colors hover:bg-senal-alta disabled:opacity-40"
-        >
-          {enCurso ? (
-            <Loader2 aria-hidden="true" className="size-4 animate-spin" />
-          ) : (
-            <CornerDownLeft aria-hidden="true" className="size-4" />
-          )}
-        </button>
+        <div className="flex items-center gap-3 border-b-2 border-tinta pb-3">
+          <label htmlFor="pregunta" className="sr-only">
+            Pregunta sobre tu negocio
+          </label>
+          <input
+            id="pregunta"
+            ref={campo}
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+            placeholder="¿Cuánto vendí esta semana?"
+            autoComplete="off"
+            className="h-12 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-tinta/55 sm:text-lg"
+          />
+          <button
+            type="submit"
+            disabled={enCurso || texto.trim().length === 0}
+            aria-label="Preguntar"
+            className="flex size-12 shrink-0 items-center justify-center rounded-plantilla bg-senal text-white transition-colors hover:bg-senal-alta disabled:opacity-40"
+          >
+            {enCurso ? (
+              <Loader2 aria-hidden="true" className="size-4 animate-spin" />
+            ) : (
+              <CornerDownLeft aria-hidden="true" className="size-4" />
+            )}
+          </button>
+        </div>
       </form>
 
       {enCurso ? (
         <p
           aria-live="polite"
-          className="mt-8 flex items-center gap-3 border-l-2 border-senal pl-4 text-sm leading-relaxed opacity-55"
+          className="mx-4 mb-5 flex items-center gap-3 border-l-2 border-senal pl-4 text-sm leading-relaxed opacity-70 sm:mx-5"
         >
           <Loader2
             aria-hidden="true"
@@ -203,18 +209,11 @@ export function Consola({
       ) : null}
 
       {entradas.length === 0 ? (
-        <div className="mt-10">
-          <p className="max-w-[58ch] leading-relaxed opacity-70">
-            Pregunta con tus palabras y te armo el gráfico. Cada respuesta se
-            queda en esta página, así que puedes comparar varias sin volver a
-            pedirlas. También puedes pedir cambios sobre la última: «ahora por
-            semana», «solo los últimos 7 días», «muéstralo como tabla».
-          </p>
-
-          <p className="mt-10 text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
+        <div className="border-t border-tinta/15 px-4 pt-4 pb-5 sm:px-5">
+          <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
             Prueba con
           </p>
-          <ul className="mt-2 grid gap-x-10 sm:grid-cols-2">
+          <ul className="mt-1 grid gap-x-10 sm:grid-cols-2">
             {SUGERENCIAS.map((sugerencia) => (
               <li key={sugerencia}>
                 <button
@@ -227,79 +226,83 @@ export function Consola({
               </li>
             ))}
           </ul>
+          <p className="mt-4 max-w-[64ch] text-sm leading-relaxed opacity-70">
+            Cada respuesta se queda en esta página, así que puedes comparar
+            varias sin volver a pedirlas. Sobre la última puedes pedir cambios:
+            «ahora por semana», «solo los últimos 7 días», «muéstralo como
+            tabla».
+          </p>
         </div>
       ) : null}
 
-      <div className={cn("flex flex-col", entradas.length > 0 && "mt-10")}>
-        {entradas.map((entrada) => (
-          <article
-            key={entrada.numero}
-            className="border-t border-tinta/15 pt-8 pb-12 first:border-t-0 first:pt-0"
-          >
-            <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-40">
-              <span className="text-senal">
-                {String(entrada.numero).padStart(2, "0")}
-              </span>{" "}
-              · {entrada.deTablero ? "De tu tablero" : "Preguntaste"}
+      {entradas.map((entrada) => (
+        <article
+          key={entrada.numero}
+          className="border-t border-tinta/15 px-4 pt-5 pb-8 sm:px-5"
+        >
+          <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
+            <span className="tabular">
+              {String(entrada.numero).padStart(2, "0")}
+            </span>{" "}
+            · {entrada.deTablero ? "De tu tablero" : "Preguntaste"}
+          </p>
+          <h3 className="mt-2 max-w-[46ch] font-titular text-lg font-bold tracking-[-0.02em] sm:text-xl">
+            {entrada.pregunta}
+          </h3>
+
+          {entrada.deTablero ? (
+            <p className="mt-2 max-w-[58ch] text-sm leading-relaxed opacity-70">
+              Escribe arriba qué quieres cambiarle: «por semana», «solo los
+              últimos 30 días», «muéstralo como tabla».
             </p>
-            <h2 className="mt-2 max-w-[46ch] font-titular text-lg font-bold tracking-[-0.02em] sm:text-xl">
-              {entrada.pregunta}
-            </h2>
+          ) : null}
 
-            {entrada.deTablero ? (
-              <p className="mt-2 max-w-[58ch] text-sm leading-relaxed opacity-55">
-                Escribe arriba qué quieres cambiarle: «por semana», «solo los
-                últimos 30 días», «muéstralo como tabla».
-              </p>
-            ) : null}
-
-            {entrada.error ? (
-              <p className="mt-5 max-w-[58ch] border-l-2 border-senal pl-4 text-sm leading-relaxed opacity-70">
-                {entrada.error}
-              </p>
-            ) : entrada.consulta ? (
-              <>
-                <div className="mt-5 flex flex-wrap items-start gap-x-8 gap-y-4">
-                  <p className="max-w-[58ch] min-w-[18rem] flex-1 border-l-2 border-senal pl-4 leading-relaxed">
-                    {entrada.lectura ??
-                      "La consulta salió bien pero no devolvió ningún dato todavía."}
-                  </p>
-
-                  <button
-                    type="button"
-                    onClick={() => alGuardar(entrada)}
-                    disabled={entrada.guardado}
-                    className={cn(
-                      "flex min-h-11 shrink-0 items-center gap-2 rounded-plantilla border-2 px-4 text-sm font-semibold transition-colors",
-                      entrada.guardado
-                        ? "border-tinta/20 text-tinta/40"
-                        : "border-tinta hover:bg-tinta hover:text-papel"
-                    )}
-                  >
-                    {entrada.guardado ? (
-                      <BookmarkCheck aria-hidden="true" className="size-4" />
-                    ) : (
-                      <BookmarkPlus aria-hidden="true" className="size-4" />
-                    )}
-                    {entrada.guardado ? "En tu tablero" : "Guardar"}
-                  </button>
-                </div>
-
-                <h3 className="mt-10 font-titular text-base font-bold tracking-[-0.01em]">
-                  {entrada.consulta.titulo}
-                </h3>
-                <p className="mt-1 max-w-[70ch] text-xs leading-relaxed opacity-45">
-                  {entrada.consulta.explicacion}
+          {entrada.error ? (
+            <p className="mt-5 max-w-[58ch] border-l-2 border-senal pl-4 text-sm leading-relaxed">
+              {entrada.error}
+            </p>
+          ) : entrada.consulta ? (
+            <>
+              <div className="mt-5 flex flex-wrap items-start gap-x-8 gap-y-4">
+                <p className="max-w-[58ch] min-w-[min(100%,18rem)] flex-1 border-l-2 border-senal pl-4 leading-relaxed">
+                  {entrada.lectura ??
+                    "La consulta salió bien pero no devolvió ningún dato todavía."}
                 </p>
 
-                <div className="mt-6">
-                  <Grafico spec={entrada.consulta} filas={entrada.filas} />
-                </div>
-              </>
-            ) : null}
-          </article>
-        ))}
-      </div>
+                <button
+                  type="button"
+                  onClick={() => alGuardar(entrada)}
+                  disabled={entrada.guardado}
+                  className={cn(
+                    "flex min-h-11 shrink-0 items-center gap-2 rounded-plantilla border-2 px-4 text-sm font-semibold transition-colors",
+                    entrada.guardado
+                      ? "border-tinta/25 text-tinta/65"
+                      : "border-tinta hover:bg-tinta hover:text-papel"
+                  )}
+                >
+                  {entrada.guardado ? (
+                    <BookmarkCheck aria-hidden="true" className="size-4" />
+                  ) : (
+                    <BookmarkPlus aria-hidden="true" className="size-4" />
+                  )}
+                  {entrada.guardado ? "En tu tablero" : "Guardar"}
+                </button>
+              </div>
+
+              <h4 className="mt-8 font-titular text-base font-bold tracking-[-0.01em]">
+                {entrada.consulta.titulo}
+              </h4>
+              <p className="mt-1 max-w-[70ch] text-xs leading-relaxed opacity-65">
+                {entrada.consulta.explicacion}
+              </p>
+
+              <div className="mt-6">
+                <Grafico spec={entrada.consulta} filas={entrada.filas} />
+              </div>
+            </>
+          ) : null}
+        </article>
+      ))}
     </div>
   )
 }

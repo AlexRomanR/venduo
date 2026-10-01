@@ -110,7 +110,7 @@ export function Foto({
           )}
           {url ? "Cambiar foto" : "Subir foto"}
         </button>
-        <p className="mt-2 text-xs opacity-55">JPG, PNG o WEBP. Hasta 5 MB.</p>
+        <p className="mt-2 text-xs opacity-70">JPG, PNG o WEBP. Hasta 5 MB.</p>
       </div>
     </div>
   )

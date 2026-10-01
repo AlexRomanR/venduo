@@ -68,7 +68,7 @@ export function MaterialesVendedor({
       <button
         type="button"
         onClick={() => copiar(codigo, "Código")}
-        className="flex min-h-11 items-center gap-2 px-2 text-sm font-semibold opacity-55 transition-opacity hover:opacity-100"
+        className="flex min-h-11 items-center gap-2 px-2 text-sm font-semibold opacity-70 transition-opacity hover:opacity-100"
       >
         Copiar solo el código
       </button>

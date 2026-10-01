@@ -103,16 +103,38 @@ informa. El atajo "Nuevo producto" va con trazo y no relleno rojo por lo mismo: 
 todas las pantallas y competiría con el botón principal de cada una. En el móvil, el botón
 del menú lleva un punto rojo si adentro hay algo urgente.
 
-### El Resumen del panel
+### Las pantallas del panel
 
-Cada sección va en su propio panel —regla estructural de un píxel, esquina viva, sin
-sombra— con un ícono, un título que dice **para qué sirve** ("Para hoy", "Cómo te va",
-"Se está acabando") y una bajada de una línea. El pie, si lo hay, es un enlace a todo el
-ancho hacia la pantalla completa de esa sección.
+**Toda pantalla del panel se arma igual que el Resumen**: cada cosa en su propio panel
+—regla estructural de un píxel, esquina viva, sin sombra— con un ícono, un título que
+dice **para qué sirve** ("Cómo van tus cobros", "Quieren vender para ti", "Se está
+acabando") y una bajada de una línea. El pie, si lo hay, es un enlace a todo el ancho
+hacia donde se sigue. Antes solo el Resumen se veía así, y en las demás pantallas las
+cifras, los filtros y las listas quedaban sueltos bajo rótulos chicos: lo importante se
+perdía entre lo demás.
+
+**Nadie arma esto a mano.** Las piezas están en `components/panel/piezas.tsx`:
+
+| Pieza              | Para qué                                                          |
+| ------------------ | ----------------------------------------------------------------- |
+| `Cabecera`         | El titular de la pantalla, su bajada, el aviso de demo y acciones |
+| `Volver`           | La vuelta desde una pantalla de detalle                           |
+| `Seccion`          | El panel. `extra` a la derecha del título, `accion` en el pie     |
+| `Cifras` y `Cifra` | Cifras en celdas separadas por una regla, de a dos o de a cuatro  |
+| `SinDatos`         | El estado vacío dentro de un panel: qué va a aparecer y cómo      |
+| `Insignia`         | Un estado en versalita: un pedido, una comisión, un vendedor      |
+| `Miniatura`        | La foto chica de un producto en una fila                          |
+
+Y el ritmo, el mismo en todas: la pantalla es una columna de paneles con `gap-6
+md:gap-8`. Dentro de un panel, las filas van de lado a lado con una regla arriba
+(`border-t border-tinta/15 first:border-t-0`) y su propio margen interior; un
+formulario o un texto usan `relleno`. Los filtros son una franja con regla abajo,
+dentro del panel que filtran, con las fichas de `lib/estilos.ts`: la elegida en tinta
+llena, nunca en rojo.
 
 Los rótulos van en tinta, nunca en rojo: en el panel el rojo es para lo que pide una
-acción, y un rótulo en cada sección lo gastaba en nombrar cosas. El texto secundario del
-Resumen no baja de tinta al 65% (5,3:1 contra el papel): al 55% no llega al contraste AA.
+acción, y un rótulo en cada sección lo gastaba en nombrar cosas. El texto secundario no
+baja de tinta al 65% (5,3:1 contra el papel): al 55% no llega al contraste AA.
 
 **Los componentes de `components/ui/` se siguen usando.** Se visten con las clases de
 `lib/estilos.ts` en vez de reemplazarse: lo que aportan es el cableado de accesibilidad

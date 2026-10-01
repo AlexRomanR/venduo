@@ -1,12 +1,10 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Loader2, Receipt } from "lucide-react"
 import { toast } from "sonner"
 
-import { formatMoney } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { Pedido } from "@/lib/data/pedidos"
 import { ESTADOS } from "@/lib/pedidos"
@@ -39,20 +37,6 @@ export function Estado({ estado }: { estado: OrderStatus }) {
   )
 }
 
-/** De quién vino la venta. Es lo que decide si alguien cobra comisión. */
-export function Origen({ pedido }: { pedido: Pedido }) {
-  if (!pedido.vendedor) {
-    return <span className="text-xs opacity-45">Venta directa</span>
-  }
-
-  return (
-    <span className="text-xs">
-      <span className="opacity-45">Vendió </span>
-      <span className="font-semibold">{pedido.vendedor.nombre}</span>
-    </span>
-  )
-}
-
 /**
  * Ver el comprobante.
  *
@@ -62,11 +46,12 @@ export function Origen({ pedido }: { pedido: Pedido }) {
 export function BotonComprobante({
   pedidoId,
   ver,
-  compacto = false,
+  icono = false,
 }: {
   pedidoId: string
   ver: (id: string) => Promise<{ ok: boolean; url?: string; error?: string }>
-  compacto?: boolean
+  /** Solo el ícono, para la columna de atajos de una fila. */
+  icono?: boolean
 }) {
   const [cargando, setCargando] = React.useState(false)
 
@@ -83,23 +68,37 @@ export function BotonComprobante({
     window.open(resultado.url, "_blank", "noopener,noreferrer")
   }
 
+  const Icono = cargando ? Loader2 : Receipt
+
+  if (icono) {
+    return (
+      <button
+        type="button"
+        onClick={abrir}
+        disabled={cargando}
+        aria-label="Ver el comprobante"
+        title="Ver el comprobante"
+        className="flex w-12 items-center justify-center border-l border-tinta/15 text-senal transition-colors hover:bg-tinta hover:text-papel sm:w-14"
+      >
+        <Icono
+          aria-hidden="true"
+          className={cn("size-5", cargando && "animate-spin")}
+        />
+      </button>
+    )
+  }
+
   return (
     <button
       type="button"
       onClick={abrir}
       disabled={cargando}
-      className={cn(
-        "flex min-h-11 items-center gap-2 text-xs font-semibold transition-colors hover:text-senal",
-        compacto
-          ? ""
-          : "border-2 border-tinta px-4 hover:bg-tinta hover:text-papel"
-      )}
+      className="flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
     >
-      {cargando ? (
-        <Loader2 aria-hidden="true" className="size-4 animate-spin" />
-      ) : (
-        <Receipt aria-hidden="true" className="size-4" />
-      )}
+      <Icono
+        aria-hidden="true"
+        className={cn("size-4", cargando && "animate-spin")}
+      />
       Ver comprobante
     </button>
   )
@@ -223,63 +222,4 @@ const PASOS: Record<OrderStatus, Paso[]> = {
     { estado: "cancelado", texto: "Cancelar", aviso: "Pedido cancelado." },
   ],
   cancelado: [],
-}
-
-/** Una fila de la lista. */
-export function FilaPedido({
-  pedido,
-  ver,
-}: {
-  pedido: Pedido
-  ver: (id: string) => Promise<{ ok: boolean; url?: string; error?: string }>
-}) {
-  return (
-    <li className="border-t border-tinta/15 py-5 first:border-t-0">
-      <div className="flex flex-wrap items-start gap-x-6 gap-y-3">
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <Link
-              href={`/panel/pedidos/${pedido.id}`}
-              className="tabular inline-flex min-h-11 items-center font-titular text-base font-bold tracking-[-0.01em] transition-colors hover:text-senal"
-            >
-              #{pedido.numero}
-            </Link>
-            <Estado estado={pedido.estado} />
-            {pedido.estado === "pendiente" && pedido.comprobante ? (
-              <span className="inline-flex items-center gap-1 text-[10px] font-semibold tracking-[0.12em] text-senal uppercase">
-                <Receipt aria-hidden="true" className="size-3" />
-                Con comprobante
-              </span>
-            ) : null}
-          </div>
-
-          <p className="mt-2 font-semibold">{pedido.comprador}</p>
-          <p className="tabular mt-0.5 text-sm opacity-55">{pedido.telefono}</p>
-
-          <p className="mt-2">
-            <Origen pedido={pedido} />
-          </p>
-        </div>
-
-        <div className="flex flex-col items-end gap-2">
-          <p className="tabular font-titular text-lg font-bold tracking-[-0.02em]">
-            {formatMoney(pedido.totalCents)}
-          </p>
-
-          <div className="flex items-center gap-3">
-            {pedido.comprobante ? (
-              <BotonComprobante pedidoId={pedido.id} ver={ver} compacto />
-            ) : null}
-
-            <Link
-              href={`/panel/pedidos/${pedido.id}`}
-              className="flex min-h-11 items-center text-sm font-semibold transition-colors hover:text-senal"
-            >
-              Ver el pedido
-            </Link>
-          </div>
-        </div>
-      </div>
-    </li>
-  )
 }

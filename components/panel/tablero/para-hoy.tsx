@@ -3,7 +3,7 @@ import { ArrowRight, CircleCheck, type LucideIcon } from "lucide-react"
 
 import { formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
-import { Seccion } from "@/components/panel/tablero/seccion"
+import { Seccion } from "@/components/panel/piezas"
 
 export interface Pendiente {
   icono: LucideIcon
