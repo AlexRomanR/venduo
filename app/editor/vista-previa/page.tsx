@@ -9,6 +9,12 @@ export const metadata = {
   robots: { index: false, follow: false },
 }
 
+// Es la tienda de quien edita: nunca puede salir del build como página fija.
+// Sin credenciales —el CI, el modo demo— no lee cookies, así que Next
+// intentaba dibujarla de antemano y el build se caía en la cabecera, que lee
+// la URL del navegador.
+export const dynamic = "force-dynamic"
+
 /**
  * La tienda de quien edita, para el `<iframe>` del editor.
  *
