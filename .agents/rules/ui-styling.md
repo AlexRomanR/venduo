@@ -94,7 +94,7 @@ cajón es el `Sheet` de shadcn con `showCloseButton={false}` y `shadow-none` —
 28 px y dice "Close"— y un cierre propio de 44 px.
 
 Las secciones las deciden los datos (`lib/data/barra.ts`), no `primary_role`: quien tiene
-tienda ve "Tu tienda", quien vende para otras ve "Como vendedor", y quien hace las dos
+tienda ve "Tu negocio", quien vende para otras ve "Como vendedor", y quien hace las dos
 ve las dos.
 
 Los contadores siguen la regla del rojo: **rojo solo si pide una acción** —un pedido que
@@ -207,6 +207,25 @@ Los mensajes de error dicen qué hacer, no qué falló internamente:
 
 Lo mismo aplica a los textos que **genera la IA**: la instrucción de sistema en
 `lib/ai/tasks.ts` fija el registro para todo lo que el modelo devuelva.
+
+### Cómo le hablamos al cliente
+
+Nuestro cliente **ya vende por TikTok, Instagram, Facebook o WhatsApp**: ropa,
+zapatillas, maquillaje, perfumes, accesorios, tecnología, segunda mano. No se levanta
+pensando "necesito una página web"; se levanta respondiendo "¿precio?" por mensaje. Por
+eso Venduo es **más que una tienda online**: la tienda se nombra, pero siempre con lo
+que hay detrás —el stock, los cobros, los pedidos, los vendedores, los catálogos—.
+
+| Sí                                                         | No                                                        |
+| ---------------------------------------------------------- | --------------------------------------------------------- |
+| "Tu tienda online, y todo lo que hay detrás"               | "Crea tu página web"                                      |
+| "Tu tienda online, con stock y cobros incluidos"           | "Tu tienda online en minutos", a secas                    |
+| "El enlace de tu bio", "mándalo por WhatsApp"              | "Tu sitio", "tu dominio", "tu e-commerce"                 |
+| "Tu negocio" para el panel: stock, pedidos, cobros, ventas | "Dashboard", "backoffice"                                 |
+| Ejemplos de redes: Rosa Deportes, Bella Piel, Tecno Sur    | Comida casera: cuñapés, panaderías, cafés                 |
+| Los dolores en su idioma: "vendí algo que ya no tenía"     | Promesas genéricas: "lleva tu negocio al siguiente nivel" |
+
+Nunca se borra la palabra "tienda": lo que se evita es que parezca que eso es todo.
 
 ## Dinero y fechas
 

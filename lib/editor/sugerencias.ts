@@ -118,7 +118,7 @@ export const COMBINACIONES: CombinacionDeLetra[] = [
   },
   {
     nombre: "Letrero",
-    ideal: "Comida, ferias, ofertas",
+    ideal: "Ferias, ofertas, segunda mano",
     tipografia: {
       titular: "oswald",
       cuerpo: "jost",

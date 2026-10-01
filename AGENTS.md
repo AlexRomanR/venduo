@@ -1,9 +1,10 @@
 # Venduo
 
-Plataforma boliviana donde un emprendedor elige una plantilla, describe su negocio y
-obtiene una tienda online que la IA edita por bloques. Esa tienda puede activar una red de
-vendedores jóvenes que colocan sus productos a comisión y construyen, con cada venta, un
-historial laboral verificable.
+Más que una tienda online: el sistema para quien vende por TikTok, Instagram y WhatsApp.
+Tiene su tienda online —el enlace de su bio, sobre una plantilla que la IA edita por
+bloques— y detrás el stock, los cobros, los pedidos y los catálogos en PDF. Esa tienda
+puede activar una red de vendedores jóvenes que colocan sus productos a comisión y
+construyen, con cada venta, un historial laboral verificable.
 
 MVP de hackathon de 48 horas. **La especificación del producto es `VENDUO.md`** y es la
 fuente de verdad: si algo de acá la contradice, gana `VENDUO.md`.

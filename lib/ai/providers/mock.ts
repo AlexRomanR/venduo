@@ -13,15 +13,15 @@ type JsonSchema = Record<string, unknown>
 
 /** Textos de relleno según el nombre del campo, para que la demo se lea bien. */
 const SAMPLE_TEXT: Record<string, string> = {
-  name: "Café de especialidad Venduo",
+  name: "Zapatilla urbana Venduo",
   title: "Tienda de ejemplo",
   slug: "tienda-demo",
   description:
     "Contenido de ejemplo generado en modo demo. Configura AI_PROVIDER y AI_API_KEY para usar un modelo real.",
   summary: "Resumen de ejemplo del período analizado.",
   headline: "Vende más, con menos vueltas",
-  tagline: "Tu tienda online lista en minutos",
-  categor: "Café",
+  tagline: "Tu tienda online, con stock y cobros incluidos",
+  categor: "Calzado",
   hashtag: "venduo",
   currency: "BOB",
   color: "#0f172a",

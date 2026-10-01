@@ -45,26 +45,26 @@ const CONTENIDO: Record<Rol, Contenido> = {
   emprendedor: {
     icono: Store,
     opcion: "Tengo un negocio",
-    detalleOpcion: "Quiero mi tienda online",
+    detalleOpcion: "Quiero mi tienda online y ordenar mi negocio",
     etiqueta: "Para quien ya vende",
-    titular: "Tu tienda abierta esta semana.",
+    titular: "Tu tienda online, y todo lo que hay detrás.",
     entrada:
-      "Describe en un párrafo qué vendes y a qué precio. La IA arma el catálogo, escribe los textos y ordena las categorías; tú corriges lo que no te cuadre.",
+      "Tu tienda para el enlace de tu bio, y detrás el stock, los cobros y los pedidos. Lo manejas desde el celular, como ya manejas tus redes.",
     puntos: [
       {
-        titulo: "Editor con IA",
+        titulo: "Stock al día",
         detalle:
-          "Le hablas y la tienda cambia: precios, textos, categorías, portada.",
+          "Cada venta descuenta sola, y te avisa lo que se está acabando.",
       },
       {
-        titulo: "Cobro por QR",
+        titulo: "Cobro con PagoFácil",
         detalle:
-          "El QR de tu banco en cada pedido, con el comprobante adjunto a la venta.",
+          "El dinero queda protegido hasta la entrega, y no revisas capturas.",
       },
       {
-        titulo: "Tu red de vendedores",
+        titulo: "Catálogos y vendedores",
         detalle:
-          "Activas vendedores a comisión, cada uno con su enlace y su registro.",
+          "Catálogos en PDF para mandar por WhatsApp, y vendedores que cobran solo si venden.",
       },
     ],
     pie: "Abrir y publicar no cuesta nada. No pedimos tarjeta.",

@@ -7,9 +7,15 @@ Desafío: empleabilidad juvenil · Enfoque: triple impacto
 
 ## 1. Qué es Venduo
 
-Una plataforma donde cualquier emprendedor elige una plantilla, describe su negocio en texto y obtiene una tienda online funcionando, con herramientas de cobro, análisis y marketing incluidas. La inteligencia artificial no escribe la tienda desde cero: trabaja sobre la plantilla elegida agregando, quitando y ajustando bloques visuales hasta que la tienda represente al negocio. Y como esa tienda ya tiene catálogo digital, puede activar con un clic una red de vendedores jóvenes que colocan sus productos a comisión.
+**Más que una tienda online: el sistema para vender por redes sociales.** Quien vende por TikTok, Instagram, Facebook o WhatsApp tiene en Venduo su **tienda online** —el enlace que pone en su bio y manda por chat— y, detrás de ella, todo lo que necesita su negocio: el stock controlado, los cobros con PagoFácil, los pedidos ordenados con el WhatsApp listo, una red de vendedores a comisión, estadísticas que se preguntan en palabras y catálogos en PDF para compartir.
 
-**En una frase:** convertimos a cualquier emprendedor que vende por TikTok en una tienda online en dos minutos, y le damos una red de vendedores que vende por él.
+La tienda se arma sobre una plantilla del rubro, y la inteligencia artificial la ajusta por bloques —agrega, quita, reordena, cambia textos y colores— cuando el emprendedor se lo pide. Y como esa tienda ya tiene catálogo digital, puede activar con un clic una red de vendedores jóvenes que colocan sus productos a comisión.
+
+**En una frase:** no es solo una página: es tu tienda y el sistema que la maneja, y una red de vendedores que vende por ti.
+
+### Cómo se le habla al cliente
+
+Quien vende por redes no se levanta pensando "necesito una página web". Se levanta respondiendo "¿precio?" por mensaje directo, vendiendo algo que ya no tenía o revisando capturas de transferencias. Venduo se presenta desde esos problemas: la tienda online se nombra —no se esconde— pero siempre acompañada de lo que la hace distinta, "tu tienda online, con stock y cobros incluidos". Los ejemplos son de rubros que se venden por redes —moda, calzado, belleza, perfumes, accesorios, tecnología, segunda mano—, no de comida casera. El detalle de tono está en `.agents/rules/ui-styling.md`, "Cómo le hablamos al cliente".
 
 ---
 
@@ -17,7 +23,7 @@ Una plataforma donde cualquier emprendedor elige una plantilla, describe su nego
 
 **Lado joven.** En Bolivia el 96,2% de los jóvenes que trabajan lo hacen en la informalidad, la tasa más alta de la región. El desempleo juvenil duplica al general (6% contra 3,1%) y siete de cada diez ganan menos de Bs 2.500 al mes. El problema no es que falte trabajo: es que el trabajo disponible no paga, no forma y no deja historial que puedan mostrar después.
 
-**Lado emprendedor.** Un volumen enorme del comercio boliviano ocurre informalmente por Facebook Marketplace, WhatsApp y TikTok, sin plataforma detrás. Menos del 30% de las pymes bolivianas tiene sitio web. Ese emprendedor no tiene tienda, no tiene números, promociona a mano en cinco redes y no puede contratar a nadie porque no le alcanza para un sueldo fijo.
+**Lado emprendedor.** Un volumen enorme del comercio boliviano ocurre informalmente por TikTok, Instagram, Facebook Marketplace y WhatsApp, sin plataforma detrás. Menos del 30% de las pymes bolivianas tiene sitio web, y quien vende por redes no siente que le falte uno: lo que le falta es orden. Responde el precio por mensaje cincuenta veces al día, vende lo que ya no tiene porque el stock lo lleva de memoria, revisa capturas de pago una por una, manda fotos sueltas por WhatsApp, no tiene números y no puede contratar a nadie porque no le alcanza para un sueldo fijo.
 
 **La conexión:** cada problema es la solución del otro. Nadie los había conectado.
 
@@ -58,14 +64,15 @@ Tres propiedades lo hacen creíble como antecedente laboral:
 
 ## 4. Los módulos
 
-| Módulo                      | Qué hace                                                                                                                 | Para quién  |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| **Editor de tienda con IA** | Sobre una plantilla del rubro, la IA agrega, elimina y edita bloques visuales según lo que el emprendedor pide en texto  | Emprendedor |
-| **Cobro con custodia**      | El comprador paga en PagoFácil, el dinero queda retenido y se libera al emprendedor y al vendedor cuando llega el pedido | Ambos       |
-| **Inteligencia de negocio** | Preguntas en lenguaje natural que devuelven gráficos y estadísticas                                                      | Emprendedor |
-| **Marketing con IA**        | Genera copys y piezas adaptadas a cada red social, listos para publicar en Facebook y WhatsApp                           | Emprendedor |
-| **Red de vendedores**       | Alta de vendedores, enlaces de referido, comisiones automáticas                                                          | Ambos       |
-| **Segunda mano**            | Filtro del catálogo que reúne los productos usados y reacondicionados, con los descuentos destacados                     | Emprendedor |
+| Módulo                      | Qué hace                                                                                                                  | Para quién  |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **Editor de tienda con IA** | Sobre una plantilla del rubro, la IA agrega, elimina y edita bloques visuales según lo que el emprendedor pide en texto   | Emprendedor |
+| **Cobro con custodia**      | El comprador paga en PagoFácil, el dinero queda retenido y se libera al emprendedor y al vendedor cuando llega el pedido  | Ambos       |
+| **Inteligencia de negocio** | Preguntas en lenguaje natural que devuelven gráficos y estadísticas                                                       | Emprendedor |
+| **Marketing con IA**        | Genera copys y piezas adaptadas a cada red social, listos para publicar en Facebook y WhatsApp                            | Emprendedor |
+| **Red de vendedores**       | Alta de vendedores, enlaces de referido, comisiones automáticas                                                           | Ambos       |
+| **Segunda mano**            | Filtro del catálogo que reúne los productos usados y reacondicionados, con los descuentos destacados                      | Emprendedor |
+| **Catálogos en PDF**        | Catálogos armados con productos elegidos, una categoría o un pack, en una de doce plantillas con los colores de la tienda | Emprendedor |
 
 **Sobre la segunda mano:** no es una sección aparte que se genera sola. Es un **filtro dentro del catálogo** de cada tienda. Lo que define que un producto sea de segunda mano es un campo que el emprendedor elige al cargarlo, junto con un precio de comparación opcional que produce el descuento destacado.
 
@@ -181,6 +188,7 @@ Flujo de demostración completo:
 12. Inteligencia de negocio: estadísticas consultadas en lenguaje natural
 13. Generador de copys de marketing y publicación en Facebook y WhatsApp
 14. Coordinación de entrega por WhatsApp con el detalle del pedido armado por la plataforma, y confirmación de envío y recepción que libera el pago
+15. Catálogos en PDF editables: productos elegidos, una categoría o un pack, en una de doce plantillas de bloques intercambiables, con los colores de la tienda, para descargar o compartir por WhatsApp
 
 ### Publicación en redes: plan A y plan B
 

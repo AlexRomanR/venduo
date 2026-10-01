@@ -107,7 +107,7 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
               <FormControl>
                 <Input
                   className={`h-12 ${CAMPO}`}
-                  placeholder="Panadería Doña Elsa"
+                  placeholder="Rosa Deportes"
                   autoComplete="organization"
                   {...field}
                 />
@@ -133,7 +133,7 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
                 <Textarea
                   rows={5}
                   className={`min-h-32 resize-y py-3 ${CAMPO}`}
-                  placeholder="Hago cuñapés, empanadas y masitas por encargo en La Paz. Vendo por WhatsApp a oficinas y para eventos."
+                  placeholder="Vendo ropa deportiva por TikTok e Instagram: buzos, poleras y zapatillas. Hago envíos en Santa Cruz y coordino por WhatsApp."
                   {...field}
                 />
               </FormControl>

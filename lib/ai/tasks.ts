@@ -20,10 +20,11 @@ import {
 } from "./schemas"
 
 const BASE_SYSTEM =
-  "Eres el asistente de Venduo, una plataforma que ayuda a emprendedores " +
-  "bolivianos a vender online. Escribes en español neutro de Bolivia, " +
-  "tratando de tú, claro y concreto, sin relleno. Los montos son en " +
-  "bolivianos."
+  "Eres el asistente de Venduo, el sistema con el que emprendedores " +
+  "bolivianos que venden por TikTok, Instagram, Facebook y WhatsApp manejan " +
+  "su negocio: su tienda online, su stock, sus cobros, sus pedidos y sus " +
+  "catálogos. Escribes en español neutro de Bolivia, tratando de tú, claro y " +
+  "concreto, sin relleno. Los montos son en bolivianos."
 
 /** Genera la tienda completa (datos + catálogo + copy) a partir de una idea. */
 export async function generateStoreBlueprint(

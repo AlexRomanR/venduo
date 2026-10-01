@@ -7,10 +7,12 @@ related_targets: []
 
 Superficie: `/` — la portada pública. Modo Persuade.
 
-Llega alguien que no conoce Venduo, desde un enlace de WhatsApp, casi siempre en un
-Android de gama baja con datos móviles. Tiene que entender qué es y querer registrarse.
-Dos audiencias con promesas opuestas: el emprendedor que no puede pagar un sueldo y el
-joven que no consigue trabajo que deje rastro.
+Llega alguien que no conoce Venduo, desde un enlace de WhatsApp o de una bio, casi siempre
+en un Android de gama baja con datos móviles. Ya vende por TikTok, Instagram o WhatsApp y
+no siente que le falte una página web: le falta orden. Tiene que entender que Venduo es
+más que una tienda online —la tienda y el sistema que la maneja— y querer registrarse.
+Dos audiencias con promesas opuestas: quien vende por redes y no da abasto, y el joven que
+no consigue trabajo que deje rastro.
 
 Prueba: el mecanismo funcionando en el primer viewport. Las cifras y los ejemplos son
 ilustrativos de la demostración y lo declaran al pie.
@@ -20,8 +22,9 @@ existe; hasta entonces queda como constante nula con su pendiente escrito.
 
 ## Direction contract
 
-THESIS: La portada demuestra el mecanismo en vez de prometerlo: se escribe un párrafo
-describiendo un negocio y la tienda se llena sola, a la vista, antes de pedir nada.
+THESIS: La portada demuestra el mecanismo en vez de prometerlo: del enlace en la bio a la
+tienda abierta, y de ahí al panel, donde el pedido entra pagado y el stock baja solo, a la
+vista, antes de pedir nada.
 Rechaza la portada SaaS con degradado, teléfono flotando en ángulo y tres tarjetas de
 características, y rechaza también el color bañado que satura la vista.
 
@@ -33,14 +36,15 @@ Archivo extrabold con tracking cerrado; texto en Geist. Fotografía en blanco y 
 recupera color al pasar el cursor, porque el rojo es el único acento y una foto a color le
 competiría.
 
-STORY: Entiende que describir un negocio en un párrafo alcanza para tener tienda. Cree
-porque lo ve ocurrir en pantalla, no porque se lo digan. Elige el camino que lo describe:
-tener un negocio o salir a vender.
+STORY: Se reconoce en los problemas de vender por redes, entiende que una tienda sola no
+los arregla y que lo que hay detrás sí. Cree porque lo ve ocurrir en pantalla, no porque se
+lo digan. Elige el camino que lo describe: ordenar su negocio o salir a vender.
 
 FIRST VIEWPORT: Barra fija con las anclas y la acción roja. A la izquierda, el titular a
-escala grande y dos acciones. A la derecha, el panel que escribe solo la descripción de un
-negocio y, debajo, la tienda que se llena con sus productos y fotos; después cambia de
-rubro y lo repite. Sin scroll para llegar a la acción.
+escala grande —"Tu tienda online, y todo lo que hay detrás"— y dos acciones. A la derecha,
+tres cuadros que se encienden en orden: el perfil con el enlace en la bio, la tienda
+online y el panel con el pedido pagado y el stock bajando. Sin scroll para llegar a la
+acción.
 
 FORM: Editorial impreso, dirección fijada por el usuario sobre una referencia propia que
 reemplazó la asignación del dado. Seed key 0c40d65d.

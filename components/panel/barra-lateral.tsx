@@ -106,7 +106,7 @@ function ConNombre({
  * Lo que hay adentro de la barra: en escritorio, desplegada o plegada, y en el
  * cajón del móvil.
  *
- * Las secciones las arman los datos: quien tiene tienda ve "Tu tienda", quien
+ * Las secciones las arman los datos: quien tiene tienda ve "Tu negocio", quien
  * vende para otras ve "Como vendedor", y quien hace las dos cosas ve las dos.
  * `primary_role` no interviene — es una intención, no un permiso.
  *
@@ -458,7 +458,7 @@ function Contenido({
         ) : null}
 
         {deTienda.length > 0 ? (
-          <Grupo titulo="Tu tienda" plegada={plegada}>
+          <Grupo titulo="Tu negocio" plegada={plegada}>
             {deTienda.map((item) => (
               <Entrada
                 key={item.href}

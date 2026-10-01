@@ -9,11 +9,11 @@ import "./globals.css"
 
 export const metadata: Metadata = {
   title: {
-    default: "Venduo — tu tienda online en minutos",
+    default: "Venduo — tu tienda online, y todo lo que hay detrás",
     template: "%s · Venduo",
   },
   description:
-    "Crea tu tienda, carga productos, cobra con QR y entiende tus ventas con IA.",
+    "Para quien vende por TikTok, Instagram y WhatsApp: tu tienda online con stock al día, cobros con PagoFácil, pedidos ordenados y catálogos en PDF.",
 }
 
 export default function RootLayout({
