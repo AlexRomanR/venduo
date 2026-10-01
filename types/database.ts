@@ -176,6 +176,50 @@ export type Database = {
         }
         Relationships: []
       }
+      catalogs: {
+        Row: {
+          config: Json
+          created_at: string
+          deleted_at: string | null
+          id: string
+          name: string
+          share_token: string
+          store_id: string
+          template_key: string
+          updated_at: string
+        }
+        Insert: {
+          config: Json
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          name: string
+          share_token?: string
+          store_id: string
+          template_key: string
+          updated_at?: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          name?: string
+          share_token?: string
+          store_id?: string
+          template_key?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalogs_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       commissions: {
         Row: {
           amount_cents: number
@@ -1447,6 +1491,15 @@ export type Database = {
           p_store_id: string
         }
         Returns: string
+      }
+      catalogo_compartido: {
+        Args: { p_token: string }
+        Returns: {
+          config: Json
+          id: string
+          name: string
+          store_id: string
+        }[]
       }
       change_store_template: {
         Args: { p_keep_sections?: boolean; p_template_key: string }

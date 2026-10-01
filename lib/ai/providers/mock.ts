@@ -1,5 +1,6 @@
 ﻿import { z } from "zod"
 
+import { catalogoDeDemostracion } from "./mock-catalogo"
 import { propuestaDeDemostracion } from "./mock-propuesta"
 import {
   AIError,
@@ -260,6 +261,22 @@ export function createMockProvider(
           return {
             object: validada.data,
             raw: JSON.stringify(sugerida, null, 2),
+            provider: "mock",
+            model,
+          }
+        }
+      }
+
+      // Y para el catálogo en PDF: elige entre los productos de la tienda.
+      if (options.schemaName === "PropuestaDeCatalogo") {
+        const pedido = options.messages.at(-1)?.content ?? ""
+        const sugerido = catalogoDeDemostracion(pedido)
+        const validado = options.schema.safeParse(sugerido)
+
+        if (validado.success) {
+          return {
+            object: validado.data,
+            raw: JSON.stringify(sugerido, null, 2),
             provider: "mock",
             model,
           }

@@ -40,6 +40,12 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/panel/productos/categorias` | Las categorías del catálogo                             | Requiere sesión |
 | `/panel/apariencia`           | La puerta al editor, la plantilla y el historial        | Requiere sesión |
 | `/panel/estadisticas/pdf`     | El informe del tablero en PDF. `?g={id}` para uno solo  | Requiere sesión |
+| `/panel/catalogos`            | Catálogos en PDF: los guardados y las doce plantillas   | Requiere sesión |
+| `/panel/catalogos/nuevo`      | Armar uno: productos, plantilla y edición               | Requiere sesión |
+| `/panel/catalogos/{id}`       | Editar un catálogo guardado                             | Requiere sesión |
+| `/panel/catalogos/pdf`        | El PDF del borrador del editor, por POST                | Requiere sesión |
+| `/panel/catalogos/{id}/pdf`   | El PDF de uno guardado, con los precios del día         | Requiere sesión |
+| `/c/{token}`                  | Un catálogo compartido, en PDF                          | Público         |
 | `/vendedor`                   | Panel del vendedor y su historial                       | Requiere sesión |
 | `/cuenta`                     | Datos de la persona, de su tienda y de su perfil        | Requiere sesión |
 | `/auth/destino`               | Resuelve a dónde entra la cuenta y redirige             | Requiere sesión |
@@ -122,6 +128,7 @@ app/
   editor/             El editor de la tienda, a pantalla completa, y sus acciones
     vista-previa/     La tienda con el borrador, dentro del iframe del editor
   sumarme/            Alta del vendedor: reparte los tres caminos
+  c/[token]/          El PDF de un catálogo compartido: público, por su token
   explorar/           Vitrinas del vendedor (layout propio)
     tiendas/
     productos/
@@ -147,6 +154,13 @@ components/
     perfume/          Esencia
   tienda/             Lo compartido por todas las plantillas: carrito, checkout,
                       pago, agregar, barra de compra, filtros y buscador
+  catalogos/          Catálogos en PDF. `primitivas.ts` es el contrato de dibujo,
+                      `html.tsx` su versión para la pantalla y `documento.tsx`
+                      las hojas; el PDF usa las mismas variantes
+    variantes/        Cómo se dibuja cada bloque: portada, productos, separador,
+                      pack, oferta, contraportada y texto
+    editor/           El constructor: productos, plantillas, hojas, packs,
+                      estilo, vista previa, IA y exportar
   panel/              Shell y piezas de los dos paneles. `piezas.tsx` son los
                       paneles, cifras y estados vacíos de toda pantalla;
                       `armazon.tsx` es la barra con su contenido y decide cuándo va
@@ -168,7 +182,11 @@ lib/
                       navegador)
   plantillas/         La base de cada plantilla: tokens, esquema de la apariencia,
                       registro, qué significa cada bloque, los campos de cada
-                      sección y el borrador del editor con sus operaciones
+                      sección y el borrador del editor con sus operaciones.
+                      `color.ts` son las cuentas de color, sin zod
+  catalogos/          El catálogo en PDF: modelo y esquema, constantes sin zod,
+                      estilo, datos, las doce plantillas, las operaciones del
+                      editor y `pdf.tsx`, que lo arma en el servidor
   demo-data.ts        Datos de ejemplo del modo demo
   estilos.ts          Clases del vestido editorial de los controles
   tienda.ts           El enlace de una tienda, sus rutas internas y el slug de un subdominio

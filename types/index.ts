@@ -32,6 +32,9 @@ export type ProductUpdate = TablesUpdate<"products">
 export type ProductCategory = Tables<"product_categories">
 export type ProductCategoryInsert = TablesInsert<"product_categories">
 
+// Catálogos en PDF
+export type CatalogRow = Tables<"catalogs">
+
 // Venta
 export type Order = Tables<"orders">
 export type OrderItem = Tables<"order_items">

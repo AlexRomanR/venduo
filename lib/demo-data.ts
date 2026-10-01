@@ -5,6 +5,7 @@ import type {
   VendedorEnRed,
   VinculoVendedor,
 } from "@/lib/data/panel"
+import type { ProductoDelCatalogo } from "@/lib/catalogos/datos"
 import type { CommissionStatus, Product, SubscriptionStatus } from "@/types"
 
 export interface Suscripcion {
@@ -769,4 +770,207 @@ export const VINCULOS_DEMO: VinculoVendedor[] = [
     status: "pendiente",
     referralCode: "ANQ9WP",
   },
+]
+
+/* -------------------------------------------------------------------------
+ * Los catálogos en PDF, en modo demo
+ * ---------------------------------------------------------------------- */
+
+function productoDeCatalogo(
+  id: string,
+  nombre: string,
+  categoria: string,
+  foto: string,
+  precioCents: number,
+  extra: Partial<ProductoDelCatalogo> = {}
+): ProductoDelCatalogo {
+  return {
+    id: `demo-c-${id}`,
+    nombre,
+    descripcion: null,
+    precioCents,
+    precioAnteriorCents: null,
+    stock: 6,
+    categoriaId: `demo-cat-${categoria.toLowerCase()}`,
+    categoria,
+    condicion: "nuevo",
+    codigo: `RD-${id.toUpperCase()}`,
+    foto: fotoDemo(foto),
+    destacado: false,
+    ...extra,
+  }
+}
+
+/**
+ * El catálogo de Rosa Deportes: con fotos, categorías, rebajas, una prenda de
+ * segunda mano y una agotada, para que cada plantilla tenga qué mostrar.
+ */
+export const PRODUCTOS_DE_CATALOGO_DEMO: ProductoDelCatalogo[] = [
+  productoDeCatalogo(
+    "z1",
+    "Zapatilla running roja",
+    "Zapatillas",
+    "1542291026-7eec264c27ff",
+    45000,
+    {
+      precioAnteriorCents: 52000,
+      stock: 8,
+      destacado: true,
+      descripcion:
+        "Liviana y con buena amortiguación, para correr o para todos los días. Tallas 36 a 43.",
+    }
+  ),
+  productoDeCatalogo(
+    "z2",
+    "Zapatilla Air gris",
+    "Zapatillas",
+    "1460353581641-37baddab0fa2",
+    52000,
+    {
+      stock: 5,
+      descripcion:
+        "Cámara de aire en el talón y capellada de malla que respira.",
+    }
+  ),
+  productoDeCatalogo(
+    "z3",
+    "Zapatilla pastel",
+    "Zapatillas",
+    "1595950653106-6c9ebd614d3a",
+    48000,
+    {
+      stock: 3,
+      destacado: true,
+      descripcion: "Plataforma baja en tonos pastel. Combina con todo.",
+    }
+  ),
+  productoDeCatalogo(
+    "z4",
+    "Zapatilla blanca de cuero",
+    "Zapatillas",
+    "1608231387042-66d1773070a5",
+    39000,
+    {
+      stock: 12,
+      descripcion: "Cuero sintético fácil de limpiar. El clásico que no falla.",
+    }
+  ),
+  productoDeCatalogo(
+    "z5",
+    "Zapatilla de entrenamiento",
+    "Zapatillas",
+    "1606107557195-0e29a4b5b4aa",
+    43000,
+    {
+      precioAnteriorCents: 49000,
+      stock: 6,
+      descripcion:
+        "Suela firme para el gimnasio y los entrenamientos funcionales.",
+    }
+  ),
+  productoDeCatalogo(
+    "z6",
+    "Zapatilla caña alta",
+    "Zapatillas",
+    "1556906781-9a412961c28c",
+    38000,
+    {
+      condicion: "segunda_mano",
+      stock: 1,
+      descripcion:
+        "Usada dos veces, talla 41. Sin marcas ni desgaste en la suela.",
+    }
+  ),
+  productoDeCatalogo(
+    "p1",
+    "Polera básica blanca",
+    "Poleras",
+    "1521572163474-6864f9cf17ab",
+    8500,
+    {
+      stock: 30,
+      descripcion: "Algodón peinado, corte recto. De la S a la XXL.",
+    }
+  ),
+  productoDeCatalogo(
+    "p2",
+    "Polera estampada",
+    "Poleras",
+    "1576566588028-4147f3842f27",
+    11000,
+    {
+      stock: 14,
+      descripcion: "Estampado al frente que no se cuartea con el lavado.",
+    }
+  ),
+  productoDeCatalogo(
+    "p3",
+    "Polera negra",
+    "Poleras",
+    "1618354691373-d851c5c3a990",
+    9000,
+    {
+      stock: 0,
+      descripcion: "Algodón grueso con logo bordado en el pecho.",
+    }
+  ),
+  productoDeCatalogo(
+    "a1",
+    "Buzo con capucha",
+    "Abrigos",
+    "1556821840-3a63f95609a7",
+    22000,
+    {
+      precioAnteriorCents: 26000,
+      stock: 9,
+      descripcion: "Frisa por dentro y bolsillo canguro. Gris jaspeado.",
+    }
+  ),
+  productoDeCatalogo(
+    "a2",
+    "Chamarra bomber",
+    "Abrigos",
+    "1591047139829-d91aecb6caea",
+    34000,
+    {
+      stock: 4,
+      descripcion: "Tela satinada, puños elásticos y forro liviano.",
+    }
+  ),
+  productoDeCatalogo(
+    "a3",
+    "Pantalón cargo",
+    "Abrigos",
+    "1548883354-7622d03aca27",
+    24000,
+    {
+      stock: 7,
+      categoriaId: "demo-cat-pantalones",
+      categoria: "Pantalones",
+      descripcion: "Seis bolsillos y tela resistente. Negro.",
+    }
+  ),
+  productoDeCatalogo(
+    "c1",
+    "Mochila urbana",
+    "Accesorios",
+    "1553062407-98eeb64c6a62",
+    19000,
+    {
+      stock: 10,
+      descripcion:
+        "Compartimento para laptop de 15 pulgadas y bolsillo oculto.",
+    }
+  ),
+  productoDeCatalogo(
+    "c2",
+    "Gorra trucker",
+    "Accesorios",
+    "1588850561407-ed78c282e89b",
+    7500,
+    {
+      stock: 20,
+      descripcion: "Malla atrás y broche regulable.",
+    }
+  ),
 ]

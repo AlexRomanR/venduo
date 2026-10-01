@@ -1,3 +1,4 @@
+import { PLANTILLAS_DE_CATALOGO } from "@/lib/catalogos/plantillas"
 import { ESQUEMA, REGLAS_SQL } from "@/lib/insights/esquema"
 import type { Apariencia } from "@/lib/plantillas/apariencia"
 import type { TipoDeBloque } from "@/lib/plantillas/bloques"
@@ -7,6 +8,7 @@ import { getAIProvider } from "./index"
 import {
   insightSqlSchema,
   marketingCampaignSchema,
+  propuestaDeCatalogoSchema,
   propuestaDeDisenoSchema,
   salesInsightSchema,
   storeBlueprintSchema,
@@ -14,6 +16,7 @@ import {
   type InsightSql,
   type InsightsRequest,
   type MarketingCampaign,
+  type PropuestaDeCatalogo,
   type PropuestaDeDiseno,
   type SalesInsight,
   type StoreBlueprint,
@@ -319,6 +322,85 @@ export async function proponerEdicion(input: {
                 "Corrígela y vuelve a proponer.",
               ]
             : []),
+        ].join("\n"),
+      },
+    ],
+  })
+
+  return { propuesta: object, provider, model }
+}
+
+/* -------------------------------------------------------------------------
+ * Catálogos en PDF
+ * ---------------------------------------------------------------------- */
+
+/** Lo que la IA ve de un producto para armar un catálogo. Sin datos de otras tiendas. */
+export interface ProductoParaCatalogo {
+  id: string
+  nombre: string
+  categoria: string | null
+  precio: string
+  /** El descuento en puntos porcentuales, si está rebajado. */
+  rebaja: number | null
+  condicion: string
+  stock: number
+  destacado: boolean
+}
+
+const REGLAS_DE_CATALOGO =
+  "Armas catálogos en PDF que la tienda manda por WhatsApp. Eliges solo " +
+  "productos de la lista, por su id exacto, y los ordenas para vender: lo " +
+  "más atractivo primero y agrupado por categoría cuando ayuda a encontrar. " +
+  "Dejas fuera lo que tiene stock 0, salvo que el pedido lo pida. Si te pasan " +
+  "los productos actuales del catálogo, eliges y ordenas solo entre esos. La " +
+  "plantilla es la que mejor sirve al pedido. El nombre es corto y concreto; " +
+  "la bajada, una línea que invite a escribir. Nunca inventas productos, " +
+  "precios ni descuentos."
+
+/**
+ * Un catálogo desde una frase: qué productos, en qué orden, con qué plantilla.
+ *
+ * El contexto va entre marcas porque el modo demo lo lee de ahí para responder
+ * con los productos reales de la tienda.
+ */
+export async function proponerCatalogo(input: {
+  frase: string
+  tienda: string
+  productos: ProductoParaCatalogo[]
+  actuales: string[] | null
+}): Promise<{
+  propuesta: PropuestaDeCatalogo
+  provider: string
+  model: string
+}> {
+  const ai = getAIProvider()
+  const plantillas = Object.values(PLANTILLAS_DE_CATALOGO)
+    .map(
+      (plantilla) =>
+        `- ${plantilla.clave}: ${plantilla.nombre}. ${plantilla.detalle} Ideal para: ${plantilla.ideal}.`
+    )
+    .join("\n")
+
+  const { object, provider, model } = await ai.generateObject({
+    schema: propuestaDeCatalogoSchema,
+    schemaName: "PropuestaDeCatalogo",
+    system: `${BASE_SYSTEM} ${REGLAS_DE_CATALOGO}`,
+    messages: [
+      {
+        role: "user",
+        content: [
+          `Pedido: ${input.frase}`,
+          "",
+          "Plantillas:",
+          plantillas,
+          "",
+          "<<CONTEXTO>>",
+          JSON.stringify({
+            tienda: input.tienda,
+            productos: input.productos,
+            actuales: input.actuales,
+          }),
+          "<</CONTEXTO>>",
         ].join("\n"),
       },
     ],

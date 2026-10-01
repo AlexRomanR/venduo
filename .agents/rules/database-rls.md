@@ -108,8 +108,9 @@ Las otras funciones del servidor son `join_store(p_store_slug, p_invite_code)`,
 `change_store_template(p_template_key, p_keep_sections)`,
 `publicar_diseno(p_theme_overrides, p_logo_url, p_bloques)`, `restaurar_version(p_version_id)`,
 `create_store(p_name, p_description, p_template_key, p_sellers, p_commission_bps)`,
-`run_insight(...)` y las dos del historial público, `seller_public_stats(p_slug)` y
-`seller_public_stores(p_slug)`.
+`run_insight(...)`, las dos del historial público, `seller_public_stats(p_slug)` y
+`seller_public_stores(p_slug)`, y la del catálogo compartido,
+`catalogo_compartido(p_token)`.
 
 **`run_insight_sql` es la única que ejecuta SQL que no escribió una persona.** Es la
 excepción a todo lo demás y se sostiene en tres cosas que impone Postgres: corre con
@@ -123,6 +124,19 @@ una carrera perdida, y ese slug es el que se imprime en el QR—, la suscripció
 prueba —que no tiene política de INSERT a propósito, así que la tienda nacería sin
 ella— y la siembra de la plantilla. En llamadas separadas, que falle la segunda
 deja una tienda a medio crear.
+
+## Los catálogos en PDF
+
+`catalogs` guarda la configuración de cada catálogo y **nunca precios ni
+stock**: se leen cada vez que se arma el PDF. Es del dueño —leer, crear y editar
+con `my_store_id()`— y no tiene política de DELETE: se da de baja con
+`deleted_at`. Por eso la de UPDATE lleva su `with check` propio: sin él,
+Postgres usaría el `using`, que pide `deleted_at is null`, y rechazaría la baja.
+
+El enlace compartido lo abre cualquiera, sin cuenta, por
+`catalogo_compartido(p_token)`: `security definer`, un catálogo por su token y
+solo si `store_is_live`. No se abre la tabla con una política para anónimos:
+expondría los catálogos de todas las tiendas.
 
 ## Columnas derivadas: las mantiene la base
 

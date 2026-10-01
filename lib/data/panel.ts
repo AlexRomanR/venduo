@@ -79,7 +79,7 @@ export const getMiTienda = cache(async function getMiTienda() {
   const { data } = await supabase
     .from("stores")
     .select(
-      "id, name, slug, is_published, template_key, commission_bps, seller_network_enabled, seller_join_mode, logo_url, theme_overrides"
+      "id, name, slug, is_published, template_key, commission_bps, seller_network_enabled, seller_join_mode, logo_url, theme_overrides, whatsapp"
     )
     .eq("owner_id", user.id)
     .is("deleted_at", null)

@@ -53,8 +53,9 @@ la pantalla.
 
 ## Paso 2 — La tarea
 
-En `lib/ai/tasks.ts`, siguiendo el molde de las tres que ya existen
-(`generateStoreBlueprint`, `analyzeSales`, `generateCampaign`):
+En `lib/ai/tasks.ts`, siguiendo el molde de las que ya existen
+(`generateCampaign` es la más simple; `proponerCatalogo`, la más parecida a una
+tarea que elige entre los datos de la tienda):
 
 ```ts
 export async function describeProduct(input: {

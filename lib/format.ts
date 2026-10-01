@@ -107,6 +107,20 @@ export function diaEnBolivia(value: string | Date = new Date()): string {
   }).format(date)
 }
 
+/** Una fecha dicha completa, en Bolivia: "1 de octubre de 2026". */
+export function formatFechaLarga(
+  value: string | Date = new Date(),
+  locale = LOCALE
+) {
+  const date = typeof value === "string" ? new Date(value) : value
+  return new Intl.DateTimeFormat(locale, {
+    timeZone: ZONA_HORARIA,
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date)
+}
+
 /** `AAAA-MM-DD` corrido `dias` días, sin que la zona horaria lo mueva. */
 export function sumarDias(dia: string, dias: number): string {
   const [anio, mes, numero] = dia.split("-").map(Number)

@@ -3,6 +3,7 @@ import { z } from "zod"
 import { CURRENCY } from "@/lib/format"
 import { RUTAS_DE_AJUSTE } from "@/lib/plantillas/apariencia"
 import { TIPOS_DE_BLOQUE } from "@/lib/plantillas/bloques"
+import { CLAVES_PLANTILLA } from "@/lib/catalogos/modelo"
 
 /* -------------------------------------------------------------------------
  * Entradas (formularios y cuerpos de request)
@@ -187,3 +188,25 @@ export const propuestaDeDisenoSchema = z.object({
   operaciones: z.array(operacionDeIaSchema).max(20),
 })
 export type PropuestaDeDiseno = z.infer<typeof propuestaDeDisenoSchema>
+
+/* -------------------------------------------------------------------------
+ * Catálogos en PDF
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Un catálogo propuesto desde una frase: qué productos, en qué orden, con qué
+ * plantilla y cómo se llama. Nunca precios: el modelo elige ids de la lista que
+ * recibe, y el sistema descarta los que no son de la tienda antes de armarlo.
+ */
+export const propuestaDeCatalogoSchema = z.object({
+  /** El nombre del catálogo, corto: "Zapatillas en oferta". */
+  nombre: z.string().min(1).max(60),
+  plantilla: z.enum(CLAVES_PLANTILLA),
+  /** Los ids elegidos, en el orden en que tienen que aparecer. */
+  productos: z.array(z.string().min(1).max(64)).min(1).max(60),
+  /** La bajada de la portada, una línea. */
+  bajada: z.string().max(160),
+  /** Por qué eligió eso, para que la persona decida. */
+  explicacion: z.string().min(1).max(280),
+})
+export type PropuestaDeCatalogo = z.infer<typeof propuestaDeCatalogoSchema>

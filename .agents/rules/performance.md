@@ -73,7 +73,8 @@ persona vuelve a una pantalla y la ve como estaba antes de su propio cambio.
 Un componente de cliente que importa un módulo con zod se lleva zod entero: así se
 sumaron 97 kB a cada pantalla del panel, por una función de `lib/plantillas/apariencia.ts`
 que usaba la barra. Lo que el cliente necesita vive en un módulo sin zod
-(`lib/plantillas/fuentes.ts`) o se calcula en el servidor y llega como prop. Ojo con
+(`lib/plantillas/fuentes.ts`, `lib/plantillas/color.ts`,
+`lib/catalogos/constantes.ts`) o se calcula en el servidor y llega como prop. Ojo con
 `lib/tienda.ts`, que lee `lib/env.ts`.
 
 Lo que solo se usa al tocar algo —el QR de compartir— se carga con `import()`.

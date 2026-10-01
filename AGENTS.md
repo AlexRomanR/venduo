@@ -71,6 +71,7 @@ nativa · **tests automatizados**.
 | `DESIGN.md`                   | El mundo visual de Venduo y la base editorial                |
 | `docs/estado-del-proyecto.md` | Qué está hecho y qué falta. **Leerlo antes de elegir tarea** |
 | `docs/store-templates.md`     | El sistema de plantillas de tienda                           |
+| `docs/catalogos-pdf.md`       | Los catálogos en PDF: un dibujo, dos salidas, sus trampas    |
 
 ## Reglas
 

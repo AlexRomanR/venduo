@@ -378,6 +378,28 @@ El documento lleva marco a 20pt del filo, cabecera con la marca y el nombre de
 la tienda, y pie con la marca, la fecha y el número de página. Marco, cabecera y
 pie van `fixed`, así que se repiten en todas las hojas.
 
+#### El catálogo en PDF
+
+Los catálogos de `/panel/catalogos` son otra cosa que el informe: se dibujan
+**dos veces con las mismas variantes**, en HTML para la vista previa y en
+`@react-pdf` para el archivo, y llevan la identidad de la tienda, no la de
+Venduo. Las variantes se escriben contra las piezas de
+`components/catalogos/primitivas.ts`, sin hooks y sin `flexShrink: 0`.
+
+Lo que no se negocia, porque cada punto rompió un PDF de verdad:
+
+- **Toda hoja va en una caja absoluta de su medida.** `wrap={false}` hace la
+  página del alto de su contenido.
+- **Lo que no entra en su caja no se dibuja**, ni el primer renglón. Se mide
+  antes (`tamanoQueEntra`, `tamanoDeTitular`) o se achica la letra.
+- **Los titulares se achican hasta que entre su palabra más larga**: el PDF no
+  parte palabras, y la vista previa tampoco.
+- **Las fotos van a JPEG con `sharp`**: el PDF no lee WebP.
+
+Los controles del editor van en el mundo de Venduo y solo las hojas llevan el de
+la tienda, como en el editor de la tienda. Todo el sistema, con el porqué de
+cada regla, está en `docs/catalogos-pdf.md`.
+
 ### Iconos
 
 Se dibujan, desde `lucide-react`, con un grosor y tamaño consistentes. **Nunca un glifo de

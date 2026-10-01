@@ -235,14 +235,15 @@ Lo que **no** hace es gobernar permisos. Los permisos siguen derivando de los da
 
 Ruteo **por path, no por subdominio**:
 
-| Ruta        | Qué es                                                                  |
-| ----------- | ----------------------------------------------------------------------- |
-| `/t/{slug}` | Tienda pública del emprendedor, con su catálogo en `/t/{slug}/catalogo` |
-| `/v/{slug}` | Perfil público del vendedor y su enlace de referido                     |
-| `/crear`    | Alta de la tienda: plantilla y descripción                              |
-| `/sumarme`  | Alta del vendedor: cómo sumarse a una tienda                            |
-| `/panel`    | Panel del emprendedor                                                   |
-| `/vendedor` | Panel del vendedor                                                      |
+| Ruta         | Qué es                                                                  |
+| ------------ | ----------------------------------------------------------------------- |
+| `/t/{slug}`  | Tienda pública del emprendedor, con su catálogo en `/t/{slug}/catalogo` |
+| `/v/{slug}`  | Perfil público del vendedor y su enlace de referido                     |
+| `/crear`     | Alta de la tienda: plantilla y descripción                              |
+| `/sumarme`   | Alta del vendedor: cómo sumarse a una tienda                            |
+| `/panel`     | Panel del emprendedor                                                   |
+| `/vendedor`  | Panel del vendedor                                                      |
+| `/c/{token}` | Un catálogo en PDF compartido, con los precios y el stock del día       |
 
 Se usa el slug y no el identificador interno porque estas URLs **se imprimen en códigos QR y se mandan por WhatsApp**: tienen que ser legibles y compartibles.
 
@@ -268,6 +269,7 @@ Tan importante como la lista de lo que sí:
 - **Crear** — elección de plantilla y onboarding conversacional
 - **Empezar a vender** — el equivalente del vendedor: cómo sumarse a una tienda
 - **Panel del emprendedor** — resumen, y desde ahí productos, pedidos, vendedores, estadísticas, apariencia, marketing. Toma la identidad de la plantilla de su tienda
+- **Catálogos en PDF** — dentro del panel, en `/panel/catalogos`: los catálogos guardados, las doce plantillas dibujadas con los productos de la tienda y el constructor, donde se eligen los productos —o se le pide el catálogo a la IA en una frase—, la plantilla, y se edita hoja por hoja viendo cómo queda. Se descarga en PDF o se manda un enlace que siempre abre con los precios del día
 - **Panel del vendedor** — ventas, comisiones, materiales de promoción
 - **Tienda pública** — portada, catálogo con filtro de segunda mano, ficha de producto, carrito, checkout, pago y seguimiento del pedido, donde el comprador confirma que lo recibió o reclama. Se dibuja con el kit de su plantilla
 - **Perfil público del vendedor** — su historial laboral verificable
@@ -428,6 +430,18 @@ El vínculo de un bloque con su tipo **no se puede romper**: no se retira del ca
 
 El filtro de segunda mano no es un tipo de bloque aparte: es una **propiedad del bloque de grilla de productos**.
 
+#### Catálogos en PDF
+
+| Tabla      | Qué guarda                                                                                                                                                                                                                |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `catalogs` | Cada catálogo guardado: su configuración entera —bloques, productos elegidos, packs y estilo— en `config`. **Nunca precios ni stock**: se leen al armar el PDF. `share_token` es la llave del enlace público `/c/{token}` |
+
+Un catálogo es una lista de **bloques** —portada, páginas de productos, separador, pack, oferta, texto y contraportada— y cada uno se dibuja con la variante que se elija: cualquier bloque sirve en cualquier plantilla. La plantilla solo decide con qué bloques arranca. El estilo sale de la tienda —sus colores, su letra y sus esquinas— y se puede cambiar sin tocarla; un catálogo cuyo texto no se lee no se descarga.
+
+El **precio de un pack** se muestra en el catálogo y nada más: la tienda online cobra cada producto por separado, y quien quiere el pack escribe por WhatsApp.
+
+El enlace compartido lo abre cualquiera, sin cuenta. Lo lee `catalogo_compartido`, que devuelve un solo catálogo por su token y solo si la tienda se sirve al público; la tabla no tiene política para anónimos.
+
 #### IA y difusión
 
 | Tabla                | Qué guarda                                                                                                                                                       |
@@ -472,11 +486,11 @@ using (seller_user_id = (select auth.uid()))
 
 ---
 
-## 9. Los tres usos de la inteligencia artificial
+## 9. Los usos de la inteligencia artificial
 
 Todos siguen el mismo patrón: se pide una respuesta estructurada, se valida antes de usarla y existe un plan alternativo si falla. **La IA nunca ejecuta nada por su cuenta: propone, el sistema valida y ejecuta.**
 
-Las tres llamadas pasan por una capa propia que traduce el pedido al formato del proveedor elegido. Cambiar de modelo o de proveedor es cambiar una configuración, no reescribir los módulos.
+Todas las llamadas pasan por una capa propia que traduce el pedido al formato del proveedor elegido. Cambiar de modelo o de proveedor es cambiar una configuración, no reescribir los módulos.
 
 ### Edición de la tienda
 
@@ -499,6 +513,10 @@ Las defensas, que no son opcionales:
 - **Lista blanca de tablas**, tiempo máximo de consulta y tope de filas.
 
 > Esto es más ambicioso que lo que existe hoy: `lib/ai/tasks.ts` resuelve `analyzeSales` recibiendo un arreglo de ventas ya calculado, sin generar consultas.
+
+### Catálogos en PDF
+
+Recibe una frase —«las zapatillas en oferta», «lista de precios para revendedores»— y los productos de la tienda con su precio, su descuento, su condición y su stock. Devuelve qué productos van, en qué orden, con qué plantilla, un nombre y una bajada para la portada, y en una línea por qué. El sistema descarta los productos que no son de esa tienda antes de armar nada, y el emprendedor ve la propuesta y decide si la usa. Con un catálogo abierto, la misma tarea elige y ordena solo entre sus productos.
 
 ### Marketing
 

@@ -1,9 +1,6 @@
 import type { ClaveDePaso } from "@/lib/editor/pasos"
-import {
-  senalAltaDe,
-  type Apariencia,
-  type Personalizacion,
-} from "@/lib/plantillas/apariencia"
+import type { Apariencia, Personalizacion } from "@/lib/plantillas/apariencia"
+import { senalAltaDe } from "@/lib/plantillas/color"
 
 /**
  * Los atajos del paso "Tu marca": paletas y combinaciones de letra listas

@@ -25,10 +25,37 @@ Actualizado el 1 de octubre de 2026.
 | 12  | Estadísticas en lenguaje natural                         | ✅     |
 | 13  | Copys de marketing y publicación en Facebook y WhatsApp  | ❌     |
 | 14  | Entrega por WhatsApp y confirmación de envío y recepción | 🟡     |
+| 15  | Catálogos en PDF editables, para descargar o compartir   | ✅     |
 
 ---
 
 ## Lo que está hecho
+
+### Mensaje y portada
+
+- Venduo se presenta como **más que una tienda online**: la tienda online —el enlace
+  de la bio— y todo lo que hay detrás: stock, cobros con PagoFácil, pedidos con
+  WhatsApp, vendedores, estadísticas y catálogos en PDF.
+- La portada (`/`) está ordenada en ese sentido: titular, el problema, por qué no es
+  solo una tienda online, cómo funciona en tres pasos, lo que incluye, para quién es,
+  la red de vendedores, preguntas frecuentes y llamado final.
+- Los ejemplos son de quien vende por redes —ropa, zapatillas, belleza, tecnología,
+  segunda mano—, no de comida casera. Cómo se le habla al cliente está en
+  `ui-styling.md`.
+
+### Catálogos en PDF (`/panel/catalogos`)
+
+- Doce plantillas —grilla, revista, lookbook, lista de precios, una foto por hoja,
+  vitrina de lujo, historia 9:16, mayorista, feria, packs, ofertas y flyer— hechas de
+  siete bloques con 25 variantes. Cualquier bloque sirve en cualquier plantilla.
+- Constructor: elegir productos con búsqueda y filtros (o pedirle el catálogo a la IA
+  en una frase), elegir la plantilla viéndola con los propios productos y editar hoja
+  por hoja con la vista previa al lado. Packs con su precio, estilo de la tienda o
+  propio, fondo oscuro, A4 o 9:16, y el contraste controlado antes de descargar.
+- El PDF se arma en el servidor con las mismas variantes de la vista previa. Se
+  descarga, se pasa a la hoja de compartir del teléfono o se manda un enlace
+  (`/c/{token}`) que abre siempre con los precios y el stock del día.
+- Funciona en modo demo, salvo guardar. Todo en `docs/catalogos-pdf.md`.
 
 ### Cuentas y altas
 
@@ -193,7 +220,7 @@ Falta:
 ### 3. Plantillas — prioridad baja
 
 - Más plantillas para los rubros que quedaron en la base editorial (tecnología, hogar,
-  comida).
+  belleza).
 - Atributos por rubro: talla y color en moda, mililitros o familia olfativa en
   perfumería. Piden variantes en el carrito y en `create_order`.
 
@@ -217,6 +244,12 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 - **Textos de ejemplo visibles** en tiendas con plantillas retiradas (p. ej. "Cuenta aquí
   de dónde salen tus piezas" en Casa Illimani). Reemplazarlos o pasar esas tiendas a una
   plantilla nueva.
+- **Tiendas de comida sembradas en producción** (Panadería Doña Elsa y otras de la
+  demostración): contradicen el mensaje nuevo, pero cambiarlas toca datos compartidos
+  y se acuerda antes.
+- **Un pack del catálogo no se compra como pack** en la tienda online: su precio se
+  muestra en el PDF y la venta se arma por WhatsApp. Venderlo como pack toca
+  `create_order` y la comisión.
 - **`.env.example`** no tiene `NEXT_PUBLIC_DOMINIO_TIENDAS`.
 - **Dominio propio** para las tiendas con subdominio: comprar el dominio, crear el
   registro DNS comodín y darlo de alta en Vercel.

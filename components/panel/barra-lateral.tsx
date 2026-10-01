@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link, { useLinkStatus } from "next/link"
 import { usePathname } from "next/navigation"
 import {
+  BookOpen,
   ChartColumn,
   Compass,
   Copy,
@@ -169,6 +170,11 @@ function Contenido({
               icono: Tags,
             },
           ],
+        },
+        {
+          href: "/panel/catalogos",
+          nombre: "Catálogos",
+          icono: BookOpen,
         },
         {
           href: "/panel/vendedores",

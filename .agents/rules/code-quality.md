@@ -71,7 +71,7 @@ No agregar dependencias sin necesidad. Todo lo que hace falta para el MVP ya est
 instalado; una biblioteca nueva es peso que alguien tiene que entender a las tres de la
 mañana.
 
-Se sumaron dos después del arranque. La primera es **`@react-pdf/renderer`**, para el informe
+Se sumaron tres después del arranque. La primera es **`@react-pdf/renderer`**, para el informe
 del tablero: el PDF tiene que ser un archivo de verdad —que se abra en su pestaña, se
 guarde y se mande por WhatsApp— y eso no lo da imprimir la pantalla. Corre solo en el
 servidor y está declarada en `serverExternalPackages`. Arrastra un `postcss` con un aviso
@@ -81,7 +81,13 @@ un PDF, así que no aplica.
 La segunda es **`@dnd-kit`** (`core`, `sortable` y `utilities`), para reordenar las
 secciones en el editor. El arrastre nativo del navegador no funciona con el dedo, y
 hacerlo a mano con eventos de puntero es justo lo que falla en una demostración; esta
-trae el dedo, el teclado y los anuncios para lector de pantalla. Solo la carga `/editor`.
+trae el dedo, el teclado y los anuncios para lector de pantalla. La cargan `/editor` y
+el editor de catálogos.
+
+La tercera es **`sharp`**, que ya venía con Next para optimizar imágenes: se declaró
+porque el catálogo en PDF convierte las fotos de la tienda, que se guardan en WebP, a
+JPEG —`@react-pdf` no lee WebP— y las achica para que el archivo se pueda mandar por
+WhatsApp. Corre solo en el servidor.
 
 No construir para requisitos hipotéticos. Si algo está en la lista de lo que no entra, no
 se escribe el andamiaje "por si acaso".

@@ -290,6 +290,16 @@ detenerse y preguntar antes de escribir código:
 - **Aplicación móvil nativa** — la tienda es responsive y con eso alcanza
 - **Tests automatizados**
 
+## Los catálogos en PDF
+
+- **Se leen los precios y el stock del momento**, cada vez que se arma el PDF.
+  Un catálogo guardado o un enlace reenviado nunca muestran un precio viejo.
+- **El precio de un pack se muestra en el catálogo y nada más.** La tienda
+  online cobra cada producto por separado; quien quiere el pack escribe por
+  WhatsApp. Venderlo como pack toca `create_order` y la comisión: se decide
+  antes de escribirlo.
+- Un producto borrado desaparece del catálogo; uno sin stock sale "Agotado".
+
 ## La suscripción
 
 Cada tienda tiene una, que nace en prueba. Al vencer, el estado pasa a `bloqueada`: la

@@ -34,7 +34,7 @@ Se obtiene con `getAIProvider()` de `lib/ai/index.ts`. `getAIStatus()` devuelve
 
 ## Las tareas que existen
 
-En `lib/ai/tasks.ts` hay **cinco**, y todas siguen el mismo molde:
+En `lib/ai/tasks.ts` hay **seis**, y todas siguen el mismo molde:
 
 | Tarea                    | Devuelve                         |
 | ------------------------ | -------------------------------- |
@@ -43,6 +43,7 @@ En `lib/ai/tasks.ts` hay **cinco**, y todas siguen el mismo molde:
 | `generateCampaign`       | `{ campaign, provider, model }`  |
 | `buildInsightSql`        | `{ consulta, provider, model }`  |
 | `proponerEdicion`        | `{ propuesta, provider, model }` |
+| `proponerCatalogo`       | `{ propuesta, provider, model }` |
 
 Para agregar otra:
 
@@ -214,3 +215,13 @@ tienda (`lib/ai/providers/mock-propuesta.ts`): colores, letra, orden, secciones 
 textos de temporada y catálogo.
 
 Ver la skill `visual-block-editor` para el procedimiento completo.
+
+## Catálogos en PDF
+
+`proponerCatalogo` recibe una frase y los productos de la tienda, y devuelve qué
+productos van, en qué orden, con qué plantilla, un nombre y una bajada. Elige
+ids, nunca precios: el servidor descarta los que no son de la tienda —o del
+catálogo abierto, si se pidió un orden— antes de que la persona vea nada, y la
+propuesta no se aplica sola. En modo demo responde
+`lib/ai/providers/mock-catalogo.ts`, por palabras clave y con los productos
+reales de la tienda.
