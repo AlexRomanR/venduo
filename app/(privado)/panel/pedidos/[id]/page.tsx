@@ -85,7 +85,7 @@ export default async function PedidoPage({
 
       <div className="mt-12 grid gap-12 lg:grid-cols-[1.3fr_1fr] lg:gap-16">
         <section>
-          <h2 className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+          <h2 className="text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
             Qué compró
           </h2>
 
@@ -141,7 +141,7 @@ export default async function PedidoPage({
         </section>
 
         <section>
-          <h2 className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+          <h2 className="text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
             Quién compró
           </h2>
 
@@ -181,7 +181,7 @@ export default async function PedidoPage({
               {pedido.vendedor ? (
                 <>
                   Por{" "}
-                  <span className="font-semibold text-senal">
+                  <span className="font-semibold">
                     {pedido.vendedor.nombre}
                   </span>
                   {pedido.vendedor.codigo ? (

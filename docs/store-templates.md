@@ -393,8 +393,8 @@ petición /t/rosa-deportes
 
 Los tokens de Tailwind están declarados con `@theme inline` en `globals.css`. Eso hace que
 `bg-papel` compile a `background-color: var(--papel)` y no al valor fijo. **Redefinir las
-variables tiñe todo lo que ya existe**: los componentes compartidos, los de shadcn vestidos
-con `lib/estilos.ts`, las cifras del panel.
+variables tiñe todo lo que ya existe**: los componentes compartidos y los de shadcn
+vestidos con `lib/estilos.ts`.
 
 Van en `:root` y no en un contenedor porque **los diálogos, cajones y avisos se dibujan en
 un portal** fuera del árbol. Con las variables en un `<div>`, esas piezas salían con los
@@ -447,19 +447,19 @@ Las de plantilla van con `preload: false`. Declararlas en `<html>` suma unas lí
 
 ## 7. El panel del emprendedor
 
-`app/(privado)/layout.tsx` pinta la apariencia de la tienda cuando la persona **tiene
-tienda**. `getBarraLateral()` la calcula con la misma función que la tienda pública.
+**El panel es de Venduo para todos**, tenga la persona tienda o no. Antes
+`app/(privado)/layout.tsx` pintaba la apariencia de la tienda, y una letra o un color
+elegidos para vender —una condensada en mayúsculas, el azul de un botón de compra, una
+antigua fina para las cifras— terminaban en cada rótulo de una herramienta de trabajo.
 
-**Cambia la piel, no la estructura.** Resumen, pedidos, productos, categorías, vendedores,
-estadísticas y cuenta son las mismas pantallas en todas las plantillas: son una herramienta
-que se aprende una vez. Lo que cambia es la letra, el papel, el color de acción y la forma
-de los botones. El panel se siente del negocio sin dejar de ser Venduo.
+La tienda sigue reconocible donde se la nombra. `getBarraLateral()` calcula su apariencia
+con la misma función que la tienda pública, y la usan la tarjeta de la barra —el sello
+chico y el nombre con la letra de su plantilla— y `SelloDeTienda` en el Resumen —su papel,
+su nombre con su letra y su color de acción—. Las dos dibujan con valores en línea dentro
+de un recuadro y no tocan `:root`.
 
-| Quién                         | Panel                                    |
-| ----------------------------- | ---------------------------------------- |
-| Tiene tienda                  | Con la identidad de su plantilla         |
-| Solo vende para otras tiendas | Mundo editorial de Venduo: cruza tiendas |
-| Las dos cosas                 | Con la identidad de su tienda            |
+Resumen, pedidos, productos, categorías, vendedores, estadísticas y cuenta son las mismas
+pantallas en todas las tiendas: una herramienta que se aprende una vez.
 
 Quedan en el mundo de Venduo la portada, el ingreso, el alta, las vitrinas del vendedor, su
 perfil público y **el informe PDF de estadísticas**, que tiene su propia marca.
@@ -486,8 +486,8 @@ perfil público y **el informe PDF de estadísticas**, que tiene su propia marca
 4. Cambia `template_key` y deja `theme_overrides = '{}'`.
 5. Si se pidió, siembra las secciones de la plantilla nueva.
 
-Después, `revalidatePath("/", "layout")` y `router.refresh()`: **el panel cambia de piel en
-el acto**.
+Después, `revalidatePath("/", "layout")` y `router.refresh()`: **el sello y la tarjeta de la
+tienda cambian en el acto**.
 
 ### Qué se conserva
 

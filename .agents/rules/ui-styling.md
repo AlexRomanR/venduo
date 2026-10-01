@@ -15,34 +15,40 @@ cubre cómo se ve.
 **Venduo usa el mundo editorial de `DESIGN.md`**: papel, tinta y un rojo de señal. Portada,
 ingreso, altas, vitrinas del vendedor y su perfil público.
 
-**Una tienda usa el de su plantilla**, y su dueño también, en su panel. La plantilla
-redefine los mismos tokens —`papel`, `tinta`, `senal`, `font-titular`, el radio— y trae su
-propio kit de componentes para la tienda pública. Cómo funciona, y cómo se agrega una, está
-en `docs/store-templates.md`.
+**Una tienda usa el de su plantilla.** La plantilla redefine los mismos tokens —`papel`,
+`tinta`, `senal`, `font-titular`, el radio— y trae su propio kit de componentes para la
+tienda pública. Cómo funciona, y cómo se agrega una, está en `docs/store-templates.md`.
+
+**El panel de quien tiene tienda es de Venduo**, igual para todas. Antes tomaba la
+plantilla, y una letra o un color elegidos para vender —una condensada en mayúsculas, el
+azul de un botón de compra, una antigua fina para las cifras— terminaban en cada rótulo de
+una pantalla de trabajo. La tienda sigue reconocible donde se la nombra: su tarjeta en la
+barra lateral y su sello en el Resumen (`SelloDeTienda`), con su papel, su letra y su
+color de acción en un recuadro.
 
 Tres reglas que se desprenden:
 
 - **Nunca preguntar por la plantilla en un componente.** Ni `if (plantilla === …)` ni
   clases por clave. Lo que cambia entre plantillas vive en su kit
   (`components/plantillas/{clave}`) o en sus tokens (`lib/plantillas/{clave}.ts`).
-- **Lo compartido se escribe con tokens y queda bien en todas**: carrito, checkout, pago,
-  filtros, y todas las pantallas del panel. Un `#16171a` o un `rounded-sm` fijos ya no
-  responden a la plantilla: usar `text-tinta` y `rounded-plantilla`.
-- **El panel cambia la piel, no la estructura.** Las pantallas de trabajo son las mismas
-  en todas las plantillas.
+- **Lo compartido se escribe con tokens y queda bien en todas**: carrito, checkout, pago y
+  filtros. Un `#16171a` o un `rounded-sm` fijos ya no responden a la plantilla: usar
+  `text-tinta` y `rounded-plantilla`.
+- **Nada en `app/(privado)` pinta la plantilla.** Ni `EstiloDePlantilla` en el layout ni
+  variables de la tienda en `:root`: lo que muestra su identidad lo hace dentro de un
+  recuadro, con sus valores en línea, como el sello.
 
-**El editor de la tienda (`/editor`) es la excepción que confirma la regla:** sus
-controles van en el mundo de Venduo y solo la vista previa lleva la identidad de la
-tienda. Si los controles tomaran los colores del borrador, cambiarían bajo el dedo de
+**El editor de la tienda (`/editor`) sigue la misma idea:** sus controles van en el mundo
+de Venduo y solo la vista previa lleva la identidad de la tienda. Si los controles tomaran los colores del borrador, cambiarían bajo el dedo de
 quien está eligiendo un color.
 
 **Todo lo que se toca en una plantilla usa `rounded-plantilla`**: botones, filtros,
 buscador. Es lo que hace cumplir "Forma de los botones" en el editor; un botón con su
 radio fijo, o sin radio, ignora lo que eligió la persona.
 
-Esto reemplaza la regla anterior de "un solo mundo", que a su vez había reemplazado la de
-"dos mundos". Lo que se mantiene de las dos: quien trabaja y quien compra en la misma
-tienda ven la misma identidad, sin costuras entre pantallas.
+Esto reemplaza la regla anterior, en la que el panel se teñía con la plantilla. Lo que se
+mantiene: quien compra ve la identidad de la tienda en cada pantalla, y quien trabaja la
+reconoce en su sello, dentro de una herramienta que se aprende una sola vez.
 
 **Editorial no quiere decir _landing_.** Un diario también es denso. Lo que cambia entre
 una portada y un panel no es la paleta ni la tipografía, es el ritmo:
@@ -73,6 +79,17 @@ ya trajo comprobante, un producto sin stock, una solicitud de vendedor—; en ti
 informa. El atajo "Nuevo producto" va con trazo y no relleno rojo por lo mismo: vive en
 todas las pantallas y competiría con el botón principal de cada una. En el móvil, el botón
 del menú lleva un punto rojo si adentro hay algo urgente.
+
+### El Resumen del panel
+
+Cada sección va en su propio panel —regla estructural de un píxel, esquina viva, sin
+sombra— con un ícono, un título que dice **para qué sirve** ("Para hoy", "Cómo te va",
+"Se está acabando") y una bajada de una línea. El pie, si lo hay, es un enlace a todo el
+ancho hacia la pantalla completa de esa sección.
+
+Los rótulos van en tinta, nunca en rojo: en el panel el rojo es para lo que pide una
+acción, y un rótulo en cada sección lo gastaba en nombrar cosas. El texto secundario del
+Resumen no baja de tinta al 65% (5,3:1 contra el papel): al 55% no llega al contraste AA.
 
 **Los componentes de `components/ui/` se siguen usando.** Se visten con las clases de
 `lib/estilos.ts` en vez de reemplazarse: lo que aportan es el cableado de accesibilidad

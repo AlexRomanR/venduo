@@ -156,7 +156,7 @@ function Ficha({
       className={cn(
         "flex min-h-11 items-center border px-4 text-sm font-semibold transition-colors",
         activa
-          ? "border-senal bg-senal text-white"
+          ? "border-tinta bg-tinta text-papel"
           : "border-tinta/25 hover:border-tinta"
       )}
     >

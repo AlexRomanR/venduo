@@ -81,7 +81,7 @@ export default async function VendedorPage() {
     <div className="flex flex-col gap-12">
       <div className="flex flex-wrap items-start gap-x-6 gap-y-4">
         <div className="flex-1">
-          <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+          <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
             Tu historial laboral
           </p>
           <h1 className="mt-3 max-w-[18ch] font-titular text-[clamp(1.75rem,5vw,2.5rem)] leading-[1.02] font-extrabold tracking-[-0.03em]">

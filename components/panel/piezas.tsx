@@ -40,7 +40,13 @@ export function Cifra({
   )
 }
 
-/** Encabezado de sección: label rojo en versalita y titular acotado. */
+/**
+ * Encabezado de sección: label en versalita y titular acotado.
+ *
+ * El label va en tinta y no en rojo, al revés que en la portada: en el panel
+ * el rojo es solo para lo que pide una acción, y un rótulo en cada sección de
+ * cada pantalla lo gastaba en nombrar cosas.
+ */
 export function Encabezado({
   etiqueta,
   titulo,
@@ -53,7 +59,7 @@ export function Encabezado({
   return (
     <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
       <div className="flex-1">
-        <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+        <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
           {etiqueta}
         </p>
         {titulo ? (

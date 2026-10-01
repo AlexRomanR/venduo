@@ -59,7 +59,7 @@ function Bloque({
 }) {
   return (
     <section className="border-t border-tinta/15 pt-8">
-      <h2 className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+      <h2 className="text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
         {titulo}
       </h2>
       {detalle ? (

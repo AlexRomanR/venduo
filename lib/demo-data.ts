@@ -1,4 +1,5 @@
-import { CURRENCY } from "@/lib/format"
+import { CURRENCY, diaEnBolivia } from "@/lib/format"
+import { diasVacios, type Tablero } from "@/lib/tablero"
 import type { CommissionStatus, Product, SubscriptionStatus } from "@/types"
 
 export interface Suscripcion {
@@ -33,12 +34,13 @@ export interface ResumenPanel {
  * hace falta demostrar sin base de datos es cómo se ve funcionando.
  */
 export const RESUMEN_DEMO: ResumenPanel = {
+  // La misma tienda que muestra la barra lateral en modo demo.
   tienda: {
     id: "demo-store",
-    name: "Café Illimani",
-    slug: "cafe-illimani",
+    name: "Rosa Deportes",
+    slug: "rosa-deportes",
     isPublished: true,
-    templateKey: "abarrotes",
+    templateKey: "fashion",
   },
   ventasCents: 1_284_500,
   pedidos: 37,
@@ -458,3 +460,191 @@ export const DEMO_PRODUCTS: Product[] = [
     is_active: false,
   },
 ]
+
+/* -------------------------------------------------------------------------
+ * El tablero del Resumen, en modo demo
+ * ---------------------------------------------------------------------- */
+
+const fotoDemo = (id: string) =>
+  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1200&q=85`
+
+/** Un número entre 0 y 1 que depende solo de la semilla: mismo día, mismo valor. */
+function azarFijo(semilla: number) {
+  let x = (semilla + 0x6d2b79f5) | 0
+  x = Math.imul(x ^ (x >>> 15), x | 1)
+  x ^= x + Math.imul(x ^ (x >>> 7), x | 61)
+  return ((x ^ (x >>> 14)) >>> 0) / 4294967296
+}
+
+/**
+ * El tablero de Rosa Deportes sin base de datos.
+ *
+ * La serie sale de la fecha de cada día y no de `Math.random`: recargar no
+ * cambia el gráfico, y cada fecha conserva sus ventas aunque pase el tiempo.
+ * Tiene fines de semana más movidos, días sin ventas y una subida en el
+ * último mes, que es como se ve una tienda chica de verdad.
+ */
+export function tableroDeDemostracion(): Tablero {
+  const hoy = diaEnBolivia()
+  const serie = diasVacios(hoy).map((dia, indice, todos) => {
+    const numero = Date.parse(dia.dia) / 86_400_000
+    const semana = new Date(`${dia.dia}T12:00:00Z`).getUTCDay()
+    const finde = semana === 0 || semana === 6 ? 1.7 : 1
+    const subida = 1 + Math.max(indice - (todos.length - 30), 0) / 30
+    const pedidos = Math.floor(azarFijo(numero) * 3.4 * finde * subida)
+    const ticket = 9_000 + Math.round(azarFijo(numero * 7) * 30) * 1_000
+    const ventasCents = pedidos * ticket
+    const deLaRed = Math.floor(pedidos * azarFijo(numero * 13) * 0.6)
+    return {
+      ...dia,
+      pedidos,
+      ventasCents,
+      redCents: deLaRed * ticket,
+    }
+  })
+
+  const hace = (minutos: number) =>
+    new Date(Date.now() - minutos * 60_000).toISOString()
+
+  return {
+    hoy,
+    serie,
+    ultimosPedidos: [
+      {
+        id: "demo-pedido-1",
+        numero: 148,
+        comprador: "Valeria Quispe Mamani",
+        telefono: "70145823",
+        totalCents: 52_000,
+        estado: "pendiente",
+        creado: hace(26),
+        articulos: 1,
+      },
+      {
+        id: "demo-pedido-2",
+        numero: 147,
+        comprador: "Jhonny Céspedes",
+        telefono: "76820417",
+        totalCents: 24_500,
+        estado: "pagado",
+        creado: hace(134),
+        articulos: 3,
+      },
+      {
+        id: "demo-pedido-3",
+        numero: 146,
+        comprador: "Carla Arteaga Ribera",
+        telefono: "69034751",
+        totalCents: 18_000,
+        estado: "enviado",
+        creado: hace(60 * 27),
+        articulos: 1,
+      },
+      {
+        id: "demo-pedido-4",
+        numero: 145,
+        comprador: "Rodrigo Mendoza Flores",
+        telefono: "71598306",
+        totalCents: 70_500,
+        estado: "entregado",
+        creado: hace(60 * 24 * 3 + 95),
+        articulos: 2,
+      },
+      {
+        id: "demo-pedido-5",
+        numero: 144,
+        comprador: "Daniela Rojas",
+        telefono: "78241169",
+        totalCents: 6_500,
+        estado: "cancelado",
+        creado: hace(60 * 24 * 4 + 300),
+        articulos: 1,
+      },
+    ],
+    porGestionar: { pendientes: 2, pagados: 1 },
+    masVendidos: [
+      {
+        id: "demo-polera",
+        nombre: "Polera básica",
+        foto: fotoDemo("1521572163474-6864f9cf17ab"),
+        unidades: 23,
+        montoCents: 149_500,
+      },
+      {
+        id: "demo-zapatilla",
+        nombre: "Zapatilla running",
+        foto: fotoDemo("1542291026-7eec264c27ff"),
+        unidades: 14,
+        montoCents: 728_000,
+      },
+      {
+        id: "demo-gorra",
+        nombre: "Gorra deportiva",
+        foto: fotoDemo("1588850561407-ed78c282e89b"),
+        unidades: 11,
+        montoCents: 60_500,
+      },
+      {
+        id: "demo-buzo",
+        nombre: "Buzo oversize",
+        foto: fotoDemo("1556905055-8f358a7a47b2"),
+        unidades: 9,
+        montoCents: 162_000,
+      },
+      {
+        id: "demo-mochila",
+        nombre: "Mochila urbana",
+        foto: fotoDemo("1553062407-98eeb64c6a62"),
+        unidades: 6,
+        montoCents: 144_000,
+      },
+    ],
+    porAcabarse: [
+      {
+        id: "demo-campera",
+        nombre: "Campera rompeviento",
+        foto: fotoDemo("1548883354-7622d03aca27"),
+        stock: 0,
+      },
+      {
+        id: "demo-zapatilla",
+        nombre: "Zapatilla running",
+        foto: fotoDemo("1542291026-7eec264c27ff"),
+        stock: 2,
+      },
+      {
+        id: "demo-gorra",
+        nombre: "Gorra deportiva",
+        foto: fotoDemo("1588850561407-ed78c282e89b"),
+        stock: 3,
+      },
+    ],
+    red: {
+      activa: true,
+      activos: 6,
+      pendientes: 2,
+      destacados: [
+        {
+          id: "demo-ana",
+          nombre: "Ana Gutiérrez",
+          ventasCents: 234_000,
+          pedidos: 9,
+        },
+        {
+          id: "demo-luis",
+          nombre: "Luis Fernando Vaca",
+          ventasCents: 118_500,
+          pedidos: 5,
+        },
+        {
+          id: "demo-micaela",
+          nombre: "Micaela Suárez",
+          ventasCents: 64_000,
+          pedidos: 3,
+        },
+      ],
+    },
+    pasos: { producto: true, estilo: true, primerPedido: true, vendedor: true },
+    esDemo: true,
+  }
+}

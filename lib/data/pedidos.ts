@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { formatMoney } from "@/lib/format"
+import { numeroDeWhatsApp } from "@/lib/pedidos"
 import type { OrderStatus } from "@/types"
 
 export interface LineaPedido {
@@ -253,6 +254,5 @@ export function mensajeDeEntrega(pedido: Pedido, tienda: string): string {
     "¿Cuándo y dónde te queda bien recibirlo?",
   ]
 
-  const telefono = pedido.telefono.replace(/\D/g, "")
-  return `https://wa.me/${telefono}?text=${encodeURIComponent(lineas.join("\n"))}`
+  return `https://wa.me/${numeroDeWhatsApp(pedido.telefono)}?text=${encodeURIComponent(lineas.join("\n"))}`
 }

@@ -88,6 +88,87 @@ export function formatDate(value: string | Date, locale = LOCALE) {
 }
 
 /**
+ * La hora del sistema es la de Bolivia, que no cambia en el año: UTC−4.
+ *
+ * El servidor corre en UTC, así que sin esto un pedido de las nueve de la
+ * noche en La Paz caía en el día siguiente y el gráfico del panel se corría.
+ */
+export const ZONA_HORARIA = "America/La_Paz"
+
+/** El día de una fecha en Bolivia, como `AAAA-MM-DD`. */
+export function diaEnBolivia(value: string | Date = new Date()): string {
+  const date = typeof value === "string" ? new Date(value) : value
+  // `en-CA` escribe la fecha como AAAA-MM-DD, que es lo que hace falta.
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: ZONA_HORARIA,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date)
+}
+
+/** `AAAA-MM-DD` corrido `dias` días, sin que la zona horaria lo mueva. */
+export function sumarDias(dia: string, dias: number): string {
+  const [anio, mes, numero] = dia.split("-").map(Number)
+  return new Date(Date.UTC(anio, mes - 1, numero + dias))
+    .toISOString()
+    .slice(0, 10)
+}
+
+/**
+ * Un día `AAAA-MM-DD` dicho corto: "lun 14 sep".
+ *
+ * Se lee al mediodía UTC y se escribe en UTC: así ninguna zona horaria lo
+ * corre al día anterior.
+ */
+export function formatDia(
+  dia: string,
+  { conSemana = true }: { conSemana?: boolean } = {},
+  locale = LOCALE
+) {
+  return new Intl.DateTimeFormat(locale, {
+    timeZone: "UTC",
+    weekday: conSemana ? "short" : undefined,
+    day: "numeric",
+    month: "short",
+  })
+    .format(new Date(`${dia}T12:00:00Z`))
+    .replace(/[.,]/g, "")
+}
+
+/**
+ * Hace cuánto: "hace 12 min", "hace 3 h", "ayer"; pasada una semana, la fecha.
+ *
+ * En una lista de pedidos importa más cuánto lleva esperando que el día exacto.
+ */
+export function formatRelative(
+  value: string | Date,
+  ahora: Date = new Date(),
+  locale = LOCALE
+) {
+  const date = typeof value === "string" ? new Date(value) : value
+  const minutos = Math.round((ahora.getTime() - date.getTime()) / 60_000)
+
+  if (minutos < 1) return "recién"
+
+  const relativo = new Intl.RelativeTimeFormat(locale, {
+    numeric: "auto",
+    style: "short",
+  })
+  if (minutos < 60) return relativo.format(-minutos, "minute")
+  if (minutos < 60 * 24) {
+    return relativo.format(-Math.round(minutos / 60), "hour")
+  }
+
+  const dias =
+    (Date.parse(diaEnBolivia(ahora)) - Date.parse(diaEnBolivia(date))) /
+    86_400_000
+  if (dias < 7) return relativo.format(-dias, "day")
+
+  return formatDia(diaEnBolivia(date), { conSemana: false }, locale)
+}
+
+/**
  * Saca el slug de una tienda de lo que una persona pegue.
  *
  * El vendedor recibe la tienda por WhatsApp, así que puede llegar el enlace

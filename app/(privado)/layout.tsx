@@ -8,7 +8,6 @@ import {
   BarraLateralEscritorio,
   BarraLateralMovil,
 } from "@/components/panel/barra-lateral"
-import { EstiloDePlantilla } from "@/components/plantillas/estilo"
 
 /**
  * Shell de las áreas privadas: `/panel`, `/vendedor` y `/cuenta`.
@@ -21,11 +20,12 @@ import { EstiloDePlantilla } from "@/components/plantillas/estilo"
  * Lo que muestra lo deciden los datos, no `primary_role`: alguien que tiene
  * tienda y además vende para otras ve las dos secciones.
  *
- * Quien tiene tienda trabaja con la identidad de su plantilla: la misma letra,
- * papel y color de acción que ve su comprador. Cambia la piel, no la
- * estructura —las pantallas de trabajo son las mismas en todas las
- * plantillas—, y así el panel se siente de su negocio sin dejar de ser una
- * herramienta que se aprende una sola vez.
+ * El panel es una herramienta de Venduo y se ve igual para todos, con el
+ * mundo de DESIGN.md. Antes tomaba la plantilla de la tienda, y una letra o un
+ * color elegidos para vender —una condensada en mayúsculas, el azul de un
+ * botón de compra, una antigua fina para las cifras— terminaban en cada rótulo
+ * de una pantalla de trabajo. La identidad de la tienda sigue a la vista
+ * donde la representa: su tarjeta en la barra y su sello en el Resumen.
  */
 export default async function PrivadoLayout({
   children,
@@ -38,9 +38,6 @@ export default async function PrivadoLayout({
 
   return (
     <div className="min-h-screen bg-papel text-tinta lg:flex">
-      {barra.apariencia ? (
-        <EstiloDePlantilla apariencia={barra.apariencia} />
-      ) : null}
       <BarraLateralEscritorio datos={barra} plegadaInicial={plegada} />
 
       <div className="flex min-w-0 flex-1 flex-col">

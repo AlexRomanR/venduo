@@ -29,3 +29,42 @@ export const CLAVES_FUENTE = Object.keys(FUENTES) as [
 export function familiaDe(clave: ClaveFuente): string {
   return `var(${FUENTES[clave].variable})`
 }
+
+/** El espaciado de los titulares, por nombre. */
+export const ESPACIADOS = {
+  apretado: "-0.03em",
+  normal: "0em",
+  abierto: "0.02em",
+} as const
+
+/** Lo que define cómo escribe sus titulares una tienda. */
+export interface TipografiaDelTitular {
+  titular: ClaveFuente
+  pesoTitular: number | null
+  espaciadoTitular: keyof typeof ESPACIADOS | null
+  mayusculas: boolean
+}
+
+/**
+ * Cómo escribe sus titulares una tienda, como estilo en línea.
+ *
+ * Es para mostrar su nombre con su propia letra dentro de una pantalla que no
+ * lleva su plantilla: la tarjeta de la tienda en el panel. Sale de tokens
+ * cerrados, igual que `cssDeApariencia`.
+ *
+ * Vive acá y no en `apariencia.ts` porque la lee la barra lateral, que es de
+ * cliente y está en todas las pantallas privadas: traerla desde allá subía el
+ * esquema de zod entero al navegador, cien kilobytes en cada pantalla del panel.
+ */
+export function estiloDelTitular(
+  tipografia: TipografiaDelTitular
+): Record<string, string | number> {
+  return {
+    fontFamily: familiaDe(tipografia.titular),
+    fontWeight: tipografia.pesoTitular ?? 800,
+    letterSpacing: tipografia.espaciadoTitular
+      ? ESPACIADOS[tipografia.espaciadoTitular]
+      : "-0.02em",
+    textTransform: tipografia.mayusculas ? "uppercase" : "none",
+  }
+}

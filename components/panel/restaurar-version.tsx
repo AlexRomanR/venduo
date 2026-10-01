@@ -85,7 +85,7 @@ export function RestaurarVersion({
       >
         <div className="flex items-start gap-4 border-b border-tinta/15 p-5 sm:p-6">
           <div className="flex-1">
-            <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+            <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
               Historial de diseño
             </p>
             <DialogTitle className="mt-2 font-titular text-2xl leading-tight font-extrabold tracking-[-0.03em]">

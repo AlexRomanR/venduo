@@ -1,6 +1,10 @@
 import { z } from "zod"
 
-import { CLAVES_FUENTE, FUENTES } from "@/lib/plantillas/fuentes"
+import { CLAVES_FUENTE, ESPACIADOS, FUENTES } from "@/lib/plantillas/fuentes"
+
+// Viven en `fuentes.ts`, que no importa zod: los lee la barra lateral del
+// panel, que es de cliente y está en todas las pantallas privadas.
+export { ESPACIADOS, estiloDelTitular } from "@/lib/plantillas/fuentes"
 
 /**
  * La apariencia de una tienda: lo que una plantilla fija y una tienda puede
@@ -21,13 +25,6 @@ import { CLAVES_FUENTE, FUENTES } from "@/lib/plantillas/fuentes"
 const color = z
   .string()
   .regex(/^#[0-9a-fA-F]{6}$/, "Un color se escribe como #rrggbb")
-
-/** El espaciado de los titulares, por nombre. */
-export const ESPACIADOS = {
-  apretado: "-0.03em",
-  normal: "0em",
-  abierto: "0.02em",
-} as const
 
 /** El radio de botones y controles, por nombre. */
 export const RADIOS = {

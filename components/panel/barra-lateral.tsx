@@ -34,9 +34,11 @@ import {
 import { toast } from "sonner"
 
 import { formatMoney } from "@/lib/format"
+import { estiloDelTitular } from "@/lib/plantillas/fuentes"
 import { COOKIE_BARRA } from "@/lib/preferencias"
 import { cn } from "@/lib/utils"
 import type { BarraLateral } from "@/lib/data/barra"
+import { SelloDeTienda } from "@/components/panel/tablero/sello"
 import {
   Sheet,
   SheetContent,
@@ -125,7 +127,7 @@ function Contenido({
   alPlegar?: () => void
 }) {
   const pathname = usePathname()
-  const { tienda, vendedor, contadores: c, persona } = datos
+  const { tienda, vendedor, contadores: c, persona, apariencia } = datos
 
   const reposicion = c.productosSinStock + c.productosPocoStock
 
@@ -370,22 +372,41 @@ function Contenido({
         {tienda && !plegada ? (
           <div className="mx-2 border-t-2 border-tinta pt-4">
             <div className="flex items-center gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden border border-tinta/20 bg-tinta/5">
-                {tienda.logoUrl ? (
-                  <Image
-                    src={tienda.logoUrl}
-                    alt=""
-                    width={80}
-                    height={80}
-                    unoptimized
-                    className="size-full object-cover"
-                  />
-                ) : (
-                  <Store aria-hidden="true" className="size-4 opacity-45" />
-                )}
-              </div>
+              {/* La tienda con su cara: su papel, su letra y su color de
+                  acción. El resto de la barra es de Venduo. */}
+              {apariencia ? (
+                <SelloDeTienda
+                  nombre={tienda.nombre}
+                  logoUrl={tienda.logoUrl}
+                  apariencia={apariencia}
+                  compacto
+                  className="size-11"
+                />
+              ) : (
+                <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden border border-tinta/20 bg-tinta/5">
+                  {tienda.logoUrl ? (
+                    <Image
+                      src={tienda.logoUrl}
+                      alt=""
+                      width={88}
+                      height={88}
+                      unoptimized
+                      className="size-full object-cover"
+                    />
+                  ) : (
+                    <Store aria-hidden="true" className="size-4 opacity-45" />
+                  )}
+                </div>
+              )}
               <div className="min-w-0">
-                <p className="truncate font-titular text-base font-bold tracking-[-0.01em]">
+                <p
+                  className="truncate text-base leading-tight"
+                  style={
+                    apariencia
+                      ? estiloDelTitular(apariencia.tipografia)
+                      : undefined
+                  }
+                >
                   {tienda.nombre}
                 </p>
                 <p className="mt-0.5 flex items-center gap-1.5 text-xs">
@@ -520,7 +541,7 @@ function Contenido({
               className={cn(
                 "flex size-11 items-center justify-center overflow-hidden rounded-full border font-titular text-sm font-bold",
                 pathname.startsWith("/cuenta")
-                  ? "border-senal text-senal"
+                  ? "border-tinta bg-tinta/[0.06]"
                   : "border-tinta/20 bg-tinta/5"
               )}
             >
@@ -584,7 +605,7 @@ function Contenido({
               className={cn(
                 "flex min-h-11 items-center justify-center gap-1.5 border text-xs font-semibold transition-colors",
                 pathname.startsWith("/cuenta")
-                  ? "border-senal text-senal"
+                  ? "border-tinta bg-tinta/[0.06]"
                   : "border-tinta/25 hover:border-tinta"
               )}
             >
@@ -628,7 +649,7 @@ function Grupo({
     >
       {plegada ? null : (
         <>
-          <p className="px-2 text-[11px] font-semibold tracking-[0.14em] text-senal uppercase">
+          <p className="px-2 text-[11px] font-semibold tracking-[0.14em] uppercase opacity-55">
             {titulo}
           </p>
           {detalle ? (
@@ -688,8 +709,8 @@ function Entrada({
             className={cn(
               "relative flex size-11 items-center justify-center border-l-2 transition-colors",
               activo
-                ? "border-senal text-senal"
-                : "border-transparent hover:text-senal"
+                ? "border-tinta bg-tinta/[0.06]"
+                : "border-transparent hover:bg-tinta/[0.04]"
             )}
           >
             <Icono
@@ -726,8 +747,8 @@ function Entrada({
           // en el resto del sistema, girado para una columna.
           "flex min-h-11 items-center gap-3 border-l-2 px-3 text-sm transition-colors",
           activo
-            ? "border-senal font-semibold text-senal"
-            : "border-transparent hover:border-tinta/25"
+            ? "border-tinta bg-tinta/[0.06] font-semibold"
+            : "border-transparent hover:border-tinta/25 hover:bg-tinta/[0.03]"
         )}
       >
         <Icono
@@ -774,7 +795,7 @@ function Entrada({
                   className={cn(
                     "flex min-h-11 items-center gap-2.5 pl-4 text-xs transition-colors",
                     hijoActivo
-                      ? "font-semibold text-senal"
+                      ? "font-semibold"
                       : "opacity-60 hover:opacity-100"
                   )}
                 >

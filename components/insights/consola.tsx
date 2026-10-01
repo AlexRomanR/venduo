@@ -211,7 +211,7 @@ export function Consola({
             semana», «solo los últimos 7 días», «muéstralo como tabla».
           </p>
 
-          <p className="mt-10 text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+          <p className="mt-10 text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
             Prueba con
           </p>
           <ul className="mt-2 grid gap-x-10 sm:grid-cols-2">

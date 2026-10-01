@@ -1,3 +1,5 @@
+import { cache } from "react"
+
 import { createClient } from "@/lib/supabase/server"
 import type { ResumenPanel, Suscripcion } from "@/lib/demo-data"
 import type { SubscriptionStatus } from "@/types"
@@ -63,8 +65,11 @@ export async function resolverDestino(): Promise<string> {
  *
  * Es lo que decide a qué pantalla entra un emprendedor: sin tienda, o con una
  * tienda sin plantilla, va al alta; con plantilla elegida, va al panel.
+ *
+ * Con memoria por pedido: el Resumen la pide desde la página, el tablero y la
+ * lista de vendedores, y sin esto eran tres viajes iguales a la base.
  */
-export async function getMiTienda() {
+export const getMiTienda = cache(async function getMiTienda() {
   const supabase = await createClient()
   if (!supabase) return null
 
@@ -84,7 +89,7 @@ export async function getMiTienda() {
     .maybeSingle()
 
   return data
-}
+})
 
 /**
  * Todo lo que el panel muestra de un vistazo.

@@ -42,7 +42,7 @@ const MARGEN = { arriba: 16, derecha: 12, abajo: 28, izquierda: 56 }
  * la notificación**: pasaba dos de cada tres veces al angostar la ventana, y el
  * gráfico se quedaba con el ancho de escritorio desbordando la pantalla.
  */
-function useAncho() {
+export function useAncho() {
   const ref = React.useRef<HTMLDivElement>(null)
   const [ancho, setAncho] = React.useState(0)
 

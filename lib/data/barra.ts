@@ -1,3 +1,5 @@
+import { cache } from "react"
+
 import { isSupabaseConfigured } from "@/lib/env"
 import { aparienciaDeTienda } from "@/lib/plantillas"
 import type { Apariencia } from "@/lib/plantillas/apariencia"
@@ -39,8 +41,9 @@ export interface BarraLateral {
   } | null
   contadores: Contadores
   /**
-   * La identidad de la plantilla de su tienda, para teñir el panel. `null`
-   * para quien solo vende: su panel cruza tiendas y lleva el mundo de Venduo.
+   * La identidad de la plantilla de su tienda, para su tarjeta y su sello. El
+   * panel ya no se tiñe con ella: es una herramienta de Venduo y se ve igual
+   * para todos. `null` para quien solo vende.
    */
   apariencia: Apariencia | null
   esDemo: boolean
@@ -70,7 +73,9 @@ function barraDeDemostracion(): BarraLateral {
       ...SIN_CONTADORES,
       pedidosPendientes: 2,
       pedidosConComprobante: 1,
-      productosPocoStock: 1,
+      productosSinStock: 1,
+      productosPocoStock: 2,
+      vendedoresPendientes: 2,
     },
     apariencia: aparienciaDeTienda("fashion", {}),
     esDemo: true,
@@ -88,134 +93,146 @@ function barraDeDemostracion(): BarraLateral {
  *
  * Lo que muestra lo deciden los datos y no `primary_role`: quien tiene tienda y
  * además vende para otras ve las dos secciones.
+ *
+ * Con memoria por pedido: la pide el layout y la vuelve a pedir el Resumen,
+ * que usa sus mismos contadores para que la barra y la pantalla no se
+ * contradigan.
  */
-export async function getBarraLateral(): Promise<BarraLateral> {
-  if (!isSupabaseConfigured) return barraDeDemostracion()
+export const getBarraLateral = cache(
+  async function getBarraLateral(): Promise<BarraLateral> {
+    if (!isSupabaseConfigured) return barraDeDemostracion()
 
-  const supabase = await createClient()
-  if (!supabase) return barraDeDemostracion()
+    const supabase = await createClient()
+    if (!supabase) return barraDeDemostracion()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return barraDeDemostracion()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return barraDeDemostracion()
 
-  const [perfilRes, tiendaRes, vinculosRes, perfilVendedorRes] =
-    await Promise.all([
-      supabase
-        .from("profiles")
-        .select("full_name, avatar_url")
-        .eq("id", user.id)
-        .maybeSingle(),
-      supabase
-        .from("stores")
-        .select(
-          "id, name, slug, logo_url, is_published, template_key, theme_overrides"
-        )
-        .eq("owner_id", user.id)
-        .is("deleted_at", null)
-        .maybeSingle(),
-      supabase
-        .from("store_sellers")
-        .select("status")
-        .eq("user_id", user.id)
-        .is("deleted_at", null),
-      supabase
-        .from("seller_profiles")
-        .select("slug")
-        .eq("user_id", user.id)
-        .is("deleted_at", null)
-        .maybeSingle(),
-    ])
-
-  const tiendaFila = tiendaRes.data?.template_key ? tiendaRes.data : null
-  const vinculos = vinculosRes.data ?? []
-
-  const contadores: Contadores = { ...SIN_CONTADORES }
-
-  if (tiendaFila) {
-    const [pendientes, conComprobante, productos, solicitudes] =
+    const [perfilRes, tiendaRes, vinculosRes, perfilVendedorRes] =
       await Promise.all([
         supabase
-          .from("orders")
-          .select("id", { count: "exact", head: true })
-          .eq("store_id", tiendaFila.id)
-          .eq("status", "pendiente"),
+          .from("profiles")
+          .select("full_name, avatar_url")
+          .eq("id", user.id)
+          .maybeSingle(),
         supabase
-          .from("orders")
-          .select("id", { count: "exact", head: true })
-          .eq("store_id", tiendaFila.id)
-          .eq("status", "pendiente")
-          .not("payment_proof_url", "is", null),
-        supabase
-          .from("products")
-          .select("stock, low_stock_threshold")
-          .eq("store_id", tiendaFila.id)
-          .eq("is_active", true)
-          .is("deleted_at", null),
+          .from("stores")
+          .select(
+            "id, name, slug, logo_url, is_published, template_key, theme_overrides"
+          )
+          .eq("owner_id", user.id)
+          .is("deleted_at", null)
+          .maybeSingle(),
         supabase
           .from("store_sellers")
-          .select("id", { count: "exact", head: true })
-          .eq("store_id", tiendaFila.id)
-          .eq("status", "pendiente")
+          .select("status")
+          .eq("user_id", user.id)
           .is("deleted_at", null),
+        supabase
+          .from("seller_profiles")
+          .select("slug")
+          .eq("user_id", user.id)
+          .is("deleted_at", null)
+          .maybeSingle(),
       ])
 
-    const catalogo = productos.data ?? []
-    contadores.pedidosPendientes = pendientes.count ?? 0
-    contadores.pedidosConComprobante = conComprobante.count ?? 0
-    contadores.productosSinStock = catalogo.filter((p) => p.stock === 0).length
-    contadores.productosPocoStock = catalogo.filter(
-      (p) => p.stock > 0 && p.stock <= p.low_stock_threshold
-    ).length
-    contadores.vendedoresPendientes = solicitudes.count ?? 0
-  }
+    const tiendaFila = tiendaRes.data?.template_key ? tiendaRes.data : null
+    const vinculos = vinculosRes.data ?? []
 
-  if (vinculos.length > 0) {
-    const { data: comisiones } = await supabase
-      .from("commissions")
-      .select("amount_cents")
-      .eq("seller_user_id", user.id)
-      .eq("status", "confirmada")
+    const contadores: Contadores = { ...SIN_CONTADORES }
 
-    contadores.comisionesPorCobrarCents = (comisiones ?? []).reduce(
-      (total, c) => total + c.amount_cents,
-      0
-    )
-  }
+    if (tiendaFila) {
+      const [pendientes, conComprobante, productos, solicitudes] =
+        await Promise.all([
+          supabase
+            .from("orders")
+            .select("id", { count: "exact", head: true })
+            .eq("store_id", tiendaFila.id)
+            .eq("status", "pendiente"),
+          supabase
+            .from("orders")
+            .select("id", { count: "exact", head: true })
+            .eq("store_id", tiendaFila.id)
+            .eq("status", "pendiente")
+            .not("payment_proof_url", "is", null),
+          supabase
+            .from("products")
+            .select("stock, low_stock_threshold")
+            .eq("store_id", tiendaFila.id)
+            .eq("is_active", true)
+            .is("deleted_at", null),
+          supabase
+            .from("store_sellers")
+            .select("id", { count: "exact", head: true })
+            .eq("store_id", tiendaFila.id)
+            .eq("status", "pendiente")
+            .is("deleted_at", null),
+        ])
 
-  const nombre =
-    perfilRes.data?.full_name?.trim() ||
-    user.email?.split("@")[0] ||
-    "Tu cuenta"
+      const catalogo = productos.data ?? []
+      contadores.pedidosPendientes = pendientes.count ?? 0
+      contadores.pedidosConComprobante = conComprobante.count ?? 0
+      contadores.productosSinStock = catalogo.filter(
+        (p) => p.stock === 0
+      ).length
+      contadores.productosPocoStock = catalogo.filter(
+        (p) => p.stock > 0 && p.stock <= p.low_stock_threshold
+      ).length
+      contadores.vendedoresPendientes = solicitudes.count ?? 0
+    }
 
-  return {
-    persona: {
-      nombre,
-      correo: user.email ?? null,
-      avatarUrl: perfilRes.data?.avatar_url ?? null,
-    },
-    tienda: tiendaFila
-      ? {
-          nombre: tiendaFila.name,
-          slug: tiendaFila.slug,
-          logoUrl: tiendaFila.logo_url,
-          publicada: tiendaFila.is_published,
-          url: urlDeTienda(tiendaFila.slug),
-        }
-      : null,
-    vendedor:
-      vinculos.length > 0
+    if (vinculos.length > 0) {
+      const { data: comisiones } = await supabase
+        .from("commissions")
+        .select("amount_cents")
+        .eq("seller_user_id", user.id)
+        .eq("status", "confirmada")
+
+      contadores.comisionesPorCobrarCents = (comisiones ?? []).reduce(
+        (total, c) => total + c.amount_cents,
+        0
+      )
+    }
+
+    const nombre =
+      perfilRes.data?.full_name?.trim() ||
+      user.email?.split("@")[0] ||
+      "Tu cuenta"
+
+    return {
+      persona: {
+        nombre,
+        correo: user.email ?? null,
+        avatarUrl: perfilRes.data?.avatar_url ?? null,
+      },
+      tienda: tiendaFila
         ? {
-            perfilSlug: perfilVendedorRes.data?.slug ?? null,
-            tiendas: vinculos.filter((v) => v.status === "activo").length,
-            pendientes: vinculos.filter((v) => v.status === "pendiente").length,
+            nombre: tiendaFila.name,
+            slug: tiendaFila.slug,
+            logoUrl: tiendaFila.logo_url,
+            publicada: tiendaFila.is_published,
+            url: urlDeTienda(tiendaFila.slug),
           }
         : null,
-    contadores,
-    apariencia: tiendaFila
-      ? aparienciaDeTienda(tiendaFila.template_key, tiendaFila.theme_overrides)
-      : null,
-    esDemo: false,
+      vendedor:
+        vinculos.length > 0
+          ? {
+              perfilSlug: perfilVendedorRes.data?.slug ?? null,
+              tiendas: vinculos.filter((v) => v.status === "activo").length,
+              pendientes: vinculos.filter((v) => v.status === "pendiente")
+                .length,
+            }
+          : null,
+      contadores,
+      apariencia: tiendaFila
+        ? aparienciaDeTienda(
+            tiendaFila.template_key,
+            tiendaFila.theme_overrides
+          )
+        : null,
+      esDemo: false,
+    }
   }
-}
+)

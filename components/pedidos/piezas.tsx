@@ -48,7 +48,7 @@ export function Origen({ pedido }: { pedido: Pedido }) {
   return (
     <span className="text-xs">
       <span className="opacity-45">Vendió </span>
-      <span className="font-semibold text-senal">{pedido.vendedor.nombre}</span>
+      <span className="font-semibold">{pedido.vendedor.nombre}</span>
     </span>
   )
 }

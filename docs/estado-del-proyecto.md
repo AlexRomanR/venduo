@@ -99,7 +99,13 @@ Actualizado el 29 de septiembre de 2026.
 
 ### Panel del emprendedor (`/panel`)
 
-- **Resumen** con cifras y pendientes.
+- **Resumen** con el estilo de Venduo, igual para toda tienda, y la tienda reconocible en
+  su sello. Cada sección en su panel: **Para hoy** (lo que espera respuesta, con los
+  mismos números de la barra), **Primeros pasos** mientras falten, **Cómo te va** (cifras
+  contra el período anterior y un gráfico de 7, 30 o 90 días que se recorre con el dedo o
+  el teclado), **Últimos pedidos** con WhatsApp directo, **Lo que más se vende**, **Se
+  está acabando** y **Tu red**. Compartir la tienda abre el enlace, el QR para descargar y
+  un mensaje listo para WhatsApp.
 - **Productos**: alta y edición con fotos, stock, umbral de aviso, condición, precio
   anterior, código y destacado. Categorías propias.
 - **Pedidos**: lista, detalle, cambio de estado, comprobante, y un botón que abre WhatsApp

@@ -50,8 +50,8 @@ export default async function AparienciaPage() {
         </h1>
         <p className="mt-3 max-w-[60ch] text-sm leading-relaxed opacity-70">
           La plantilla decide la letra, los colores y cómo se muestran tus
-          productos, en tu tienda y en este panel. Cambiarla no toca tus
-          productos, categorías, pedidos ni vendedores.
+          productos en tu tienda. Cambiarla no toca tus productos, categorías,
+          pedidos ni vendedores.
           {esDemo ? (
             <>
               {" "}
@@ -65,7 +65,7 @@ export default async function AparienciaPage() {
 
       <section className="flex flex-col gap-6 border-2 border-tinta p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div className="max-w-[46ch]">
-          <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+          <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
             Editor de tu tienda
           </p>
           <h2 className="mt-2 font-titular text-[clamp(1.5rem,4vw,2rem)] leading-tight font-extrabold tracking-[-0.03em]">

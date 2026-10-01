@@ -145,6 +145,8 @@ components/
   tienda/             Lo compartido por todas las plantillas: carrito, checkout,
                       pago, agregar, barra de compra, filtros y buscador
   panel/              Shell, cifras y piezas de los dos paneles
+    tablero/          El Resumen: sus secciones, el gráfico de ventas, el sello de
+                      la tienda y compartirla
   landing/            Piezas de la portada
   config-status.tsx   Checklist de capas configuradas
   theme-provider.tsx
@@ -166,6 +168,8 @@ lib/
   estilos.ts          Clases del vestido editorial de los controles
   tienda.ts           El enlace de una tienda, sus rutas internas y el slug de un subdominio
   catalogo.ts         Filtrar y ordenar el catálogo público, sin dependencias de servidor
+  tablero.ts          El tablero del Resumen: sus tipos y las cuentas de los períodos,
+                      sin dependencias de servidor
   fuentes.ts          Todas las tipografías, con next/font
   format.ts           Moneda, fechas, slugs
   pedidos.ts          Los estados de un pedido, sin dependencias de servidor
@@ -186,8 +190,8 @@ docs/
 
 Una tienda se dibuja con **el kit de su plantilla**. Las páginas de `app/t/[slug]` piden
 `kitDePlantilla(tienda.plantilla)` y componen sus piezas; nunca preguntan qué plantilla es.
-El layout pinta la apariencia —base más personalización— como variables CSS en `:root`, y
-el panel de quien tiene tienda hace lo mismo.
+El layout de la tienda pinta la apariencia —base más personalización— como variables CSS
+en `:root`. El panel no: es de Venduo para todos, y la tienda aparece en su sello.
 
 Dos trampas:
 

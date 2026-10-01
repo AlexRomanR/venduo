@@ -130,8 +130,9 @@ perfil del vendedor `/v/{slug}`. Lo que cambia entre una portada y un panel es e
 ritmo, no el sistema: el panel usa la misma paleta y la misma tipografía con la
 mitad del aire vertical y la navegación siempre a la vista.
 
-**Una tienda `/t/{slug}`, y el panel de su dueño, usan el mundo de su plantilla.**
-Las plantillas redefinen estos mismos tokens —papel, tinta, señal, titular,
+**Una tienda `/t/{slug}` usa el mundo de su plantilla; el panel de su dueño, este.** La
+tienda queda reconocible en el panel por su sello, un recuadro con su papel, su letra y su
+color de acción. Las plantillas redefinen estos mismos tokens —papel, tinta, señal, titular,
 cuerpo, radio— y traen sus propios componentes; sus valores están en
 `lib/plantillas` y el sistema entero en `docs/store-templates.md`. Este documento
 es además **la base editorial**: la plantilla de respaldo con la que se dibuja
@@ -344,7 +345,9 @@ cómo se visten en el mundo público.
 
 No hay tarjetas. Lo que cumple ese papel es el **panel de demostración**: campo
 papel encerrado por una regla estructural de 1 px, esquina viva, `16px` de relleno
-interno, y cabecera y pie separados por la misma regla. Sin sombra y sin radio.
+interno, y cabecera y pie separados por la misma regla. Sin sombra y sin radio. En el
+Resumen del panel, cada sección es uno de estos, con su título y un pie que lleva a la
+pantalla completa.
 
 ### Navigation
 
@@ -359,7 +362,8 @@ colapso móvil.
 El patrón que abre casi toda sección: un **label** rojo en versalita con tracking
 `0.12em`, `20px` de aire, y debajo el **headline** en Archivo extrabold a medida
 acotada. El label nombra la sección —y es el mismo texto que el ancla de
-navegación—; no repite el titular ni le agrega adjetivos.
+navegación—; no repite el titular ni le agrega adjetivos. En los paneles el label va
+en tinta: ahí el rojo queda para lo que pide una acción.
 
 ### Listas separadas por regla
 
