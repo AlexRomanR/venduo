@@ -169,6 +169,7 @@ components/
     tablero/          El Resumen: sus secciones, el gráfico de ventas, el sello de
                       la tienda y compartirla
   landing/            Piezas de la portada
+  marca/              `Logo` y `Simbolo`: la marca de Venduo, desde `lib/marca.ts`
   config-status.tsx   Checklist de capas configuradas
   theme-provider.tsx
 
@@ -191,6 +192,7 @@ lib/
                       editor y `pdf.tsx`, que lo arma en el servidor
   canva.ts            Llevar un catálogo a Canva: el permiso con PKCE y la
                       importación del PDF. Solo servidor
+  marca.ts            La geometría y los colores del logo: la fuente de todo archivo
   demo-data.ts        Datos de ejemplo del modo demo
   estilos.ts          Clases del vestido editorial de los controles
   tienda.ts           El enlace de una tienda, sus rutas internas y el slug de un subdominio
@@ -208,6 +210,10 @@ types/
   index.ts            Alias escritos a mano
 
 supabase/migrations/  SQL con marca de tiempo en el nombre
+
+public/marca/         Íconos del manifiesto y la tarjeta de compartir. Generados
+
+scripts/marca.mjs     Genera todos los archivos del logo: `npm run marca`
 
 docs/
   store-templates.md  El sistema de plantillas: capas, base de datos, cómo agregar una

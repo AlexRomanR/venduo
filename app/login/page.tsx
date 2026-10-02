@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react"
 
 import { isSupabaseConfigured } from "@/lib/env"
 import { Acceso } from "@/components/auth/acceso"
+import { Logo } from "@/components/marca/logo"
 
 export const metadata = { title: "Entrar" }
 
@@ -21,11 +22,8 @@ export default async function LoginPage({
     <div className="flex min-h-screen flex-col bg-papel text-tinta">
       <header className="border-b border-tinta/15">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-5 py-3.5">
-          <Link
-            href="/"
-            className="flex min-h-11 flex-1 items-center font-titular text-lg font-extrabold tracking-[-0.02em]"
-          >
-            Venduo
+          <Link href="/" className="flex min-h-11 flex-1 items-center text-lg">
+            <Logo />
           </Link>
           <Link
             href="/"

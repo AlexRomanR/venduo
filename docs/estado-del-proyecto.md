@@ -43,6 +43,14 @@ Actualizado el 1 de octubre de 2026.
   segunda mano—, no de comida casera. Cómo se le habla al cliente está en
   `ui-styling.md`.
 
+### La marca
+
+- El logo es la feria en el celular: el toldo a rayas de un puesto dentro de la pantalla.
+  Va en la portada, el ingreso, las altas, el perfil del vendedor y la barra lateral
+  —plegada, el símbolo solo—, y es el favicon, el ícono del celular y la tarjeta al
+  compartir la portada. Se regenera con `npm run marca`. Todo en
+  `.agents/rules/marca.md`.
+
 ### Catálogos en PDF (`/panel/catalogos`)
 
 - Doce plantillas —grilla, revista, lookbook, lista de precios, una foto por hoja,

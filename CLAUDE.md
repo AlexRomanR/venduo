@@ -85,6 +85,7 @@ Se cargan solas. Son la misma fuente que lee Antigravity desde `.agents/rules/`.
 @.agents/rules/code-quality.md
 @.agents/rules/performance.md
 @.agents/rules/workflow.md
+@.agents/rules/marca.md
 
 ## Skills
 

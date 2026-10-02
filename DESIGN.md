@@ -353,7 +353,8 @@ un pie que lleva adonde se sigue.
 ### Navigation
 
 Encabezado adherido, papel al 90% con desenfoque, regla inferior al 15%. La marca
-va en Archivo extrabold `1.125rem` con tracking `-0.02em`. Los enlaces son Geist
+es `<Logo />`: el símbolo de la feria en el celular y el nombre en Archivo extrabold
+`1.125rem` con tracking `-0.02em` (`.agents/rules/marca.md`). Los enlaces son Geist
 `0.875rem` a opacidad `70%` que suben a `100%` en `hover`; no hay subrayado ni
 color de estado activo. La acción roja cierra la barra a la derecha y sobrevive al
 colapso móvil.

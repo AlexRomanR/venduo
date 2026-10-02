@@ -88,6 +88,7 @@ Code desde `CLAUDE.md`, así que las dos herramientas aplican los mismos estánd
 | `code-quality.md`  | TypeScript estricto, secretos, commits                           |
 | `performance.md`   | Región, sesión sin viajes, consultas en paralelo, esqueletos     |
 | `workflow.md`      | Base compartida con producción, ramas, trampas del entorno       |
+| `marca.md`         | El logo: dónde vive, sus colores, cómo se regenera               |
 
 ## Skills
 

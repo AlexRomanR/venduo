@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
+import { Logo } from "@/components/marca/logo"
+
 /**
  * El marco de las altas: `/crear`, y `/sumarme` con las vitrinas para quien
  * todavía no tiene panel.
@@ -25,11 +27,8 @@ export function Marco({
     <div className="flex min-h-screen flex-col bg-papel text-tinta">
       <header className="border-b border-tinta/15">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-5 py-3.5">
-          <Link
-            href="/"
-            className="flex min-h-11 flex-1 items-center font-titular text-lg font-extrabold tracking-[-0.02em]"
-          >
-            Venduo
+          <Link href="/" className="flex min-h-11 flex-1 items-center text-lg">
+            <Logo />
           </Link>
           {conPanel ? (
             <Link

@@ -5,6 +5,7 @@ import { ShieldCheck, UserRound } from "lucide-react"
 
 import { getPerfilPublico } from "@/lib/data/vendedor"
 import { formatMoney, formatNumber } from "@/lib/format"
+import { Logo } from "@/components/marca/logo"
 
 export async function generateMetadata({
   params,
@@ -54,11 +55,8 @@ export default async function PerfilVendedorPage({
     <div className="flex min-h-screen flex-col bg-papel text-tinta">
       <header className="border-b border-tinta/15">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-5 py-3.5">
-          <Link
-            href="/"
-            className="flex min-h-11 flex-1 items-center font-titular text-lg font-extrabold tracking-[-0.02em]"
-          >
-            Venduo
+          <Link href="/" className="flex min-h-11 flex-1 items-center text-lg">
+            <Logo />
           </Link>
           <Link
             href="/login?rol=vendedor"

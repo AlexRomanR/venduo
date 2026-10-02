@@ -40,6 +40,7 @@ import { COOKIE_BARRA } from "@/lib/preferencias"
 import { cn } from "@/lib/utils"
 import type { BarraLateral } from "@/lib/data/barra"
 import { SelloDeTienda } from "@/components/panel/tablero/sello"
+import { Logo, Simbolo } from "@/components/marca/logo"
 import {
   Sheet,
   SheetContent,
@@ -257,13 +258,23 @@ function Contenido({
           plegada ? "flex-col px-3" : "justify-between px-5"
         )}
       >
-        {plegada ? null : (
+        {plegada ? (
+          // Plegada no entra el nombre: queda el símbolo, que también lleva
+          // al panel.
           <Link
             href="/auth/destino"
             onClick={alNavegar}
-            className="flex min-h-11 items-center font-titular text-xl font-extrabold tracking-[-0.03em]"
+            className="flex size-11 items-center justify-center"
           >
-            Venduo
+            <Simbolo titulo="Venduo" className="size-7" />
+          </Link>
+        ) : (
+          <Link
+            href="/auth/destino"
+            onClick={alNavegar}
+            className="flex min-h-11 items-center text-xl"
+          >
+            <Logo />
           </Link>
         )}
 

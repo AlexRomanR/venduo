@@ -1,15 +1,27 @@
 import Link from "next/link"
 import { Check, Minus, Plus } from "lucide-react"
 
+import { getSiteUrl } from "@/lib/env"
 import { getUsuario } from "@/lib/supabase/server"
 import { DemoRedes } from "@/components/landing/demo-redes"
 import { Entra } from "@/components/landing/entra"
 import { Foto } from "@/components/landing/foto"
+import { Logo } from "@/components/marca/logo"
 
 export const metadata = {
   title: "Venduo — tu tienda online, y todo lo que hay detrás",
   description:
     "Para quien vende por TikTok, Instagram y WhatsApp: tu tienda online con stock al día, cobros con PagoFácil, pedidos ordenados y catálogos en PDF.",
+  // La tarjeta va acá y no en la raíz: una tienda sin logo la heredaría, y
+  // su enlace por WhatsApp mostraría a Venduo en vez de la tienda.
+  metadataBase: new URL(getSiteUrl()),
+  openGraph: {
+    title: "Venduo",
+    description: "Tu tienda online, y todo lo que hay detrás.",
+    siteName: "Venduo",
+    type: "website",
+    images: [{ url: "/marca/compartir.png", width: 1200, height: 630 }],
+  },
 }
 
 /**
@@ -188,8 +200,8 @@ export default async function Inicio() {
     <div className="min-h-screen bg-papel text-tinta">
       <header className="sticky top-0 z-30 border-b border-tinta/15 bg-papel/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-5 py-3.5">
-          <span className="flex-1 font-titular text-lg font-extrabold tracking-[-0.02em]">
-            Venduo
+          <span className="flex-1 text-lg">
+            <Logo />
           </span>
 
           <nav className="hidden items-center gap-6 text-sm md:flex">
@@ -574,7 +586,7 @@ export default async function Inicio() {
 
       <footer className="border-t border-tinta/15">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-2 px-5 py-8 text-sm opacity-70">
-          <span className="font-titular font-bold opacity-100">Venduo</span>
+          <Logo className="opacity-100" />
           <span className="flex-1">Santa Cruz · La Paz · Cochabamba</span>
           <a href="mailto:hola@venduo.bo" className="hover:opacity-100">
             hola@venduo.bo
