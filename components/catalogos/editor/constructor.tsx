@@ -47,7 +47,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  AVISOS_DE_CANVA,
   BotonDeCanva,
   type ModoDeCanva,
 } from "@/components/catalogos/editor/canva"
@@ -397,20 +396,6 @@ function Editor({
   const [compartible, setCompartible] = React.useState(false)
   React.useEffect(() => setCompartible(puedeCompartirArchivos()), [])
 
-  // Si se volvió de Canva con un problema, decirlo una vez y limpiar la
-  // dirección: recargar la página no tiene que repetir el aviso.
-  React.useEffect(() => {
-    if (!avisoDeCanva) return
-    const texto = AVISOS_DE_CANVA[avisoDeCanva]
-    if (texto) {
-      if (avisoDeCanva === "fallo") toast.error(texto)
-      else toast(texto)
-    }
-    const direccion = new URL(window.location.href)
-    direccion.searchParams.delete("canva")
-    window.history.replaceState(null, "", direccion)
-  }, [avisoDeCanva])
-
   const hojas = hojasDe(catalogo, datos).length
   const problemas = [
     ...faltantes(catalogo),
@@ -534,6 +519,7 @@ function Editor({
             <BotonDeCanva
               catalogo={catalogo}
               modo={canva}
+              aviso={avisoDeCanva}
               guardado={guardado}
               sinGuardar={sinGuardar}
               deshabilitado={ocupado !== null || bloqueado}

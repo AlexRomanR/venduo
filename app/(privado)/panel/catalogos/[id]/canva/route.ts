@@ -23,11 +23,20 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const origen = new URL(peticion.url).origin
+  const direccion = new URL(peticion.url)
+  const origen = direccion.origin
 
   if (!isCanvaConfigured) {
     return NextResponse.redirect(
       new URL(`/panel/catalogos/${id}?canva=sin-conectar`, origen)
+    )
+  }
+  // Canva solo acepta 127.0.0.1 como dirección de vuelta local. Desde
+  // localhost respondía que la dirección no coincide y devolvía a la persona
+  // a producción, sin sesión: mejor decirlo antes de salir.
+  if (direccion.hostname === "localhost") {
+    return NextResponse.redirect(
+      new URL(`/panel/catalogos/${id}?canva=local`, origen)
     )
   }
 

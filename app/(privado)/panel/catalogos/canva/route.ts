@@ -45,7 +45,18 @@ export async function GET(peticion: Request) {
   const volver = (motivo: string) =>
     ir(`/panel/catalogos/${pedido.catalogo}?canva=${motivo}`)
 
-  if (direccion.searchParams.get("error")) return volver("cancelado")
+  const error = direccion.searchParams.get("error")
+  if (error) {
+    // `access_denied` es la persona diciendo que no. Lo demás es Canva
+    // rechazando el pedido: una integración sin aprobar, por ejemplo.
+    if (error === "access_denied") return volver("cancelado")
+    console.error(
+      "[catalogos] Canva rechazó la autorización:",
+      error,
+      direccion.searchParams.get("error_description")
+    )
+    return volver("rechazado")
+  }
   const codigo = direccion.searchParams.get("code")
   if (!codigo || direccion.searchParams.get("state") !== pedido.estado) {
     return volver("fallo")

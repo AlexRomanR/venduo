@@ -301,8 +301,18 @@ El directo es OAuth con PKCE contra la API Connect de Canva (`lib/canva.ts`):
    segundo y medio; al terminar, se redirige al `edit_url` del diseño.
 
 **El permiso se usa en el momento y no se guarda**: no hay tabla de tokens que cuidar.
-Cualquier tropiezo devuelve al catálogo con un aviso (`?canva=fallo`, `cancelado` o
-`sin-conectar`), nunca a una página de error.
+Cualquier tropiezo devuelve al catálogo con un aviso (`?canva=fallo`, `rechazado`,
+`cancelado`, `sin-conectar` o `local`), nunca a una página de error. **El aviso ofrece
+"Llevarlo a mano"**: quien Canva no deja entrar directo —una cuenta que no puede
+autorizar una integración sin aprobar, por ejemplo— igual termina en Canva con su
+catálogo, con un paso más. `cancelado` es la persona negando el permiso
+(`access_denied`); cualquier otro error de Canva es `rechazado` y queda en el registro
+del servidor.
+
+Desde `localhost` no se sale a Canva: la dirección de vuelta sería
+`http://localhost:3000/…`, que Canva no acepta, y su respuesta era mandar a la persona a
+la primera dirección registrada —producción—, donde no tenía sesión y caía en el
+ingreso. Ahora el editor avisa que en local se entra por `127.0.0.1:3000`.
 
 La pestaña de Canva se abre en el mismo toque, antes de guardar o de bajar nada: una
 ventana que se abre después de esperar algo la bloquea el navegador.
@@ -319,8 +329,12 @@ ventana que se abre después de esperar algo la bloquea el navegador.
    `.env.local`. Son de servidor: nunca con `NEXT_PUBLIC_`.
 
 Para que la autorice cualquier cuenta, **Canva tiene que revisar y aprobar la
-integración** (las privadas son solo para equipos con plan Enterprise). Mientras tanto,
-el camino a mano funciona para todos.
+integración** (las privadas son solo para equipos con plan Enterprise). Se pide en
+**Submit for review**, y la lista de Canva exige, entre otras cosas, **no tener ninguna
+dirección local** entre las de vuelta: antes de mandarla, quitar la de `127.0.0.1`. Pide
+además una cuenta de prueba con la que probar todo, textos e imágenes para su listado, y
+seguir sus guías de marca donde se nombra a Canva. Mientras tanto, el camino a mano
+funciona para todos.
 
 **Lo que queda en Canva es una copia.** Los precios y el stock quedan como el día que se
 mandó: para actualizarlos, se vuelve a mandar desde Venduo.

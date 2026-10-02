@@ -41,17 +41,25 @@ const CANVA_PDF = "https://www.canva.com/pdf-editor/"
 
 export type ModoDeCanva = "directo" | "a-mano"
 
-export const AVISOS_DE_CANVA: Record<string, string> = {
-  fallo:
-    "Canva no pudo abrir el catálogo. Bájalo en PDF y súbelo a Canva a mano.",
-  cancelado: "No se abrió Canva: hace falta que des el permiso.",
-  "sin-conectar":
-    "Canva todavía no está conectado: el catálogo se lleva en PDF, a mano.",
+/** Lo que se dice al volver de Canva sin el diseño. Siempre se ofrece el camino a mano. */
+const AVISOS_DE_CANVA: Record<string, { texto: string; error?: boolean }> = {
+  fallo: { texto: "Canva no pudo abrir el catálogo.", error: true },
+  rechazado: {
+    texto: "Canva no dejó abrir el catálogo directo con tu cuenta.",
+    error: true,
+  },
+  cancelado: { texto: "No se abrió Canva: hace falta que des el permiso." },
+  "sin-conectar": { texto: "Canva todavía no está conectado." },
+  local: {
+    texto:
+      "Para abrir Canva directo en tu computadora, entra por 127.0.0.1:3000 y no por localhost.",
+  },
 }
 
 export function BotonDeCanva({
   catalogo,
   modo,
+  aviso = null,
   guardado,
   sinGuardar,
   deshabilitado,
@@ -59,6 +67,8 @@ export function BotonDeCanva({
 }: {
   catalogo: Catalogo
   modo: ModoDeCanva
+  /** Lo que pasó al volver de Canva, si se volvió sin el diseño. */
+  aviso?: string | null
   guardado: { id: string; enlace: string } | null
   sinGuardar: boolean
   deshabilitado: boolean
@@ -85,6 +95,34 @@ export function BotonDeCanva({
         )
       })
   }
+
+  // El aviso ofrece el camino a mano: quien Canva no deja entrar directo
+  // igual termina en Canva con su catálogo. Se lee la versión al día.
+  const aManoAlDia = React.useRef(aMano)
+  React.useEffect(() => {
+    aManoAlDia.current = aMano
+  })
+
+  // Una vez, y se limpia la dirección: recargar no tiene que repetirlo.
+  const avisado = React.useRef(false)
+  React.useEffect(() => {
+    if (!aviso || avisado.current) return
+    avisado.current = true
+    const direccion = new URL(window.location.href)
+    direccion.searchParams.delete("canva")
+    window.history.replaceState(null, "", direccion)
+    const mensaje = AVISOS_DE_CANVA[aviso]
+    if (!mensaje) return
+    const opciones = {
+      duration: 15_000,
+      action: {
+        label: "Llevarlo a mano",
+        onClick: () => aManoAlDia.current(),
+      },
+    }
+    if (mensaje.error) toast.error(mensaje.texto, opciones)
+    else toast(mensaje.texto, opciones)
+  }, [aviso])
 
   async function directo() {
     // La pestaña se abre ya, en el toque; se la manda a Canva cuando el
