@@ -8,16 +8,26 @@ import {
 } from "node:crypto"
 import { z } from "zod"
 
+import { hojasDe } from "@/lib/catalogos/datos"
+import { problemasDeEstilo } from "@/lib/catalogos/estilo"
+import { catalogoEnPdf } from "@/lib/catalogos/pdf"
+import { getCatalogo, getMaterialDelCatalogo } from "@/lib/data/catalogos"
 import { env, isCanvaConfigured } from "@/lib/env"
+import { createAdminClient } from "@/lib/supabase/server"
 
 /*
  * Editar un catálogo en Canva, directo.
  *
  * Canva no recibe un catálogo: recibe un PDF y lo convierte en un diseño
  * editable de la cuenta de la persona —textos, fotos y colores—, y devuelve el
- * enlace para seguir en su editor. Para eso la persona autoriza a Venduo una
- * vez por pedido, con OAuth y PKCE, y el permiso se usa en el momento y no se
- * guarda: no hay tabla de tokens que cuidar.
+ * enlace para seguir en su editor.
+ *
+ * **La aprobación se pide una sola vez.** La primera, la persona autoriza con
+ * OAuth y PKCE, y se guarda el token de renovación que entrega Canva, cifrado,
+ * en `social_connections`. Las siguientes se cambia por un permiso nuevo sin
+ * pasar por su pantalla. Canva da un token de renovación distinto cada vez, y
+ * se guarda el nuevo. Si ya no sirve —la persona quitó el acceso desde Canva—
+ * se borra y se vuelve a pedir la aprobación.
  *
  * Necesita una integración creada en el portal de desarrolladores de Canva,
  * con el alcance `design:content:write` y la dirección de vuelta
@@ -40,6 +50,56 @@ export function direccionDeVuelta(origen: string): string {
 }
 
 /* ---------------------------------------------------------------------------
+ * Cifrado
+ * ------------------------------------------------------------------------ */
+
+function aBase64Url(datos: Buffer): string {
+  return datos.toString("base64url")
+}
+
+/**
+ * La llave de cada uso, derivada del secreto de la integración.
+ *
+ * Cambiar el secreto invalida los tokens guardados: no se pueden descifrar, se
+ * descartan y la persona vuelve a aprobar una vez.
+ */
+function llave(uso: "pedido" | "token"): Buffer {
+  return createHash("sha256")
+    .update(`venduo-canva:${uso}:${env.CANVA_CLIENT_SECRET ?? ""}`)
+    .digest()
+}
+
+/** AES-256-GCM: el vector, la etiqueta y el texto cifrado, en base64url. */
+function cifrar(texto: string, uso: "pedido" | "token"): string {
+  const iv = randomBytes(12)
+  const cifrador = createCipheriv("aes-256-gcm", llave(uso), iv)
+  const cifrado = Buffer.concat([
+    cifrador.update(texto, "utf8"),
+    cifrador.final(),
+  ])
+  return aBase64Url(Buffer.concat([iv, cifrador.getAuthTag(), cifrado]))
+}
+
+/** El texto, o `null` si no es auténtico. */
+function descifrar(valor: string, uso: "pedido" | "token"): string | null {
+  try {
+    const crudo = Buffer.from(valor, "base64url")
+    const descifrador = createDecipheriv(
+      "aes-256-gcm",
+      llave(uso),
+      crudo.subarray(0, 12)
+    )
+    descifrador.setAuthTag(crudo.subarray(12, 28))
+    return Buffer.concat([
+      descifrador.update(crudo.subarray(28)),
+      descifrador.final(),
+    ]).toString("utf8")
+  } catch {
+    return null
+  }
+}
+
+/* ---------------------------------------------------------------------------
  * El pedido en curso
  * ------------------------------------------------------------------------ */
 
@@ -51,17 +111,6 @@ const pedidoSchema = z.object({
 })
 
 export type PedidoACanva = z.infer<typeof pedidoSchema>
-
-function aBase64Url(datos: Buffer): string {
-  return datos.toString("base64url")
-}
-
-/** La llave de la cookie, derivada del secreto de la integración. */
-function llave(): Buffer {
-  return createHash("sha256")
-    .update(`venduo-canva:${env.CANVA_CLIENT_SECRET ?? ""}`)
-    .digest()
-}
 
 /**
  * Un pedido nuevo: el estado contra la falsificación y el verificador de PKCE.
@@ -80,32 +129,16 @@ export function pedidoNuevo(catalogo: string): {
     catalogo,
     vence: Date.now() + 10 * 60_000,
   }
-  const iv = randomBytes(12)
-  const cifrador = createCipheriv("aes-256-gcm", llave(), iv)
-  const cifrado = Buffer.concat([
-    cifrador.update(JSON.stringify(pedido), "utf8"),
-    cifrador.final(),
-  ])
-  const cookie = aBase64Url(Buffer.concat([iv, cifrador.getAuthTag(), cifrado]))
-  return { pedido, cookie }
+  return { pedido, cookie: cifrar(JSON.stringify(pedido), "pedido") }
 }
 
 /** El pedido guardado en la cookie, si es auténtico y no venció. */
 export function leerPedido(cookie: string | undefined): PedidoACanva | null {
   // Sin la integración, la llave saldría de un secreto vacío.
   if (!cookie || !isCanvaConfigured) return null
+  const texto = descifrar(cookie, "pedido")
+  if (!texto) return null
   try {
-    const crudo = Buffer.from(cookie, "base64url")
-    const descifrador = createDecipheriv(
-      "aes-256-gcm",
-      llave(),
-      crudo.subarray(0, 12)
-    )
-    descifrador.setAuthTag(crudo.subarray(12, 28))
-    const texto = Buffer.concat([
-      descifrador.update(crudo.subarray(28)),
-      descifrador.final(),
-    ]).toString("utf8")
     const pedido = pedidoSchema.parse(JSON.parse(texto))
     return pedido.vence > Date.now() ? pedido : null
   } catch {
@@ -134,41 +167,187 @@ export function direccionDeAutorizacion(
 }
 
 /* ---------------------------------------------------------------------------
- * La API
+ * Los permisos
  * ------------------------------------------------------------------------ */
 
-const tokenSchema = z.object({ access_token: z.string().min(1) })
+const tokenSchema = z.object({
+  access_token: z.string().min(1),
+  refresh_token: z.string().min(1).optional(),
+})
 
-/** Cambia el código de la vuelta por un permiso de un solo uso. */
-export async function pedirPermiso(
-  codigo: string,
-  verificador: string,
-  vuelta: string
-): Promise<string> {
-  const credenciales = Buffer.from(
+export interface Permiso {
+  /** Para llamar a la API ahora. No se guarda. */
+  acceso: string
+  /** Para pedir el próximo sin la pantalla de Canva. Se guarda cifrado. */
+  renovacion: string | null
+}
+
+/** Un rechazo de Canva al pedir un permiso, con su código HTTP. */
+class RechazoDeCanva extends Error {
+  constructor(
+    readonly estado: number,
+    detalle: string
+  ) {
+    super(`Canva no dio el permiso (${estado}): ${detalle}`)
+  }
+}
+
+function credenciales(): string {
+  return Buffer.from(
     `${env.CANVA_CLIENT_ID}:${env.CANVA_CLIENT_SECRET}`
   ).toString("base64")
+}
+
+async function pedirToken(cuerpo: Record<string, string>): Promise<Permiso> {
   const respuesta = await fetch(`${API}/oauth/token`, {
     method: "POST",
     headers: {
-      Authorization: `Basic ${credenciales}`,
+      Authorization: `Basic ${credenciales()}`,
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: new URLSearchParams({
-      grant_type: "authorization_code",
-      code: codigo,
-      code_verifier: verificador,
-      redirect_uri: vuelta,
-    }),
+    body: new URLSearchParams(cuerpo),
     signal: AbortSignal.timeout(15_000),
   })
   if (!respuesta.ok) {
-    throw new Error(
-      `Canva no dio el permiso (${respuesta.status}): ${await respuesta.text()}`
-    )
+    throw new RechazoDeCanva(respuesta.status, await respuesta.text())
   }
-  return tokenSchema.parse(await respuesta.json()).access_token
+  const token = tokenSchema.parse(await respuesta.json())
+  return { acceso: token.access_token, renovacion: token.refresh_token ?? null }
 }
+
+/** Cambia el código de la vuelta por un permiso. */
+export function pedirPermiso(
+  codigo: string,
+  verificador: string,
+  vuelta: string
+): Promise<Permiso> {
+  return pedirToken({
+    grant_type: "authorization_code",
+    code: codigo,
+    code_verifier: verificador,
+    redirect_uri: vuelta,
+  })
+}
+
+/* ---------------------------------------------------------------------------
+ * La conexión guardada
+ * ------------------------------------------------------------------------ */
+
+/*
+ * La conexión vive en `social_connections`, una fila por tienda y proveedor,
+ * con RLS activo y cero políticas: solo la toca el servidor, con la clave de
+ * servicio. Quien llama ya resolvió la tienda con la sesión de la persona.
+ */
+
+/** Guarda el token de renovación de la tienda, cifrado. */
+export async function guardarConexion(
+  tienda: string,
+  renovacion: string
+): Promise<void> {
+  const admin = createAdminClient()
+  if (!admin) return
+  const { error } = await admin.from("social_connections").upsert(
+    {
+      store_id: tienda,
+      provider: "canva",
+      refresh_token: cifrar(renovacion, "token"),
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "store_id,provider" }
+  )
+  // Sin guardarlo, la próxima vez se vuelve a pedir la aprobación: molesto,
+  // no grave. No vale cortar el viaje a Canva por eso.
+  if (error) console.error("[canva] no se pudo guardar la conexión:", error)
+}
+
+async function borrarConexion(tienda: string): Promise<void> {
+  const admin = createAdminClient()
+  if (!admin) return
+  await admin
+    .from("social_connections")
+    .delete()
+    .eq("store_id", tienda)
+    .eq("provider", "canva")
+}
+
+async function renovacionGuardada(tienda: string): Promise<string | null> {
+  const admin = createAdminClient()
+  if (!admin) return null
+  const { data } = await admin
+    .from("social_connections")
+    .select("refresh_token")
+    .eq("store_id", tienda)
+    .eq("provider", "canva")
+    .maybeSingle()
+  return data?.refresh_token ? descifrar(data.refresh_token, "token") : null
+}
+
+/** Si la tienda ya aprobó a Venduo en Canva. */
+export async function estaConectado(tienda: string): Promise<boolean> {
+  if (!isCanvaConfigured) return false
+  return (await renovacionGuardada(tienda)) !== null
+}
+
+/**
+ * Un permiso nuevo sin pasar por la pantalla de Canva, o `null` si hay que
+ * pedir la aprobación.
+ *
+ * El token viejo deja de servir al renovarlo: el nuevo se guarda antes de
+ * seguir. Si Canva lo rechaza, se borra; si el problema fue de red, se deja,
+ * y la aprobación que sigue lo reemplaza igual.
+ */
+export async function permisoGuardado(tienda: string): Promise<string | null> {
+  if (!isCanvaConfigured) return null
+  const renovacion = await renovacionGuardada(tienda)
+  if (!renovacion) return null
+  try {
+    const permiso = await pedirToken({
+      grant_type: "refresh_token",
+      refresh_token: renovacion,
+    })
+    if (permiso.renovacion) await guardarConexion(tienda, permiso.renovacion)
+    return permiso.acceso
+  } catch (error) {
+    if (
+      error instanceof RechazoDeCanva &&
+      (error.estado === 400 || error.estado === 401)
+    ) {
+      await borrarConexion(tienda)
+    } else {
+      console.error("[canva] no se pudo renovar el permiso:", error)
+    }
+    return null
+  }
+}
+
+/**
+ * Desconecta la tienda: Canva revoca el token —y con él su aprobación— y se
+ * borra la fila. Aunque Canva no responda, la fila se borra: lo que la persona
+ * pidió es que Venduo deje de tener acceso.
+ */
+export async function desconectarCanva(tienda: string): Promise<void> {
+  const renovacion = await renovacionGuardada(tienda)
+  if (renovacion && isCanvaConfigured) {
+    try {
+      await fetch(`${API}/oauth/revoke`, {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${credenciales()}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ token: renovacion }),
+        signal: AbortSignal.timeout(10_000),
+      })
+    } catch (error) {
+      console.error("[canva] no se pudo revocar el permiso:", error)
+    }
+  }
+  await borrarConexion(tienda)
+}
+
+/* ---------------------------------------------------------------------------
+ * La importación
+ * ------------------------------------------------------------------------ */
 
 const trabajoSchema = z.object({
   job: z.object({
@@ -192,15 +371,15 @@ const trabajoSchema = z.object({
  * La importación es un trabajo que tarda unos segundos: se consulta cada
  * segundo y medio hasta que termina, dentro del tiempo de la función.
  */
-export async function importarEnCanva(
-  permiso: string,
+async function importarEnCanva(
+  acceso: string,
   pdf: Buffer,
   titulo: string
 ): Promise<string> {
   const respuesta = await fetch(`${API}/imports`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${permiso}`,
+      Authorization: `Bearer ${acceso}`,
       "Content-Type": "application/octet-stream",
       "Import-Metadata": JSON.stringify({
         // Canva acepta hasta 50 caracteres de título, en base64.
@@ -227,7 +406,7 @@ export async function importarEnCanva(
   ) {
     await new Promise((listo) => setTimeout(listo, 1_500))
     const consulta = await fetch(`${API}/imports/${job.id}`, {
-      headers: { Authorization: `Bearer ${permiso}` },
+      headers: { Authorization: `Bearer ${acceso}` },
       signal: AbortSignal.timeout(10_000),
     })
     if (!consulta.ok) {
@@ -244,4 +423,28 @@ export async function importarEnCanva(
       ? `Canva no pudo importar el PDF: ${job.error.code} ${job.error.message}`
       : "Canva tardó demasiado en importar el PDF"
   )
+}
+
+/**
+ * El catálogo guardado, con los precios de hoy, convertido en un diseño de
+ * Canva. Devuelve el enlace a su editor, o `null` si el catálogo no existe o
+ * no se puede armar. Un rechazo de Canva se lanza.
+ */
+export async function catalogoACanva(
+  acceso: string,
+  catalogo: string
+): Promise<string | null> {
+  const [abierto, { datos }] = await Promise.all([
+    getCatalogo(catalogo),
+    getMaterialDelCatalogo(),
+  ])
+  if (
+    !abierto ||
+    problemasDeEstilo(abierto.catalogo.estilo).length > 0 ||
+    hojasDe(abierto.catalogo, datos).length === 0
+  ) {
+    return null
+  }
+  const pdf = await catalogoEnPdf(abierto.catalogo, datos)
+  return importarEnCanva(acceso, pdf, abierto.catalogo.nombre)
 }

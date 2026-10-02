@@ -210,7 +210,9 @@ Las políticas RLS van juntas en su propio archivo, para poder auditarlas de una
 
 Dos tablas tienen RLS activo y **cero políticas**, a propósito. No agregarles.
 
-`social_connections` guarda tokens de Meta y solo se accede con la clave de servicio.
+`social_connections` guarda los tokens de las conexiones de la tienda —Meta y Canva— y solo
+se accede con la clave de servicio. El de Canva llega además cifrado por la aplicación
+(`lib/canva.ts`): leer la fila no da acceso a la cuenta de nadie.
 
 `store_invites` guarda el código de invitación de cada tienda. Ni siquiera el dueño la
 lee con un `select`: llega a su código por `my_seller_invite()`, que es

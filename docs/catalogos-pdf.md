@@ -290,17 +290,32 @@ Hay dos caminos, y el editor elige solo (`ModoDeCanva`, en
 | **Directo** | Con `CANVA_CLIENT_ID` y `CANVA_CLIENT_SECRET` | Se guarda, la persona autoriza en Canva y queda en el editor de Canva con el diseño |
 | **A mano**  | Sin esas variables, y siempre en el modo demo | Se baja el PDF y se abre el editor de PDF de Canva, donde se sube                   |
 
-El directo es OAuth con PKCE contra la API Connect de Canva (`lib/canva.ts`):
+El directo es OAuth con PKCE contra la API Connect de Canva (`lib/canva.ts`), y **la
+aprobación se pide una sola vez por tienda**:
 
-1. `GET /panel/catalogos/{id}/canva` arma el pedido —el estado y el verificador— y lo
-   guarda en una cookie `HttpOnly` cifrada con AES-GCM, con una llave derivada del
-   secreto: Canva pide que el verificador no lo pueda leer ni el navegador.
+1. `GET /panel/catalogos/{id}/canva` busca la conexión guardada. Si la hay, cambia el
+   token de renovación por un permiso nuevo, arma el PDF, lo importa y va directo al
+   editor de Canva, sin su pantalla. Si no la hay —o Canva ya no la acepta—, arma el
+   pedido —el estado y el verificador— y lo guarda en una cookie `HttpOnly` cifrada
+   con AES-GCM: Canva pide que el verificador no lo pueda leer ni el navegador.
 2. Canva vuelve a `/panel/catalogos/canva` con un código. Se comprueba el estado, se
-   cambia el código por un permiso y, a la vez, se arma el PDF con los precios de hoy.
-3. `POST /v1/imports` sube el PDF. La importación es un trabajo que se consulta cada
-   segundo y medio; al terminar, se redirige al `edit_url` del diseño.
+   cambia el código por un permiso y se guarda la conexión.
+3. `POST /v1/imports` sube el PDF con los precios de hoy. La importación es un trabajo
+   que se consulta cada segundo y medio; al terminar, se redirige al `edit_url`.
 
-**El permiso se usa en el momento y no se guarda**: no hay tabla de tokens que cuidar.
+**La conexión es el token de renovación, cifrado, en `social_connections`** —la tabla
+de las conexiones de la tienda con servicios de afuera, con proveedor `canva`—. Se
+cifra en la aplicación con una llave que sale del secreto de la integración, así que
+leer la tabla no da acceso a ninguna cuenta de Canva, y cambiar el secreto las
+invalida todas: cada tienda vuelve a aprobar una vez. El permiso de cuatro horas que
+se obtiene con él no se guarda.
+
+Canva entrega un token de renovación nuevo en cada renovación, y el viejo deja de
+servir: se guarda el nuevo antes de seguir. Si Canva lo rechaza (400 o 401), la fila se
+borra y se vuelve a pedir la aprobación; si el problema fue de red, se deja.
+**"Desconectar Canva"**, en `/cuenta`, revoca el token en Canva —eso retira también la
+aprobación— y borra la fila.
+
 Cualquier tropiezo devuelve al catálogo con un aviso (`?canva=fallo`, `rechazado`,
 `cancelado`, `sin-conectar` o `local`), nunca a una página de error. **El aviso ofrece
 "Llevarlo a mano"**: quien Canva no deja entrar directo —una cuenta que no puede

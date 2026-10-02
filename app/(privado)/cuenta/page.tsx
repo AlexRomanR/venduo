@@ -1,9 +1,19 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { ArrowUpRight, IdCard, QrCode, Store, UserRound } from "lucide-react"
+import {
+  ArrowUpRight,
+  IdCard,
+  Paintbrush,
+  QrCode,
+  Store,
+  UserRound,
+} from "lucide-react"
 
+import { estaConectado, isCanvaConfigured } from "@/lib/canva"
 import { getCuenta } from "@/lib/data/cuenta"
 import { isSupabaseConfigured } from "@/lib/env"
+import { getMiTienda } from "@/lib/data/panel"
+import { ConexionCanva } from "@/components/cuenta/canva"
 import {
   FormPersona,
   FormTienda,
@@ -37,7 +47,10 @@ function Ver({ href, children }: { href: string; children: string }) {
  * cambiar de lugar. Cada una en su panel, y cada panel se guarda por su lado.
  */
 export default async function CuentaPage() {
-  const cuenta = await getCuenta()
+  const [cuenta, conCanva] = await Promise.all([
+    getCuenta(),
+    getMiTienda().then((tienda) => (tienda ? estaConectado(tienda.id) : false)),
+  ])
 
   // Sin sesión no hay cuenta que editar; el modo demo tampoco tiene una.
   if (!cuenta) {
@@ -110,6 +123,18 @@ export default async function CuentaPage() {
           relleno
         >
           <FormCobro cuenta={cuenta} />
+        </Seccion>
+      ) : null}
+
+      {cuenta.tienda && isCanvaConfigured ? (
+        <Seccion
+          id="canva"
+          icono={Paintbrush}
+          titulo="Tu cuenta de Canva"
+          bajada="Para abrir tus catálogos en Canva sin aprobar el acceso cada vez."
+          relleno
+        >
+          <ConexionCanva conectado={conCanva} />
         </Seccion>
       ) : null}
 

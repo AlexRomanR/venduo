@@ -2,33 +2,32 @@ import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
 import {
+  catalogoACanva,
   COOKIE_DE_CANVA,
   direccionDeVuelta,
-  importarEnCanva,
+  guardarConexion,
   leerPedido,
   pedirPermiso,
 } from "@/lib/canva"
-import { hojasDe } from "@/lib/catalogos/datos"
-import { problemasDeEstilo } from "@/lib/catalogos/estilo"
-import { catalogoEnPdf } from "@/lib/catalogos/pdf"
-import { getCatalogo, getMaterialDelCatalogo } from "@/lib/data/catalogos"
+import { getMiTienda } from "@/lib/data/panel"
 
 export const dynamic = "force-dynamic"
 /** Armar el PDF y esperar a que Canva lo importe puede tardar más que lo de siempre. */
 export const maxDuration = 60
 
 /**
- * La vuelta desde Canva: cambia el código por un permiso, arma el PDF del
- * catálogo con los precios de hoy, lo importa como diseño de la persona y la
- * manda al editor de Canva.
+ * La vuelta desde Canva: cambia el código por un permiso, guarda la conexión
+ * para no volver a pedir la aprobación, arma el PDF del catálogo con los
+ * precios de hoy, lo importa como diseño de la persona y la manda al editor de
+ * Canva.
  *
  * Cualquier tropiezo la devuelve al catálogo con un aviso, nunca a una página
- * de error: lo que ve es "no se pudo, bájalo y súbelo a mano".
+ * de error: lo que ve es "no se pudo, llévalo a mano".
  */
 export async function GET(peticion: Request) {
   const direccion = new URL(peticion.url)
   const origen = direccion.origin
-  const almacen = await cookies()
+  const [almacen, tienda] = await Promise.all([cookies(), getMiTienda()])
   const pedido = leerPedido(almacen.get(COOKIE_DE_CANVA)?.value)
 
   const ir = (ruta: string) => {
@@ -41,7 +40,7 @@ export async function GET(peticion: Request) {
     return respuesta
   }
 
-  if (!pedido) return ir("/panel/catalogos")
+  if (!pedido || !tienda) return ir("/panel/catalogos")
   const volver = (motivo: string) =>
     ir(`/panel/catalogos/${pedido.catalogo}?canva=${motivo}`)
 
@@ -63,23 +62,18 @@ export async function GET(peticion: Request) {
   }
 
   try {
-    const [abierto, { datos }] = await Promise.all([
-      getCatalogo(pedido.catalogo),
-      getMaterialDelCatalogo(),
+    const permiso = await pedirPermiso(
+      codigo,
+      pedido.verificador,
+      direccionDeVuelta(origen)
+    )
+    const [edicion] = await Promise.all([
+      catalogoACanva(permiso.acceso, pedido.catalogo),
+      permiso.renovacion
+        ? guardarConexion(tienda.id, permiso.renovacion)
+        : null,
     ])
-    if (
-      !abierto ||
-      problemasDeEstilo(abierto.catalogo.estilo).length > 0 ||
-      hojasDe(abierto.catalogo, datos).length === 0
-    ) {
-      return volver("fallo")
-    }
-
-    const [permiso, pdf] = await Promise.all([
-      pedirPermiso(codigo, pedido.verificador, direccionDeVuelta(origen)),
-      catalogoEnPdf(abierto.catalogo, datos),
-    ])
-    const edicion = await importarEnCanva(permiso, pdf, abierto.catalogo.nombre)
+    if (!edicion) return volver("fallo")
 
     const respuesta = NextResponse.redirect(edicion)
     respuesta.cookies.set(COOKIE_DE_CANVA, "", {

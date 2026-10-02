@@ -146,7 +146,7 @@ components/
   onboarding/         Altas: marco, pasos y carrusel de plantillas
   explorar/           Vitrinas: navegación, buscador, paginación y listas
   editor/             El editor: pasos, vista previa, secciones, imágenes y la IA
-  cuenta/             Formularios de ajustes y foto de perfil
+  cuenta/             Formularios de ajustes, foto de perfil y la conexión con Canva
   insights/           Cuaderno, tablero y gráficos SVG
   pedidos/            Lista, detalle y estados de un pedido
   productos/          Catálogo: lista, filtros, formulario, fotos y categorías

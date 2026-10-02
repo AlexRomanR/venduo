@@ -442,14 +442,14 @@ El **precio de un pack** se muestra en el catálogo y nada más: la tienda onlin
 
 El enlace compartido lo abre cualquiera, sin cuenta. Lo lee `catalogo_compartido`, que devuelve un solo catálogo por su token y solo si la tienda se sirve al público; la tabla no tiene política para anónimos.
 
-**Llevarlo a Canva no guarda nada.** Canva recibe el PDF y lo convierte en un diseño de la cuenta de la persona; el permiso que da se usa en ese momento y se descarta, así que no hay tokens de Canva que cuidar. Lo que queda allá es una copia: no sigue los precios del día.
+**Llevarlo a Canva pide la aprobación una sola vez.** Canva recibe el PDF y lo convierte en un diseño de la cuenta de la persona. La primera vez la tienda autoriza a Venduo, y se guarda en `social_connections` el token de renovación que entrega Canva, cifrado por la aplicación; las siguientes se renueva sin su pantalla. Desde su cuenta, la persona puede desconectar Canva: se revoca el token y se borra. Lo que queda en Canva es una copia: no sigue los precios del día.
 
 #### IA y difusión
 
 | Tabla                | Qué guarda                                                                                                                                                       |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ai_generations`     | Historial de todo lo que generó la IA: tipo, proveedor, modelo, prompt y salida                                                                                  |
-| `social_connections` | Credenciales de Facebook y WhatsApp por tienda. **Sin políticas de lectura: solo accesible desde el servidor**                                                   |
+| `social_connections` | Credenciales de Facebook, WhatsApp y Canva por tienda. **Sin políticas de lectura: solo accesible desde el servidor**                                            |
 | `social_posts`       | Posteos generados. Su estado distingue `publicado` por API de `compartido` manualmente, que es lo que permite sostener el plan A y el plan B con el mismo modelo |
 
 ### Comisiones: el congelamiento

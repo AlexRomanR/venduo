@@ -764,6 +764,7 @@ export type Database = {
           external_account_id: string | null
           id: string
           provider: Database["public"]["Enums"]["social_provider"]
+          refresh_token: string | null
           store_id: string
           updated_at: string
         }
@@ -774,6 +775,7 @@ export type Database = {
           external_account_id?: string | null
           id?: string
           provider: Database["public"]["Enums"]["social_provider"]
+          refresh_token?: string | null
           store_id: string
           updated_at?: string
         }
@@ -784,6 +786,7 @@ export type Database = {
           external_account_id?: string | null
           id?: string
           provider?: Database["public"]["Enums"]["social_provider"]
+          refresh_token?: string | null
           store_id?: string
           updated_at?: string
         }
@@ -1627,7 +1630,7 @@ export type Database = {
       seller_join_mode: "abierta" | "con_aprobacion"
       seller_status: "pendiente" | "activo" | "rechazado" | "suspendido"
       social_post_status: "borrador" | "publicado" | "compartido" | "fallido"
-      social_provider: "facebook" | "whatsapp"
+      social_provider: "facebook" | "whatsapp" | "canva"
       subscription_status: "prueba" | "activa" | "bloqueada" | "cancelada"
       user_role: "emprendedor" | "vendedor"
     }
@@ -1780,7 +1783,7 @@ export const Constants = {
       seller_join_mode: ["abierta", "con_aprobacion"],
       seller_status: ["pendiente", "activo", "rechazado", "suspendido"],
       social_post_status: ["borrador", "publicado", "compartido", "fallido"],
-      social_provider: ["facebook", "whatsapp"],
+      social_provider: ["facebook", "whatsapp", "canva"],
       subscription_status: ["prueba", "activa", "bloqueada", "cancelada"],
       user_role: ["emprendedor", "vendedor"],
     },

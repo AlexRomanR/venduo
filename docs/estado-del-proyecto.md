@@ -61,7 +61,8 @@ Actualizado el 1 de octubre de 2026.
   la hoja de compartir del teléfono o se manda un enlace (`/c/{token}`) que abre siempre
   con los precios y el stock del día.
 - **Editar en Canva**: con la integración configurada, el catálogo se abre en Canva como
-  un diseño editable; sin ella, se baja el PDF y se abre el editor de PDF de Canva para
+  un diseño editable, y la aprobación se pide una sola vez por tienda (se desconecta
+  desde `/cuenta`); sin ella, se baja el PDF y se abre el editor de PDF de Canva para
   subirlo.
 - Funciona en modo demo, salvo guardar. Todo en `docs/catalogos-pdf.md`.
 
