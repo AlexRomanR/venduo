@@ -82,6 +82,11 @@ ejemplo—, devolverlas a como estaban.
 Los puntos de control son 375 px y 1280 px (`ui-styling.md`). Las capturas de Playwright
 van a `.playwright-mcp/`, que está ignorada: no guardarlas en otro lado del repositorio.
 
+**En el navegador de Playwright, toda descarga queda en una carpeta temporal, con un
+nombre al azar y sin extensión.** Es la herramienta, no la página: el nombre que eligió
+la página es el que Playwright informa como sugerido. Una descarga se prueba de verdad en
+un navegador normal.
+
 ## Documentos que hay que mantener al día
 
 | Al terminar…                     | Actualizar                                     |

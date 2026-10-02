@@ -16,6 +16,8 @@ import type { Catalogo, Estilo, Pack } from "@/lib/catalogos/modelo"
 import {
   PLANTILLAS_DE_CATALOGO,
   armarCatalogo,
+  armarConEstilo,
+  type EstiloSugerido,
 } from "@/lib/catalogos/plantillas"
 import { cn } from "@/lib/utils"
 import { hojasConContexto } from "@/components/catalogos/documento"
@@ -24,6 +26,62 @@ import {
   useAncho,
 } from "@/components/catalogos/editor/vista-previa"
 
+interface Comunes {
+  productos: ProductoDelCatalogo[]
+  datos: DatosDelCatalogo
+  nombre: string
+  packs?: Pack[]
+  alElegir: (catalogo: Catalogo) => void
+}
+
+/**
+ * Los estilos que salen de la tienda —tal cual, su color a toda hoja, en
+ * oscuro y en tonos de su color—, cada uno con la plantilla que mejor lo luce
+ * y armado con los productos elegidos.
+ */
+export function GaleriaDeEstilos({
+  sugeridos,
+  ...comunes
+}: Comunes & { sugeridos: EstiloSugerido[] }) {
+  const { productos, datos, nombre, packs } = comunes
+  const muestras = React.useMemo(
+    () =>
+      sugeridos.map((sugerido) => {
+        const catalogo = armarConEstilo(sugerido, {
+          nombre,
+          productos,
+          tienda: {
+            nombre: datos.tienda.nombre,
+            whatsapp: datos.tienda.whatsapp,
+          },
+          packs,
+        })
+        return {
+          sugerido,
+          catalogo,
+          hojas: hojasConContexto(catalogo, datos).slice(0, 2),
+        }
+      }),
+    [sugeridos, productos, datos, nombre, packs]
+  )
+
+  return (
+    <ul className="grid grid-cols-1 gap-px bg-tinta/15 md:grid-cols-2">
+      {muestras.map(({ sugerido, catalogo, hojas }) => (
+        <li key={sugerido.clave} className="bg-papel">
+          <Muestra
+            nombre={sugerido.nombre}
+            detalle={sugerido.detalle}
+            pie={`Plantilla ${PLANTILLAS_DE_CATALOGO[sugerido.plantilla].nombre}`}
+            hojas={hojas}
+            alElegir={() => comunes.alElegir(catalogo)}
+          />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 /**
  * Las doce plantillas, cada una armada con los productos elegidos.
  *
@@ -31,24 +89,16 @@ import {
  * que contestar es cómo se ven mis productos así, no cómo se ve la plantilla.
  */
 export function GaleriaDePlantillas({
-  productos,
-  datos,
   estilo,
-  nombre,
-  packs,
   actual,
   sugerida,
-  alElegir,
-}: {
-  productos: ProductoDelCatalogo[]
-  datos: DatosDelCatalogo
+  ...comunes
+}: Comunes & {
   estilo: Estilo
-  nombre: string
-  packs?: Pack[]
   actual?: ClavePlantilla
   sugerida?: ClavePlantilla | null
-  alElegir: (catalogo: Catalogo) => void
 }) {
+  const { productos, datos, nombre, packs } = comunes
   const muestras = React.useMemo(
     () =>
       CLAVES_PLANTILLA.map((clave) => {
@@ -74,35 +124,43 @@ export function GaleriaDePlantillas({
 
   return (
     <ul className="grid grid-cols-1 gap-px bg-tinta/15 md:grid-cols-2 2xl:grid-cols-3">
-      {muestras.map(({ clave, catalogo, hojas }) => (
-        <li key={clave} className="bg-papel">
-          <Muestra
-            clave={clave}
-            hojas={hojas}
-            actual={clave === actual}
-            sugerida={clave === sugerida}
-            alElegir={() => alElegir(catalogo)}
-          />
-        </li>
-      ))}
+      {muestras.map(({ clave, catalogo, hojas }) => {
+        const plantilla = PLANTILLAS_DE_CATALOGO[clave]
+        return (
+          <li key={clave} className="bg-papel">
+            <Muestra
+              nombre={plantilla.nombre}
+              detalle={plantilla.detalle}
+              pie={`${plantilla.ideal} · ${HOJAS[plantilla.hoja].nombre}`}
+              hojas={hojas}
+              actual={clave === actual}
+              sugerida={clave === sugerida}
+              alElegir={() => comunes.alElegir(catalogo)}
+            />
+          </li>
+        )
+      })}
     </ul>
   )
 }
 
 function Muestra({
-  clave,
+  nombre,
+  detalle,
+  pie,
   hojas,
-  actual,
-  sugerida,
+  actual = false,
+  sugerida = false,
   alElegir,
 }: {
-  clave: ClavePlantilla
+  nombre: string
+  detalle: string
+  pie: string
   hojas: ReturnType<typeof hojasConContexto>
-  actual: boolean
-  sugerida: boolean
+  actual?: boolean
+  sugerida?: boolean
   alElegir: () => void
 }) {
-  const plantilla = PLANTILLAS_DE_CATALOGO[clave]
   const [ref, ancho] = useAncho<HTMLDivElement>()
   const anchoDeHoja = Math.max(0, (ancho - 12) / 2)
 
@@ -136,7 +194,7 @@ function Muestra({
       <div>
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="font-titular text-lg leading-tight font-bold tracking-[-0.02em]">
-            {plantilla.nombre}
+            {nombre}
           </h3>
           {sugerida ? (
             <span className="inline-flex items-center gap-1 border border-tinta px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] uppercase">
@@ -150,12 +208,8 @@ function Muestra({
             </span>
           ) : null}
         </div>
-        <p className="mt-1 text-sm leading-relaxed opacity-75">
-          {plantilla.detalle}
-        </p>
-        <p className="mt-1 text-xs opacity-65">
-          {plantilla.ideal} · {HOJAS[plantilla.hoja].nombre}
-        </p>
+        <p className="mt-1 text-sm leading-relaxed opacity-75">{detalle}</p>
+        <p className="mt-1 text-xs opacity-65">{pie}</p>
       </div>
     </button>
   )

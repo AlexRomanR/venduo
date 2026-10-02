@@ -56,6 +56,8 @@ export interface MaterialDelCatalogo {
   datos: DatosDelCatalogo
   /** Los colores y la letra de la tienda: el punto de partida del estilo. */
   estiloDeTienda: Estilo
+  /** La plantilla de la tienda online, para sugerir la de catálogo que se le parece. */
+  plantillaDeLaTienda: string | null
   esDemo: boolean
 }
 
@@ -156,6 +158,7 @@ async function materialDeDemostracion(): Promise<MaterialDelCatalogo> {
       fecha: formatFechaLarga(new Date()),
     },
     estiloDeTienda: estiloDeTienda(aparienciaDeTienda("fashion", {})),
+    plantillaDeLaTienda: "fashion",
     esDemo: true,
   }
 }
@@ -221,6 +224,7 @@ export const getMaterialDelCatalogo = cache(
       estiloDeTienda: estiloDeTienda(
         aparienciaDeTienda(tienda.template_key, tienda.theme_overrides)
       ),
+      plantillaDeLaTienda: tienda.template_key,
       esDemo: false,
     }
   }

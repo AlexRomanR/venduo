@@ -13,6 +13,12 @@ import type {
   Pack,
 } from "@/lib/catalogos/modelo"
 import type { ProductoDelCatalogo } from "@/lib/catalogos/datos"
+import {
+  acentoCercano,
+  contraste,
+  problemasDeEstilo,
+} from "@/lib/catalogos/estilo"
+import { hexAHsl, hslAHex } from "@/lib/plantillas/color"
 
 /*
  * Las doce plantillas de catálogo.
@@ -138,6 +144,11 @@ export interface EntradaDePlantilla {
   estilo: Estilo
   /** Packs ya armados; si la plantilla los necesita y no hay, se arma uno. */
   packs?: Pack[]
+  /**
+   * El fondo, si se elige a propósito. Sin esto manda la plantilla: la vitrina
+   * de lujo arranca oscura y las demás claras.
+   */
+  invertido?: boolean
 }
 
 /** Un catálogo nuevo, con la composición inicial de su plantilla. */
@@ -149,7 +160,10 @@ export function armarCatalogo(entrada: EntradaDePlantilla): Catalogo {
     nombre: entrada.nombre,
     plantilla: plantilla.clave,
     hoja: plantilla.hoja,
-    estilo: { ...entrada.estilo, invertido: plantilla.invertido ?? false },
+    estilo: {
+      ...entrada.estilo,
+      invertido: entrada.invertido ?? plantilla.invertido ?? false,
+    },
     productos: entrada.productos.map((producto) => producto.id),
     packs,
   }
@@ -484,4 +498,158 @@ export function packDeEjemplo(lista: ProductoDelCatalogo[]): Pack[] {
       nota: "Llévalos juntos y ahorra.",
     },
   ]
+}
+
+/* ---------------------------------------------------------------------------
+ * Con el estilo de la tienda
+ * ------------------------------------------------------------------------ */
+
+export type ClaveDeEstiloSugerido = "tienda" | "pleno" | "oscuro" | "tonos"
+
+/** Un estilo sacado de la tienda, con la plantilla que mejor lo luce. */
+export interface EstiloSugerido {
+  clave: ClaveDeEstiloSugerido
+  nombre: string
+  detalle: string
+  plantilla: ClavePlantilla
+  estilo: Estilo
+}
+
+/** La plantilla de catálogo que más se parece a la de cada tienda online. */
+const PLANTILLA_POR_TIENDA: Record<string, ClavePlantilla> = {
+  fashion: "lookbook",
+  perfume: "destacado",
+  clasica: "revista",
+}
+
+/** La luz más cercana del mismo tono con la que `color` se lee sobre `fondo`. */
+function conLuz(color: string, fondo: string, minimo: number): string | null {
+  const [tono, saturacion, luz] = hexAHsl(color)
+  for (let paso = 0; paso <= 100; paso++) {
+    for (const candidata of [luz - paso, luz + paso]) {
+      if (candidata < 0 || candidata > 100) continue
+      const hex = hslAHex(tono, saturacion, candidata)
+      if (contraste(hex, fondo) >= minimo) return hex
+    }
+  }
+  return null
+}
+
+/**
+ * El acento como fondo de las hojas, con la letra en blanco.
+ *
+ * Se oscurece lo justo para que el blanco se lea con margen —un rojo vivo no
+ * llega a 7:1 con el blanco—, y el acento pasa a ser el mismo tono, claro.
+ */
+function colorPleno(acento: string): Estilo["colores"] | null {
+  const [tono, saturacion, luz] = hexAHsl(acento)
+  let fondo: string | null = null
+  for (let candidata = Math.min(luz, 60); candidata >= 5; candidata--) {
+    const hex = hslAHex(tono, saturacion, candidata)
+    if (contraste("#ffffff", hex) >= 7.5) {
+      fondo = hex
+      break
+    }
+  }
+  if (!fondo) return null
+  const claro = hslAHex(tono, Math.min(saturacion, 85), 86)
+  const nuevoAcento =
+    contraste(claro, fondo) >= 4.5 ? claro : conLuz(claro, fondo, 4.5)
+  return nuevoAcento
+    ? { papel: fondo, tinta: "#ffffff", acento: nuevoAcento }
+    : null
+}
+
+/** Todo en la gama del acento: el papel apenas teñido y el texto profundo. */
+function tonosDe(acento: string): Estilo["colores"] {
+  const [tono, saturacion] = hexAHsl(acento)
+  return {
+    papel: hslAHex(tono, Math.min(saturacion, 40), 96),
+    tinta: hslAHex(tono, Math.min(saturacion, 45), 11),
+    acento,
+  }
+}
+
+/**
+ * Los estilos que salen de la tienda: tal cual, su color a toda hoja, en
+ * oscuro y en tonos de su color.
+ *
+ * Se calculan y no se guardan, por la misma razón que la apariencia: si la
+ * tienda cambia sus colores, los estilos sugeridos cambian con ella. Uno que
+ * no se lee se arregla con el acento más cercano que sí, y si ni así, no se
+ * ofrece.
+ */
+export function estilosDeLaTienda(
+  estilo: Estilo,
+  plantillaDeLaTienda: string | null
+): EstiloSugerido[] {
+  const pleno = colorPleno(estilo.colores.acento)
+  const candidatos: (EstiloSugerido | null)[] = [
+    {
+      clave: "tienda",
+      nombre: "Tal cual tu tienda",
+      detalle:
+        "Tus colores, tu letra y tus esquinas, como en tu tienda online.",
+      plantilla:
+        (plantillaDeLaTienda && PLANTILLA_POR_TIENDA[plantillaDeLaTienda]) ||
+        "revista",
+      estilo: { ...estilo, invertido: false },
+    },
+    pleno
+      ? {
+          clave: "pleno",
+          nombre: "Tu color a toda hoja",
+          detalle:
+            "Las hojas en tu color, con la letra en blanco. Se ve desde lejos.",
+          plantilla: "minimal",
+          estilo: { ...estilo, invertido: false, colores: pleno },
+        }
+      : null,
+    {
+      clave: "oscuro",
+      nombre: "Tu tienda en oscuro",
+      detalle: "Tus colores invertidos: fondo oscuro para lucir pocas piezas.",
+      plantilla: "lujo",
+      estilo: { ...estilo, invertido: true },
+    },
+    {
+      clave: "tonos",
+      nombre: "Tonos de tu color",
+      detalle: "Todo en la gama de tu acento, del más claro al más profundo.",
+      plantilla: "feria",
+      estilo: {
+        ...estilo,
+        invertido: false,
+        colores: tonosDe(estilo.colores.acento),
+      },
+    },
+  ]
+
+  return candidatos.flatMap((sugerido) => {
+    if (!sugerido) return []
+    if (problemasDeEstilo(sugerido.estilo).length === 0) return [sugerido]
+    const acento = acentoCercano(sugerido.estilo)
+    if (!acento) return []
+    const arreglado: EstiloSugerido = {
+      ...sugerido,
+      estilo: {
+        ...sugerido.estilo,
+        colores: { ...sugerido.estilo.colores, acento },
+      },
+    }
+    return problemasDeEstilo(arreglado.estilo).length === 0 ? [arreglado] : []
+  })
+}
+
+/** Un catálogo nuevo con un estilo sugerido y su plantilla. */
+export function armarConEstilo(
+  sugerido: EstiloSugerido,
+  entrada: Omit<EntradaDePlantilla, "plantilla" | "estilo" | "invertido">
+): Catalogo {
+  return armarCatalogo({
+    ...entrada,
+    plantilla: sugerido.plantilla,
+    estilo: sugerido.estilo,
+    invertido: sugerido.estilo.invertido,
+  })
 }

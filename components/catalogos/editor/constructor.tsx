@@ -11,6 +11,7 @@ import {
   LayoutTemplate,
   LoaderCircle,
   Package,
+  Palette,
   PencilLine,
   Save,
   Send,
@@ -30,7 +31,11 @@ import {
 import { problemasDeEstilo } from "@/lib/catalogos/estilo"
 import type { Catalogo, Estilo } from "@/lib/catalogos/modelo"
 import { faltantes } from "@/lib/catalogos/operaciones"
-import { armarCatalogo } from "@/lib/catalogos/plantillas"
+import {
+  armarCatalogo,
+  estilosDeLaTienda,
+  type EstiloSugerido,
+} from "@/lib/catalogos/plantillas"
 import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
 import { cn } from "@/lib/utils"
 import { Cabecera, Seccion } from "@/components/panel/piezas"
@@ -41,16 +46,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  AVISOS_DE_CANVA,
+  BotonDeCanva,
+  type ModoDeCanva,
+} from "@/components/catalogos/editor/canva"
 import { PanelDeEstilo } from "@/components/catalogos/editor/estilo"
 import {
   compartirArchivo,
-  descargar,
+  descargarPdf,
   enlaceDeWhatsApp,
   nombreDelArchivo,
   pedirPdf,
   puedeCompartirArchivos,
 } from "@/components/catalogos/editor/exportar"
-import { GaleriaDePlantillas } from "@/components/catalogos/editor/galeria"
+import {
+  GaleriaDeEstilos,
+  GaleriaDePlantillas,
+} from "@/components/catalogos/editor/galeria"
 import { PanelDeHojas } from "@/components/catalogos/editor/hojas"
 import { PedidoALaIa } from "@/components/catalogos/editor/ia"
 import { PanelDePacks } from "@/components/catalogos/editor/packs"
@@ -96,14 +109,26 @@ function nombreDelMes(): string {
 export function Constructor({
   datos,
   estiloDeTienda,
+  plantillaDeLaTienda,
   esDemo,
   inicial,
+  canva,
+  avisoDeCanva = null,
 }: {
   datos: DatosDelCatalogo
   estiloDeTienda: Estilo
+  plantillaDeLaTienda: string | null
   esDemo: boolean
   inicial: CatalogoInicial | null
+  /** Directo si la integración con Canva está configurada; si no, a mano. */
+  canva: ModoDeCanva
+  /** Lo que pasó al volver de Canva, si se volvió con un problema. */
+  avisoDeCanva?: string | null
 }) {
+  const sugeridos = React.useMemo(
+    () => estilosDeLaTienda(estiloDeTienda, plantillaDeLaTienda),
+    [estiloDeTienda, plantillaDeLaTienda]
+  )
   const [catalogo, setCatalogo] = React.useState<Catalogo | null>(
     inicial?.catalogo ?? null
   )
@@ -248,6 +273,26 @@ export function Constructor({
               : "Cada una armada con tus productos y los colores de tu tienda. Después cambias cualquier hoja."
           }
         />
+        {sugeridos.length > 0 ? (
+          <Seccion
+            id="con-tu-estilo"
+            icono={Palette}
+            titulo="Con el estilo de tu tienda"
+            bajada="Tus colores tal cual, tu color a toda hoja, en oscuro o en tonos de tu color."
+          >
+            <GaleriaDeEstilos
+              sugeridos={sugeridos}
+              productos={productos}
+              datos={datos}
+              nombre={catalogo?.nombre ?? nombreDelMes()}
+              packs={catalogo?.packs}
+              alElegir={(nuevo) => {
+                cambiar(nuevo)
+                setFase("editar")
+              }}
+            />
+          </Seccion>
+        ) : null}
         <Seccion
           id="plantillas"
           icono={LayoutTemplate}
@@ -279,7 +324,10 @@ export function Constructor({
       catalogo={catalogo}
       datos={datos}
       estiloDeTienda={estiloDeTienda}
+      sugeridos={sugeridos}
       esDemo={esDemo}
+      canva={canva}
+      avisoDeCanva={avisoDeCanva}
       guardado={guardado}
       sinGuardar={sinGuardar}
       alCambiar={cambiar}
@@ -315,7 +363,10 @@ function Editor({
   catalogo,
   datos,
   estiloDeTienda,
+  sugeridos,
   esDemo,
+  canva,
+  avisoDeCanva,
   guardado,
   sinGuardar,
   alCambiar,
@@ -325,7 +376,10 @@ function Editor({
   catalogo: Catalogo
   datos: DatosDelCatalogo
   estiloDeTienda: Estilo
+  sugeridos: EstiloSugerido[]
   esDemo: boolean
+  canva: ModoDeCanva
+  avisoDeCanva: string | null
   guardado: { id: string; enlace: string } | null
   sinGuardar: boolean
   alCambiar: (catalogo: Catalogo) => void
@@ -335,11 +389,27 @@ function Editor({
   const [panel, setPanel] = React.useState<Panel>("hojas")
   const [elegido, setElegido] = React.useState<string | null>(null)
   const [vista, setVista] = React.useState<"editar" | "ver">("editar")
+  // Al abrir la vista en el celular, que muestre la hoja que se estaba editando.
+  const [pedidoDeVista, setPedidoDeVista] = React.useState(0)
   const [ocupado, setOcupado] = React.useState<
     null | "guardar" | "descargar" | "compartir"
   >(null)
   const [compartible, setCompartible] = React.useState(false)
   React.useEffect(() => setCompartible(puedeCompartirArchivos()), [])
+
+  // Si se volvió de Canva con un problema, decirlo una vez y limpiar la
+  // dirección: recargar la página no tiene que repetir el aviso.
+  React.useEffect(() => {
+    if (!avisoDeCanva) return
+    const texto = AVISOS_DE_CANVA[avisoDeCanva]
+    if (texto) {
+      if (avisoDeCanva === "fallo") toast.error(texto)
+      else toast(texto)
+    }
+    const direccion = new URL(window.location.href)
+    direccion.searchParams.delete("canva")
+    window.history.replaceState(null, "", direccion)
+  }, [avisoDeCanva])
 
   const hojas = hojasDe(catalogo, datos).length
   const problemas = [
@@ -368,9 +438,8 @@ function Editor({
   async function bajarPdf() {
     setOcupado("descargar")
     try {
-      const pdf = await pedirPdf(catalogo)
-      descargar(pdf, nombreDelArchivo(catalogo.nombre))
-      toast.success("Listo: tu catálogo se descargó.")
+      await descargarPdf(catalogo)
+      toast.success("Listo: tu catálogo está en Descargas.")
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "No pudimos armar el PDF."
@@ -462,6 +531,14 @@ function Editor({
                 Guardar
               </button>
             )}
+            <BotonDeCanva
+              catalogo={catalogo}
+              modo={canva}
+              guardado={guardado}
+              sinGuardar={sinGuardar}
+              deshabilitado={ocupado !== null || bloqueado}
+              alGuardar={alGuardar}
+            />
             <DropdownMenu>
               <DropdownMenuTrigger
                 disabled={ocupado !== null || bloqueado}
@@ -616,6 +693,7 @@ function Editor({
               <PanelDeEstilo
                 catalogo={catalogo}
                 estiloDeTienda={estiloDeTienda}
+                sugeridos={sugeridos}
                 alCambiar={alCambiar}
                 alCambiarPlantilla={alCambiarPlantilla}
               />
@@ -636,14 +714,14 @@ function Editor({
             </h2>
             <p className="text-xs opacity-65">Toca una hoja para editarla</p>
           </header>
-          <div className="bg-tinta/[0.04] px-4 py-6 sm:px-6 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto">
-            <VistaPrevia
-              catalogo={catalogo}
-              datos={datos}
-              elegido={elegido}
-              alElegir={elegirHoja}
-            />
-          </div>
+          <VistaPrevia
+            catalogo={catalogo}
+            datos={datos}
+            elegido={elegido}
+            pedido={pedidoDeVista}
+            alElegir={elegirHoja}
+            className="bg-tinta/[0.04] px-4 py-6 sm:px-6 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto"
+          />
         </section>
       </div>
 
@@ -665,7 +743,10 @@ function Editor({
         <button
           type="button"
           aria-pressed={vista === "ver"}
-          onClick={() => setVista("ver")}
+          onClick={() => {
+            setVista("ver")
+            setPedidoDeVista((pedido) => pedido + 1)
+          }}
           className={cn(
             "flex min-h-14 items-center justify-center gap-2 text-sm font-semibold",
             vista === "ver" && "bg-tinta text-papel"

@@ -405,7 +405,17 @@ export function nombreDeArchivo(texto: string): string {
  */
 export async function respuestaDePdf(
   catalogo: Catalogo,
-  datos: DatosDelCatalogo
+  datos: DatosDelCatalogo,
+  {
+    descarga = null,
+  }: {
+    /**
+     * Si viene, el PDF se baja como archivo en vez de abrirse en el visor. Si
+     * además es una marca, vuelve en una cookie para que el editor sepa que
+     * la descarga ya empezó.
+     */
+    descarga?: string | null
+  } = {}
 ): Promise<Response> {
   const [problema] = problemasDeEstilo(catalogo.estilo)
   if (problema) return aviso(problema, 422)
@@ -418,16 +428,26 @@ export async function respuestaDePdf(
   }
 
   const cuerpo = await catalogoEnPdf(catalogo, datos)
-  return new Response(new Uint8Array(cuerpo), {
-    headers: {
-      "Content-Type": "application/pdf",
-      // `inline` abre el visor del navegador, que ya trae su botón de
-      // descarga; el editor lo baja igual con su propio botón.
-      "Content-Disposition": `inline; filename="${nombreDeArchivo(catalogo.nombre)}"`,
-      // Los precios y el stock son los del momento: nunca de una memoria.
-      "Cache-Control": "no-store",
-    },
+  const archivo = nombreDeArchivo(catalogo.nombre)
+  const cabeceras = new Headers({
+    "Content-Type": "application/pdf",
+    // `inline` abre el visor del navegador, que trae su propio botón de
+    // descarga. `attachment` lo guarda como archivo: es lo que hace que el
+    // navegador lo deje en Descargas, con su nombre y su `.pdf`. Un enlace a
+    // un blob, en cambio, algunos navegadores lo guardaban sin extensión y
+    // en una carpeta temporal.
+    "Content-Disposition": `${descarga ? "attachment" : "inline"}; filename="${archivo}"; filename*=UTF-8''${encodeURIComponent(archivo)}`,
+    // Los precios y el stock son los del momento: nunca de una memoria.
+    "Cache-Control": "no-store",
   })
+  if (descarga && /^[a-z0-9]{8,64}$/.test(descarga)) {
+    cabeceras.append(
+      "Set-Cookie",
+      `descarga=${descarga}; Path=/; Max-Age=120; SameSite=Lax`
+    )
+  }
+
+  return new Response(new Uint8Array(cuerpo), { headers: cabeceras })
 }
 
 /** Un aviso en texto, para que el editor lo muestre tal cual. */

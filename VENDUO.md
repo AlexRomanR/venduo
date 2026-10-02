@@ -188,7 +188,7 @@ Flujo de demostración completo:
 12. Inteligencia de negocio: estadísticas consultadas en lenguaje natural
 13. Generador de copys de marketing y publicación en Facebook y WhatsApp
 14. Coordinación de entrega por WhatsApp con el detalle del pedido armado por la plataforma, y confirmación de envío y recepción que libera el pago
-15. Catálogos en PDF editables: productos elegidos, una categoría o un pack, en una de doce plantillas de bloques intercambiables, con los colores de la tienda, para descargar o compartir por WhatsApp
+15. Catálogos en PDF editables: productos elegidos, una categoría o un pack, en una de doce plantillas de bloques intercambiables o con uno de los estilos sacados de la tienda, para descargar, compartir por WhatsApp o seguir editando en Canva
 
 ### Publicación en redes: plan A y plan B
 
@@ -269,7 +269,7 @@ Tan importante como la lista de lo que sí:
 - **Crear** — elección de plantilla y onboarding conversacional
 - **Empezar a vender** — el equivalente del vendedor: cómo sumarse a una tienda
 - **Panel del emprendedor** — resumen, y desde ahí productos, pedidos, vendedores, estadísticas, apariencia, marketing. Toma la identidad de la plantilla de su tienda
-- **Catálogos en PDF** — dentro del panel, en `/panel/catalogos`: los catálogos guardados, las doce plantillas dibujadas con los productos de la tienda y el constructor, donde se eligen los productos —o se le pide el catálogo a la IA en una frase—, la plantilla, y se edita hoja por hoja viendo cómo queda. Se descarga en PDF o se manda un enlace que siempre abre con los precios del día
+- **Catálogos en PDF** — dentro del panel, en `/panel/catalogos`: los catálogos guardados, las doce plantillas dibujadas con los productos de la tienda y el constructor, donde se eligen los productos —o se le pide el catálogo a la IA en una frase—, la plantilla —o uno de los cuatro estilos sacados de la tienda—, y se edita hoja por hoja con la vista previa siguiendo lo que se edita. Se descarga en PDF, se manda un enlace que siempre abre con los precios del día o se lleva a Canva para editarlo entero allá
 - **Panel del vendedor** — ventas, comisiones, materiales de promoción
 - **Tienda pública** — portada, catálogo con filtro de segunda mano, ficha de producto, carrito, checkout, pago y seguimiento del pedido, donde el comprador confirma que lo recibió o reclama. Se dibuja con el kit de su plantilla
 - **Perfil público del vendedor** — su historial laboral verificable
@@ -441,6 +441,8 @@ Un catálogo es una lista de **bloques** —portada, páginas de productos, sepa
 El **precio de un pack** se muestra en el catálogo y nada más: la tienda online cobra cada producto por separado, y quien quiere el pack escribe por WhatsApp.
 
 El enlace compartido lo abre cualquiera, sin cuenta. Lo lee `catalogo_compartido`, que devuelve un solo catálogo por su token y solo si la tienda se sirve al público; la tabla no tiene política para anónimos.
+
+**Llevarlo a Canva no guarda nada.** Canva recibe el PDF y lo convierte en un diseño de la cuenta de la persona; el permiso que da se usa en ese momento y se descarta, así que no hay tokens de Canva que cuidar. Lo que queda allá es una copia: no sigue los precios del día.
 
 #### IA y difusión
 

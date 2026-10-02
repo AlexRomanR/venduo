@@ -4,6 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import {
   Copy,
+  Download,
   FileText,
   MoreHorizontal,
   Pencil,
@@ -71,6 +72,14 @@ export function AccionesDeCatalogo({
           <MoreHorizontal aria-hidden="true" className="size-4" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64">
+          <DropdownMenuItem asChild>
+            {/* El servidor lo manda como archivo: el navegador lo guarda en
+                Descargas, con su nombre y su .pdf. */}
+            <a href={`/panel/catalogos/${id}/pdf?descargar=1`} download>
+              <Download aria-hidden="true" className="size-4" />
+              Descargar el PDF
+            </a>
+          </DropdownMenuItem>
           <DropdownMenuItem
             disabled={esDemo}
             onSelect={() =>

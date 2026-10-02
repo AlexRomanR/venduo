@@ -1,12 +1,14 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { BookOpen, LayoutTemplate, Plus } from "lucide-react"
+import { BookOpen, LayoutTemplate, Palette, Plus } from "lucide-react"
 
 import { CLAVES_PLANTILLA, HOJAS } from "@/lib/catalogos/constantes"
 import { elegidos } from "@/lib/catalogos/datos"
 import {
   PLANTILLAS_DE_CATALOGO,
   armarCatalogo,
+  armarConEstilo,
+  estilosDeLaTienda,
 } from "@/lib/catalogos/plantillas"
 import { getCatalogos, getMaterialDelCatalogo } from "@/lib/data/catalogos"
 import { getMiTienda } from "@/lib/data/panel"
@@ -35,7 +37,8 @@ export default async function CatalogosPage() {
     getCatalogos(),
     getMaterialDelCatalogo(),
   ])
-  const { datos, estiloDeTienda } = material
+  const { datos, estiloDeTienda, plantillaDeLaTienda } = material
+  const sugeridos = estilosDeLaTienda(estiloDeTienda, plantillaDeLaTienda)
   const productos = Object.values(datos.productos)
 
   // Las muestras se arman con los primeros productos: alcanzan para ver cómo
@@ -133,6 +136,49 @@ export default async function CatalogosPage() {
           </ul>
         )}
       </Seccion>
+
+      {muestra.length > 0 && sugeridos.length > 0 ? (
+        <Seccion
+          id="con-tu-estilo"
+          icono={Palette}
+          titulo="Con el estilo de tu tienda"
+          bajada="Tus colores tal cual, tu color a toda hoja, en oscuro o en tonos de tu color."
+          accion={{
+            href: "/panel/catalogos/nuevo",
+            texto: "Armar uno con tu estilo",
+          }}
+        >
+          <ul className="grid grid-cols-2 gap-px bg-tinta/15 lg:grid-cols-4">
+            {sugeridos.map((sugerido) => (
+              <li
+                key={sugerido.clave}
+                className="flex flex-col gap-3 bg-papel p-4"
+              >
+                <MiniaturaDeCatalogo
+                  catalogo={armarConEstilo(sugerido, {
+                    nombre: "Catálogo de temporada",
+                    productos: muestra,
+                    tienda: {
+                      nombre: datos.tienda.nombre,
+                      whatsapp: datos.tienda.whatsapp,
+                    },
+                  })}
+                  datos={datos}
+                  ancho={112}
+                />
+                <div>
+                  <p className="font-titular leading-tight font-bold tracking-[-0.01em]">
+                    {sugerido.nombre}
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed opacity-70">
+                    {sugerido.detalle}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Seccion>
+      ) : null}
 
       <Seccion
         id="plantillas"

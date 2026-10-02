@@ -4,9 +4,13 @@ import { getCatalogo, getMaterialDelCatalogo } from "@/lib/data/catalogos"
 /** Los precios y el stock se leen en el momento: nunca de caché. */
 export const dynamic = "force-dynamic"
 
-/** Un catálogo guardado, armado con los precios y el stock de hoy. */
+/**
+ * Un catálogo guardado, armado con los precios y el stock de hoy.
+ *
+ * Se abre en el visor del navegador; con `?descargar=1` se baja como archivo.
+ */
 export async function GET(
-  _peticion: Request,
+  peticion: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
@@ -16,5 +20,8 @@ export async function GET(
   ])
   if (!abierto) return aviso("No encontramos ese catálogo.", 404)
 
-  return respuestaDePdf(abierto.catalogo, datos)
+  const descargar = new URL(peticion.url).searchParams.has("descargar")
+  return respuestaDePdf(abierto.catalogo, datos, {
+    descarga: descargar ? "1" : null,
+  })
 }

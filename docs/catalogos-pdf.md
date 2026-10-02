@@ -17,8 +17,9 @@ contrario salió mal en un PDF de verdad.
 7. [El editor](#7-el-editor)
 8. [La IA](#8-la-ia)
 9. [Descargar y compartir](#9-descargar-y-compartir)
-10. [Agregar una variante o una plantilla](#10-agregar-una-variante-o-una-plantilla)
-11. [Límites conocidos](#11-límites-conocidos)
+10. [Editar en Canva](#10-editar-en-canva)
+11. [Agregar una variante o una plantilla](#11-agregar-una-variante-o-una-plantilla)
+12. [Límites conocidos](#12-límites-conocidos)
 
 ---
 
@@ -164,6 +165,31 @@ mismo tono que sí se lea: el rojo de la tienda pasa a un rojo más claro.
 mismo que el editor de la tienda —texto 7:1, acento 4,5:1, letra sobre el acento 4,5:1—
 y `acentoCercano()` es el arreglo de un toque.
 
+### Con el estilo de tu tienda
+
+Antes de las doce plantillas, la galería ofrece cuatro estilos que salen de la tienda
+(`estilosDeLaTienda()`, en `lib/catalogos/plantillas.ts`), cada uno con la plantilla que
+mejor lo luce. El primero usa la que más se parece a la plantilla de la tienda online
+(`PLANTILLA_POR_TIENDA`: Pasarela va con Lookbook, Esencia con Una foto por hoja y la
+clásica con Revista):
+
+| Estilo               | Qué hace                                                          | Plantilla          |
+| -------------------- | ----------------------------------------------------------------- | ------------------ |
+| Tal cual tu tienda   | Su papel, su tinta, su acento, su letra y sus esquinas            | La de su tienda    |
+| Tu color a toda hoja | El acento de fondo, oscurecido hasta que el blanco se lea a 7,5:1 | Grilla minimalista |
+| Tu tienda en oscuro  | Sus colores invertidos                                            | Vitrina de lujo    |
+| Tonos de tu color    | Papel apenas teñido y texto profundo, los dos del tono del acento | Feria              |
+
+En "Tu color a toda hoja" el acento pasa a ser un claro del mismo tono: el original no
+se leería sobre su propio color.
+
+**Se calculan, no se guardan**, por lo mismo que la apariencia de la tienda: si la tienda
+cambia sus colores, los estilos cambian con ella. Pasan por el mismo control de
+contraste; uno que no lo pasa se arregla con `acentoCercano()` y, si ni así, no se ofrece.
+
+En el editor, el panel de estilo los repite como botones: cambian los colores y el fondo
+y dejan las hojas como están.
+
 ---
 
 ## 7. El editor
@@ -185,10 +211,25 @@ teléfono llega HTML y no el catálogo con todos los productos.
 En el celular no entran las dos columnas: una barra abajo alterna entre editar y ver las
 hojas. Tocar una hoja abre su formulario.
 
+**La vista previa sigue a la hoja que se edita.** Al elegir un bloque —en la lista o al
+agregarlo— la vista previa va a su primera hoja: editar la oferta con la vista parada en
+la portada era editar a ciegas. En escritorio se desplaza dentro de su columna, para no
+correr el formulario; en el celular, al tocar "Ver", abre en esa hoja. Tres cosas que
+`VistaPrevia` cuida:
+
+- Se mueve cuando **cambia lo elegido**, no en cada letra: quien recorre las hojas
+  mientras escribe no vuelve a la suya a cada rato.
+- Una hoja tocada en la vista previa ya está a la vista: no se la lleva al principio de
+  su bloque.
+- Al abrir la vista en el celular aparece la barra de desplazamiento, las hojas se
+  angostan y la elegida se corre. Durante un segundo y medio después de mostrarla, un
+  cambio de ancho la vuelve a alinear.
+
 El editor importa constantes y no esquemas: `lib/catalogos/constantes.ts` y
 `lib/plantillas/color.ts` no traen zod (`performance.md`).
 
-En modo demo funciona todo menos guardar: el PDF se descarga igual.
+En modo demo funciona todo menos guardar: el PDF se descarga igual, y "Editar en Canva"
+va por el camino a mano.
 
 ---
 
@@ -209,21 +250,84 @@ productos reales.
 
 ## 9. Descargar y compartir
 
-- **Descargar**: el editor manda su borrador, guardado o no, a `POST
-/panel/catalogos/pdf`. Se valida con el mismo esquema que al guardar, y los productos
-  se leen con la sesión: el PDF no puede mostrar un producto de otra tienda aunque el
-  borrador nombre su id.
+- **Descargar**: el editor manda su borrador, guardado o no, a
+  `POST /panel/catalogos/pdf`. Se valida con el mismo esquema que al guardar, y los
+  productos se leen con la sesión: el PDF no puede mostrar un producto de otra tienda
+  aunque el borrador nombre su id. Desde la lista, "Descargar el PDF" es un enlace a
+  `/panel/catalogos/{id}/pdf?descargar=1`.
 - **Mandar el PDF**: la hoja de compartir del sistema, con el archivo. Ahí está
   WhatsApp.
 - **Mandar el enlace**: `/c/{token}`, solo de un catálogo guardado. Abre el PDF en el
   visor del teléfono, armado en ese momento.
+
+**La descarga la hace el navegador, no la página.** El borrador viaja en un formulario
+a un `iframe` oculto y la respuesta llega con `Content-Disposition: attachment` y el
+nombre del archivo: el navegador la guarda como cualquier descarga, con su `.pdf` y en
+Descargas. Antes la página la bajaba con `fetch` y la guardaba desde una dirección
+`blob:`, y ahí el nombre depende de que se respete el atributo `download`; un gestor de
+descargas que la intercepta, por ejemplo, no lo hace.
+
+Un `iframe` no avisa cuándo empezó una descarga. Por eso la respuesta trae además la
+cookie `descarga={marca}`, que `descargarPdf()` (`exportar.ts`) espera para decir que
+terminó. Si en el `iframe` carga una página, es un error, y se muestra su texto.
 
 **El precio de un pack se muestra en el catálogo y nada más.** La tienda online cobra
 cada producto por separado; quien quiere el pack escribe por WhatsApp.
 
 ---
 
-## 10. Agregar una variante o una plantilla
+## 10. Editar en Canva
+
+"Editar en Canva" lleva el catálogo a Canva, convertido en un diseño de la cuenta de la
+persona donde se edita todo: textos, fotos, colores y composición. Canva no recibe el
+catálogo sino su PDF, y lo convierte al importarlo.
+
+Hay dos caminos, y el editor elige solo (`ModoDeCanva`, en
+`components/catalogos/editor/canva.tsx`):
+
+| Camino      | Cuándo                                        | Qué pasa                                                                            |
+| ----------- | --------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **Directo** | Con `CANVA_CLIENT_ID` y `CANVA_CLIENT_SECRET` | Se guarda, la persona autoriza en Canva y queda en el editor de Canva con el diseño |
+| **A mano**  | Sin esas variables, y siempre en el modo demo | Se baja el PDF y se abre el editor de PDF de Canva, donde se sube                   |
+
+El directo es OAuth con PKCE contra la API Connect de Canva (`lib/canva.ts`):
+
+1. `GET /panel/catalogos/{id}/canva` arma el pedido —el estado y el verificador— y lo
+   guarda en una cookie `HttpOnly` cifrada con AES-GCM, con una llave derivada del
+   secreto: Canva pide que el verificador no lo pueda leer ni el navegador.
+2. Canva vuelve a `/panel/catalogos/canva` con un código. Se comprueba el estado, se
+   cambia el código por un permiso y, a la vez, se arma el PDF con los precios de hoy.
+3. `POST /v1/imports` sube el PDF. La importación es un trabajo que se consulta cada
+   segundo y medio; al terminar, se redirige al `edit_url` del diseño.
+
+**El permiso se usa en el momento y no se guarda**: no hay tabla de tokens que cuidar.
+Cualquier tropiezo devuelve al catálogo con un aviso (`?canva=fallo`, `cancelado` o
+`sin-conectar`), nunca a una página de error.
+
+La pestaña de Canva se abre en el mismo toque, antes de guardar o de bajar nada: una
+ventana que se abre después de esperar algo la bloquea el navegador.
+
+### Configurar el camino directo
+
+1. Crear una integración en el portal de desarrolladores de Canva
+   (canva.com/developers), en **Outside Canva → Configuration**, con el alcance
+   `design:content:write`.
+2. Darle de alta las direcciones de vuelta: `https://venduo.vercel.app/panel/catalogos/canva`
+   y, para probar en local, `http://127.0.0.1:3000/panel/catalogos/canva`. En local se
+   entra por `127.0.0.1` y no por `localhost`, como pide Canva.
+3. Generar el secreto y poner `CANVA_CLIENT_ID` y `CANVA_CLIENT_SECRET` en Vercel y en
+   `.env.local`. Son de servidor: nunca con `NEXT_PUBLIC_`.
+
+Para que la autorice cualquier cuenta, **Canva tiene que revisar y aprobar la
+integración** (las privadas son solo para equipos con plan Enterprise). Mientras tanto,
+el camino a mano funciona para todos.
+
+**Lo que queda en Canva es una copia.** Los precios y el stock quedan como el día que se
+mandó: para actualizarlos, se vuelve a mandar desde Venduo.
+
+---
+
+## 11. Agregar una variante o una plantilla
 
 **Una variante**: su clave y su nombre en `VARIANTES` (`lib/catalogos/constantes.ts`),
 su componente en `components/catalogos/variantes/{tipo}.tsx` y su entrada en el registro
@@ -239,7 +343,7 @@ otra casi siempre es una de las trampas de la sección 5.
 
 ---
 
-## 11. Límites conocidos
+## 12. Límites conocidos
 
 - `config` es la versión 1 del esquema. Un cambio que no sea aditivo pide migrar el JSON
   o subir la versión; mientras tanto, la lista esconde los que no validan en vez de
@@ -250,3 +354,6 @@ otra casi siempre es una de las trampas de la sección 5.
 - Con fotos nuevas el PDF tarda de uno a cuatro segundos; después, la conversión queda
   en memoria mientras viva la función.
 - Un pack no se puede comprar como pack en la tienda online.
+- El diseño de Canva no se actualiza: es una copia del PDF del día en que se mandó.
+- Canva convierte el PDF a su manera: una letra que no tiene la cambia por otra
+  parecida, y un texto largo puede quedar partido en varias cajas.

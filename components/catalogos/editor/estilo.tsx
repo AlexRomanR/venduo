@@ -4,9 +4,16 @@ import * as React from "react"
 import { LayoutTemplate, RotateCcw } from "lucide-react"
 
 import { HOJAS, type ClaveHoja } from "@/lib/catalogos/constantes"
-import { acentoCercano, problemasDeEstilo } from "@/lib/catalogos/estilo"
+import {
+  acentoCercano,
+  problemasDeEstilo,
+  resolverEstilo,
+} from "@/lib/catalogos/estilo"
 import type { Catalogo, Estilo } from "@/lib/catalogos/modelo"
-import { PLANTILLAS_DE_CATALOGO } from "@/lib/catalogos/plantillas"
+import {
+  PLANTILLAS_DE_CATALOGO,
+  type EstiloSugerido,
+} from "@/lib/catalogos/plantillas"
 import { COMBINACIONES, PALETAS } from "@/lib/editor/sugerencias"
 import { BOTON_SECUNDARIO } from "@/lib/estilos"
 import {
@@ -31,11 +38,14 @@ import { Interruptor } from "@/components/catalogos/editor/campos"
 export function PanelDeEstilo({
   catalogo,
   estiloDeTienda,
+  sugeridos,
   alCambiar,
   alCambiarPlantilla,
 }: {
   catalogo: Catalogo
   estiloDeTienda: Estilo
+  /** Los estilos que salen de la tienda: se aplican sin tocar las hojas. */
+  sugeridos: EstiloSugerido[]
   alCambiar: (catalogo: Catalogo) => void
   alCambiarPlantilla: () => void
 }) {
@@ -69,6 +79,59 @@ export function PanelDeEstilo({
           </button>
         </div>
       </Grupo>
+
+      {sugeridos.length > 0 ? (
+        <Grupo
+          titulo="Con el estilo de tu tienda"
+          ayuda="Cambian los colores y el fondo; las hojas quedan como están."
+        >
+          <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {sugeridos.map((sugerido) => {
+              const activo =
+                JSON.stringify(sugerido.estilo) === JSON.stringify(estilo)
+              const colores = resolverEstilo(sugerido.estilo).colores
+              return (
+                <li key={sugerido.clave}>
+                  <button
+                    type="button"
+                    aria-pressed={activo}
+                    onClick={() =>
+                      alCambiar({ ...catalogo, estilo: sugerido.estilo })
+                    }
+                    className={cn(
+                      "flex min-h-14 w-full items-center gap-3 border px-3 py-2 text-left transition-colors",
+                      activo
+                        ? "border-tinta bg-tinta/[0.06]"
+                        : "border-tinta/20 hover:border-tinta"
+                    )}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="flex h-9 w-12 shrink-0 overflow-hidden border border-tinta/20"
+                    >
+                      <span
+                        className="flex-[2]"
+                        style={{ backgroundColor: colores.papel }}
+                      />
+                      <span
+                        className="flex-1"
+                        style={{ backgroundColor: colores.tinta }}
+                      />
+                      <span
+                        className="flex-1"
+                        style={{ backgroundColor: colores.acento }}
+                      />
+                    </span>
+                    <span className="text-sm font-semibold">
+                      {sugerido.nombre}
+                    </span>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </Grupo>
+      ) : null}
 
       <Grupo titulo="Hoja">
         <Opciones<ClaveHoja>

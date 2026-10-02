@@ -21,6 +21,11 @@ const envSchema = z.object({
   AI_BASE_URL: z.string().url().optional(),
 
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
+
+  // Editar un catálogo en Canva: la integración se crea en el portal de
+  // desarrolladores de Canva. Sin esto, el botón lleva el PDF a mano.
+  CANVA_CLIENT_ID: z.string().min(1).optional(),
+  CANVA_CLIENT_SECRET: z.string().min(1).optional(),
 })
 
 const parsed = envSchema.safeParse({
@@ -33,6 +38,8 @@ const parsed = envSchema.safeParse({
   AI_API_KEY: process.env.AI_API_KEY || undefined,
   AI_BASE_URL: process.env.AI_BASE_URL || undefined,
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || undefined,
+  CANVA_CLIENT_ID: process.env.CANVA_CLIENT_ID || undefined,
+  CANVA_CLIENT_SECRET: process.env.CANVA_CLIENT_SECRET || undefined,
 })
 
 if (!parsed.success) {
@@ -46,6 +53,10 @@ export const env = parsed.success ? parsed.data : envSchema.parse({})
 
 export const isSupabaseConfigured = Boolean(
   env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
+
+export const isCanvaConfigured = Boolean(
+  env.CANVA_CLIENT_ID && env.CANVA_CLIENT_SECRET
 )
 
 export const isAIConfigured =

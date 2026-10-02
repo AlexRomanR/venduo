@@ -45,6 +45,8 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/panel/catalogos/{id}`       | Editar un catálogo guardado                             | Requiere sesión |
 | `/panel/catalogos/pdf`        | El PDF del borrador del editor, por POST                | Requiere sesión |
 | `/panel/catalogos/{id}/pdf`   | El PDF de uno guardado, con los precios del día         | Requiere sesión |
+| `/panel/catalogos/{id}/canva` | Llevar uno a Canva: pide el permiso                     | Requiere sesión |
+| `/panel/catalogos/canva`      | La vuelta de Canva: importa el PDF y abre el diseño     | Requiere sesión |
 | `/c/{token}`                  | Un catálogo compartido, en PDF                          | Público         |
 | `/vendedor`                   | Panel del vendedor y su historial                       | Requiere sesión |
 | `/cuenta`                     | Datos de la persona, de su tienda y de su perfil        | Requiere sesión |
@@ -160,7 +162,7 @@ components/
     variantes/        Cómo se dibuja cada bloque: portada, productos, separador,
                       pack, oferta, contraportada y texto
     editor/           El constructor: productos, plantillas, hojas, packs,
-                      estilo, vista previa, IA y exportar
+                      estilo, vista previa, IA, exportar y Canva
   panel/              Shell y piezas de los dos paneles. `piezas.tsx` son los
                       paneles, cifras y estados vacíos de toda pantalla;
                       `armazon.tsx` es la barra con su contenido y decide cuándo va
@@ -187,6 +189,8 @@ lib/
   catalogos/          El catálogo en PDF: modelo y esquema, constantes sin zod,
                       estilo, datos, las doce plantillas, las operaciones del
                       editor y `pdf.tsx`, que lo arma en el servidor
+  canva.ts            Llevar un catálogo a Canva: el permiso con PKCE y la
+                      importación del PDF. Solo servidor
   demo-data.ts        Datos de ejemplo del modo demo
   estilos.ts          Clases del vestido editorial de los controles
   tienda.ts           El enlace de una tienda, sus rutas internas y el slug de un subdominio

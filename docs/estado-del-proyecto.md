@@ -52,9 +52,17 @@ Actualizado el 1 de octubre de 2026.
   en una frase), elegir la plantilla viéndola con los propios productos y editar hoja
   por hoja con la vista previa al lado. Packs con su precio, estilo de la tienda o
   propio, fondo oscuro, A4 o 9:16, y el contraste controlado antes de descargar.
+- Cuatro estilos sacados de la tienda —tal cual, su color a toda hoja, en oscuro y en
+  tonos de su acento—, cada uno con la plantilla que mejor lo luce. Se calculan de la
+  tienda: si cambia sus colores, cambian con ella.
+- La vista previa sigue a la hoja que se edita, también en el celular.
 - El PDF se arma en el servidor con las mismas variantes de la vista previa. Se
-  descarga, se pasa a la hoja de compartir del teléfono o se manda un enlace
-  (`/c/{token}`) que abre siempre con los precios y el stock del día.
+  descarga —la descarga la hace el navegador, con su nombre y en Descargas—, se pasa a
+  la hoja de compartir del teléfono o se manda un enlace (`/c/{token}`) que abre siempre
+  con los precios y el stock del día.
+- **Editar en Canva**: con la integración configurada, el catálogo se abre en Canva como
+  un diseño editable; sin ella, se baja el PDF y se abre el editor de PDF de Canva para
+  subirlo.
 - Funciona en modo demo, salvo guardar. Todo en `docs/catalogos-pdf.md`.
 
 ### Cuentas y altas
@@ -250,14 +258,19 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 - **Un pack del catálogo no se compra como pack** en la tienda online: su precio se
   muestra en el PDF y la venta se arma por WhatsApp. Venderlo como pack toca
   `create_order` y la comisión.
-- **`.env.example`** no tiene `NEXT_PUBLIC_DOMINIO_TIENDAS`.
+- **Canva directo**: crear la integración en el portal de desarrolladores de Canva,
+  cargar `CANVA_CLIENT_ID` y `CANVA_CLIENT_SECRET` en Vercel y pedirle a Canva la
+  revisión, sin la cual no la puede autorizar cualquier cuenta. Mientras tanto, "Editar
+  en Canva" va por el camino a mano. Los pasos, en `docs/catalogos-pdf.md` §10.
+- **`.env.example`** no tiene `NEXT_PUBLIC_DOMINIO_TIENDAS`, `CANVA_CLIENT_ID` ni
+  `CANVA_CLIENT_SECRET`.
 - **Dominio propio** para las tiendas con subdominio: comprar el dominio, crear el
   registro DNS comodín y darlo de alta en Vercel.
 - **El rojo de Venduo** está a 4,35:1 contra el papel, un poco por debajo del mínimo AA
   para texto chico.
 - **Avisos de Next.js** por `quality="90"` en imágenes de la portada: hace falta
   configurar `images.qualities` antes de pasar a Next 16.
-- 191 avisos de lint, en su mayoría variables sin usar.
+- 189 avisos de lint, casi todos en los scripts de la skill `impeccable`.
 
 ---
 

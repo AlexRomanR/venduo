@@ -245,6 +245,9 @@ function ListaDeSecciones() {
 
   return (
     <DndContext
+      // Un id fijo: sin él, dnd-kit numera sus ids de accesibilidad distinto
+      // en el servidor y en el navegador, y la hidratación no coincide.
+      id="editor-secciones"
       sensors={sensores}
       collisionDetection={closestCenter}
       onDragEnd={alSoltar}
