@@ -45,14 +45,14 @@ lo digan. Elige el camino que lo describe: ordenar su negocio o salir a vender.
 FIRST VIEWPORT: Barra fija con las anclas y la acción roja. A la izquierda, el titular a
 escala grande —"Tu tienda online, tu inventario y tus ventas. Lista en un minuto."—, una
 bajada, los cuatro agregados con su ícono y la acción. A la derecha (`Vitrina`), tres
-capas: una foto en blanco y negro de una vendedora fotografiando sus productos; un
+capas: una foto en blanco y negro de una joven con su celular y una bolsa con un pedido; un
 celular recto con la captura real de Rosa Deportes; y dos tarjetas de papel con regla,
 el aviso de Venduo de un pedido nuevo y el stock que se está acabando en rojo. Sin
 scroll para llegar a la acción en la computadora.
 
-La foto es de Pexels (7309930, licencia libre) y la captura sale de la tienda publicada,
+La foto es de Pexels (8788781, licencia libre) y la captura sale de la tienda publicada,
 a 390 px y doble densidad, desde la sección "Lo nuevo", con el primer producto (un
-mouse gamer) cambiado por una zapatilla de running antes de sacarla. Las dos viven en
+mouse gamer) cambiado por una zapatilla de running (Pexels 2529148) antes de sacarla. Las dos viven en
 `public/portada/`: si la tienda de Rosa cambia, la captura se vuelve a sacar.
 
 FORM: Editorial impreso, dirección fijada por el usuario sobre una referencia propia que

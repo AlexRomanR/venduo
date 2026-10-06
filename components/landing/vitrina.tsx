@@ -13,7 +13,7 @@ import tiendaRosa from "@/public/portada/tienda-rosa.webp"
  * Venduo.
  *
  * Tres capas, y cada una dice una de las tres cosas del titular. La foto es
- * quien vende por redes, fotografiando sus productos con el celular. El
+ * quien vende por redes: joven, con el celular en la mano y un pedido listo. El
  * celular es una tienda real —Rosa Deportes, de las de demostración—
  * capturada tal como se ve: es la tienda online. Las dos tarjetas son lo que
  * hay detrás: el pedido que llegó, que es la venta, y el stock que se está
@@ -27,8 +27,8 @@ import tiendaRosa from "@/public/portada/tienda-rosa.webp"
  * La captura de la tienda es un archivo: si su diseño cambia, se vuelve a
  * sacar a 390 px de ancho y doble densidad, desde la sección "Lo nuevo". Está
  * retocada: el primer producto de la tienda era un mouse gamer, que no pega en
- * una tienda de deportes, y en la captura es una zapatilla de running, con la
- * foto de los datos de ejemplo (`lib/demo-data.ts`). Por eso el pie dice que
+ * una tienda de deportes, y en la captura es una zapatilla de running, con
+ * una foto de Pexels (2529148) sobre fondo claro, como los demás productos. Por eso el pie dice que
  * la tienda es ilustrativa.
  */
 
@@ -47,7 +47,7 @@ export function Vitrina() {
         <div className="relative ml-auto aspect-[4/5] w-[86%] overflow-hidden bg-tinta/10">
           <Image
             src={vendedora}
-            alt="Una vendedora fotografía sus productos con el celular"
+            alt="Una joven con su celular y una bolsa de compras"
             fill
             priority
             placeholder="blur"
