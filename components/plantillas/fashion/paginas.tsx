@@ -1,6 +1,7 @@
 import Link from "next/link"
-import { ArrowRight, MessageCircle, Repeat, Truck } from "lucide-react"
+import { ArrowRight, MessageCircle, Repeat, ShoppingBag } from "lucide-react"
 
+import { numeroDeWhatsApp } from "@/lib/pedidos"
 import {
   CONDICIONES,
   descuento,
@@ -35,8 +36,8 @@ import { FiltrosTienda } from "@/components/tienda/filtros"
  * catálogo vive en su propia pantalla, con búsqueda y orden. Una tienda de
  * ropa con cuarenta prendas en la portada no deja ver ninguna.
  */
-export function Inicio({ tienda, codigo }: PropsInicio) {
-  const catalogo = rutaDeTienda(tienda.slug, "/catalogo", { ref: codigo })
+export function Inicio({ tienda }: PropsInicio) {
+  const catalogo = rutaDeTienda(tienda.slug, "/catalogo")
 
   if (tienda.productos.length === 0 && tienda.bloques.length === 0) {
     return (
@@ -52,22 +53,13 @@ export function Inicio({ tienda, codigo }: PropsInicio) {
   return (
     <>
       {tienda.bloques.length > 0 ? (
-        <Bloques
-          componentes={BLOQUES_FASHION}
-          tienda={tienda}
-          codigo={codigo}
-        />
+        <Bloques componentes={BLOQUES_FASHION} tienda={tienda} />
       ) : (
         <section className="mx-auto w-full max-w-7xl px-5 py-14">
           <TituloDeSeccion titulo={tienda.nombre} como="h1" />
           <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-3 md:gap-x-5 lg:grid-cols-4">
             {tienda.productos.slice(0, 12).map((producto) => (
-              <Tarjeta
-                key={producto.id}
-                producto={producto}
-                tienda={tienda}
-                codigo={codigo}
-              />
+              <Tarjeta key={producto.id} producto={producto} tienda={tienda} />
             ))}
           </div>
         </section>
@@ -113,7 +105,7 @@ export function Inicio({ tienda, codigo }: PropsInicio) {
   )
 }
 
-/** Quién vende y cómo se entrega. En moda, eso decide tanto como la prenda. */
+/** Quién vende y cómo se compra. En moda, eso decide tanto como la prenda. */
 function SobreLaTienda({ tienda }: { tienda: TiendaPublica }) {
   const usados = tienda.productos.some((p) => p.condition !== "nuevo")
 
@@ -134,15 +126,15 @@ function SobreLaTienda({ tienda }: { tienda: TiendaPublica }) {
       </div>
 
       <ul className="self-end border-t-2 border-tinta">
-        <Servicio icono={<Truck aria-hidden="true" className="size-5" />}>
-          Entrega coordinada contigo por WhatsApp
+        <Servicio icono={<ShoppingBag aria-hidden="true" className="size-5" />}>
+          Tu pedido llega a nuestro WhatsApp y lo cerramos ahí
         </Servicio>
         {tienda.whatsapp ? (
           <Servicio
             icono={<MessageCircle aria-hidden="true" className="size-5" />}
           >
             <a
-              href={`https://wa.me/${tienda.whatsapp.replace(/\D/g, "")}`}
+              href={`https://wa.me/${numeroDeWhatsApp(tienda.whatsapp)}`}
               target="_blank"
               rel="noreferrer noopener"
               className="underline-offset-4 hover:text-senal hover:underline"
@@ -154,19 +146,6 @@ function SobreLaTienda({ tienda }: { tienda: TiendaPublica }) {
         {usados ? (
           <Servicio icono={<Repeat aria-hidden="true" className="size-5" />}>
             Segunda mano con el estado de cada prenda descrito
-          </Servicio>
-        ) : null}
-        {tienda.aceptaVendedores && tienda.comisionBps > 0 ? (
-          <Servicio
-            icono={<ArrowRight aria-hidden="true" className="size-5" />}
-          >
-            <Link
-              href="/sumarme"
-              className="underline-offset-4 hover:text-senal hover:underline"
-            >
-              Vende nuestra ropa y gana {(tienda.comisionBps / 100).toFixed(0)}%
-              por venta
-            </Link>
           </Servicio>
         ) : null}
       </ul>
@@ -189,12 +168,7 @@ function Servicio({
   )
 }
 
-export function Catalogo({
-  tienda,
-  codigo,
-  filtros,
-  productos,
-}: PropsCatalogo) {
+export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
   const categoria = tienda.categorias.find((c) => c.id === filtros.categoria)
   const usados = tienda.productos.filter((p) => p.condition !== "nuevo").length
   const titulo =
@@ -216,7 +190,7 @@ export function Catalogo({
         className="flex items-center gap-2 text-[11px] tracking-[0.16em] uppercase"
       >
         <Link
-          href={rutaDeTienda(tienda.slug, "", { ref: codigo })}
+          href={rutaDeTienda(tienda.slug, "")}
           className="flex min-h-11 items-center opacity-60 transition-opacity hover:opacity-100"
         >
           Inicio
@@ -254,9 +228,7 @@ export function Catalogo({
               hayFiltro
                 ? {
                     etiqueta: "Ver todo",
-                    href: rutaDeTienda(tienda.slug, "/catalogo", {
-                      ref: codigo,
-                    }),
+                    href: rutaDeTienda(tienda.slug, "/catalogo", {}),
                   }
                 : undefined
             }
@@ -270,12 +242,7 @@ export function Catalogo({
           )}
         >
           {productos.map((producto) => (
-            <Tarjeta
-              key={producto.id}
-              producto={producto}
-              tienda={tienda}
-              codigo={codigo}
-            />
+            <Tarjeta key={producto.id} producto={producto} tienda={tienda} />
           ))}
         </div>
       )}
@@ -283,7 +250,7 @@ export function Catalogo({
   )
 }
 
-export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
+export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
   const { ficha } = tienda.apariencia
   const vitrina = ficha.diseno === "vitrina"
   const consulta = enlaceDeConsulta(tienda, producto)
@@ -307,7 +274,7 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
         )}
       >
         <Link
-          href={rutaDeTienda(tienda.slug, "/catalogo", { ref: codigo })}
+          href={rutaDeTienda(tienda.slug, "/catalogo")}
           className="flex min-h-11 items-center opacity-60 transition-opacity hover:opacity-100"
         >
           Catálogo
@@ -320,7 +287,6 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
             <Link
               href={rutaDeTienda(tienda.slug, "/catalogo", {
                 categoria: producto.category_id,
-                ref: codigo,
               })}
               className="flex min-h-11 items-center truncate opacity-60 transition-opacity hover:opacity-100"
             >
@@ -436,10 +402,10 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
                 </p>
               </Detalle>
             ) : null}
-            <Detalle titulo="Entrega">
+            <Detalle titulo="Cómo comprar">
               <p className="leading-relaxed opacity-80">
-                La coordinas con la tienda por WhatsApp después de hacer tu
-                pedido.
+                Agrégala al carrito y manda tu pedido por WhatsApp: la tienda te
+                responde ahí.
               </p>
             </Detalle>
             {producto.sku ? (
@@ -456,12 +422,7 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
           <TituloDeSeccion titulo="También te puede gustar" />
           <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 md:gap-x-5 lg:grid-cols-4">
             {relacionados.map((otro) => (
-              <Tarjeta
-                key={otro.id}
-                producto={otro}
-                tienda={tienda}
-                codigo={codigo}
-              />
+              <Tarjeta key={otro.id} producto={otro} tienda={tienda} />
             ))}
           </div>
         </section>

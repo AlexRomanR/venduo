@@ -27,9 +27,8 @@ export interface TiendaPublica {
   nombre: string
   descripcion: string | null
   logoUrl: string | null
+  /** A donde llega cada pedido. Sin él, la tienda no puede vender. */
   whatsapp: string | null
-  aceptaVendedores: boolean
-  comisionBps: number
   /** Con qué kit se dibuja. Una clave retirada ya llega resuelta a la base. */
   plantilla: ClavePlantilla
   /** La base de la plantilla con la personalización de la tienda encima. */
@@ -75,12 +74,6 @@ export function marcoDeTienda(tienda: TiendaPublica): MarcoDeTienda {
   }
 }
 
-/** El vendedor al que se le acredita la venta, si el enlace traía código. */
-export interface Referido {
-  codigo: string
-  nombre: string | null
-}
-
 function bloquesDeDemostracion(): BloquePublico[] {
   return [
     {
@@ -103,7 +96,7 @@ function bloquesDeDemostracion(): BloquePublico[] {
       tipo: "about",
       props: {
         title: "Sobre nosotros",
-        body: "Vendemos ropa para entrenar y para el día a día. Coordinamos la entrega por WhatsApp.",
+        body: "Vendemos ropa para entrenar y para el día a día. Haz tu pedido y lo cerramos contigo por WhatsApp.",
       },
     },
   ]
@@ -135,8 +128,6 @@ export const getTiendaPublica = cache(async function getTiendaPublica(
       descripcion: "Ropa deportiva en Santa Cruz.",
       logoUrl: null,
       whatsapp: null,
-      aceptaVendedores: true,
-      comisionBps: 1200,
       plantilla: "fashion",
       apariencia: aparienciaDeTienda("fashion", {}),
       bloques: bloquesDeDemostracion(),
@@ -167,7 +158,7 @@ type Cliente = NonNullable<Awaited<ReturnType<typeof createClient>>>
 
 /** Lo que se lee de `stores` para armar una tienda. */
 export const COLUMNAS_DE_TIENDA =
-  "id, slug, name, description, logo_url, whatsapp, seller_network_enabled, commission_bps, is_published, template_key, theme_overrides"
+  "id, slug, name, description, logo_url, whatsapp, is_published, template_key, theme_overrides"
 
 type FilaDeTienda = {
   id: string
@@ -176,8 +167,6 @@ type FilaDeTienda = {
   description: string | null
   logo_url: string | null
   whatsapp: string | null
-  seller_network_enabled: boolean
-  commission_bps: number
   template_key: string | null
   theme_overrides: Json
 }
@@ -242,8 +231,6 @@ export async function completarTienda(
     descripcion: tienda.description,
     logoUrl: tienda.logo_url,
     whatsapp: tienda.whatsapp,
-    aceptaVendedores: tienda.seller_network_enabled,
-    comisionBps: tienda.commission_bps,
     plantilla: plantillaDeTienda(tienda.template_key),
     apariencia: aparienciaDeTienda(tienda.template_key, tienda.theme_overrides),
     bloques,
@@ -267,123 +254,4 @@ export async function getProductoPublico(
 
   const producto = tienda.productos.find((p) => p.id === productoId)
   return producto ? { tienda, producto } : null
-}
-
-/**
- * Quién trae la visita, si el enlace traía un código.
- *
- * Pasa por `referido_publico` y no por un `select` a `store_sellers`: esa tabla
- * solo se lee `to authenticated`, y quien compra es anónimo. Con el select
- * directo el cartel solo lo veía el dueño mientras probaba.
- *
- * Esto es **solo para mostrarlo**. La validación que decide si alguien cobra la
- * hace `create_order`, que vuelve a resolver el código contra la tienda antes
- * de congelar la comisión.
- */
-export async function getReferido(
-  tiendaId: string,
-  codigo: string | null
-): Promise<Referido | null> {
-  if (!codigo) return null
-
-  const supabase = await createClient()
-  if (!supabase) return null
-
-  const { data } = await supabase.rpc("referido_publico", {
-    p_store_id: tiendaId,
-    p_codigo: codigo,
-  })
-
-  const fila = data?.[0]
-  return fila ? { codigo: fila.codigo, nombre: fila.nombre } : null
-}
-
-/**
- * El código tal como se propaga por la tienda.
- *
- * Se limpia pero **no se valida**: validar exige leer `store_sellers`, que un
- * comprador anónimo no puede. Si solo se propagara el código ya resuelto, para
- * un comprador real se perdería al pasar de la tienda al producto, y con él la
- * comisión de quien trajo la venta. El árbitro es `create_order`: un código que
- * no exista se ignora ahí y la venta queda sin vendedor, que es lo correcto.
- */
-export function codigoDeReferido(valor: unknown): string | null {
-  if (typeof valor !== "string") return null
-
-  const limpio = valor.trim().toUpperCase()
-  return /^[A-Z0-9]{4,20}$/.test(limpio) ? limpio : null
-}
-
-/**
- * El pedido, para quien acaba de hacerlo.
- *
- * Pasa por `pedido_publico`, que es `security definer`: `orders` se lee solo
- * `to authenticated` y quien compró no tiene cuenta. Esa función devuelve lo
- * que el comprador ya sabe más los datos de pago de la tienda, y nunca la
- * comisión ni el vendedor: eso es del comercio.
- */
-export async function getPedidoPublico(
-  pedidoId: string
-): Promise<PedidoPublicoConTienda | null> {
-  const supabase = await createClient()
-  if (!supabase) return null
-
-  const { data } = await supabase.rpc("pedido_publico", {
-    p_order_id: pedidoId,
-  })
-
-  if (!data || typeof data !== "object") return null
-
-  const crudo = data as Record<string, Json>
-  const tienda = (crudo.tienda ?? {}) as Record<string, Json>
-  const items = Array.isArray(crudo.items) ? crudo.items : []
-
-  return {
-    id: String(crudo.id),
-    numero: Number(crudo.numero),
-    estado: String(crudo.estado),
-    totalCents: Number(crudo.total_cents),
-    comprador: String(crudo.comprador),
-    tieneComprobante: Boolean(crudo.tiene_comprobante),
-    items: items.map((item) => {
-      const fila = item as Record<string, Json>
-      return {
-        nombre: String(fila.nombre),
-        cantidad: Number(fila.cantidad),
-        precioCents: Number(fila.precio_cents),
-        totalCents: Number(fila.total_cents),
-      }
-    }),
-    tienda: {
-      nombre: String(tienda.nombre),
-      slug: String(tienda.slug),
-      logoUrl: tienda.logo_url ? String(tienda.logo_url) : null,
-      whatsapp: tienda.whatsapp ? String(tienda.whatsapp) : null,
-      qrUrl: tienda.qr_url ? String(tienda.qr_url) : null,
-      instrucciones: tienda.instrucciones ? String(tienda.instrucciones) : null,
-    },
-  }
-}
-
-export interface PedidoPublicoConTienda {
-  id: string
-  numero: number
-  estado: string
-  totalCents: number
-  comprador: string
-  tieneComprobante: boolean
-  items: Array<{
-    nombre: string
-    cantidad: number
-    precioCents: number
-    totalCents: number
-  }>
-  tienda: {
-    nombre: string
-    slug: string
-    logoUrl: string | null
-    whatsapp: string | null
-    qrUrl: string | null
-    instrucciones: string | null
-  }
 }

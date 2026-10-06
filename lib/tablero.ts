@@ -24,15 +24,14 @@ export interface DiaDeVentas {
   dia: string
   ventasCents: number
   pedidos: number
-  /** La parte que vendieron los vendedores de la red. */
-  redCents: number
 }
 
 export interface PedidoReciente {
   id: string
   numero: number
-  comprador: string
-  telefono: string
+  /** Solo los pedidos anteriores a la compra por WhatsApp lo guardan. */
+  comprador: string | null
+  telefono: string | null
   totalCents: number
   estado: OrderStatus
   creado: string
@@ -54,36 +53,21 @@ export interface ProductoPorAcabarse {
   stock: number
 }
 
-export interface VendedorDestacado {
-  id: string
-  nombre: string
-  ventasCents: number
-  pedidos: number
-}
-
 export interface Tablero {
   /** El día de hoy en Bolivia: el último de la serie. */
   hoy: string
   /** Un día por fila, del más viejo a hoy, con los días sin ventas en cero. */
   serie: DiaDeVentas[]
   ultimosPedidos: PedidoReciente[]
-  /** Los pedidos que esperan algo de la tienda, por estado. */
-  porGestionar: { pendientes: number; pagados: number }
+  /** Los pedidos que esperan que la tienda confirme el pago. */
+  porGestionar: { pendientes: number }
   masVendidos: ProductoVendido[]
   porAcabarse: ProductoPorAcabarse[]
-  red: {
-    activa: boolean
-    activos: number
-    pendientes: number
-    destacados: VendedorDestacado[]
-  }
   /** Los primeros pasos de una tienda nueva, hechos o no. */
   pasos: {
     producto: boolean
     estilo: boolean
     primerPedido: boolean
-    /** `null` si la tienda no acepta vendedores: el paso no aplica. */
-    vendedor: boolean | null
   }
   esDemo: boolean
 }
@@ -97,14 +81,12 @@ export function diasVacios(
     dia: sumarDias(hoy, indice - (cantidad - 1)),
     ventasCents: 0,
     pedidos: 0,
-    redCents: 0,
   }))
 }
 
 export interface TotalesDelPeriodo {
   ventasCents: number
   pedidos: number
-  redCents: number
   /** Ventas sobre pedidos; `null` sin pedidos, porque no hay promedio de nada. */
   ticketCents: number | null
   mejorDia: DiaDeVentas | null
@@ -124,7 +106,6 @@ export function totales(dias: DiaDeVentas[]): TotalesDelPeriodo {
   return {
     ventasCents,
     pedidos,
-    redCents: dias.reduce((total, d) => total + d.redCents, 0),
     ticketCents: pedidos > 0 ? Math.round(ventasCents / pedidos) : null,
     mejorDia,
   }
@@ -192,7 +173,7 @@ export function columnas(dias: DiaDeVentas[]): Columna[] {
 
 /** Los pasos de una tienda nueva que faltan, en el orden en que conviene. */
 export function pasosPendientes(pasos: Tablero["pasos"]): number {
-  return [pasos.producto, pasos.estilo, pasos.primerPedido, pasos.vendedor]
-    .filter((hecho) => hecho !== null)
-    .filter((hecho) => !hecho).length
+  return [pasos.producto, pasos.estilo, pasos.primerPedido].filter(
+    (hecho) => !hecho
+  ).length
 }

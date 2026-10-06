@@ -6,7 +6,7 @@ export interface FiltrosCatalogo {
   buscar?: string
   categoria?: string
   condicion?: ProductCondition
-  /** `activos`, `ocultos`, `sin_stock`, `poco_stock`, `vendedores`, `destacados`. */
+  /** `activos`, `ocultos`, `sin_stock`, `poco_stock`, `destacados`. */
   estado?: string
   orden?: string
 }
@@ -17,7 +17,6 @@ export interface ResumenCatalogo {
   ocultos: number
   sinStock: number
   pocoStock: number
-  conVendedores: number
   destacados: number
   /** Precio por stock, en centavos. Lo que vale lo que tienes guardado. */
   valorInventarioCents: number
@@ -55,7 +54,6 @@ function catalogoDeDemostracion(): Catalogo {
     image_url: null,
     low_stock_threshold: 3,
     is_featured: false,
-    seller_enabled: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     deleted_at: null,
@@ -104,7 +102,6 @@ function catalogoDeDemostracion(): Catalogo {
       price_cents: 5500,
       stock: 12,
       is_active: false,
-      seller_enabled: false,
     },
   ] as Product[]
 
@@ -139,7 +136,6 @@ function resumir(productos: Product[]): ResumenCatalogo {
     pocoStock: productos.filter(
       (p) => p.stock > 0 && p.stock <= p.low_stock_threshold
     ).length,
-    conVendedores: productos.filter((p) => p.seller_enabled).length,
     destacados: productos.filter((p) => p.is_featured).length,
     valorInventarioCents: productos.reduce(
       (total, p) => total + p.price_cents * p.stock,
@@ -238,9 +234,6 @@ function filtrar(productos: Product[], filtros: FiltrosCatalogo): Product[] {
       salida = salida.filter(
         (p) => p.stock > 0 && p.stock <= p.low_stock_threshold
       )
-      break
-    case "vendedores":
-      salida = salida.filter((p) => p.seller_enabled)
       break
     case "destacados":
       salida = salida.filter((p) => p.is_featured)

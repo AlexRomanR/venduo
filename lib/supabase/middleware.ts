@@ -5,15 +5,7 @@ import { env, isSupabaseConfigured } from "@/lib/env"
 import { slugDesdeHost } from "@/lib/tienda"
 
 /** Rutas que exigen sesión iniciada. */
-const PROTECTED_PREFIXES = [
-  "/panel",
-  "/editor",
-  "/vendedor",
-  "/cuenta",
-  "/crear",
-  "/sumarme",
-  "/explorar",
-]
+const PROTECTED_PREFIXES = ["/panel", "/editor", "/cuenta", "/crear"]
 
 /**
  * Refresca el token de Supabase en cada request y protege las áreas privadas.

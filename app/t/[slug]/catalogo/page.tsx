@@ -1,12 +1,7 @@
 import { notFound } from "next/navigation"
 
 import { filtrarCatalogo, leerFiltros } from "@/lib/catalogo"
-import {
-  codigoDeReferido,
-  getReferido,
-  getTiendaPublica,
-  marcoDeTienda,
-} from "@/lib/data/tienda-publica"
+import { getTiendaPublica, marcoDeTienda } from "@/lib/data/tienda-publica"
 import { kitDePlantilla } from "@/components/plantillas"
 import { BarraDelCarrito } from "@/components/tienda/barra-del-carrito"
 
@@ -26,7 +21,7 @@ export async function generateMetadata({
  * El catálogo completo, con filtros, búsqueda y orden.
  *
  * Los filtros viven en la URL: "solo segunda mano, de menor a mayor precio" es
- * un enlace que un vendedor puede mandar por WhatsApp tal cual.
+ * un enlace que la tienda puede mandar por WhatsApp tal cual.
  */
 export default async function CatalogoPage({
   params,
@@ -40,8 +35,6 @@ export default async function CatalogoPage({
   if (!tienda) notFound()
 
   const consulta = await searchParams
-  const codigo = codigoDeReferido(consulta.ref)
-  const referido = await getReferido(tienda.id, codigo)
   const filtros = leerFiltros(consulta)
 
   const kit = kitDePlantilla(tienda.plantilla)
@@ -49,18 +42,17 @@ export default async function CatalogoPage({
 
   return (
     <>
-      <kit.Cabecera marco={marco} referido={referido} codigo={codigo} />
+      <kit.Cabecera marco={marco} />
 
       <main className="flex-1">
         <kit.Catalogo
           tienda={tienda}
-          codigo={codigo}
           filtros={filtros}
           productos={filtrarCatalogo(tienda.productos, filtros)}
         />
       </main>
 
-      <kit.Pie marco={marco} codigo={codigo} />
+      <kit.Pie marco={marco} />
       <BarraDelCarrito slug={tienda.slug} />
     </>
   )

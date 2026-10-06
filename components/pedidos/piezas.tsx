@@ -2,12 +2,12 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Receipt } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 import { cn } from "@/lib/utils"
 import type { Pedido } from "@/lib/data/pedidos"
-import { ESTADOS } from "@/lib/pedidos"
+import { ESTADOS, SIGUIENTES } from "@/lib/pedidos"
 import type { OrderStatus } from "@/types"
 
 const ASPECTO: Record<OrderStatus, string> = {
@@ -15,10 +15,6 @@ const ASPECTO: Record<OrderStatus, string> = {
   // estados fueran de color, el acento dejaría de señalar nada.
   pendiente: "border-senal text-senal",
   pagado: "border-tinta text-tinta",
-  enviado: "border-tinta/40 text-tinta/70",
-  entregado: "border-tinta/25 text-tinta/45",
-  // Quedó en el enum de la base y nada lo escribe; si apareciera, pide acción.
-  en_disputa: "border-senal text-senal",
   cancelado: "border-tinta/25 text-tinta/40 line-through",
 }
 
@@ -38,78 +34,11 @@ export function Estado({ estado }: { estado: OrderStatus }) {
 }
 
 /**
- * Ver el comprobante.
- *
- * Se pide al hacer clic y no al cargar la lista: la URL viene firmada por una
- * hora, y firmar veinte de una vez para que se miren dos es trabajo tirado.
- */
-export function BotonComprobante({
-  pedidoId,
-  ver,
-  icono = false,
-}: {
-  pedidoId: string
-  ver: (id: string) => Promise<{ ok: boolean; url?: string; error?: string }>
-  /** Solo el ícono, para la columna de atajos de una fila. */
-  icono?: boolean
-}) {
-  const [cargando, setCargando] = React.useState(false)
-
-  async function abrir() {
-    setCargando(true)
-    const resultado = await ver(pedidoId)
-    setCargando(false)
-
-    if (!resultado.ok || !resultado.url) {
-      toast.error(resultado.error ?? "No pudimos abrir el comprobante.")
-      return
-    }
-
-    window.open(resultado.url, "_blank", "noopener,noreferrer")
-  }
-
-  const Icono = cargando ? Loader2 : Receipt
-
-  if (icono) {
-    return (
-      <button
-        type="button"
-        onClick={abrir}
-        disabled={cargando}
-        aria-label="Ver el comprobante"
-        title="Ver el comprobante"
-        className="flex w-12 items-center justify-center border-l border-tinta/15 text-senal transition-colors hover:bg-tinta hover:text-papel sm:w-14"
-      >
-        <Icono
-          aria-hidden="true"
-          className={cn("size-5", cargando && "animate-spin")}
-        />
-      </button>
-    )
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={abrir}
-      disabled={cargando}
-      className="flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
-    >
-      <Icono
-        aria-hidden="true"
-        className={cn("size-4", cargando && "animate-spin")}
-      />
-      Ver comprobante
-    </button>
-  )
-}
-
-/**
  * Cambiar el estado.
  *
  * Cada paso avisa qué va a pasar además de cambiar la etiqueta, porque lo que
- * pasa no es obvio: marcar pagado le acredita la comisión al vendedor, y
- * cancelar devuelve el stock al catálogo.
+ * pasa no es obvio: marcar pagado descuenta el stock, y cancelar un pagado lo
+ * devuelve al catálogo.
  */
 export function CambiarEstado({
   pedido,
@@ -126,24 +55,26 @@ export function CambiarEstado({
   const router = useRouter()
   const [enCurso, setEnCurso] = React.useState<OrderStatus | null>(null)
 
-  const siguientes = PASOS[pedido.estado]
+  const siguientes = SIGUIENTES[pedido.estado].map((estado) => PASOS[estado])
 
-  async function aplicar(estado: OrderStatus, aviso: string) {
+  async function aplicar(paso: Paso) {
     if (soloLectura) {
       toast.info("Estás en modo demo: los cambios no se guardan.")
       return
     }
 
-    if (estado === "cancelado") {
+    if (paso.estado === "cancelado") {
       const confirmar = window.confirm(
-        `¿Cancelar el pedido #${pedido.numero}? El stock vuelve a tu catálogo` +
-          (pedido.vendedor ? " y la comisión de su vendedor se anula." : ".")
+        `¿Cancelar el pedido #${pedido.numero}?` +
+          (pedido.estado === "pagado"
+            ? " Sus productos vuelven a tu stock."
+            : "")
       )
       if (!confirmar) return
     }
 
-    setEnCurso(estado)
-    const resultado = await cambiar(pedido.id, estado)
+    setEnCurso(paso.estado)
+    const resultado = await cambiar(pedido.id, paso.estado)
     setEnCurso(null)
 
     if (!resultado.ok) {
@@ -151,7 +82,7 @@ export function CambiarEstado({
       return
     }
 
-    toast.success(aviso)
+    toast.success(paso.aviso)
     router.refresh()
   }
 
@@ -163,7 +94,7 @@ export function CambiarEstado({
         <button
           key={paso.estado}
           type="button"
-          onClick={() => aplicar(paso.estado, paso.aviso)}
+          onClick={() => aplicar(paso)}
           disabled={enCurso !== null}
           className={cn(
             "flex min-h-11 items-center gap-2 rounded-plantilla px-4 text-sm font-semibold transition-colors disabled:opacity-50",
@@ -189,37 +120,22 @@ interface Paso {
   principal?: boolean
 }
 
-/** El camino de un pedido. Un entregado o cancelado ya no se mueve. */
-const PASOS: Record<OrderStatus, Paso[]> = {
-  pendiente: [
-    {
-      estado: "pagado",
-      texto: "Confirmar el pago",
-      aviso: "Pago confirmado. Si vino de un vendedor, su comisión ya está.",
-      principal: true,
-    },
-    { estado: "cancelado", texto: "Cancelar", aviso: "Pedido cancelado." },
-  ],
-  pagado: [
-    {
-      estado: "enviado",
-      texto: "Marcar como enviado",
-      aviso: "Marcado como enviado.",
-      principal: true,
-    },
-    { estado: "cancelado", texto: "Cancelar", aviso: "Pedido cancelado." },
-  ],
-  enviado: [
-    {
-      estado: "entregado",
-      texto: "Marcar como entregado",
-      aviso: "Entregado. Pedido cerrado.",
-      principal: true,
-    },
-  ],
-  entregado: [],
-  en_disputa: [
-    { estado: "cancelado", texto: "Cancelar", aviso: "Pedido cancelado." },
-  ],
-  cancelado: [],
+/** Cómo se ofrece en pantalla pasar a cada estado. */
+const PASOS: Record<OrderStatus, Paso> = {
+  pendiente: {
+    estado: "pendiente",
+    texto: "Volver a pendiente",
+    aviso: "Pedido pendiente.",
+  },
+  pagado: {
+    estado: "pagado",
+    texto: "Marcar pagado",
+    aviso: "Pago confirmado. Ya se descontó del stock.",
+    principal: true,
+  },
+  cancelado: {
+    estado: "cancelado",
+    texto: "Cancelar",
+    aviso: "Pedido cancelado.",
+  },
 }

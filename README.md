@@ -6,8 +6,8 @@
 
 <p align="center">
   Tu tienda online lista en minutos —sobre una plantilla que la IA edita por bloques— y
-  todo lo que hay detrás: stock, pedidos, cobros, estadísticas, catálogos en PDF y una red
-  de vendedores a comisión.
+  todo lo que hay detrás: stock, pedidos que llegan por WhatsApp, estadísticas y
+  catálogos en PDF.
 </p>
 
 <p align="center">
@@ -28,24 +28,21 @@
 **Venduo es una plataforma que genera tiendas online para emprendedores que venden por
 TikTok, Instagram, Facebook y WhatsApp.** Quien vende por redes no necesita "una página
 web": necesita dejar de responder "¿precio?" cincuenta veces al día, no vender lo que ya
-no tiene y dejar de revisar capturas de pago una por una.
+no tiene y dejar de perder pedidos entre mensajes.
 
 Con Venduo, el emprendedor:
 
 1. **Elige una plantilla** según su rubro (moda, perfumería o editorial).
-2. **Cuenta su negocio** en un párrafo y la **IA ajusta la tienda**: secciones, textos,
-   colores y tipografía.
+2. **Cuenta su negocio** en un párrafo, deja el **WhatsApp de su tienda** y la **IA
+   ajusta la tienda**: secciones, textos, colores y tipografía.
 3. **Carga sus productos** con fotos, stock y condición (nuevo, segunda mano o
    reacondicionado).
 4. **Publica** y obtiene el enlace de su tienda y un código QR para su bio y WhatsApp.
-5. **Gestiona** pedidos, stock, estadísticas y catálogos en PDF desde su panel.
+5. **Recibe los pedidos por WhatsApp**: su cliente arma el carrito y se lo manda con el
+   total y el número del pedido, sin llenar formularios.
+6. **Gestiona** pedidos, stock, estadísticas y catálogos en PDF desde su panel.
 
-Y si quiere, activa una **red de vendedores jóvenes** que colocan sus productos a
-comisión. Cada venta que hacen queda registrada en un **historial laboral público y
-verificable**: su primer antecedente de trabajo real.
-
-> Proyecto nacido en una hackathon de 48 horas con el desafío de **empleabilidad
-> juvenil** y enfoque de **triple impacto**, pensado para Bolivia.
+> Proyecto nacido en una hackathon de 48 horas, pensado para Bolivia.
 
 ---
 
@@ -59,23 +56,15 @@ verificable**: su primer antecedente de trabajo real.
 | 🎨 **Editor visual con IA**             | Seis pasos con vista previa real: marca, portada, catálogo, ficha de producto, carrito y publicar. Arrastrar secciones, deshacer, versiones |
 | 🤖 **La IA edita por bloques**          | Se le pide en palabras ("ponla en tonos de verano") y devuelve operaciones que el sistema valida antes de mostrarlas                        |
 | 📦 **Productos y stock**                | Fotos, stock con umbral de aviso, categorías, precio anterior para descuentos, segunda mano y reacondicionados                              |
-| 🧾 **Pedidos**                          | Carrito y checkout, detalle y estados del pedido, y el mensaje de WhatsApp para coordinar la entrega ya armado                              |
+| 🧾 **Pedidos por WhatsApp**             | El carrito se manda al WhatsApp de la tienda con su número y su total; en el panel se marca pagado y el stock baja solo                     |
 | 📊 **Estadísticas en lenguaje natural** | "¿Qué producto se vende más este mes?" → la IA arma la consulta y la respuesta llega como gráfico, con informe descargable en PDF           |
 | 📄 **Catálogos en PDF**                 | Doce plantillas, packs y ofertas, con los colores de la tienda. Se descargan, se comparten por enlace o se siguen editando en Canva         |
-| 🤝 **Red de vendedores**                | Invitaciones, aprobación de solicitudes y comisiones automáticas que se congelan al momento de la venta                                     |
-
-### Para el vendedor
-
-- Se suma a **una o varias tiendas**, o toma productos sueltos de una vitrina pública.
-- Recibe un **enlace de referido y un QR** propios: toda venta que entra por ahí es suya.
-- Ve sus ventas y comisiones en su panel (`/vendedor`).
-- Tiene un **perfil público** (`/v/{slug}`) con su historial de ventas verificable, que
-  sobrevive aunque la tienda abandone la plataforma.
 
 ### Para el comprador
 
 - Tienda **pensada para el celular**, con catálogo, filtros, búsqueda y ficha de producto.
-- Carrito y checkout **sin crear cuenta**: nombre y WhatsApp alcanzan.
+- **Sin cuenta y sin formularios**: elige, ve el total y toca "Enviar pedido por
+  WhatsApp". El chat se abre con su pedido ya escrito para la tienda.
 
 ---
 
@@ -103,27 +92,29 @@ verificable**: su primer antecedente de trabajo real.
 ## Arquitectura en corto
 
 ```
-Comprador ─▶ /t/{slug}  ─┐
-Emprendedor ─▶ /panel   ─┼─▶ Next.js (Server Components) ─▶ Supabase (PostgreSQL + RLS)
-Vendedor ─▶ /vendedor   ─┘              │
-                                        └─▶ Capa de IA ─▶ Claude · Gemini · OpenAI · mock
+Comprador ─▶ /t/{slug} ─┬─▶ Next.js (Server Components) ─▶ Supabase (PostgreSQL + RLS)
+Emprendedor ─▶ /panel ──┘              │
+     ▲                                 └─▶ Capa de IA ─▶ Claude · Gemini · OpenAI · mock
+     └──────── el pedido llega por WhatsApp ◀── carrito del comprador
 ```
 
 Algunas decisiones que vale la pena conocer:
 
 - **Multi-tenant con Row Level Security.** Cada tabla de negocio lleva su `store_id` y
-  Postgres impone el aislamiento: un emprendedor tiene una tienda, pero un vendedor
-  trabaja para varias.
-- **El checkout no confía en el navegador.** El pedido se crea con una función del
-  servidor (`create_order`) que recalcula precios, valida stock y congela la comisión.
+  Postgres impone el aislamiento: una tienda por emprendedor, y ninguna ve los datos de
+  otra.
+- **El pedido no confía en el navegador.** Se crea con una función del servidor
+  (`create_order`) que recalcula los precios y comprueba el stock; el mensaje de WhatsApp
+  se arma con lo que ella devuelve.
+- **El stock baja al marcar el pedido pagado**, y lo mueve un disparador de la base: un
+  carrito mandado y nunca concretado no retiene unidades.
 - **Dinero en centavos enteros**, porcentajes en puntos básicos. Nunca punto flotante.
 - **La IA propone, el sistema valida y ejecuta.** Toda respuesta del modelo pasa por un
   esquema zod antes de tocar la base o la pantalla. La IA de estadísticas solo puede leer,
   en una transacción de solo lectura y contra vistas acotadas a la propia tienda.
 - **Plantillas como kits de componentes.** Una tienda se dibuja con el kit de su
   plantilla, y la personalización se guarda como diferencia respecto de la base.
-- **Borrado lógico** en todas partes, y un historial del vendedor que nunca se borra en
-  cascada.
+- **Borrado lógico** en todas partes: los pedidos se cancelan, nunca se borran.
 - **Modo demo**: sin credenciales, el proyecto arranca igual con datos e IA simulados.
 
 ---
@@ -133,14 +124,11 @@ Algunas decisiones que vale la pena conocer:
 ```
 app/                    Rutas de Next.js
   page.tsx              Portada pública
-  t/[slug]/             Tienda pública: portada, catálogo, producto, carrito y pedido
-  v/[slug]/             Perfil público del vendedor
-  crear/                Alta de la tienda (el generador)
+  t/[slug]/             Tienda pública: portada, catálogo, producto y carrito
+  crear/                Alta de la tienda (el generador), con su WhatsApp
   editor/               Editor visual de la tienda, a pantalla completa
-  (privado)/panel/      Panel del emprendedor: productos, pedidos, vendedores,
-                        estadísticas, apariencia y catálogos
-  (privado)/vendedor/   Panel del vendedor
-  sumarme/, explorar/   Alta del vendedor y vitrinas de tiendas y productos
+  (privado)/panel/      Panel del emprendedor: productos, pedidos, estadísticas,
+                        apariencia y catálogos
   c/[token]/            Catálogo en PDF compartido por enlace
 
 components/             Componentes de React por área (tienda, editor, panel, catálogos…)
@@ -155,7 +143,7 @@ lib/                    Lógica sin interfaz
   catalogos/            Modelo y generación de los catálogos en PDF
   insights/             Estadísticas en lenguaje natural
 
-supabase/migrations/    Esquema SQL: 29 tablas, políticas RLS, funciones y disparadores
+supabase/migrations/    Esquema SQL: tablas, políticas RLS, funciones y disparadores
 types/                  Tipos generados de la base y alias
 docs/                   Documentación técnica
 ```
@@ -206,21 +194,18 @@ npm run setup   # crea .env.local desde .env.example y dice qué falta
 
 | Funcionalidad                                          | Estado |
 | ------------------------------------------------------ | ------ |
-| Registro e ingreso por rol (emprendedor o vendedor)    | ✅     |
+| Registro e ingreso                                     | ✅     |
 | Generación de la tienda desde una plantilla del rubro  | ✅     |
 | Editor visual de la tienda asistido por IA             | ✅     |
 | Tienda pública con URL propia, navegable en el celular | ✅     |
 | Productos con fotos, stock, categorías y condición     | ✅     |
-| Carrito y checkout sin cuenta                          | ✅     |
-| Red de vendedores, referidos y comisiones automáticas  | ✅     |
-| Panel del vendedor y perfil público verificable        | ✅     |
+| Carrito que manda el pedido por WhatsApp, sin datos    | ✅     |
+| Pedidos en el panel, con stock que baja al pagar       | ✅     |
 | Estadísticas en lenguaje natural con informe en PDF    | ✅     |
 | Catálogos en PDF con doce plantillas y Canva           | ✅     |
-| Cobro con PagoFácil y custodia del pago                | 🟡     |
-| Entrega por WhatsApp con marcas de enviado y recibido  | 🟡     |
 | Copys de marketing con IA y publicación en redes       | ❌     |
 
-✅ hecho · 🟡 con un flujo provisorio · ❌ pendiente. El detalle está en
+✅ hecho · ❌ pendiente. El detalle está en
 [`docs/estado-del-proyecto.md`](docs/estado-del-proyecto.md).
 
 ---

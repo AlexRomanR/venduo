@@ -1,78 +1,52 @@
 # Venduo
 
 **Documento maestro del proyecto** — hackathon de 48 horas
-Desafío: empleabilidad juvenil · Enfoque: triple impacto
 
 ---
 
 ## 1. Qué es Venduo
 
-**Más que una tienda online: el sistema para vender por redes sociales.** Quien vende por TikTok, Instagram, Facebook o WhatsApp tiene en Venduo su **tienda online** —el enlace que pone en su bio y manda por chat— y, detrás de ella, todo lo que necesita su negocio: el stock controlado, los cobros con PagoFácil, los pedidos ordenados con el WhatsApp listo, una red de vendedores a comisión, estadísticas que se preguntan en palabras y catálogos en PDF para compartir.
+**Más que una tienda online: el sistema para vender por redes sociales.** Quien vende por TikTok, Instagram, Facebook o WhatsApp tiene en Venduo su **tienda online** —el enlace que pone en su bio y manda por chat— y, detrás de ella, todo lo que necesita su negocio: el stock controlado, los pedidos que le llegan a su WhatsApp con el número y el total, estadísticas que se preguntan en palabras y catálogos en PDF para compartir.
 
-La tienda se arma sobre una plantilla del rubro, y la inteligencia artificial la ajusta por bloques —agrega, quita, reordena, cambia textos y colores— cuando el emprendedor se lo pide. Y como esa tienda ya tiene catálogo digital, puede activar con un clic una red de vendedores jóvenes que colocan sus productos a comisión.
+La tienda se arma sobre una plantilla del rubro, y la inteligencia artificial la ajusta por bloques —agrega, quita, reordena, cambia textos y colores— cuando el emprendedor se lo pide.
 
-**En una frase:** no es solo una página: es tu tienda y el sistema que la maneja, y una red de vendedores que vende por ti.
+**En una frase:** no es solo una página: es tu tienda y el sistema que la maneja, y los pedidos te llegan por WhatsApp, donde ya vendes.
 
 ### Cómo se le habla al cliente
 
-Quien vende por redes no se levanta pensando "necesito una página web". Se levanta respondiendo "¿precio?" por mensaje directo, vendiendo algo que ya no tenía o revisando capturas de transferencias. Venduo se presenta desde esos problemas: la tienda online se nombra —no se esconde— pero siempre acompañada de lo que la hace distinta, "tu tienda online, con stock y cobros incluidos". Los ejemplos son de rubros que se venden por redes —moda, calzado, belleza, perfumes, accesorios, tecnología, segunda mano—, no de comida casera. El detalle de tono está en `.agents/rules/ui-styling.md`, "Cómo le hablamos al cliente".
+Quien vende por redes no se levanta pensando "necesito una página web". Se levanta respondiendo "¿precio?" por mensaje directo, vendiendo algo que ya no tenía o buscando un pedido entre cien mensajes. Venduo se presenta desde esos problemas: la tienda online se nombra —no se esconde— pero siempre acompañada de lo que la hace distinta, "tu tienda online, con stock y pedidos incluidos". Los ejemplos son de rubros que se venden por redes —moda, calzado, belleza, perfumes, accesorios, tecnología, segunda mano—, no de comida casera. El detalle de tono está en `.agents/rules/ui-styling.md`, "Cómo le hablamos al cliente".
 
 ---
 
 ## 2. El problema
 
-**Lado joven.** En Bolivia el 96,2% de los jóvenes que trabajan lo hacen en la informalidad, la tasa más alta de la región. El desempleo juvenil duplica al general (6% contra 3,1%) y siete de cada diez ganan menos de Bs 2.500 al mes. El problema no es que falte trabajo: es que el trabajo disponible no paga, no forma y no deja historial que puedan mostrar después.
+Un volumen enorme del comercio boliviano ocurre informalmente por TikTok, Instagram, Facebook Marketplace y WhatsApp, sin plataforma detrás. Menos del 30% de las pymes bolivianas tiene sitio web, y quien vende por redes no siente que le falte uno: lo que le falta es orden. Responde el precio por mensaje cincuenta veces al día, vende lo que ya no tiene porque el stock lo lleva de memoria, pierde pedidos entre mensajes, manda fotos sueltas por WhatsApp y no tiene números de su negocio.
 
-**Lado emprendedor.** Un volumen enorme del comercio boliviano ocurre informalmente por TikTok, Instagram, Facebook Marketplace y WhatsApp, sin plataforma detrás. Menos del 30% de las pymes bolivianas tiene sitio web, y quien vende por redes no siente que le falte uno: lo que le falta es orden. Responde el precio por mensaje cincuenta veces al día, vende lo que ya no tiene porque el stock lo lleva de memoria, revisa capturas de pago una por una, manda fotos sueltas por WhatsApp, no tiene números y no puede contratar a nadie porque no le alcanza para un sueldo fijo.
-
-**La conexión:** cada problema es la solución del otro. Nadie los había conectado.
+Lo que **no** le falta es el canal: sus clientes ya le escriben por WhatsApp, y ahí es donde cierra cada venta. Venduo no lo saca de ese chat; le ordena todo lo que pasa antes y después.
 
 ---
 
 ## 3. Cómo funciona
 
-### Para el emprendedor
-
 1. Elige una plantilla según su rubro. Cada una tiene su propia identidad —letra, colores, cómo muestra los productos— y la puede cambiar después sin perder nada.
-2. Describe su negocio en un párrafo de texto. La IA ajusta la plantilla: agrega y quita bloques, reordena secciones, adapta textos y colores.
+2. Describe su negocio en un párrafo y deja **el WhatsApp de la tienda**, que es obligatorio: ahí le llega cada pedido. La IA ajusta la plantilla: agrega y quita bloques, reordena secciones, adapta textos y colores.
 3. Carga sus productos, marcando cuáles son nuevos y cuáles de segunda mano o reacondicionados.
 4. Publica. Obtiene una URL propia y un código QR de su tienda.
-5. Cobra por PagoFácil —el dinero queda retenido hasta que el comprador recibe su pedido—, consulta sus estadísticas preguntando en lenguaje natural y genera piezas de promoción con IA.
-6. Si quiere, activa la red de vendedores y define el porcentaje de comisión.
-
-### Para el vendedor
-
-1. Se suma a una o varias tiendas, o toma productos sueltos de una vitrina pública que reúne lo que cada emprendedor marcó como disponible para vendedores. Sumarse a una tienda entera puede quedar a la espera de aprobación; tomar un producto marcado no, porque marcarlo ya fue el consentimiento del dueño.
-2. Recibe un enlace y un QR propios, más los materiales de promoción que la IA generó.
-3. Vende por sus redes, en su barrio o cara a cara.
-4. Cada venta que entra por su enlace queda trazada y le genera comisión automática, que cobra directo de PagoFácil cuando el comprador recibe el pedido.
-5. Acumula un historial de ventas verificable: su primer antecedente laboral real.
-
-### El historial laboral verificable
-
-Es la promesa central de la plataforma hacia el vendedor, y funciona así:
-
-Cada vendedor tiene un **perfil público y permanente** en una URL estable. Reúne sus ventas confirmadas, el monto total que generó, cuántas tiendas lo tuvieron vendiendo, en qué rubros, la fecha de su primera venta y su antigüedad activa. Se puede exportar para adjuntar a una postulación.
-
-Tres propiedades lo hacen creíble como antecedente laboral:
-
-- **No lo edita el vendedor.** Se construye solo, a partir de comisiones confirmadas.
-- **Sobrevive a la tienda.** Si un emprendedor abandona la plataforma y sus datos se eliminan, el historial del vendedor queda intacto. Esto no es una aspiración: está garantizado por el diseño de la base de datos (ver sección 8).
-- **Es verificable por un tercero.** La URL es pública y estable; quien recibe el currículum puede abrirla y comprobarlo.
+5. **Recibe los pedidos por WhatsApp.** Quien compra no deja datos: arma su carrito, ve el total y toca "Enviar pedido por WhatsApp". Se abre el chat con la tienda y el pedido ya escrito —productos, cantidades, total y el número del pedido—. La tienda cobra como ya lo hace, por QR, transferencia o en efectivo, y lo acuerdan en ese mismo chat.
+6. Cuando le pagan, marca el pedido **pagado** en su panel y el stock se descuenta solo. Consulta sus estadísticas preguntando en lenguaje natural, arma catálogos en PDF y genera piezas de promoción con IA.
 
 ---
 
 ## 4. Los módulos
 
-| Módulo                      | Qué hace                                                                                                                  | Para quién  |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| **Editor de tienda con IA** | Sobre una plantilla del rubro, la IA agrega, elimina y edita bloques visuales según lo que el emprendedor pide en texto   | Emprendedor |
-| **Cobro con custodia**      | El comprador paga en PagoFácil, el dinero queda retenido y se libera al emprendedor y al vendedor cuando llega el pedido  | Ambos       |
-| **Inteligencia de negocio** | Preguntas en lenguaje natural que devuelven gráficos y estadísticas                                                       | Emprendedor |
-| **Marketing con IA**        | Genera copys y piezas adaptadas a cada red social, listos para publicar en Facebook y WhatsApp                            | Emprendedor |
-| **Red de vendedores**       | Alta de vendedores, enlaces de referido, comisiones automáticas                                                           | Ambos       |
-| **Segunda mano**            | Filtro del catálogo que reúne los productos usados y reacondicionados, con los descuentos destacados                      | Emprendedor |
-| **Catálogos en PDF**        | Catálogos armados con productos elegidos, una categoría o un pack, en una de doce plantillas con los colores de la tienda | Emprendedor |
+| Módulo                      | Qué hace                                                                                                                       |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Editor de tienda con IA** | Sobre una plantilla del rubro, la IA agrega, elimina y edita bloques visuales según lo que el emprendedor pide en texto        |
+| **Pedidos por WhatsApp**    | El carrito se manda a WhatsApp de la tienda con su número y su total; el pedido queda en el panel y descuenta stock al pagarse |
+| **Inteligencia de negocio** | Preguntas en lenguaje natural que devuelven gráficos y estadísticas                                                            |
+| **Marketing con IA**        | Genera copys y piezas adaptadas a cada red social, listos para publicar en Facebook y WhatsApp                                 |
+| **Segunda mano**            | Filtro del catálogo que reúne los productos usados y reacondicionados, con los descuentos destacados                           |
+| **Catálogos en PDF**        | Catálogos armados con productos elegidos, una categoría o un pack, en una de doce plantillas con los colores de la tienda      |
 
 **Sobre la segunda mano:** no es una sección aparte que se genera sola. Es un **filtro dentro del catálogo** de cada tienda. Lo que define que un producto sea de segunda mano es un campo que el emprendedor elige al cargarlo, junto con un precio de comparación opcional que produce el descuento destacado.
 
@@ -80,10 +54,9 @@ Tres propiedades lo hacen creíble como antecedente laboral:
 
 ## 5. Modelo de negocio
 
-- **Único ingreso:** suscripción mensual del emprendedor, con período de prueba. Paga porque la tienda, el análisis y el marketing le sirven aunque nunca active vendedores.
-- **Venduo no cobra comisión por venta.** Ni al emprendedor ni al vendedor. El porcentaje que se descuenta de cada venta referida va íntegro al vendedor que la generó.
-- **La comisión de PagoFácil la absorbe el emprendedor.** Sale de su parte, nunca de la del vendedor: el porcentaje que la tienda ofreció es lo que el vendedor cobra, completo.
-- **El vendedor no paga nunca nada.** Cero barrera de entrada.
+- **Único ingreso:** suscripción mensual del emprendedor, con período de prueba. Paga porque la tienda, los pedidos, el análisis y los catálogos le sirven todos los días.
+- **Venduo no cobra comisión por venta.** Lo que vende la tienda es de la tienda.
+- **Venduo no toca el dinero de las ventas.** El comprador le paga a la tienda como ya le paga hoy —QR, transferencia, efectivo—, y lo acuerdan por WhatsApp. Venduo registra el pedido y su estado; no recibe, retiene ni reparte fondos. Por eso no necesita autorización como intermediario de pagos.
 - **Costos:** infraestructura que escala con el uso, plantillas por sector que se reutilizan entre tiendas, e IA solo en momentos de alto valor. El costo marginal por tienda nueva es de centavos.
 
 ### Planes y prueba
@@ -98,75 +71,23 @@ El vencimiento **bloquea la plataforma**, no la borra:
 
 1. La tienda pública deja de servirse.
 2. El panel queda en solo lectura, con un aviso de que debe suscribirse.
-3. Se habilita una única acción: **exportar los datos** en CSV — catálogo de productos, pedidos con sus líneas, vendedores vinculados e historial de comisiones. CSV porque es lo que el emprendedor puede abrir sin instalar nada.
+3. Se habilita una única acción: **exportar los datos** en CSV — catálogo de productos y pedidos con sus líneas. CSV porque es lo que el emprendedor puede abrir sin instalar nada.
 4. Se le informa que **sus datos se eliminarán a los 90 días** del bloqueo si no se suscribe. Es tiempo suficiente para volver de un mal mes, sin que la plataforma cargue datos muertos indefinidamente.
 
-Esa eliminación a los 90 días es **el único caso en toda la plataforma donde se borran datos físicamente** (ver sección 8). Y aun en ese caso, el historial de los vendedores que trabajaron para esa tienda sobrevive.
+Esa eliminación a los 90 días es **el único caso en toda la plataforma donde se borran datos físicamente** (ver sección 8).
 
-### Quién retiene el dinero
+### El pedido por WhatsApp
 
-El flujo de venta reparte un pago entre dos destinatarios: el emprendedor y el vendedor que la generó. **Quién es titular de esos fondos mientras están en tránsito es una decisión con peso regulatorio**, no un detalle técnico.
+| Paso | Qué pasa                                                                                                                                                         | Estado del pedido |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| 1    | El comprador toca "Enviar pedido por WhatsApp". El servidor crea el pedido con los precios recalculados, **sin datos del comprador**, y comprueba que haya stock | `pendiente`       |
+| 2    | Se abre WhatsApp con el pedido escrito para la tienda: las líneas, el total y el número                                                                          | `pendiente`       |
+| 3    | La tienda cobra en el chat y marca el pedido **pagado**. Recién ahí **se descuenta el stock**                                                                    | `pagado`          |
+| —    | Si no se concreta, la tienda lo **cancela**. Si ya estaba pagado, el stock vuelve al catálogo                                                                    | `cancelado`       |
 
-El reglamento boliviano de servicios de pago regula la figura de Administradora de Pasarela de Pagos y responsabiliza a las entidades financieras y empresas de servicios de pago por el cumplimiento de las pasarelas que contratan. Retener fondos de terceros y redistribuirlos es intermediación de pagos, y requiere autorización.
+**Por qué el stock baja al pagar y no al pedir.** Un pedido sin datos cuesta un toque, y muchos carritos se mandan y no se concretan. Si el stock bajara al tocar el botón, cualquiera podría vaciar una tienda tocándolo en bucle, y un carrito abandonado retendría unidades sin que la tienda supiera de quién. El pedido comprueba que haya stock; lo descuenta la tienda cuando le pagan.
 
-Hay dos arquitecturas posibles y **solo una resuelve el problema**:
-
-| Arquitectura                                                                                                                                                        | ¿Resuelve?                                                                                              |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| El comprador paga a la pasarela, y **la pasarela dispersa** directo al emprendedor y al vendedor. Venduo solo instruye el reparto y nunca es titular de los fondos. | **Sí.** Venduo queda como plataforma tecnológica; la actividad regulada la ejerce el sujeto autorizado. |
-| El comprador paga a una cuenta de Venduo, y después Venduo transfiere a cada parte.                                                                                 | **No.** Es intermediación de pagos, por más que el cobro entre por una pasarela autorizada.             |
-
-**Decisión: la primera.** La pasarela es **PagoFácil**, que está en proceso de adecuación para operar como Entidad Tecnológica Financiera bajo supervisión de ASFI, mediante la razón social ETF PAYIN & PAYOUT SRL, y publicita dispersión automática de pagos, que es exactamente el reparto que Venduo necesita.
-
-### El pago queda en custodia hasta la entrega
-
-El comprador no le paga al emprendedor: le paga a PagoFácil, y **el dinero queda retenido** hasta que el pedido llega. Recién ahí se libera y se reparte. Es el mismo trato que da Binance entre dos personas que no se conocen, y resuelve la desconfianza de comprarle a un negocio de TikTok: quien paga sabe que no pierde su plata si el producto no aparece.
-
-**La custodia la ejerce PagoFácil, no Venduo.** Venduo nunca recibe ni guarda fondos: solo le da a PagoFácil la orden de liberar o de devolver. Si el dinero pasara por una cuenta de Venduo, aunque fuera un día, sería la segunda arquitectura de la tabla.
-
-El circuito de un pedido:
-
-| Paso | Qué pasa                                                                      | Estado del pedido | Comisión del vendedor |
-| ---- | ----------------------------------------------------------------------------- | ----------------- | --------------------- |
-| 1    | El comprador confirma su carrito. El pedido nace con los precios recalculados | `pendiente`       | —                     |
-| 2    | Paga en PagoFácil. PagoFácil avisa a Venduo, y **el dinero queda retenido**   | `pagado`          | `pendiente`           |
-| 3    | El emprendedor coordina la entrega por WhatsApp y **marca el pedido enviado** | `enviado`         | `pendiente`           |
-| 4    | El comprador **confirma que lo recibió**, o vence el plazo sin que responda   | `entregado`       | `confirmada`          |
-| 5    | Venduo ordena la liberación. PagoFácil dispersa a cada parte                  | `entregado`       | `pagada`              |
-
-**Qué recibe cada uno** cuando se libera: el vendedor, su comisión completa; el emprendedor, el total menos esa comisión y menos el costo de PagoFácil.
-
-**La liberación automática** existe para que un comprador que no vuelve a entrar no deje el dinero retenido para siempre. Corre desde que el pedido se marca enviado.
-
-**Si el comprador reclama** —no le llegó, llegó mal— antes de la liberación, el pedido pasa a `en_disputa` y **el pago queda congelado**. Venduo revisa el caso con las dos partes y decide:
-
-- **A favor del emprendedor:** el pedido pasa a `entregado` y se libera como en el paso 5.
-- **A favor del comprador:** el pedido pasa a `cancelado`, Venduo ordena a PagoFácil **devolver** el pago, y la comisión del vendedor se anula.
-
-Una vez liberado el pago ya no hay reclamo posible dentro de la plataforma: el dinero ya salió de la custodia.
-
-Un pedido cancelado antes de pagar no mueve dinero. Uno cancelado después de pagar y antes de enviar se **devuelve** entero.
-
-### Lo que falta confirmar
-
-Con PagoFácil, antes de comprometer la arquitectura:
-
-1. Si la dispersión admite como beneficiario a un tercero que no es el comercio, es decir al vendedor.
-2. Qué requisitos de identificación se le exigen a ese beneficiario. Si exigen alta formal de cada vendedor, choca de frente con la promesa de cero barrera de entrada y hay que replantear el circuito de la comisión.
-3. Si su servicio admite **retener un cobro y liberarlo por orden de Venduo**, y devolverlo por la misma vía. Todo el modelo de custodia depende de esto.
-
-Del lado del producto:
-
-4. **El plazo de liberación automática.** Se propone 7 días desde que el pedido se marca enviado.
-5. **Qué pasa si el emprendedor nunca marca el envío.** Sin una regla, el pago del comprador quedaría retenido sin fecha. Lo razonable es devolverlo pasado un plazo, pero no está decidido.
-
-> Esto no es asesoramiento legal y requiere confirmación profesional antes de operar con dinero real.
-
-### En el MVP
-
-**La pasarela es simulada**, así que la decisión no bloquea el desarrollo: el circuito y sus estados se construyen igual, contra una PagoFácil falsa.
-
-**Lo que hoy está construido no sigue este modelo** y hay que reemplazarlo. La pantalla de pago muestra el QR bancario que subió el emprendedor, el comprador sube una captura de su transferencia, y el emprendedor confirma el pago a mano. En ese flujo el dinero va directo del comprador al comercio, sin custodia: es un arreglo provisorio que se hizo antes de esta decisión, no una base sobre la cual construir.
+**No hay envíos ni seguimiento.** Cómo llega el producto lo acuerdan la tienda y el comprador en el mismo chat; la plataforma no lo registra.
 
 ---
 
@@ -175,24 +96,19 @@ Del lado del producto:
 Flujo de demostración completo:
 
 1. Registro y login del emprendedor
-2. Selección de plantilla según rubro
+2. Selección de plantilla según rubro, con el WhatsApp de la tienda obligatorio en el alta
 3. Edición de la tienda asistida por IA sobre el catálogo de bloques
 4. Tienda pública real, navegable en móvil, con URL propia
 5. Gestión de productos con imagen y stock, marcables como nuevos, de segunda mano o reacondicionados
-6. Carrito y checkout con datos del cliente
-7. Pago por PagoFácil con custodia, sobre una pasarela simulada: el pago se retiene y se libera al confirmarse la entrega
-8. Alta de vendedor, con código y enlace propios
-9. Atribución de la venta al vendedor mediante el enlace
-10. Cálculo automático de comisión
-11. Panel del vendedor: sus ventas, sus comisiones, sus materiales
-12. Inteligencia de negocio: estadísticas consultadas en lenguaje natural
-13. Generador de copys de marketing y publicación en Facebook y WhatsApp
-14. Coordinación de entrega por WhatsApp con el detalle del pedido armado por la plataforma, y confirmación de envío y recepción que libera el pago
-15. Catálogos en PDF editables: productos elegidos, una categoría o un pack, en una de doce plantillas de bloques intercambiables o con uno de los estilos sacados de la tienda, para descargar, compartir por WhatsApp o seguir editando en Canva
+6. Carrito con el total y un botón que manda el pedido al WhatsApp de la tienda, sin pedirle datos al comprador
+7. Panel de pedidos: cada pedido con su número, que descuenta stock al marcarse pagado
+8. Inteligencia de negocio: estadísticas consultadas en lenguaje natural
+9. Generador de copys de marketing y publicación en Facebook y WhatsApp
+10. Catálogos en PDF editables: productos elegidos, una categoría o un pack, en una de doce plantillas de bloques intercambiables o con uno de los estilos sacados de la tienda, para descargar, compartir por WhatsApp o seguir editando en Canva
 
 ### Publicación en redes: plan A y plan B
 
-El punto 13 es el de mayor riesgo de alcance, porque no depende solo de nosotros.
+El punto 9 es el de mayor riesgo de alcance, porque no depende solo de nosotros.
 
 - **Plan A — publicación real por API.** Requiere revisión de la aplicación y verificación de negocio por parte de Meta, con plazos que pueden no entrar en 48 horas.
 - **Plan B — compartir por intent.** Enlaces de compartir de WhatsApp y Facebook, más copiar al portapapeles. El emprendedor publica con un toque y la demostración se sostiene igual.
@@ -217,13 +133,13 @@ Se intenta el plan A; si no llega, entra el plan B. **El modelo de datos soporta
 
 ### Cuentas y acceso
 
-**Correo y contraseña, sin verificación.** Quien se registra entra al instante: no hay enlace por correo ni código que esperar. La fricción de verificar un correo es exactamente la barrera que la plataforma promete no ponerle a un joven que se suma desde el celular.
+**Correo y contraseña, sin verificación.** Quien se registra entra al instante: no hay enlace por correo ni código que esperar.
 
 El correo **se guarda igual**, así que exigir verificación más adelante es cambiar un ajuste del proyecto, sin migrar datos ni rehacer el formulario.
 
-**Al registrarse se elige con qué intención se entra:** tener un negocio o vender para otros. Esa elección decide qué ve la persona a continuación y, en el caso del vendedor, le crea de una su identidad y su URL pública.
+**Hay un solo tipo de cuenta: la de quien tiene una tienda.** Al registrarse no se elige rol; toda cuenta nueva va a crear su tienda. Los permisos derivan de los datos: sos dueño si tenés una tienda.
 
-Lo que **no** hace es gobernar permisos. Los permisos siguen derivando de los datos: sos dueño si tenés una tienda, y sos vendedor si tenés un vínculo activo con alguna. Una misma persona puede ser las dos cosas, y la elección del registro no se lo impide — solo dice por dónde empezó.
+**Quien compra no tiene cuenta ni deja datos.** Su nombre y su teléfono ya van en el chat de WhatsApp donde manda el pedido.
 
 > El ingreso con Google queda para después: el proveedor no está habilitado y hacerlo exige credenciales de Google Cloud.
 
@@ -238,11 +154,8 @@ Ruteo **por path, no por subdominio**:
 | Ruta         | Qué es                                                                  |
 | ------------ | ----------------------------------------------------------------------- |
 | `/t/{slug}`  | Tienda pública del emprendedor, con su catálogo en `/t/{slug}/catalogo` |
-| `/v/{slug}`  | Perfil público del vendedor y su enlace de referido                     |
-| `/crear`     | Alta de la tienda: plantilla y descripción                              |
-| `/sumarme`   | Alta del vendedor: cómo sumarse a una tienda                            |
+| `/crear`     | Alta de la tienda: plantilla, descripción y WhatsApp                    |
 | `/panel`     | Panel del emprendedor                                                   |
-| `/vendedor`  | Panel del vendedor                                                      |
 | `/c/{token}` | Un catálogo en PDF compartido, con los precios y el stock del día       |
 
 Se usa el slug y no el identificador interno porque estas URLs **se imprimen en códigos QR y se mandan por WhatsApp**: tienen que ser legibles y compartibles.
@@ -252,8 +165,9 @@ Se usa el slug y no el identificador interno porque estas URLs **se imprimen en 
 Tan importante como la lista de lo que sí:
 
 - **Multi-tienda por usuario.** Un emprendedor, una tienda.
-- **Gestión de envíos.** La entrega se coordina por WhatsApp directamente entre el emprendedor y el comprador: no hay couriers, guías ni seguimiento. Lo que sí hace la plataforma es **armar ese mensaje** con el detalle del pedido y abrir la conversación, y registrar dos marcas —el emprendedor dice _enviado_, el comprador dice _recibido_— porque son las que liberan el pago.
-- **Procesar el cobro.** Lo hace PagoFácil. Venduo instruye la liberación, la devolución y el reparto; nunca recibe ni guarda el dinero.
+- **Red de vendedores, comisiones y referidos.** La tienda vende sola; no hay terceros que cobren por venta.
+- **Gestión de envíos.** No hay couriers, guías, seguimiento ni marcas de enviado o recibido: la entrega la acuerdan la tienda y el comprador por WhatsApp.
+- **Cobrar dentro de la plataforma.** No hay pasarela, custodia, QR de pago ni comprobantes: el pago se acuerda por WhatsApp y la tienda lo marca en su panel.
 - **Cobro de la suscripción.** Se modela el estado de la suscripción, no el cobro.
 - **Notificaciones por email.**
 - **Aplicación móvil nativa.** La tienda es responsive; con eso alcanza.
@@ -266,25 +180,16 @@ Tan importante como la lista de lo que sí:
 ### Pantallas
 
 - **Inicio** — presentación del producto
-- **Crear** — elección de plantilla y onboarding conversacional
-- **Empezar a vender** — el equivalente del vendedor: cómo sumarse a una tienda
-- **Panel del emprendedor** — resumen, y desde ahí productos, pedidos, vendedores, estadísticas, apariencia, marketing. Toma la identidad de la plantilla de su tienda
+- **Crear** — elección de plantilla y alta de la tienda, con su WhatsApp
+- **Panel del emprendedor** — resumen, y desde ahí productos, pedidos, estadísticas, apariencia, marketing. Es de Venduo, igual para toda tienda, y la tienda se reconoce en su sello
 - **Catálogos en PDF** — dentro del panel, en `/panel/catalogos`: los catálogos guardados, las doce plantillas dibujadas con los productos de la tienda y el constructor, donde se eligen los productos —o se le pide el catálogo a la IA en una frase—, la plantilla —o uno de los cuatro estilos sacados de la tienda—, y se edita hoja por hoja con la vista previa siguiendo lo que se edita. Se descarga en PDF, se manda un enlace que siempre abre con los precios del día o se lleva a Canva para editarlo entero allá
-- **Panel del vendedor** — ventas, comisiones, materiales de promoción
-- **Tienda pública** — portada, catálogo con filtro de segunda mano, ficha de producto, carrito, checkout, pago y seguimiento del pedido, donde el comprador confirma que lo recibió o reclama. Se dibuja con el kit de su plantilla
-- **Perfil público del vendedor** — su historial laboral verificable
+- **Tienda pública** — portada, catálogo con filtro de segunda mano, ficha de producto y carrito, que manda el pedido por WhatsApp. Se dibuja con el kit de su plantilla
 
 ### Estrategia de multi-tenancy
 
 **Esquema compartido con aislamiento por Row Level Security.** Toda tabla de negocio lleva el identificador de la tienda, y Postgres impide en la propia base que una tienda vea datos de otra. Se descartan esquema por tienda y base por tienda: rompen la ergonomía de Supabase y son desproporcionados para el proyecto.
 
-**La asimetría que define todo el modelo:**
-
-> Un emprendedor tiene **una sola tienda**. Un vendedor pertenece a **varias**.
-
-El lado del emprendedor es el aislamiento fácil: una comparación directa. Toda la dificultad real está en la tabla que vincula vendedores con tiendas y en las comisiones, que cruzan tenants por naturaleza.
-
-Que sea una tienda por usuario simplifica mucho las políticas de seguridad: la función auxiliar devuelve **un identificador**, no una lista.
+**Un emprendedor tiene una sola tienda**, impuesto por un índice único. Eso simplifica mucho las políticas de seguridad: la función auxiliar devuelve **un identificador**, no una lista, y toda política es una comparación directa.
 
 **Principio rector:** el identificador de la tienda se repite incluso donde podría deducirse — por ejemplo en los bloques, que ya pertenecen a una página que pertenece a una tienda. Esa redundancia deliberada permite que cada política de seguridad sea una comparación sobre una sola tabla, sin joins ni riesgo de recursión.
 
@@ -294,7 +199,7 @@ Que sea una tienda por usuario simplifica mucho las políticas de seguridad: la 
 
 Tres consecuencias que hay que respetar, porque son las que se olvidan y rompen cosas:
 
-- **Los índices únicos son parciales.** El slug de la tienda, el código de referido y el par tienda-vendedor son únicos **solo entre las filas vivas**. Si no, un registro borrado bloquea para siempre reutilizar ese código.
+- **Los índices únicos son parciales.** El slug de la tienda y el nombre de una categoría son únicos **solo entre las filas vivas**. Si no, un registro borrado bloquea para siempre reutilizar ese nombre.
 - **El filtro va en la política de seguridad, no solo en la consulta.** Si se deja únicamente en la capa de datos, cualquier consulta nueva se olvida de excluir lo borrado.
 - **Los pedidos no se borran nunca**, ni siquiera lógicamente: se cancelan cambiando su estado.
 
@@ -304,29 +209,28 @@ Las cláusulas de borrado en cascada quedan declaradas en el esquema, pero **sol
 
 #### Identidad
 
-| Tabla             | Qué guarda                                                                                                                                       |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `profiles`        | Perfil del usuario y con qué intención se registró. Se crea solo al darse de alta, mediante un disparador sobre la tabla de usuarios de Supabase |
-| `seller_profiles` | Identidad del vendedor: nombre visible, slug público, ciudad. **Vive fuera de toda tienda** — es lo que sostiene el historial laboral            |
+| Tabla      | Qué guarda                                                                                                      |
+| ---------- | --------------------------------------------------------------------------------------------------------------- |
+| `profiles` | Perfil del usuario: nombre y foto. Se crea solo al darse de alta, mediante un disparador sobre la tabla de Auth |
 
 #### Tenant
 
 **`stores`** — la tienda es el tenant.
 
-| Columna                                              | Tipo        | Nota                                                             |
-| ---------------------------------------------------- | ----------- | ---------------------------------------------------------------- |
-| `id`                                                 | uuid        |                                                                  |
-| `owner_id`                                           | uuid        | **Único.** Una tienda por usuario                                |
-| `name`, `slug`, `tagline`, `description`, `logo_url` | text        | `slug` con índice único parcial                                  |
-| `template_key`                                       | text        | Referencia a la plantilla, anulable si se retira del catálogo    |
-| `theme_overrides`                                    | jsonb       | Solo lo que la tienda cambia de su plantilla. `{}` es la base    |
-| `commission_bps`                                     | integer     | Porcentaje de comisión en **puntos básicos** (entero, 0 a 10000) |
-| `seller_network_enabled`                             | boolean     | Interruptor de la red de vendedores                              |
-| `seller_join_mode`                                   | enum        | `abierta` o `con_aprobacion`                                     |
-| `is_published`                                       | boolean     |                                                                  |
-| `created_at`, `updated_at`, `deleted_at`             | timestamptz |                                                                  |
+| Columna                                              | Tipo        | Nota                                                                |
+| ---------------------------------------------------- | ----------- | ------------------------------------------------------------------- |
+| `id`                                                 | uuid        |                                                                     |
+| `owner_id`                                           | uuid        | **Único.** Una tienda por usuario                                   |
+| `name`, `slug`, `tagline`, `description`, `logo_url` | text        | `slug` con índice único parcial                                     |
+| `whatsapp`                                           | text        | **A donde llega cada pedido.** Solo cifras. `create_store` lo exige |
+| `template_key`                                       | text        | Referencia a la plantilla, anulable si se retira del catálogo       |
+| `theme_overrides`                                    | jsonb       | Solo lo que la tienda cambia de su plantilla. `{}` es la base       |
+| `is_published`                                       | boolean     |                                                                     |
+| `created_at`, `updated_at`, `deleted_at`             | timestamptz |                                                                     |
 
 No hay columna de moneda: es constante del sistema.
+
+`whatsapp` es obligatorio en el alta pero no tiene `not null` en la columna: las tiendas creadas antes pueden no tenerlo, y una restricción haría fallar cualquier cambio que se les haga. Una tienda sin número no puede vender —el carrito no ofrece el botón— y su panel se lo pide primero.
 
 **`plans`** — catálogo de planes (`key`, nombre, prestaciones). Preparado para sumar niveles; sin campos de precio hasta que el cobro entre en alcance.
 
@@ -343,88 +247,43 @@ No hay columna de moneda: es constante del sistema.
 
 #### Catálogo
 
-**`products`** — suma respecto del esquema actual:
+**`products`**
 
-| Columna                  | Nota                                                                                                                                            |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `condition`              | `nuevo`, `segunda_mano` o `reacondicionado`. **Lo elige el emprendedor al cargar el producto** y es lo que alimenta el filtro de segunda mano   |
-| `condition_note`         | Descripción del estado, para usados                                                                                                             |
-| `compare_at_price_cents` | Precio anterior, opcional. Debe ser mayor o igual al precio. Es lo que produce el descuento destacado                                           |
-| `seller_enabled`         | Si este producto se puede vender por vendedores. Nace en `true`; el interruptor que manda es el de la tienda. Es lo que arma la vitrina pública |
-| `deleted_at`             | Borrado lógico                                                                                                                                  |
+| Columna                  | Nota                                                                                                                                          |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `condition`              | `nuevo`, `segunda_mano` o `reacondicionado`. **Lo elige el emprendedor al cargar el producto** y es lo que alimenta el filtro de segunda mano |
+| `condition_note`         | Descripción del estado, para usados                                                                                                           |
+| `compare_at_price_cents` | Precio anterior, opcional. Debe ser mayor o igual al precio. Es lo que produce el descuento destacado                                         |
+| `deleted_at`             | Borrado lógico                                                                                                                                |
 
 #### Venta
 
 **`orders`**
 
-| Columna                              | Nota                                                                                                                           |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| `order_number`                       | Correlativo legible, para que el emprendedor pueda nombrar un pedido                                                           |
-| `buyer_name`                         | Obligatorio                                                                                                                    |
-| `buyer_phone`                        | **Obligatorio.** Es el canal por el que se coordina la entrega                                                                 |
-| `buyer_email`                        | Opcional                                                                                                                       |
-| `seller_id`                          | **Anulable.** Vacío es venta directa por carrito; con valor es venta referida. Un solo flujo de compra, dos modelos de negocio |
-| `referral_code`                      | Copia textual del código usado, sobrevive al borrado del vínculo                                                               |
-| `subtotal_cents`, `total_cents`      |                                                                                                                                |
-| `commission_bps`, `commission_cents` | **Congelados al momento de la venta**                                                                                          |
-| `commission_base_cents`              | Sobre cuánto se calculó la comisión: solo los productos con `seller_enabled`. También congelado                                |
-| `net_to_store_cents`                 | Lo que le corresponde al emprendedor: el total menos la comisión del vendedor y menos el costo de PagoFácil                    |
-| `status`                             | `pendiente`, `pagado`, `enviado`, `entregado`, `en_disputa`, `cancelado`. El circuito está en la sección 5                     |
-| `payment_reference`                  | El identificador del cobro en PagoFácil. Es con lo que se le ordena liberar o devolver                                         |
-| `paid_at`                            | Cuándo PagoFácil confirmó el pago y empezó la custodia                                                                         |
-| `shipped_at`, `delivered_at`         | Las dos marcas que liberan el pago: el envío del emprendedor y la recepción del comprador                                      |
-| `release_due_at`                     | Cuándo se libera solo si el comprador no confirma                                                                              |
-| `released_at`, `refunded_at`         | Cuándo se ordenó a PagoFácil repartir o devolver. Son excluyentes                                                              |
-| `disputed_at`, `dispute_reason`      | El reclamo del comprador, que congela el pago hasta que Venduo resuelve                                                        |
+| Columna                                    | Nota                                                                                                                 |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `order_number`                             | Correlativo legible. Va en el mensaje de WhatsApp: es como la tienda encuentra el pedido en su panel                 |
+| `buyer_name`, `buyer_phone`, `buyer_email` | **Opcionales y vacíos en los pedidos nuevos**: quien compra ya está en el chat. Los conservan los pedidos anteriores |
+| `subtotal_cents`, `total_cents`            | Calculados en el servidor, desde el catálogo                                                                         |
+| `status`                                   | `pendiente`, `pagado`, `cancelado`                                                                                   |
+| `paid_at`                                  | Cuándo la tienda lo marcó pagado                                                                                     |
 
 Sin marca de borrado: un pedido se cancela, no se borra.
 
-**`stores` suma los datos para recibir la dispersión** —la cuenta donde PagoFácil deposita al emprendedor—, y `seller_profiles` los del vendedor. Qué datos exactos pide PagoFácil está en lo que falta confirmar. El QR bancario y la captura de transferencia del flujo provisorio (`stores.payment_qr_url`, `orders.payment_proof_url`) se retiran al reemplazarlo.
-
 **`order_items`** — líneas del pedido, con el nombre y el precio del producto copiados al momento de la compra. Lleva también el identificador de la tienda por el principio de redundancia deliberada.
-
-#### Red de vendedores
-
-**`store_sellers`** — el vínculo tienda-vendedor. Es el corazón del multi-tenancy cruzado.
-
-| Columna                                   | Nota                                                       |
-| ----------------------------------------- | ---------------------------------------------------------- |
-| `store_id`, `user_id`                     | Únicos como par, entre filas vivas                         |
-| `referral_code`                           | Único entre filas vivas. Es lo que va en el enlace y el QR |
-| `status`                                  | `pendiente`, `activo`, `rechazado`, `suspendido`           |
-| `joined_at`, `approved_at`, `approved_by` |                                                            |
-| `deleted_at`                              |                                                            |
-
-El estado inicial depende de `seller_join_mode` de la tienda: `activo` si el alta es abierta, `pendiente` si exige aprobación.
-
-**`commissions`** — el ciclo de vida del pago al vendedor.
-
-| Columna                                         | Nota                                                                                                                 |
-| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `order_id`                                      | **Único.** Defensa contra el doble conteo si el pedido oscila entre estados                                          |
-| `store_id`                                      | **Anulable, no cascada**                                                                                             |
-| `store_name`                                    | **Copia del nombre de la tienda**                                                                                    |
-| `seller_id`                                     | Anulable                                                                                                             |
-| `seller_user_id`                                | Obligatorio. Redundante a propósito, para que la política de seguridad del panel del vendedor no necesite un join    |
-| `base_amount_cents`, `rate_bps`, `amount_cents` | La tasa **congelada** al momento de la venta                                                                         |
-| `status`                                        | `pendiente` mientras el pago está retenido, `confirmada` al liberarse, `pagada` cuando PagoFácil dispersó, `anulada` |
-| `paid_at`, `payment_reference`                  | Cuándo y con qué referencia PagoFácil le transfirió al vendedor                                                      |
-
-**Por qué el vínculo con la tienda es anulable y el nombre va copiado.** Cuando se purga una tienda que no se suscribió, la comisión sobrevive con el nombre del comercio y el historial del vendedor queda intacto. Si la comisión se borrara en cascada, el día que un emprendedor abandona la plataforma se borraría el antecedente laboral de todos sus vendedores — exactamente lo que la plataforma promete no hacer.
 
 #### Tienda visual
 
-| Tabla                         | Qué guarda                                                                                                                                           |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `block_types`                 | **Catálogo global.** Cada tipo de bloque con su esquema de propiedades y sus valores por defecto                                                     |
-| `templates`, `template_pages` | **Catálogo global.** Ficha, versión y bloques sembrados de cada plantilla. Su identidad visual vive en código: ver `docs/store-templates.md`         |
-| `sectors`                     | **Catálogo global.** Los rubros con su nombre visible y su orden. `templates.sector` lo referencia, y es lo que agrupa la galería del alta           |
-| `store_invites`               | El código de invitación de cada tienda. **RLS activo y cero políticas**: ni el dueño la lee directamente, llega a su código por `my_seller_invite()` |
-| `insights`                    | Gráficos guardados. Guarda la **especificación**, no las filas: se recalcula con los datos de cada día                                               |
-| `store_pages`                 | Páginas concretas de cada tienda, con estado borrador o publicada                                                                                    |
-| `store_blocks`                | Bloques concretos: tipo, posición, propiedades en JSON y visibilidad                                                                                 |
-| `block_edit_proposals`        | Lo que la IA propuso, con el estado previo guardado                                                                                                  |
-| `store_design_versions`       | Puntos de restauración del diseño: plantilla, personalización y páginas con bloques. Se toman antes de cada cambio; solo las escriben funciones      |
+| Tabla                         | Qué guarda                                                                                                                                      |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `block_types`                 | **Catálogo global.** Cada tipo de bloque con su esquema de propiedades y sus valores por defecto                                                |
+| `templates`, `template_pages` | **Catálogo global.** Ficha, versión y bloques sembrados de cada plantilla. Su identidad visual vive en código: ver `docs/store-templates.md`    |
+| `sectors`                     | **Catálogo global.** Los rubros con su nombre visible y su orden. `templates.sector` lo referencia, y es lo que agrupa la galería del alta      |
+| `insights`                    | Gráficos guardados. Guarda la **especificación**, no las filas: se recalcula con los datos de cada día                                          |
+| `store_pages`                 | Páginas concretas de cada tienda, con estado borrador o publicada                                                                               |
+| `store_blocks`                | Bloques concretos: tipo, posición, propiedades en JSON y visibilidad                                                                            |
+| `block_edit_proposals`        | Lo que la IA propuso, con el estado previo guardado                                                                                             |
+| `store_design_versions`       | Puntos de restauración del diseño: plantilla, personalización y páginas con bloques. Se toman antes de cada cambio; solo las escriben funciones |
 
 El vínculo de un bloque con su tipo **no se puede romper**: no se retira del catálogo un tipo de bloque que alguna tienda esté usando.
 
@@ -452,39 +311,28 @@ El enlace compartido lo abre cualquiera, sin cuenta. Lo lee `catalogo_compartido
 | `social_connections` | Credenciales de Facebook, WhatsApp y Canva por tienda. **Sin políticas de lectura: solo accesible desde el servidor**                                            |
 | `social_posts`       | Posteos generados. Su estado distingue `publicado` por API de `compartido` manualmente, que es lo que permite sostener el plan A y el plan B con el mismo modelo |
 
-### Comisiones: el congelamiento
-
-Es el punto más importante del modelo y el más fácil de hacer mal.
-
-- **La tasa se congela en el momento de la venta.** Cambiar el porcentaje de la tienda después no reescribe la historia. Un vendedor que vendió con 15% cobra 15%, aunque hoy la tienda pague 10%.
-- **Montos en centavos enteros, porcentajes en puntos básicos enteros.** Nunca punto flotante.
-- **Ciclo:** `pendiente` → `confirmada` → `pagada`, más `anulada`, atado a la custodia: nace `pendiente` cuando el pago entra y queda retenido, pasa a `confirmada` cuando se libera, y a `pagada` cuando PagoFácil transfirió. Un pedido cancelado o resuelto a favor del comprador **anula** la comisión; nunca la borra.
-- **El historial laboral cuenta solo `confirmada` y `pagada`.** Una venta con el pago todavía retenido puede terminar en devolución, así que no es trabajo hecho hasta que se libera.
-- **Una comisión por pedido**, garantizado por índice único. Sin eso, un pedido que va y vuelve entre estados genera comisiones duplicadas.
-
 ### Cómo se hace cumplir el aislamiento
 
 El patrón, con las trampas que hay que esquivar:
 
-**Funciones auxiliares.** Se define una función que devuelve la tienda del usuario y otra que devuelve sus vínculos activos como vendedor. Las políticas quedan como comparaciones simples:
+**Función auxiliar.** `my_store_id()` devuelve la tienda del usuario. Las políticas quedan como comparaciones simples:
 
 ```sql
 -- El dueño ve los pedidos de su tienda
 using (store_id = public.my_store_id())
-
--- El vendedor ve los pedidos que él generó, en todas las tiendas donde trabaja
-using (seller_id = any (public.my_seller_ids()))
 ```
 
-**Trampa de recursión.** Una política sobre la tabla de vendedores que consulte esa misma tabla entra en recursión infinita. Por eso los auxiliares se declaran con permisos elevados y saltan la política.
+**Trampa de recursión.** Una política que consulte la misma tabla que protege entra en recursión infinita. Por eso los auxiliares se declaran con permisos elevados y saltan la política.
 
 **Trampa de rendimiento.** La identidad del usuario debe evaluarse una vez por consulta, no una vez por fila. Se logra envolviéndola como subconsulta:
 
 ```sql
-using (seller_user_id = (select auth.uid()))
+using (owner_id = (select auth.uid()))
 ```
 
-**El checkout no es una inserción del cliente.** Un comprador anónimo que inserta directamente en la tabla de pedidos puede declarar el total que quiera. Por eso la tabla de pedidos **no tiene política de inserción**: el pedido se crea mediante una función del servidor que **recalcula los precios desde el catálogo** y resuelve el código de referido validando que pertenezca a esa tienda y esté activo.
+**El pedido no es una inserción del cliente.** Un comprador anónimo que inserta directamente en la tabla de pedidos puede declarar el total que quiera. Por eso la tabla de pedidos **no tiene política de inserción**: el pedido se crea mediante `create_order`, una función del servidor que **recalcula los precios desde el catálogo**, comprueba el stock y devuelve el número, las líneas y el WhatsApp de la tienda con los que se arma el mensaje.
+
+**Lo que se sigue de un cambio de estado lo hace un disparador.** `handle_order_status_change` descuenta el stock al pasar a `pagado`, lo devuelve al cancelar un pagado, y rechaza los cambios que no tienen sentido: un cancelado no revive y un pagado no vuelve a pendiente. La aplicación nunca ajusta el stock a mano.
 
 ---
 
@@ -510,11 +358,11 @@ Recibe la pregunta del emprendedor y resuelve tres cosas en orden: qué datos ne
 
 Las defensas, que no son opcionales:
 
-- **La IA solo lee.** Nunca elimina, actualiza ni ejecuta nada que modifique datos. Se ejecuta con un rol de base de datos de **solo lectura**.
-- **El identificador de la tienda lo impone el sistema, nunca la IA.** El filtro se inyecta del lado del servidor, después de recibir la propuesta.
-- **Lista blanca de tablas**, tiempo máximo de consulta y tope de filas.
+- **La IA solo lee.** Nunca elimina, actualiza ni ejecuta nada que modifique datos. Se ejecuta en una transacción de **solo lectura**.
+- **El identificador de la tienda lo impone el sistema, nunca la IA.** La consulta solo puede tocar tres vistas ya acotadas a la tienda —`mis_ventas`, `mis_items` y `mis_productos`—, donde ni siquiera existe la columna de la tienda.
+- **Lista blanca de vistas**, tiempo máximo de consulta y tope de filas.
 
-> Esto es más ambicioso que lo que existe hoy: `lib/ai/tasks.ts` resuelve `analyzeSales` recibiendo un arreglo de ventas ya calculado, sin generar consultas.
+Una venta es un pedido **pagado**: un pendiente puede ser un carrito que se mandó y nunca se concretó.
 
 ### Catálogos en PDF
 

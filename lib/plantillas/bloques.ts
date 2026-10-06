@@ -1,3 +1,4 @@
+import { numeroDeWhatsApp } from "@/lib/pedidos"
 import type {
   BloquePublico,
   CategoriaPublica,
@@ -151,7 +152,7 @@ export function enlaceDeConsulta(
   tienda: Pick<TiendaPublica, "nombre" | "whatsapp" | "apariencia">,
   producto: Pick<Product, "name">
 ): string | null {
-  const numero = tienda.whatsapp?.replace(/D/g, "")
+  const numero = tienda.whatsapp ? numeroDeWhatsApp(tienda.whatsapp) : ""
   if (!tienda.apariencia.ficha.consulta || !numero) return null
 
   const mensaje = `Hola ${tienda.nombre}, quisiera saber más sobre ${producto.name}.`

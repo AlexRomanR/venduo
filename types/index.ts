@@ -18,7 +18,6 @@ export type {
 
 // Identidad
 export type Profile = Tables<"profiles">
-export type SellerProfile = Tables<"seller_profiles">
 
 // Tenant
 export type Store = Tables<"stores">
@@ -39,10 +38,6 @@ export type CatalogRow = Tables<"catalogs">
 export type Order = Tables<"orders">
 export type OrderItem = Tables<"order_items">
 
-// Red de vendedores
-export type StoreSeller = Tables<"store_sellers">
-export type Commission = Tables<"commissions">
-
 // Tienda visual
 export type StorePage = Tables<"store_pages">
 export type StoreBlock = Tables<"store_blocks">
@@ -60,10 +55,7 @@ export type SocialPost = Tables<"social_posts">
 // Enums
 export type OrderStatus = Enums<"order_status">
 export type ProductCondition = Enums<"product_condition">
-export type SellerStatus = Enums<"seller_status">
-export type SellerJoinMode = Enums<"seller_join_mode">
 export type DesignOrigin = Enums<"design_origin">
-export type CommissionStatus = Enums<"commission_status">
 export type SubscriptionStatus = Enums<"subscription_status">
 export type PageStatus = Enums<"page_status">
 export type SocialProvider = Enums<"social_provider">

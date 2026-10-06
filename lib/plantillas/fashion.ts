@@ -39,6 +39,6 @@ export const fashion: DefinicionDePlantilla = {
       consulta: false,
       relacionados: true,
     },
-    carrito: { diseno: "columnas", sugerencias: false, correo: true },
+    carrito: { diseno: "columnas", sugerencias: false },
   },
 }

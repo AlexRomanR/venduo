@@ -27,7 +27,7 @@ export function Cabecera({
   demo,
   children,
 }: {
-  /** Lo que va arriba del titular, en versalita: "Tu historial laboral". */
+  /** Lo que va arriba del titular, en versalita: "Pedido". */
   etiqueta?: string
   titulo: React.ReactNode
   bajada?: React.ReactNode

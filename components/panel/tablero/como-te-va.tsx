@@ -38,11 +38,9 @@ import { Seccion, SinDatos } from "@/components/panel/piezas"
 export function ComoTeVa({
   serie,
   hoy,
-  redActiva,
 }: {
   serie: DiaDeVentas[]
   hoy: string
-  redActiva: boolean
 }) {
   const [periodo, setPeriodo] = React.useState<Periodo>(30)
 
@@ -54,17 +52,12 @@ export function ComoTeVa({
   // estaría hablando de algo que no se ve.
   const comparable = antes.pedidos > 0
 
-  const porcentajeDeLaRed =
-    ahora.ventasCents > 0
-      ? Math.round((ahora.redCents / ahora.ventasCents) * 100)
-      : 0
-
   return (
     <Seccion
       id="como-te-va"
       icono={ChartNoAxesColumn}
       titulo="Cómo te va"
-      bajada="Tus ventas, sin contar los pedidos cancelados."
+      bajada="Tus ventas: los pedidos que marcaste pagados."
       extra={
         hayVentas ? (
           <SelectorDePeriodo valor={periodo} alCambiar={setPeriodo} />
@@ -97,29 +90,17 @@ export function ComoTeVa({
               }
               detalle="Promedio de cada compra"
             />
-            {redActiva ? (
-              <Cifra
-                etiqueta="Vendió tu red"
-                valor={formatMoney(ahora.redCents)}
-                detalle={
-                  ahora.ventasCents > 0
-                    ? `${porcentajeDeLaRed} % de tus ventas`
-                    : "Todavía nada en este período"
-                }
-              />
-            ) : (
-              <Cifra
-                etiqueta="Tu mejor día"
-                valor={
-                  ahora.mejorDia ? formatMoney(ahora.mejorDia.ventasCents) : "—"
-                }
-                detalle={
-                  ahora.mejorDia
-                    ? formatDia(ahora.mejorDia.dia)
-                    : "Sin ventas en este período"
-                }
-              />
-            )}
+            <Cifra
+              etiqueta="Tu mejor día"
+              valor={
+                ahora.mejorDia ? formatMoney(ahora.mejorDia.ventasCents) : "—"
+              }
+              detalle={
+                ahora.mejorDia
+                  ? formatDia(ahora.mejorDia.dia)
+                  : "Sin ventas en este período"
+              }
+            />
           </dl>
 
           {comparable ? (

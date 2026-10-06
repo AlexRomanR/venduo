@@ -149,7 +149,7 @@ export function Fotos({
 
       <p className="mt-3 text-xs leading-relaxed text-tinta/55">
         Hasta {MAXIMO} fotos, 5 MB cada una. La primera es la portada: es la que
-        se ve en tu tienda y la que comparte el vendedor.
+        se ve en tu tienda y la que sale al compartir el producto.
       </p>
     </div>
   )

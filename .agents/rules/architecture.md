@@ -14,79 +14,67 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 
 ## Rutas
 
-| Ruta                          | Qué es                                                  | Acceso          |
-| ----------------------------- | ------------------------------------------------------- | --------------- |
-| `/`                           | Portada pública                                         | Público         |
-| `/login`                      | Registro e ingreso                                      | Público         |
-| `/t/{slug}`                   | Tienda pública del emprendedor                          | Público         |
-| `/t/{slug}/catalogo`          | Catálogo completo: filtros, búsqueda y orden por URL    | Público         |
-| `/t/{slug}/p/{id}`            | Ficha de producto, con selector de cantidad             | Público         |
-| `/t/{slug}/carrito`           | Carrito y checkout                                      | Público         |
-| `/t/{slug}/pedido/{id}`       | Pago y seguimiento del pedido (hoy, flujo provisorio)   | Público         |
-| `/v/{slug}`                   | Perfil público del vendedor                             | Público         |
-| `/crear`                      | Alta de la tienda, paso 1: elegir plantilla             | Requiere sesión |
-| `/crear/negocio`              | Alta de la tienda, paso 2: nombre y rubro               | Requiere sesión |
-| `/crear/listo`                | Alta de la tienda, paso 3: ofrece el editor             | Requiere sesión |
-| `/editor`                     | Editor de la tienda, a pantalla completa. `?paso=`      | Requiere sesión |
-| `/editor/vista-previa`        | La tienda del dueño con su borrador, para el `iframe`   | Requiere sesión |
-| `/sumarme`                    | Alta del vendedor: reparte los tres caminos             | Requiere sesión |
-| `/explorar/tiendas`           | Vitrina de tiendas que aceptan vendedores               | Requiere sesión |
-| `/explorar/productos`         | Vitrina de productos abiertos a vendedores              | Requiere sesión |
-| `/panel`                      | Resumen del emprendedor                                 | Requiere sesión |
-| `/panel/{seccion}`            | Productos, pedidos, vendedores, estadísticas, marketing | Requiere sesión |
-| `/panel/pedidos/{id}`         | Un pedido: detalle y estados                            | Requiere sesión |
-| `/panel/productos/nuevo`      | Alta de un producto                                     | Requiere sesión |
-| `/panel/productos/{id}`       | Edición de un producto                                  | Requiere sesión |
-| `/panel/productos/categorias` | Las categorías del catálogo                             | Requiere sesión |
-| `/panel/apariencia`           | La puerta al editor, la plantilla y el historial        | Requiere sesión |
-| `/panel/estadisticas/pdf`     | El informe del tablero en PDF. `?g={id}` para uno solo  | Requiere sesión |
-| `/panel/catalogos`            | Catálogos en PDF: los guardados y las doce plantillas   | Requiere sesión |
-| `/panel/catalogos/nuevo`      | Armar uno: productos, plantilla y edición               | Requiere sesión |
-| `/panel/catalogos/{id}`       | Editar un catálogo guardado                             | Requiere sesión |
-| `/panel/catalogos/pdf`        | El PDF del borrador del editor, por POST                | Requiere sesión |
-| `/panel/catalogos/{id}/pdf`   | El PDF de uno guardado, con los precios del día         | Requiere sesión |
-| `/panel/catalogos/{id}/canva` | Llevar uno a Canva: pide el permiso                     | Requiere sesión |
-| `/panel/catalogos/canva`      | La vuelta de Canva: importa el PDF y abre el diseño     | Requiere sesión |
-| `/c/{token}`                  | Un catálogo compartido, en PDF                          | Público         |
-| `/vendedor`                   | Panel del vendedor y su historial                       | Requiere sesión |
-| `/cuenta`                     | Datos de la persona, de su tienda y de su perfil        | Requiere sesión |
-| `/auth/destino`               | Resuelve a dónde entra la cuenta y redirige             | Requiere sesión |
-| `/auth/*`                     | Callback y cierre de sesión                             | —               |
-| `/api/health`                 | Estado del servidor y sus capas                         | Público         |
+| Ruta                          | Qué es                                                 | Acceso          |
+| ----------------------------- | ------------------------------------------------------ | --------------- |
+| `/`                           | Portada pública                                        | Público         |
+| `/login`                      | Registro e ingreso                                     | Público         |
+| `/t/{slug}`                   | Tienda pública del emprendedor                         | Público         |
+| `/t/{slug}/catalogo`          | Catálogo completo: filtros, búsqueda y orden por URL   | Público         |
+| `/t/{slug}/p/{id}`            | Ficha de producto, con selector de cantidad            | Público         |
+| `/t/{slug}/carrito`           | Carrito: el total y el pedido por WhatsApp             | Público         |
+| `/crear`                      | Alta de la tienda, paso 1: elegir plantilla            | Requiere sesión |
+| `/crear/negocio`              | Alta de la tienda, paso 2: nombre, rubro y WhatsApp    | Requiere sesión |
+| `/crear/listo`                | Alta de la tienda, paso 3: ofrece el editor            | Requiere sesión |
+| `/editor`                     | Editor de la tienda, a pantalla completa. `?paso=`     | Requiere sesión |
+| `/editor/vista-previa`        | La tienda del dueño con su borrador, para el `iframe`  | Requiere sesión |
+| `/panel`                      | Resumen del emprendedor                                | Requiere sesión |
+| `/panel/{seccion}`            | Productos, pedidos, estadísticas, marketing            | Requiere sesión |
+| `/panel/pedidos/{id}`         | Un pedido: detalle y estados                           | Requiere sesión |
+| `/panel/productos/nuevo`      | Alta de un producto                                    | Requiere sesión |
+| `/panel/productos/{id}`       | Edición de un producto                                 | Requiere sesión |
+| `/panel/productos/categorias` | Las categorías del catálogo                            | Requiere sesión |
+| `/panel/apariencia`           | La puerta al editor, la plantilla y el historial       | Requiere sesión |
+| `/panel/estadisticas/pdf`     | El informe del tablero en PDF. `?g={id}` para uno solo | Requiere sesión |
+| `/panel/catalogos`            | Catálogos en PDF: los guardados y las doce plantillas  | Requiere sesión |
+| `/panel/catalogos/nuevo`      | Armar uno: productos, plantilla y edición              | Requiere sesión |
+| `/panel/catalogos/{id}`       | Editar un catálogo guardado                            | Requiere sesión |
+| `/panel/catalogos/pdf`        | El PDF del borrador del editor, por POST               | Requiere sesión |
+| `/panel/catalogos/{id}/pdf`   | El PDF de uno guardado, con los precios del día        | Requiere sesión |
+| `/panel/catalogos/{id}/canva` | Llevar uno a Canva: pide el permiso                    | Requiere sesión |
+| `/panel/catalogos/canva`      | La vuelta de Canva: importa el PDF y abre el diseño    | Requiere sesión |
+| `/c/{token}`                  | Un catálogo compartido, en PDF                         | Público         |
+| `/cuenta`                     | Datos de la persona y de su tienda, con su WhatsApp    | Requiere sesión |
+| `/auth/destino`               | Resuelve a dónde entra la cuenta y redirige            | Requiere sesión |
+| `/auth/*`                     | Callback y cierre de sesión                            | —               |
+| `/api/health`                 | Estado del servidor y sus capas                        | Público         |
 
 **Qué pantallas llevan la barra lateral** está en `ui-styling.md`, "Cuándo aparece la
 barra": en corto, toda pantalla de la cuenta de quien ya tiene panel.
 
 ## A dónde entra cada cuenta
 
-El destino no lo decide `primary_role`, que es solo una intención. Lo decide el
-estado de los datos, y lo resuelve un `redirect()` en el componente de servidor:
+Hay un solo tipo de cuenta, y el destino lo decide el estado de sus datos. Lo
+resuelve un `redirect()` en el componente de servidor:
 
-| Situación                                          | Va a        |
-| -------------------------------------------------- | ----------- |
-| Emprendedor sin tienda, o con tienda sin plantilla | `/crear`    |
-| Emprendedor con plantilla elegida                  | `/panel`    |
-| Vendedor sin ningún vínculo a una tienda           | `/sumarme`  |
-| Vendedor con al menos un vínculo                   | `/vendedor` |
+| Situación                              | Va a     |
+| -------------------------------------- | -------- |
+| Sin tienda, o con tienda sin plantilla | `/crear` |
+| Con plantilla elegida                  | `/panel` |
 
-La comprobación del emprendedor es sobre `stores.template_key` y no sobre la
-existencia de la fila: es lo que marca que el alta terminó.
+La comprobación es sobre `stores.template_key` y no sobre la existencia de la fila:
+es lo que marca que el alta terminó.
 
 **El ingreso no adivina el destino: manda a `/auth/destino`.** Ese route handler
 resuelve en el servidor y redirige una sola vez. Antes empujaba a `/panel` y esa
 pantalla rebotaba, así que se veía el panel un instante antes de salir de él.
-
-El rol **redirige pero no prohíbe**. Un vendedor que pide `/crear` va a su panel,
-y encuentra ahí un enlace a `/crear?abrir=1` que lo deja pasar: `primary_role` es
-una intención, y una misma persona puede terminar siendo dueña y vendedora.
 
 ## El enlace de la tienda
 
 Se usa el slug y no el identificador porque estas URLs se imprimen en códigos QR y se
 mandan por WhatsApp.
 
-**Nadie arma ese enlace a mano.** Sale de `urlDeTienda`, `urlDeReferido` y
-`urlDeProducto`, en `lib/tienda.ts`. Antes lo concatenaban siete archivos y cambiar la
+**Nadie arma ese enlace a mano.** Sale de `urlDeTienda` y `urlDeProducto`, en
+`lib/tienda.ts`. Antes lo concatenaban siete archivos y cambiar la
 forma obligaba a encontrarlos todos.
 
 Hay **dos formas y un interruptor**, `NEXT_PUBLIC_DOMINIO_TIENDAS`:
@@ -119,21 +107,16 @@ app/
   (privado)/          Grupo de rutas: no aparece en la URL
     layout.tsx        Shell compartido de las áreas privadas
     panel/            Resumen del emprendedor y sus secciones
-    vendedor/         Panel del vendedor
-    cuenta/           Ajustes de la persona, su tienda y su perfil
-  t/[slug]/           Tienda pública: portada, catálogo, producto, carrito y pago.
-                      Compone el kit de la plantilla; no sabe cuál es
-  v/[slug]/           Historial laboral público del vendedor
+    cuenta/           Ajustes de la persona y de su tienda
+  t/[slug]/           Tienda pública: portada, catálogo, producto y carrito, que
+                      manda el pedido por WhatsApp. Compone el kit de la
+                      plantilla; no sabe cuál es
   crear/              Alta de la tienda (layout propio)
     negocio/
     listo/            El último paso: ofrece el editor
   editor/             El editor de la tienda, a pantalla completa, y sus acciones
     vista-previa/     La tienda con el borrador, dentro del iframe del editor
-  sumarme/            Alta del vendedor: reparte los tres caminos
   c/[token]/          El PDF de un catálogo compartido: público, por su token
-  explorar/           Vitrinas del vendedor (layout propio)
-    tiendas/
-    productos/
   login/
   auth/callback/      Intercambio de código por sesión
   auth/destino/       Resuelve a dónde entra la cuenta
@@ -143,8 +126,7 @@ app/
 components/
   ui/                 shadcn/ui. No editar a mano: se regeneran
   auth/               Ingreso y registro
-  onboarding/         Altas: marco, pasos y carrusel de plantillas
-  explorar/           Vitrinas: navegación, buscador, paginación y listas
+  onboarding/         El alta de la tienda: marco, pasos, formulario y galería
   editor/             El editor: pasos, vista previa, secciones, imágenes y la IA
   cuenta/             Formularios de ajustes, foto de perfil y la conexión con Canva
   insights/           Cuaderno, tablero y gráficos SVG
@@ -154,8 +136,8 @@ components/
     clasica/          La base editorial. Los demás kits heredan de esta
     fashion/          Pasarela
     perfume/          Esencia
-  tienda/             Lo compartido por todas las plantillas: carrito, checkout,
-                      pago, agregar, barra de compra, filtros y buscador
+  tienda/             Lo compartido por todas las plantillas: carrito, el pedido
+                      por WhatsApp, agregar, barra de compra, filtros y buscador
   catalogos/          Catálogos en PDF. `primitivas.ts` es el contrato de dibujo,
                       `html.tsx` su versión para la pantalla y `documento.tsx`
                       las hojas; el PDF usa las mismas variantes
@@ -163,7 +145,7 @@ components/
                       pack, oferta, contraportada y texto
     editor/           El constructor: productos, plantillas, hojas, packs,
                       estilo, vista previa, IA, exportar y Canva
-  panel/              Shell y piezas de los dos paneles. `piezas.tsx` son los
+  panel/              Shell y piezas del panel. `piezas.tsx` son los
                       paneles, cifras y estados vacíos de toda pantalla;
                       `armazon.tsx` es la barra con su contenido y decide cuándo va
     tablero/          El Resumen: sus secciones, el gráfico de ventas, el sello de
@@ -201,7 +183,8 @@ lib/
                       sin dependencias de servidor
   fuentes.ts          Todas las tipografías, con next/font
   format.ts           Moneda, fechas, slugs
-  pedidos.ts          Los estados de un pedido, sin dependencias de servidor
+  pedidos.ts          Los estados de un pedido y el mensaje de WhatsApp, sin
+                      dependencias de servidor
   qr.ts               Códigos QR
   env.ts              Entorno validado con zod
 

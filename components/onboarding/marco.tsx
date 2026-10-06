@@ -4,8 +4,7 @@ import { ArrowLeft } from "lucide-react"
 import { Logo } from "@/components/marca/logo"
 
 /**
- * El marco de las altas: `/crear`, y `/sumarme` con las vitrinas para quien
- * todavía no tiene panel.
+ * El marco del alta de la tienda: `/crear` y sus pasos.
  *
  * Sin la barra del panel a propósito: son la continuación directa del
  * ingreso, nadie ha empezado a trabajar todavía, y es donde una persona
@@ -18,8 +17,8 @@ export function Marco({
 }: {
   children: React.ReactNode
   /**
-   * Quien ya tiene panel y entró a un alta desde él —un vendedor que abre su
-   * tienda— necesita una salida que no sea cerrar sesión.
+   * Quien ya tiene panel y volvió al alta desde él necesita una salida que
+   * no sea cerrar sesión.
    */
   conPanel?: boolean
 }) {

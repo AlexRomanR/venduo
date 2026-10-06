@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, Store, Users, type LucideIcon } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -22,90 +22,38 @@ import { Input } from "@/components/ui/input"
 
 const MIN_PASSWORD = 8
 
-type Rol = "emprendedor" | "vendedor"
 type Modo = "ingresar" | "registrarse"
 
-type Contenido = {
-  icono: LucideIcon
-  opcion: string
-  detalleOpcion: string
-  etiqueta: string
-  titular: string
-  entrada: string
-  puntos: { titulo: string; detalle: string }[]
-  pie: string
+/** Lo que se lee al lado del registro: la promesa, y por qué creerla. */
+const REGISTRO = {
+  etiqueta: "Para quien ya vende",
+  titular: "Tu tienda online, y todo lo que hay detrás.",
+  entrada:
+    "Tu tienda para el enlace de tu bio, y detrás el stock, los pedidos y los catálogos. Lo manejas desde el celular, como ya manejas tus redes.",
+  puntos: [
+    {
+      titulo: "Stock al día",
+      detalle: "Cada venta descuenta sola, y te avisa lo que se está acabando.",
+    },
+    {
+      titulo: "Pedidos por WhatsApp",
+      detalle:
+        "Tu cliente arma su carrito y te lo manda a tu WhatsApp, con el total y el número de pedido.",
+    },
+    {
+      titulo: "Catálogos en PDF",
+      detalle:
+        "Con tus productos y tus colores, para mandar por WhatsApp con los precios del día.",
+    },
+  ],
+  pie: "Abrir y publicar no cuesta nada. No pedimos tarjeta.",
 }
 
-/**
- * Cada rol llega con su propia promesa: quien ya vende quiere una tienda, y
- * quien quiere vender quiere un historial. Es el mismo formulario, pero lo que
- * se lee al lado cambia entero.
- */
-const CONTENIDO: Record<Rol, Contenido> = {
-  emprendedor: {
-    icono: Store,
-    opcion: "Tengo un negocio",
-    detalleOpcion: "Quiero mi tienda online y ordenar mi negocio",
-    etiqueta: "Para quien ya vende",
-    titular: "Tu tienda online, y todo lo que hay detrás.",
-    entrada:
-      "Tu tienda para el enlace de tu bio, y detrás el stock, los cobros y los pedidos. Lo manejas desde el celular, como ya manejas tus redes.",
-    puntos: [
-      {
-        titulo: "Stock al día",
-        detalle:
-          "Cada venta descuenta sola, y te avisa lo que se está acabando.",
-      },
-      {
-        titulo: "Cobro con PagoFácil",
-        detalle:
-          "El dinero queda protegido hasta la entrega, y no revisas capturas.",
-      },
-      {
-        titulo: "Catálogos y vendedores",
-        detalle:
-          "Catálogos en PDF para mandar por WhatsApp, y vendedores que cobran solo si venden.",
-      },
-    ],
-    pie: "Abrir y publicar no cuesta nada. No pedimos tarjeta.",
-  },
-  vendedor: {
-    icono: Users,
-    opcion: "Quiero vender",
-    detalleOpcion: "Gano comisión por cada venta",
-    etiqueta: "Para quien quiere vender",
-    titular: "Cada venta queda a tu nombre.",
-    entrada:
-      "Te sumas a una tienda, vendes con tu propio enlace y ganas comisión. Lo que vendas se registra con tu nombre, la fecha y el monto.",
-    puntos: [
-      {
-        titulo: "Comisión por cada venta",
-        detalle:
-          "La tienda define el porcentaje, y queda congelado al momento de la venta.",
-      },
-      {
-        titulo: "Tu enlace y tu código",
-        detalle:
-          "Compartes los tuyos. Lo que se venda con ellos entra a tu nombre.",
-      },
-      {
-        titulo: "Historial que se arma solo",
-        detalle:
-          "Ventas, tiendas y fechas en un enlace que puedes mostrar después.",
-      },
-    ],
-    pie: "Desde los 16 años. Sin inversión inicial.",
-  },
-}
-
-const ORDEN_ROLES: Rol[] = ["emprendedor", "vendedor"]
-
-// En el ingreso el rol no se pregunta: quien vuelve ya es lo que es.
 const VUELTA = {
   etiqueta: "Entrar",
   titular: "Retoma donde lo dejaste.",
   entrada:
-    "Tu tienda, tus ventas y tu historial siguen igual que la última vez.",
+    "Tu tienda, tus pedidos y tus ventas siguen igual que la última vez.",
 }
 
 // Los dos esquemas declaran los mismos campos y solo cambian las reglas: si
@@ -114,7 +62,6 @@ const baseSchema = z.object({
   fullName: z.string().max(80),
   email: z.email("Escribe un correo válido."),
   password: z.string(),
-  role: z.enum(["emprendedor", "vendedor"]),
 })
 
 const signInSchema = baseSchema.extend({
@@ -143,17 +90,16 @@ export function Acceso({
   next,
   configured,
   initialError,
-  rolInicial,
+  registro = false,
 }: {
   next?: string
   configured: boolean
   initialError?: string
-  rolInicial?: Rol
+  /** Quien llega desde "Crear mi tienda" viene a registrarse, no a entrar. */
+  registro?: boolean
 }) {
-  // Quien llega desde la portada ya eligió un camino: se le abre el registro,
-  // no el ingreso.
   const [modo, setModo] = React.useState<Modo>(
-    rolInicial ? "registrarse" : "ingresar"
+    registro ? "registrarse" : "ingresar"
   )
 
   const esRegistro = modo === "registrarse"
@@ -164,12 +110,8 @@ export function Acceso({
       fullName: "",
       email: "",
       password: "",
-      role: rolInicial ?? "emprendedor",
     },
   })
-
-  const rol = form.watch("role")
-  const contenido = CONTENIDO[rol]
 
   React.useEffect(() => {
     if (initialError) toast.error(initialError)
@@ -193,11 +135,8 @@ export function Acceso({
       const { error } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
-        // El disparador de la base lee estos datos para crear el perfil, y
-        // para darle identidad de vendedor a quien se registra como tal.
-        options: {
-          data: { full_name: values.fullName, primary_role: values.role },
-        },
+        // El disparador de la base lee el nombre para crear el perfil.
+        options: { data: { full_name: values.fullName } },
       })
 
       if (error) {
@@ -227,7 +166,7 @@ export function Acceso({
     }
 
     // El destino lo resuelve el servidor, que es el único que sabe si esta
-    // cuenta tiene tienda o vínculos. Antes se empujaba a `/panel` y esa
+    // cuenta ya terminó de crear su tienda. Antes se empujaba a `/panel` y esa
     // pantalla rebotaba: se veía el panel un instante antes de salir de él.
     //
     // Navegación completa y no `router.push`: el destino es un route handler
@@ -241,13 +180,13 @@ export function Acceso({
     <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-12 lg:grid-cols-[1fr_0.95fr] lg:grid-rows-[auto_1fr] lg:gap-y-0 lg:py-20">
       <div className="lg:col-start-1 lg:row-start-1 lg:pr-14">
         <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-          {esRegistro ? contenido.etiqueta : VUELTA.etiqueta}
+          {esRegistro ? REGISTRO.etiqueta : VUELTA.etiqueta}
         </p>
         <h1 className="mt-5 max-w-[13ch] font-titular text-[clamp(2.25rem,7vw,3.75rem)] leading-[0.98] font-extrabold tracking-[-0.035em] text-balance">
-          {esRegistro ? contenido.titular : VUELTA.titular}
+          {esRegistro ? REGISTRO.titular : VUELTA.titular}
         </h1>
         <p className="mt-5 max-w-[46ch] leading-relaxed opacity-70">
-          {esRegistro ? contenido.entrada : VUELTA.entrada}
+          {esRegistro ? REGISTRO.entrada : VUELTA.entrada}
         </p>
       </div>
 
@@ -287,50 +226,6 @@ export function Acceso({
           >
             {esRegistro ? (
               <>
-                <FormItem>
-                  <FormLabel className={ETIQUETA_CAMPO}>
-                    ¿Cómo vas a usar Venduo?
-                  </FormLabel>
-                  <div className="grid grid-cols-2 gap-3">
-                    {ORDEN_ROLES.map((valor) => {
-                      const opcion = CONTENIDO[valor]
-                      const Icono = opcion.icono
-                      const elegido = rol === valor
-
-                      return (
-                        <button
-                          key={valor}
-                          type="button"
-                          onClick={() => form.setValue("role", valor)}
-                          aria-pressed={elegido}
-                          className={cn(
-                            "flex min-h-11 flex-col gap-1.5 border p-4 text-left transition-colors",
-                            elegido
-                              ? "border-tinta bg-tinta text-papel"
-                              : "border-tinta/15 hover:border-tinta"
-                          )}
-                        >
-                          <Icono aria-hidden="true" className="size-4" />
-                          <span className="font-titular text-sm leading-tight font-bold tracking-[-0.01em]">
-                            {opcion.opcion}
-                          </span>
-                          <span
-                            className={cn(
-                              "text-xs leading-tight",
-                              elegido ? "text-papel/70" : "opacity-55"
-                            )}
-                          >
-                            {opcion.detalleOpcion}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                  <FormDescription className="text-xs text-tinta/55">
-                    Puedes hacer las dos cosas más adelante.
-                  </FormDescription>
-                </FormItem>
-
                 <FormField
                   control={form.control}
                   name="fullName"
@@ -417,7 +312,7 @@ export function Acceso({
       {esRegistro ? (
         <div className="lg:col-start-1 lg:row-start-2 lg:self-start lg:pt-14 lg:pr-14">
           <ul>
-            {contenido.puntos.map((punto) => (
+            {REGISTRO.puntos.map((punto) => (
               <li key={punto.titulo} className="border-t border-tinta/15 py-5">
                 <h2 className="font-titular text-base font-bold tracking-[-0.02em]">
                   {punto.titulo}
@@ -429,7 +324,7 @@ export function Acceso({
             ))}
           </ul>
           <p className="mt-5 border-t border-tinta/15 pt-5 text-sm opacity-55">
-            {contenido.pie}
+            {REGISTRO.pie}
           </p>
         </div>
       ) : null}

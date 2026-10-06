@@ -16,18 +16,15 @@ import {
   ERROR_CAMPO,
   ETIQUETA_CAMPO,
 } from "@/lib/estilos"
-import { formatMoney, formatPercent } from "@/lib/format"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import {
   perfilSchema,
   tiendaSchema,
-  vendedorSchema,
   type PerfilInput,
   type TiendaInput,
-  type VendedorInput,
 } from "@/lib/validation/cuenta"
-import { COMISION_MAXIMA_BPS, COMISIONES } from "@/lib/validation/tienda"
+import { soloCifras } from "@/lib/validation/tienda"
 import {
   Form,
   FormControl,
@@ -39,8 +36,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-
-const EJEMPLO_VENTA_CENTS = 20_000
 
 function Guardar({ enCurso }: { enCurso: boolean }) {
   return (
@@ -169,9 +164,6 @@ export function FormPersona({ cuenta }: { cuenta: Cuenta }) {
 export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
   const router = useRouter()
   const tienda = cuenta.tienda!
-  const [personalizada, setPersonalizada] = React.useState(
-    !COMISIONES.includes(tienda.commissionBps as (typeof COMISIONES)[number])
-  )
 
   const form = useForm<TiendaInput>({
     resolver: zodResolver(tiendaSchema),
@@ -179,20 +171,12 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
       nombre: tienda.name,
       tagline: tienda.tagline ?? "",
       descripcion: tienda.description ?? "",
+      whatsapp: tienda.whatsapp ?? "",
       publicada: tienda.isPublished,
-      aceptaVendedores: tienda.sellerNetworkEnabled,
-      comisionBps: tienda.commissionBps,
-      modoAlta:
-        tienda.sellerJoinMode === "con_aprobacion"
-          ? "con_aprobacion"
-          : "abierta",
     },
   })
 
   const publicada = form.watch("publicada")
-  const aceptaVendedores = form.watch("aceptaVendedores")
-  const comisionBps = form.watch("comisionBps")
-  const modoAlta = form.watch("modoAlta")
 
   async function onSubmit(values: TiendaInput) {
     const supabase = createClient()
@@ -204,12 +188,10 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
         name: values.nombre,
         tagline: values.tagline || null,
         description: values.descripcion || null,
+        // Solo las cifras, igual que lo guarda el alta: así el número se lee
+        // igual venga de donde venga.
+        whatsapp: soloCifras(values.whatsapp),
         is_published: values.publicada,
-        seller_network_enabled: values.aceptaVendedores,
-        // Sin vendedores la comisión no significa nada: se guarda en cero para
-        // que no quede un número colgado que nadie va a cobrar.
-        commission_bps: values.aceptaVendedores ? values.comisionBps : 0,
-        seller_join_mode: values.modoAlta,
         updated_at: new Date().toISOString(),
       })
       .eq("id", tienda.id)
@@ -267,7 +249,7 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
                 />
               </FormControl>
               <FormDescription className={AYUDA_CAMPO}>
-                Es lo que se lee debajo del nombre y en la lista de tiendas.
+                Es lo que se lee debajo del nombre de tu tienda.
               </FormDescription>
               <FormMessage className={ERROR_CAMPO} />
             </FormItem>
@@ -292,6 +274,33 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="whatsapp"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className={ETIQUETA_CAMPO}>
+                WhatsApp de la tienda
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className={CAMPO_LINEA}
+                  type="tel"
+                  inputMode="tel"
+                  placeholder="700 12345"
+                  autoComplete="tel"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription className={AYUDA_CAMPO}>
+                Cada pedido de tu tienda llega a este número, con la lista de
+                productos y el total.
+              </FormDescription>
+              <FormMessage className={ERROR_CAMPO} />
+            </FormItem>
+          )}
+        />
+
         <FormItem>
           <FormLabel className={ETIQUETA_CAMPO}>Estado de la tienda</FormLabel>
           <Par
@@ -311,287 +320,6 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
             ]}
           />
         </FormItem>
-
-        <FormItem>
-          <FormLabel className={ETIQUETA_CAMPO}>Red de vendedores</FormLabel>
-          <Par
-            valor={aceptaVendedores}
-            onChange={(v) => form.setValue("aceptaVendedores", v)}
-            opciones={[
-              {
-                valor: true,
-                titulo: "Acepto vendedores",
-                detalle: "Ganan comisión por lo que traen",
-              },
-              {
-                valor: false,
-                titulo: "Por ahora no",
-                detalle: "Vendes solo tú",
-              },
-            ]}
-          />
-        </FormItem>
-
-        <div
-          className={cn(
-            "grid transition-all duration-300 ease-out",
-            aceptaVendedores
-              ? "grid-rows-[1fr] opacity-100"
-              : "grid-rows-[0fr] opacity-0"
-          )}
-        >
-          <div className="overflow-hidden">
-            <div className="flex flex-col gap-7">
-              <FormItem>
-                <FormLabel className={ETIQUETA_CAMPO}>
-                  Comisión por venta
-                </FormLabel>
-                <div className="flex flex-wrap gap-2">
-                  {COMISIONES.map((bps) => (
-                    <button
-                      key={bps}
-                      type="button"
-                      onClick={() => {
-                        setPersonalizada(false)
-                        form.setValue("comisionBps", bps)
-                      }}
-                      aria-pressed={!personalizada && comisionBps === bps}
-                      className={cn(
-                        "tabular flex min-h-11 items-center border px-5 font-titular font-bold transition-colors duration-200",
-                        !personalizada && comisionBps === bps
-                          ? "border-senal bg-senal text-white"
-                          : "border-tinta/15 hover:border-tinta"
-                      )}
-                    >
-                      {formatPercent(bps)}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => setPersonalizada(true)}
-                    aria-pressed={personalizada}
-                    className={cn(
-                      "flex min-h-11 items-center border px-5 font-titular font-bold transition-colors duration-200",
-                      personalizada
-                        ? "border-senal bg-senal text-white"
-                        : "border-tinta/15 hover:border-tinta"
-                    )}
-                  >
-                    Otro
-                  </button>
-                </div>
-
-                {personalizada ? (
-                  <div className="mt-3 flex items-center gap-3">
-                    <input
-                      type="number"
-                      inputMode="decimal"
-                      min={0}
-                      max={COMISION_MAXIMA_BPS / 100}
-                      step={0.5}
-                      aria-label="Porcentaje de comisión"
-                      value={comisionBps / 100}
-                      onChange={(e) => {
-                        const pct = Number.parseFloat(e.target.value)
-                        if (Number.isNaN(pct))
-                          return form.setValue("comisionBps", 0)
-                        form.setValue(
-                          "comisionBps",
-                          Math.min(
-                            Math.max(Math.round(pct * 100), 0),
-                            COMISION_MAXIMA_BPS
-                          )
-                        )
-                      }}
-                      className="tabular h-12 w-28 rounded-none border-0 border-b border-tinta bg-transparent px-0 font-titular text-2xl font-bold outline-none focus:border-senal"
-                    />
-                    <span className="font-titular text-2xl font-bold opacity-65">
-                      %
-                    </span>
-                  </div>
-                ) : null}
-
-                <FormDescription className={AYUDA_CAMPO}>
-                  En una venta de {formatMoney(EJEMPLO_VENTA_CENTS)} el vendedor
-                  se lleva{" "}
-                  <span className="tabular font-semibold text-tinta">
-                    {formatMoney((EJEMPLO_VENTA_CENTS * comisionBps) / 10000)}
-                  </span>
-                  . Cambiarlo no afecta a las ventas ya hechas: la tasa se
-                  congela en cada una.
-                </FormDescription>
-              </FormItem>
-
-              <FormItem>
-                <FormLabel className={ETIQUETA_CAMPO}>
-                  ¿Quién puede sumarse?
-                </FormLabel>
-                <Par
-                  valor={modoAlta}
-                  onChange={(v) => form.setValue("modoAlta", v)}
-                  opciones={[
-                    {
-                      valor: "abierta" as const,
-                      titulo: "Cualquiera",
-                      detalle: "Entra activo al instante",
-                    },
-                    {
-                      valor: "con_aprobacion" as const,
-                      titulo: "Con aprobación",
-                      detalle: "Revisas cada solicitud",
-                    },
-                  ]}
-                />
-                <FormDescription className={AYUDA_CAMPO}>
-                  Tu enlace de invitación salta la aprobación: quien entra por
-                  ahí queda activo aunque elijas revisar.
-                </FormDescription>
-              </FormItem>
-            </div>
-          </div>
-        </div>
-
-        <Guardar enCurso={form.formState.isSubmitting} />
-      </form>
-    </Form>
-  )
-}
-
-export function FormVendedor({ cuenta }: { cuenta: Cuenta }) {
-  const router = useRouter()
-  const vendedor = cuenta.vendedor!
-
-  const form = useForm<VendedorInput>({
-    resolver: zodResolver(vendedorSchema),
-    defaultValues: {
-      nombre: vendedor.displayName,
-      ciudad: vendedor.city ?? "",
-      bio: vendedor.bio ?? "",
-      telefono: vendedor.phone ?? "",
-    },
-  })
-
-  async function onSubmit(values: VendedorInput) {
-    const supabase = createClient()
-    if (!supabase) return toast.error("Falta configurar Supabase en .env.local")
-
-    const { error } = await supabase
-      .from("seller_profiles")
-      .update({
-        display_name: values.nombre,
-        city: values.ciudad || null,
-        bio: values.bio || null,
-        phone: values.telefono || null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("user_id", cuenta.userId)
-
-    if (error) return toast.error("No pudimos guardar tu perfil.")
-
-    toast.success("Tu perfil está al día.")
-    router.refresh()
-  }
-
-  return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-7"
-      >
-        <FormField
-          control={form.control}
-          name="nombre"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className={ETIQUETA_CAMPO}>
-                Cómo quieres que te vean
-              </FormLabel>
-              <FormControl>
-                <Input className={CAMPO_LINEA} {...field} />
-              </FormControl>
-              <FormDescription className={AYUDA_CAMPO}>
-                Es el nombre que aparece en tu historial laboral público.
-              </FormDescription>
-              <FormMessage className={ERROR_CAMPO} />
-            </FormItem>
-          )}
-        />
-
-        <div>
-          <p className={ETIQUETA_CAMPO}>Tu enlace público</p>
-          <p className="mt-2 border-b border-tinta/15 pb-3 font-mono text-sm break-all opacity-70">
-            /v/{vendedor.slug}
-          </p>
-          <p className={cn(AYUDA_CAMPO, "mt-2")}>
-            No cambia nunca: es la dirección estable que adjuntas a una
-            postulación, y tiene que seguir abriendo dentro de dos años.
-          </p>
-        </div>
-
-        <FormField
-          control={form.control}
-          name="ciudad"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className={ETIQUETA_CAMPO}>Ciudad</FormLabel>
-              <FormControl>
-                <Input
-                  className={CAMPO_LINEA}
-                  placeholder="El Alto"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage className={ERROR_CAMPO} />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="telefono"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className={ETIQUETA_CAMPO}>WhatsApp</FormLabel>
-              <FormControl>
-                <Input
-                  className={CAMPO_LINEA}
-                  type="tel"
-                  placeholder="700 12345"
-                  autoComplete="tel"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription className={AYUDA_CAMPO}>
-                Lo usan las tiendas para coordinar contigo. No se muestra en tu
-                perfil público.
-              </FormDescription>
-              <FormMessage className={ERROR_CAMPO} />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="bio"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className={ETIQUETA_CAMPO}>Sobre ti</FormLabel>
-              <FormControl>
-                <Textarea
-                  rows={4}
-                  className={cn("min-h-28 resize-y py-3", CAMPO)}
-                  placeholder="Vendo por WhatsApp y en ferias los fines de semana."
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription className={AYUDA_CAMPO}>
-                Dos líneas alcanzan. Se lee en tu perfil público, encima de tus
-                ventas.
-              </FormDescription>
-              <FormMessage className={ERROR_CAMPO} />
-            </FormItem>
-          )}
-        />
 
         <Guardar enCurso={form.formState.isSubmitting} />
       </form>

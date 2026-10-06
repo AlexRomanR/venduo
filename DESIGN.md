@@ -125,8 +125,8 @@ reducida para que el titular mande sin necesidad de un segundo color. El sistema
 está hecho para un Android de gama baja con datos móviles, así que el peso visual
 lo cargan la tipografía y el espacio, no los efectos.
 
-Este mundo rige **Venduo**: la portada, el ingreso, las altas, las vitrinas y el
-perfil del vendedor `/v/{slug}`. Lo que cambia entre una portada y un panel es el
+Este mundo rige **Venduo**: la portada, el ingreso, el alta de la tienda y el
+panel. Lo que cambia entre una portada y un panel es el
 ritmo, no el sistema: el panel usa la misma paleta y la misma tipografía con la
 mitad del aire vertical y la navegación siempre a la vista.
 

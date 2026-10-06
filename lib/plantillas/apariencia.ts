@@ -97,12 +97,13 @@ export const aparienciaSchema = z.object({
   }),
   /** El carrito, que es el mismo componente en todas las plantillas. */
   carrito: z.object({
-    /** `columnas`: pedido y datos lado a lado. `boleta` y `pasos`: una columna. */
+    /**
+     * `columnas`: el pedido y el total lado a lado. `boleta` y `pasos`: una
+     * columna. En los tres el pedido sale por WhatsApp: no se piden datos.
+     */
     diseno: z.enum(["columnas", "boleta", "pasos"]),
     /** Otros productos de la tienda para sumar al pedido. */
     sugerencias: z.boolean(),
-    /** El campo de correo, que es opcional para quien compra. */
-    correo: z.boolean(),
   }),
 })
 
@@ -298,7 +299,6 @@ export const NOMBRES_DE_AJUSTE = {
   "ficha.relacionados": "Productos parecidos",
   "carrito.diseno": "Diseño del carrito",
   "carrito.sugerencias": "Sugerencias en el carrito",
-  "carrito.correo": "Pedir el correo",
 } as const
 
 export type RutaDeAjuste = keyof typeof NOMBRES_DE_AJUSTE

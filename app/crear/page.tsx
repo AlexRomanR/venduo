@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 
-import { getMiTienda, getPerfil, getVinculosDeVendedor } from "@/lib/data/panel"
+import { getMiTienda } from "@/lib/data/panel"
 import {
   getNombresDeBloque,
   getPlantillasPorRubro,
@@ -16,28 +16,16 @@ export const metadata = { title: "Elige tu plantilla" }
  * Quien ya eligió plantilla no vuelve acá: su tienda existe y lo que
  * corresponde es el panel.
  */
-export default async function CrearPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ abrir?: string }>
-}) {
-  const { abrir } = await searchParams
-  const [tienda, perfil] = await Promise.all([getMiTienda(), getPerfil()])
-
-  if (tienda?.template_key) redirect("/panel")
-
-  // Quien se registró como vendedor no cae acá por accidente. Pero puede
-  // insistir con `?abrir=1`, porque el rol es una intención y no un permiso:
-  // una misma persona puede terminar siendo dueña y vendedora.
-  if (perfil?.primary_role === "vendedor" && abrir !== "1" && !tienda) {
-    const vinculos = await getVinculosDeVendedor()
-    redirect(vinculos.length > 0 ? "/vendedor" : "/sumarme")
-  }
-
-  const [rubros, nombresDeBloque] = await Promise.all([
+export default async function CrearPage() {
+  // Lo que no depende de la tienda arranca a la vez: una cuenta nueva siempre
+  // llega acá, y no tiene por qué esperar dos viajes en fila.
+  const [tienda, rubros, nombresDeBloque] = await Promise.all([
+    getMiTienda(),
     getPlantillasPorRubro(),
     getNombresDeBloque(),
   ])
+
+  if (tienda?.template_key) redirect("/panel")
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-12 lg:py-16">

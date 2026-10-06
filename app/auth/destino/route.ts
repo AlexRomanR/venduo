@@ -9,8 +9,7 @@ import { getUsuario } from "@/lib/supabase/server"
  *
  * El ingreso manda acá en vez de adivinar. Antes empujaba a `/panel`, esa
  * pantalla consultaba los datos y recién entonces redirigía: se veía el panel
- * un instante antes del rebote, y el vendedor pasaba por una pantalla que no
- * era suya.
+ * un instante antes del rebote.
  */
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.clone()

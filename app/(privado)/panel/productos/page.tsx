@@ -60,7 +60,7 @@ export default async function ProductosPage({
     <div className="flex flex-col gap-6 md:gap-8">
       <Cabecera
         titulo="Tu catálogo."
-        bajada="Lo que vendes, a qué precio y cuánto te queda. Es lo mismo que ve quien entra a tu tienda y lo que reparten tus vendedores."
+        bajada="Lo que vendes, a qué precio y cuánto te queda. Es lo mismo que ve quien entra a tu tienda."
         demo={
           esDemo &&
           "Estás en modo demo: los productos son de ejemplo y los cambios no se guardan."
@@ -97,7 +97,7 @@ export default async function ProductosPage({
           <Cifra
             etiqueta="Unidades"
             valor={formatNumber(resumen.unidades)}
-            detalle={`${formatNumber(resumen.conVendedores)} ${resumen.conVendedores === 1 ? "abierto" : "abiertos"} a vendedores`}
+            detalle={`${formatNumber(resumen.destacados)} ${resumen.destacados === 1 ? "destacado" : "destacados"} en tu portada`}
           />
           <Cifra
             etiqueta="Vale tu stock"
@@ -141,7 +141,7 @@ export default async function ProductosPage({
             <SinDatos
               icono={Boxes}
               titulo="Todavía no cargaste ningún producto"
-              texto="Carga el primero con su foto, su precio y cuántas unidades tienes. Desde ese momento tu tienda tiene qué mostrar y tus vendedores qué repartir."
+              texto="Carga el primero con su foto, su precio y cuántas unidades tienes. Desde ese momento tu tienda tiene qué mostrar."
             >
               <Link
                 href="/panel/productos/nuevo"

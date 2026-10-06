@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
-import { EyeOff, PackageX, ShoppingBag, UserPlus } from "lucide-react"
+import { EyeOff, MessageCircle, PackageX, ShoppingBag } from "lucide-react"
 
 import { getBarraLateral, type Contadores } from "@/lib/data/barra"
 import { getMiTienda, getResumenPanel } from "@/lib/data/panel"
@@ -23,7 +23,6 @@ import { ParaHoy, type Pendiente } from "@/components/panel/tablero/para-hoy"
 import { UltimosPedidos } from "@/components/panel/tablero/pedidos"
 import { PrimerosPasos } from "@/components/panel/tablero/primeros-pasos"
 import { MasVendidos, PorAcabarse } from "@/components/panel/tablero/productos"
-import { TuRed } from "@/components/panel/tablero/red"
 
 export const metadata = { title: "Resumen" }
 
@@ -32,7 +31,7 @@ export const metadata = { title: "Resumen" }
  *
  * Se lee de arriba abajo en el orden en que se usa: qué espera una respuesta,
  * qué le falta a la tienda si es nueva, cómo vienen las ventas, y después el
- * detalle —pedidos, productos, la red—. Cada parte va en su propio panel, con
+ * detalle —pedidos y productos—. Cada parte va en su propio panel, con
  * un título que dice para qué sirve.
  *
  * Quien todavía no eligió plantilla no tiene nada que resumir acá. La
@@ -83,6 +82,7 @@ export default async function PanelPage() {
           tablero={tablero}
           contadores={barra.contadores}
           tienda={deLaTienda}
+          sinWhatsApp={isSupabaseConfigured && !tienda?.whatsapp}
         />
       </Suspense>
     </div>
@@ -97,13 +97,20 @@ async function ContenidoDelTablero({
   tablero: lectura,
   contadores,
   tienda,
+  sinWhatsApp,
 }: {
   tablero: Promise<Tablero | null>
   contadores: Contadores
   tienda: { nombre: string; slug: string; url: string; publicada: boolean }
+  sinWhatsApp: boolean
 }) {
   const tablero = (await lectura) ?? tableroDeDemostracion()
-  const pendientes = armarPendientes(tablero, contadores, tienda.publicada)
+  const pendientes = armarPendientes(
+    tablero,
+    contadores,
+    tienda.publicada,
+    sinWhatsApp
+  )
   const faltanPasos = pasosPendientes(tablero.pasos) > 0
 
   return (
@@ -116,11 +123,7 @@ async function ContenidoDelTablero({
 
       <PrimerosPasos pasos={tablero.pasos} tienda={tienda} />
 
-      <ComoTeVa
-        serie={tablero.serie}
-        hoy={tablero.hoy}
-        redActiva={tablero.red.activa}
-      />
+      <ComoTeVa serie={tablero.serie} hoy={tablero.hoy} />
 
       <div className="grid gap-6 md:gap-8 xl:grid-cols-2">
         <UltimosPedidos pedidos={tablero.ultimosPedidos} />
@@ -132,7 +135,6 @@ async function ContenidoDelTablero({
             <PorAcabarse productos={tablero.porAcabarse} />
           </>
         ) : null}
-        <TuRed red={tablero.red} />
       </div>
     </div>
   )
@@ -148,11 +150,26 @@ async function ContenidoDelTablero({
 function armarPendientes(
   tablero: Tablero,
   contadores: Contadores,
-  publicada: boolean
+  publicada: boolean,
+  sinWhatsApp: boolean
 ): Pendiente[] {
   const pendientes: Pendiente[] = []
   const plural = (n: number, uno: string, varios: string) =>
     `${formatNumber(n)} ${n === 1 ? uno : varios}`
+
+  // Sin número, el botón de compra de la tienda no le escribe a nadie: es lo
+  // primero, antes incluso que publicarla.
+  if (sinWhatsApp) {
+    pendientes.push({
+      icono: MessageCircle,
+      texto: "Tu tienda no tiene WhatsApp",
+      detalle:
+        "Los pedidos llegan a ese número. Sin él, nadie puede comprarte.",
+      href: "/cuenta",
+      accion: "Agregarlo",
+      urgente: true,
+    })
+  }
 
   if (!publicada) {
     pendientes.push({
@@ -165,23 +182,16 @@ function armarPendientes(
     })
   }
 
-  const { pendientes: sinPagar, pagados } = tablero.porGestionar
-  if (sinPagar + pagados > 0) {
+  const sinPagar = tablero.porGestionar.pendientes
+  if (sinPagar > 0) {
     pendientes.push({
       icono: ShoppingBag,
       texto: plural(
-        sinPagar + pagados,
+        sinPagar,
         "pedido espera tu respuesta",
         "pedidos esperan tu respuesta"
       ),
-      detalle: [
-        sinPagar > 0 ? plural(sinPagar, "pendiente", "pendientes") : null,
-        pagados > 0
-          ? plural(pagados, "pagado por enviar", "pagados por enviar")
-          : null,
-      ]
-        .filter(Boolean)
-        .join(" · "),
+      detalle: "Márcalos pagados cuando te paguen por WhatsApp.",
       href: "/panel/pedidos",
       accion: "Ver pedidos",
       urgente: true,
@@ -200,21 +210,6 @@ function armarPendientes(
       href: "/panel/productos",
       accion: "Reponer",
       urgente: true,
-    })
-  }
-
-  if (tablero.red.pendientes > 0) {
-    pendientes.push({
-      icono: UserPlus,
-      texto: plural(
-        tablero.red.pendientes,
-        "persona quiere vender para ti",
-        "personas quieren vender para ti"
-      ),
-      detalle: "Apruébalas para que empiecen a compartir tus productos.",
-      href: "/panel/vendedores",
-      accion: "Revisar",
-      urgente: false,
     })
   }
 

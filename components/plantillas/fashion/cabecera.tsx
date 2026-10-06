@@ -15,42 +15,24 @@ import { useCarrito } from "@/components/tienda/carrito"
 /**
  * La cabecera de Pasarela.
  *
- * Tres pisos, como una tienda de ropa: una franja negra con el servicio —o con
- * quién trajo la visita—, el nombre centrado, y las categorías debajo. Las
+ * Tres pisos, como una tienda de ropa: una franja negra con el servicio, el
+ * nombre centrado, y las categorías debajo. Las
  * categorías van a la vista y no en un menú porque en moda se compra por
  * sección: quien busca zapatillas no quiere abrir nada para encontrarlas.
  */
-export function Cabecera({
-  marco,
-  referido,
-  codigo,
-  enlaceDelCarrito = true,
-}: PropsCabecera) {
-  const { unidades, listo, recordarReferido } = useCarrito()
+export function Cabecera({ marco, enlaceDelCarrito = true }: PropsCabecera) {
+  const { unidades, listo } = useCarrito()
   const ruta = usePathname()
   const parametros = useSearchParams()
 
-  React.useEffect(() => {
-    if (referido) recordarReferido(referido.codigo)
-  }, [referido, recordarReferido])
-
   const enCatalogo = ruta.endsWith("/catalogo")
   const categoriaActiva = enCatalogo ? parametros.get("categoria") : null
-  const catalogo = rutaDeTienda(marco.slug, "/catalogo", { ref: codigo })
+  const catalogo = rutaDeTienda(marco.slug, "/catalogo")
 
   return (
     <header className="sticky top-0 z-30 bg-papel">
       <p className="bg-tinta px-5 py-2 text-center text-[11px] font-semibold tracking-[0.18em] text-papel uppercase">
-        {referido ? (
-          <>
-            Te trajo{" "}
-            <span className="underline decoration-senal-alta decoration-2 underline-offset-4">
-              {referido.nombre ?? referido.codigo}
-            </span>
-          </>
-        ) : (
-          "Entrega coordinada por WhatsApp"
-        )}
+        Pedidos por WhatsApp
       </p>
 
       <div className="border-b border-tinta">
@@ -70,7 +52,7 @@ export function Cabecera({
           </nav>
 
           <Link
-            href={rutaDeTienda(marco.slug, "", { ref: codigo })}
+            href={rutaDeTienda(marco.slug, "")}
             className="flex min-h-14 max-w-[58vw] items-center justify-center md:max-w-md"
           >
             {marco.logoUrl ? (
@@ -117,7 +99,6 @@ export function Cabecera({
                   <EnlaceDeCategoria
                     href={rutaDeTienda(marco.slug, "/catalogo", {
                       categoria: categoria.id,
-                      ref: codigo,
                     })}
                     activo={categoriaActiva === categoria.id}
                   >

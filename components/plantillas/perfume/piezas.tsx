@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 
+import { numeroDeWhatsApp } from "@/lib/pedidos"
 import { descuento } from "@/lib/plantillas/bloques"
 import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
@@ -20,14 +21,14 @@ import type {
  * píldora con trazo fino. El oro no rellena: subraya.
  */
 
-export function Tarjeta({ producto, tienda, codigo }: PropsTarjeta) {
+export function Tarjeta({ producto, tienda }: PropsTarjeta) {
   const agotado = producto.stock === 0
   const rebaja = descuento(producto)
   const retrato = tienda.apariencia.disposicion.tarjeta === "retrato"
 
   return (
     <Link
-      href={rutaDeTienda(tienda.slug, `/p/${producto.id}`, { ref: codigo })}
+      href={rutaDeTienda(tienda.slug, `/p/${producto.id}`)}
       className="group block text-center"
     >
       <div
@@ -237,7 +238,7 @@ export function Vacio({ titulo, texto, accion }: PropsVacio) {
   )
 }
 
-export function Pie({ marco, codigo }: PropsPie) {
+export function Pie({ marco }: PropsPie) {
   return (
     <footer className="border-t border-tinta/10">
       <div className="mx-auto w-full max-w-6xl px-5 py-16 text-center">
@@ -254,20 +255,20 @@ export function Pie({ marco, codigo }: PropsPie) {
           className="mt-6 flex flex-wrap items-center justify-center gap-x-8"
         >
           <Link
-            href={rutaDeTienda(marco.slug, "", { ref: codigo })}
+            href={rutaDeTienda(marco.slug, "")}
             className="flex min-h-11 items-center text-[11px] tracking-[0.24em] uppercase opacity-70 transition-opacity hover:opacity-100"
           >
             Inicio
           </Link>
           <Link
-            href={rutaDeTienda(marco.slug, "/catalogo", { ref: codigo })}
+            href={rutaDeTienda(marco.slug, "/catalogo")}
             className="flex min-h-11 items-center text-[11px] tracking-[0.24em] uppercase opacity-70 transition-opacity hover:opacity-100"
           >
             La colección
           </Link>
           {marco.whatsapp ? (
             <a
-              href={`https://wa.me/${marco.whatsapp.replace(/\D/g, "")}`}
+              href={`https://wa.me/${numeroDeWhatsApp(marco.whatsapp)}`}
               target="_blank"
               rel="noreferrer noopener"
               className="flex min-h-11 items-center text-[11px] tracking-[0.24em] uppercase opacity-70 transition-opacity hover:opacity-100"
@@ -278,7 +279,7 @@ export function Pie({ marco, codigo }: PropsPie) {
         </nav>
 
         <p className="mx-auto mt-6 max-w-[40ch] text-sm leading-relaxed opacity-55">
-          La entrega y el pago se coordinan con la tienda por WhatsApp.
+          Los pedidos y el pago se acuerdan con la tienda por WhatsApp.
         </p>
 
         <Link

@@ -143,21 +143,21 @@ aplicación:
 ### Solo las vistas de mi tienda
 
 RLS no alcanza por sí sola. La política de `products` deja leer el catálogo de
-**toda tienda publicada** —hace falta para que un comprador navegue— y la de
-`seller_profiles` es pública por el historial laboral. Con las tablas base a la
-vista, "mis productos más vendidos" podía mezclar los de todos: no una fuga de
+**toda tienda publicada** —hace falta para que un comprador navegue—. Con las
+tablas base a la vista, "mis productos más vendidos" podía mezclar los de todos: no una fuga de
 datos privados, pero sí **una respuesta incorrecta**, que en una herramienta de
 análisis es igual de grave.
 
-Por eso la IA escribe contra cinco vistas ya acotadas a `my_store_id()`:
+Por eso la IA escribe contra tres vistas ya acotadas a `my_store_id()`:
 
-| Vista            | Qué trae                       |
-| ---------------- | ------------------------------ |
-| `mis_ventas`     | Pedidos                        |
-| `mis_items`      | Líneas de pedido, por producto |
-| `mis_productos`  | Catálogo y stock               |
-| `mis_vendedores` | La red                         |
-| `mis_comisiones` | Lo que generó cada vendedor    |
+| Vista           | Qué trae                       |
+| --------------- | ------------------------------ |
+| `mis_ventas`    | Pedidos, con su número         |
+| `mis_items`     | Líneas de pedido, por producto |
+| `mis_productos` | Catálogo y stock               |
+
+**Una venta es un pedido pagado.** El esquema se lo dice al modelo: un pendiente
+puede ser un carrito que se mandó por WhatsApp y nunca se concretó.
 
 **En esas vistas no existe `store_id`.** El alcance deja de depender de que el
 modelo se acuerde de filtrar. Nombrar una tabla base corta la consulta.
@@ -167,8 +167,8 @@ es lo que permite dibujar sin adivinar qué vino.
 
 **Una fila no siempre es una cifra.** `normalizarForma` degrada a `numero` solo
 cuando la etiqueta es un rótulo de total. Una consulta agrupada que devolvió un
-único grupo —"activo", "2026-09"— conserva su gráfico: volverla un número suelto
-tira la etiqueta, y "5" no contesta "¿en qué estado están mis vendedores?".
+único grupo —"pagado", "2026-09"— conserva su gráfico: volverla un número suelto
+tira la etiqueta, y "5" no contesta "¿en qué estado están mis pedidos?".
 
 **El tipo de gráfico que nombra la persona manda.** Torta y dona no existen —la
 paleta es un solo rojo y el color no puede separar categorías, ver
@@ -183,7 +183,7 @@ invisible.
 
 La `explicacion` que devuelve el modelo se escribe **antes** de ejecutar la
 consulta, así que solo puede describir la intención —"voy a mostrar las ventas
-por vendedor"—, nunca lo que salió. Sirve de epígrafe del gráfico y nada más.
+por producto"—, nunca lo que salió. Sirve de epígrafe del gráfico y nada más.
 
 Lo que **lee** el gráfico es `leerGrafico()` de `lib/insights/lectura.ts`, que
 mira las filas ya calculadas y dice quién encabeza, con cuánta ventaja y cómo

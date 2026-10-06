@@ -117,7 +117,6 @@ export function FormularioProducto({
       fotos: producto?.images ?? [],
       activo: producto?.is_active ?? true,
       destacado: producto?.is_featured ?? false,
-      aceptaVendedores: producto?.seller_enabled ?? true,
     },
   })
 
@@ -485,7 +484,7 @@ export function FormularioProducto({
           id="donde"
           icono={Eye}
           titulo="Dónde se ve"
-          detalle="En tu tienda, en su portada y en tu red de vendedores."
+          detalle="En tu tienda y en su portada."
         >
           {(
             [
@@ -498,12 +497,6 @@ export function FormularioProducto({
                 nombre: "destacado" as const,
                 etiqueta: "Destacado",
                 ayuda: "Sale primero en la portada de tu tienda.",
-              },
-              {
-                nombre: "aceptaVendedores" as const,
-                etiqueta: "Lo pueden vender mis vendedores",
-                ayuda:
-                  "La comisión se calcula solo sobre los productos marcados.",
               },
             ] as const
           ).map((campo) => (

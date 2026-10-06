@@ -185,7 +185,6 @@ export function productosDeEjemplo(
     condition_note: null,
     is_active: true,
     is_featured: ejemplo.destacado ?? false,
-    seller_enabled: true,
     sku: null,
     created_at: ahora,
     updated_at: ahora,

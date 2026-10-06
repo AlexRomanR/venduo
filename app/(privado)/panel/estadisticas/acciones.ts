@@ -76,7 +76,7 @@ export async function preguntar(
     return {
       ok: false,
       error:
-        "No entendimos la pregunta con los datos que hay. Prueba nombrando qué quieres ver: ventas, productos, vendedores o catálogo.",
+        "No entendimos la pregunta con los datos que hay. Prueba nombrando qué quieres ver: ventas, pedidos, productos o catálogo.",
     }
   }
 

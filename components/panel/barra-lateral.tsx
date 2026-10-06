@@ -7,11 +7,8 @@ import { usePathname } from "next/navigation"
 import {
   BookOpen,
   ChartColumn,
-  Compass,
   Copy,
   ExternalLink,
-  Handshake,
-  IdCard,
   LayoutGrid,
   LogOut,
   Megaphone,
@@ -22,19 +19,14 @@ import {
   Palette,
   Plus,
   Receipt,
-  Search,
   Settings,
   Store,
   Tags,
-  Ticket,
-  Users,
-  Wallet,
   X,
   type LucideIcon,
 } from "lucide-react"
 import { toast } from "sonner"
 
-import { formatMoney } from "@/lib/format"
 import { estiloDelTitular } from "@/lib/plantillas/fuentes"
 import { COOKIE_BARRA } from "@/lib/preferencias"
 import { cn } from "@/lib/utils"
@@ -108,13 +100,9 @@ function ConNombre({
  * Lo que hay adentro de la barra: en escritorio, desplegada o plegada, y en el
  * cajón del móvil.
  *
- * Las secciones las arman los datos: quien tiene tienda ve "Tu negocio", quien
- * vende para otras ve "Como vendedor", y quien hace las dos cosas ve las dos.
- * `primary_role` no interviene — es una intención, no un permiso.
- *
- * El rojo aparece solo donde algo pide una acción: un pedido que ya trajo su
- * comprobante, un producto que se quedó sin stock. Un contador que no exige
- * nada va en tinta. Si todo fuera rojo, el acento dejaría de avisar.
+ * El rojo aparece solo donde algo pide una acción: un pedido que espera que
+ * confirmes su pago, un producto que se quedó sin stock. Un contador que no
+ * exige nada va en tinta. Si todo fuera rojo, el acento dejaría de avisar.
  */
 function Contenido({
   datos,
@@ -129,7 +117,7 @@ function Contenido({
   alPlegar?: () => void
 }) {
   const pathname = usePathname()
-  const { tienda, vendedor, contadores: c, persona, apariencia } = datos
+  const { tienda, contadores: c, persona, apariencia } = datos
 
   const reposicion = c.productosSinStock + c.productosPocoStock
 
@@ -144,11 +132,8 @@ function Contenido({
             c.pedidosPendientes > 0
               ? {
                   valor: c.pedidosPendientes,
-                  urgente: c.pedidosConComprobante > 0,
-                  etiqueta:
-                    c.pedidosConComprobante > 0
-                      ? `${c.pedidosPendientes} pendientes, ${c.pedidosConComprobante} con comprobante`
-                      : `${c.pedidosPendientes} pendientes`,
+                  urgente: true,
+                  etiqueta: `${c.pedidosPendientes} pendientes`,
                 }
               : undefined,
         },
@@ -178,19 +163,6 @@ function Contenido({
           icono: BookOpen,
         },
         {
-          href: "/panel/vendedores",
-          nombre: "Vendedores",
-          icono: Users,
-          contador:
-            c.vendedoresPendientes > 0
-              ? {
-                  valor: c.vendedoresPendientes,
-                  urgente: true,
-                  etiqueta: `${c.vendedoresPendientes} solicitudes`,
-                }
-              : undefined,
-        },
-        {
           href: "/panel/estadisticas",
           nombre: "Estadísticas",
           icono: ChartColumn,
@@ -206,33 +178,6 @@ function Contenido({
           icono: Megaphone,
           pronto: true,
         },
-      ]
-    : []
-
-  const deVendedor: Item[] = vendedor
-    ? [
-        {
-          href: "/vendedor",
-          nombre: "Lo que vendo",
-          icono: Wallet,
-          exacto: true,
-        },
-        { href: "/explorar/tiendas", nombre: "Buscar tiendas", icono: Compass },
-        {
-          href: "/explorar/productos",
-          nombre: "Buscar productos",
-          icono: Search,
-        },
-        ...(vendedor.perfilSlug
-          ? [
-              {
-                href: `/v/${vendedor.perfilSlug}`,
-                nombre: "Mi perfil público",
-                icono: IdCard,
-              },
-            ]
-          : []),
-        { href: "/sumarme", nombre: "Entrar con un código", icono: Ticket },
       ]
     : []
 
@@ -485,64 +430,6 @@ function Contenido({
                 plegada={plegada}
               />
             ))}
-          </Grupo>
-        ) : null}
-
-        {deVendedor.length > 0 && vendedor ? (
-          <Grupo
-            titulo="Como vendedor"
-            plegada={plegada}
-            detalle={
-              c.comisionesPorCobrarCents > 0
-                ? `Te deben ${formatMoney(c.comisionesPorCobrarCents)}`
-                : `${vendedor.tiendas} ${vendedor.tiendas === 1 ? "tienda activa" : "tiendas activas"}${
-                    vendedor.pendientes > 0
-                      ? ` · ${vendedor.pendientes} esperando`
-                      : ""
-                  }`
-            }
-            detalleUrgente={c.comisionesPorCobrarCents > 0}
-          >
-            {deVendedor.map((item) => (
-              <Entrada
-                key={item.href}
-                item={item}
-                pathname={pathname}
-                alNavegar={alNavegar}
-                plegada={plegada}
-              />
-            ))}
-          </Grupo>
-        ) : null}
-
-        {/* La otra mitad del producto, para quien todavía no la usa */}
-        {tienda && !vendedor ? (
-          <Grupo titulo="Gana extra" plegada={plegada}>
-            <Entrada
-              item={{
-                href: "/sumarme",
-                nombre: "Vender para otras tiendas",
-                icono: Handshake,
-              }}
-              pathname={pathname}
-              alNavegar={alNavegar}
-              plegada={plegada}
-            />
-          </Grupo>
-        ) : null}
-
-        {!tienda && vendedor ? (
-          <Grupo titulo="Tu propio negocio" plegada={plegada}>
-            <Entrada
-              item={{
-                href: "/crear?abrir=1",
-                nombre: "Abrir mi tienda",
-                icono: Store,
-              }}
-              pathname={pathname}
-              alNavegar={alNavegar}
-              plegada={plegada}
-            />
           </Grupo>
         ) : null}
       </div>
@@ -862,7 +749,7 @@ function Entrada({
  *
  * Plegada no desaparece: queda un riel de 72 px con los íconos, sus contadores
  * y su nombre al pasar el mouse. Ocultarla del todo dejaría los avisos
- * —pedidos con comprobante, productos sin stock— fuera de la vista justo
+ * —pedidos sin cobrar, productos sin stock— fuera de la vista justo
  * cuando alguien quiso más lugar para trabajar.
  *
  * El estado vive en una cookie y no en `localStorage`: la lee el layout del
@@ -942,10 +829,7 @@ export function BarraLateralMovil({ datos }: { datos: BarraLateral }) {
   }, [pathname])
 
   const c = datos.contadores
-  const urgente =
-    c.pedidosConComprobante > 0 ||
-    c.productosSinStock > 0 ||
-    c.vendedoresPendientes > 0
+  const urgente = c.pedidosPendientes > 0 || c.productosSinStock > 0
 
   return (
     <header className="sticky top-0 z-30 border-b border-tinta/15 bg-papel/92 backdrop-blur lg:hidden">
@@ -997,9 +881,7 @@ export function BarraLateralMovil({ datos }: { datos: BarraLateral }) {
               <span
                 className={cn(
                   "tabular absolute top-1 right-0 flex h-4 min-w-4 items-center justify-center px-1 text-[10px] font-bold",
-                  c.pedidosConComprobante > 0
-                    ? "bg-senal text-white"
-                    : "bg-tinta text-papel"
+                  "bg-senal text-white"
                 )}
               >
                 {c.pedidosPendientes > 9 ? "9+" : c.pedidosPendientes}

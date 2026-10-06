@@ -2,9 +2,8 @@
 
 Más que una tienda online: el sistema para quien vende por TikTok, Instagram y WhatsApp.
 Tiene su tienda online —el enlace de su bio, sobre una plantilla que la IA edita por
-bloques— y detrás el stock, los cobros, los pedidos y los catálogos en PDF. Esa tienda
-puede activar una red de vendedores jóvenes que colocan sus productos a comisión y
-construyen, con cada venta, un historial laboral verificable.
+bloques— y detrás el stock, los pedidos, las estadísticas y los catálogos en PDF. Quien
+compra no deja datos: arma su carrito y lo manda al WhatsApp de la tienda.
 
 MVP de hackathon de 48 horas. **La especificación del producto es `VENDUO.md`** y es la
 fuente de verdad: si algo de acá la contradice, gana `VENDUO.md`.
@@ -28,15 +27,19 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
 
 ## Lo que hay que saber antes de tocar nada
 
-- **Una tienda por usuario**, impuesto por índice único. Un vendedor, en cambio, pertenece
-  a varias: ahí está toda la dificultad del aislamiento.
+- **Una tienda por usuario**, impuesto por índice único. Por eso `my_store_id()` devuelve
+  un identificador y toda política es una comparación directa.
 - **Dinero en centavos enteros, porcentajes en puntos básicos.** Nunca punto flotante. La
   moneda es el boliviano y es constante del sistema: no hay columna de moneda.
 - **Borrado lógico en todas partes.** Toda consulta filtra `deleted_at is null`, y los
   índices únicos son parciales.
-- **El checkout no es una inserción del cliente.** `orders` no tiene política de INSERT: el
-  pedido se crea con la función `create_order`, que recalcula los precios en el servidor.
-- **La comisión se congela al momento de la venta.** Nunca se recalcula después.
+- **El pedido no es una inserción del cliente.** `orders` no tiene política de INSERT: el
+  pedido se crea con `create_order`, que recalcula los precios en el servidor y devuelve
+  con qué armar el mensaje de WhatsApp. Quien compra no deja ningún dato.
+- **El stock baja al marcar un pedido pagado, no al crearlo**, y lo mueve un disparador.
+  La aplicación nunca ajusta el stock por un cambio de estado.
+- **El WhatsApp de la tienda es obligatorio**: ahí llega cada pedido. Todo enlace a
+  WhatsApp pasa por `numeroDeWhatsApp`, que le pone el 591.
 - **`types/database.ts` es generado.** Los alias van en `types/index.ts`.
 - **La IA propone, el sistema valida y ejecuta.** Toda salida del modelo se valida con zod
   antes de tocar la base o la pantalla.
@@ -59,9 +62,10 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
 Está en `VENDUO.md` §7 y vale tanto como la lista de lo que sí. Si una tarea pide algo de
 acá, frena y pregunta antes de escribir código:
 
-multi-tienda por usuario · gestión de envíos · recibir o guardar el dinero de una venta
-(lo hace PagoFácil) · cobro de la suscripción · notificaciones por correo · app móvil
-nativa · **tests automatizados**.
+multi-tienda por usuario · red de vendedores, comisiones o referidos · gestión de envíos
+· cobrar dentro de la plataforma (el pago se acuerda por WhatsApp) · pedirle datos a
+quien compra · cobro de la suscripción · notificaciones por correo · app móvil nativa ·
+**tests automatizados**.
 
 ## Documentos
 
@@ -82,7 +86,7 @@ Code desde `CLAUDE.md`, así que las dos herramientas aplican los mismos estánd
 | ------------------ | ---------------------------------------------------------------- |
 | `architecture.md`  | App Router, componentes de servidor, rutas, clientes de Supabase |
 | `database-rls.md`  | Dinero, borrado lógico, políticas RLS, migraciones               |
-| `domain-venduo.md` | Reglas de negocio, comisiones, roles, alcance                    |
+| `domain-venduo.md` | Reglas de negocio, pedidos por WhatsApp, cuentas, alcance        |
 | `ui-styling.md`    | Móvil primero, Tailwind v4, shadcn/ui, textos                    |
 | `ai-layer.md`      | Interfaz del proveedor, esquemas zod, modo mock                  |
 | `code-quality.md`  | TypeScript estricto, secretos, commits                           |
@@ -95,14 +99,14 @@ Code desde `CLAUDE.md`, así que las dos herramientas aplican los mismos estánd
 En `.agents/skills/`, que es la **fuente única**: `.claude/skills/` se genera desde acá
 con `npm run sync:agents`. Editar siempre el original.
 
-| Skill                   | Cuándo                                                      |
-| ----------------------- | ----------------------------------------------------------- |
-| `implement-feature`     | Una feature de punta a punta, de la migración a la pantalla |
-| `database-migration`    | Migraciones, políticas RLS, índices, funciones              |
-| `sales-and-commissions` | Checkout, referidos, comisiones, entrega por WhatsApp       |
-| `visual-block-editor`   | Plantillas, tipos de bloque, propuestas de la IA            |
-| `ai-task-workflow`      | Agregar o cambiar una tarea de IA                           |
-| `qa-verification`       | Verificación antes de commitear                             |
+| Skill                  | Cuándo                                                      |
+| ---------------------- | ----------------------------------------------------------- |
+| `implement-feature`    | Una feature de punta a punta, de la migración a la pantalla |
+| `database-migration`   | Migraciones, políticas RLS, índices, funciones              |
+| `pedidos-por-whatsapp` | Carrito, el pedido por WhatsApp, sus estados y el stock     |
+| `visual-block-editor`  | Plantillas, tipos de bloque, propuestas de la IA            |
+| `ai-task-workflow`     | Agregar o cambiar una tarea de IA                           |
+| `qa-verification`      | Verificación antes de commitear                             |
 
 ### Skills de terceros
 

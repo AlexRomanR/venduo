@@ -68,7 +68,7 @@ export async function analyzeSales(
       {
         role: "user",
         content: [
-          `Pregunta del vendedor: ${input.question}`,
+          `Pregunta de la tienda: ${input.question}`,
           "Series de ventas (JSON, montos en centavos):",
           JSON.stringify(input.sales),
         ].join("\n"),
@@ -275,7 +275,6 @@ const REGLAS_DE_EDICION = [
   '- ficha.relacionados: true | false ("También te puede gustar")',
   "- carrito.diseno: columnas | boleta | pasos",
   "- carrito.sugerencias: true | false (tres productos más para sumar al pedido)",
-  "- carrito.correo: true | false (pedir el correo, que es opcional)",
   "",
   "Tipos de sección y sus campos:",
   TIPOS_DE_SECCION,

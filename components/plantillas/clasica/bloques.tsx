@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, ImageOff, MessageCircle } from "lucide-react"
 
+import { numeroDeWhatsApp } from "@/lib/pedidos"
 import {
   accionDePortada,
   categoriasConFoto,
@@ -107,13 +108,13 @@ function Portada({ bloque }: PropsBloque) {
   )
 }
 
-export function Tarjeta({ producto, tienda, codigo }: PropsTarjeta) {
+export function Tarjeta({ producto, tienda }: PropsTarjeta) {
   const agotado = producto.stock === 0
   const retrato = tienda.apariencia.disposicion.tarjeta === "retrato"
 
   return (
     <Link
-      href={rutaDeTienda(tienda.slug, `/p/${producto.id}`, { ref: codigo })}
+      href={rutaDeTienda(tienda.slug, `/p/${producto.id}`)}
       className="group flex flex-col"
     >
       <div
@@ -174,7 +175,7 @@ export function Tarjeta({ producto, tienda, codigo }: PropsTarjeta) {
   )
 }
 
-function Grilla({ bloque, tienda, codigo }: PropsBloque) {
+function Grilla({ bloque, tienda }: PropsBloque) {
   const productos = productosDeGrilla(bloque, tienda.productos)
   if (productos.length === 0) return null
 
@@ -187,7 +188,6 @@ function Grilla({ bloque, tienda, codigo }: PropsBloque) {
         <Link
           href={rutaDeTienda(tienda.slug, "/catalogo", {
             condicion: filtroDeGrilla(bloque).condicion,
-            ref: codigo,
           })}
           className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
         >
@@ -203,19 +203,14 @@ function Grilla({ bloque, tienda, codigo }: PropsBloque) {
         )}
       >
         {productos.map((producto) => (
-          <Tarjeta
-            key={producto.id}
-            producto={producto}
-            tienda={tienda}
-            codigo={codigo}
-          />
+          <Tarjeta key={producto.id} producto={producto} tienda={tienda} />
         ))}
       </div>
     </Seccion>
   )
 }
 
-function Categorias({ bloque, tienda, codigo }: PropsBloque) {
+function Categorias({ bloque, tienda }: PropsBloque) {
   const categorias = categoriasConFoto(tienda, numero(bloque, "limit") ?? 6)
   if (categorias.length === 0) return null
 
@@ -229,7 +224,6 @@ function Categorias({ bloque, tienda, codigo }: PropsBloque) {
             <Link
               href={rutaDeTienda(tienda.slug, "/catalogo", {
                 categoria: categoria.id,
-                ref: codigo,
               })}
               className="group flex min-h-16 items-center justify-between gap-4 py-4 sm:pr-8"
             >
@@ -380,7 +374,7 @@ function Contacto({ bloque }: PropsBloque) {
             </dt>
             <dd className="mt-2">
               <a
-                href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`}
+                href={`https://wa.me/${numeroDeWhatsApp(whatsapp)}`}
                 target="_blank"
                 rel="noreferrer noopener"
                 className="inline-flex min-h-11 items-center gap-2 font-semibold transition-colors hover:text-senal"

@@ -40,6 +40,6 @@ export const perfume: DefinicionDePlantilla = {
       consulta: true,
       relacionados: true,
     },
-    carrito: { diseno: "columnas", sugerencias: false, correo: true },
+    carrito: { diseno: "columnas", sugerencias: false },
   },
 }

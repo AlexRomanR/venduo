@@ -29,6 +29,7 @@ import {
   ProveedorCarrito,
   type LineaCarrito,
 } from "@/components/tienda/carrito"
+import type { ResultadoPedido } from "@/app/t/[slug]/acciones"
 import { Checkout } from "@/components/tienda/checkout"
 
 type Estado = Extract<MensajeAlaVistaPrevia, { tipo: "estado" }>
@@ -58,7 +59,7 @@ function marcada(id: string) {
   return `[data-seccion]${selector(id)}`
 }
 
-async function sinPedidos() {
+async function sinPedidos(): Promise<ResultadoPedido> {
   return {
     ok: false,
     error: "Es una vista previa: acá no se crean pedidos.",
@@ -321,26 +322,16 @@ export function VistaPrevia({
         }}
         onDropCapture={alSoltar}
       >
-        <kit.Cabecera
-          marco={marco}
-          referido={null}
-          codigo={null}
-          enlaceDelCarrito={vista !== "carrito"}
-        />
+        <kit.Cabecera marco={marco} enlaceDelCarrito={vista !== "carrito"} />
 
         <main className="flex-1">
           {vista === "inicio" ? (
-            <kit.Inicio
-              tienda={paraVista}
-              codigo={null}
-              filtros={SIN_FILTROS}
-            />
+            <kit.Inicio tienda={paraVista} filtros={SIN_FILTROS} />
           ) : null}
 
           {vista === "catalogo" ? (
             <kit.Catalogo
               tienda={paraVista}
-              codigo={null}
               filtros={SIN_FILTROS}
               productos={filtrarCatalogo(paraVista.productos, SIN_FILTROS)}
             />
@@ -351,7 +342,6 @@ export function VistaPrevia({
               <kit.Ficha
                 tienda={paraVista}
                 producto={producto}
-                codigo={null}
                 relacionados={relacionados(producto, paraVista.productos)}
               />
             ) : (
@@ -371,6 +361,8 @@ export function VistaPrevia({
                 <Checkout
                   slug={actual.slug}
                   nombreTienda={actual.nombre}
+                  whatsapp={actual.whatsapp}
+                  demo={actual.esDemo}
                   crear={sinPedidos}
                   opciones={actual.apariencia.carrito}
                   sugeridos={sugerenciasDelCarrito(paraVista.productos)}
@@ -384,7 +376,7 @@ export function VistaPrevia({
             justo lo que se está editando. El contador de la cabecera queda.
             La barra de compra sí va, si la tienda la eligió: es parte de
             cómo se ve su ficha. */}
-        <kit.Pie marco={marco} codigo={null} />
+        <kit.Pie marco={marco} />
         {conBarra && producto ? (
           <BarraDeCompra producto={producto} slug={actual.slug} />
         ) : null}

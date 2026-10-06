@@ -69,9 +69,10 @@ Dos errores que ya pasaron y no los atrapa el compilador:
 ## Cuentas de demostración
 
 Las tiendas sembradas tienen dueños con correo `@demo.venduo.bo` —`rosa@` (Rosa Deportes,
-plantilla Pasarela), `bella@` (Bella Piel, Esencia), `casa@`, `elsa@`, `tecno@`— y
-`ana@demo.venduo.bo` es una vendedora de Rosa. **La contraseña se pide al equipo**, no se
-escribe en el repositorio.
+plantilla Pasarela), `bella@` (Bella Piel, Esencia), `casa@`, `elsa@`, `tecno@`—.
+`ana@demo.venduo.bo` era una vendedora de Rosa: con la red de vendedores borrada queda
+como una cuenta sin tienda, que entra a `/crear`. **La contraseña se pide al equipo**, no
+se escribe en el repositorio.
 
 Son los datos de la demostración y viven en producción: probar sobre ellas está bien,
 dejarlas rotas no. Si un cambio de prueba las altera —cambiar la plantilla de Rosa, por

@@ -17,17 +17,16 @@ import {
   SinDatos,
 } from "@/components/panel/piezas"
 import { FilaPedido } from "@/components/pedidos/fila"
-import { verComprobante } from "./acciones"
 
 export const metadata = { title: "Pedidos" }
 
 /**
  * Los pedidos de la tienda.
  *
- * Lo que manda el orden de la pantalla es qué pide una acción: arriba, cuánto
- * falta cobrar y cuántos pedidos llegaron con su comprobante esperando que
- * alguien los mire. Un pedido pendiente con comprobante es plata que ya está y
- * una comisión que todavía no se pagó.
+ * Llegan por WhatsApp: el comprador manda su carrito con el número del pedido,
+ * y acá queda registrado. Lo que manda el orden de la pantalla es qué pide una
+ * acción: arriba, cuántos esperan que la tienda confirme el pago, que es lo
+ * que descuenta el stock.
  */
 export default async function PedidosPage({
   searchParams,
@@ -42,13 +41,12 @@ export default async function PedidosPage({
     typeof consulta.estado === "string" ? consulta.estado : undefined
 
   const { pedidos, resumen, esDemo } = await getPedidos(filtro)
-  const confirmados = resumen.pagados + resumen.enCamino + resumen.entregados
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <Cabecera
         titulo="Tus pedidos."
-        bajada="Confirma los pagos, coordina las entregas y lleva cada pedido hasta el final."
+        bajada="Cada pedido llega a tu WhatsApp con su número. Cuando te paguen, márcalo pagado: así baja del stock."
         demo={
           esDemo &&
           "Estás en modo demo: los pedidos son de ejemplo y los cambios no se guardan."
@@ -59,18 +57,18 @@ export default async function PedidosPage({
         id="cobros"
         icono={Wallet}
         titulo="Cómo van tus cobros"
-        bajada="Lo que falta confirmar y lo que ya entró, sin los cancelados."
+        bajada="Lo que falta cobrar y lo que ya entró."
       >
         <Cifras>
           <Cifra
             etiqueta="Esperan pago"
             valor={formatNumber(resumen.pendientes)}
             detalle={
-              resumen.conComprobante > 0
-                ? `${formatNumber(resumen.conComprobante)} ya subieron su comprobante`
-                : "Ninguno subió comprobante todavía"
+              resumen.pendientes > 0
+                ? "Márcalos pagados cuando te paguen"
+                : "Ninguno espera respuesta"
             }
-            alerta={resumen.conComprobante > 0}
+            alerta={resumen.pendientes > 0}
           />
           <Cifra
             etiqueta="Por cobrar"
@@ -80,12 +78,12 @@ export default async function PedidosPage({
           <Cifra
             etiqueta="Cobrado"
             valor={formatMoney(resumen.cobradoCents)}
-            detalle={`${formatNumber(confirmados)} ${confirmados === 1 ? "pedido confirmado" : "pedidos confirmados"}`}
+            detalle={`${formatNumber(resumen.pagados)} ${resumen.pagados === 1 ? "pedido pagado" : "pedidos pagados"}`}
           />
           <Cifra
-            etiqueta="En camino"
-            valor={formatNumber(resumen.enCamino)}
-            detalle={`${formatNumber(resumen.entregados)} ya ${resumen.entregados === 1 ? "entregado" : "entregados"}`}
+            etiqueta="Cancelados"
+            valor={formatNumber(resumen.cancelados)}
+            detalle="No cuentan en lo cobrado"
           />
         </Cifras>
       </Seccion>
@@ -143,7 +141,7 @@ export default async function PedidosPage({
             <SinDatos
               icono={ShoppingBag}
               titulo="Todavía no llegó ningún pedido"
-              texto="Cuando alguien compre en tu tienda aparece acá, con su WhatsApp para coordinar la entrega. Comparte el enlace de tu tienda para que empiecen a llegar."
+              texto="Cuando alguien te mande su carrito por WhatsApp, el pedido aparece acá con el mismo número. Comparte el enlace de tu tienda para que empiecen a llegar."
             >
               <Link
                 href="/panel"
@@ -156,11 +154,7 @@ export default async function PedidosPage({
         ) : (
           <ul>
             {pedidos.map((pedido) => (
-              <FilaPedido
-                key={pedido.id}
-                pedido={pedido}
-                ver={verComprobante}
-              />
+              <FilaPedido key={pedido.id} pedido={pedido} />
             ))}
           </ul>
         )}

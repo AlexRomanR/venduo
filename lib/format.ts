@@ -33,7 +33,7 @@ export function formatMoney(
 /**
  * Formatea una tasa guardada en puntos básicos.
  *
- * Vive acá por la misma razón que `formatMoney`: la comisión se guarda como
+ * Vive acá por la misma razón que `formatMoney`: un porcentaje se guarda como
  * entero en puntos básicos y dividir por 100 en el JSX es justo el error que
  * termina mostrando "1000%" en una pantalla.
  */
@@ -180,43 +180,6 @@ export function formatRelative(
   if (dias < 7) return relativo.format(-dias, "day")
 
   return formatDia(diaEnBolivia(date), { conSemana: false }, locale)
-}
-
-/**
- * Saca el slug de una tienda de lo que una persona pegue.
- *
- * El vendedor recibe la tienda por WhatsApp, así que puede llegar el enlace
- * entero, el enlace sin protocolo o solo el nombre. Exigir un formato sería
- * trasladarle a él un trabajo que el sistema puede hacer.
- */
-export function storeSlugFromInput(value: string) {
-  const limpio = value.trim()
-  if (!limpio) return ""
-
-  const match = limpio.match(/\/t\/([^/?#\s]+)/i)
-  if (match) return slugify(decodeURIComponent(match[1]))
-
-  // El enlace de invitación lleva la tienda en `?t=`.
-  const porParametro = limpio.match(/[?&]t=([^&#\s]+)/i)
-  if (porParametro) return slugify(decodeURIComponent(porParametro[1]))
-
-  // Un enlace sin `/t/` no sirve: se queda con el último tramo, sin la cadena
-  // de consulta, que es lo más probable que sea el nombre.
-  const sinConsulta = limpio.split(/[?#]/)[0]
-  const ultimo = sinConsulta.split("/").filter(Boolean).pop() ?? sinConsulta
-  return slugify(ultimo)
-}
-
-/**
- * Saca el código de invitación de un enlace, si lo trae.
- *
- * Es lo que distingue "me pasaron el enlace de la tienda" de "me invitaron":
- * la URL pública está en el código QR y la tiene cualquiera, el código de
- * invitación solo lo tiene quien lo recibió del dueño.
- */
-export function inviteCodeFromInput(value: string) {
-  const match = value.trim().match(/[?&]inv=([A-Za-z0-9]+)/i)
-  return match ? match[1].toUpperCase() : null
 }
 
 /** Convierte un nombre en un slug apto para URL. */

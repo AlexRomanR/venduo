@@ -67,21 +67,6 @@ export function PrimerosPasos({
         </CompartirTienda>
       ),
     },
-    ...(pasos.vendedor === null
-      ? []
-      : [
-          {
-            hecho: pasos.vendedor,
-            titulo: "Suma tu primer vendedor",
-            texto: "Alguien que comparta tus productos y cobre por venta.",
-            accion: (
-              <Link href="/panel/vendedores" className={BOTON_DEL_PASO}>
-                Invitar vendedores
-                <ArrowRight aria-hidden="true" className="size-4" />
-              </Link>
-            ),
-          },
-        ]),
   ]
 
   const hechos = lista.filter((paso) => paso.hecho).length

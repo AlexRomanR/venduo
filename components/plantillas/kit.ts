@@ -4,7 +4,6 @@ import type { FiltrosDeCatalogo } from "@/lib/catalogo"
 import type {
   BloquePublico,
   MarcoDeTienda,
-  Referido,
   TiendaPublica,
 } from "@/lib/data/tienda-publica"
 import type { TipoDeBloque } from "@/lib/plantillas/bloques"
@@ -42,26 +41,21 @@ export interface KitDeTienda {
 
 export interface PropsCabecera {
   marco: MarcoDeTienda
-  referido: Referido | null
-  codigo: string | null
   /** En el carrito y en el pago no se ofrece volver al carrito. */
   enlaceDelCarrito?: boolean
 }
 
 export interface PropsPie {
   marco: MarcoDeTienda
-  codigo: string | null
 }
 
 export interface PropsInicio {
   tienda: TiendaPublica
-  codigo: string | null
   filtros: FiltrosDeCatalogo
 }
 
 export interface PropsCatalogo {
   tienda: TiendaPublica
-  codigo: string | null
   filtros: FiltrosDeCatalogo
   /** Ya filtrados y ordenados. */
   productos: Product[]
@@ -70,20 +64,17 @@ export interface PropsCatalogo {
 export interface PropsFicha {
   tienda: TiendaPublica
   producto: Product
-  codigo: string | null
   relacionados: Product[]
 }
 
 export interface PropsTarjeta {
   producto: Product
   tienda: TiendaPublica
-  codigo: string | null
 }
 
 export interface PropsBloque {
   bloque: BloquePublico
   tienda: TiendaPublica
-  codigo: string | null
 }
 
 export interface PropsEncabezado {

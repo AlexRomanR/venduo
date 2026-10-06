@@ -13,7 +13,7 @@ import type { CategoriaPublica } from "@/lib/data/tienda-publica"
  * comercio vende nuevo y usado y quien busca una ganga quiere verlos juntos.
  *
  * Va por URL: así el enlace de "solo segunda mano" se puede compartir, que es
- * exactamente lo que hace un vendedor en un grupo de WhatsApp.
+ * exactamente lo que hace una tienda en un grupo de WhatsApp.
  */
 export function FiltrosTienda({
   categorias,

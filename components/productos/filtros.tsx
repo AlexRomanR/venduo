@@ -15,7 +15,6 @@ const ESTADOS = [
   { valor: "poco_stock", etiqueta: "Queda poco" },
   { valor: "sin_stock", etiqueta: "Sin stock" },
   { valor: "destacados", etiqueta: "Destacados" },
-  { valor: "vendedores", etiqueta: "Con vendedores" },
 ] as const
 
 const ORDENES = [

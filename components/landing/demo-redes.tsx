@@ -54,9 +54,9 @@ const PRODUCTOS: Producto[] = [
 ]
 
 const COMPRAS = [
-  { numero: 148, cliente: "Valeria Q.", producto: 2 },
-  { numero: 149, cliente: "Jhonny C.", producto: 0 },
-  { numero: 150, cliente: "Carla A.", producto: 3 },
+  { numero: 148, producto: 2 },
+  { numero: 149, producto: 0 },
+  { numero: 150, producto: 3 },
 ]
 
 /** 0: el enlace en la bio. 1: la tienda abierta. 2: el pedido en el panel. */
@@ -204,7 +204,8 @@ export function DemoRedes() {
 
       <Flecha />
 
-      {/* 3. El panel, donde el pedido entra cobrado y el stock baja solo. */}
+      {/* 3. El panel, donde el pedido entra por WhatsApp y el stock baja solo
+          al marcarlo pagado. */}
       <Cuadro numero="03" titulo="Tu negocio" activo={paso === 2}>
         <ul aria-live="polite">
           {pedidos.length === 0 ? (
@@ -223,7 +224,7 @@ export function DemoRedes() {
                       #{pedido.numero}
                     </span>
                     <span className="truncate text-sm font-semibold">
-                      {pedido.cliente}
+                      Por WhatsApp
                     </span>
                   </span>
                   <span className="mt-0.5 flex items-center gap-1 text-[0.7rem] opacity-70">
