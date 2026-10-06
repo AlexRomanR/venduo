@@ -39,8 +39,10 @@ Al tocar el botón:
 3. El carrito se vacía y queda un aviso con el número del pedido y un enlace para volver
    a abrir el chat, por si el navegador no lo abrió o la persona vuelve atrás.
 
-**Se navega a WhatsApp, no se abre otra pestaña.** Después de esperar al servidor el
-navegador ya no considera la acción un toque y bloquea la ventana.
+**WhatsApp se abre en una pestaña nueva**, y la tienda queda con el aviso del pedido.
+La pestaña se abre vacía en el toque y recibe el enlace cuando responde el servidor:
+abrirla después de esperar no sirve, porque el navegador ya no lo considera un toque y
+la bloquea. Si no se pudo abrir, se navega en la misma.
 
 ### El WhatsApp de la tienda es obligatorio
 
@@ -76,11 +78,11 @@ cancelado reviva ni que un pagado vuelva a pendiente. **Nunca duplicarlo desde l
 aplicación**: ajustar `products.stock` a mano daría stock inventado el día que alguien
 cambie dos veces de estado.
 
-**Los pedidos que no responden no se cancelan solos.** Un pendiente con más de siete
-días (`DIAS_SIN_RESPUESTA` en `lib/pedidos.ts`) queda **sin respuesta**: sale de "Por
+**Los pedidos que no se concretan no se cancelan solos.** Un pendiente con más de siete
+días (`DIAS_PARA_CONCRETAR` en `lib/pedidos.ts`) queda **no concretado**: sale de "Por
 cobrar" y de los contadores rojos, y se encuentra en su propio filtro. No se escribe
-nada en la base: se decide al leer, con `quedoSinRespuesta` en la lista y
-`limiteSinRespuesta` en los conteos. Y se puede marcar pagado igual, porque cancelarlo
+nada en la base: se decide al leer, con `noSeConcreto` en la lista y
+`limiteParaConcretar` en los conteos. Y se puede marcar pagado igual, porque cancelarlo
 lo dejaría bloqueado para el comprador que paga el día ocho.
 
 **El mismo carrito no crea dos pedidos.** Si quien compra vuelve atrás desde WhatsApp

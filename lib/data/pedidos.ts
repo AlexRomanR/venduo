@@ -1,6 +1,6 @@
 import { getMiTienda } from "@/lib/data/panel"
 import { createClient } from "@/lib/supabase/server"
-import { quedoSinRespuesta } from "@/lib/pedidos"
+import { noSeConcreto } from "@/lib/pedidos"
 import type { OrderStatus } from "@/types"
 
 export interface LineaPedido {
@@ -31,7 +31,7 @@ export interface ResumenPedidos {
   /** Los pendientes dentro del plazo: los que esperan a la tienda. */
   pendientes: number
   /** Los pendientes que pasaron el plazo sin cobrarse. */
-  sinRespuesta: number
+  noConcretados: number
   pagados: number
   cancelados: number
   porCobrarCents: number
@@ -105,14 +105,14 @@ function pedidosDeDemostracion(filtro?: FiltroPedidos): Pedidos {
 }
 
 /**
- * Los filtros de la lista: los tres estados y "sin respuesta", que no es un
- * estado de la base sino un pendiente viejo (`quedoSinRespuesta`).
+ * Los filtros de la lista: los tres estados y "no concretados", que no es un
+ * estado de la base sino un pendiente viejo (`noSeConcreto`).
  */
-export type FiltroPedidos = OrderStatus | "sin_respuesta"
+export type FiltroPedidos = OrderStatus | "no_concretado"
 
 function enFiltro(pedido: Pedido, filtro: FiltroPedidos): boolean {
-  const viejo = quedoSinRespuesta(pedido)
-  if (filtro === "sin_respuesta") return viejo
+  const viejo = noSeConcreto(pedido)
+  if (filtro === "no_concretado") return viejo
   if (filtro === "pendiente") return pedido.estado === "pendiente" && !viejo
   return pedido.estado === filtro
 }
@@ -125,10 +125,10 @@ function resumir(pedidos: Pedido[]): ResumenPedidos {
   return {
     total: pedidos.length,
     pendientes: en("pendiente").length,
-    sinRespuesta: en("sin_respuesta").length,
+    noConcretados: en("no_concretado").length,
     pagados: en("pagado").length,
     cancelados: en("cancelado").length,
-    // Lo que no respondió en una semana ya no es plata por cobrar.
+    // Lo que no se concretó en una semana ya no es plata por cobrar.
     porCobrarCents: suma(en("pendiente")),
     cobradoCents: suma(en("pagado")),
   }

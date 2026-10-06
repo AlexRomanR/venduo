@@ -2,7 +2,7 @@ import Link from "next/link"
 import { MessageCircle } from "lucide-react"
 
 import { formatMoney, formatNumber, formatRelative } from "@/lib/format"
-import { numeroDeWhatsApp, quedoSinRespuesta } from "@/lib/pedidos"
+import { numeroDeWhatsApp, noSeConcreto } from "@/lib/pedidos"
 import type { Pedido } from "@/lib/data/pedidos"
 import { cn } from "@/lib/utils"
 import { Estado } from "@/components/pedidos/piezas"
@@ -56,10 +56,7 @@ export function FilaPedido({ pedido }: { pedido: Pedido }) {
           <span className="tabular font-titular font-bold">
             {formatMoney(pedido.totalCents)}
           </span>
-          <Estado
-            estado={pedido.estado}
-            sinRespuesta={quedoSinRespuesta(pedido)}
-          />
+          <Estado estado={pedido.estado} noConcretado={noSeConcreto(pedido)} />
         </span>
       </Link>
 

@@ -119,9 +119,14 @@ export function Checkout({
       Date.now() - (enviado.cuando ?? 0) < REUSAR_DURANTE_MS
     ) {
       vaciar()
-      window.location.href = enviado.enlace
+      window.open(enviado.enlace, "_blank", "noopener,noreferrer")
       return
     }
+
+    // La pestaña se abre ya, dentro del toque, y recién después se le da el
+    // enlace. Abrirla cuando responde el servidor no funciona: pasado ese rato
+    // el navegador ya no lo considera un toque y la bloquea.
+    const pestana = abrirPestanaDeEspera()
 
     setEnCurso(true)
     const resultado = await crear({
@@ -132,6 +137,7 @@ export function Checkout({
     })
 
     if (!resultado.ok) {
+      pestana?.close()
       setEnCurso(false)
       toast.error(resultado.error)
       return
@@ -161,9 +167,10 @@ export function Checkout({
     setEnviado(nuevo)
     setEnCurso(false)
 
-    // Se navega en vez de abrir otra pestaña: después de esperar al servidor
-    // el navegador ya no considera esto un toque, y bloquearía la ventana.
-    window.location.href = nuevo.enlace
+    // Si el navegador no dejó abrir la pestaña —algunos navegadores dentro de
+    // TikTok o Instagram no lo permiten—, WhatsApp se abre en esta misma.
+    if (pestana) pestana.location.href = nuevo.enlace
+    else window.location.href = nuevo.enlace
   }
 
   if (!listo) {
@@ -568,6 +575,8 @@ function PedidoEnviado({ enviado, slug }: { enviado: Enviado; slug: string }) {
       <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2">
         <a
           href={enviado.enlace}
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-flex min-h-12 items-center gap-2 rounded-plantilla bg-senal px-6 font-semibold text-white transition-colors hover:bg-senal-alta"
         >
           <MessageCircle aria-hidden="true" className="size-4" />
@@ -577,6 +586,26 @@ function PedidoEnviado({ enviado, slug }: { enviado: Enviado; slug: string }) {
       </div>
     </div>
   )
+}
+
+/**
+ * Una pestaña vacía que espera el enlace de WhatsApp, con un aviso para que no
+ * parezca rota mientras responde el servidor. `null` si el navegador no la abre.
+ */
+function abrirPestanaDeEspera(): Window | null {
+  const pestana = window.open("", "_blank")
+  if (!pestana) return null
+  // Sin `opener`, la página de WhatsApp no puede tocar la tienda.
+  pestana.opener = null
+  try {
+    pestana.document.title = "Abriendo WhatsApp…"
+    pestana.document.body.textContent = "Abriendo WhatsApp…"
+    pestana.document.body.style.cssText =
+      "font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;color:#555"
+  } catch {
+    // Sin el aviso, la pestaña igual recibe el enlace.
+  }
+  return pestana
 }
 
 /** Un paso numerado del carrito por pasos. */

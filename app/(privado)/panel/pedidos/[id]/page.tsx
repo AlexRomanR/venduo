@@ -6,9 +6,9 @@ import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
 import { formatDate, formatMoney } from "@/lib/format"
 import {
-  DIAS_SIN_RESPUESTA,
+  DIAS_PARA_CONCRETAR,
   numeroDeWhatsApp,
-  quedoSinRespuesta,
+  noSeConcreto,
 } from "@/lib/pedidos"
 import type { OrderStatus } from "@/types"
 import { Cabecera, Seccion, Volver } from "@/components/panel/piezas"
@@ -38,7 +38,7 @@ export default async function PedidoPage({
   // como inexistente y no como prohibido: es lo mismo para quien lo pide.
   if (!pedido) notFound()
 
-  const sinRespuesta = quedoSinRespuesta(pedido)
+  const noConcretado = noSeConcreto(pedido)
   const whatsapp = pedido.telefono
     ? `https://wa.me/${numeroDeWhatsApp(pedido.telefono)}`
     : null
@@ -52,7 +52,7 @@ export default async function PedidoPage({
         titulo={
           <span className="flex flex-wrap items-center gap-3">
             <span className="tabular">#{pedido.numero}</span>
-            <Estado estado={pedido.estado} sinRespuesta={sinRespuesta} />
+            <Estado estado={pedido.estado} noConcretado={noConcretado} />
           </span>
         }
         bajada={
@@ -73,8 +73,8 @@ export default async function PedidoPage({
         icono={ListChecks}
         titulo="Qué sigue"
         bajada={
-          sinRespuesta
-            ? `Pasó más de ${DIAS_SIN_RESPUESTA} días sin pagarse, así que ya no cuenta en lo que tienes por cobrar. Si al final te pagan, márcalo pagado igual.`
+          noConcretado
+            ? `Pasó más de ${DIAS_PARA_CONCRETAR} días sin concretarse, así que ya no cuenta en lo que tienes por cobrar. Si al final te pagan, márcalo pagado igual.`
             : QUE_SIGUE[pedido.estado]
         }
         relleno

@@ -140,7 +140,7 @@ Actualizado el 6 de octubre de 2026.
   deja ningún dato. El pedido queda en el panel; al volver del chat ve su número y puede
   reabrirlo. Mandar otra vez el mismo carrito en la siguiente media hora reabre ese
   pedido en vez de crear otro.
-- **Pendientes sin respuesta**: a los siete días un pendiente sale de "Por cobrar" y de
+- **Pedidos no concretados**: a los siete días un pendiente sale de "Por cobrar" y de
   los avisos, y queda en su filtro. No se cancela: se puede marcar pagado igual.
 - Pantallas de carga, error y "no encontrado".
 - Enlace propio por tienda, con subdominio listo detrás de un interruptor

@@ -44,9 +44,12 @@ contradice la decisión de producto; si una tarea lo pide, se pregunta antes.
 - **El enlace sale de `enlaceDeWhatsApp`**, que pasa por `numeroDeWhatsApp`: un celular
   de 8 cifras necesita el 591 adelante, o `wa.me` abre un chat con nadie. Nunca armar
   `https://wa.me/${numero}` a mano.
-- **Se navega con `window.location.href`**, no con `window.open`: después de esperar
-  al servidor el navegador ya no lo considera un toque y bloquea la ventana.
-- **Antes de navegar** se vacía el carrito y se guarda `{ numero, enlace }` en
+- **WhatsApp se abre en una pestaña nueva, abierta en el toque.** La pestaña se abre
+  vacía antes de llamar al servidor y recibe el enlace cuando responde: abrirla
+  después de esperar no funciona, porque el navegador ya no lo considera un toque y la
+  bloquea. Si no se pudo abrir —pasa en navegadores dentro de redes sociales—, se
+  navega en la misma con `window.location.href`. Si el pedido falla, se cierra.
+- **Antes de abrir el chat** se vacía el carrito y se guarda `{ numero, enlace }` en
   `sessionStorage`: quien vuelve con el botón de atrás ve su pedido y puede volver a
   abrir el chat.
 
@@ -66,11 +69,11 @@ errores del disparador se traducen en `app/(privado)/panel/pedidos/acciones.ts`.
 
 **Una venta es un pedido pagado.** Todo lo que sume ventas filtra `status = 'pagado'`.
 
-**Un pendiente viejo queda "sin respuesta", no cancelado.** Pasados `DIAS_SIN_RESPUESTA`
+**Un pendiente viejo queda "no concretado", no cancelado.** Pasados `DIAS_PARA_CONCRETAR`
 días deja de contar como algo que espera a la tienda, pero se puede seguir marcando
 pagado. No hay columna ni tarea programada: todo lo que cuente pendientes que esperan
-—la barra, el Resumen, "Por cobrar"— filtra `created_at >= limiteSinRespuesta()`, y la
-lista usa `quedoSinRespuesta`. Un conteo nuevo de pendientes que se olvide del plazo
+—la barra, el Resumen, "Por cobrar"— filtra `created_at >= limiteParaConcretar()`, y la
+lista usa `noSeConcreto`. Un conteo nuevo de pendientes que se olvide del plazo
 vuelve a llenar el panel de rojo con carritos que nunca se mandaron.
 
 ## El WhatsApp de la tienda

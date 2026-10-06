@@ -2,7 +2,7 @@ import { cache } from "react"
 
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
-import { limiteSinRespuesta } from "@/lib/pedidos"
+import { limiteParaConcretar } from "@/lib/pedidos"
 import { aparienciaDeTienda } from "@/lib/plantillas"
 import type { Apariencia } from "@/lib/plantillas/apariencia"
 import { createClient, getUsuario } from "@/lib/supabase/server"
@@ -104,14 +104,14 @@ export const getBarraLateral = cache(
 
     if (tiendaFila) {
       const [pendientes, productos] = await Promise.all([
-        // Solo los pendientes dentro del plazo: uno que no respondió en una
-        // semana ya no espera nada de la tienda (`quedoSinRespuesta`).
+        // Solo los pendientes dentro del plazo: uno que no se concretó en una
+        // semana ya no espera nada de la tienda (`noSeConcreto`).
         supabase
           .from("orders")
           .select("id", { count: "exact", head: true })
           .eq("store_id", tiendaFila.id)
           .eq("status", "pendiente")
-          .gte("created_at", limiteSinRespuesta()),
+          .gte("created_at", limiteParaConcretar()),
         supabase
           .from("products")
           .select("stock, low_stock_threshold")

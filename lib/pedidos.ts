@@ -31,7 +31,7 @@ export const SIGUIENTES: Record<OrderStatus, OrderStatus[]> = {
 }
 
 /**
- * Los días que un pedido pendiente espera antes de quedar "sin respuesta".
+ * Los días que un pedido pendiente espera antes de quedar "no concretado".
  *
  * Cada toque al botón del carrito crea un pedido, y muchos no se concretan:
  * el comprador no manda el mensaje o no vuelve a escribir. Pasado el plazo
@@ -40,17 +40,17 @@ export const SIGUIENTES: Record<OrderStatus, OrderStatus[]> = {
  * puede marcar pagado, y el comprador que paga el día ocho tiene que poder.
  * Por eso tampoco hay una tarea que los cambie en la base: se decide al leer.
  */
-export const DIAS_SIN_RESPUESTA = 7
+export const DIAS_PARA_CONCRETAR = 7
 
-/** Desde cuándo un pedido pendiente todavía espera respuesta, en ISO. */
-export function limiteSinRespuesta(ahora: Date = new Date()): string {
+/** Desde cuándo un pedido pendiente todavía cuenta como por cobrar, en ISO. */
+export function limiteParaConcretar(ahora: Date = new Date()): string {
   return new Date(
-    ahora.getTime() - DIAS_SIN_RESPUESTA * 24 * 60 * 60 * 1000
+    ahora.getTime() - DIAS_PARA_CONCRETAR * 24 * 60 * 60 * 1000
   ).toISOString()
 }
 
 /** Si un pedido pendiente ya pasó el plazo sin que la tienda lo cobrara. */
-export function quedoSinRespuesta(
+export function noSeConcreto(
   pedido: { estado: OrderStatus; creado: string },
   ahora: Date = new Date()
 ): boolean {
@@ -59,7 +59,7 @@ export function quedoSinRespuesta(
     // Se comparan instantes y no textos: la base escribe "+00:00" y
     // `toISOString` escribe "Z".
     new Date(pedido.creado).getTime() <
-      new Date(limiteSinRespuesta(ahora)).getTime()
+      new Date(limiteParaConcretar(ahora)).getTime()
   )
 }
 

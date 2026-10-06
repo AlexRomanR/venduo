@@ -1,5 +1,5 @@
 import { diaEnBolivia, sumarDias } from "@/lib/format"
-import { limiteSinRespuesta } from "@/lib/pedidos"
+import { limiteParaConcretar } from "@/lib/pedidos"
 import { createClient } from "@/lib/supabase/server"
 import {
   DIAS_DE_SERIE,
@@ -71,14 +71,14 @@ export async function getTablero(): Promise<Tablero | null> {
         .select("id", { count: "exact", head: true })
         .eq("store_id", tienda.id)
         .is("deleted_at", null),
-      // Solo los pendientes dentro del plazo: uno que no respondió en una
-      // semana ya no espera nada de la tienda (`quedoSinRespuesta`).
+      // Solo los pendientes dentro del plazo: uno que no se concretó en una
+      // semana ya no espera nada de la tienda (`noSeConcreto`).
       supabase
         .from("orders")
         .select("id", { count: "exact", head: true })
         .eq("store_id", tienda.id)
         .eq("status", "pendiente")
-        .gte("created_at", limiteSinRespuesta()),
+        .gte("created_at", limiteParaConcretar()),
     ])
 
   // La serie: cada pedido cae en su día de Bolivia.

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { ShoppingBag, Wallet } from "lucide-react"
 
 import { getPedidos, type FiltroPedidos } from "@/lib/data/pedidos"
-import { DIAS_SIN_RESPUESTA, ESTADOS } from "@/lib/pedidos"
+import { DIAS_PARA_CONCRETAR, ESTADOS } from "@/lib/pedidos"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
 import { FICHA, FICHA_ELEGIDA, FICHA_LIBRE } from "@/lib/estilos"
@@ -21,13 +21,13 @@ import { FilaPedido } from "@/components/pedidos/fila"
 export const metadata = { title: "Pedidos" }
 
 /**
- * Las fichas de la lista. "Sin respuesta" va al final y sin rojo: son los
+ * Las fichas de la lista. "No concretados" va al final y sin rojo: son los
  * pendientes que pasaron el plazo, y están para encontrarlos, no para que
  * esperen algo de la tienda.
  */
 const FILTROS: Array<{ valor: FiltroPedidos; etiqueta: string }> = [
   ...ESTADOS,
-  { valor: "sin_respuesta", etiqueta: "Sin respuesta" },
+  { valor: "no_concretado", etiqueta: "No concretados" },
 ]
 
 /**
@@ -82,7 +82,7 @@ export default async function PedidosPage({
           <Cifra
             etiqueta="Por cobrar"
             valor={formatMoney(resumen.porCobrarCents)}
-            detalle={`De los últimos ${DIAS_SIN_RESPUESTA} días`}
+            detalle={`De los últimos ${DIAS_PARA_CONCRETAR} días`}
           />
           <Cifra
             etiqueta="Cobrado"
@@ -90,9 +90,9 @@ export default async function PedidosPage({
             detalle={`${formatNumber(resumen.pagados)} ${resumen.pagados === 1 ? "pedido pagado" : "pedidos pagados"}`}
           />
           <Cifra
-            etiqueta="Sin respuesta"
-            valor={formatNumber(resumen.sinRespuesta)}
-            detalle={`Pendientes de hace más de ${DIAS_SIN_RESPUESTA} días`}
+            etiqueta="No concretados"
+            valor={formatNumber(resumen.noConcretados)}
+            detalle={`Pendientes de hace más de ${DIAS_PARA_CONCRETAR} días`}
           />
         </Cifras>
       </Seccion>
@@ -128,9 +128,9 @@ export default async function PedidosPage({
               activa={filtro === f.valor}
             >
               {f.etiqueta}
-              {f.valor === "sin_respuesta" && resumen.sinRespuesta > 0 ? (
+              {f.valor === "no_concretado" && resumen.noConcretados > 0 ? (
                 <span className="tabular ml-1.5 opacity-65">
-                  {formatNumber(resumen.sinRespuesta)}
+                  {formatNumber(resumen.noConcretados)}
                 </span>
               ) : null}
             </Ficha>
@@ -142,13 +142,13 @@ export default async function PedidosPage({
             <SinDatos
               icono={ShoppingBag}
               titulo={
-                filtro === "sin_respuesta"
-                  ? "Ningún pedido quedó sin respuesta"
+                filtro === "no_concretado"
+                  ? "Ningún pedido quedó sin concretar"
                   : "No hay pedidos en ese estado"
               }
               texto={
-                filtro === "sin_respuesta"
-                  ? `Acá aparecen los pendientes que pasan ${DIAS_SIN_RESPUESTA} días sin pagarse. Se pueden marcar pagados igual si al final te pagan.`
+                filtro === "no_concretado"
+                  ? `Acá aparecen los pendientes que pasan ${DIAS_PARA_CONCRETAR} días sin concretarse: el cliente armó el carrito y no siguió. Se pueden marcar pagados igual si al final te pagan.`
                   : "Prueba con otro filtro, o mira todos los pedidos de tu tienda."
               }
             >
