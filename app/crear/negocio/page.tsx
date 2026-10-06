@@ -11,7 +11,7 @@ import { Miniatura } from "@/components/plantillas/miniatura"
 export const metadata = { title: "Cuenta tu negocio" }
 
 /**
- * Paso 2 del alta: el nombre y la descripción del negocio.
+ * Paso 2 del alta: el nombre, la descripción y el WhatsApp del negocio.
  *
  * La plantilla llega por la URL y se valida contra el catálogo: si no existe
  * —enlace viejo, clave inventada— se vuelve al paso 1 en vez de crear una

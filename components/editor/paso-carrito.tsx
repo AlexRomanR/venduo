@@ -19,7 +19,7 @@ const DISENOS: Record<Carrito["diseno"], { nombre: string; texto: string }> = {
   columnas: {
     nombre: "Dos columnas",
     texto:
-      "El pedido y los datos lado a lado en la computadora, con el total siempre a la vista.",
+      "El pedido y el total lado a lado en la computadora, con el botón de WhatsApp siempre a la vista.",
   },
   boleta: {
     nombre: "Boleta",
@@ -29,7 +29,7 @@ const DISENOS: Record<Carrito["diseno"], { nombre: string; texto: string }> = {
   pasos: {
     nombre: "Por pasos",
     texto:
-      "Revisar, dar los datos y confirmar, numerados. Nadie se pierde en el camino.",
+      "Revisar el pedido y mandarlo por WhatsApp, numerados. Nadie se pierde en el camino.",
   },
 }
 
@@ -74,7 +74,7 @@ function EsquemaDeCarrito({ diseno }: { diseno: Carrito["diseno"] }) {
       aria-hidden="true"
       className="flex h-11 w-14 flex-col justify-between py-0.5"
     >
-      {[1, 2, 3].map((numero) => (
+      {[1, 2].map((numero) => (
         <span key={numero} className="flex items-center gap-1.5">
           <span className="w-2 text-[10px] leading-none font-bold">
             {numero}
@@ -87,11 +87,11 @@ function EsquemaDeCarrito({ diseno }: { diseno: Carrito["diseno"] }) {
 }
 
 /**
- * Paso 5: el carrito y el pago.
+ * Paso 5: el carrito.
  *
- * El formulario pide lo mismo en todas las tiendas —lo justo para que el pedido
- * llegue por WhatsApp—, pero cómo se ordena y qué ofrece lo elige cada una. En
- * la vista previa se ve con dos productos, para que no aparezca vacío.
+ * En todas las tiendas termina igual —un botón que manda el pedido por
+ * WhatsApp, sin pedir datos—, pero cómo se ordena y qué ofrece lo elige cada
+ * una. En la vista previa se ve con dos productos, para que no aparezca vacío.
  */
 export function PasoCarrito() {
   const { irAPaso, productos, apariencia, borrador } = useEditor()
@@ -105,8 +105,8 @@ export function PasoCarrito() {
     <>
       <EncabezadoDePaso
         numero={5}
-        titulo="Carrito y pago"
-        bajada="Así ve tu cliente su pedido antes de confirmarlo. Elige cómo se ordena y qué más le ofreces."
+        titulo="Carrito"
+        bajada="Así ve tu cliente su pedido antes de mandártelo por WhatsApp. Elige cómo se ordena y qué más le ofreces."
       />
 
       <Grupo titulo="Diseño del carrito">
@@ -135,12 +135,6 @@ export function PasoCarrito() {
             activo={carrito.sugerencias}
             alCambiar={(activo) => ajustar("sugerencias", activo)}
           />
-          <Interruptor
-            etiqueta="Pedir el correo"
-            ayuda="Es opcional para quien compra. Sin él, el formulario es más corto: el pedido igual te llega por WhatsApp."
-            activo={carrito.correo}
-            alCambiar={(activo) => ajustar("correo", activo)}
-          />
         </div>
       </Grupo>
 
@@ -167,8 +161,8 @@ export function PasoCarrito() {
           </Aviso>
         ) : null}
         <Aviso>
-          Es una vista previa: acá no se crean pedidos aunque toques «Confirmar
-          pedido».
+          Es una vista previa: acá no se crean pedidos aunque toques «Enviar por
+          WhatsApp».
         </Aviso>
       </div>
 

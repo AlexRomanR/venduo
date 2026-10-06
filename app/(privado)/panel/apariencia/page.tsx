@@ -54,7 +54,7 @@ export default async function AparienciaPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <Cabecera
         titulo="Cómo se ve tu tienda."
-        bajada="La plantilla decide la letra, los colores y cómo se muestran tus productos. Cambiarla no toca tus productos, categorías, pedidos ni vendedores."
+        bajada="La plantilla decide la letra, los colores y cómo se muestran tus productos. Cambiarla no toca tus productos, categorías ni pedidos."
         demo={esDemo && "Estás en modo demo: los cambios no se guardan."}
       />
 

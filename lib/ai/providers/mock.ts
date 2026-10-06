@@ -108,33 +108,18 @@ function sampleFromSchema(
  * No pretende entender: busca términos y devuelve una consulta que existe. Las
  * cifras son reales porque salen de la base igual que con un modelo de verdad
  * — lo simulado es la interpretación de la pregunta, no el dato.
- *
- * El orden de las ramas importa: la de vendedores va primero porque "han
- * vendido" contiene "vendid" y se comía las preguntas sobre la red.
  */
 function sqlDeDemostracion(pedido: string) {
   const t = pedido.toLowerCase()
 
-  if (/vendedor|comisi|red|qui[eé]n vende/.test(t)) {
-    return {
-      titulo: "Comisiones por vendedor",
-      explicacion:
-        "Comisiones confirmadas y pagadas de cada vendedor, de mayor a menor.",
-      grafico: "barra",
-      formato: "dinero",
-      vistas: ["mis_comisiones"],
-      sql: "select nombre as etiqueta, sum(amount_cents) as valor from mis_comisiones where status in ('confirmada','pagada') group by 1 order by 2 desc limit 15",
-    }
-  }
-
   if (/producto|art[ií]culo|m[aá]s vendid/.test(t)) {
     return {
       titulo: "Productos más vendidos",
-      explicacion: "Unidades vendidas por producto, sin contar los cancelados.",
+      explicacion: "Unidades vendidas por producto, en los pedidos pagados.",
       grafico: "barra",
       formato: "cantidad",
       vistas: ["mis_items"],
-      sql: "select product_name as etiqueta, sum(quantity) as valor from mis_items where status <> 'cancelado' group by 1 order by 2 desc limit 15",
+      sql: "select product_name as etiqueta, sum(quantity) as valor from mis_items where status = 'pagado' group by 1 order by 2 desc limit 15",
     }
   }
 
@@ -156,7 +141,7 @@ function sqlDeDemostracion(pedido: string) {
       grafico: "linea",
       formato: "dinero",
       vistas: ["mis_ventas"],
-      sql: "select to_char(date_trunc('week', created_at), 'YYYY-MM-DD') as etiqueta, sum(total_cents) as valor from mis_ventas where status <> 'cancelado' and created_at >= now() - interval '90 days' group by 1 order by 1",
+      sql: "select to_char(date_trunc('week', created_at), 'YYYY-MM-DD') as etiqueta, sum(total_cents) as valor from mis_ventas where status = 'pagado' and created_at >= now() - interval '90 days' group by 1 order by 1",
     }
   }
 
@@ -167,7 +152,7 @@ function sqlDeDemostracion(pedido: string) {
       grafico: "columna",
       formato: "dinero",
       vistas: ["mis_ventas"],
-      sql: "select to_char(date_trunc('month', created_at), 'YYYY-MM') as etiqueta, sum(total_cents) as valor from mis_ventas where status <> 'cancelado' and created_at >= now() - interval '365 days' group by 1 order by 1",
+      sql: "select to_char(date_trunc('month', created_at), 'YYYY-MM') as etiqueta, sum(total_cents) as valor from mis_ventas where status = 'pagado' and created_at >= now() - interval '365 days' group by 1 order by 1",
     }
   }
 
@@ -189,7 +174,7 @@ function sqlDeDemostracion(pedido: string) {
       grafico: "numero",
       formato: "dinero",
       vistas: ["mis_ventas"],
-      sql: "select 'Total' as etiqueta, coalesce(sum(total_cents), 0) as valor from mis_ventas where status <> 'cancelado' and created_at >= now() - interval '30 days'",
+      sql: "select 'Total' as etiqueta, coalesce(sum(total_cents), 0) as valor from mis_ventas where status = 'pagado' and created_at >= now() - interval '30 days'",
     }
   }
 
@@ -199,7 +184,7 @@ function sqlDeDemostracion(pedido: string) {
     grafico: "linea",
     formato: "dinero",
     vistas: ["mis_ventas"],
-    sql: "select to_char(date_trunc('day', created_at), 'YYYY-MM-DD') as etiqueta, sum(total_cents) as valor from mis_ventas where status <> 'cancelado' and created_at >= now() - interval '30 days' group by 1 order by 1",
+    sql: "select to_char(date_trunc('day', created_at), 'YYYY-MM-DD') as etiqueta, sum(total_cents) as valor from mis_ventas where status = 'pagado' and created_at >= now() - interval '30 days' group by 1 order by 1",
   }
 }
 

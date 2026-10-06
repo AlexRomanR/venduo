@@ -5,11 +5,10 @@ import {
   diasVacios,
   type ProductoVendido,
   type Tablero,
-  type VendedorDestacado,
 } from "@/lib/tablero"
-import { getMiTienda, getVendedoresDeMiTienda } from "@/lib/data/panel"
+import { getMiTienda } from "@/lib/data/panel"
 
-/** Hasta dónde se mira para lo más vendido y los vendedores destacados. */
+/** Hasta dónde se mira para lo más vendido. */
 const DIAS_DE_RANKING = 30
 
 /**
@@ -32,65 +31,51 @@ export async function getTablero(): Promise<Tablero | null> {
   // Bolivia no cambia de hora en el año: el día empieza siempre a las −04:00.
   const inicio = (dia: string) => `${dia}T00:00:00-04:00`
 
-  const [
-    ventas,
-    ultimos,
-    lineas,
-    catalogo,
-    cantidad,
-    vendedores,
-    pendientes,
-    pagados,
-  ] = await Promise.all([
-    // Un pedido cancelado no es una venta: no suma, igual que en el resto
-    // del panel.
-    supabase
-      .from("orders")
-      .select("total_cents, created_at, seller_id")
-      .eq("store_id", tienda.id)
-      .neq("status", "cancelado")
-      .gte("created_at", inicio(primerDia)),
-    supabase
-      .from("orders")
-      .select(
-        "id, order_number, buyer_name, buyer_phone, total_cents, status, created_at, order_items(quantity)"
-      )
-      .eq("store_id", tienda.id)
-      .order("created_at", { ascending: false })
-      .limit(5),
-    supabase
-      .from("order_items")
-      .select(
-        "product_id, product_name, quantity, unit_price_cents, products(image_url), orders!inner(status)"
-      )
-      .eq("store_id", tienda.id)
-      .neq("orders.status", "cancelado")
-      .gte("created_at", inicio(desdeRanking)),
-    // Comparar stock con el umbral es comparar dos columnas, cosa que el
-    // filtro de PostgREST no sabe hacer: un catálogo de MVP son decenas.
-    supabase
-      .from("products")
-      .select("id, name, image_url, stock, low_stock_threshold")
-      .eq("store_id", tienda.id)
-      .eq("is_active", true)
-      .is("deleted_at", null),
-    supabase
-      .from("products")
-      .select("id", { count: "exact", head: true })
-      .eq("store_id", tienda.id)
-      .is("deleted_at", null),
-    getVendedoresDeMiTienda(),
-    supabase
-      .from("orders")
-      .select("id", { count: "exact", head: true })
-      .eq("store_id", tienda.id)
-      .eq("status", "pendiente"),
-    supabase
-      .from("orders")
-      .select("id", { count: "exact", head: true })
-      .eq("store_id", tienda.id)
-      .eq("status", "pagado"),
-  ])
+  const [ventas, ultimos, lineas, catalogo, cantidad, pendientes] =
+    await Promise.all([
+      // Una venta es un pedido pagado, igual que en el resto del panel: un
+      // pendiente puede ser un carrito que nunca se mandó por WhatsApp.
+      supabase
+        .from("orders")
+        .select("total_cents, created_at")
+        .eq("store_id", tienda.id)
+        .eq("status", "pagado")
+        .gte("created_at", inicio(primerDia)),
+      supabase
+        .from("orders")
+        .select(
+          "id, order_number, buyer_name, buyer_phone, total_cents, status, created_at, order_items(quantity)"
+        )
+        .eq("store_id", tienda.id)
+        .order("created_at", { ascending: false })
+        .limit(5),
+      supabase
+        .from("order_items")
+        .select(
+          "product_id, product_name, quantity, unit_price_cents, products(image_url), orders!inner(status)"
+        )
+        .eq("store_id", tienda.id)
+        .eq("orders.status", "pagado")
+        .gte("created_at", inicio(desdeRanking)),
+      // Comparar stock con el umbral es comparar dos columnas, cosa que el
+      // filtro de PostgREST no sabe hacer: un catálogo de MVP son decenas.
+      supabase
+        .from("products")
+        .select("id, name, image_url, stock, low_stock_threshold")
+        .eq("store_id", tienda.id)
+        .eq("is_active", true)
+        .is("deleted_at", null),
+      supabase
+        .from("products")
+        .select("id", { count: "exact", head: true })
+        .eq("store_id", tienda.id)
+        .is("deleted_at", null),
+      supabase
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .eq("store_id", tienda.id)
+        .eq("status", "pendiente"),
+    ])
 
   // La serie: cada pedido cae en su día de Bolivia.
   const serie = diasVacios(hoy)
@@ -100,7 +85,6 @@ export async function getTablero(): Promise<Tablero | null> {
     if (indice === undefined) continue
     serie[indice].ventasCents += pedido.total_cents
     serie[indice].pedidos += 1
-    if (pedido.seller_id) serie[indice].redCents += pedido.total_cents
   }
 
   // Lo más vendido: por producto, o por nombre si el producto ya no existe.
@@ -133,23 +117,6 @@ export async function getTablero(): Promise<Tablero | null> {
       stock: p.stock,
     }))
 
-  // Los vendedores que más vendieron en el mismo período que lo más vendido.
-  const nombres = new Map(vendedores.map((v) => [v.id, v.nombre]))
-  const porVendedor = new Map<string, VendedorDestacado>()
-  for (const pedido of ventas.data ?? []) {
-    if (!pedido.seller_id) continue
-    if (diaEnBolivia(pedido.created_at) < desdeRanking) continue
-    const previo = porVendedor.get(pedido.seller_id) ?? {
-      id: pedido.seller_id,
-      nombre: nombres.get(pedido.seller_id) ?? "Vendedor",
-      ventasCents: 0,
-      pedidos: 0,
-    }
-    previo.ventasCents += pedido.total_cents
-    previo.pedidos += 1
-    porVendedor.set(pedido.seller_id, previo)
-  }
-
   const ultimosPedidos = (ultimos.data ?? []).map((pedido) => ({
     id: pedido.id,
     numero: pedido.order_number,
@@ -168,31 +135,18 @@ export async function getTablero(): Promise<Tablero | null> {
     typeof tienda.theme_overrides === "object" &&
     tienda.theme_overrides !== null &&
     Object.keys(tienda.theme_overrides).length > 0
-  const activos = vendedores.filter((v) => v.status === "activo").length
 
   return {
     hoy,
     serie,
     ultimosPedidos,
-    porGestionar: {
-      pendientes: pendientes.count ?? 0,
-      pagados: pagados.count ?? 0,
-    },
+    porGestionar: { pendientes: pendientes.count ?? 0 },
     masVendidos,
     porAcabarse,
-    red: {
-      activa: tienda.seller_network_enabled,
-      activos,
-      pendientes: vendedores.filter((v) => v.status === "pendiente").length,
-      destacados: [...porVendedor.values()]
-        .sort((a, b) => b.ventasCents - a.ventasCents)
-        .slice(0, 3),
-    },
     pasos: {
       producto: (cantidad.count ?? 0) > 0,
       estilo: Boolean(tienda.logo_url) || personalizada,
       primerPedido: ultimosPedidos.length > 0,
-      vendedor: tienda.seller_network_enabled ? activos > 0 : null,
     },
     esDemo: false,
   }

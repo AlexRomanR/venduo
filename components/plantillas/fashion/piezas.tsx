@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, ImageOff } from "lucide-react"
 
+import { numeroDeWhatsApp } from "@/lib/pedidos"
 import { CONDICIONES, descuento } from "@/lib/plantillas/bloques"
 import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
@@ -21,7 +22,7 @@ import type {
  * esquinas redondeadas. El azul aparece solo donde se compra o se rebaja.
  */
 
-export function Tarjeta({ producto, tienda, codigo }: PropsTarjeta) {
+export function Tarjeta({ producto, tienda }: PropsTarjeta) {
   const agotado = producto.stock === 0
   const rebaja = descuento(producto)
   const segunda = producto.images[1]
@@ -29,7 +30,7 @@ export function Tarjeta({ producto, tienda, codigo }: PropsTarjeta) {
 
   return (
     <Link
-      href={rutaDeTienda(tienda.slug, `/p/${producto.id}`, { ref: codigo })}
+      href={rutaDeTienda(tienda.slug, `/p/${producto.id}`)}
       className="group block"
     >
       <div
@@ -188,7 +189,7 @@ export function Vacio({ titulo, texto, accion }: PropsVacio) {
   )
 }
 
-export function Pie({ marco, codigo }: PropsPie) {
+export function Pie({ marco }: PropsPie) {
   return (
     <footer className="bg-tinta text-papel">
       <div className="mx-auto w-full max-w-7xl px-5 pt-14 pb-8">
@@ -199,20 +200,20 @@ export function Pie({ marco, codigo }: PropsPie) {
         <div className="mt-10 grid gap-x-8 gap-y-6 border-t border-papel/20 pt-6 sm:grid-cols-3">
           <nav aria-label="Tienda" className="flex flex-col">
             <Link
-              href={rutaDeTienda(marco.slug, "", { ref: codigo })}
+              href={rutaDeTienda(marco.slug, "")}
               className="flex min-h-11 items-center text-xs font-semibold tracking-[0.16em] uppercase opacity-80 transition-opacity hover:opacity-100"
             >
               Inicio
             </Link>
             <Link
-              href={rutaDeTienda(marco.slug, "/catalogo", { ref: codigo })}
+              href={rutaDeTienda(marco.slug, "/catalogo")}
               className="flex min-h-11 items-center text-xs font-semibold tracking-[0.16em] uppercase opacity-80 transition-opacity hover:opacity-100"
             >
               Catálogo
             </Link>
             {marco.whatsapp ? (
               <a
-                href={`https://wa.me/${marco.whatsapp.replace(/\D/g, "")}`}
+                href={`https://wa.me/${numeroDeWhatsApp(marco.whatsapp)}`}
                 target="_blank"
                 rel="noreferrer noopener"
                 className="flex min-h-11 items-center text-xs font-semibold tracking-[0.16em] uppercase opacity-80 transition-opacity hover:opacity-100"
@@ -223,7 +224,7 @@ export function Pie({ marco, codigo }: PropsPie) {
           </nav>
 
           <p className="text-sm leading-relaxed opacity-60 sm:col-span-1">
-            La entrega y el pago se coordinan con la tienda por WhatsApp.
+            Los pedidos y el pago se acuerdan con la tienda por WhatsApp.
           </p>
 
           <Link

@@ -86,7 +86,6 @@ export async function guardarProducto(
     images: v.fotos,
     is_active: v.activo,
     is_featured: v.destacado,
-    seller_enabled: v.aceptaVendedores,
   }
 
   const respuesta = id
@@ -130,15 +129,15 @@ export async function borrarProducto(id: string): Promise<Resultado> {
 }
 
 /**
- * Los interruptores de la lista: publicar, destacar y aceptar vendedores.
+ * Los interruptores de la lista: publicar y destacar.
  *
- * Van juntos y no en tres acciones porque los tres son lo mismo —un booleano
+ * Van juntos y no en dos acciones porque los dos son lo mismo —un booleano
  * de una fila mía— y separarlos solo multiplica el código que resuelve la
  * tienda.
  */
 export async function alternarProducto(
   id: string,
-  campo: "is_active" | "is_featured" | "seller_enabled",
+  campo: "is_active" | "is_featured",
   valor: boolean
 ): Promise<Resultado> {
   const { supabase, tiendaId } = await miTienda()
@@ -148,11 +147,7 @@ export async function alternarProducto(
   // Escrito y no `{ [campo]: valor }`: con la clave calculada TypeScript pierde
   // de vista qué columna se toca y deja de comprobar que exista.
   const cambio: ProductUpdate =
-    campo === "is_active"
-      ? { is_active: valor }
-      : campo === "is_featured"
-        ? { is_featured: valor }
-        : { seller_enabled: valor }
+    campo === "is_active" ? { is_active: valor } : { is_featured: valor }
 
   const { error } = await supabase
     .from("products")

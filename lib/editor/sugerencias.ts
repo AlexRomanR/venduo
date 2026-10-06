@@ -189,10 +189,6 @@ export const PEDIDOS_SUGERIDOS: Record<ClaveDePaso, string[]> = {
     "Botón de compra siempre a la vista",
     "Sin productos parecidos al pie",
   ],
-  carrito: [
-    "Carrito tipo boleta",
-    "Sugiere otros productos en el carrito",
-    "No pidas el correo",
-  ],
+  carrito: ["Carrito tipo boleta", "Sugiere otros productos en el carrito"],
   publicar: [],
 }

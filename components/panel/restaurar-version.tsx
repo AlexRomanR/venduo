@@ -106,7 +106,7 @@ export function RestaurarVersion({
           <DialogDescription className="text-sm leading-relaxed text-tinta/70">
             Tu tienda vuelve a verse como en ese momento: la plantilla, los
             colores, el logo y las secciones de la portada con sus textos. Tus
-            productos, pedidos y vendedores no se tocan.
+            productos y pedidos no se tocan.
           </DialogDescription>
           <p className="mt-4 border-l-2 border-tinta pl-3 text-sm leading-relaxed">
             Antes de volver guardamos cómo está ahora. Si te arrepientes, lo

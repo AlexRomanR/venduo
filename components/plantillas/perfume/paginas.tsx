@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { MessageCircle, Sparkles, Truck } from "lucide-react"
+import { MessageCircle } from "lucide-react"
 
 import {
   CONDICIONES,
@@ -35,7 +35,7 @@ import { FiltrosTienda } from "@/components/tienda/filtros"
  * llegado. El catálogo completo tiene su pantalla. Y cada ficha ofrece hablar
  * con alguien, porque un aroma no se elige leyendo.
  */
-export function Inicio({ tienda, codigo }: PropsInicio) {
+export function Inicio({ tienda }: PropsInicio) {
   if (tienda.productos.length === 0 && tienda.bloques.length === 0) {
     return (
       <Vacio
@@ -48,11 +48,7 @@ export function Inicio({ tienda, codigo }: PropsInicio) {
   return (
     <>
       {tienda.bloques.length > 0 ? (
-        <Bloques
-          componentes={BLOQUES_PERFUME}
-          tienda={tienda}
-          codigo={codigo}
-        />
+        <Bloques componentes={BLOQUES_PERFUME} tienda={tienda} />
       ) : (
         <section className="mx-auto w-full max-w-6xl px-5 py-16">
           <TituloDeSeccion titulo={tienda.nombre} como="h1" />
@@ -63,7 +59,6 @@ export function Inicio({ tienda, codigo }: PropsInicio) {
                   key={producto.id}
                   producto={producto}
                   tienda={tienda}
-                  codigo={codigo}
                 />
               ))}
             </Vitrina>
@@ -92,18 +87,10 @@ function LaCasa({ tienda }: { tienda: TiendaPublica }) {
         }
       : null,
     {
-      icono: Truck,
-      titulo: "Entrega",
-      texto: "La coordinamos contigo después de tu pedido.",
+      icono: MessageCircle,
+      titulo: "Tu pedido",
+      texto: "Llega a nuestro WhatsApp y lo cerramos contigo ahí mismo.",
     },
-    tienda.aceptaVendedores && tienda.comisionBps > 0
-      ? {
-          icono: Sparkles,
-          titulo: "Recomienda",
-          texto: `Vende la colección y gana ${(tienda.comisionBps / 100).toFixed(0)}% por venta.`,
-          href: "/sumarme",
-        }
-      : null,
   ].filter((servicio) => servicio !== null)
 
   return (
@@ -160,12 +147,7 @@ function LaCasa({ tienda }: { tienda: TiendaPublica }) {
   )
 }
 
-export function Catalogo({
-  tienda,
-  codigo,
-  filtros,
-  productos,
-}: PropsCatalogo) {
+export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
   const categoria = tienda.categorias.find((c) => c.id === filtros.categoria)
   const usados = tienda.productos.filter((p) => p.condition !== "nuevo").length
   const hayFiltro = Boolean(
@@ -210,9 +192,7 @@ export function Catalogo({
             hayFiltro
               ? {
                   etiqueta: "Ver toda la colección",
-                  href: rutaDeTienda(tienda.slug, "/catalogo", {
-                    ref: codigo,
-                  }),
+                  href: rutaDeTienda(tienda.slug, "/catalogo", {}),
                 }
               : undefined
           }
@@ -221,12 +201,7 @@ export function Catalogo({
         <div className="mt-12">
           <Vitrina columnas={tienda.apariencia.disposicion.columnas}>
             {productos.map((producto) => (
-              <Tarjeta
-                key={producto.id}
-                producto={producto}
-                tienda={tienda}
-                codigo={codigo}
-              />
+              <Tarjeta key={producto.id} producto={producto} tienda={tienda} />
             ))}
           </Vitrina>
         </div>
@@ -235,7 +210,7 @@ export function Catalogo({
   )
 }
 
-export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
+export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
   const { ficha } = tienda.apariencia
   const vitrina = ficha.diseno === "vitrina"
   const consulta = enlaceDeConsulta(tienda, producto)
@@ -272,7 +247,6 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
             <Link
               href={rutaDeTienda(tienda.slug, "/catalogo", {
                 categoria: producto.category_id,
-                ref: codigo,
               })}
               className="inline-flex min-h-11 items-center text-[11px] tracking-[0.28em] text-senal uppercase underline-offset-4 hover:underline"
             >
@@ -388,12 +362,7 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
           <div className="mt-12">
             <Vitrina columnas={4}>
               {relacionados.map((otro) => (
-                <Tarjeta
-                  key={otro.id}
-                  producto={otro}
-                  tienda={tienda}
-                  codigo={codigo}
-                />
+                <Tarjeta key={otro.id} producto={otro} tienda={tienda} />
               ))}
             </Vitrina>
           </div>

@@ -10,74 +10,57 @@ web
 
 **Emprendedor boliviano sin tienda online.** Vende por Facebook Marketplace, WhatsApp y
 TikTok, sin plataforma detrás. Menos del 30% de las pymes bolivianas tiene sitio web. No
-tiene números de su negocio, promociona a mano en varias redes, y no puede contratar a
-nadie porque no le alcanza para un sueldo fijo.
+tiene números de su negocio, promociona a mano en varias redes, lleva el stock de memoria
+y pierde pedidos entre mensajes.
 
-**Joven vendedor.** En Bolivia el 96,2% de los jóvenes que trabajan lo hacen en la
-informalidad, la tasa más alta de la región; el desempleo juvenil duplica al general (6%
-contra 3,1%) y siete de cada diez ganan menos de Bs 2.500 al mes. El problema no es que
-falte trabajo: es que el disponible no paga, no forma y no deja historial que puedan
-mostrar después.
+**Quien le compra.** Llega desde un enlace en la bio o en un chat, en el celular, y ya
+está acostumbrado a comprarle por WhatsApp. No quiere crear una cuenta ni llenar un
+formulario.
 
-Ambos operan **desde el celular**, no desde un escritorio.
+Los dos operan **desde el celular**, no desde un escritorio.
 
 ## Product Purpose
 
 Convertir a un emprendedor que vende por redes en una tienda online funcionando en
-minutos, y darle una red de vendedores jóvenes que colocan sus productos a comisión.
+minutos, con el stock, los pedidos, los números y los catálogos detrás, sin sacarlo del
+canal donde ya vende: los pedidos le siguen llegando por WhatsApp, pero ordenados.
 
-Para el emprendedor, el éxito es tener catálogo, cobro, números y promoción sin contratar
-a nadie. Para el joven, es ganar una comisión y acumular un **historial de ventas
-verificable**: su primer antecedente laboral real.
+Para el emprendedor, el éxito es tener catálogo, pedidos ordenados, números y promoción
+sin contratar a nadie. Para quien compra, es pedir con un toque y seguir la conversación
+en el chat de siempre.
 
 ## Positioning
 
-Cada problema es la solución del otro, y nadie los había conectado: el emprendedor no
-puede pagar un sueldo fijo, y el joven no consigue trabajo que deje rastro.
+Una tienda online común muestra productos y espera que el cliente cambie de costumbre.
+Venduo hace lo contrario: la tienda arma el pedido y lo manda al WhatsApp de siempre, con
+el número y el total, y detrás ordena el stock y los números.
 
-El mecanismo que un competidor no podría copiar sin rehacer su modelo: **Venduo no cobra
-comisión por venta.** El porcentaje que se descuenta va íntegro al vendedor que la generó.
-El único ingreso es la suscripción del emprendedor, y el joven no paga nunca nada.
-
-Y al comprador le da una garantía que un negocio de TikTok no puede dar solo: **su pago
-queda retenido hasta que recibe el pedido.** Si el producto no aparece, no pierde la plata.
+**Venduo no cobra comisión por venta y no toca el dinero.** El único ingreso es la
+suscripción del emprendedor. El pago se acuerda en el chat, como hoy.
 
 ## Operating Context
 
 - **El celular es el dispositivo principal**, tanto para vender como para comprar.
-- **La entrega se coordina por WhatsApp** entre el emprendedor y el comprador. La
-  plataforma arma el mensaje con el detalle del pedido y registra solo dos marcas —enviado
-  y recibido—, que son las que liberan el pago. No gestiona envíos.
-- **El cobro es por PagoFácil, con custodia.** El comprador paga, el dinero queda retenido
-  en PagoFácil, y se libera al emprendedor y al vendedor cuando el comprador confirma que
-  recibió —o solo, si pasa el plazo sin respuesta—. Si hay un reclamo, el pago se congela y
-  Venduo media. **Venduo nunca recibe ni guarda el dinero**, y el costo de PagoFácil lo
-  absorbe el emprendedor. En el MVP la pasarela es simulada, y lo construido hoy todavía es
-  un flujo provisorio de QR bancario con comprobante, sin custodia.
-- Los enlaces de tienda y de vendedor **se imprimen en códigos QR y se mandan por
-  WhatsApp**, así que tienen que ser legibles y compartibles.
-- El vendedor trabaja en sus redes, en su barrio y cara a cara.
+- **El pedido sale por WhatsApp.** Quien compra arma su carrito y toca un botón: se abre
+  el chat con la tienda y el pedido escrito. No deja datos; ya está en el chat.
+- **El pago y la entrega se acuerdan en ese chat.** La plataforma no cobra, no retiene
+  dinero ni gestiona envíos. La tienda marca el pedido pagado y ahí baja el stock.
+- Los enlaces de tienda **se imprimen en códigos QR y se mandan por WhatsApp**, así que
+  tienen que ser legibles y compartibles.
 
 ## Capabilities and Constraints
 
 - **Un emprendedor, una tienda.** Multi-tienda está fuera de alcance e impedido en la base.
-- **Un vendedor pertenece a varias tiendas.** Esa asimetría define el modelo de datos.
+- **El WhatsApp de la tienda es obligatorio.** Es a donde llega cada pedido.
 - **Moneda: boliviano, constante del sistema.** No hay moneda configurable.
 - **Montos en centavos enteros, porcentajes en puntos básicos.** Nunca punto flotante.
-- **La comisión se congela al momento de la venta** y no se recalcula después.
-- **El historial del vendedor sobrevive a la tienda**: si un emprendedor abandona la
-  plataforma y sus datos se purgan, el antecedente laboral del joven queda intacto.
+- **El stock baja al marcar el pedido pagado**, no al crearlo: un carrito mandado y
+  nunca concretado no retiene unidades.
 - **Registro con correo y contraseña, sin verificación.** La fricción de verificar un
-  correo es la barrera que la plataforma promete no ponerle a un joven.
-- **Fuera de alcance, confirmado:** gestión de envíos, recibir o guardar el dinero de una
-  venta, cobro de la suscripción, notificaciones por correo, aplicación móvil nativa y
-  tests automatizados.
-- **Decisiones abiertas con PagoFácil:** si puede retener un cobro y liberarlo o devolverlo
-  por orden de Venduo; si la dispersión admite como beneficiario al vendedor, que no es el
-  comercio; y qué identificación le exige. Si exigiera alta formal de cada vendedor, choca
-  con la promesa de cero barrera de entrada.
-- **Decisiones abiertas del producto:** el plazo de liberación automática (se propone 7
-  días desde el envío) y qué pasa si el emprendedor nunca marca el pedido enviado.
+  correo es una barrera más antes de tener la tienda funcionando.
+- **Fuera de alcance, confirmado:** red de vendedores y comisiones, gestión de envíos,
+  cobrar dentro de la plataforma, pedirle datos a quien compra, cobro de la suscripción,
+  notificaciones por correo, aplicación móvil nativa y tests automatizados.
 
 La especificación funcional completa vive en `VENDUO.md` y es la fuente de verdad.
 
@@ -106,12 +89,10 @@ La especificación funcional completa vive en `VENDUO.md` y es la fuente de verd
 
 ## Product Principles
 
-1. **Cero barrera para el joven.** Cualquier fricción que se le agregue —verificar un
-   correo, dar de alta una cuenta bancaria, esperar aprobación— contradice la promesa
-   central del producto.
-2. **El historial es del vendedor, no de la tienda.** Ninguna decisión técnica o de
-   producto puede hacer que el antecedente laboral de alguien desaparezca porque un
-   tercero se fue.
+1. **Cero fricción para quien compra.** Ni cuenta ni formulario: el pedido sale con un
+   toque hacia el chat donde ya compra.
+2. **No sacar a nadie de WhatsApp.** La venta se cierra donde siempre se cerró; Venduo
+   ordena lo que pasa antes y después.
 3. **El celular es el escenario real, no un caso secundario.** Lo que no se puede usar con
    el pulgar en la calle no sirve.
 4. **La IA propone, la persona decide.** Nada se aplica al negocio de alguien sin que lo
@@ -122,7 +103,7 @@ La especificación funcional completa vive en `VENDUO.md` y es la fuente de verd
 ## Accessibility & Inclusion
 
 **Android de gama baja y datos móviles.** Es el equipo y la conexión del público real:
-jóvenes vendiendo desde el celular y compradores en la calle.
+emprendedores vendiendo desde el celular y compradores en la calle.
 
 Consecuencias que el diseño y el código deben respetar:
 

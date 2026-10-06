@@ -35,8 +35,9 @@ función nueva que necesita la tienda la pide ahí, no con su propio `select` a 
 ## Las consultas van a la vez, no en fila
 
 - **Lo que no depende de nada va en el mismo `Promise.all`.** Una consulta que espera a
-  otra solo porque estaba escrita debajo es un viaje regalado. Pasó en `/vendedor` (tres
-  lecturas independientes, una detrás de otra) y en estadísticas.
+  otra solo porque estaba escrita debajo es un viaje regalado. Pasó en el panel del
+  vendedor que existía antes (tres lecturas independientes, una detrás de otra) y en
+  estadísticas.
 - **Lo que depende va en una segunda tanda**, y casi siempre depende de lo mismo: el id
   de la tienda. Tres tandas en una pantalla son una señal de que algo se puede juntar.
 - **Si hay una relación declarada, se embebe.** La portada de la tienda trae sus
@@ -46,8 +47,8 @@ función nueva que necesita la tienda la pide ahí, no con su propio `select` a 
   del padre, la promesa se arranca arriba y se le pasa: así lo hace el tablero del
   Resumen en `app/(privado)/panel/page.tsx`.
 - Una consulta de más **en paralelo** cuesta casi nada. Si saber si hace falta exige
-  otro viaje, conviene pedirla igual: la barra lateral trae las comisiones aunque la
-  persona no venda.
+  otro viaje, conviene pedirla igual: el alta pide la tienda y las plantillas a la vez,
+  aunque con tienda terminada redirija sin usarlas.
 
 ## El toque responde en el acto
 

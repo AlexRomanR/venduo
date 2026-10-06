@@ -8,11 +8,12 @@ import { Estado } from "@/components/pedidos/piezas"
 import { Seccion, SinDatos } from "@/components/panel/piezas"
 
 /**
- * Los cinco pedidos más nuevos, con su estado y un atajo a WhatsApp.
+ * Los cinco pedidos más nuevos, con su estado.
  *
- * Cada fila lleva al pedido; el botón de al lado abre la conversación con
- * quien compró, que es por donde se coordina todo. Son dos destinos y por eso
- * dos objetos: un enlace dentro de otro no se puede tocar bien con el dedo.
+ * Cada fila lleva al pedido. Los anteriores a la compra por WhatsApp guardan
+ * el teléfono de quien compró, y esos llevan al lado el atajo al chat: son dos
+ * destinos y por eso dos objetos, porque un enlace dentro de otro no se puede
+ * tocar bien con el dedo.
  */
 export function UltimosPedidos({ pedidos }: { pedidos: PedidoReciente[] }) {
   return (
@@ -31,14 +32,18 @@ export function UltimosPedidos({ pedidos }: { pedidos: PedidoReciente[] }) {
         <SinDatos
           icono={ShoppingBag}
           titulo="Todavía no llegó ningún pedido"
-          texto="Cuando alguien compre en tu tienda, lo vas a ver acá con su WhatsApp para coordinar la entrega."
+          texto="Cuando alguien te mande su carrito por WhatsApp, el pedido aparece acá con el mismo número."
         />
       ) : (
         <ul>
           {pedidos.map((pedido) => (
             <li
               key={pedido.id}
-              className="grid grid-cols-[minmax(0,1fr)_auto] border-t border-tinta/15 first:border-t-0"
+              className={
+                pedido.telefono
+                  ? "grid grid-cols-[minmax(0,1fr)_auto] border-t border-tinta/15 first:border-t-0"
+                  : "grid grid-cols-[minmax(0,1fr)] border-t border-tinta/15 first:border-t-0"
+              }
             >
               <Link
                 href={`/panel/pedidos/${pedido.id}`}
@@ -50,7 +55,7 @@ export function UltimosPedidos({ pedidos }: { pedidos: PedidoReciente[] }) {
                       #{pedido.numero}
                     </span>
                     <span className="truncate font-titular font-bold tracking-[-0.01em] transition-colors group-hover:text-senal">
-                      {pedido.comprador}
+                      {pedido.comprador ?? "Pedido por WhatsApp"}
                     </span>
                   </span>
                   <span className="mt-1 block text-xs opacity-70">
@@ -66,16 +71,18 @@ export function UltimosPedidos({ pedidos }: { pedidos: PedidoReciente[] }) {
                   <Estado estado={pedido.estado} />
                 </span>
               </Link>
-              <a
-                href={`https://wa.me/${numeroDeWhatsApp(pedido.telefono)}`}
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label={`Escribir a ${pedido.comprador} por WhatsApp`}
-                title="Escribir por WhatsApp"
-                className="flex w-14 items-center justify-center border-l border-tinta/15 transition-colors hover:bg-tinta hover:text-papel"
-              >
-                <MessageCircle aria-hidden="true" className="size-5" />
-              </a>
+              {pedido.telefono ? (
+                <a
+                  href={`https://wa.me/${numeroDeWhatsApp(pedido.telefono)}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  aria-label={`Escribir a ${pedido.comprador ?? "quien compró"} por WhatsApp`}
+                  title="Escribir por WhatsApp"
+                  className="flex w-14 items-center justify-center border-l border-tinta/15 transition-colors hover:bg-tinta hover:text-papel"
+                >
+                  <MessageCircle aria-hidden="true" className="size-5" />
+                </a>
+              ) : null}
             </li>
           ))}
         </ul>

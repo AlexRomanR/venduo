@@ -38,6 +38,6 @@ export const clasica: DefinicionDePlantilla = {
       consulta: false,
       relacionados: true,
     },
-    carrito: { diseno: "columnas", sugerencias: false, correo: true },
+    carrito: { diseno: "columnas", sugerencias: false },
   },
 }

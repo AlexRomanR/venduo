@@ -1,12 +1,7 @@
 import { notFound } from "next/navigation"
 
 import { leerFiltros } from "@/lib/catalogo"
-import {
-  codigoDeReferido,
-  getReferido,
-  getTiendaPublica,
-  marcoDeTienda,
-} from "@/lib/data/tienda-publica"
+import { getTiendaPublica, marcoDeTienda } from "@/lib/data/tienda-publica"
 import { kitDePlantilla } from "@/components/plantillas"
 import { BarraDelCarrito } from "@/components/tienda/barra-del-carrito"
 
@@ -29,27 +24,19 @@ export default async function TiendaPage({
   if (!tienda) notFound()
 
   const consulta = await searchParams
-  // El código se propaga tal como vino; el cartel de "te trajo" depende de
-  // poder resolver el nombre, que es otra cosa y puede fallar sin consecuencia.
-  const codigo = codigoDeReferido(consulta.ref)
-  const referido = await getReferido(tienda.id, codigo)
 
   const kit = kitDePlantilla(tienda.plantilla)
   const marco = marcoDeTienda(tienda)
 
   return (
     <>
-      <kit.Cabecera marco={marco} referido={referido} codigo={codigo} />
+      <kit.Cabecera marco={marco} />
 
       <main className="flex-1">
-        <kit.Inicio
-          tienda={tienda}
-          codigo={codigo}
-          filtros={leerFiltros(consulta)}
-        />
+        <kit.Inicio tienda={tienda} filtros={leerFiltros(consulta)} />
       </main>
 
-      <kit.Pie marco={marco} codigo={codigo} />
+      <kit.Pie marco={marco} />
       <BarraDelCarrito slug={tienda.slug} />
     </>
   )

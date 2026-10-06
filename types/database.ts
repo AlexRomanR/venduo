@@ -220,93 +220,6 @@ export type Database = {
           },
         ]
       }
-      commissions: {
-        Row: {
-          amount_cents: number
-          base_amount_cents: number
-          confirmed_at: string | null
-          created_at: string
-          id: string
-          order_id: string
-          paid_at: string | null
-          payment_reference: string | null
-          rate_bps: number
-          seller_id: string | null
-          seller_user_id: string
-          status: Database["public"]["Enums"]["commission_status"]
-          store_id: string | null
-          store_name: string
-        }
-        Insert: {
-          amount_cents: number
-          base_amount_cents: number
-          confirmed_at?: string | null
-          created_at?: string
-          id?: string
-          order_id: string
-          paid_at?: string | null
-          payment_reference?: string | null
-          rate_bps: number
-          seller_id?: string | null
-          seller_user_id: string
-          status?: Database["public"]["Enums"]["commission_status"]
-          store_id?: string | null
-          store_name: string
-        }
-        Update: {
-          amount_cents?: number
-          base_amount_cents?: number
-          confirmed_at?: string | null
-          created_at?: string
-          id?: string
-          order_id?: string
-          paid_at?: string | null
-          payment_reference?: string | null
-          rate_bps?: number
-          seller_id?: string | null
-          seller_user_id?: string
-          status?: Database["public"]["Enums"]["commission_status"]
-          store_id?: string | null
-          store_name?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "commissions_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: true
-            referencedRelation: "mis_ventas"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "commissions_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: true
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "commissions_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "mis_vendedores"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "commissions_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "store_sellers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "commissions_store_id_fkey"
-            columns: ["store_id"]
-            isOneToOne: false
-            referencedRelation: "stores"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       insights: {
         Row: {
           created_at: string
@@ -426,19 +339,12 @@ export type Database = {
       orders: {
         Row: {
           buyer_email: string | null
-          buyer_name: string
-          buyer_phone: string
-          commission_base_cents: number
-          commission_bps: number
-          commission_cents: number
+          buyer_name: string | null
+          buyer_phone: string | null
           created_at: string
           id: string
-          net_to_store_cents: number
           order_number: number
           paid_at: string | null
-          payment_proof_url: string | null
-          referral_code: string | null
-          seller_id: string | null
           status: Database["public"]["Enums"]["order_status"]
           store_id: string
           subtotal_cents: number
@@ -447,19 +353,12 @@ export type Database = {
         }
         Insert: {
           buyer_email?: string | null
-          buyer_name: string
-          buyer_phone: string
-          commission_base_cents?: number
-          commission_bps?: number
-          commission_cents?: number
+          buyer_name?: string | null
+          buyer_phone?: string | null
           created_at?: string
           id?: string
-          net_to_store_cents?: number
           order_number?: number
           paid_at?: string | null
-          payment_proof_url?: string | null
-          referral_code?: string | null
-          seller_id?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           store_id: string
           subtotal_cents: number
@@ -468,19 +367,12 @@ export type Database = {
         }
         Update: {
           buyer_email?: string | null
-          buyer_name?: string
-          buyer_phone?: string
-          commission_base_cents?: number
-          commission_bps?: number
-          commission_cents?: number
+          buyer_name?: string | null
+          buyer_phone?: string | null
           created_at?: string
           id?: string
-          net_to_store_cents?: number
           order_number?: number
           paid_at?: string | null
-          payment_proof_url?: string | null
-          referral_code?: string | null
-          seller_id?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           store_id?: string
           subtotal_cents?: number
@@ -488,20 +380,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "orders_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "mis_vendedores"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "store_sellers"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "orders_store_id_fkey"
             columns: ["store_id"]
@@ -597,7 +475,6 @@ export type Database = {
           low_stock_threshold: number
           name: string
           price_cents: number
-          seller_enabled: boolean
           sku: string | null
           stock: number
           store_id: string
@@ -620,7 +497,6 @@ export type Database = {
           low_stock_threshold?: number
           name: string
           price_cents: number
-          seller_enabled?: boolean
           sku?: string | null
           stock?: number
           store_id: string
@@ -643,7 +519,6 @@ export type Database = {
           low_stock_threshold?: number
           name?: string
           price_cents?: number
-          seller_enabled?: boolean
           sku?: string | null
           stock?: number
           store_id?: string
@@ -673,7 +548,6 @@ export type Database = {
           deleted_at: string | null
           full_name: string | null
           id: string
-          primary_role: Database["public"]["Enums"]["user_role"] | null
           updated_at: string
         }
         Insert: {
@@ -682,7 +556,6 @@ export type Database = {
           deleted_at?: string | null
           full_name?: string | null
           id: string
-          primary_role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string
         }
         Update: {
@@ -691,7 +564,6 @@ export type Database = {
           deleted_at?: string | null
           full_name?: string | null
           id?: string
-          primary_role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string
         }
         Relationships: []
@@ -717,42 +589,6 @@ export type Database = {
           key?: string
           name?: string
           position?: number
-        }
-        Relationships: []
-      }
-      seller_profiles: {
-        Row: {
-          bio: string | null
-          city: string | null
-          created_at: string
-          deleted_at: string | null
-          display_name: string
-          phone: string | null
-          slug: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          bio?: string | null
-          city?: string | null
-          created_at?: string
-          deleted_at?: string | null
-          display_name: string
-          phone?: string | null
-          slug: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          bio?: string | null
-          city?: string | null
-          created_at?: string
-          deleted_at?: string | null
-          display_name?: string
-          phone?: string | null
-          slug?: string
-          updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -1004,35 +840,6 @@ export type Database = {
           },
         ]
       }
-      store_invites: {
-        Row: {
-          code: string
-          created_at: string
-          store_id: string
-          updated_at: string
-        }
-        Insert: {
-          code: string
-          created_at?: string
-          store_id: string
-          updated_at?: string
-        }
-        Update: {
-          code?: string
-          created_at?: string
-          store_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "store_invites_store_id_fkey"
-            columns: ["store_id"]
-            isOneToOne: true
-            referencedRelation: "stores"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       store_pages: {
         Row: {
           created_at: string
@@ -1080,59 +887,8 @@ export type Database = {
           },
         ]
       }
-      store_sellers: {
-        Row: {
-          approved_at: string | null
-          approved_by: string | null
-          created_at: string
-          deleted_at: string | null
-          id: string
-          joined_at: string
-          referral_code: string
-          status: Database["public"]["Enums"]["seller_status"]
-          store_id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          approved_at?: string | null
-          approved_by?: string | null
-          created_at?: string
-          deleted_at?: string | null
-          id?: string
-          joined_at?: string
-          referral_code: string
-          status?: Database["public"]["Enums"]["seller_status"]
-          store_id: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          approved_at?: string | null
-          approved_by?: string | null
-          created_at?: string
-          deleted_at?: string | null
-          id?: string
-          joined_at?: string
-          referral_code?: string
-          status?: Database["public"]["Enums"]["seller_status"]
-          store_id?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "store_sellers_store_id_fkey"
-            columns: ["store_id"]
-            isOneToOne: false
-            referencedRelation: "stores"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       stores: {
         Row: {
-          commission_bps: number
           created_at: string
           deleted_at: string | null
           description: string | null
@@ -1141,10 +897,6 @@ export type Database = {
           logo_url: string | null
           name: string
           owner_id: string
-          payment_instructions: string | null
-          payment_qr_url: string | null
-          seller_join_mode: Database["public"]["Enums"]["seller_join_mode"]
-          seller_network_enabled: boolean
           slug: string
           tagline: string | null
           template_key: string | null
@@ -1153,7 +905,6 @@ export type Database = {
           whatsapp: string | null
         }
         Insert: {
-          commission_bps?: number
           created_at?: string
           deleted_at?: string | null
           description?: string | null
@@ -1162,10 +913,6 @@ export type Database = {
           logo_url?: string | null
           name: string
           owner_id: string
-          payment_instructions?: string | null
-          payment_qr_url?: string | null
-          seller_join_mode?: Database["public"]["Enums"]["seller_join_mode"]
-          seller_network_enabled?: boolean
           slug: string
           tagline?: string | null
           template_key?: string | null
@@ -1174,7 +921,6 @@ export type Database = {
           whatsapp?: string | null
         }
         Update: {
-          commission_bps?: number
           created_at?: string
           deleted_at?: string | null
           description?: string | null
@@ -1183,10 +929,6 @@ export type Database = {
           logo_url?: string | null
           name?: string
           owner_id?: string
-          payment_instructions?: string | null
-          payment_qr_url?: string | null
-          seller_join_mode?: Database["public"]["Enums"]["seller_join_mode"]
-          seller_network_enabled?: boolean
           slug?: string
           tagline?: string | null
           template_key?: string | null
@@ -1330,18 +1072,6 @@ export type Database = {
       }
     }
     Views: {
-      mis_comisiones: {
-        Row: {
-          amount_cents: number | null
-          base_amount_cents: number | null
-          created_at: string | null
-          id: string | null
-          nombre: string | null
-          rate_bps: number | null
-          status: Database["public"]["Enums"]["commission_status"] | null
-        }
-        Relationships: []
-      }
       mis_items: {
         Row: {
           created_at: string | null
@@ -1382,7 +1112,6 @@ export type Database = {
           low_stock_threshold: number | null
           name: string | null
           price_cents: number | null
-          seller_enabled: boolean | null
           sku: string | null
           stock: number | null
         }
@@ -1397,7 +1126,6 @@ export type Database = {
           low_stock_threshold?: number | null
           name?: string | null
           price_cents?: number | null
-          seller_enabled?: boolean | null
           sku?: string | null
           stock?: number | null
         }
@@ -1412,77 +1140,37 @@ export type Database = {
           low_stock_threshold?: number | null
           name?: string | null
           price_cents?: number | null
-          seller_enabled?: boolean | null
           sku?: string | null
           stock?: number | null
         }
         Relationships: []
       }
-      mis_vendedores: {
-        Row: {
-          ciudad: string | null
-          id: string | null
-          joined_at: string | null
-          nombre: string | null
-          referral_code: string | null
-          status: Database["public"]["Enums"]["seller_status"] | null
-        }
-        Relationships: []
-      }
       mis_ventas: {
         Row: {
-          commission_base_cents: number | null
-          commission_cents: number | null
           created_at: string | null
           id: string | null
-          referral_code: string | null
-          seller_id: string | null
+          numero: number | null
           status: Database["public"]["Enums"]["order_status"] | null
           total_cents: number | null
         }
         Insert: {
-          commission_base_cents?: number | null
-          commission_cents?: number | null
           created_at?: string | null
           id?: string | null
-          referral_code?: string | null
-          seller_id?: string | null
+          numero?: number | null
           status?: Database["public"]["Enums"]["order_status"] | null
           total_cents?: number | null
         }
         Update: {
-          commission_base_cents?: number | null
-          commission_cents?: number | null
           created_at?: string | null
           id?: string | null
-          referral_code?: string | null
-          seller_id?: string | null
+          numero?: number | null
           status?: Database["public"]["Enums"]["order_status"] | null
           total_cents?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "orders_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "mis_vendedores"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "store_sellers"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Functions: {
-      adjuntar_comprobante: {
-        Args: { p_order_id: string; p_url: string }
-        Returns: boolean
-      }
       apply_template: {
         Args: { p_store_id: string; p_template_key: string }
         Returns: undefined
@@ -1509,70 +1197,25 @@ export type Database = {
         Returns: string
       }
       create_order: {
-        Args: {
-          p_buyer_email: string
-          p_buyer_name: string
-          p_buyer_phone: string
-          p_items: Json
-          p_referral_code: string
-          p_store_id: string
-        }
-        Returns: string
+        Args: { p_items: Json; p_store_id: string }
+        Returns: Json
       }
       create_store: {
         Args: {
-          p_commission_bps?: number
           p_description: string
           p_name: string
-          p_sellers?: boolean
           p_template_key: string
+          p_whatsapp: string
         }
         Returns: string
       }
-      ensure_seller_profile: { Args: { p_user_id: string }; Returns: undefined }
-      generate_invite_code: { Args: never; Returns: string }
-      generate_referral_code: { Args: never; Returns: string }
-      insight_filtro: {
-        Args: { p_dataset: string; p_fecha: string }
-        Returns: string
-      }
-      join_store: {
-        Args: { p_invite_code?: string; p_store_slug: string }
-        Returns: string
-      }
-      my_seller_ids: { Args: never; Returns: string[] }
-      my_seller_invite: { Args: never; Returns: string }
       my_store_id: { Args: never; Returns: string }
-      pedido_publico: { Args: { p_order_id: string }; Returns: Json }
       portada_de_tienda: { Args: { p_store_id: string }; Returns: string }
       publicar_diseno: {
         Args: { p_bloques: Json; p_logo_url: string; p_theme_overrides: Json }
         Returns: string
       }
-      referido_publico: {
-        Args: { p_codigo: string; p_store_id: string }
-        Returns: {
-          codigo: string
-          nombre: string
-        }[]
-      }
       restaurar_version: { Args: { p_version_id: string }; Returns: string }
-      rotate_seller_invite: { Args: never; Returns: string }
-      run_insight: {
-        Args: {
-          p_dataset: string
-          p_desde?: string
-          p_dimension: string
-          p_hasta?: string
-          p_limite?: number
-          p_metrica: string
-        }
-        Returns: {
-          etiqueta: string
-          orden: string
-          valor: number
-        }[]
-      }
       run_insight_sql: {
         Args: { p_sql: string }
         Returns: {
@@ -1584,55 +1227,23 @@ export type Database = {
         Args: { p_store_id: string; p_template_key: string }
         Returns: undefined
       }
-      seller_public_stats: {
-        Args: { p_slug: string }
-        Returns: {
-          avatar_url: string
-          bio: string
-          city: string
-          desde: string
-          display_name: string
-          tiendas: number
-          ventas: number
-          volumen_cents: number
-        }[]
-      }
-      seller_public_stores: {
-        Args: { p_slug: string }
-        Returns: {
-          desde: string
-          store_name: string
-          ventas: number
-        }[]
-      }
       store_is_live: { Args: { p_store_id: string }; Returns: boolean }
-      take_product: { Args: { p_product_id: string }; Returns: string }
     }
     Enums: {
       ai_generation_kind: "tienda" | "bloques" | "analisis" | "marketing"
       block_proposal_status: "propuesta" | "aplicada" | "rechazada" | "invalida"
-      commission_status: "pendiente" | "confirmada" | "pagada" | "anulada"
       design_origin:
         | "inicial"
         | "alta"
         | "antes_de_cambiar_plantilla"
         | "antes_de_publicar"
         | "antes_de_restaurar"
-      order_status:
-        | "pendiente"
-        | "pagado"
-        | "enviado"
-        | "entregado"
-        | "en_disputa"
-        | "cancelado"
+      order_status: "pendiente" | "pagado" | "cancelado"
       page_status: "borrador" | "publicada"
       product_condition: "nuevo" | "segunda_mano" | "reacondicionado"
-      seller_join_mode: "abierta" | "con_aprobacion"
-      seller_status: "pendiente" | "activo" | "rechazado" | "suspendido"
       social_post_status: "borrador" | "publicado" | "compartido" | "fallido"
       social_provider: "facebook" | "whatsapp" | "canva"
       subscription_status: "prueba" | "activa" | "bloqueada" | "cancelada"
-      user_role: "emprendedor" | "vendedor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1762,7 +1373,6 @@ export const Constants = {
     Enums: {
       ai_generation_kind: ["tienda", "bloques", "analisis", "marketing"],
       block_proposal_status: ["propuesta", "aplicada", "rechazada", "invalida"],
-      commission_status: ["pendiente", "confirmada", "pagada", "anulada"],
       design_origin: [
         "inicial",
         "alta",
@@ -1770,22 +1380,12 @@ export const Constants = {
         "antes_de_publicar",
         "antes_de_restaurar",
       ],
-      order_status: [
-        "pendiente",
-        "pagado",
-        "enviado",
-        "entregado",
-        "en_disputa",
-        "cancelado",
-      ],
+      order_status: ["pendiente", "pagado", "cancelado"],
       page_status: ["borrador", "publicada"],
       product_condition: ["nuevo", "segunda_mano", "reacondicionado"],
-      seller_join_mode: ["abierta", "con_aprobacion"],
-      seller_status: ["pendiente", "activo", "rechazado", "suspendido"],
       social_post_status: ["borrador", "publicado", "compartido", "fallido"],
       social_provider: ["facebook", "whatsapp", "canva"],
       subscription_status: ["prueba", "activa", "bloqueada", "cancelada"],
-      user_role: ["emprendedor", "vendedor"],
     },
   },
 } as const

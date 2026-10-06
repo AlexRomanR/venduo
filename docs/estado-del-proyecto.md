@@ -1,7 +1,7 @@
 # Estado del proyecto
 
 Qué está construido en Venduo y qué falta, contra el alcance del MVP de `VENDUO.md` §6.
-Actualizado el 1 de octubre de 2026.
+Actualizado el 6 de octubre de 2026.
 
 **Leyenda:** ✅ hecho · 🟡 hecho con un flujo provisorio o a medias · ❌ falta
 
@@ -9,23 +9,24 @@ Actualizado el 1 de octubre de 2026.
 
 ## Resumen
 
-| #   | Punto del MVP (`VENDUO.md` §6)                           | Estado |
-| --- | -------------------------------------------------------- | ------ |
-| 1   | Registro e ingreso del emprendedor                       | ✅     |
-| 2   | Selección de plantilla según rubro                       | ✅     |
-| 3   | Edición de la tienda asistida por IA                     | ✅     |
-| 4   | Tienda pública real, navegable en móvil, con URL propia  | ✅     |
-| 5   | Productos con imagen, stock y condición                  | ✅     |
-| 6   | Carrito y checkout con datos del cliente                 | ✅     |
-| 7   | Pago por PagoFácil con custodia (simulada)               | 🟡     |
-| 8   | Alta de vendedor, con código y enlace propios            | ✅     |
-| 9   | Atribución de la venta al vendedor por el enlace         | ✅     |
-| 10  | Cálculo automático de comisión                           | ✅     |
-| 11  | Panel del vendedor: ventas, comisiones, materiales       | ✅     |
-| 12  | Estadísticas en lenguaje natural                         | ✅     |
-| 13  | Copys de marketing y publicación en Facebook y WhatsApp  | ❌     |
-| 14  | Entrega por WhatsApp y confirmación de envío y recepción | 🟡     |
-| 15  | Catálogos en PDF editables, para descargar o compartir   | ✅     |
+| #   | Punto del MVP (`VENDUO.md` §6)                               | Estado |
+| --- | ------------------------------------------------------------ | ------ |
+| 1   | Registro e ingreso del emprendedor                           | ✅     |
+| 2   | Selección de plantilla según rubro, con WhatsApp obligatorio | ✅     |
+| 3   | Edición de la tienda asistida por IA                         | ✅     |
+| 4   | Tienda pública real, navegable en móvil, con URL propia      | ✅     |
+| 5   | Productos con imagen, stock y condición                      | ✅     |
+| 6   | Carrito que manda el pedido al WhatsApp de la tienda         | ✅     |
+| 7   | Panel de pedidos que descuenta stock al marcarse pagado      | ✅     |
+| 8   | Estadísticas en lenguaje natural                             | ✅     |
+| 9   | Copys de marketing y publicación en Facebook y WhatsApp      | ❌     |
+| 10  | Catálogos en PDF editables, para descargar o compartir       | ✅     |
+
+> **6 de octubre:** se quitaron la red de vendedores, el cobro dentro de la plataforma
+> (PagoFácil, la custodia, el QR de pago y el comprobante) y los estados de envío. La
+> compra se cierra por WhatsApp. La migración `20261006120000_compra_por_whatsapp.sql`
+> borra de la base las tablas, funciones y columnas de la red de vendedores: **hay que
+> aplicarla** antes de publicar el código (ver "Lo que falta").
 
 ---
 
@@ -34,11 +35,11 @@ Actualizado el 1 de octubre de 2026.
 ### Mensaje y portada
 
 - Venduo se presenta como **más que una tienda online**: la tienda online —el enlace
-  de la bio— y todo lo que hay detrás: stock, cobros con PagoFácil, pedidos con
-  WhatsApp, vendedores, estadísticas y catálogos en PDF.
+  de la bio— y todo lo que hay detrás: stock, pedidos que llegan por WhatsApp,
+  estadísticas y catálogos en PDF.
 - La portada (`/`) está ordenada en ese sentido: titular, el problema, por qué no es
   solo una tienda online, cómo funciona en tres pasos, lo que incluye, para quién es,
-  la red de vendedores, preguntas frecuentes y llamado final.
+  cómo llegan los pedidos por WhatsApp, preguntas frecuentes y llamado final.
 - Los ejemplos son de quien vende por redes —ropa, zapatillas, belleza, tecnología,
   segunda mano—, no de comida casera. Cómo se le habla al cliente está en
   `ui-styling.md`.
@@ -46,7 +47,7 @@ Actualizado el 1 de octubre de 2026.
 ### La marca
 
 - El logo es la feria en el celular: el toldo a rayas de un puesto dentro de la pantalla.
-  Va en la portada, el ingreso, las altas, el perfil del vendedor y la barra lateral
+  Va en la portada, el ingreso, el alta y la barra lateral
   —plegada, el símbolo solo—, y es el favicon, el ícono del celular y la tarjeta al
   compartir la portada. Se regenera con `npm run marca`. Todo en
   `.agents/rules/marca.md`.
@@ -76,20 +77,19 @@ Actualizado el 1 de octubre de 2026.
 
 ### Cuentas y altas
 
-- Registro e ingreso con correo y contraseña, eligiendo el rol: emprendedor o vendedor.
-- `/auth/destino` decide a dónde entra cada cuenta según sus datos, no según el rol.
-- Alta de la tienda en tres pasos (`/crear`): elegir plantilla, contar el negocio y, en
-  `/crear/listo`, la oferta de personalizarla en el editor o hacerlo más tarde. Nace con
-  suscripción de prueba, invitación para vendedores y su versión inicial de diseño.
-- Alta del vendedor (`/sumarme`) por tres caminos: sumarse a una tienda, entrar con un
-  código de invitación o tomar un producto suelto.
+- Registro e ingreso con correo y contraseña. Un solo tipo de cuenta: toda cuenta nueva
+  va a crear su tienda.
+- `/auth/destino` decide a dónde entra cada cuenta según sus datos.
+- Alta de la tienda en tres pasos (`/crear`): elegir plantilla, contar el negocio con su
+  **WhatsApp obligatorio** y, en `/crear/listo`, la oferta de personalizarla en el editor
+  o hacerlo más tarde. Nace con suscripción de prueba y su versión inicial de diseño.
 
 ### Plantillas de tienda
 
 - Dos plantillas con identidad propia: **Pasarela** (moda) y **Esencia** (perfumería).
 - La identidad llega a toda la tienda pública **y al panel del emprendedor**.
-- Cambio de plantilla desde `/panel/apariencia` sin perder productos, pedidos ni
-  vendedores, con historial de versiones que se pueden **restaurar**.
+- Cambio de plantilla desde `/panel/apariencia` sin perder productos ni pedidos, con
+  historial de versiones que se pueden **restaurar**.
 - Todo documentado en `docs/store-templates.md`.
 
 ### Editor de la tienda (`/editor`)
@@ -135,7 +135,10 @@ Actualizado el 1 de octubre de 2026.
 - Portada armada con bloques, catálogo con filtros, búsqueda y orden, ficha de producto
   con galería y sugerencias.
 - Filtro de segunda mano, reacondicionado y ofertas.
-- Carrito en el navegador y checkout con nombre, WhatsApp y correo opcional.
+- **Carrito que manda el pedido por WhatsApp**: quien compra ve sus productos y el total,
+  y un botón abre el chat con la tienda y el pedido escrito —líneas, total y número—. No
+  deja ningún dato. El pedido queda en el panel; al volver del chat ve su número y puede
+  reabrirlo.
 - Pantallas de carga, error y "no encontrado".
 - Enlace propio por tienda, con subdominio listo detrás de un interruptor
   (`NEXT_PUBLIC_DOMINIO_TIENDAS`).
@@ -147,15 +150,14 @@ Actualizado el 1 de octubre de 2026.
   su sello. Cada sección en su panel: **Para hoy** (lo que espera respuesta, con los
   mismos números de la barra), **Primeros pasos** mientras falten, **Cómo te va** (cifras
   contra el período anterior y un gráfico de 7, 30 o 90 días que se recorre con el dedo o
-  el teclado), **Últimos pedidos** con WhatsApp directo, **Lo que más se vende**, **Se
-  está acabando** y **Tu red**. Compartir la tienda abre el enlace, el QR para descargar y
+  el teclado), **Últimos pedidos**, **Lo que más se vende** y **Se está acabando**.
+  Si la tienda no tiene WhatsApp, es lo primero que pide. Compartir la tienda abre el enlace, el QR para descargar y
   un mensaje listo para WhatsApp.
 - **Productos**: alta y edición con fotos, stock, umbral de aviso, condición, precio
   anterior, código y destacado. Categorías propias.
-- **Pedidos**: lista, detalle, cambio de estado, comprobante, y un botón que abre WhatsApp
-  con el pedido ya armado.
-- **Vendedores**: la red con lo que vendió cada uno y su comisión, aprobar o rechazar
-  solicitudes, y la invitación.
+- **Pedidos**: lista y detalle con el mismo número que llegó por WhatsApp. Tres estados:
+  pendiente, pagado y cancelado. Marcar pagado descuenta el stock; cancelar un pagado lo
+  devuelve.
 - **Estadísticas**: preguntas en lenguaje natural, gráficos guardados, edición del gráfico
   por texto e informe en PDF (completo o de un gráfico).
 - **Apariencia**: la puerta al editor, la plantilla, cambiarla y el historial, con
@@ -166,19 +168,11 @@ Actualizado el 1 de octubre de 2026.
 - Barra lateral con contadores de lo que pide atención; se puede plegar y recuerda cómo
   quedó.
 
-### Vendedores
-
-- Panel del vendedor (`/vendedor`) con sus tiendas, ventas y comisiones.
-- Vitrinas para buscar tiendas y productos (`/explorar`).
-- Enlace de referido por tienda: la venta se le atribuye aunque el comprador navegue sin
-  el código.
-- Comisión congelada al momento de la venta, una por pedido.
-- Perfil público con historial laboral verificable (`/v/{slug}`).
-
 ### Base y seguridad
 
 - Supabase con RLS en todas las tablas y borrado lógico.
-- El pedido solo se crea en el servidor (`create_order`), que recalcula los precios.
+- El pedido solo se crea en el servidor (`create_order`), que recalcula los precios y
+  comprueba el stock. El stock lo mueve un disparador al cambiar de estado.
 - La IA de estadísticas solo lee, en una transacción de solo lectura y contra vistas de la
   propia tienda.
 - Modo demo que funciona sin credenciales.
@@ -198,30 +192,26 @@ Actualizado el 1 de octubre de 2026.
 
 ## Lo que falta
 
-### 1. El cobro con PagoFácil y la custodia — prioridad alta
+### 1. Aplicar la migración de la compra por WhatsApp — antes de publicar
 
-Es lo que más cambia el producto. El modelo está decidido y documentado en `VENDUO.md` §5,
-pero **lo que está construido es provisorio**: el comprador transfiere al QR del comercio,
-sube una captura y el emprendedor confirma a mano. El dinero va directo, sin custodia.
+`supabase/migrations/20261006120000_compra_por_whatsapp.sql` cambia producción:
 
-Falta:
+- Borra `store_sellers`, `commissions`, `seller_profiles` y `store_invites`, sus
+  funciones y sus columnas en `stores`, `products`, `orders` y `profiles`. **No se
+  recupera**: se pierden los vínculos, las comisiones y los perfiles de vendedor de la
+  demostración.
+- Deja los estados del pedido en `pendiente`, `pagado` y `cancelado`: los enviados,
+  entregados y en disputa pasan a pagados.
+- Devuelve el stock de los pedidos pendientes, porque desde ahora el stock baja al pagar.
+- `create_order` pasa a recibir solo la tienda y los productos, y `create_store` exige el
+  WhatsApp.
 
-- La pasarela simulada de PagoFácil: cobrar, retener, liberar y devolver.
-- Estados nuevos del pedido: marca de enviado, confirmación de recibido por el comprador y
-  `en_disputa`, con sus columnas (`shipped_at`, `delivered_at`, `release_due_at`…).
-- Cambiar el disparador de comisiones: hoy nace `confirmada` al pagar; tiene que nacer
-  `pendiente` y confirmarse en la entrega.
-- Pantalla de seguimiento del pedido para el comprador, con "lo recibí" y "tengo un
-  problema".
-- Liberación automática pasado un plazo.
-- Retirar el QR y el comprobante, y actualizar el texto de "Cómo te pagan" en `/cuenta`.
+Pasos: `npx supabase db push`, `npm run db:types` (tiene que dar el mismo
+`types/database.ts` que va en el commit) y recién entonces publicar el código. Entre
+uno y otro, el código viejo falla contra la base nueva: conviene hacerlos seguidos.
 
-**Decisiones pendientes antes de construirlo:**
-
-- Con PagoFácil: si admite retener y liberar por orden de Venduo, si puede pagarle al
-  vendedor como tercero y qué identificación le exige.
-- Del producto: el plazo de liberación automática (se propone 7 días) y qué pasa si el
-  emprendedor nunca marca el envío.
+Las tiendas de la demostración que no tengan WhatsApp no reciben pedidos hasta cargarlo
+en `/cuenta`.
 
 ### 2. Marketing — prioridad media
 
@@ -256,6 +246,10 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 - **`generateStoreBlueprint` sigue sin usarse**: inventa una tienda entera, con slug y
   productos. "Que la IA escriba tu portada" se resolvió con la tarea del editor.
 
+- **Pedidos pendientes que nunca se concretan.** Cada toque al botón deja un pedido
+  pendiente aunque no se mande el mensaje. No retienen stock, pero se acumulan: la tienda
+  los cancela a mano. Si molestan, se puede cancelar solo lo pendiente después de un
+  plazo.
 - **Fotos en los datos de ejemplo.** Casi ningún producto tiene foto, y las plantillas se
   lucen con ellas. Importante antes de la demostración.
 - **Textos de ejemplo visibles** en tiendas con plantillas retiradas (p. ej. "Cuenta aquí
@@ -266,7 +260,7 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
   y se acuerda antes.
 - **Un pack del catálogo no se compra como pack** en la tienda online: su precio se
   muestra en el PDF y la venta se arma por WhatsApp. Venderlo como pack toca
-  `create_order` y la comisión.
+  `create_order`.
 - **Canva directo**: crear la integración en el portal de desarrolladores de Canva,
   cargar `CANVA_CLIENT_ID` y `CANVA_CLIENT_SECRET` en Vercel y pedirle a Canva la
   revisión, sin la cual no la puede autorizar cualquier cuenta. Mientras tanto, "Editar
@@ -279,12 +273,13 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
   para texto chico.
 - **Avisos de Next.js** por `quality="90"` en imágenes de la portada: hace falta
   configurar `images.qualities` antes de pasar a Next 16.
-- 189 avisos de lint, casi todos en los scripts de la skill `impeccable`.
+- Avisos de lint en los scripts de la skill `impeccable`, que es de terceros.
 
 ---
 
 ## Fuera de alcance
 
-No se construye, según `VENDUO.md` §7: multi-tienda por usuario, gestión de envíos,
-recibir o guardar el dinero de una venta, cobro de la suscripción, notificaciones por
-correo, app móvil nativa y tests automatizados.
+No se construye, según `VENDUO.md` §7: multi-tienda por usuario, red de vendedores y
+comisiones, gestión de envíos, cobrar dentro de la plataforma, pedirle datos a quien
+compra, cobro de la suscripción, notificaciones por correo, app móvil nativa y tests
+automatizados.

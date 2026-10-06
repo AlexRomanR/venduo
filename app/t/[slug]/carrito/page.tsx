@@ -9,10 +9,10 @@ import { crearPedido, type PedidoInput } from "../acciones"
 export const metadata = { title: "Tu carrito" }
 
 /**
- * El carrito y el checkout.
+ * El carrito, y el pedido que sale por WhatsApp.
  *
- * El marco y el título son de la plantilla; el formulario es el mismo en todas,
- * porque lo que pide —quién eres y cómo te contactan— no cambia con el rubro.
+ * El marco y el título son de la plantilla; el carrito es el mismo en todas,
+ * porque lo que hace —mostrar el pedido y mandarlo— no cambia con el rubro.
  * Toma la identidad de los tokens, y cómo se ordena lo elige la tienda.
  */
 export default async function CarritoPage({
@@ -36,12 +36,7 @@ export default async function CarritoPage({
 
   return (
     <>
-      <kit.Cabecera
-        marco={marco}
-        referido={null}
-        codigo={null}
-        enlaceDelCarrito={false}
-      />
+      <kit.Cabecera marco={marco} enlaceDelCarrito={false} />
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:py-14">
         <kit.Encabezado titulo="Tu pedido" />
@@ -50,6 +45,8 @@ export default async function CarritoPage({
           <Checkout
             slug={slug}
             nombreTienda={tienda.nombre}
+            whatsapp={tienda.whatsapp}
+            demo={tienda.esDemo}
             crear={pedir}
             opciones={tienda.apariencia.carrito}
             sugeridos={
@@ -61,7 +58,7 @@ export default async function CarritoPage({
         </div>
       </main>
 
-      <kit.Pie marco={marco} codigo={null} />
+      <kit.Pie marco={marco} />
     </>
   )
 }

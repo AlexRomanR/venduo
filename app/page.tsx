@@ -11,7 +11,7 @@ import { Logo } from "@/components/marca/logo"
 export const metadata = {
   title: "Venduo — tu tienda online, y todo lo que hay detrás",
   description:
-    "Para quien vende por TikTok, Instagram y WhatsApp: tu tienda online con stock al día, cobros con PagoFácil, pedidos ordenados y catálogos en PDF.",
+    "Para quien vende por TikTok, Instagram y WhatsApp: tu tienda online con stock al día, pedidos que llegan a tu WhatsApp y catálogos en PDF.",
   // La tarjeta va acá y no en la raíz: una tienda sin logo la heredaría, y
   // su enlace por WhatsApp mostraría a Venduo en vez de la tienda.
   metadataBase: new URL(getSiteUrl()),
@@ -32,8 +32,8 @@ export const metadata = {
  * Le habla a quien ya vende por redes y no se levanta pensando "necesito una
  * página web": se levanta respondiendo "¿precio?" por mensaje directo. Por eso
  * la tienda online aparece como lo que es —la vitrina del enlace en la bio— y
- * el resto de la página cuenta lo que hay detrás: stock, cobros, pedidos,
- * vendedores y catálogos. El tono para escribirle está en `ui-styling.md`,
+ * el resto de la página cuenta lo que hay detrás: stock, pedidos por WhatsApp,
+ * estadísticas y catálogos. El tono para escribirle está en `ui-styling.md`,
  * "Cómo le hablamos al cliente".
  *
  * Los ejemplos son ilustrativos y lo dicen al pie.
@@ -50,7 +50,7 @@ const DOLORES = [
   "Me preguntan el precio cincuenta veces al día por mensaje.",
   "Vendí algo que ya no tenía.",
   "No sé cuánto me queda de cada talla.",
-  "Me pagan por QR y reviso capturas una por una.",
+  "Los pedidos se me pierden entre tantos mensajes.",
   "Mando fotos sueltas por WhatsApp y se ve desordenado.",
 ]
 
@@ -68,16 +68,10 @@ const COMPARACION = [
     venduo: "Baja solo con cada venta y te avisa antes de que se acabe.",
   },
   {
-    tema: "Los cobros",
-    comun: "Revisas capturas de transferencia una por una.",
-    venduo:
-      "Cobras con PagoFácil, y el dinero queda protegido hasta que llega el pedido.",
-  },
-  {
     tema: "Los pedidos",
     comun: "Te llegan sueltos, mezclados con el resto del chat.",
     venduo:
-      "Llegan ordenados, con los datos de quien compra y el WhatsApp listo para coordinar.",
+      "Llegan a tu WhatsApp con la lista de productos, el total y su número, y quedan en tu panel.",
   },
   {
     tema: "Para mandar",
@@ -86,9 +80,9 @@ const COMPARACION = [
       "Catálogos en PDF con tus productos, tus colores y tus precios de hoy.",
   },
   {
-    tema: "Quién vende",
-    comun: "Solo tú.",
-    venduo: "Una red de vendedores que cobra comisión solo si vende.",
+    tema: "Tus números",
+    comun: "No sabes cuánto vendiste el mes pasado.",
+    venduo: "Le preguntas «¿qué se vendió más?» y te responde con un gráfico.",
   },
 ]
 
@@ -107,9 +101,9 @@ const PASOS = [
   },
   {
     n: "03",
-    titulo: "Los pedidos llegan pagados",
+    titulo: "Los pedidos llegan a tu WhatsApp",
     detalle:
-      "Pagan con PagoFácil, el stock se descuenta solo y tú coordinas la entrega por WhatsApp.",
+      "Tu cliente arma su carrito y te lo manda con el total. Cuando te paga, lo marcas y el stock se descuenta solo.",
   },
 ]
 
@@ -125,14 +119,9 @@ const INCLUYE = [
       "Cada venta descuenta del inventario. Te avisa lo que se está acabando y nadie compra lo que ya no tienes.",
   },
   {
-    titulo: "Cobro con PagoFácil",
+    titulo: "Pedidos por WhatsApp",
     detalle:
-      "Quien compra paga en línea y el dinero queda en custodia hasta la entrega. Confía más, y tú no revisas capturas.",
-  },
-  {
-    titulo: "Pedidos con WhatsApp",
-    detalle:
-      "Cada pedido trae quién compró, qué y cuánto, con el mensaje para coordinar la entrega ya escrito.",
+      "Quien compra no llena formularios: toca un botón y te escribe con su pedido, el total y su número ya armados.",
   },
   {
     titulo: "Catálogos en PDF",
@@ -141,9 +130,9 @@ const INCLUYE = [
     nuevo: true,
   },
   {
-    titulo: "Red de vendedores",
+    titulo: "Tu negocio en un panel",
     detalle:
-      "Otros venden tus productos con su propio enlace. La comisión se calcula sola y solo se paga si venden.",
+      "Pedidos, productos y ventas de un vistazo, con lo que pide tu atención primero. En el celular o en la computadora.",
   },
   {
     titulo: "Estadísticas en tus palabras",
@@ -165,15 +154,19 @@ const RUBROS = [
 const PREGUNTAS = [
   {
     p: "¿Es una tienda online?",
-    r: "Sí, y más que eso. Tienes tu tienda online con tu enlace, y detrás el stock, los cobros, los pedidos, los vendedores y los catálogos en PDF. Todo se maneja desde el celular.",
+    r: "Sí, y más que eso. Tienes tu tienda online con tu enlace, y detrás el stock, los pedidos, las estadísticas y los catálogos en PDF. Todo se maneja desde el celular.",
   },
   {
     p: "Ya vendo por TikTok y WhatsApp. ¿Tengo que dejar de hacerlo?",
-    r: "No. Sigues vendiendo donde ya te conocen. Venduo pone el enlace en tu bio y en tus chats, y lo que pasa después —el pago, el stock, el pedido— se ordena solo.",
+    r: "No. Sigues vendiendo donde ya te conocen. Venduo pone el enlace en tu bio y en tus chats, y lo que pasa después —el pedido, el stock, los números— se ordena solo.",
+  },
+  {
+    p: "¿Mi cliente tiene que crear una cuenta?",
+    r: "No, ni llenar un formulario. Elige sus productos, toca «Enviar pedido por WhatsApp» y te escribe con todo armado: qué quiere, cuánto es y el número del pedido.",
   },
   {
     p: "¿Cómo me pagan mis clientes?",
-    r: "Con PagoFácil. El dinero queda retenido hasta que el pedido llega, así quien compra no tiene miedo de pagarle a una cuenta de redes, y tú no tienes que revisar comprobantes.",
+    r: "Como ya te pagan: por QR, transferencia o en efectivo. Lo acuerdan en el mismo chat del pedido. Cuando te pagan, lo marcas en tu panel y el stock se descuenta solo.",
   },
   {
     p: "¿Qué es el catálogo en PDF?",
@@ -186,10 +179,6 @@ const PREGUNTAS = [
   {
     p: "¿Cuánto cuesta?",
     r: "Abrir tu tienda y probar todo no cuesta nada. Los planes llegan después, y Venduo no se queda con comisión de tus ventas.",
-  },
-  {
-    p: "¿Qué gana el vendedor?",
-    r: "La comisión que define cada tienda, y un historial con su nombre que puede mostrar cuando busque trabajo. El vendedor no paga nada, nunca.",
   },
 ]
 
@@ -211,8 +200,8 @@ export default async function Inicio() {
             <a href="#incluye" className="opacity-70 hover:opacity-100">
               Qué incluye
             </a>
-            <a href="#vendedores" className="opacity-70 hover:opacity-100">
-              Vendedores
+            <a href="#pedidos" className="opacity-70 hover:opacity-100">
+              Pedidos
             </a>
             <a href="#preguntas" className="opacity-70 hover:opacity-100">
               Preguntas
@@ -231,7 +220,7 @@ export default async function Inicio() {
           )}
 
           <Link
-            href={user ? "/auth/destino" : "/login?rol=emprendedor"}
+            href={user ? "/auth/destino" : "/login?modo=registro"}
             className="flex min-h-11 items-center rounded-sm bg-senal px-4 text-sm font-semibold text-white transition-colors hover:bg-senal-alta"
           >
             {user ? "Ir a mi panel" : "Crear mi tienda"}
@@ -253,21 +242,15 @@ export default async function Inicio() {
               <p className="mt-6 max-w-[52ch] text-lg leading-relaxed opacity-70">
                 Ya vendes por TikTok, Instagram y WhatsApp. Venduo te da la
                 tienda online para el enlace de tu bio y el sistema que la
-                maneja: el stock al día, los cobros con PagoFácil, los pedidos
-                ordenados y catálogos en PDF para mandar.
+                maneja: el stock al día, los pedidos que llegan a tu WhatsApp y
+                catálogos en PDF para mandar.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
-                  href="/login?rol=emprendedor"
+                  href="/login?modo=registro"
                   className="rounded-sm bg-senal px-5 py-3 font-semibold text-white transition-colors hover:bg-senal-alta"
                 >
                   Crear mi tienda
-                </Link>
-                <Link
-                  href="/login?rol=vendedor"
-                  className="rounded-sm border-2 border-tinta px-5 py-3 font-semibold transition-colors hover:bg-tinta hover:text-white"
-                >
-                  Quiero vender
                 </Link>
               </div>
               <p className="mt-4 text-sm opacity-70">
@@ -477,43 +460,32 @@ export default async function Inicio() {
           </div>
         </section>
 
-        {/* El bloque rojo: la red de vendedores y la tesis del proyecto. */}
+        {/* El bloque rojo: cómo compra tu cliente, que es lo que se ve distinto. */}
         <section
-          id="vendedores"
+          id="pedidos"
           className="campo-senal scroll-mt-20 bg-senal text-white"
         >
           <div className="mx-auto max-w-6xl px-5 py-20 sm:py-24">
             <p className="text-xs font-semibold tracking-[0.12em] text-white/80 uppercase">
-              Red de vendedores
+              Pedidos por WhatsApp
             </p>
             <h2 className="mt-5 max-w-[18ch] font-titular text-[clamp(2rem,6vw,3.5rem)] leading-[1.02] font-extrabold tracking-[-0.03em] text-balance">
-              Otros venden tus productos, y cobran solo si venden.
+              Tu cliente arma el carrito. El pedido te llega por WhatsApp.
             </h2>
             <p className="mt-8 max-w-[52ch] text-lg leading-relaxed text-white/90">
-              Cada vendedor tiene su enlace y su código. Cuando alguien compra
-              por ahí, la comisión se calcula sola y no te cuesta nada más. Para
-              el vendedor, cada venta queda registrada con su nombre: siete de
-              cada diez jóvenes que trabajan en Bolivia no tienen nada que lo
-              demuestre, y esto es su primer historial laboral.
+              Sin formularios ni cuentas: quien compra elige, ve el total y toca
+              un botón. Te escribe con la lista de productos y el número del
+              pedido, y lo cierran en el mismo chat donde ya le vendías. El
+              pedido queda en tu panel, y cuando te paga, el stock baja solo.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link
-                href="/login?rol=vendedor"
-                className="inline-block rounded-sm border-2 border-white px-5 py-3 font-semibold transition-colors hover:bg-white hover:text-senal"
-              >
-                Sumarme como vendedor
-              </Link>
-              <Link
-                href="/login?rol=emprendedor"
+                href="/login?modo=registro"
                 className="inline-block rounded-sm bg-white px-5 py-3 font-semibold text-senal transition-colors hover:bg-white/90"
               >
-                Abrir mi tienda con vendedores
+                Abrir mi tienda
               </Link>
             </div>
-            <p className="mt-8 max-w-[60ch] text-xs leading-relaxed text-white/75">
-              Estimación propia de Venduo sobre empleo juvenil urbano; el dato
-              oficial varía según la fuente y el año.
-            </p>
           </div>
         </section>
 
@@ -559,16 +531,10 @@ export default async function Inicio() {
             </h2>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link
-                href="/login?rol=emprendedor"
+                href="/login?modo=registro"
                 className="rounded-sm bg-senal px-5 py-3 font-semibold text-white transition-colors hover:bg-senal-alta"
               >
                 Crear mi tienda gratis
-              </Link>
-              <Link
-                href="/login?rol=vendedor"
-                className="rounded-sm border-2 border-tinta px-5 py-3 font-semibold transition-colors hover:bg-tinta hover:text-white"
-              >
-                Sumarme como vendedor
               </Link>
             </div>
 

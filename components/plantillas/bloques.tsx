@@ -17,12 +17,10 @@ import type { KitDeTienda } from "@/components/plantillas/kit"
 export function Bloques({
   componentes,
   tienda,
-  codigo,
   omitir = [],
 }: {
   componentes: KitDeTienda["bloques"]
   tienda: TiendaPublica
-  codigo: string | null
   /** Tipos que la portada del kit ya resuelve por su cuenta. */
   omitir?: TipoDeBloque[]
 }) {
@@ -33,12 +31,7 @@ export function Bloques({
 
     const Componente = componentes[bloque.tipo]
     const dibujado = (
-      <Componente
-        key={bloque.id}
-        bloque={bloque}
-        tienda={tienda}
-        codigo={codigo}
-      />
+      <Componente key={bloque.id} bloque={bloque} tienda={tienda} />
     )
 
     return tienda.enEdicion ? (

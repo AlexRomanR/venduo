@@ -21,8 +21,8 @@ cuando el esquema no da lo que se supuso.
    preguntar.
 2. **¿Ya existe?** Buscar en `lib/` antes de escribir. Formato de moneda, slugs, QR,
    clientes de Supabase y validación ya están resueltos.
-3. **¿Qué rol la usa?** Emprendedor en `/panel`, vendedor en `/vendedor`, o pública en
-   `/t/{slug}` y `/v/{slug}`. Eso decide dónde vive y qué política RLS la cubre.
+3. **¿Quién la usa?** El emprendedor en `/panel`, o quien compra en la tienda pública,
+   `/t/{slug}`. Eso decide dónde vive y qué política RLS la cubre.
 
 ---
 
@@ -30,7 +30,7 @@ cuando el esquema no da lo que se supuso.
 
 Si hace falta tabla o columna nueva, seguir la skill `database-migration`. En resumen:
 migración con marca de tiempo, SQL idempotente, RLS en su propio archivo, `store_id` en
-toda tabla de negocio, `deleted_at` salvo en `orders`, `order_items` y `commissions`.
+toda tabla de negocio, `deleted_at` salvo en `orders` y `order_items`.
 
 ```bash
 npx supabase db push
@@ -88,7 +88,7 @@ Lo que se repite en todas:
   fila es un viaje más que la pantalla espera. Todo esto está en `performance.md`.
 
 Las escrituras sensibles no van acá: el checkout pasa por `create_order`, el alta de
-vendedor por `join_store`. Ver la skill `sales-and-commissions`.
+tienda por `create_store`. Ver la skill `pedidos-por-whatsapp`.
 
 ---
 
@@ -101,7 +101,7 @@ Formularios con `react-hook-form` y `zodResolver`, con el esquema en `lib/valida
 compartido entre el formulario y lo que lo procesa.
 
 Escribir los tres estados: con datos, vacío y cargando. Una tienda recién creada y un
-vendedor sin ventas son el estado normal durante la demostración.
+catálogo sin productos son el estado normal durante la demostración.
 
 **Una pantalla del panel se arma con las piezas de `components/panel/piezas.tsx`**:
 `Cabecera` arriba y una columna de `Seccion`, cada una con su ícono, un título que dice
@@ -135,11 +135,11 @@ demo. La skill `qa-verification` tiene la lista completa.
 
 ## Errores que ya nos pasaron
 
-| Error                                  | Qué produce                                            |
-| -------------------------------------- | ------------------------------------------------------ |
-| Insertar en `orders` desde el cliente  | Falla en silencio: no hay política de INSERT           |
-| Olvidar `.is("deleted_at", null)`      | Aparecen filas borradas en la tienda pública           |
-| Recalcular la comisión al mostrarla    | Reescribe el historial cuando la tienda cambia su tasa |
-| Editar `types/database.ts` a mano      | El próximo `db:types` lo borra                         |
-| Dividir por 100 en el JSX              | Rompe cuando la moneda cambie de formato               |
-| Usar `primary_role` para permitir algo | Los permisos los decide RLS, no el perfil              |
+| Error                                  | Qué produce                                           |
+| -------------------------------------- | ----------------------------------------------------- |
+| Insertar en `orders` desde el cliente  | Falla en silencio: no hay política de INSERT          |
+| Olvidar `.is("deleted_at", null)`      | Aparecen filas borradas en la tienda pública          |
+| Ajustar `products.stock` a mano        | Stock inventado el día que alguien cambia dos estados |
+| Editar `types/database.ts` a mano      | El próximo `db:types` lo borra                        |
+| Dividir por 100 en el JSX              | Rompe cuando la moneda cambie de formato              |
+| Usar `primary_role` para permitir algo | Los permisos los decide RLS, no el perfil             |

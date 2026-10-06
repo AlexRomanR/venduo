@@ -30,12 +30,12 @@ import type { KitDeTienda, PropsBloque } from "@/components/plantillas/kit"
  * sola prenda por pantalla obliga a desplazarse demasiado para comparar.
  */
 
-function Portada({ bloque, tienda, codigo }: PropsBloque) {
+function Portada({ bloque, tienda }: PropsBloque) {
   const foto = fotoDePortada(bloque, tienda)
   const titulo = texto(bloque, "title") ?? tienda.nombre
   const bajada = texto(bloque, "subtitle")
   const accion = accionDePortada(bloque) ?? "Ver la colección"
-  const catalogo = rutaDeTienda(tienda.slug, "/catalogo", { ref: codigo })
+  const catalogo = rutaDeTienda(tienda.slug, "/catalogo")
 
   // Sin ninguna foto en la tienda, la portada es tipográfica. Un recuadro gris
   // con texto encima se lee como una imagen que no cargó.
@@ -131,7 +131,7 @@ function BotonDePortada({
   )
 }
 
-function Categorias({ bloque, tienda, codigo }: PropsBloque) {
+function Categorias({ bloque, tienda }: PropsBloque) {
   const categorias = categoriasConFoto(tienda, numero(bloque, "limit") ?? 6)
   if (categorias.length === 0) return null
 
@@ -141,7 +141,7 @@ function Categorias({ bloque, tienda, codigo }: PropsBloque) {
         titulo={texto(bloque, "title") ?? "Compra por categoría"}
         enlace={{
           etiqueta: "Ver todo",
-          href: rutaDeTienda(tienda.slug, "/catalogo", { ref: codigo }),
+          href: rutaDeTienda(tienda.slug, "/catalogo"),
         }}
       />
 
@@ -156,7 +156,6 @@ function Categorias({ bloque, tienda, codigo }: PropsBloque) {
             <Link
               href={rutaDeTienda(tienda.slug, "/catalogo", {
                 categoria: categoria.id,
-                ref: codigo,
               })}
               // Sin foto, el recuadro es negro y la categoría se lee como un
               // rótulo: un gris vacío parecía una imagen que no cargó.
@@ -205,7 +204,7 @@ function Categorias({ bloque, tienda, codigo }: PropsBloque) {
   )
 }
 
-function Grilla({ bloque, tienda, codigo }: PropsBloque) {
+function Grilla({ bloque, tienda }: PropsBloque) {
   const productos = productosDeGrilla(bloque, tienda.productos)
   if (productos.length === 0) return null
 
@@ -220,7 +219,6 @@ function Grilla({ bloque, tienda, codigo }: PropsBloque) {
           etiqueta: "Ver todo",
           href: rutaDeTienda(tienda.slug, "/catalogo", {
             condicion: filtroDeGrilla(bloque).condicion,
-            ref: codigo,
           }),
         }}
       />
@@ -232,12 +230,7 @@ function Grilla({ bloque, tienda, codigo }: PropsBloque) {
         )}
       >
         {productos.map((producto) => (
-          <Tarjeta
-            key={producto.id}
-            producto={producto}
-            tienda={tienda}
-            codigo={codigo}
-          />
+          <Tarjeta key={producto.id} producto={producto} tienda={tienda} />
         ))}
       </div>
     </section>
@@ -325,7 +318,7 @@ function Preguntas({ bloque }: PropsBloque) {
   )
 }
 
-function Cierre({ bloque, tienda, codigo }: PropsBloque) {
+function Cierre({ bloque, tienda }: PropsBloque) {
   const titulo = texto(bloque, "title")
   if (!titulo) return null
 
@@ -343,7 +336,7 @@ function Cierre({ bloque, tienda, codigo }: PropsBloque) {
           ) : null}
         </div>
         <Link
-          href={rutaDeTienda(tienda.slug, "/catalogo", { ref: codigo })}
+          href={rutaDeTienda(tienda.slug, "/catalogo")}
           className="inline-flex min-h-12 shrink-0 items-center gap-3 rounded-plantilla bg-papel px-7 text-xs font-semibold tracking-[0.16em] text-tinta uppercase transition-colors hover:bg-senal hover:text-white"
         >
           {texto(bloque, "buttonLabel") ?? "Ver la colección"}

@@ -35,7 +35,7 @@ import { FiltrosTienda } from "@/components/tienda/filtros"
  * los bloques son la cara del negocio, y el catálogo es lo que la gente vino a
  * usar. Por eso está siempre, aunque la plantilla no traiga ninguna grilla.
  */
-export function Inicio({ tienda, codigo, filtros }: PropsInicio) {
+export function Inicio({ tienda, filtros }: PropsInicio) {
   const catalogo = filtrarCatalogo(tienda.productos, {
     categoria: filtros.categoria,
     condicion: filtros.condicion,
@@ -63,7 +63,6 @@ export function Inicio({ tienda, codigo, filtros }: PropsInicio) {
         <Bloques
           componentes={BLOQUES_CLASICOS}
           tienda={tienda}
-          codigo={codigo}
           omitir={["product_grid"]}
         />
       )}
@@ -71,7 +70,7 @@ export function Inicio({ tienda, codigo, filtros }: PropsInicio) {
       <ParteFija
         tienda={tienda}
         nombre="Sobre la tienda"
-        ayuda="Tu descripción, cuántos productos tienes y cómo se entrega. La descripción se cambia en Cuenta, desde tu panel."
+        ayuda="Tu descripción, cuántos productos tienes y cómo se hacen los pedidos. La descripción se cambia en Cuenta, desde tu panel."
       >
         <DatosDeLaTienda
           tienda={tienda}
@@ -107,11 +106,7 @@ export function Inicio({ tienda, codigo, filtros }: PropsInicio) {
               />
             </div>
 
-            <GrillaDelCatalogo
-              tienda={tienda}
-              codigo={codigo}
-              productos={catalogo}
-            />
+            <GrillaDelCatalogo tienda={tienda} productos={catalogo} />
           </div>
         </section>
       </ParteFija>
@@ -121,11 +116,9 @@ export function Inicio({ tienda, codigo, filtros }: PropsInicio) {
 
 function GrillaDelCatalogo({
   tienda,
-  codigo,
   productos,
 }: {
   tienda: TiendaPublica
-  codigo: string | null
   productos: TiendaPublica["productos"]
 }) {
   if (productos.length === 0) {
@@ -146,12 +139,7 @@ function GrillaDelCatalogo({
       )}
     >
       {productos.map((producto) => (
-        <Tarjeta
-          key={producto.id}
-          producto={producto}
-          tienda={tienda}
-          codigo={codigo}
-        />
+        <Tarjeta key={producto.id} producto={producto} tienda={tienda} />
       ))}
     </div>
   )
@@ -208,30 +196,12 @@ function DatosDeLaTienda({
 
             <div>
               <dt className="text-xs font-semibold tracking-[0.12em] uppercase opacity-45">
-                Entrega
+                Pedidos
               </dt>
               <dd className="mt-1 text-sm leading-snug">
-                Coordinada por WhatsApp
+                Por WhatsApp, directo con la tienda
               </dd>
             </div>
-
-            {tienda.aceptaVendedores && tienda.comisionBps > 0 ? (
-              <div className="col-span-2 border-t border-tinta/15 pt-4">
-                <dt className="text-xs font-semibold tracking-[0.12em] uppercase opacity-45">
-                  ¿Quieres vender lo nuestro?
-                </dt>
-                <dd className="mt-1 text-sm leading-relaxed opacity-70">
-                  Esta tienda paga {(tienda.comisionBps / 100).toFixed(0)}% por
-                  cada venta que traigas.{" "}
-                  <Link
-                    href="/sumarme"
-                    className="inline-flex min-h-11 items-center font-semibold text-senal underline-offset-4 hover:underline"
-                  >
-                    Súmate
-                  </Link>
-                </dd>
-              </div>
-            ) : null}
           </dl>
         </div>
       </div>
@@ -239,12 +209,7 @@ function DatosDeLaTienda({
   )
 }
 
-export function Catalogo({
-  tienda,
-  codigo,
-  filtros,
-  productos,
-}: PropsCatalogo) {
+export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
   const categoria = tienda.categorias.find((c) => c.id === filtros.categoria)
   const usados = tienda.productos.filter((p) => p.condition !== "nuevo").length
 
@@ -252,7 +217,7 @@ export function Catalogo({
     <section className="py-12 md:py-16">
       <div className="mx-auto w-full max-w-6xl px-5">
         <Link
-          href={rutaDeTienda(tienda.slug, "", { ref: codigo })}
+          href={rutaDeTienda(tienda.slug, "")}
           className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
         >
           <ArrowLeft
@@ -276,17 +241,13 @@ export function Catalogo({
           />
         </div>
 
-        <GrillaDelCatalogo
-          tienda={tienda}
-          codigo={codigo}
-          productos={productos}
-        />
+        <GrillaDelCatalogo tienda={tienda} productos={productos} />
       </div>
     </section>
   )
 }
 
-export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
+export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
   const { ficha } = tienda.apariencia
   const vitrina = ficha.diseno === "vitrina"
   const consulta = enlaceDeConsulta(tienda, producto)
@@ -295,7 +256,7 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-10 md:py-14">
       <Link
-        href={rutaDeTienda(tienda.slug, "", { ref: codigo })}
+        href={rutaDeTienda(tienda.slug, "")}
         className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
       >
         <ArrowLeft
@@ -459,12 +420,7 @@ export function Ficha({ tienda, producto, codigo, relacionados }: PropsFicha) {
           </h2>
           <div className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
             {relacionados.map((otro) => (
-              <Tarjeta
-                key={otro.id}
-                producto={otro}
-                tienda={tienda}
-                codigo={codigo}
-              />
+              <Tarjeta key={otro.id} producto={otro} tienda={tienda} />
             ))}
           </div>
         </section>

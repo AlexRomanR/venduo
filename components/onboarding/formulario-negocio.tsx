@@ -1,19 +1,15 @@
 "use client"
 
-import * as React from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-import { formatMoney, formatPercent } from "@/lib/format"
 import { createClient } from "@/lib/supabase/client"
-import { cn } from "@/lib/utils"
 import {
-  COMISION_MAXIMA_BPS,
-  COMISIONES,
   crearTiendaSchema,
+  soloCifras,
   type CrearTiendaInput,
 } from "@/lib/validation/tienda"
 import {
@@ -34,9 +30,6 @@ const ETIQUETA_CAMPO =
 const CAMPO =
   "rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-senal focus-visible:ring-0 aria-invalid:border-senal aria-invalid:ring-0 md:text-base"
 
-/** Venta típica con la que se ilustra la comisión, en centavos. */
-const EJEMPLO_VENTA_CENTS = 20_000
-
 export function FormularioNegocio({ plantilla }: { plantilla: string }) {
   const router = useRouter()
 
@@ -45,16 +38,9 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
     defaultValues: {
       nombre: "",
       descripcion: "",
-      // Encendido por defecto: la red de vendedores es la promesa que
-      // distingue a Venduo, y una tienda que nace sin ella la descubre tarde.
-      aceptaVendedores: true,
-      comisionBps: 1000,
+      whatsapp: "",
     },
   })
-
-  const aceptaVendedores = form.watch("aceptaVendedores")
-  const comisionBps = form.watch("comisionBps")
-  const [personalizada, setPersonalizada] = React.useState(false)
 
   async function onSubmit(values: CrearTiendaInput) {
     const supabase = createClient()
@@ -70,8 +56,7 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
       p_name: values.nombre,
       p_description: values.descripcion,
       p_template_key: plantilla,
-      p_sellers: values.aceptaVendedores,
-      p_commission_bps: values.comisionBps,
+      p_whatsapp: soloCifras(values.whatsapp),
     })
 
     if (error) {
@@ -133,7 +118,7 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
                 <Textarea
                   rows={5}
                   className={`min-h-32 resize-y py-3 ${CAMPO}`}
-                  placeholder="Vendo ropa deportiva por TikTok e Instagram: buzos, poleras y zapatillas. Hago envíos en Santa Cruz y coordino por WhatsApp."
+                  placeholder="Vendo ropa deportiva por TikTok e Instagram: buzos, poleras y zapatillas. Atiendo en Santa Cruz y coordino todo por WhatsApp."
                   {...field}
                 />
               </FormControl>
@@ -146,154 +131,32 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
           )}
         />
 
-        <FormItem>
-          <FormLabel className={ETIQUETA_CAMPO}>
-            ¿Quieres que otros vendan tus productos?
-          </FormLabel>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              {
-                valor: true,
-                titulo: "Sí, activar vendedores",
-                detalle: "Ganan comisión por cada venta que traen",
-              },
-              {
-                valor: false,
-                titulo: "Por ahora no",
-                detalle: "Lo puedes activar después",
-              },
-            ].map((opcion) => {
-              const elegida = aceptaVendedores === opcion.valor
-
-              return (
-                <button
-                  key={String(opcion.valor)}
-                  type="button"
-                  onClick={() =>
-                    form.setValue("aceptaVendedores", opcion.valor)
-                  }
-                  aria-pressed={elegida}
-                  className={cn(
-                    "flex min-h-11 flex-col gap-1.5 border p-4 text-left transition-colors duration-200",
-                    elegida
-                      ? "border-tinta bg-tinta text-papel"
-                      : "border-tinta/15 hover:border-tinta"
-                  )}
-                >
-                  <span className="font-titular text-sm leading-tight font-bold tracking-[-0.01em]">
-                    {opcion.titulo}
-                  </span>
-                  <span
-                    className={cn(
-                      "text-xs leading-tight",
-                      elegida ? "text-papel/70" : "opacity-55"
-                    )}
-                  >
-                    {opcion.detalle}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        </FormItem>
-
-        {/* La comisión solo tiene sentido si hay vendedores. Se revela en vez
-            de deshabilitarse: un campo apagado ocupa lugar sin decir nada. */}
-        <div
-          className={cn(
-            "grid transition-all duration-300 ease-out",
-            aceptaVendedores
-              ? "grid-rows-[1fr] opacity-100"
-              : "grid-rows-[0fr] opacity-0"
-          )}
-        >
-          <div className="overflow-hidden">
+        <FormField
+          control={form.control}
+          name="whatsapp"
+          render={({ field }) => (
             <FormItem>
               <FormLabel className={ETIQUETA_CAMPO}>
-                ¿Cuánto les pagas por venta?
+                ¿A qué WhatsApp te escriben?
               </FormLabel>
-              <div className="flex flex-wrap gap-2">
-                {COMISIONES.map((bps) => (
-                  <button
-                    key={bps}
-                    type="button"
-                    onClick={() => {
-                      setPersonalizada(false)
-                      form.setValue("comisionBps", bps)
-                    }}
-                    aria-pressed={!personalizada && comisionBps === bps}
-                    className={cn(
-                      "tabular flex min-h-11 items-center border px-5 font-titular font-bold transition-colors duration-200",
-                      !personalizada && comisionBps === bps
-                        ? "border-senal bg-senal text-white"
-                        : "border-tinta/15 hover:border-tinta"
-                    )}
-                  >
-                    {formatPercent(bps)}
-                  </button>
-                ))}
-
-                <button
-                  type="button"
-                  onClick={() => setPersonalizada(true)}
-                  aria-pressed={personalizada}
-                  className={cn(
-                    "flex min-h-11 items-center border px-5 font-titular font-bold transition-colors duration-200",
-                    personalizada
-                      ? "border-senal bg-senal text-white"
-                      : "border-tinta/15 hover:border-tinta"
-                  )}
-                >
-                  Otro
-                </button>
-              </div>
-
-              {personalizada ? (
-                <div className="mt-3 flex items-center gap-3">
-                  <input
-                    type="number"
-                    inputMode="decimal"
-                    min={0}
-                    max={COMISION_MAXIMA_BPS / 100}
-                    step={0.5}
-                    autoFocus
-                    aria-label="Porcentaje de comisión"
-                    value={comisionBps / 100}
-                    onChange={(e) => {
-                      const pct = Number.parseFloat(e.target.value)
-                      if (Number.isNaN(pct))
-                        return form.setValue("comisionBps", 0)
-                      // A puntos básicos enteros: el sistema nunca guarda
-                      // porcentajes en punto flotante.
-                      form.setValue(
-                        "comisionBps",
-                        Math.min(
-                          Math.max(Math.round(pct * 100), 0),
-                          COMISION_MAXIMA_BPS
-                        )
-                      )
-                    }}
-                    className="tabular h-12 w-28 rounded-none border-0 border-b border-tinta bg-transparent px-0 font-titular text-2xl font-bold outline-none focus:border-senal"
-                  />
-                  <span className="font-titular text-2xl font-bold opacity-40">
-                    %
-                  </span>
-                </div>
-              ) : null}
-
+              <FormControl>
+                <Input
+                  className={`h-12 ${CAMPO}`}
+                  type="tel"
+                  inputMode="tel"
+                  placeholder="700 12345"
+                  autoComplete="tel"
+                  {...field}
+                />
+              </FormControl>
               <FormDescription className="text-xs text-tinta/55">
-                En una venta de {formatMoney(EJEMPLO_VENTA_CENTS)} el vendedor
-                se lleva{" "}
-                <span className="tabular font-semibold text-tinta">
-                  {formatMoney((EJEMPLO_VENTA_CENTS * comisionBps) / 10000)}
-                </span>
-                . Se descuenta de cada venta que traiga y va íntegra para él:
-                Venduo no cobra comisión. Puedes cambiarlo después, pero no
-                afecta a las ventas ya hechas.
+                Cada pedido de tu tienda te llega a este número, con la lista de
+                productos y el total. Lo puedes cambiar después.
               </FormDescription>
+              <FormMessage className="text-sm text-senal" />
             </FormItem>
-          </div>
-        </div>
+          )}
+        />
 
         <button
           type="submit"

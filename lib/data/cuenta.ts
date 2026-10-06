@@ -12,29 +12,11 @@ export interface Cuenta {
     description: string | null
     logoUrl: string | null
     isPublished: boolean
-    sellerNetworkEnabled: boolean
-    commissionBps: number
-    sellerJoinMode: string
     whatsapp: string | null
-    paymentQrUrl: string | null
-    paymentInstructions: string | null
-  } | null
-  vendedor: {
-    slug: string
-    displayName: string
-    city: string | null
-    bio: string | null
-    phone: string | null
   } | null
 }
 
-/**
- * Todo lo editable de una cuenta, en una sola lectura.
- *
- * Trae las tres piezas aunque la persona use una sola: quien tiene tienda y
- * además vende para otras edita las dos identidades en la misma pantalla, y
- * decidir cuál mostrar es de la interfaz, no de la consulta.
- */
+/** Todo lo editable de una cuenta: la persona y su tienda, a la vez. */
 export async function getCuenta(): Promise<Cuenta | null> {
   const supabase = await createClient()
   if (!supabase) return null
@@ -42,7 +24,7 @@ export async function getCuenta(): Promise<Cuenta | null> {
   const user = await getUsuario()
   if (!user) return null
 
-  const [perfilResult, tiendaResult, vendedorResult] = await Promise.all([
+  const [perfilResult, tiendaResult] = await Promise.all([
     supabase
       .from("profiles")
       .select("full_name, avatar_url")
@@ -51,15 +33,9 @@ export async function getCuenta(): Promise<Cuenta | null> {
     supabase
       .from("stores")
       .select(
-        "id, name, slug, tagline, description, logo_url, is_published, seller_network_enabled, commission_bps, seller_join_mode, whatsapp, payment_qr_url, payment_instructions"
+        "id, name, slug, tagline, description, logo_url, is_published, whatsapp"
       )
       .eq("owner_id", user.id)
-      .is("deleted_at", null)
-      .maybeSingle(),
-    supabase
-      .from("seller_profiles")
-      .select("slug, display_name, city, bio, phone")
-      .eq("user_id", user.id)
       .is("deleted_at", null)
       .maybeSingle(),
   ])
@@ -80,21 +56,7 @@ export async function getCuenta(): Promise<Cuenta | null> {
           description: tiendaResult.data.description,
           logoUrl: tiendaResult.data.logo_url,
           isPublished: tiendaResult.data.is_published,
-          sellerNetworkEnabled: tiendaResult.data.seller_network_enabled,
-          commissionBps: tiendaResult.data.commission_bps,
-          sellerJoinMode: tiendaResult.data.seller_join_mode,
           whatsapp: tiendaResult.data.whatsapp,
-          paymentQrUrl: tiendaResult.data.payment_qr_url,
-          paymentInstructions: tiendaResult.data.payment_instructions,
-        }
-      : null,
-    vendedor: vendedorResult.data
-      ? {
-          slug: vendedorResult.data.slug,
-          displayName: vendedorResult.data.display_name,
-          city: vendedorResult.data.city,
-          bio: vendedorResult.data.bio,
-          phone: vendedorResult.data.phone,
         }
       : null,
   }

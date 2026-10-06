@@ -43,7 +43,7 @@ Al crear una nueva tabla de negocio:
 - [ ] ¿Tiene columna `id uuid primary key default gen_random_uuid()`?
 - [ ] Si pertenece a una tienda: ¿tiene `store_id uuid not null references public.stores(id) on delete cascade`?
 - [ ] ¿Tiene marcas de tiempo `created_at timestamptz default now() not null` y `updated_at timestamptz default now() not null`?
-- [ ] ¿Tiene columna de borrado lógico `deleted_at timestamptz default null`? _(Excepto `orders`, `order_items` y `commissions`: un pedido se cancela por estado y una comisión se anula, nunca se borran)_
+- [ ] ¿Tiene columna de borrado lógico `deleted_at timestamptz default null`? _(Excepto `orders` y `order_items`: un pedido se cancela por estado, nunca se borra)_
 - [ ] Si maneja dinero: ¿está en centavos enteros con sufijo `_cents` (`integer` o `bigint`)? NUNCA `float` ni `numeric`.
 - [ ] Si maneja porcentajes: ¿está en puntos básicos enteros con sufijo `_bps` (`integer` de 0 a 10000)?
 - [ ] ¿Tiene índices únicos parciales `where deleted_at is null` para slugs, códigos o pares únicos?
@@ -55,11 +55,10 @@ Al crear una nueva tabla de negocio:
 
 ## Reglas Críticas de RLS y Prevención de Recursión
 
-1. **Evitar Recursión en Vendedores y Tiendas:**
-   - La tabla `store_sellers` no debe consultarse a sí misma dentro de su política RLS.
+1. **Evitar Recursión:**
+   - Una tabla no debe consultarse a sí misma dentro de su política RLS.
    - Utilizar las funciones auxiliares declaradas en `supabase/migrations/20260913090900_funciones.sql`:
      - `public.my_store_id()`: Obtiene la tienda viva del usuario actual.
-     - `public.my_seller_ids()`: Obtiene el arreglo de IDs de vendedor activos del usuario actual.
      - `public.store_is_live(p_store_id)`: Comprueba si la tienda está viva y con suscripción activa.
 2. **Definición Segura de Funciones:**
    - Toda función `security definer` debe fijar explícitamente el `search_path`:

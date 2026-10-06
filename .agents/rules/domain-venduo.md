@@ -3,182 +3,91 @@
 La especificación completa está en `VENDUO.md`. Acá van las que, si se ignoran, producen
 código que parece correcto y no lo es.
 
-## La asimetría que define el modelo
+## Una tienda por emprendedor
 
-> Un emprendedor tiene **una sola tienda**. Un vendedor pertenece a **varias**.
+> Un emprendedor tiene **una sola tienda**.
 
-Lo primero está impuesto en la base con un índice único parcial sobre `owner_id`. Por eso
-`my_store_id()` devuelve un identificador y no una lista, y por eso las consultas del
-emprendedor son una comparación directa.
-
-Lo segundo es donde vive toda la dificultad real: `store_sellers` y `commissions` cruzan
-tenants por naturaleza. Cualquier consulta del panel del vendedor abarca varias tiendas.
+Está impuesto en la base con un índice único parcial sobre `owner_id`. Por eso
+`my_store_id()` devuelve un identificador y no una lista, y por eso toda consulta del
+panel es una comparación directa.
 
 **Multi-tienda por usuario está fuera de alcance.** No escribir código que lo anticipe.
 
-## Comisiones: el congelamiento
-
-El punto más fácil de hacer mal de todo el sistema.
-
-- **La tasa se congela al momento de la venta.** Queda copiada en `orders.commission_bps`
-  y en `commissions.rate_bps`. Cambiar el porcentaje de la tienda después no reescribe la
-  historia: quien vendió con 15% cobra 15%, aunque hoy la tienda pague 10%.
-- `commission_bps` vive en **`stores`**, no en el vínculo del vendedor.
-- **Una comisión por pedido**, garantizado por índice único sobre `order_id`. Sin eso, un
-  pedido que va y vuelve entre estados genera comisiones duplicadas.
-- Ciclo: `pendiente` → `confirmada` → `pagada`, más `anulada`, **atado a la custodia del
-  pago** (ver abajo). Un pedido cancelado **anula** la comisión; nunca la borra.
-- La crea un disparador cuando el pedido pasa a `pagado`. **No insertarla desde código.**
-
-### El estado del pedido mueve la comisión
-
-El pago lo cobra **PagoFácil y lo retiene** hasta que el pedido llega; recién ahí se
-libera y se reparte. El modelo completo está en `VENDUO.md` §5. La comisión sigue a esa
-custodia:
-
-| El pedido pasa a | Qué pasó con el dinero                    | La comisión      |
-| ---------------- | ----------------------------------------- | ---------------- |
-| `pagado`         | PagoFácil lo cobró y lo retiene           | Nace `pendiente` |
-| `enviado`        | Sigue retenido                            | `pendiente`      |
-| `entregado`      | Se ordena liberarlo                       | `confirmada`     |
-| —                | PagoFácil confirmó la transferencia       | `pagada`         |
-| `en_disputa`     | Congelado mientras Venduo revisa          | `pendiente`      |
-| `cancelado`      | Devuelto al comprador, si llegó a pagarse | `anulada`        |
-
-Todo lo que se sigue de un cambio de estado lo hace el disparador
-`handle_order_status_change`, y cancelar además **devuelve el stock** al catálogo. Nunca
-duplicarlo desde la aplicación: escribir en `commissions` o ajustar `products.stock` a mano
-daría comisiones dobles y stock inventado el día que alguien cambie dos veces de estado.
-
-**Una comisión `pendiente` no es trabajo hecho.** El pago puede terminar devuelto, así que
-el historial laboral y lo que el vendedor ve como ganado cuentan solo `confirmada` y
-`pagada`.
-
-> **Hoy el disparador no sigue esta tabla.** Crea la comisión directamente `confirmada` al
-> pasar a `pagado`, porque se escribió para el flujo provisorio sin custodia. Al construir
-> la pasarela hay que cambiarlo para que nazca `pendiente` y se confirme en `entregado`, y
-> sumar el estado `en_disputa` al enum.
-
-## El historial laboral del vendedor
-
-Es la promesa central de la plataforma y está sostenida por dos decisiones del esquema
-que **no se tocan**:
-
-- `commissions.store_id` es **anulable, no cascada**.
-- `commissions.store_name` guarda **una copia** del nombre de la tienda.
-
-Cuando se purga una tienda que no se suscribió, la comisión sobrevive con el nombre del
-comercio y el historial del vendedor queda intacto. Si eso fuera cascada, el día que un
-emprendedor abandona la plataforma se borraría el antecedente laboral de todos sus
-vendedores — exactamente lo que la plataforma promete no hacer.
-
-`seller_profiles` vive **fuera de toda tienda** por la misma razón.
-
-## Cuentas y roles
+## Cuentas
 
 **Correo y contraseña, sin verificación.** Quien se registra entra al instante. No hay
 enlace mágico ni ingreso con Google: el proveedor no está habilitado.
 
-Al registrarse se elige `primary_role`: `emprendedor` o `vendedor`. Se guarda en
-`profiles` y el disparador de alta lo lee de los metadatos del usuario.
+**Hay un solo tipo de cuenta: la de quien tiene una tienda.** El registro no pregunta
+rol; toda cuenta nueva va a `/crear`. Los permisos derivan de los datos: sos dueño si
+tenés una fila viva en `stores`, y eso lo decide RLS.
 
-**`primary_role` NO es un permiso.** Es una intención, para saber a dónde llevar a una
-cuenta recién creada. Los permisos derivan de los datos:
+## El pedido sale por WhatsApp
 
-| Sos…     | Si…                                        |
-| -------- | ------------------------------------------ |
-| Dueño    | Tenés una fila viva en `stores`            |
-| Vendedor | Tenés un vínculo activo en `store_sellers` |
+**Quien compra no deja datos.** Ve su carrito, el total y un botón: "Enviar pedido por
+WhatsApp". Su nombre y su teléfono ya van en el chat; pedirlos era un formulario más
+entre la decisión y la compra.
 
-Una misma persona puede ser las dos cosas. Nunca escribir una condición del estilo
-`if (profile.primary_role === "vendedor")` para decidir si alguien **puede** algo; eso lo
-decide RLS. Sirve solo para elegir qué pantalla mostrar primero.
+Al tocar el botón:
 
-## Alta de vendedores
+1. **`create_order(p_store_id, p_items)`** crea el pedido en el servidor: recalcula cada
+   precio desde el catálogo, comprueba el stock y devuelve el número, las líneas, el
+   total y el WhatsApp de la tienda. No guarda nada de quien compra.
+2. El mensaje se arma **con lo que devolvió el servidor**, no con el carrito del
+   navegador (`mensajeDePedido` en `lib/pedidos.ts`), y se abre `wa.me` con el número de
+   la tienda (`enlaceDeWhatsApp`, que le pone el 591 a un celular de 8 cifras).
+3. El carrito se vacía y queda un aviso con el número del pedido y un enlace para volver
+   a abrir el chat, por si el navegador no lo abrió o la persona vuelve atrás.
 
-La decide la tienda, no quien se suma: `stores.seller_join_mode` es `abierta` (entra
-`activo` al instante) o `con_aprobacion` (entra `pendiente`). Eso lo resuelve
-`join_store()`; no replicar la lógica en el cliente.
+**Se navega a WhatsApp, no se abre otra pestaña.** Después de esperar al servidor el
+navegador ya no considera la acción un toque y bloquea la ventana.
 
-### Dos caminos, un solo vínculo
+### El WhatsApp de la tienda es obligatorio
 
-Un vendedor llega de dos maneras y hay que tener clara la diferencia:
+Es a donde llega cada pedido. `create_store` lo exige en el alta (`/crear/negocio`) y
+`/cuenta` no deja borrarlo. Se guardan **solo las cifras**.
 
-| Camino                | Qué habilita               | Función                    | Espera aprobación        |
-| --------------------- | -------------------------- | -------------------------- | ------------------------ |
-| Sumarse a la tienda   | El catálogo completo       | `join_store`               | Según `seller_join_mode` |
-| Entrar por invitación | El catálogo completo       | `join_store` con el código | **No**                   |
-| Tomar un producto     | Ese producto de la vitrina | `take_product`             | **No**                   |
+No hay `not null` en la columna, a propósito: las tiendas creadas antes pueden no
+tenerlo, y una restricción haría fallar cualquier cambio que se les haga. Por eso:
 
-### El código de referido se propaga, no se valida en la tienda
+- `create_order` rechaza el pedido de una tienda sin número.
+- El carrito no ofrece el botón y dice que la tienda todavía no recibe pedidos.
+- El Resumen del panel lo pide primero, antes incluso que publicar.
 
-Quien compra es **anónimo**, y `store_sellers` solo se lee `to authenticated`. Así que la
-tienda pública no puede comprobar si un código existe.
+Todo enlace a WhatsApp pasa por **`numeroDeWhatsApp`**: un `wa.me/70123456` sin el 591
+abre un chat con nadie.
 
-De ahí dos reglas:
+### Los estados del pedido
 
-1. **El código viaja tal como vino** por toda la tienda —de la portada al producto—
-   después de una limpieza de forma. Propagar solo el código ya resuelto parecía más
-   prudente y era justo lo contrario: para un comprador real nunca resolvía, así que el
-   referido se perdía al primer clic y con él la comisión del vendedor.
-2. **El árbitro es `create_order`.** Vuelve a resolver el código contra esa tienda antes
-   de congelar la comisión. Un código inventado se ignora ahí y la venta queda sin
-   vendedor, que es lo correcto.
+| Estado      | Qué significa                                     | El stock                 |
+| ----------- | ------------------------------------------------- | ------------------------ |
+| `pendiente` | Se mandó por WhatsApp; la tienda todavía no cobró | No se toca               |
+| `pagado`    | La tienda cobró en el chat y lo marcó             | **Se descuenta**         |
+| `cancelado` | No se concretó                                    | Vuelve, si estaba pagado |
 
-El cartel de "te trajo Ana" es otra cosa: solo se muestra, y sale de `referido_publico`,
-una función `security definer` que confirma que el código pertenece a un vínculo activo
-de esa tienda y devuelve el nombre público del vendedor. Que falle no cambia a quién se
-le paga.
+**El stock baja al pagar, no al pedir.** Un pedido sin datos cuesta un toque y muchos
+carritos se mandan y no se concretan. Si bajara al tocar el botón, cualquiera podría
+vaciar una tienda tocándolo en bucle. El pedido solo **comprueba** que haya stock.
 
-### La invitación no es el enlace de la tienda
+Todo lo que se sigue de un cambio de estado lo hace el disparador
+**`handle_order_status_change`**: descuenta el stock al pagar —y rechaza el cambio si
+ya no alcanza—, lo devuelve al cancelar un pagado, fecha el pago, y no deja que un
+cancelado reviva ni que un pagado vuelva a pendiente. **Nunca duplicarlo desde la
+aplicación**: ajustar `products.stock` a mano daría stock inventado el día que alguien
+cambie dos veces de estado.
 
-`venduo.../t/{slug}` es **público**: está impreso en el código QR y se manda por
-WhatsApp a cualquiera. Si tenerlo bastara para entrar sin aprobación,
-`con_aprobacion` sería decorativo.
+**Una venta es un pedido pagado.** El panel, el tablero y las estadísticas cuentan solo
+`pagado`: un pendiente puede ser un carrito que nunca se mandó.
 
-La invitación es un código aparte que vive en **`store_invites`**, una tabla con
-RLS activo y **cero políticas** —como `social_connections`—: ni el dueño la lee
-con un `select`. Llega a su código por `my_seller_invite()` y lo cambia con
-`rotate_seller_invite()`, las dos `security definer`.
+`buyer_name` y `buyer_phone` siguen en `orders`, opcionales: los pedidos anteriores a la
+compra por WhatsApp los guardan, y para esos el panel ofrece abrir el chat. Los nuevos
+llegan vacíos.
 
-Nunca ponerlo como columna de `stores`: la política de lectura de esa tabla
-expone toda tienda publicada a cualquiera, así que sería un código de invitación
-consultable.
+## El carrito vive en el navegador
 
-El enlace lleva **la tienda y el código juntos** (`/sumarme?t={slug}&inv={codigo}`).
-No hay ni debe haber un endpoint que traduzca código a tienda: sería justo la
-herramienta para averiguar por descarte qué códigos valen.
-
-Un vínculo `pendiente` que después recibe la invitación pasa a `activo`: la
-invitación **es** la aprobación, y dejarlo esperando contradiría al dueño.
-
-**Marcar un producto es el consentimiento.** Por eso tomar un producto entra `activo`
-aunque la tienda sea `con_aprobacion`: ese modo gobierna el acceso al catálogo entero,
-no al producto que el dueño ya publicó como disponible. Un vínculo pendiente que toma
-un producto marcado pasa a activo, porque dejarlo esperando contradiría al dueño.
-
-Los dos caminos escriben **el mismo vínculo** en `store_sellers`, con un solo código de
-referido por tienda. No hay códigos por producto, y no debe haberlos: `orders.seller_id`
-apunta a un vínculo y el índice único sobre `commissions.order_id` es lo que garantiza
-una comisión por pedido. Un código por producto obliga a rehacer las dos cosas.
-
-### Qué producto acepta vendedores
-
-Dos interruptores, y los dos tienen que estar encendidos:
-
-- `stores.seller_network_enabled` — si la tienda acepta vendedores. Se elige al crearla.
-- `products.seller_enabled` — si ese producto en particular se puede vender. Nace en
-  `true`: el interruptor que manda es el de la tienda, y lo razonable es que al
-  encenderla el catálogo entero esté disponible y el dueño apague las excepciones.
-
-**La comisión se calcula solo sobre los productos habilitados.** Si un pedido mezcla
-productos marcados con otros que no lo están, pagar sobre el total le cobraría al
-emprendedor una comisión que nunca ofreció. `orders.commission_base_cents` guarda esa
-base y se congela igual que la tasa: cambiar después qué productos aceptan vendedores
-no reescribe la historia.
-
-El código de referido usa un alfabeto sin caracteres ambiguos — nada de `0/O` ni `1/I/L` —
-porque se dicta por teléfono y se tipea cuando el QR no escanea.
+Por tienda, en `localStorage`. En la base obligaría a identificar a alguien que nunca da
+ningún dato. Lo que el carrito diga de los montos es solo para mostrar: `create_order`
+recalcula cada precio desde el catálogo.
 
 ## El catálogo
 
@@ -203,88 +112,18 @@ que define la condición es `products.condition` (`nuevo`, `segunda_mano`,
 
 `compare_at_price_cents` es el precio anterior y es lo que produce el descuento destacado.
 
-## La compra de quien no tiene cuenta
-
-Todo el flujo público —catálogo, carrito, pedido, pago— lo hace un comprador anónimo. Y
-`orders` se lee solo `to authenticated`. **No se abre la tabla con una política**: eso
-expondría los pedidos de todas las tiendas. Se abren dos funciones `security definer`
-acotadas, y la llave es el identificador del pedido, que es un uuid y no se adivina:
-
-| Función                | Para qué                                            |
-| ---------------------- | --------------------------------------------------- |
-| `pedido_publico`       | El pedido y los datos de pago de su tienda          |
-| `adjuntar_comprobante` | Provisorio: el comprobante, mientras siga pendiente |
-
-`pedido_publico` nunca devuelve la comisión, el vendedor ni el neto del comercio: eso es
-de la tienda, no del comprador.
-
-**El carrito vive en el navegador**, por tienda. En la base obligaría a identificar a
-alguien que todavía no dio ningún dato. Lo que el carrito diga de los montos es solo para
-mostrar: `create_order` recalcula cada precio desde el catálogo.
-
-### El cobro: PagoFácil con custodia
-
-**Venduo nunca recibe ni guarda el dinero.** El comprador le paga a PagoFácil, que lo
-retiene. Venduo solo le da órdenes: liberar, devolver y cómo repartir. Si el dinero pasara
-por una cuenta de Venduo, aunque fuera un día, sería intermediación de pagos y exigiría
-autorización de ASFI — `VENDUO.md` §5 lo explica.
-
-- **Se libera con dos marcas:** el emprendedor marca el pedido _enviado_ y el comprador
-  confirma que lo _recibió_. Si el comprador no responde, se libera solo pasado un plazo
-  que corre desde el envío.
-- **Al liberarse, PagoFácil dispersa directo:** el vendedor recibe su comisión completa y
-  el emprendedor el resto. **El costo de PagoFácil lo absorbe el emprendedor**, nunca sale
-  de la parte del vendedor.
-- **Venduo no cobra comisión por venta.**
-- **Confirmar el pago ya no es tarea del emprendedor.** Lo avisa PagoFácil; nadie lo
-  marca a mano.
-
-### Reclamos
-
-Si el comprador reclama antes de la liberación, el pedido pasa a `en_disputa` y **el pago
-queda congelado**. Venduo revisa el caso con las dos partes y decide: a favor del
-emprendedor, se libera; a favor del comprador, se ordena la devolución y la comisión se
-anula. Liberado el pago ya no hay reclamo dentro de la plataforma, porque el dinero salió
-de la custodia.
-
-### Lo provisorio que hay que reemplazar
-
-**Lo que hoy está construido no sigue este modelo.** La pantalla de pago muestra el QR
-bancario que subió el emprendedor (`stores.payment_qr_url`, en `/cuenta`), el comprador
-sube una captura (`adjuntar_comprobante`, `orders.payment_proof_url`) y el emprendedor
-confirma el pago a mano. El dinero va directo del comprador al comercio, **sin custodia**.
-
-Se hizo antes de decidir el cobro y queda solo mientras no exista la pasarela. **No
-construir nada nuevo encima**: ni reportes sobre comprobantes ni pasos que dependan de que
-el emprendedor confirme el pago.
-
-Dos cosas de ese flujo que siguen valiendo mientras exista: el comprobante se guarda **por
-ruta y no por URL** —vive en un bucket privado y firmar una URL exige un permiso de lectura
-que el comprador anónimo no tiene—, y quien lo necesite ver lo firma del lado del servidor.
-
-## Entrega por WhatsApp
-
-**La gestión de envíos está fuera de alcance**: no hay couriers, guías ni seguimiento. La
-entrega se coordina entre el emprendedor y el comprador por WhatsApp. Lo que sí hace la
-plataforma es armar ese mensaje con el detalle del pedido y abrir la conversación, usando
-`orders.buyer_phone` — que por eso es obligatorio.
-
-Lo que sí registra son **las dos marcas que liberan el pago**: _enviado_, que pone el
-emprendedor, y _recibido_, que pone el comprador. No son seguimiento de envío: son la
-condición de la custodia.
-
-`stores.whatsapp` es el número del comercio, para que el comprador le escriba desde la
-tienda pública.
-
 ## Lo que NO se construye
 
 Esta lista es tan importante como la de lo que sí. Si una tarea pide algo de acá,
 detenerse y preguntar antes de escribir código:
 
 - **Multi-tienda por usuario**
-- **Gestión de envíos** — se coordina por WhatsApp; solo se registran las marcas de
-  enviado y recibido
-- **Recibir o guardar el dinero de una venta** — lo hace PagoFácil; Venduo solo instruye
+- **Red de vendedores, comisiones y códigos de referido** — la tienda vende sola
+- **Gestión de envíos** — ni couriers ni seguimiento ni marcas de enviado o recibido: la
+  entrega se acuerda por WhatsApp
+- **Cobrar dentro de la plataforma** — ni pasarela, ni custodia, ni QR de pago, ni
+  comprobantes: el pago se acuerda por WhatsApp y la tienda lo marca en su panel
+- **Pedirle datos a quien compra** — van en el chat
 - **Cobro de la suscripción** — se modela el estado, no el cobro
 - **Notificaciones por email**
 - **Aplicación móvil nativa** — la tienda es responsive y con eso alcanza
@@ -296,8 +135,8 @@ detenerse y preguntar antes de escribir código:
   Un catálogo guardado o un enlace reenviado nunca muestran un precio viejo.
 - **El precio de un pack se muestra en el catálogo y nada más.** La tienda
   online cobra cada producto por separado; quien quiere el pack escribe por
-  WhatsApp. Venderlo como pack toca `create_order` y la comisión: se decide
-  antes de escribirlo.
+  WhatsApp. Venderlo como pack toca `create_order`: se decide antes de
+  escribirlo.
 - Un producto borrado desaparece del catálogo; uno sin stock sale "Agotado".
 
 ## La suscripción

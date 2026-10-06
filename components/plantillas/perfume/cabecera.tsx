@@ -19,35 +19,19 @@ import { useCarrito } from "@/components/tienda/carrito"
  * cursiva, la colección y el carrito a los lados, y las líneas de la tienda
  * debajo en versalitas con mucho espacio entre letras. Nada en negrita.
  */
-export function Cabecera({
-  marco,
-  referido,
-  codigo,
-  enlaceDelCarrito = true,
-}: PropsCabecera) {
-  const { unidades, listo, recordarReferido } = useCarrito()
+export function Cabecera({ marco, enlaceDelCarrito = true }: PropsCabecera) {
+  const { unidades, listo } = useCarrito()
   const ruta = usePathname()
   const parametros = useSearchParams()
 
-  React.useEffect(() => {
-    if (referido) recordarReferido(referido.codigo)
-  }, [referido, recordarReferido])
-
   const enCatalogo = ruta.endsWith("/catalogo")
   const categoriaActiva = enCatalogo ? parametros.get("categoria") : null
-  const catalogo = rutaDeTienda(marco.slug, "/catalogo", { ref: codigo })
+  const catalogo = rutaDeTienda(marco.slug, "/catalogo")
 
   return (
     <header className="sticky top-0 z-30 border-b border-tinta/10 bg-papel/95 backdrop-blur">
-      <p
-        className={cn(
-          "border-b border-tinta/10 px-5 py-2 text-center text-[10px] tracking-[0.28em] uppercase",
-          referido ? "text-senal" : "opacity-65"
-        )}
-      >
-        {referido
-          ? `Te recomendó ${referido.nombre ?? referido.codigo}`
-          : "Asesoría personalizada por WhatsApp"}
+      <p className="border-b border-tinta/10 px-5 py-2 text-center text-[10px] tracking-[0.28em] uppercase opacity-65">
+        Asesoría personalizada por WhatsApp
       </p>
 
       <div className="mx-auto grid w-full max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-5">
@@ -69,7 +53,7 @@ export function Cabecera({
         </nav>
 
         <Link
-          href={rutaDeTienda(marco.slug, "", { ref: codigo })}
+          href={rutaDeTienda(marco.slug, "")}
           className="flex min-h-16 max-w-[58vw] items-center justify-center md:max-w-md"
         >
           {marco.logoUrl ? (
@@ -112,7 +96,6 @@ export function Cabecera({
                   <Enlace
                     href={rutaDeTienda(marco.slug, "/catalogo", {
                       categoria: categoria.id,
-                      ref: codigo,
                     })}
                     activo={categoriaActiva === categoria.id}
                   >

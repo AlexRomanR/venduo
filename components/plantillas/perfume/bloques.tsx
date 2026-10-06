@@ -33,7 +33,7 @@ import {
  * sombras.
  */
 
-function Portada({ bloque, tienda, codigo }: PropsBloque) {
+function Portada({ bloque, tienda }: PropsBloque) {
   const foto = fotoDePortada(bloque, tienda)
   const titulo = texto(bloque, "title") ?? tienda.nombre
   const bajada = texto(bloque, "subtitle")
@@ -76,7 +76,7 @@ function Portada({ bloque, tienda, codigo }: PropsBloque) {
             </p>
           ) : null}
           <EnlacePildora
-            href={rutaDeTienda(tienda.slug, "/catalogo", { ref: codigo })}
+            href={rutaDeTienda(tienda.slug, "/catalogo")}
             claro
             className="mt-10"
           >
@@ -104,7 +104,7 @@ function Portada({ bloque, tienda, codigo }: PropsBloque) {
   )
 }
 
-function Grilla({ bloque, tienda, codigo }: PropsBloque) {
+function Grilla({ bloque, tienda }: PropsBloque) {
   const productos = productosDeGrilla(bloque, tienda.productos)
   if (productos.length === 0) return null
 
@@ -118,12 +118,7 @@ function Grilla({ bloque, tienda, codigo }: PropsBloque) {
       <div className="mt-12">
         <Vitrina columnas={columnas}>
           {productos.map((producto) => (
-            <Tarjeta
-              key={producto.id}
-              producto={producto}
-              tienda={tienda}
-              codigo={codigo}
-            />
+            <Tarjeta key={producto.id} producto={producto} tienda={tienda} />
           ))}
         </Vitrina>
       </div>
@@ -132,7 +127,6 @@ function Grilla({ bloque, tienda, codigo }: PropsBloque) {
         <EnlacePildora
           href={rutaDeTienda(tienda.slug, "/catalogo", {
             condicion: filtroDeGrilla(bloque).condicion,
-            ref: codigo,
           })}
         >
           Ver toda la colección
@@ -142,7 +136,7 @@ function Grilla({ bloque, tienda, codigo }: PropsBloque) {
   )
 }
 
-function Categorias({ bloque, tienda, codigo }: PropsBloque) {
+function Categorias({ bloque, tienda }: PropsBloque) {
   const categorias = categoriasConFoto(tienda, numero(bloque, "limit") ?? 6)
   if (categorias.length === 0) return null
 
@@ -163,7 +157,6 @@ function Categorias({ bloque, tienda, codigo }: PropsBloque) {
                 <Link
                   href={rutaDeTienda(tienda.slug, "/catalogo", {
                     categoria: categoria.id,
-                    ref: codigo,
                   })}
                   className="group flex w-28 flex-col items-center text-center md:w-36"
                 >
@@ -296,7 +289,7 @@ function Voces({ bloque }: PropsBloque) {
   )
 }
 
-function Cierre({ bloque, tienda, codigo }: PropsBloque) {
+function Cierre({ bloque, tienda }: PropsBloque) {
   const titulo = texto(bloque, "title")
   if (!titulo) return null
 
@@ -312,7 +305,7 @@ function Cierre({ bloque, tienda, codigo }: PropsBloque) {
           </p>
         ) : null}
         <EnlacePildora
-          href={rutaDeTienda(tienda.slug, "/catalogo", { ref: codigo })}
+          href={rutaDeTienda(tienda.slug, "/catalogo")}
           claro
           className="mt-10"
         >

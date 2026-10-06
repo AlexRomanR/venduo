@@ -19,7 +19,7 @@ import { getSiteUrl } from "@/lib/env"
  *
  * `DOMINIO_DE_TIENDAS` es el interruptor. Mientras esté vacío, todo sale por
  * ruta; en cuanto tenga un dominio, todos los enlaces del sistema —el QR
- * impreso, el material del vendedor, el panel— pasan a la forma con subdominio
+ * impreso, lo que se comparte por WhatsApp, el panel— pasan a la forma con subdominio
  * a la vez, porque todos preguntan acá.
  */
 export const DOMINIO_DE_TIENDAS =
@@ -33,12 +33,12 @@ export const SUBDOMINIOS_RESERVADOS = new Set([
   "admin",
   "panel",
   "cuenta",
-  "vendedor",
-  "explorar",
+  "crear",
+  "editor",
   "login",
   "auth",
   "t",
-  "v",
+  "c",
 ])
 
 /** La URL pública de una tienda. Absoluta: se comparte y se imprime. */
@@ -49,34 +49,17 @@ export function urlDeTienda(slug: string): string {
   return `${getSiteUrl()}/t/${slug}`
 }
 
-/**
- * La misma tienda, con el código de un vendedor.
- *
- * Es el enlace que el vendedor reparte, y la única forma de que una venta se
- * le acredite: el código viaja en la URL y `create_order` lo valida contra esa
- * tienda antes de congelar la comisión.
- */
-export function urlDeReferido(slug: string, codigo: string): string {
-  return `${urlDeTienda(slug)}?ref=${encodeURIComponent(codigo)}`
-}
-
 /** El enlace de un producto suelto dentro de la tienda. */
-export function urlDeProducto(
-  slug: string,
-  productoId: string,
-  codigo?: string | null
-): string {
-  const base = `${urlDeTienda(slug)}/p/${productoId}`
-  return codigo ? `${base}?ref=${encodeURIComponent(codigo)}` : base
+export function urlDeProducto(slug: string, productoId: string): string {
+  return `${urlDeTienda(slug)}/p/${productoId}`
 }
 
 /**
  * Una ruta dentro de la tienda, para navegar sin salir de ella.
  *
  * Relativa y siempre con `/t/{slug}`: el middleware deja pasar esa forma tal
- * cual también desde un subdominio. Lleva el código del vendedor si lo hay,
- * para que el cartel de "te trajo" siga en cada pantalla; el carrito además lo
- * recuerda, así que perderlo acá no le quita la venta a nadie.
+ * cual también desde un subdominio. Los parámetros son los filtros del
+ * catálogo, que viven en la URL.
  */
 export function rutaDeTienda(
   slug: string,

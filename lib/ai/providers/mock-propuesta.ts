@@ -259,18 +259,6 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
     })
     partes.push("sugiero otros productos en el carrito")
   }
-  if (quiere("correo", "email")) {
-    operaciones.push({
-      op: "apariencia",
-      ruta: "carrito.correo",
-      valor: !sin,
-    })
-    partes.push(
-      sin
-        ? "dejo de pedir el correo en el carrito"
-        : "pido el correo en el carrito"
-    )
-  }
 
   // Secciones
   if (quiere("pregunta", "faq")) {
@@ -316,7 +304,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
       props: {
         title: "Para mamá, lo mejor",
         subtitle:
-          "Regalos que se quedan en el recuerdo. Pide hoy y coordinamos la entrega por WhatsApp.",
+          "Regalos que se quedan en el recuerdo. Pide hoy y lo cerramos contigo por WhatsApp.",
         ctaLabel: "Ver regalos",
       },
     })
@@ -327,8 +315,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
       seccion: portada.id,
       props: {
         title: "Regalos para esta Navidad",
-        subtitle:
-          "Elige con tiempo: te ayudamos por WhatsApp y coordinamos la entrega.",
+        subtitle: "Elige con tiempo: te ayudamos a elegir por WhatsApp.",
         ctaLabel: "Ver regalos",
       },
     })

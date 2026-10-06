@@ -69,9 +69,9 @@ Ninguna página pregunta qué plantilla tiene la tienda. Piden el kit y lo compo
 ```tsx
 const kit = kitDePlantilla(tienda.plantilla)
 
-<kit.Cabecera marco={marco} referido={referido} codigo={codigo} />
-<kit.Inicio tienda={tienda} codigo={codigo} filtros={filtros} />
-<kit.Pie marco={marco} codigo={codigo} />
+<kit.Cabecera marco={marco} />
+<kit.Inicio tienda={tienda} filtros={filtros} />
+<kit.Pie marco={marco} />
 ```
 
 No hay un solo `if (plantilla === "fashion")` en el código.
@@ -247,8 +247,8 @@ components/plantillas/
   fashion/          cabecera, piezas, bloques, galeria, paginas, index
   perfume/          cabecera, piezas, bloques, galeria, paginas, index
 
-components/tienda/  Lo compartido: carrito, checkout, pago, agregar, filtros,
-                    buscar, barra-del-carrito
+components/tienda/  Lo compartido: carrito, el pedido por WhatsApp, agregar,
+                    filtros, buscar, barra-del-carrito
 
 app/t/[slug]/
   layout.tsx        Pinta el tema en el servidor
@@ -349,9 +349,9 @@ export const KIT_PERFUME: KitDeTienda = {
 Así una plantilla a medio escribir se ve completa, y un tipo de bloque nuevo existe en
 todas desde el día que se escribe en la base editorial.
 
-**Lo que es igual en todas no está en el kit**: carrito, checkout, pago, agregar al
-carrito, filtros y buscador. Toman la identidad de los tokens, y lo que resuelven —quién
-eres, cuánto llevas, cómo pagas— no cambia con el rubro.
+**Lo que es igual en todas no está en el kit**: el carrito con su botón de WhatsApp,
+agregar al carrito, filtros y buscador. Toman la identidad de los tokens, y lo que
+resuelven —cuánto llevas y cómo se lo mandas a la tienda— no cambia con el rubro.
 
 ### El registro
 
@@ -458,11 +458,11 @@ chico y el nombre con la letra de su plantilla— y `SelloDeTienda` en el Resume
 su nombre con su letra y su color de acción—. Las dos dibujan con valores en línea dentro
 de un recuadro y no tocan `:root`.
 
-Resumen, pedidos, productos, categorías, vendedores, estadísticas y cuenta son las mismas
+Resumen, pedidos, productos, categorías, estadísticas y cuenta son las mismas
 pantallas en todas las tiendas: una herramienta que se aprende una vez.
 
-Quedan en el mundo de Venduo la portada, el ingreso, el alta, las vitrinas del vendedor, su
-perfil público y **el informe PDF de estadísticas**, que tiene su propia marca.
+Quedan en el mundo de Venduo la portada, el ingreso, el alta y **el informe PDF de
+estadísticas**, que tiene su propia marca.
 
 ### `/panel/apariencia`
 
@@ -491,11 +491,11 @@ tienda cambian en el acto**.
 
 ### Qué se conserva
 
-| Se conserva siempre                                | Depende de la elección           | Se descarta (queda en la versión) |
-| -------------------------------------------------- | -------------------------------- | --------------------------------- |
-| Productos, categorías, fotos, stock                | Secciones de la portada y textos | La personalización visual         |
-| Pedidos, comisiones, vendedores, invitaciones      |                                  |                                   |
-| Nombre, slug, enlace, QR, WhatsApp, datos de cobro |                                  |                                   |
+| Se conserva siempre                 | Depende de la elección           | Se descarta (queda en la versión) |
+| ----------------------------------- | -------------------------------- | --------------------------------- |
+| Productos, categorías, fotos, stock | Secciones de la portada y textos | La personalización visual         |
+| Pedidos                             |                                  |                                   |
+| Nombre, slug, enlace, QR, WhatsApp  |                                  |                                   |
 
 **Por defecto se conservan las secciones.** Sus textos pueden ser trabajo del emprendedor,
 y la plantilla nueva las dibuja a su manera. Elegir "Empezar con las de {plantilla}"

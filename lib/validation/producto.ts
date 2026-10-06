@@ -49,7 +49,6 @@ export const productoSchema = z
       .default([]),
     activo: z.boolean().default(true),
     destacado: z.boolean().default(false),
-    aceptaVendedores: z.boolean().default(true),
   })
   .superRefine((valores, ctx) => {
     // El precio anterior es lo que produce el descuento tachado. Si no es mayor

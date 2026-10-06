@@ -20,7 +20,7 @@ const SUGERENCIAS = [
   "¿Cuánto vendí en los últimos 30 días?",
   "Mis productos más vendidos",
   "Ventas por semana de los últimos 3 meses",
-  "¿Qué vendedor me trae más comisiones?",
+  "¿Cuántos pedidos tengo sin cobrar?",
   "¿Cuánto vale mi inventario?",
 ]
 

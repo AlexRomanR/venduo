@@ -7,11 +7,11 @@ contra él sin romperlo.
 
 **Centavos enteros. Puntos básicos enteros. Nunca punto flotante.**
 
-| Concepto | Columna          | Ejemplo                 |
-| -------- | ---------------- | ----------------------- |
-| Precio   | `price_cents`    | `8500` son Bs 85        |
-| Comisión | `commission_bps` | `1500` es 15%           |
-| Cálculo  | —                | `(monto * bps) / 10000` |
+| Concepto   | Columna       | Ejemplo                 |
+| ---------- | ------------- | ----------------------- |
+| Precio     | `price_cents` | `8500` son Bs 85        |
+| Porcentaje | `*_bps`       | `1500` es 15%           |
+| Cálculo    | —             | `(monto * bps) / 10000` |
 
 La moneda es el boliviano y es **constante del sistema**: no hay columna de moneda en
 ninguna tabla. Para mostrar montos se usa `formatMoney` de `lib/format.ts`, que ya conoce
@@ -32,8 +32,8 @@ Tres cosas que se olvidan y rompen:
    único común, una fila dada de baja bloquea para siempre reutilizar ese slug o código.
 2. **El filtro va también en la política RLS**, no solo en la consulta. Si vive únicamente
    en la capa de datos, la próxima consulta que alguien escriba se olvida de ponerlo.
-3. **Tres tablas no llevan `deleted_at`:** `orders`, `order_items` y `commissions`. Un
-   pedido se cancela cambiando su estado; una comisión se anula. Nunca se borran.
+3. **Dos tablas no llevan `deleted_at`:** `orders` y `order_items`. Un pedido se cancela
+   cambiando su estado. Nunca se borra.
 
 El borrado físico existe en un solo flujo: la purga de una tienda que venció su prueba,
 a los 90 días del bloqueo.
@@ -51,31 +51,28 @@ Usar siempre estos, nunca subconsultas `exists` escritas a mano:
 | Función                      | Devuelve                                         |
 | ---------------------------- | ------------------------------------------------ |
 | `public.my_store_id()`       | La tienda del usuario. **Un uuid, no una lista** |
-| `public.my_seller_ids()`     | `uuid[]` con sus vínculos activos como vendedor  |
 | `public.store_is_live(uuid)` | Si la tienda se sirve al público                 |
 
 ```sql
 -- El dueño ve lo suyo
 using (store_id = public.my_store_id())
 
--- El vendedor ve lo suyo, en todas las tiendas donde trabaja
-using (seller_id = any (public.my_seller_ids()))
 ```
 
 ### Dos trampas
 
-**Recursión.** Una política sobre `store_sellers` que consulte `store_sellers` cuelga la
+**Recursión.** Una política sobre una tabla que consulte esa misma tabla cuelga la
 consulta. Por eso los auxiliares son `security definer`: saltan la política.
 
 **Rendimiento.** Envolver siempre la identidad como subconsulta, para que Postgres la
 evalúe una vez por consulta y no una vez por fila:
 
 ```sql
-using (seller_user_id = (select auth.uid()))   -- sí
-using (seller_user_id = auth.uid())            -- no
+using (owner_id = (select auth.uid()))   -- sí
+using (owner_id = auth.uid())            -- no
 ```
 
-## El checkout no es una inserción del cliente
+## El pedido no es una inserción del cliente
 
 **`orders` no tiene política de INSERT, a propósito.** Un comprador anónimo que pudiera
 insertar ahí declararía el total que quisiera.
@@ -83,34 +80,27 @@ insertar ahí declararía el total que quisiera.
 El pedido se crea llamando a la función del servidor:
 
 ```ts
-const { data: orderId, error } = await supabase.rpc("create_order", {
+const { data, error } = await supabase.rpc("create_order", {
   p_store_id: storeId,
-  p_buyer_name: nombre,
-  p_buyer_phone: telefono, // obligatorio: es el canal de entrega
-  p_buyer_email: email ?? null,
-  p_referral_code: codigo ?? null,
   p_items: [{ product_id: id, quantity: 2 }],
 })
+// data: { id, numero, total_cents, whatsapp, items: [{ nombre, cantidad, ... }] }
 ```
 
-Esa función recalcula cada precio desde el catálogo, valida el stock, resuelve el código
-de referido comprobando que pertenezca a **esa** tienda y esté activo, congela la comisión
-y descuenta stock. Nada de eso puede quedar en manos del cliente.
+Esa función recalcula cada precio desde el catálogo, comprueba que haya stock y que la
+tienda tenga WhatsApp, y devuelve con qué armar el mensaje. **No pide datos de quien
+compra y no descuenta stock**: eso pasa al marcarlo pagado. Lo que devuelve llega como
+`Json` y se valida con zod antes de usarlo.
 
-**Si alguna vez escribes `supabase.from("orders").insert(...)`, está mal.** Lo mismo para
-`commissions`: las crea un disparador cuando el pedido pasa a `pagado`, y los estados
-siguientes la mueven. Qué estado de pedido corresponde a qué estado de comisión está en
-`domain-venduo.md`, atado a la custodia del pago en PagoFácil.
+**Si alguna vez escribes `supabase.from("orders").insert(...)`, está mal.** Y el stock
+no se toca desde la aplicación: lo mueve el disparador `handle_order_status_change` al
+cambiar de estado. Qué hace en cada caso está en `domain-venduo.md`.
 
-Las otras funciones del servidor son `join_store(p_store_slug, p_invite_code)`,
-`take_product(p_product_id)`, `my_seller_invite()`, `rotate_seller_invite()`,
-`apply_template(p_store_id, p_template_key)`,
+Las otras funciones del servidor son `apply_template(p_store_id, p_template_key)`,
 `change_store_template(p_template_key, p_keep_sections)`,
 `publicar_diseno(p_theme_overrides, p_logo_url, p_bloques)`, `restaurar_version(p_version_id)`,
-`create_store(p_name, p_description, p_template_key, p_sellers, p_commission_bps)`,
-`run_insight(...)`, las dos del historial público, `seller_public_stats(p_slug)` y
-`seller_public_stores(p_slug)`, y la del catálogo compartido,
-`catalogo_compartido(p_token)`.
+`create_store(p_name, p_description, p_template_key, p_whatsapp)` y la del catálogo
+compartido, `catalogo_compartido(p_token)`.
 
 **`run_insight_sql` es la única que ejecuta SQL que no escribió una persona.** Es la
 excepción a todo lo demás y se sostiene en tres cosas que impone Postgres: corre con
@@ -118,8 +108,9 @@ excepción a todo lo demás y se sostiene en tres cosas que impone Postgres: cor
 cualquier escritura, y solo contra las vistas `mis_*`, que ya están acotadas a
 `my_store_id()` y donde `store_id` ni siquiera aparece. Está explicado en `ai-layer.md`.
 
-**La tienda tampoco se inserta desde el cliente.** `create_store` resuelve tres
-cosas que no se pueden repartir: el slug único —comprobarlo desde el navegador es
+**La tienda tampoco se inserta desde el cliente.** `create_store` exige el WhatsApp
+de la tienda —sin él no puede recibir pedidos— y resuelve tres cosas que no se pueden
+repartir: el slug único —comprobarlo desde el navegador es
 una carrera perdida, y ese slug es el que se imprime en el QR—, la suscripción de
 prueba —que no tiene política de INSERT a propósito, así que la tienda nacería sin
 ella— y la siembra de la plantilla. En llamadas separadas, que falle la segunda
@@ -208,14 +199,8 @@ Las políticas RLS van juntas en su propio archivo, para poder auditarlas de una
 
 ## Tablas sin políticas
 
-Dos tablas tienen RLS activo y **cero políticas**, a propósito. No agregarles.
+`social_connections` tiene RLS activo y **cero políticas**, a propósito. No agregarle.
 
 `social_connections` guarda los tokens de las conexiones de la tienda —Meta y Canva— y solo
 se accede con la clave de servicio. El de Canva llega además cifrado por la aplicación
 (`lib/canva.ts`): leer la fila no da acceso a la cuenta de nadie.
-
-`store_invites` guarda el código de invitación de cada tienda. Ni siquiera el dueño la
-lee con un `select`: llega a su código por `my_seller_invite()`, que es
-`security definer`. Si el código fuera una columna de `stores`, la política
-`"tiendas: leer"` —que expone toda tienda publicada— lo dejaría a la vista de
-cualquiera.

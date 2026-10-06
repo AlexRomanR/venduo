@@ -57,11 +57,11 @@ npm run build
 ### Base de Datos y Seguridad
 
 - [ ] ¿Los montos monetarios se almacenan en centavos enteros (`_cents`)?
-- [ ] ¿Las comisiones se expresan en puntos básicos (`_bps`) de 0 a 10000?
+- [ ] ¿Los porcentajes se expresan en puntos básicos (`_bps`) de 0 a 10000?
 - [ ] ¿Las nuevas tablas tienen RLS habilitado y políticas con `(select auth.uid())`?
 - [ ] ¿Se verificó `deleted_at is null` para respetar el borrado lógico?
 - [ ] ¿El pedido se crea llamando a `create_order` y no con `from("orders").insert(...)`? `orders` no tiene política de inserción: un insert directo falla en silencio.
-- [ ] ¿Las comisiones las sigue creando el disparador, sin inserciones desde código?
+- [ ] ¿El stock lo sigue moviendo el disparador de estados, sin ajustes desde código?
 
 ### Rendimiento y UI Mobile-First
 

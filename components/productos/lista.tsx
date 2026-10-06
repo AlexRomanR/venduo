@@ -12,7 +12,6 @@ import {
   Pencil,
   Star,
   Trash2,
-  Users,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -37,7 +36,7 @@ const CONDICION: Record<string, string> = {
 interface Acciones {
   alternar: (
     id: string,
-    campo: "is_active" | "is_featured" | "seller_enabled",
+    campo: "is_active" | "is_featured",
     valor: boolean
   ) => Promise<{ ok: boolean; error?: string }>
   ajustarStock: (
@@ -200,9 +199,6 @@ function Fila({
               <Insignia tono="suave">Oculto</Insignia>
             ) : null}
             {producto.is_featured ? <Insignia>Destacado</Insignia> : null}
-            {producto.seller_enabled ? (
-              <Insignia tono="suave">Vendedores</Insignia>
-            ) : null}
 
             <div className="ml-auto flex items-center gap-1">
               <Link
@@ -264,34 +260,13 @@ function Fila({
                     {producto.is_featured ? "Quitar destacado" : "Destacar"}
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem
-                    onSelect={() =>
-                      correr(
-                        () =>
-                          acciones.alternar(
-                            producto.id,
-                            "seller_enabled",
-                            !producto.seller_enabled
-                          ),
-                        producto.seller_enabled
-                          ? "Tus vendedores ya no pueden venderlo."
-                          : "Tus vendedores ya pueden venderlo."
-                      )
-                    }
-                  >
-                    <Users aria-hidden="true" className="size-4" />
-                    {producto.seller_enabled
-                      ? "Quitar de la red de vendedores"
-                      : "Abrir a mis vendedores"}
-                  </DropdownMenuItem>
-
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem
                     variant="destructive"
                     onSelect={() => {
                       // Se pregunta porque saca el producto de la tienda y de
-                      // los enlaces que los vendedores ya repartieron.
+                      // los enlaces que ya se compartieron.
                       if (
                         !window.confirm(
                           `¿Sacar "${producto.name}" de tu catálogo? Los pedidos que ya tenga se conservan.`

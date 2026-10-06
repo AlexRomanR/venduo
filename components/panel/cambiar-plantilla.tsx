@@ -96,9 +96,8 @@ export function CambiarPlantilla({
           {/* Sin miniatura: ya está en la tarjeta que abrió esto, y con ella el
               botón de confirmar quedaba debajo del borde en una laptop. */}
           <DialogDescription className="text-sm leading-relaxed text-tinta/70">
-            Cambia cómo se ve tu tienda y este panel. Tus productos, categorías,
-            pedidos, vendedores y comisiones no se tocan. Antes de cambiar
-            guardamos tu diseño actual.
+            Cambia cómo se ve tu tienda y este panel. Tus productos, categorías
+            y pedidos no se tocan. Antes de cambiar guardamos tu diseño actual.
           </DialogDescription>
 
           <fieldset className="mt-6">

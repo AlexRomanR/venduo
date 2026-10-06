@@ -305,7 +305,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
   faq: {
     tipo: "faq",
     nombre: "Preguntas frecuentes",
-    descripcion: "Responde antes de que pregunten: entregas, cambios, pagos.",
+    descripcion: "Responde antes de que pregunten: pedidos, cambios, pagos.",
     maximo: 1,
     vacia: "Agrégale al menos una pregunta.",
     campos: [
@@ -338,9 +338,9 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
       title: "Preguntas frecuentes",
       items: [
         {
-          question: "¿Cómo recibo mi pedido?",
+          question: "¿Cómo hago mi pedido?",
           answer:
-            "Al confirmar tu pedido te escribimos por WhatsApp para acordar la entrega.",
+            "Arma tu carrito y toca «Enviar pedido por WhatsApp». Te respondemos ahí para acordar el pago.",
         },
         {
           question: "¿Puedo cambiar un producto?",

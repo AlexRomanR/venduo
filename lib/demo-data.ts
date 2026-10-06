@@ -1,12 +1,7 @@
 import { CURRENCY, diaEnBolivia } from "@/lib/format"
 import { diasVacios, type Tablero } from "@/lib/tablero"
-import type {
-  RedDeMiTienda,
-  VendedorEnRed,
-  VinculoVendedor,
-} from "@/lib/data/panel"
 import type { ProductoDelCatalogo } from "@/lib/catalogos/datos"
-import type { CommissionStatus, Product, SubscriptionStatus } from "@/types"
+import type { Product, SubscriptionStatus } from "@/types"
 
 export interface Suscripcion {
   status: SubscriptionStatus
@@ -26,8 +21,6 @@ export interface ResumenPanel {
   ventasCents: number
   pedidos: number
   pedidosPendientes: number
-  vendedoresActivos: number
-  vendedoresPendientes: number
   productos: number
   suscripcion: Suscripcion | null
   esDemo: boolean
@@ -51,8 +44,6 @@ export const RESUMEN_DEMO: ResumenPanel = {
   ventasCents: 1_284_500,
   pedidos: 37,
   pedidosPendientes: 4,
-  vendedoresActivos: 6,
-  vendedoresPendientes: 2,
   productos: 24,
   suscripcion: {
     status: "prueba",
@@ -140,209 +131,6 @@ export function getDemoMetrics(): DashboardMetrics {
   }
 }
 
-export interface ComisionItem {
-  id: string
-  storeName: string
-  amountCents: number
-  baseCents: number
-  rateBps: number
-  status: CommissionStatus
-  createdAt: string
-}
-
-export interface ResumenVendedor {
-  volumenCents: number
-  ventas: number
-  porEstado: Record<CommissionStatus, number>
-  ganadoCents: number
-  tiendasActivas: number
-  tiendasPendientes: number
-  tiendasEnHistorial: number
-  desde: string | null
-  perfil: {
-    slug: string
-    displayName: string
-    city: string | null
-    bio: string | null
-  } | null
-  esDemo: boolean
-}
-
-export interface PerfilPublico {
-  slug: string
-  displayName: string
-  city: string | null
-  bio: string | null
-  avatarUrl: string | null
-  ventas: number
-  volumenCents: number
-  tiendas: number
-  desde: string | null
-  historial: Array<{ storeName: string; ventas: number; desde: string | null }>
-}
-
-const HACE = (dias: number) =>
-  new Date(Date.now() - dias * 86_400_000).toISOString()
-
-/** Panel del vendedor de ejemplo, con historial ya empezado. */
-export const RESUMEN_VENDEDOR_DEMO: ResumenVendedor = {
-  volumenCents: 412_000,
-  ventas: 17,
-  porEstado: {
-    pendiente: 8_400,
-    confirmada: 26_600,
-    pagada: 14_400,
-    anulada: 3_600,
-  },
-  ganadoCents: 41_000,
-  tiendasActivas: 2,
-  tiendasPendientes: 1,
-  tiendasEnHistorial: 3,
-  desde: HACE(94),
-  perfil: {
-    slug: "ana-quispe-4f2c1a",
-    displayName: "Ana Quispe",
-    city: "El Alto",
-    bio: "Vendo por WhatsApp y en ferias los fines de semana.",
-  },
-  esDemo: true,
-}
-
-export const COMISIONES_DEMO: ComisionItem[] = [
-  {
-    id: "demo-c-1",
-    storeName: "Rosa Deportes",
-    amountCents: 2_160,
-    baseCents: 18_000,
-    rateBps: 1200,
-    status: "confirmada",
-    createdAt: HACE(2),
-  },
-  {
-    id: "demo-c-2",
-    storeName: "Tecno Sur",
-    amountCents: 850,
-    baseCents: 8_500,
-    rateBps: 1000,
-    status: "pendiente",
-    createdAt: HACE(4),
-  },
-  {
-    id: "demo-c-3",
-    storeName: "Rosa Deportes",
-    amountCents: 2_880,
-    baseCents: 24_000,
-    rateBps: 1200,
-    status: "pagada",
-    createdAt: HACE(11),
-  },
-  {
-    id: "demo-c-4",
-    storeName: "Vintage Feria",
-    amountCents: 3_600,
-    baseCents: 45_000,
-    rateBps: 800,
-    status: "anulada",
-    createdAt: HACE(19),
-  },
-]
-
-export interface TiendaAbierta {
-  id: string
-  name: string
-  slug: string
-  tagline: string | null
-  joinMode: string
-  commissionBps: number
-}
-
-export interface ProductoVitrina {
-  id: string
-  name: string
-  priceCents: number
-  compareAtPriceCents: number | null
-  imageUrl: string | null
-  condition: string
-  storeName: string
-  storeSlug: string
-  commissionBps: number
-}
-
-/** Tiendas de ejemplo para que la vitrina del vendedor no salga vacía. */
-export const TIENDAS_ABIERTAS_DEMO: TiendaAbierta[] = [
-  {
-    id: "demo-tienda-1",
-    name: "Rosa Deportes",
-    slug: "rosa-deportes",
-    tagline: "Ropa deportiva en Santa Cruz. Buzos, poleras y mochilas.",
-    joinMode: "abierta",
-    commissionBps: 1200,
-  },
-  {
-    id: "demo-tienda-2",
-    name: "Bella Piel",
-    slug: "bella-piel",
-    tagline: "Maquillaje y cuidado de la piel, con envíos a todo el país.",
-    joinMode: "con_aprobacion",
-    commissionBps: 800,
-  },
-  {
-    id: "demo-tienda-3",
-    name: "Tecno Sur",
-    slug: "tecno-sur",
-    tagline: "Celulares, audífonos y accesorios, nuevos y reacondicionados.",
-    joinMode: "abierta",
-    commissionBps: 1000,
-  },
-]
-
-export const PRODUCTOS_VITRINA_DEMO: ProductoVitrina[] = [
-  {
-    id: "demo-v-1",
-    name: "Buzo oversize",
-    priceCents: 18000,
-    compareAtPriceCents: null,
-    imageUrl: null,
-    condition: "nuevo",
-    storeName: "Rosa Deportes",
-    storeSlug: "rosa-deportes",
-    commissionBps: 1200,
-  },
-  {
-    id: "demo-v-2",
-    name: "Mochila urbana",
-    priceCents: 24000,
-    compareAtPriceCents: 30000,
-    imageUrl: null,
-    condition: "nuevo",
-    storeName: "Rosa Deportes",
-    storeSlug: "rosa-deportes",
-    commissionBps: 1200,
-  },
-  {
-    id: "demo-v-3",
-    name: "Audífonos inalámbricos",
-    priceCents: 17000,
-    compareAtPriceCents: null,
-    imageUrl: null,
-    condition: "nuevo",
-    storeName: "Tecno Sur",
-    storeSlug: "tecno-sur",
-    commissionBps: 1000,
-  },
-  {
-    id: "demo-v-4",
-    name: "Celular reacondicionado",
-    priceCents: 66000,
-    compareAtPriceCents: 89000,
-    imageUrl: null,
-    condition: "reacondicionado",
-    storeName: "Tecno Sur",
-    storeSlug: "tecno-sur",
-    commissionBps: 1000,
-  },
-]
-
 export interface PlantillaResumen {
   key: string
   name: string
@@ -415,7 +203,6 @@ const DEMO_PRODUCT_BASE = {
   sku: null,
   low_stock_threshold: 3,
   is_featured: false,
-  seller_enabled: true,
   created_at: NOW,
   updated_at: NOW,
   deleted_at: null,
@@ -499,14 +286,7 @@ export function tableroDeDemostracion(): Tablero {
     const subida = 1 + Math.max(indice - (todos.length - 30), 0) / 30
     const pedidos = Math.floor(azarFijo(numero) * 3.4 * finde * subida)
     const ticket = 9_000 + Math.round(azarFijo(numero * 7) * 30) * 1_000
-    const ventasCents = pedidos * ticket
-    const deLaRed = Math.floor(pedidos * azarFijo(numero * 13) * 0.6)
-    return {
-      ...dia,
-      pedidos,
-      ventasCents,
-      redCents: deLaRed * ticket,
-    }
+    return { ...dia, pedidos, ventasCents: pedidos * ticket }
   })
 
   const hace = (minutos: number) =>
@@ -519,8 +299,8 @@ export function tableroDeDemostracion(): Tablero {
       {
         id: "demo-pedido-1",
         numero: 148,
-        comprador: "Valeria Quispe Mamani",
-        telefono: "70145823",
+        comprador: null,
+        telefono: null,
         totalCents: 52_000,
         estado: "pendiente",
         creado: hace(26),
@@ -529,8 +309,8 @@ export function tableroDeDemostracion(): Tablero {
       {
         id: "demo-pedido-2",
         numero: 147,
-        comprador: "Jhonny Céspedes",
-        telefono: "76820417",
+        comprador: null,
+        telefono: null,
         totalCents: 24_500,
         estado: "pagado",
         creado: hace(134),
@@ -539,35 +319,35 @@ export function tableroDeDemostracion(): Tablero {
       {
         id: "demo-pedido-3",
         numero: 146,
-        comprador: "Carla Arteaga Ribera",
-        telefono: "69034751",
+        comprador: null,
+        telefono: null,
         totalCents: 18_000,
-        estado: "enviado",
+        estado: "pagado",
         creado: hace(60 * 27),
         articulos: 1,
       },
       {
         id: "demo-pedido-4",
         numero: 145,
-        comprador: "Rodrigo Mendoza Flores",
-        telefono: "71598306",
+        comprador: null,
+        telefono: null,
         totalCents: 70_500,
-        estado: "entregado",
+        estado: "pagado",
         creado: hace(60 * 24 * 3 + 95),
         articulos: 2,
       },
       {
         id: "demo-pedido-5",
         numero: 144,
-        comprador: "Daniela Rojas",
-        telefono: "78241169",
+        comprador: null,
+        telefono: null,
         totalCents: 6_500,
         estado: "cancelado",
         creado: hace(60 * 24 * 4 + 300),
         articulos: 1,
       },
     ],
-    porGestionar: { pendientes: 2, pagados: 1 },
+    porGestionar: { pendientes: 1 },
     masVendidos: [
       {
         id: "demo-polera",
@@ -625,152 +405,10 @@ export function tableroDeDemostracion(): Tablero {
         stock: 3,
       },
     ],
-    red: {
-      activa: true,
-      activos: 6,
-      pendientes: 2,
-      destacados: [
-        {
-          id: "demo-ana",
-          nombre: "Ana Gutiérrez",
-          ventasCents: 234_000,
-          pedidos: 9,
-        },
-        {
-          id: "demo-luis",
-          nombre: "Luis Fernando Vaca",
-          ventasCents: 118_500,
-          pedidos: 5,
-        },
-        {
-          id: "demo-micaela",
-          nombre: "Micaela Suárez",
-          ventasCents: 64_000,
-          pedidos: 3,
-        },
-      ],
-    },
-    pasos: { producto: true, estilo: true, primerPedido: true, vendedor: true },
+    pasos: { producto: true, estilo: true, primerPedido: true },
     esDemo: true,
   }
 }
-
-/**
- * La red de Rosa Deportes, para el modo demo.
- *
- * Los mismos nombres y cifras que muestra el Resumen de demostración, para
- * que las dos pantallas no se contradigan, y dos solicitudes esperando.
- */
-export function redDeDemostracion(): RedDeMiTienda {
-  const comisionBps = 1200
-  const vendedor = (
-    id: string,
-    nombre: string,
-    status: string,
-    referralCode: string,
-    dias: number,
-    pedidos: number,
-    ventasCents: number
-  ): VendedorEnRed => ({
-    id,
-    nombre,
-    status,
-    referralCode,
-    joinedAt: new Date(Date.now() - dias * 86_400_000).toISOString(),
-    pedidos,
-    ventasCents,
-    comisionCents: Math.round((ventasCents * comisionBps) / 10_000),
-  })
-
-  return {
-    slug: "rosa-deportes",
-    comisionBps,
-    activa: true,
-    modo: "con_aprobacion",
-    vendedores: [
-      vendedor("demo-camila", "Camila Vargas", "pendiente", "CVG2HX", 0, 0, 0),
-      vendedor(
-        "demo-rodrigo",
-        "Rodrigo Céspedes",
-        "pendiente",
-        "RCS5MJ",
-        1,
-        0,
-        0
-      ),
-      vendedor("demo-ana", "Ana Gutiérrez", "activo", "ANA7K2", 64, 9, 234_000),
-      vendedor(
-        "demo-luis",
-        "Luis Fernando Vaca",
-        "activo",
-        "FVA9HM",
-        41,
-        5,
-        118_500
-      ),
-      vendedor(
-        "demo-micaela",
-        "Micaela Suárez",
-        "activo",
-        "MSU4RP",
-        33,
-        3,
-        64_000
-      ),
-      vendedor(
-        "demo-jorge",
-        "Jorge Mamani Quispe",
-        "activo",
-        "JMQ8TX",
-        20,
-        2,
-        31_500
-      ),
-      vendedor(
-        "demo-valeria",
-        "Valeria Rocha",
-        "activo",
-        "VRC3WN",
-        12,
-        1,
-        18_000
-      ),
-      vendedor("demo-diego", "Diego Antezana", "activo", "DAZ6PE", 4, 0, 0),
-    ],
-    esDemo: true,
-  }
-}
-
-/**
- * Las tiendas de la vendedora de ejemplo: las mismas de su resumen, dos
- * activas y una esperando que el dueño la apruebe.
- */
-export const VINCULOS_DEMO: VinculoVendedor[] = [
-  {
-    id: "demo-v-rosa",
-    storeId: "demo-rosa",
-    storeName: "Rosa Deportes",
-    storeSlug: "rosa-deportes",
-    status: "activo",
-    referralCode: "ANQ4RX",
-  },
-  {
-    id: "demo-v-tecno",
-    storeId: "demo-tecno",
-    storeName: "Tecno Sur",
-    storeSlug: "tecno-sur",
-    status: "activo",
-    referralCode: "ANQ7KM",
-  },
-  {
-    id: "demo-v-bella",
-    storeId: "demo-bella",
-    storeName: "Bella Piel",
-    storeSlug: "bella-piel",
-    status: "pendiente",
-    referralCode: "ANQ9WP",
-  },
-]
 
 /* -------------------------------------------------------------------------
  * Los catálogos en PDF, en modo demo

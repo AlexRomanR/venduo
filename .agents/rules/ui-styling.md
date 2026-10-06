@@ -13,7 +13,7 @@ cubre cómo se ve.
 ### El mundo de Venduo y el de cada tienda
 
 **Venduo usa el mundo editorial de `DESIGN.md`**: papel, tinta y un rojo de señal. Portada,
-ingreso, altas, vitrinas del vendedor y su perfil público.
+ingreso, el alta de la tienda y el panel.
 
 **Una tienda usa el de su plantilla.** La plantilla redefine los mismos tokens —`papel`,
 `tinta`, `senal`, `font-titular`, el radio— y trae su propio kit de componentes para la
@@ -65,27 +65,23 @@ Esencia oro viejo. La regla de usarla poco no cambia con el color.
 
 ### Cuándo aparece la barra
 
-**Desde que una persona tiene panel —una tienda o un vínculo de vendedor—, toda pantalla
-de su cuenta lleva la barra.** Si la barra enlaza a una pantalla, esa pantalla la muestra:
-antes "Buscar tiendas" o "Vender para otras tiendas" la hacían desaparecer, porque esas
-rutas vivían fuera de `app/(privado)`.
+**Desde que una persona tiene panel —una tienda con su alta terminada—, toda pantalla de
+su cuenta lleva la barra.**
 
-| Pantalla                                  | Barra                                      |
-| ----------------------------------------- | ------------------------------------------ |
-| `/panel/*`, `/vendedor`, `/cuenta`        | Siempre                                    |
-| `/explorar/*`, `/sumarme`                 | Con panel sí; sin panel, el marco del alta |
-| `/crear/*` (el alta de la tienda)         | No. Con panel, ofrece "Volver a mi panel"  |
-| `/editor`                                 | No: es pantalla completa, con su "Salir"   |
-| Lo público: `/`, `/login`, `/t/*`, `/v/*` | No                                         |
+| Pantalla                          | Barra                                     |
+| --------------------------------- | ----------------------------------------- |
+| `/panel/*`, `/cuenta`             | Siempre                                   |
+| `/crear/*` (el alta de la tienda) | No. Con panel, ofrece "Volver a mi panel" |
+| `/editor`                         | No: es pantalla completa, con su "Salir"  |
+| Lo público: `/`, `/login`, `/t/*` | No                                        |
 
 Quien recién se registró y no tiene nada todavía está en su alta: una barra vacía no le
 sirve, y ve el marco del alta (`Marco`) hasta tener algo a qué volver.
 
-**Nadie arma esto a mano.** El armazón con la barra es `ArmazonDelPanel` y la decisión
-entre los dos marcos es `MarcoDeCuenta`, los dos en `components/panel/armazon.tsx`; si
-la persona tiene panel lo dice `tienePanel()`. Una pantalla nueva de la cuenta va dentro
-de `app/(privado)` o usa `MarcoDeCuenta`; nunca un layout propio con otra cabecera.
-Una pantalla sin barra tiene que ofrecer siempre una salida visible al panel.
+**Nadie arma esto a mano.** El armazón con la barra es `ArmazonDelPanel`, en
+`components/panel/armazon.tsx`; si la persona tiene panel lo dice `tienePanel()`. Una
+pantalla nueva de la cuenta va dentro de `app/(privado)`; nunca un layout propio con otra
+cabecera. Una pantalla sin barra tiene que ofrecer siempre una salida visible al panel.
 
 ### La barra lateral de los paneles
 
@@ -93,13 +89,11 @@ Las pantallas del panel comparten una barra lateral fija desde `lg` y un cajón 
 cajón es el `Sheet` de shadcn con `showCloseButton={false}` y `shadow-none` —el suyo mide
 28 px y dice "Close"— y un cierre propio de 44 px.
 
-Las secciones las deciden los datos (`lib/data/barra.ts`), no `primary_role`: quien tiene
-tienda ve "Tu negocio", quien vende para otras ve "Como vendedor", y quien hace las dos
-ve las dos.
+Lo que muestra sale de `lib/data/barra.ts`: la tienda con su enlace, "Tu negocio" con
+sus secciones, y la cuenta.
 
 Los contadores siguen la regla del rojo: **rojo solo si pide una acción** —un pedido que
-ya trajo comprobante, un producto sin stock, una solicitud de vendedor—; en tinta si solo
-informa. El atajo "Nuevo producto" va con trazo y no relleno rojo por lo mismo: vive en
+espera que confirmes su pago, un producto sin stock—; en tinta si solo informa. El atajo "Nuevo producto" va con trazo y no relleno rojo por lo mismo: vive en
 todas las pantallas y competiría con el botón principal de cada una. En el móvil, el botón
 del menú lleva un punto rojo si adentro hay algo urgente.
 
@@ -107,7 +101,7 @@ del menú lleva un punto rojo si adentro hay algo urgente.
 
 **Toda pantalla del panel se arma igual que el Resumen**: cada cosa en su propio panel
 —regla estructural de un píxel, esquina viva, sin sombra— con un ícono, un título que
-dice **para qué sirve** ("Cómo van tus cobros", "Quieren vender para ti", "Se está
+dice **para qué sirve** ("Cómo van tus cobros", "Para hoy", "Se está
 acabando") y una bajada de una línea. El pie, si lo hay, es un enlace a todo el ancho
 hacia donde se sigue. Antes solo el Resumen se veía así, y en las demás pantallas las
 cifras, los filtros y las listas quedaban sueltos bajo rótulos chicos: lo importante se
@@ -122,7 +116,7 @@ perdía entre lo demás.
 | `Seccion`          | El panel. `extra` a la derecha del título, `accion` en el pie     |
 | `Cifras` y `Cifra` | Cifras en celdas separadas por una regla, de a dos o de a cuatro  |
 | `SinDatos`         | El estado vacío dentro de un panel: qué va a aparecer y cómo      |
-| `Insignia`         | Un estado en versalita: un pedido, una comisión, un vendedor      |
+| `Insignia`         | Un estado en versalita: un pedido, un producto oculto             |
 | `Miniatura`        | La foto chica de un producto en una fila                          |
 
 Y el ritmo, el mismo en todas: la pantalla es una columna de paneles con `gap-6
@@ -214,16 +208,16 @@ Nuestro cliente **ya vende por TikTok, Instagram, Facebook o WhatsApp**: ropa,
 zapatillas, maquillaje, perfumes, accesorios, tecnología, segunda mano. No se levanta
 pensando "necesito una página web"; se levanta respondiendo "¿precio?" por mensaje. Por
 eso Venduo es **más que una tienda online**: la tienda se nombra, pero siempre con lo
-que hay detrás —el stock, los cobros, los pedidos, los vendedores, los catálogos—.
+que hay detrás —el stock, los pedidos por WhatsApp, las estadísticas, los catálogos—.
 
-| Sí                                                         | No                                                        |
-| ---------------------------------------------------------- | --------------------------------------------------------- |
-| "Tu tienda online, y todo lo que hay detrás"               | "Crea tu página web"                                      |
-| "Tu tienda online, con stock y cobros incluidos"           | "Tu tienda online en minutos", a secas                    |
-| "El enlace de tu bio", "mándalo por WhatsApp"              | "Tu sitio", "tu dominio", "tu e-commerce"                 |
-| "Tu negocio" para el panel: stock, pedidos, cobros, ventas | "Dashboard", "backoffice"                                 |
-| Ejemplos de redes: Rosa Deportes, Bella Piel, Tecno Sur    | Comida casera: cuñapés, panaderías, cafés                 |
-| Los dolores en su idioma: "vendí algo que ya no tenía"     | Promesas genéricas: "lleva tu negocio al siguiente nivel" |
+| Sí                                                      | No                                                        |
+| ------------------------------------------------------- | --------------------------------------------------------- |
+| "Tu tienda online, y todo lo que hay detrás"            | "Crea tu página web"                                      |
+| "Tu tienda online, con stock y pedidos incluidos"       | "Tu tienda online en minutos", a secas                    |
+| "El enlace de tu bio", "mándalo por WhatsApp"           | "Tu sitio", "tu dominio", "tu e-commerce"                 |
+| "Tu negocio" para el panel: stock, pedidos, ventas      | "Dashboard", "backoffice"                                 |
+| Ejemplos de redes: Rosa Deportes, Bella Piel, Tecno Sur | Comida casera: cuñapés, panaderías, cafés                 |
+| Los dolores en su idioma: "vendí algo que ya no tenía"  | Promesas genéricas: "lleva tu negocio al siguiente nivel" |
 
 Nunca se borra la palabra "tienda": lo que se evita es que parezca que eso es todo.
 
@@ -265,7 +259,7 @@ antes de darla por buena.
 ## Estados vacíos y de carga
 
 Toda lista tiene tres estados y los tres se escriben: con datos, vacía y cargando. Una
-tienda recién creada, un vendedor sin ventas y un panel sin pedidos son **el estado
+tienda recién creada, un catálogo sin productos y un panel sin pedidos son **el estado
 normal** durante la demostración, no un caso raro.
 
 Para cargas usar `Skeleton` de shadcn, con la forma aproximada del contenido real.
@@ -425,10 +419,10 @@ contenido tenga un ancho máximo en escritorio — una línea de texto de 1280 p
 
 En 48 horas el diseño no se reparte parejo:
 
-| Superficie                           | Criterio                                                                       |
-| ------------------------------------ | ------------------------------------------------------------------------------ |
-| Tienda pública y perfil del vendedor | **Acá sí.** Es lo que ve un comprador desde el celular y lo que ve un jurado   |
-| Paneles (`/panel`, `/vendedor`)      | El mismo mundo, con menos aire. Sirven para trabajar, y trabajar también se ve |
+| Superficie               | Criterio                                                                      |
+| ------------------------ | ----------------------------------------------------------------------------- |
+| Tienda pública y carrito | **Acá sí.** Es lo que ve un comprador desde el celular y lo que ve un jurado  |
+| Panel (`/panel`)         | El mismo mundo, con menos aire. Sirve para trabajar, y trabajar también se ve |
 
 Para animación, los tres lugares donde cambia la percepción del producto: aplicar una
 propuesta de la IA en el editor de bloques, el carrito, y los avisos.

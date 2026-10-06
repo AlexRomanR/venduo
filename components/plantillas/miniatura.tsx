@@ -83,7 +83,7 @@ function DibujoFashion() {
   return (
     <div className="flex h-full flex-col">
       <div className="bg-tinta py-[3px] text-center text-[length:1.562cqw] font-semibold tracking-[0.2em] text-papel uppercase">
-        Entrega coordinada por WhatsApp
+        Pedidos por WhatsApp
       </div>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center border-b border-tinta px-2.5 py-1.5">
         <span className="text-[length:1.562cqw] font-semibold tracking-[0.16em] uppercase">

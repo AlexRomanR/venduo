@@ -14,8 +14,6 @@ export interface LineaCarrito {
 
 interface EstadoCarrito {
   lineas: LineaCarrito[]
-  /** El vendedor que trajo la visita, si el enlace traía código. */
-  referido: string | null
   unidades: number
   subtotalCents: number
   listo: boolean
@@ -23,7 +21,6 @@ interface EstadoCarrito {
   cambiar: (productoId: string, cantidad: number) => void
   quitar: (productoId: string) => void
   vaciar: () => void
-  recordarReferido: (codigo: string | null) => void
 }
 
 const Contexto = React.createContext<EstadoCarrito | null>(null)
@@ -31,10 +28,11 @@ const Contexto = React.createContext<EstadoCarrito | null>(null)
 /**
  * El carrito vive en el navegador, por tienda.
  *
- * No en la base: obligaría a identificar a un comprador que todavía no dio
- * ningún dato, y a limpiar carritos abandonados. Lo que sí se guarda en la
- * base es el pedido, y ahí `create_order` recalcula cada precio desde el
- * catálogo — lo que el carrito diga de los montos es solo para mostrar.
+ * No en la base: obligaría a identificar a un comprador que no da ningún dato,
+ * y a limpiar carritos abandonados. Lo que sí se guarda en la base es el
+ * pedido que se manda por WhatsApp, y ahí `create_order` recalcula cada
+ * precio desde el catálogo — lo que el carrito diga de los montos es solo
+ * para mostrar.
  *
  * La clave incluye el slug porque una misma persona puede estar comprando en
  * dos tiendas a la vez desde la misma pestaña.
@@ -56,7 +54,6 @@ export function ProveedorCarrito({
   const clave = `venduo:carrito:${slug}`
 
   const [lineas, setLineas] = React.useState<LineaCarrito[]>(muestra ?? [])
-  const [referido, setReferido] = React.useState<string | null>(null)
   // Hasta que no se leyó el almacenamiento no se dibuja el contador: pintar
   // cero y corregirlo un instante después se ve como un parpadeo, y en la
   // primera pantalla de una tienda eso parece un error.
@@ -68,12 +65,8 @@ export function ProveedorCarrito({
     try {
       const crudo = window.localStorage.getItem(clave)
       if (crudo) {
-        const datos = JSON.parse(crudo) as {
-          lineas?: LineaCarrito[]
-          referido?: string | null
-        }
+        const datos = JSON.parse(crudo) as { lineas?: LineaCarrito[] }
         setLineas(Array.isArray(datos.lineas) ? datos.lineas : [])
-        setReferido(datos.referido ?? null)
       }
     } catch {
       // Almacenamiento bloqueado o contenido corrupto: se empieza vacío. Un
@@ -85,11 +78,11 @@ export function ProveedorCarrito({
   React.useEffect(() => {
     if (!listo || deMuestra) return
     try {
-      window.localStorage.setItem(clave, JSON.stringify({ lineas, referido }))
+      window.localStorage.setItem(clave, JSON.stringify({ lineas }))
     } catch {
       // Sin almacenamiento el carrito dura lo que dure la pestaña.
     }
-  }, [clave, lineas, referido, listo, deMuestra])
+  }, [clave, lineas, listo, deMuestra])
 
   const valor = React.useMemo<EstadoCarrito>(() => {
     const unidades = lineas.reduce((total, l) => total + l.cantidad, 0)
@@ -100,7 +93,6 @@ export function ProveedorCarrito({
 
     return {
       lineas,
-      referido,
       unidades,
       subtotalCents,
       listo,
@@ -149,14 +141,8 @@ export function ProveedorCarrito({
         // vuelve a disparar el efecto que llamó acá: bucle infinito.
         setLineas((previas) => (previas.length === 0 ? previas : []))
       },
-
-      recordarReferido(codigo) {
-        // El primero que llegó manda: si alguien entró por el enlace de Ana y
-        // después navega sin código, la venta sigue siendo de Ana.
-        if (codigo) setReferido((previo) => previo ?? codigo)
-      },
     }
-  }, [lineas, referido, listo])
+  }, [lineas, listo])
 
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>
 }

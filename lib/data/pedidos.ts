@@ -1,7 +1,5 @@
 import { getMiTienda } from "@/lib/data/panel"
 import { createClient } from "@/lib/supabase/server"
-import { formatMoney } from "@/lib/format"
-import { numeroDeWhatsApp } from "@/lib/pedidos"
 import type { OrderStatus } from "@/types"
 
 export interface LineaPedido {
@@ -15,15 +13,13 @@ export interface Pedido {
   id: string
   numero: number
   estado: OrderStatus
-  comprador: string
-  telefono: string
-  correo: string | null
+  /**
+   * Quién compró. Los pedidos que llegan por WhatsApp no lo traen —la tienda
+   * lo tiene en el chat—; solo los anteriores a ese cambio.
+   */
+  comprador: string | null
+  telefono: string | null
   totalCents: number
-  comisionCents: number
-  netoCents: number
-  /** El vendedor que trajo la venta, o `null` si fue directa. */
-  vendedor: { nombre: string; codigo: string } | null
-  comprobante: string | null
   creado: string
   pagado: string | null
   items: LineaPedido[]
@@ -33,12 +29,9 @@ export interface ResumenPedidos {
   total: number
   pendientes: number
   pagados: number
-  enCamino: number
-  entregados: number
   cancelados: number
   porCobrarCents: number
   cobradoCents: number
-  conComprobante: number
 }
 
 export interface Pedidos {
@@ -49,10 +42,8 @@ export interface Pedidos {
 
 function pedidosDeDemostracion(): Pedidos {
   const base = {
-    comisionCents: 0,
-    netoCents: 0,
-    correo: null,
-    comprobante: null,
+    comprador: null,
+    telefono: null,
     pagado: null,
     creado: new Date().toISOString(),
   }
@@ -63,13 +54,7 @@ function pedidosDeDemostracion(): Pedidos {
       id: "demo-1",
       numero: 104,
       estado: "pendiente",
-      comprador: "Lucía Fernández",
-      telefono: "76543210",
       totalCents: 24000,
-      comisionCents: 2880,
-      netoCents: 21120,
-      vendedor: { nombre: "Ana Quispe", codigo: "JZCER68" },
-      comprobante: "demo/comprobante.jpg",
       items: [
         {
           nombre: "Mochila urbana",
@@ -84,10 +69,8 @@ function pedidosDeDemostracion(): Pedidos {
       id: "demo-2",
       numero: 103,
       estado: "pagado",
-      comprador: "Carlos Pérez",
-      telefono: "71234567",
       totalCents: 13000,
-      vendedor: null,
+      pagado: new Date().toISOString(),
       items: [
         {
           nombre: "Polera básica",
@@ -105,23 +88,15 @@ function pedidosDeDemostracion(): Pedidos {
 function resumir(pedidos: Pedido[]): ResumenPedidos {
   const enEstado = (estado: OrderStatus) =>
     pedidos.filter((p) => p.estado === estado)
+  const suma = (lista: Pedido[]) => lista.reduce((t, p) => t + p.totalCents, 0)
 
   return {
     total: pedidos.length,
     pendientes: enEstado("pendiente").length,
     pagados: enEstado("pagado").length,
-    enCamino: enEstado("enviado").length,
-    entregados: enEstado("entregado").length,
     cancelados: enEstado("cancelado").length,
-    // Lo pendiente es lo que todavía no entró: cobrado es todo lo que pasó de
-    // ahí, incluido lo ya entregado.
-    porCobrarCents: enEstado("pendiente").reduce((t, p) => t + p.totalCents, 0),
-    cobradoCents: pedidos
-      .filter((p) => ["pagado", "enviado", "entregado"].includes(p.estado))
-      .reduce((t, p) => t + p.totalCents, 0),
-    conComprobante: pedidos.filter(
-      (p) => p.estado === "pendiente" && p.comprobante
-    ).length,
+    porCobrarCents: suma(enEstado("pendiente")),
+    cobradoCents: suma(enEstado("pagado")),
   }
 }
 
@@ -142,62 +117,20 @@ export async function getPedidos(filtro?: string): Promise<Pedidos> {
   const { data: filas } = await supabase
     .from("orders")
     .select(
-      `id, order_number, status, buyer_name, buyer_phone, buyer_email,
-       total_cents, commission_cents, net_to_store_cents, referral_code,
-       payment_proof_url, created_at, paid_at, seller_id,
+      `id, order_number, status, buyer_name, buyer_phone, total_cents,
+       created_at, paid_at,
        order_items ( product_name, quantity, unit_price_cents )`
     )
     .eq("store_id", tienda.id)
     .order("created_at", { ascending: false })
 
-  const crudos = filas ?? []
-
-  // Los nombres de los vendedores en una sola consulta: uno por pedido sería
-  // una ida a la base por fila.
-  const vinculos = [
-    ...new Set(
-      crudos.map((f) => f.seller_id).filter((id): id is string => !!id)
-    ),
-  ]
-
-  const nombres = new Map<string, string>()
-  if (vinculos.length > 0) {
-    const { data: sellers } = await supabase
-      .from("store_sellers")
-      .select("id, user_id")
-      .in("id", vinculos)
-
-    const usuarios = (sellers ?? []).map((s) => s.user_id)
-    const { data: perfiles } = await supabase
-      .from("seller_profiles")
-      .select("user_id, display_name")
-      .in("user_id", usuarios)
-
-    const porUsuario = new Map(
-      (perfiles ?? []).map((p) => [p.user_id, p.display_name])
-    )
-    for (const s of sellers ?? []) {
-      nombres.set(s.id, porUsuario.get(s.user_id) ?? "Vendedor")
-    }
-  }
-
-  const pedidos: Pedido[] = crudos.map((fila) => ({
+  const pedidos: Pedido[] = (filas ?? []).map((fila) => ({
     id: fila.id,
     numero: fila.order_number,
     estado: fila.status,
     comprador: fila.buyer_name,
     telefono: fila.buyer_phone,
-    correo: fila.buyer_email,
     totalCents: fila.total_cents,
-    comisionCents: fila.commission_cents,
-    netoCents: fila.net_to_store_cents,
-    vendedor: fila.seller_id
-      ? {
-          nombre: nombres.get(fila.seller_id) ?? "Vendedor",
-          codigo: fila.referral_code ?? "",
-        }
-      : null,
-    comprobante: fila.payment_proof_url,
     creado: fila.created_at,
     pagado: fila.paid_at,
     items: (fila.order_items ?? []).map((item) => ({
@@ -221,28 +154,4 @@ export async function getPedidos(filtro?: string): Promise<Pedidos> {
 export async function getPedido(id: string): Promise<Pedido | null> {
   const { pedidos } = await getPedidos()
   return pedidos.find((p) => p.id === id) ?? null
-}
-
-/**
- * El mensaje de WhatsApp con el pedido ya escrito.
- *
- * La plataforma no gestiona envíos: la entrega se coordina entre las dos
- * personas. Lo que sí hace es que nadie tenga que volver a tipear qué se
- * compró, que es donde se pierden los detalles.
- */
-export function mensajeDeEntrega(pedido: Pedido, tienda: string): string {
-  const lineas = [
-    `Hola ${pedido.comprador}, te escribo de ${tienda}.`,
-    "",
-    `Tu pedido #${pedido.numero}:`,
-    ...pedido.items.map(
-      (i) => `· ${i.cantidad}× ${i.nombre} — ${formatMoney(i.totalCents)}`
-    ),
-    "",
-    `Total: ${formatMoney(pedido.totalCents)}`,
-    "",
-    "¿Cuándo y dónde te queda bien recibirlo?",
-  ]
-
-  return `https://wa.me/${numeroDeWhatsApp(pedido.telefono)}?text=${encodeURIComponent(lineas.join("\n"))}`
 }

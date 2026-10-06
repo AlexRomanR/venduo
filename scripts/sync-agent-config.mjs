@@ -42,8 +42,8 @@ const SKILLS_PROPIAS = [
   "ai-task-workflow",
   "database-migration",
   "implement-feature",
+  "pedidos-por-whatsapp",
   "qa-verification",
-  "sales-and-commissions",
   "visual-block-editor",
 ]
 

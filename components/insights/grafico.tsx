@@ -371,7 +371,7 @@ function Serie({
  * Ranking: barras horizontales con etiqueta directa.
  *
  * Horizontales y no verticales porque las etiquetas son nombres —un producto,
- * un vendedor— y en vertical se cortan o se inclinan. La identidad viene del
+ * una categoría— y en vertical se cortan o se inclinan. La identidad viene del
  * nombre a la izquierda, nunca del color.
  * ------------------------------------------------------------------------ */
 function Barras({

@@ -254,7 +254,7 @@ function contraportada(
     texto:
       "Escríbenos por WhatsApp o compra directo en nuestra tienda online: ahí ves lo que queda de cada producto.",
     redes: "",
-    pago: "Pagas con PagoFácil en la tienda online, y tu dinero queda protegido hasta que recibes tu pedido.",
+    pago: "Arma tu pedido en la tienda online y te llega a nuestro WhatsApp: ahí acordamos el pago.",
     whatsapp: Boolean(tienda.whatsapp),
     qr: true,
   }

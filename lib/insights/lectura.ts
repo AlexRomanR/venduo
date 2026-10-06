@@ -7,7 +7,7 @@ import { formatMoney, formatNumber } from "@/lib/format"
  *
  * La `explicacion` que devuelve la IA se escribe **antes** de ejecutar la
  * consulta, así que solo puede describir la intención: "voy a mostrar las
- * ventas por vendedor". Eso no es leer el gráfico.
+ * ventas por producto". Eso no es leer el gráfico.
  *
  * Esto sí lo lee, y se calcula acá y no con una segunda pasada por el modelo
  * por dos razones: sale al instante —el viaje al proveedor cuesta entre 11 y 23
@@ -27,7 +27,7 @@ export function leerGrafico(
     const fila = filas[0]
     // Una fila con etiqueta propia es una categoría que resultó ser la única,
     // no un total. Decir solo la cifra tira el nombre, que es la mitad de la
-    // respuesta: "5" no contesta "¿en qué estado están mis vendedores?".
+    // respuesta: "5" no contesta "¿en qué estado están mis pedidos?".
     return esEtiquetaDeTotal(fila.etiqueta)
       ? `${fmt(fila.valor)} en total.`
       : `Todo cae en un solo grupo: ${fechaLegible(fila.etiqueta)}, con ${fmt(fila.valor)}.`
