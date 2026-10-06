@@ -29,7 +29,7 @@ const REGISTRO = {
   etiqueta: "Para quien ya vende",
   titular: "Tu tienda online, tu inventario y tus ventas.",
   entrada:
-    "Elige una plantilla y tu tienda queda armada. Subes tus productos desde el celular, los pedidos te llegan por WhatsApp y un panel te muestra lo que vendes cada día.",
+    "Elige una plantilla y tu tienda queda armada. Subes tus productos desde el celular o computadora, los pedidos te llegan por WhatsApp y un panel te muestra lo que vendes cada día.",
   puntos: [
     {
       titulo: "Tu inventario, con un toque",
