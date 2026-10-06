@@ -1,8 +1,8 @@
 # Venduo
 
 Más que una tienda online: el sistema para quien vende por TikTok, Instagram y WhatsApp.
-Tiene su tienda online —el enlace de su bio, sobre una plantilla que la IA edita por
-bloques— y detrás el stock, los pedidos, las estadísticas y los catálogos en PDF. Quien
+Tiene su tienda online —lista en un minuto, sobre una plantilla que edita a mano o con
+la IA— y con ella el stock, los pedidos, las estadísticas y los catálogos en PDF. Quien
 compra no deja datos: arma su carrito y lo manda al WhatsApp de la tienda.
 
 MVP de hackathon de 48 horas. **La especificación del producto es `VENDUO.md`** y es la

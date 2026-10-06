@@ -27,9 +27,9 @@ type Modo = "ingresar" | "registrarse"
 /** Lo que se lee al lado del registro: la promesa, y por qué creerla. */
 const REGISTRO = {
   etiqueta: "Para quien ya vende",
-  titular: "Tu tienda online, y todo lo que hay detrás.",
+  titular: "Tu tienda online, tu inventario y tus ventas.",
   entrada:
-    "Tu tienda para el enlace de tu bio, y detrás el stock, los pedidos y los catálogos. Lo manejas desde el celular, como ya manejas tus redes.",
+    "Tu tienda lista en un minuto, con el stock al día, los pedidos por WhatsApp y los catálogos. Lo manejas desde el celular, como ya manejas tus redes.",
   puntos: [
     {
       titulo: "Stock al día",

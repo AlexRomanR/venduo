@@ -10,7 +10,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Venduo",
     short_name: "Venduo",
-    description: "Tu tienda online, y todo lo que hay detrás.",
+    description: "Tu tienda online, tu inventario y tus ventas.",
     start_url: "/auth/destino",
     display: "browser",
     background_color: COLORES_DE_MARCA.papel,

@@ -34,9 +34,9 @@ Actualizado el 6 de octubre de 2026.
 
 ### Mensaje y portada
 
-- Venduo se presenta como **más que una tienda online**: la tienda online —el enlace
-  de la bio— y todo lo que hay detrás: stock, pedidos que llegan por WhatsApp,
-  estadísticas y catálogos en PDF.
+- Venduo se presenta como **tienda online, inventario y ventas en uno, listo en un
+  minuto**, con lo que viene además: plantillas editables, pedidos que llegan por
+  WhatsApp, catálogos en PDF y estadísticas.
 - La portada (`/`) está ordenada en ese sentido: titular, el problema, por qué no es
   solo una tienda online, cómo funciona en tres pasos, lo que incluye, para quién es,
   cómo llegan los pedidos por WhatsApp, preguntas frecuentes y llamado final.

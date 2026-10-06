@@ -5,9 +5,9 @@
 <h3 align="center">Generador de tiendas online para quien vende por redes sociales</h3>
 
 <p align="center">
-  Tu tienda online lista en minutos —sobre una plantilla que la IA edita por bloques— y
-  todo lo que hay detrás: stock, pedidos que llegan por WhatsApp, estadísticas y
-  catálogos en PDF.
+  Tu tienda online, tu inventario y tus ventas, listos en un minuto —sobre una
+  plantilla que editas a mano o con la IA—, con pedidos que llegan por WhatsApp,
+  estadísticas y catálogos en PDF.
 </p>
 
 <p align="center">
@@ -37,7 +37,7 @@ Con Venduo, el emprendedor:
    ajusta la tienda**: secciones, textos, colores y tipografía.
 3. **Carga sus productos** con fotos, stock y condición (nuevo, segunda mano o
    reacondicionado).
-4. **Publica** y obtiene el enlace de su tienda y un código QR para su bio y WhatsApp.
+4. **Publica** y obtiene el enlace de su tienda y un código QR para sus redes y WhatsApp.
 5. **Recibe los pedidos por WhatsApp**: su cliente arma el carrito y se lo manda con el
    total y el número del pedido, sin llenar formularios.
 6. **Gestiona** pedidos, stock, estadísticas y catálogos en PDF desde su panel.

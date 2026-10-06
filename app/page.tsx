@@ -1,23 +1,31 @@
 import Link from "next/link"
-import { Check, Minus, Plus } from "lucide-react"
+import {
+  BarChart3,
+  Check,
+  FileText,
+  MessageCircle,
+  Minus,
+  Palette,
+  Plus,
+} from "lucide-react"
 
 import { getSiteUrl } from "@/lib/env"
 import { getUsuario } from "@/lib/supabase/server"
-import { DemoRedes } from "@/components/landing/demo-redes"
 import { Entra } from "@/components/landing/entra"
 import { Foto } from "@/components/landing/foto"
+import { TresPaneles } from "@/components/landing/tres-paneles"
 import { Logo } from "@/components/marca/logo"
 
 export const metadata = {
-  title: "Venduo — tu tienda online, y todo lo que hay detrás",
+  title: "Venduo — tu tienda online, tu inventario y tus ventas",
   description:
-    "Para quien vende por TikTok, Instagram y WhatsApp: tu tienda online con stock al día, pedidos que llegan a tu WhatsApp y catálogos en PDF.",
+    "Para quien vende por TikTok, Instagram y WhatsApp: tu tienda online lista en un minuto, con control de stock, pedidos por WhatsApp, catálogos en PDF y estadísticas.",
   // La tarjeta va acá y no en la raíz: una tienda sin logo la heredaría, y
   // su enlace por WhatsApp mostraría a Venduo en vez de la tienda.
   metadataBase: new URL(getSiteUrl()),
   openGraph: {
     title: "Venduo",
-    description: "Tu tienda online, y todo lo que hay detrás.",
+    description: "Tu tienda online, tu inventario y tus ventas.",
     siteName: "Venduo",
     type: "website",
     images: [{ url: "/marca/compartir.png", width: 1200, height: 630 }],
@@ -31,9 +39,10 @@ export const metadata = {
  *
  * Le habla a quien ya vende por redes y no se levanta pensando "necesito una
  * página web": se levanta respondiendo "¿precio?" por mensaje directo. Por eso
- * la tienda online aparece como lo que es —la vitrina del enlace en la bio— y
- * el resto de la página cuenta lo que hay detrás: stock, pedidos por WhatsApp,
- * estadísticas y catálogos. El tono para escribirle está en `ui-styling.md`,
+ * Venduo se presenta como tres cosas a la vez —la tienda online, el inventario
+ * y las ventas— que se arman en un minuto, y el resto de la página cuenta lo
+ * que viene con ellas: pedidos por WhatsApp, plantillas, catálogos y
+ * estadísticas. El tono para escribirle está en `ui-styling.md`,
  * "Cómo le hablamos al cliente".
  *
  * Los ejemplos son ilustrativos y lo dicen al pie.
@@ -44,6 +53,14 @@ export const metadata = {
  * registrándose y cargando productos. Cuando exista, poner acá su slug.
  */
 const TIENDA_EJEMPLO: string | null = null
+
+/** Lo que viene además de la tienda, el inventario y las ventas del titular. */
+const ADEMAS = [
+  { icono: Palette, texto: "Editas tu plantilla, o se lo pides a la IA" },
+  { icono: MessageCircle, texto: "Los pedidos te llegan por WhatsApp" },
+  { icono: FileText, texto: "Catálogos en PDF para mandar" },
+  { icono: BarChart3, texto: "Estadísticas que respondes preguntando" },
+]
 
 /** Lo que dice quien vende por redes antes de usar Venduo. */
 const DOLORES = [
@@ -60,7 +77,7 @@ const COMPARACION = [
     tema: "Tu catálogo",
     comun: "Una página con fotos y precios.",
     venduo:
-      "Tu tienda online, con tu plantilla, para el enlace de tu bio y tus chats.",
+      "Tu tienda online, con tu plantilla, para compartir en tus redes y tus chats.",
   },
   {
     tema: "El stock",
@@ -95,7 +112,7 @@ const PASOS = [
   },
   {
     n: "02",
-    titulo: "Pones tu enlace en la bio",
+    titulo: "Compartes tu enlace en tus redes",
     detalle:
       "O lo mandas por WhatsApp. Quien te sigue ve todo tu catálogo ordenado, con precios y lo que queda, sin preguntarte nada.",
   },
@@ -158,7 +175,7 @@ const PREGUNTAS = [
   },
   {
     p: "Ya vendo por TikTok y WhatsApp. ¿Tengo que dejar de hacerlo?",
-    r: "No. Sigues vendiendo donde ya te conocen. Venduo pone el enlace en tu bio y en tus chats, y lo que pasa después —el pedido, el stock, los números— se ordena solo.",
+    r: "No. Sigues vendiendo donde ya te conocen. Compartes el enlace de tu tienda en tus redes y en tus chats, y lo que pasa después —el pedido, el stock, los números— se ordena solo.",
   },
   {
     p: "¿Mi cliente tiene que crear una cuenta?",
@@ -221,7 +238,7 @@ export default async function Inicio() {
 
           <Link
             href={user ? "/auth/destino" : "/login?modo=registro"}
-            className="flex min-h-11 items-center rounded-sm bg-senal px-4 text-sm font-semibold text-white transition-colors hover:bg-senal-alta"
+            className="flex min-h-11 items-center rounded-sm bg-senal px-4 text-sm font-semibold whitespace-nowrap text-white transition-colors hover:bg-senal-alta"
           >
             {user ? "Ir a mi panel" : "Crear mi tienda"}
           </Link>
@@ -234,31 +251,48 @@ export default async function Inicio() {
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center lg:gap-16">
             <div>
               <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-                Para quien vende por redes
+                Para quien vende por TikTok, Instagram y WhatsApp
               </p>
-              <h1 className="mt-5 max-w-[14ch] font-titular text-[clamp(2.5rem,8vw,4.5rem)] leading-[0.97] font-extrabold tracking-[-0.035em] text-balance">
-                Tu tienda online, y todo lo que hay detrás.
+              <h1 className="mt-5 max-w-[17ch] font-titular text-[clamp(2.25rem,7vw,3.75rem)] leading-[0.98] font-extrabold tracking-[-0.035em] text-balance">
+                Tu tienda online, tu inventario y tus ventas.
+                <span className="mt-2 block text-senal">
+                  Lista en un minuto.
+                </span>
               </h1>
-              <p className="mt-6 max-w-[52ch] text-lg leading-relaxed opacity-70">
-                Ya vendes por TikTok, Instagram y WhatsApp. Venduo te da la
-                tienda online para el enlace de tu bio y el sistema que la
-                maneja: el stock al día, los pedidos que llegan a tu WhatsApp y
-                catálogos en PDF para mandar.
+              <p className="mt-6 max-w-[50ch] text-lg leading-relaxed opacity-70">
+                Elige una plantilla y tu tienda queda armada, con el stock de
+                cada producto y un panel con lo que vendes cada día.
               </p>
+
+              <ul className="mt-7 grid max-w-[34rem] gap-x-6 sm:grid-cols-2">
+                {ADEMAS.map(({ icono: Icono, texto }) => (
+                  <li
+                    key={texto}
+                    className="flex items-start gap-2.5 border-t border-tinta/15 py-3 text-sm leading-snug font-medium"
+                  >
+                    <Icono
+                      aria-hidden="true"
+                      className="mt-px size-4 shrink-0 text-senal"
+                    />
+                    {texto}
+                  </li>
+                ))}
+              </ul>
+
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/login?modo=registro"
                   className="rounded-sm bg-senal px-5 py-3 font-semibold text-white transition-colors hover:bg-senal-alta"
                 >
-                  Crear mi tienda
+                  Crear mi tienda gratis
                 </Link>
               </div>
               <p className="mt-4 text-sm opacity-70">
-                Abrirla no cuesta nada. No pedimos tarjeta.
+                Lista en un minuto. No pedimos tarjeta.
               </p>
             </div>
 
-            <DemoRedes />
+            <TresPaneles />
           </div>
         </section>
 

@@ -9,7 +9,7 @@ import "./globals.css"
 
 export const metadata: Metadata = {
   title: {
-    default: "Venduo — tu tienda online, y todo lo que hay detrás",
+    default: "Venduo — tu tienda online, tu inventario y tus ventas",
     template: "%s · Venduo",
   },
   description:

@@ -6,7 +6,7 @@
 
 ## 1. Qué es Venduo
 
-**Más que una tienda online: el sistema para vender por redes sociales.** Quien vende por TikTok, Instagram, Facebook o WhatsApp tiene en Venduo su **tienda online** —el enlace que pone en su bio y manda por chat— y, detrás de ella, todo lo que necesita su negocio: el stock controlado, los pedidos que le llegan a su WhatsApp con el número y el total, estadísticas que se preguntan en palabras y catálogos en PDF para compartir.
+**Más que una tienda online: el sistema para vender por redes sociales.** Quien vende por TikTok, Instagram, Facebook o WhatsApp tiene en Venduo su **tienda online** —el enlace que comparte en sus redes y manda por chat— y, detrás de ella, todo lo que necesita su negocio: el stock controlado, los pedidos que le llegan a su WhatsApp con el número y el total, estadísticas que se preguntan en palabras y catálogos en PDF para compartir.
 
 La tienda se arma sobre una plantilla del rubro, y la inteligencia artificial la ajusta por bloques —agrega, quita, reordena, cambia textos y colores— cuando el emprendedor se lo pide.
 

@@ -212,9 +212,9 @@ que hay detrás —el stock, los pedidos por WhatsApp, las estadísticas, los ca
 
 | Sí                                                      | No                                                        |
 | ------------------------------------------------------- | --------------------------------------------------------- |
-| "Tu tienda online, y todo lo que hay detrás"            | "Crea tu página web"                                      |
+| "Tu tienda online, tu inventario y tus ventas"          | "Crea tu página web"                                      |
 | "Tu tienda online, con stock y pedidos incluidos"       | "Tu tienda online en minutos", a secas                    |
-| "El enlace de tu bio", "mándalo por WhatsApp"           | "Tu sitio", "tu dominio", "tu e-commerce"                 |
+| "Compártelo en tus redes", "mándalo por WhatsApp"       | "Tu sitio", "tu dominio", "tu e-commerce"                 |
 | "Tu negocio" para el panel: stock, pedidos, ventas      | "Dashboard", "backoffice"                                 |
 | Ejemplos de redes: Rosa Deportes, Bella Piel, Tecno Sur | Comida casera: cuñapés, panaderías, cafés                 |
 | Los dolores en su idioma: "vendí algo que ya no tenía"  | Promesas genéricas: "lleva tu negocio al siguiente nivel" |

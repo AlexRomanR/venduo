@@ -7,7 +7,7 @@ related_targets: []
 
 Superficie: `/` — la portada pública. Modo Persuade.
 
-Llega alguien que no conoce Venduo, desde un enlace de WhatsApp o de una bio, casi siempre
+Llega alguien que no conoce Venduo, desde un enlace de WhatsApp o de sus redes, casi siempre
 en un Android de gama baja con datos móviles. Ya vende por TikTok, Instagram o WhatsApp y
 no siente que le falte una página web: le falta orden. Tiene que entender que Venduo es
 más que una tienda online —la tienda y el sistema que la maneja— y querer registrarse.
@@ -22,9 +22,10 @@ existe; hasta entonces queda como constante nula con su pendiente escrito.
 
 ## Direction contract
 
-THESIS: La portada demuestra el mecanismo en vez de prometerlo: del enlace en la bio a la
-tienda abierta, y de ahí al panel, donde el pedido entra por WhatsApp y el stock baja solo, a la
-vista, antes de pedir nada.
+THESIS: La portada nombra las tres cosas que la persona se lleva —la tienda online, el
+inventario y las ventas— y las muestra armadas, con los mismos productos en los tres
+paneles, antes de pedir nada. Promete que se arma en un minuto, y nombra lo que viene
+además: la plantilla editable, los pedidos por WhatsApp, los catálogos y las estadísticas.
 Rechaza la portada SaaS con degradado, teléfono flotando en ángulo y tres tarjetas de
 características, y rechaza también el color bañado que satura la vista.
 
@@ -41,10 +42,11 @@ los arregla y que lo que hay detrás sí. Cree porque lo ve ocurrir en pantalla,
 lo digan. Elige el camino que lo describe: ordenar su negocio o salir a vender.
 
 FIRST VIEWPORT: Barra fija con las anclas y la acción roja. A la izquierda, el titular a
-escala grande —"Tu tienda online, y todo lo que hay detrás"— y su acción. A la derecha,
-tres cuadros que se encienden en orden: el perfil con el enlace en la bio, la tienda
-online y el panel con el pedido pagado y el stock bajando. Sin scroll para llegar a la
-acción.
+escala grande —"Tu tienda online, tu inventario y tus ventas. Lista en un minuto."—, una
+bajada, los cuatro agregados con su ícono y la acción. A la derecha, tres paneles con
+regla de un píxel: la tienda con sus productos, el inventario con lo que se está
+acabando en rojo, y las ventas de la semana en barras. Sin scroll para llegar a la
+acción en la computadora.
 
 FORM: Editorial impreso, dirección fijada por el usuario sobre una referencia propia que
 reemplazó la asignación del dado. Seed key 0c40d65d.

@@ -13,7 +13,7 @@ TikTok, sin plataforma detrás. Menos del 30% de las pymes bolivianas tiene siti
 tiene números de su negocio, promociona a mano en varias redes, lleva el stock de memoria
 y pierde pedidos entre mensajes.
 
-**Quien le compra.** Llega desde un enlace en la bio o en un chat, en el celular, y ya
+**Quien le compra.** Llega desde un enlace en sus redes o en un chat, en el celular, y ya
 está acostumbrado a comprarle por WhatsApp. No quiere crear una cuenta ni llenar un
 formulario.
 
