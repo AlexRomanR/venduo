@@ -23,9 +23,10 @@ existe; hasta entonces queda como constante nula con su pendiente escrito.
 ## Direction contract
 
 THESIS: La portada nombra las tres cosas que la persona se lleva —la tienda online, el
-inventario y las ventas— y las muestra armadas, con los mismos productos en los tres
-paneles, antes de pedir nada. Promete que se arma en un minuto, y nombra lo que viene
-además: la plantilla editable, los pedidos por WhatsApp, los catálogos y las estadísticas.
+inventario y las ventas—, promete que se arman en un minuto y nombra lo que viene además:
+la plantilla editable, los pedidos por WhatsApp, los catálogos y las estadísticas. A la
+derecha lo muestra con algo real y no con un esquema: quien vende, su tienda funcionando
+y lo que Venduo le avisa.
 Rechaza la portada SaaS con degradado, teléfono flotando en ángulo y tres tarjetas de
 características, y rechaza también el color bañado que satura la vista.
 
@@ -43,10 +44,15 @@ lo digan. Elige el camino que lo describe: ordenar su negocio o salir a vender.
 
 FIRST VIEWPORT: Barra fija con las anclas y la acción roja. A la izquierda, el titular a
 escala grande —"Tu tienda online, tu inventario y tus ventas. Lista en un minuto."—, una
-bajada, los cuatro agregados con su ícono y la acción. A la derecha, tres paneles con
-regla de un píxel: la tienda con sus productos, el inventario con lo que se está
-acabando en rojo, y las ventas de la semana en barras. Sin scroll para llegar a la
-acción en la computadora.
+bajada, los cuatro agregados con su ícono y la acción. A la derecha (`Vitrina`), tres
+capas: una foto en blanco y negro de una vendedora fotografiando sus productos; un
+celular recto con la captura real de Rosa Deportes; y dos tarjetas de papel con regla,
+el aviso de Venduo de un pedido nuevo y el stock que se está acabando en rojo. Sin
+scroll para llegar a la acción en la computadora.
+
+La foto es de Pexels (7309930, licencia libre) y la captura sale de la tienda publicada,
+a 390 px y doble densidad, desde la sección "Lo nuevo". Las dos viven en
+`public/portada/`: si la tienda de Rosa cambia, la captura se vuelve a sacar.
 
 FORM: Editorial impreso, dirección fijada por el usuario sobre una referencia propia que
 reemplazó la asignación del dado. Seed key 0c40d65d.

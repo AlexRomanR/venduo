@@ -13,7 +13,7 @@ import { getSiteUrl } from "@/lib/env"
 import { getUsuario } from "@/lib/supabase/server"
 import { Entra } from "@/components/landing/entra"
 import { Foto } from "@/components/landing/foto"
-import { TresPaneles } from "@/components/landing/tres-paneles"
+import { Vitrina } from "@/components/landing/vitrina"
 import { Logo } from "@/components/marca/logo"
 
 export const metadata = {
@@ -292,7 +292,7 @@ export default async function Inicio() {
               </p>
             </div>
 
-            <TresPaneles />
+            <Vitrina />
           </div>
         </section>
 

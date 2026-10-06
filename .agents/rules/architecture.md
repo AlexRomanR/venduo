@@ -195,6 +195,7 @@ types/
 supabase/migrations/  SQL con marca de tiempo en el nombre
 
 public/marca/         Íconos del manifiesto y la tarjeta de compartir. Generados
+public/portada/       La foto y la captura de la tienda del primer bloque de la portada
 
 scripts/marca.mjs     Genera todos los archivos del logo: `npm run marca`
 
