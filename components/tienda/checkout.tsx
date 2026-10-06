@@ -29,6 +29,27 @@ import { useCarrito } from "@/components/tienda/carrito"
 interface Enviado {
   numero: number
   enlace: string
+  /** Qué llevaba el carrito, para no crear el mismo pedido dos veces. */
+  firma?: string
+  /** Cuándo se mandó, en milisegundos. */
+  cuando?: number
+}
+
+/**
+ * Cuánto tiempo un carrito igual reabre el mismo pedido. Pasado ese rato es
+ * una compra nueva: quien vuelve al día siguiente por lo mismo no puede caer en
+ * un pedido que la tienda quizás ya cobró.
+ */
+const REUSAR_DURANTE_MS = 30 * 60 * 1000
+
+/** El carrito reducido a productos y cantidades, sin importar el orden. */
+function firmaDelCarrito(
+  lineas: Array<{ productoId: string; cantidad: number }>
+): string {
+  return lineas
+    .map((l) => `${l.productoId}:${l.cantidad}`)
+    .sort()
+    .join(",")
 }
 
 /**
@@ -89,6 +110,19 @@ export function Checkout({
   async function enviar() {
     if (enCurso || lineas.length === 0) return
 
+    // Quien vuelve atrás desde WhatsApp y manda otra vez lo mismo no crea otro
+    // pedido: se reabre el chat con el que ya existe. Cada pedido de más es uno
+    // que la tienda ve pendiente y nunca se cobra.
+    const firma = firmaDelCarrito(lineas)
+    if (
+      enviado?.firma === firma &&
+      Date.now() - (enviado.cuando ?? 0) < REUSAR_DURANTE_MS
+    ) {
+      vaciar()
+      window.location.href = enviado.enlace
+      return
+    }
+
     setEnCurso(true)
     const resultado = await crear({
       items: lineas.map((l) => ({
@@ -111,9 +145,11 @@ export function Checkout({
       lineas: resultado.lineas,
       totalCents: resultado.totalCents,
     })
-    const nuevo = {
+    const nuevo: Enviado = {
       numero: resultado.numero,
       enlace: enlaceDeWhatsApp(resultado.whatsapp, mensaje),
+      firma,
+      cuando: Date.now(),
     }
 
     try {

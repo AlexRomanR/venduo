@@ -76,6 +76,17 @@ cancelado reviva ni que un pagado vuelva a pendiente. **Nunca duplicarlo desde l
 aplicación**: ajustar `products.stock` a mano daría stock inventado el día que alguien
 cambie dos veces de estado.
 
+**Los pedidos que no responden no se cancelan solos.** Un pendiente con más de siete
+días (`DIAS_SIN_RESPUESTA` en `lib/pedidos.ts`) queda **sin respuesta**: sale de "Por
+cobrar" y de los contadores rojos, y se encuentra en su propio filtro. No se escribe
+nada en la base: se decide al leer, con `quedoSinRespuesta` en la lista y
+`limiteSinRespuesta` en los conteos. Y se puede marcar pagado igual, porque cancelarlo
+lo dejaría bloqueado para el comprador que paga el día ocho.
+
+**El mismo carrito no crea dos pedidos.** Si quien compra vuelve atrás desde WhatsApp
+y manda lo mismo en la siguiente media hora, el carrito reabre el chat del pedido que
+ya existe (`components/tienda/checkout.tsx`).
+
 **Una venta es un pedido pagado.** El panel, el tablero y las estadísticas cuentan solo
 `pagado`: un pendiente puede ser un carrito que nunca se mandó.
 

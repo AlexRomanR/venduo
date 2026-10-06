@@ -2,7 +2,7 @@ import Link from "next/link"
 import { MessageCircle, ShoppingBag } from "lucide-react"
 
 import { formatMoney, formatNumber, formatRelative } from "@/lib/format"
-import { numeroDeWhatsApp } from "@/lib/pedidos"
+import { numeroDeWhatsApp, quedoSinRespuesta } from "@/lib/pedidos"
 import type { PedidoReciente } from "@/lib/tablero"
 import { Estado } from "@/components/pedidos/piezas"
 import { Seccion, SinDatos } from "@/components/panel/piezas"
@@ -68,7 +68,10 @@ export function UltimosPedidos({ pedidos }: { pedidos: PedidoReciente[] }) {
                   <span className="tabular font-titular font-bold">
                     {formatMoney(pedido.totalCents)}
                   </span>
-                  <Estado estado={pedido.estado} />
+                  <Estado
+                    estado={pedido.estado}
+                    sinRespuesta={quedoSinRespuesta(pedido)}
+                  />
                 </span>
               </Link>
               {pedido.telefono ? (

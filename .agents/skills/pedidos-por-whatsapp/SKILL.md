@@ -66,6 +66,13 @@ errores del disparador se traducen en `app/(privado)/panel/pedidos/acciones.ts`.
 
 **Una venta es un pedido pagado.** Todo lo que sume ventas filtra `status = 'pagado'`.
 
+**Un pendiente viejo queda "sin respuesta", no cancelado.** Pasados `DIAS_SIN_RESPUESTA`
+días deja de contar como algo que espera a la tienda, pero se puede seguir marcando
+pagado. No hay columna ni tarea programada: todo lo que cuente pendientes que esperan
+—la barra, el Resumen, "Por cobrar"— filtra `created_at >= limiteSinRespuesta()`, y la
+lista usa `quedoSinRespuesta`. Un conteo nuevo de pendientes que se olvide del plazo
+vuelve a llenar el panel de rojo con carritos que nunca se mandaron.
+
 ## El WhatsApp de la tienda
 
 - Obligatorio en el alta: `crearTiendaSchema` y `create_store(…, p_whatsapp)`.

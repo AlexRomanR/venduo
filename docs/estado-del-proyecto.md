@@ -138,7 +138,10 @@ Actualizado el 6 de octubre de 2026.
 - **Carrito que manda el pedido por WhatsApp**: quien compra ve sus productos y el total,
   y un botón abre el chat con la tienda y el pedido escrito —líneas, total y número—. No
   deja ningún dato. El pedido queda en el panel; al volver del chat ve su número y puede
-  reabrirlo.
+  reabrirlo. Mandar otra vez el mismo carrito en la siguiente media hora reabre ese
+  pedido en vez de crear otro.
+- **Pendientes sin respuesta**: a los siete días un pendiente sale de "Por cobrar" y de
+  los avisos, y queda en su filtro. No se cancela: se puede marcar pagado igual.
 - Pantallas de carga, error y "no encontrado".
 - Enlace propio por tienda, con subdominio listo detrás de un interruptor
   (`NEXT_PUBLIC_DOMINIO_TIENDAS`).
@@ -246,10 +249,6 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 - **`generateStoreBlueprint` sigue sin usarse**: inventa una tienda entera, con slug y
   productos. "Que la IA escriba tu portada" se resolvió con la tarea del editor.
 
-- **Pedidos pendientes que nunca se concretan.** Cada toque al botón deja un pedido
-  pendiente aunque no se mande el mensaje. No retienen stock, pero se acumulan: la tienda
-  los cancela a mano. Si molestan, se puede cancelar solo lo pendiente después de un
-  plazo.
 - **Fotos en los datos de ejemplo.** Casi ningún producto tiene foto, y las plantillas se
   lucen con ellas. Importante antes de la demostración.
 - **Textos de ejemplo visibles** en tiendas con plantillas retiradas (p. ej. "Cuenta aquí

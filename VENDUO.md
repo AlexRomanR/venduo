@@ -85,6 +85,8 @@ Esa eliminación a los 90 días es **el único caso en toda la plataforma donde 
 | 3    | La tienda cobra en el chat y marca el pedido **pagado**. Recién ahí **se descuenta el stock**                                                                    | `pagado`          |
 | —    | Si no se concreta, la tienda lo **cancela**. Si ya estaba pagado, el stock vuelve al catálogo                                                                    | `cancelado`       |
 
+**Los que no responden quedan a un lado, sin cancelarse.** Pasada una semana, un pendiente que nadie pagó pasa a "sin respuesta": deja de contar en lo que la tienda tiene por cobrar y en sus avisos, pero se puede marcar pagado si al final el comprador paga. Y si quien compra vuelve atrás y manda el mismo carrito, se reabre el pedido que ya existía en vez de crear otro.
+
 **Por qué el stock baja al pagar y no al pedir.** Un pedido sin datos cuesta un toque, y muchos carritos se mandan y no se concretan. Si el stock bajara al tocar el botón, cualquiera podría vaciar una tienda tocándolo en bucle, y un carrito abandonado retendría unidades sin que la tienda supiera de quién. El pedido comprueba que haya stock; lo descuenta la tienda cuando le pagan.
 
 **No hay envíos ni seguimiento.** Cómo llega el producto lo acuerdan la tienda y el comprador en el mismo chat; la plataforma no lo registra.

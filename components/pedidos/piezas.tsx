@@ -18,14 +18,29 @@ const ASPECTO: Record<OrderStatus, string> = {
   cancelado: "border-tinta/25 text-tinta/40 line-through",
 }
 
-export function Estado({ estado }: { estado: OrderStatus }) {
-  const etiqueta = ESTADOS.find((e) => e.valor === estado)?.etiqueta ?? estado
+/**
+ * El estado de un pedido, en versalita.
+ *
+ * Un pendiente que pasó el plazo dice "Sin respuesta" y deja el rojo: ya no
+ * pide una acción. Lo decide quien llama, en el servidor, para que la hora del
+ * navegador no dibuje otra cosa que la del servidor.
+ */
+export function Estado({
+  estado,
+  sinRespuesta = false,
+}: {
+  estado: OrderStatus
+  sinRespuesta?: boolean
+}) {
+  const etiqueta = sinRespuesta
+    ? "Sin respuesta"
+    : (ESTADOS.find((e) => e.valor === estado)?.etiqueta ?? estado)
 
   return (
     <span
       className={cn(
         "inline-flex shrink-0 border px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] uppercase",
-        ASPECTO[estado]
+        sinRespuesta ? "border-tinta/40 text-tinta/65" : ASPECTO[estado]
       )}
     >
       {etiqueta}

@@ -1,5 +1,6 @@
 import { getMiTienda } from "@/lib/data/panel"
 import { createClient } from "@/lib/supabase/server"
+import { quedoSinRespuesta } from "@/lib/pedidos"
 import type { OrderStatus } from "@/types"
 
 export interface LineaPedido {
@@ -27,7 +28,10 @@ export interface Pedido {
 
 export interface ResumenPedidos {
   total: number
+  /** Los pendientes dentro del plazo: los que esperan a la tienda. */
   pendientes: number
+  /** Los pendientes que pasaron el plazo sin cobrarse. */
+  sinRespuesta: number
   pagados: number
   cancelados: number
   porCobrarCents: number
@@ -40,7 +44,7 @@ export interface Pedidos {
   esDemo: boolean
 }
 
-function pedidosDeDemostracion(): Pedidos {
+function pedidosDeDemostracion(filtro?: FiltroPedidos): Pedidos {
   const base = {
     comprador: null,
     telefono: null,
@@ -80,23 +84,53 @@ function pedidosDeDemostracion(): Pedidos {
         },
       ],
     },
+    {
+      ...base,
+      id: "demo-3",
+      numero: 101,
+      estado: "pendiente",
+      totalCents: 5500,
+      creado: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+      items: [
+        { nombre: "Gorra", cantidad: 1, precioCents: 5500, totalCents: 5500 },
+      ],
+    },
   ]
 
-  return { pedidos, resumen: resumir(pedidos), esDemo: true }
+  return {
+    pedidos: filtro ? pedidos.filter((p) => enFiltro(p, filtro)) : pedidos,
+    resumen: resumir(pedidos),
+    esDemo: true,
+  }
+}
+
+/**
+ * Los filtros de la lista: los tres estados y "sin respuesta", que no es un
+ * estado de la base sino un pendiente viejo (`quedoSinRespuesta`).
+ */
+export type FiltroPedidos = OrderStatus | "sin_respuesta"
+
+function enFiltro(pedido: Pedido, filtro: FiltroPedidos): boolean {
+  const viejo = quedoSinRespuesta(pedido)
+  if (filtro === "sin_respuesta") return viejo
+  if (filtro === "pendiente") return pedido.estado === "pendiente" && !viejo
+  return pedido.estado === filtro
 }
 
 function resumir(pedidos: Pedido[]): ResumenPedidos {
-  const enEstado = (estado: OrderStatus) =>
-    pedidos.filter((p) => p.estado === estado)
+  const en = (filtro: FiltroPedidos) =>
+    pedidos.filter((p) => enFiltro(p, filtro))
   const suma = (lista: Pedido[]) => lista.reduce((t, p) => t + p.totalCents, 0)
 
   return {
     total: pedidos.length,
-    pendientes: enEstado("pendiente").length,
-    pagados: enEstado("pagado").length,
-    cancelados: enEstado("cancelado").length,
-    porCobrarCents: suma(enEstado("pendiente")),
-    cobradoCents: suma(enEstado("pagado")),
+    pendientes: en("pendiente").length,
+    sinRespuesta: en("sin_respuesta").length,
+    pagados: en("pagado").length,
+    cancelados: en("cancelado").length,
+    // Lo que no respondió en una semana ya no es plata por cobrar.
+    porCobrarCents: suma(en("pendiente")),
+    cobradoCents: suma(en("pagado")),
   }
 }
 
@@ -107,12 +141,12 @@ function resumir(pedidos: Pedido[]): ResumenPedidos {
  * ya acota a `my_store_id()`, pero un filtro explícito es lo que hace que la
  * consulta siga siendo correcta si alguien toca la política.
  */
-export async function getPedidos(filtro?: string): Promise<Pedidos> {
+export async function getPedidos(filtro?: FiltroPedidos): Promise<Pedidos> {
   const supabase = await createClient()
-  if (!supabase) return pedidosDeDemostracion()
+  if (!supabase) return pedidosDeDemostracion(filtro)
 
   const tienda = await getMiTienda()
-  if (!tienda) return pedidosDeDemostracion()
+  if (!tienda) return pedidosDeDemostracion(filtro)
 
   const { data: filas } = await supabase
     .from("orders")
@@ -144,7 +178,7 @@ export async function getPedidos(filtro?: string): Promise<Pedidos> {
   return {
     // El resumen se calcula sobre todo, no sobre lo filtrado: es el estado del
     // negocio y no el pie de la tabla.
-    pedidos: filtro ? pedidos.filter((p) => p.estado === filtro) : pedidos,
+    pedidos: filtro ? pedidos.filter((p) => enFiltro(p, filtro)) : pedidos,
     resumen: resumir(pedidos),
     esDemo: false,
   }

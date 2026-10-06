@@ -2,8 +2,8 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { ShoppingBag, Wallet } from "lucide-react"
 
-import { getPedidos } from "@/lib/data/pedidos"
-import { ESTADOS } from "@/lib/pedidos"
+import { getPedidos, type FiltroPedidos } from "@/lib/data/pedidos"
+import { DIAS_SIN_RESPUESTA, ESTADOS } from "@/lib/pedidos"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
 import { FICHA, FICHA_ELEGIDA, FICHA_LIBRE } from "@/lib/estilos"
@@ -19,6 +19,16 @@ import {
 import { FilaPedido } from "@/components/pedidos/fila"
 
 export const metadata = { title: "Pedidos" }
+
+/**
+ * Las fichas de la lista. "Sin respuesta" va al final y sin rojo: son los
+ * pendientes que pasaron el plazo, y están para encontrarlos, no para que
+ * esperen algo de la tienda.
+ */
+const FILTROS: Array<{ valor: FiltroPedidos; etiqueta: string }> = [
+  ...ESTADOS,
+  { valor: "sin_respuesta", etiqueta: "Sin respuesta" },
+]
 
 /**
  * Los pedidos de la tienda.
@@ -37,8 +47,7 @@ export default async function PedidosPage({
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
   const consulta = await searchParams
-  const filtro =
-    typeof consulta.estado === "string" ? consulta.estado : undefined
+  const filtro = FILTROS.find((f) => f.valor === consulta.estado)?.valor
 
   const { pedidos, resumen, esDemo } = await getPedidos(filtro)
 
@@ -73,7 +82,7 @@ export default async function PedidosPage({
           <Cifra
             etiqueta="Por cobrar"
             valor={formatMoney(resumen.porCobrarCents)}
-            detalle="De los que esperan pago"
+            detalle={`De los últimos ${DIAS_SIN_RESPUESTA} días`}
           />
           <Cifra
             etiqueta="Cobrado"
@@ -81,9 +90,9 @@ export default async function PedidosPage({
             detalle={`${formatNumber(resumen.pagados)} ${resumen.pagados === 1 ? "pedido pagado" : "pedidos pagados"}`}
           />
           <Cifra
-            etiqueta="Cancelados"
-            valor={formatNumber(resumen.cancelados)}
-            detalle="No cuentan en lo cobrado"
+            etiqueta="Sin respuesta"
+            valor={formatNumber(resumen.sinRespuesta)}
+            detalle={`Pendientes de hace más de ${DIAS_SIN_RESPUESTA} días`}
           />
         </Cifras>
       </Seccion>
@@ -112,13 +121,18 @@ export default async function PedidosPage({
               {formatNumber(resumen.total)}
             </span>
           </Ficha>
-          {ESTADOS.map((estado) => (
+          {FILTROS.map((f) => (
             <Ficha
-              key={estado.valor}
-              href={`/panel/pedidos?estado=${estado.valor}`}
-              activa={filtro === estado.valor}
+              key={f.valor}
+              href={`/panel/pedidos?estado=${f.valor}`}
+              activa={filtro === f.valor}
             >
-              {estado.etiqueta}
+              {f.etiqueta}
+              {f.valor === "sin_respuesta" && resumen.sinRespuesta > 0 ? (
+                <span className="tabular ml-1.5 opacity-65">
+                  {formatNumber(resumen.sinRespuesta)}
+                </span>
+              ) : null}
             </Ficha>
           ))}
         </nav>
@@ -127,8 +141,16 @@ export default async function PedidosPage({
           filtro ? (
             <SinDatos
               icono={ShoppingBag}
-              titulo="No hay pedidos en ese estado"
-              texto="Prueba con otro filtro, o mira todos los pedidos de tu tienda."
+              titulo={
+                filtro === "sin_respuesta"
+                  ? "Ningún pedido quedó sin respuesta"
+                  : "No hay pedidos en ese estado"
+              }
+              texto={
+                filtro === "sin_respuesta"
+                  ? `Acá aparecen los pendientes que pasan ${DIAS_SIN_RESPUESTA} días sin pagarse. Se pueden marcar pagados igual si al final te pagan.`
+                  : "Prueba con otro filtro, o mira todos los pedidos de tu tienda."
+              }
             >
               <Link
                 href="/panel/pedidos"

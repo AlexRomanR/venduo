@@ -5,7 +5,11 @@ import { getPedido } from "@/lib/data/pedidos"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
 import { formatDate, formatMoney } from "@/lib/format"
-import { numeroDeWhatsApp } from "@/lib/pedidos"
+import {
+  DIAS_SIN_RESPUESTA,
+  numeroDeWhatsApp,
+  quedoSinRespuesta,
+} from "@/lib/pedidos"
 import type { OrderStatus } from "@/types"
 import { Cabecera, Seccion, Volver } from "@/components/panel/piezas"
 import { CambiarEstado, Estado } from "@/components/pedidos/piezas"
@@ -34,6 +38,7 @@ export default async function PedidoPage({
   // como inexistente y no como prohibido: es lo mismo para quien lo pide.
   if (!pedido) notFound()
 
+  const sinRespuesta = quedoSinRespuesta(pedido)
   const whatsapp = pedido.telefono
     ? `https://wa.me/${numeroDeWhatsApp(pedido.telefono)}`
     : null
@@ -47,7 +52,7 @@ export default async function PedidoPage({
         titulo={
           <span className="flex flex-wrap items-center gap-3">
             <span className="tabular">#{pedido.numero}</span>
-            <Estado estado={pedido.estado} />
+            <Estado estado={pedido.estado} sinRespuesta={sinRespuesta} />
           </span>
         }
         bajada={
@@ -67,7 +72,11 @@ export default async function PedidoPage({
         id="que-sigue"
         icono={ListChecks}
         titulo="Qué sigue"
-        bajada={QUE_SIGUE[pedido.estado]}
+        bajada={
+          sinRespuesta
+            ? `Pasó más de ${DIAS_SIN_RESPUESTA} días sin pagarse, así que ya no cuenta en lo que tienes por cobrar. Si al final te pagan, márcalo pagado igual.`
+            : QUE_SIGUE[pedido.estado]
+        }
         relleno
       >
         <div className="flex flex-wrap items-center gap-3">
