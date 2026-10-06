@@ -5,7 +5,7 @@
 <h3 align="center">Generador de tiendas online para quien vende por redes sociales</h3>
 
 <p align="center">
-  Tu tienda online, tu inventario y tus ventas, listos en un minuto —sobre una
+  Tu tienda online, tu inventario y tus ventas, listos en minutos —sobre una
   plantilla que editas a mano o con la IA—, con pedidos que llegan por WhatsApp,
   estadísticas y catálogos en PDF.
 </p>

@@ -29,11 +29,12 @@ const REGISTRO = {
   etiqueta: "Para quien ya vende",
   titular: "Tu tienda online, tu inventario y tus ventas.",
   entrada:
-    "Tu tienda lista en un minuto, con el stock al día, los pedidos por WhatsApp y los catálogos. Lo manejas desde el celular, como ya manejas tus redes.",
+    "Elige una plantilla y tu tienda queda armada. Subes tus productos desde el celular, los pedidos te llegan por WhatsApp y un panel te muestra lo que vendes cada día.",
   puntos: [
     {
-      titulo: "Stock al día",
-      detalle: "Cada venta descuenta sola, y te avisa lo que se está acabando.",
+      titulo: "Tu inventario, con un toque",
+      detalle:
+        "Cuando te pagan, marcas el pedido y se descuenta del stock. Te avisa lo que se está acabando.",
     },
     {
       titulo: "Pedidos por WhatsApp",

@@ -23,7 +23,7 @@ existe; hasta entonces queda como constante nula con su pendiente escrito.
 ## Direction contract
 
 THESIS: La portada nombra las tres cosas que la persona se lleva —la tienda online, el
-inventario y las ventas—, promete que se arman en un minuto y nombra lo que viene además:
+inventario y las ventas—, promete que se arman en minutos y nombra lo que viene además:
 la plantilla editable, los pedidos por WhatsApp, los catálogos y las estadísticas. A la
 derecha lo muestra con algo real y no con un esquema: quien vende, su tienda funcionando
 y lo que Venduo le avisa.
