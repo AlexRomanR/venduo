@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     template: "%s · Venduo",
   },
   description:
-    "Para quien vende por TikTok, Instagram y WhatsApp: tu tienda online con stock al día, pedidos que llegan a tu WhatsApp y catálogos en PDF.",
+    "Para quien vende por TikTok, Facebook, Instagram y WhatsApp: tu tienda online con stock al día, pedidos que llegan a tu WhatsApp y catálogos en PDF.",
 }
 
 export default function RootLayout({

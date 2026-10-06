@@ -19,7 +19,7 @@ import { Logo } from "@/components/marca/logo"
 export const metadata = {
   title: "Venduo — tu tienda online, tu inventario y tus ventas",
   description:
-    "Para quien vende por TikTok, Instagram y WhatsApp: tu tienda online lista en un minuto, con control de stock, pedidos por WhatsApp, catálogos en PDF y estadísticas.",
+    "Para quien vende por TikTok, Facebook, Instagram y WhatsApp: tu tienda online lista en un minuto, con control de stock, pedidos por WhatsApp, catálogos en PDF y estadísticas.",
   // La tarjeta va acá y no en la raíz: una tienda sin logo la heredaría, y
   // su enlace por WhatsApp mostraría a Venduo en vez de la tienda.
   metadataBase: new URL(getSiteUrl()),
@@ -251,12 +251,12 @@ export default async function Inicio() {
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center lg:gap-16">
             <div>
               <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-                Para quien vende por TikTok, Instagram y WhatsApp
+                Para quien vende por TikTok, Facebook, Instagram y WhatsApp
               </p>
               <h1 className="mt-5 max-w-[17ch] font-titular text-[clamp(2.25rem,7vw,3.75rem)] leading-[0.98] font-extrabold tracking-[-0.035em] text-balance">
                 Tu tienda online, tu inventario y tus ventas.
                 <span className="mt-2 block text-senal">
-                  Lista en un minuto.
+                  Lista en minutos.
                 </span>
               </h1>
               <p className="mt-6 max-w-[50ch] text-lg leading-relaxed opacity-70">
@@ -289,7 +289,7 @@ export default async function Inicio() {
                 </Link>
               </div>
               <p className="mt-4 text-sm opacity-70">
-                Lista en un minuto. No pedimos tarjeta.
+                Lista en minutos. No pedimos tarjeta.
               </p>
             </div>
 

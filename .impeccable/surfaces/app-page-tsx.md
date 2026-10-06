@@ -43,7 +43,7 @@ los arregla y que lo que hay detrás sí. Cree porque lo ve ocurrir en pantalla,
 lo digan. Elige el camino que lo describe: ordenar su negocio o salir a vender.
 
 FIRST VIEWPORT: Barra fija con las anclas y la acción roja. A la izquierda, el titular a
-escala grande —"Tu tienda online, tu inventario y tus ventas. Lista en un minuto."—, una
+escala grande —"Tu tienda online, tu inventario y tus ventas. Lista en minutos."—, una
 bajada, los cuatro agregados con su ícono y la acción. A la derecha (`Vitrina`), tres
 capas: una foto en blanco y negro de una joven con su celular y una bolsa con un pedido; un
 celular recto con la captura real de Rosa Deportes; y dos tarjetas de papel con regla,
