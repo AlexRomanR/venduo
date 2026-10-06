@@ -25,7 +25,11 @@ import tiendaRosa from "@/public/portada/tienda-rosa.webp"
  * regla.
  *
  * La captura de la tienda es un archivo: si su diseño cambia, se vuelve a
- * sacar a 390 px de ancho y doble densidad, desde la sección "Lo nuevo".
+ * sacar a 390 px de ancho y doble densidad, desde la sección "Lo nuevo". Está
+ * retocada: el primer producto de la tienda era un mouse gamer, que no pega en
+ * una tienda de deportes, y en la captura es una zapatilla de running, con la
+ * foto de los datos de ejemplo (`lib/demo-data.ts`). Por eso el pie dice que
+ * la tienda es ilustrativa.
  */
 
 const PEDIDO = {
@@ -106,7 +110,7 @@ export function Vitrina() {
 
       <figcaption className="mt-3 text-xs leading-relaxed opacity-65">
         En el celular, Rosa Deportes, una tienda de demostración hecha con
-        Venduo. El pedido y el stock son ilustrativos.
+        Venduo. La tienda, el pedido y el stock son ilustrativos.
       </figcaption>
     </figure>
   )

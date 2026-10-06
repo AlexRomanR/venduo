@@ -260,8 +260,9 @@ export default async function Inicio() {
                 </span>
               </h1>
               <p className="mt-6 max-w-[50ch] text-lg leading-relaxed opacity-70">
-                Elige una plantilla y tu tienda queda armada, con el stock de
-                cada producto y un panel con lo que vendes cada día.
+                Elige una plantilla y tu tienda queda armada. Subes tus
+                productos desde el celular y un panel te muestra lo que vendes
+                cada día.
               </p>
 
               <ul className="mt-7 grid max-w-[34rem] gap-x-6 sm:grid-cols-2">
