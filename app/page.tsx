@@ -19,7 +19,7 @@ import { Logo } from "@/components/marca/logo"
 export const metadata = {
   title: "Venduo — tu tienda online, tu inventario y tus ventas",
   description:
-    "Para quien vende por TikTok, Facebook, Instagram y WhatsApp: tu tienda online lista en un minuto, con control de stock, pedidos por WhatsApp, catálogos en PDF y estadísticas.",
+    "Para quien vende por TikTok, Facebook, Instagram y WhatsApp: tu tienda online lista en minutos, con control de stock, pedidos por WhatsApp, catálogos en PDF y estadísticas.",
   // La tarjeta va acá y no en la raíz: una tienda sin logo la heredaría, y
   // su enlace por WhatsApp mostraría a Venduo en vez de la tienda.
   metadataBase: new URL(getSiteUrl()),
@@ -40,7 +40,7 @@ export const metadata = {
  * Le habla a quien ya vende por redes y no se levanta pensando "necesito una
  * página web": se levanta respondiendo "¿precio?" por mensaje directo. Por eso
  * Venduo se presenta como tres cosas a la vez —la tienda online, el inventario
- * y las ventas— que se arman en un minuto, y el resto de la página cuenta lo
+ * y las ventas— que se arman en minutos, y el resto de la página cuenta lo
  * que viene con ellas: pedidos por WhatsApp, plantillas, catálogos y
  * estadísticas. El tono para escribirle está en `ui-styling.md`,
  * "Cómo le hablamos al cliente".
@@ -82,7 +82,8 @@ const COMPARACION = [
   {
     tema: "El stock",
     comun: "Lo llevas aparte, en un cuaderno o en tu cabeza.",
-    venduo: "Baja solo con cada venta y te avisa antes de que se acabe.",
+    venduo:
+      "Marcas el pedido pagado y se descuenta con un toque. Te avisa antes de que se acabe.",
   },
   {
     tema: "Los pedidos",
@@ -133,7 +134,7 @@ const INCLUYE = [
   {
     titulo: "Control de stock",
     detalle:
-      "Cada venta descuenta del inventario. Te avisa lo que se está acabando y nadie compra lo que ya no tienes.",
+      "Marcas un pedido pagado y se descuenta del inventario con un toque. Te avisa lo que se está acabando y nadie compra lo que ya no tienes.",
   },
   {
     titulo: "Pedidos por WhatsApp",
@@ -255,9 +256,7 @@ export default async function Inicio() {
               </p>
               <h1 className="mt-5 max-w-[17ch] font-titular text-[clamp(2.25rem,7vw,3.75rem)] leading-[0.98] font-extrabold tracking-[-0.035em] text-balance">
                 Tu tienda online, tu inventario y tus ventas.
-                <span className="mt-2 block text-senal">
-                  Lista en minutos.
-                </span>
+                <span className="mt-2 block text-senal">Lista en minutos.</span>
               </h1>
               <p className="mt-6 max-w-[50ch] text-lg leading-relaxed opacity-70">
                 Elige una plantilla y tu tienda queda armada. Subes tus

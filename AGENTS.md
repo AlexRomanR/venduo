@@ -1,7 +1,7 @@
 # Venduo
 
 Más que una tienda online: el sistema para quien vende por TikTok, Facebook, Instagram y WhatsApp.
-Tiene su tienda online —lista en un minuto, sobre una plantilla que edita a mano o con
+Tiene su tienda online —lista en minutos, sobre una plantilla que edita a mano o con
 la IA— y con ella el stock, los pedidos, las estadísticas y los catálogos en PDF. Quien
 compra no deja datos: arma su carrito y lo manda al WhatsApp de la tienda.
 
