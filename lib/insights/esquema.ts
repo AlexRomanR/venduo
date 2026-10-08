@@ -52,4 +52,7 @@ export const REGLAS_SQL = `
 - Una venta es un pedido pagado: filtra status = 'pagado' salvo que pregunten
   por los pendientes o los cancelados. Un pendiente es un pedido que se mandó
   por WhatsApp y la tienda todavía no cobró.
+- Ventas, lo más vendido, ingresos, ticket promedio y todo lo que diga
+  "vendí" o "vendido" usan status = 'pagado'. Nunca status != 'cancelado':
+  eso cuenta como vendido lo que todavía no se cobró.
 `.trim()

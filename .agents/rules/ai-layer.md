@@ -86,6 +86,15 @@ después responde bien; si eso llega a la pantalla como "la IA no pudo
 responder", es falso y además no dice qué hacer. Se reintenta 429, 500 y 503 con
 espera creciente. Nunca un 400: volvería a fallar igual.
 
+**Un pedido que no responde no puede colgar la pantalla.** Sin límite, un
+modelo lento hacía esperar a la función hasta que Vercel la cortaba a los 60
+segundos, la acción terminaba en una excepción y la barra quedaba en "pensando"
+para siempre. Cada pedido tiene un tope (`limiteMs`, por defecto
+`LIMITE_POR_DEFECTO_MS` en `lib/ai/types.ts`) que incluye los reintentos, las
+pantallas que llaman a la IA fijan `maxDuration`, y del lado del navegador toda
+acción de IA lleva `.catch` con `MENSAJE_SIN_RESPUESTA`. El texto para la
+persona según cómo falló sale de `mensajeDeErrorDeIa` (`lib/ai/mensajes.ts`).
+
 ## El modo mock no es opcional
 
 `AI_PROVIDER=mock` devuelve respuestas simuladas **válidas contra los mismos esquemas

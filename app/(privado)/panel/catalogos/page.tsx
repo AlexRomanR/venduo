@@ -108,7 +108,7 @@ export default async function CatalogosPage() {
                   <div className="min-w-0 flex-1">
                     <Link
                       href={`/panel/catalogos/${guardado.id}`}
-                      className="block truncate font-semibold underline-offset-4 hover:underline"
+                      className="line-clamp-2 font-semibold break-words underline-offset-4 hover:underline"
                     >
                       {guardado.nombre}
                     </Link>

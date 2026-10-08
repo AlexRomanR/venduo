@@ -9,6 +9,7 @@ import { PLANTILLAS_DE_CATALOGO } from "@/lib/catalogos/plantillas"
 import { BOTON_SECUNDARIO } from "@/lib/estilos"
 import { cn } from "@/lib/utils"
 import { pedirCatalogoALaIa } from "@/app/(privado)/panel/catalogos/acciones"
+import { MENSAJE_SIN_RESPUESTA } from "@/lib/ai/mensajes"
 
 /**
  * Pedirle a la IA un catálogo, o un orden para el que está abierto.
@@ -43,7 +44,11 @@ export function PedidoALaIa({
     if (!texto.trim()) return
     setFrase(texto)
     empezar(async () => {
-      const resultado = await pedirCatalogoALaIa(texto, actuales)
+      // Si la plataforma corta la función, la acción lanza en vez de responder.
+      const resultado = await pedirCatalogoALaIa(texto, actuales).catch(() => ({
+        ok: false as const,
+        error: MENSAJE_SIN_RESPUESTA,
+      }))
       if (resultado.ok) setPropuesta(resultado.propuesta)
       else toast.error(resultado.error)
     })

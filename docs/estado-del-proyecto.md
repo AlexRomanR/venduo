@@ -1,7 +1,7 @@
 # Estado del proyecto
 
 Qué está construido en Venduo y qué falta, contra el alcance del MVP de `VENDUO.md` §6.
-Actualizado el 8 de octubre de 2026.
+Actualizado el 9 de octubre de 2026.
 
 **Leyenda:** ✅ hecho · 🟡 hecho con un flujo provisorio o a medias · ❌ falta
 
@@ -245,6 +245,11 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 
 ### 5. Pendientes chicos
 
+- **Una vez, entrar a `/panel/apariencia` después de horas sin uso terminó en `/panel`**
+  (revisión del 8 de octubre). El registro muestra pedidos a `/auth/destino` y `/crear`
+  justo después, como si en ese instante la sesión no encontrara la tienda. No se pudo
+  reproducir: si vuelve a pasar, mirar el refresco del token cuando varias precargas de
+  la barra salen a la vez con un token vencido.
 - **La plantilla editorial no dibuja las grillas de productos de su portada**: muestra
   su catálogo completo. El editor lo avisa en esas tiendas, pero editar una grilla ahí no
   se ve.

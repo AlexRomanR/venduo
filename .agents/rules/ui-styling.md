@@ -179,6 +179,10 @@ Cuando un formulario tiene dos modos con reglas distintas —como registro e ing
 dos esquemas deben **declarar los mismos campos** y cambiar solo las reglas. Con formas
 distintas el resolver no puede alternar entre ellos y TypeScript lo rechaza.
 
+Para confirmar algo que no se deshace —cancelar un pedido, borrar— se usa
+`useConfirmacion` (`components/panel/confirmar.tsx`), nunca `window.confirm`: el
+navegador lo dibuja a su manera, a veces en inglés, y no se lee con el resto.
+
 Los errores se muestran con `toast` de `sonner`, traducidos al español. Nunca volcar el
 mensaje crudo de Supabase: decir qué pasó en términos del usuario.
 

@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import {
+  ArrowRight,
   ExternalLink,
   Loader2,
   MessageCircle,
@@ -157,9 +158,22 @@ export function PasoPublicar() {
               {cambio.color ? (
                 <span
                   aria-hidden="true"
-                  className="size-4 shrink-0 border border-tinta/25"
-                  style={{ background: cambio.color }}
-                />
+                  className="flex shrink-0 items-center gap-1"
+                >
+                  {cambio.colorAntes ? (
+                    <>
+                      <span
+                        className="size-4 border border-tinta/25"
+                        style={{ background: cambio.colorAntes }}
+                      />
+                      <ArrowRight className="size-3 opacity-50" />
+                    </>
+                  ) : null}
+                  <span
+                    className="size-4 border border-tinta/25"
+                    style={{ background: cambio.color }}
+                  />
+                </span>
               ) : (
                 <span
                   aria-hidden="true"

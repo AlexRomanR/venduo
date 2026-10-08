@@ -26,6 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Insignia } from "@/components/panel/piezas"
+import { useConfirmacion } from "@/components/panel/confirmar"
 
 const CONDICION: Record<string, string> = {
   nuevo: "Nuevo",
@@ -89,6 +90,7 @@ function Fila({
 }) {
   const router = useRouter()
   const [ocupado, setOcupado] = React.useState(false)
+  const { preguntar, dialogo } = useConfirmacion()
 
   const sinStock = producto.stock === 0
   const pocoStock =
@@ -124,6 +126,7 @@ function Fila({
         !producto.is_active && "opacity-60"
       )}
     >
+      {dialogo}
       <div className="flex gap-4">
         <div className="size-16 shrink-0 overflow-hidden border border-tinta/20 bg-tinta/5 sm:size-20">
           {producto.image_url ? (
@@ -264,16 +267,16 @@ function Fila({
 
                   <DropdownMenuItem
                     variant="destructive"
-                    onSelect={() => {
+                    onSelect={async () => {
                       // Se pregunta porque saca el producto de la tienda y de
                       // los enlaces que ya se compartieron.
-                      if (
-                        !window.confirm(
-                          `¿Sacar "${producto.name}" de tu catálogo? Los pedidos que ya tenga se conservan.`
-                        )
-                      ) {
-                        return
-                      }
+                      const borrar = await preguntar({
+                        titulo: `¿Sacar «${producto.name}» de tu catálogo?`,
+                        texto:
+                          "Deja de verse en tu tienda. Los pedidos que ya tenga se conservan.",
+                        confirmar: "Borrar del catálogo",
+                      })
+                      if (!borrar) return
                       correr(
                         () => acciones.borrar(producto.id),
                         "Producto borrado."

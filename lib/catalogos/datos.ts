@@ -231,3 +231,45 @@ export function fotoDeBloque(
     elegidos(catalogo, datos).find((producto) => producto.foto)?.foto ?? null
   )
 }
+
+/**
+ * Lo que se le puede pedir a la IA, con lo que esta tienda vende.
+ *
+ * Un "Las zapatillas en oferta" fijo no le dice nada a quien vende relojes:
+ * la primera idea sale de su categoría con más rebajas, o de la más grande.
+ * Las otras dos sirven en cualquier rubro.
+ */
+export function ideasParaLaIa(datos: DatosDelCatalogo): string[] {
+  const productos = Object.values(datos.productos)
+
+  const contar = (lista: ProductoDelCatalogo[]) => {
+    const cuenta = new Map<string, number>()
+    for (const producto of lista) {
+      if (!producto.categoria) continue
+      cuenta.set(producto.categoria, (cuenta.get(producto.categoria) ?? 0) + 1)
+    }
+    return [...cuenta.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null
+  }
+
+  const conRebaja = productos.filter(
+    (producto) =>
+      producto.precioAnteriorCents !== null &&
+      producto.precioAnteriorCents > producto.precioCents
+  )
+  const enOferta = contar(conRebaja)
+  const masGrande = contar(productos)
+
+  const primera = enOferta
+    ? `${enOferta} en oferta`
+    : conRebaja.length > 0
+      ? "Lo que está en oferta"
+      : masGrande
+        ? `Solo ${masGrande.toLowerCase()}`
+        : null
+
+  return [
+    ...(primera ? [primera] : []),
+    "Lista de precios para revendedores",
+    "Lo nuevo para los estados de WhatsApp",
+  ]
+}

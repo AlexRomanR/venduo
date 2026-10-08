@@ -25,6 +25,7 @@ import { HOJAS, type ClavePlantilla } from "@/lib/catalogos/constantes"
 import {
   elegidos,
   hojasDe,
+  ideasParaLaIa,
   type DatosDelCatalogo,
   type ProductoDelCatalogo,
 } from "@/lib/catalogos/datos"
@@ -210,11 +211,7 @@ export function Constructor({
           <PedidoALaIa
             titulo="¿Qué catálogo quieres?"
             ayuda="Elige los productos, el orden y la plantilla. Tú revisas antes de usarlo."
-            ejemplos={[
-              "Las zapatillas en oferta",
-              "Lista de precios para revendedores",
-              "Lo nuevo para los estados de WhatsApp",
-            ]}
+            ejemplos={ideasParaLaIa(datos)}
             actuales={null}
             textoDeUsar="Armarlo así"
             alUsar={usarPropuesta}
@@ -417,6 +414,9 @@ function Editor({
     // pantalla: se perdería lo que estaba abierto.
     if (!guardado) {
       window.history.replaceState(null, "", `/panel/catalogos/${resultado.id}`)
+      // Sin navegar, la pestaña seguía diciendo "Nuevo catálogo". Es el mismo
+      // título que pone la página de un catálogo guardado.
+      document.title = "Editar catálogo · Venduo"
     }
   }
 
@@ -497,13 +497,18 @@ function Editor({
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          {/* En el celular, dos por fila y del mismo ancho: con flex cada uno
+              medía su texto y las dos filas no se alineaban. */}
+          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center">
             {esDemo ? null : (
               <button
                 type="button"
                 onClick={guardar}
                 disabled={ocupado !== null || bloqueado}
-                className={cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")}
+                className={cn(
+                  BOTON_SECUNDARIO,
+                  "min-h-11 px-3 text-sm whitespace-nowrap sm:px-4"
+                )}
               >
                 {ocupado === "guardar" ? (
                   <LoaderCircle
@@ -528,7 +533,10 @@ function Editor({
             <DropdownMenu>
               <DropdownMenuTrigger
                 disabled={ocupado !== null || bloqueado}
-                className={cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")}
+                className={cn(
+                  BOTON_SECUNDARIO,
+                  "min-h-11 px-3 text-sm whitespace-nowrap sm:px-4"
+                )}
               >
                 {ocupado === "compartir" ? (
                   <LoaderCircle
@@ -587,7 +595,12 @@ function Editor({
               type="button"
               onClick={bajarPdf}
               disabled={ocupado !== null || bloqueado}
-              className={cn(BOTON_PRIMARIO, "min-h-11 px-4 text-sm")}
+              className={cn(
+                BOTON_PRIMARIO,
+                "min-h-11 px-3 text-sm whitespace-nowrap sm:px-4",
+                // En demo no hay "Guardar": quedan tres y el PDF ocupa la fila.
+                esDemo && "col-span-2"
+              )}
             >
               {ocupado === "descargar" ? (
                 <LoaderCircle

@@ -13,6 +13,8 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 
+import { cn } from "@/lib/utils"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { enlaceDeWhatsApp } from "@/components/catalogos/editor/exportar"
 import { borrarCatalogo } from "@/app/(privado)/panel/catalogos/acciones"
+import { useConfirmacion } from "@/components/panel/confirmar"
 
 const ICONO =
   "flex size-11 items-center justify-center opacity-65 transition-colors hover:text-senal hover:opacity-100"
@@ -44,22 +47,24 @@ export function AccionesDeCatalogo({
   esDemo: boolean
 }) {
   const [borrando, empezar] = React.useTransition()
+  const { preguntar, dialogo } = useConfirmacion()
 
   return (
     <div className="flex shrink-0 items-center">
+      {dialogo}
       <a
         href={`/panel/catalogos/${id}/pdf`}
         target="_blank"
         rel="noopener"
         aria-label={`Abrir el PDF de ${nombre}`}
-        className={ICONO}
+        className={cn(ICONO, "hidden sm:flex")}
       >
         <FileText aria-hidden="true" className="size-4" />
       </a>
       <Link
         href={`/panel/catalogos/${id}`}
         aria-label={`Editar ${nombre}`}
-        className={ICONO}
+        className={cn(ICONO, "hidden sm:flex")}
       >
         <Pencil aria-hidden="true" className="size-4" />
       </Link>
@@ -72,6 +77,25 @@ export function AccionesDeCatalogo({
           <MoreHorizontal aria-hidden="true" className="size-4" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64">
+          {/* En el celular el PDF y el lápiz viven acá: tres íconos de 44 px
+              le dejaban al nombre del catálogo siete letras. */}
+          <DropdownMenuItem asChild className="sm:hidden">
+            <a
+              href={`/panel/catalogos/${id}/pdf`}
+              target="_blank"
+              rel="noopener"
+            >
+              <FileText aria-hidden="true" className="size-4" />
+              Abrir el PDF
+            </a>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className="sm:hidden">
+            <Link href={`/panel/catalogos/${id}`}>
+              <Pencil aria-hidden="true" className="size-4" />
+              Editar
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator className="sm:hidden" />
           <DropdownMenuItem asChild>
             {/* El servidor lo manda como archivo: el navegador lo guarda en
                 Descargas, con su nombre y su .pdf. */}
@@ -107,15 +131,14 @@ export function AccionesDeCatalogo({
           <DropdownMenuItem
             variant="destructive"
             disabled={esDemo}
-            onSelect={() => {
+            onSelect={async () => {
               // Se pregunta porque el enlace que ya se mandó deja de abrir.
-              if (
-                !window.confirm(
-                  `¿Borrar «${nombre}»? El enlace que ya compartiste deja de abrir.`
-                )
-              ) {
-                return
-              }
+              const borrar = await preguntar({
+                titulo: `¿Borrar «${nombre}»?`,
+                texto: "El enlace que ya compartiste deja de abrir.",
+                confirmar: "Borrar el catálogo",
+              })
+              if (!borrar) return
               empezar(async () => {
                 const resultado = await borrarCatalogo(id)
                 if (resultado.ok) toast.success("Catálogo borrado.")

@@ -38,9 +38,9 @@ export default async function ListoPage() {
             Ahora, que se vea como tu negocio.
           </h1>
           <p className="mt-5 max-w-[50ch] text-lg leading-relaxed opacity-70">
-            Tu logo, tus colores, tu letra y los textos de tu portada. Lo ves
-            todo al instante en tu tienda de verdad, y tus clientes no ven nada
-            hasta que publiques.
+            Tu logo, tus colores, tu letra y los textos de tu portada. Tu tienda
+            ya está en línea con tu plantilla; lo que cambies lo ves al instante
+            y tus clientes lo ven recién cuando lo publiques.
           </p>
 
           <ul className="mt-8 max-w-[46ch] border-t border-tinta/15 text-sm">

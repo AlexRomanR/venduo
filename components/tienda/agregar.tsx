@@ -90,7 +90,7 @@ export function AgregarAlCarrito({
               onClick={() => setCantidad((c) => Math.max(1, c - 1))}
               disabled={cantidad <= 1}
               aria-label="Quitar una unidad"
-              className="flex size-11 items-center justify-center border border-tinta/30 transition-colors hover:border-senal hover:text-senal disabled:opacity-30"
+              className="flex size-11 items-center justify-center rounded-plantilla border border-tinta/30 transition-colors hover:border-senal hover:text-senal disabled:opacity-30"
             >
               <Minus aria-hidden="true" className="size-4" />
             </button>
@@ -107,7 +107,7 @@ export function AgregarAlCarrito({
               onClick={() => setCantidad((c) => Math.min(tope, c + 1))}
               disabled={cantidad >= tope}
               aria-label="Agregar una unidad"
-              className="flex size-11 items-center justify-center border border-tinta/30 transition-colors hover:border-senal hover:text-senal disabled:opacity-30"
+              className="flex size-11 items-center justify-center rounded-plantilla border border-tinta/30 transition-colors hover:border-senal hover:text-senal disabled:opacity-30"
             >
               <Plus aria-hidden="true" className="size-4" />
             </button>
@@ -156,13 +156,13 @@ export function AgregarAlCarrito({
             onClick={() => router.push(`/t/${slug}/carrito`)}
             className="flex min-h-12 items-center justify-center rounded-plantilla border-2 border-tinta px-5 font-semibold transition-colors hover:bg-tinta hover:text-papel"
           >
-            Ir a pagar
+            Ver mi carrito
           </button>
         ) : null}
       </div>
 
       {yaEnCarrito > 0 ? (
-        <p className="mt-4 text-sm opacity-55">
+        <p className="mt-4 text-sm opacity-65">
           Ya tienes {yaEnCarrito} en tu carrito.
           {disponible === 0
             ? " Es todo el stock disponible."

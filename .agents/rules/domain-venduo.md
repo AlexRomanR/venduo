@@ -85,6 +85,10 @@ nada en la base: se decide al leer, con `noSeConcreto` en la lista y
 `limiteParaConcretar` en los conteos. Y se puede marcar pagado igual, porque cancelarlo
 lo dejaría bloqueado para el comprador que paga el día ocho.
 
+**El número de pedido es de cada tienda**: el siguiente es el último de esa tienda
+más uno, lo calcula `create_order` bajo un candado por tienda. Era una secuencia
+global, y el primer pedido de una tienda nueva llegaba como "#261".
+
 **El mismo carrito no crea dos pedidos.** Si quien compra vuelve atrás desde WhatsApp
 y manda lo mismo en la siguiente media hora, el carrito reabre el chat del pedido que
 ya existe (`components/tienda/checkout.tsx`).

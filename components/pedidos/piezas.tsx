@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import type { Pedido } from "@/lib/data/pedidos"
 import { ESTADOS, SIGUIENTES } from "@/lib/pedidos"
 import type { OrderStatus } from "@/types"
+import { useConfirmacion } from "@/components/panel/confirmar"
 
 const ASPECTO: Record<OrderStatus, string> = {
   // Rojo solo en lo que pide una acción: un pedido sin gestionar. Si todos los
@@ -69,6 +70,7 @@ export function CambiarEstado({
 }) {
   const router = useRouter()
   const [enCurso, setEnCurso] = React.useState<OrderStatus | null>(null)
+  const { preguntar, dialogo } = useConfirmacion()
 
   const siguientes = SIGUIENTES[pedido.estado].map((estado) => PASOS[estado])
 
@@ -79,12 +81,14 @@ export function CambiarEstado({
     }
 
     if (paso.estado === "cancelado") {
-      const confirmar = window.confirm(
-        `¿Cancelar el pedido #${pedido.numero}?` +
-          (pedido.estado === "pagado"
-            ? " Sus productos vuelven a tu stock."
-            : "")
-      )
+      const confirmar = await preguntar({
+        titulo: `¿Cancelar el pedido #${pedido.numero}?`,
+        texto:
+          pedido.estado === "pagado"
+            ? "Sus productos vuelven a tu stock. Un pedido cancelado no se puede reabrir."
+            : "Un pedido cancelado no se puede reabrir.",
+        confirmar: "Cancelar el pedido",
+      })
       if (!confirmar) return
     }
 
@@ -105,6 +109,7 @@ export function CambiarEstado({
 
   return (
     <div className="flex flex-wrap gap-2">
+      {dialogo}
       {siguientes.map((paso) => (
         <button
           key={paso.estado}

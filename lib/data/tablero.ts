@@ -53,11 +53,13 @@ export async function getTablero(): Promise<Tablero | null> {
       supabase
         .from("order_items")
         .select(
-          "product_id, product_name, quantity, unit_price_cents, products(image_url), orders!inner(status)"
+          "product_id, product_name, quantity, unit_price_cents, products(image_url), orders!inner(status, created_at)"
         )
         .eq("store_id", tienda.id)
         .eq("orders.status", "pagado")
-        .gte("created_at", inicio(desdeRanking)),
+        // La fecha es la del pedido, como en la serie de ventas: la de la
+        // línea puede ser otra, y entonces el ranking sumaba meses viejos.
+        .gte("orders.created_at", inicio(desdeRanking)),
       // Comparar stock con el umbral es comparar dos columnas, cosa que el
       // filtro de PostgREST no sabe hacer: un catálogo de MVP son decenas.
       supabase

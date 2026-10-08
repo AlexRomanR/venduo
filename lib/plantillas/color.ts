@@ -63,3 +63,76 @@ export function hslAHex(tono: number, saturacion: number, luz: number): string {
   }
   return `#${canal(0)}${canal(8)}${canal(4)}`
 }
+
+/**
+ * Un color dicho en palabras: "crema", "verde oscuro", "café casi negro".
+ *
+ * Es para contarle a quien vende qué cambia —en el resumen de publicar y en la
+ * propuesta de la IA—, donde un "#f6efe7" no dice nada. Es aproximado a
+ * propósito: nombra la familia, y la muestra de color al lado dice el resto.
+ */
+export function nombreDeColor(hex: string): string {
+  const [tono, saturacion, luz] = hexAHsl(hex)
+
+  if (saturacion < 12) {
+    if (luz >= 90) return "blanco"
+    if (luz >= 70) return "gris claro"
+    if (luz >= 35) return "gris"
+    if (luz >= 15) return "gris oscuro"
+    return "negro"
+  }
+
+  const familia =
+    tono < 15 || tono >= 345
+      ? "rojo"
+      : tono < 40
+        ? "naranja"
+        : tono < 65
+          ? "amarillo"
+          : tono < 160
+            ? "verde"
+            : tono < 200
+              ? "turquesa"
+              : tono < 250
+                ? "azul"
+                : tono < 290
+                  ? "violeta"
+                  : "rosa"
+
+  if (luz >= 88) {
+    return familia === "naranja" || familia === "amarillo"
+      ? "crema"
+      : `${familia} muy claro`
+  }
+  // Un naranja, un rojo o un rosa oscuros ya no se ven así: son café, vino y
+  // ciruela.
+  const oscuro =
+    familia === "naranja"
+      ? "café"
+      : familia === "rojo"
+        ? "vino"
+        : familia === "rosa"
+          ? "ciruela"
+          : familia
+  if (luz < 15) return `${oscuro} casi negro`
+  if (luz < 30) return familia === oscuro ? `${familia} oscuro` : oscuro
+  // Un naranja apagado, entre el café y el naranja de verdad, es terracota.
+  if (familia === "naranja" && luz < 45) return "terracota"
+  if (luz >= 70) return `${familia} claro`
+  return familia
+}
+
+/**
+ * Cómo cambió un color, en palabras: "crema → verde claro", o, si los dos se
+ * llaman igual, "crema más claro". Un "crema → crema" no cuenta nada.
+ */
+export function cambioDeColor(antes: string, despues: string): string {
+  const nombreAntes = nombreDeColor(antes)
+  const nombreDespues = nombreDeColor(despues)
+  if (nombreAntes !== nombreDespues) return `${nombreAntes} → ${nombreDespues}`
+
+  const diferencia = hexAHsl(despues)[2] - hexAHsl(antes)[2]
+  if (diferencia >= 3) return `${nombreDespues}, más claro`
+  if (diferencia <= -3) return `${nombreDespues}, más oscuro`
+  return `${nombreDespues}, otro tono`
+}

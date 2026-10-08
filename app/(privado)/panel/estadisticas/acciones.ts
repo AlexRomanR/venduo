@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 
+import { mensajeDeErrorDeIa } from "@/lib/ai/mensajes"
 import { buildInsightSql } from "@/lib/ai/tasks"
 import { insightSqlSchema, type InsightSql } from "@/lib/ai/schemas"
 import {
@@ -53,17 +54,7 @@ export async function preguntar(
     // indistinguible de una pregunta mal entendida y no hay por dónde empezar.
     console.error("[insights] el proveedor de IA falló:", error)
 
-    // Saturación y error real piden cosas distintas de quien está mirando: una
-    // se arregla esperando diez segundos y la otra cambiando la pregunta.
-    const detalle = error instanceof Error ? error.message : ""
-    const saturado = /503|UNAVAILABLE|429|high demand/i.test(detalle)
-
-    return {
-      ok: false,
-      error: saturado
-        ? "El modelo está saturado en este momento. Vuelve a preguntar en unos segundos."
-        : "La IA no pudo responder ahora. Intenta de nuevo en un momento.",
-    }
+    return { ok: false, error: mensajeDeErrorDeIa(error) }
   }
 
   // La salida del modelo se valida antes de tocar la base, siempre.
