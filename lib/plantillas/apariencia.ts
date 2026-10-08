@@ -358,17 +358,21 @@ export function cssDeApariencia(apariencia: Apariencia): string {
   if (tipografia.espaciadoTitular) {
     titular.push(`letter-spacing:${ESPACIADOS[tipografia.espaciadoTitular]}`)
   }
-  if (tipografia.mayusculas) {
-    titular.push("text-transform:uppercase")
-  }
 
   // Las miniaturas de la galería llevan su propia plantilla adentro de esta
   // página: la regla del titular no les llega, o una miniatura de perfumería
   // saldría en mayúsculas dentro de un panel de moda.
-  const css = `html:root{${variables.join(";")}}`
-  return titular.length > 0
-    ? `${css}.font-titular:not([data-miniatura] *){${titular.join(";")}}`
-    : css
+  let css = `html:root{${variables.join(";")}}`
+  if (titular.length > 0) {
+    css += `.font-titular:not([data-miniatura] *){${titular.join(";")}}`
+  }
+  // Las mayúsculas no alcanzan a las cifras, que siempre llevan `.tabular`:
+  // en una plantilla de titulares en mayúsculas, "Bs 180" salía "BS 180".
+  if (tipografia.mayusculas) {
+    css +=
+      ".font-titular:not(.tabular):not([data-miniatura] *){text-transform:uppercase}"
+  }
+  return css
 }
 
 /**

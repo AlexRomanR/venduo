@@ -170,8 +170,9 @@ y `acentoCercano()` es el arreglo de un toque.
 Antes de las doce plantillas, la galería ofrece cuatro estilos que salen de la tienda
 (`estilosDeLaTienda()`, en `lib/catalogos/plantillas.ts`), cada uno con la plantilla que
 mejor lo luce. El primero usa la que más se parece a la plantilla de la tienda online
-(`PLANTILLA_POR_TIENDA`: Pasarela va con Lookbook, Esencia con Una foto por hoja y la
-clásica con Revista):
+(`PLANTILLA_POR_TIENDA`: Pasarela y Pisada van con Lookbook, Esencia con Una foto por
+hoja, Calle con Feria, Atelier con Vitrina de lujo, Fórmula con Grilla minimalista, Bazar
+con Lista de precios y la clásica con Revista):
 
 | Estilo               | Qué hace                                                          | Plantilla          |
 | -------------------- | ----------------------------------------------------------------- | ------------------ |

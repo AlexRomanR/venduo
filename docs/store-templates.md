@@ -230,6 +230,11 @@ lib/plantillas/
   clasica.ts        La base editorial de Venduo: respaldo, no se ofrece
   fashion.ts        Pasarela
   perfume.ts        Esencia
+  calle.ts          Calle
+  atelier.ts        Atelier
+  pisada.ts         Pisada
+  formula.ts        Fórmula
+  bazar.ts          Bazar
   bloques.ts        Qué significa cada bloque, sin decir cómo se ve
   index.ts          El registro: PLANTILLAS, ClavePlantilla, plantillaDeTienda()
 
@@ -246,6 +251,10 @@ components/plantillas/
   clasica/          El kit editorial. Los demás heredan de este
   fashion/          cabecera, piezas, bloques, galeria, paginas, index
   perfume/          cabecera, piezas, bloques, galeria, paginas, index
+  comunes/          paginasDeKit(): portada, catálogo y ficha armados con las
+                    piezas de un kit. Lo usan los cinco de abajo
+  calle/ atelier/ pisada/ formula/ bazar/
+                    cabecera, piezas, bloques, index
 
 components/tienda/  Lo compartido: carrito, el pedido por WhatsApp, agregar,
                     filtros, buscar, barra-del-carrito
@@ -297,7 +306,7 @@ app/(privado)/panel/apariencia/   La pantalla y la acción de cambiar plantilla
 ```
 
 `ficha` y `carrito` no llegan al CSS: los leen los componentes. Son **formas cerradas
-que los tres kits saben dibujar**, cada uno con su estilo —la vitrina de Esencia es su arco
+que todos los kits saben dibujar**, cada uno con su estilo —la vitrina de Esencia es su arco
 al centro; la de Pasarela, la prenda chica con aire—, así que ningún valor queda sin efecto
 en una plantilla. El carrito es un solo componente compartido y ordena las mismas piezas de
 tres maneras. `consulta` solo se dibuja si la tienda tiene WhatsApp, y la barra de compra
@@ -357,11 +366,11 @@ resuelven —cuánto llevas y cómo se lo mandas a la tienda— no cambia con el
 
 ```ts
 // lib/plantillas/index.ts
-export const PLANTILLAS = { clasica, fashion, perfume }
+export const PLANTILLAS = { clasica, fashion, perfume, calle, atelier, pisada, formula, bazar }
 export type ClavePlantilla = keyof typeof PLANTILLAS
 
 // components/plantillas/index.ts
-const KITS: Record<ClavePlantilla, KitDeTienda> = { clasica: …, fashion: …, perfume: … }
+const KITS: Record<ClavePlantilla, KitDeTienda> = { clasica: …, fashion: …, perfume: …, calle: …, … }
 ```
 
 `KITS` está tipado contra `ClavePlantilla`: **una base registrada sin su kit no compila.**
@@ -554,6 +563,121 @@ alcanza.
 - **Ficha** con foto en arco y miniaturas circulares, y un "¿No sabes si es para ti?
   Pregúntanos" que abre WhatsApp con el producto ya nombrado.
 
+### Calle (`calle`) — Ropa urbana y de tanda
+
+Un cartel pegado en un poste: se lee de lejos y se reconoce por la letra.
+
+| Token         | Valor                                                            |
+| ------------- | ---------------------------------------------------------------- |
+| Papel / tinta | Cemento `#e9e7e2` / `#151515` — 14,8:1                           |
+| Señal         | Naranja de obra `#b23a0e` — 4,9:1 contra papel, 6,0:1 con blanco |
+| Titular       | Anton 400, mayúsculas: letra de afiche, pesada y angosta         |
+| Cuerpo        | Geist                                                            |
+| Forma         | Recta                                                            |
+| Tarjeta       | Cuadrada, con marco de 2 px, tres por fila en escritorio         |
+
+- **Cabecera** con una cinta que corre (`.cinta` en `globals.css`; quieta con menos
+  movimiento): cómo se compra y las categorías. Es decorado, `aria-hidden`.
+- **Portada** partida: titular de afiche a un lado, la foto enmarcada al otro con el nombre
+  corriendo por su borde y una calcomanía torcida.
+- **Categorías** como renglones de afiche que se invierten al tocarlos.
+- **Tarjeta** con sombra dura, sin desenfoque, al pasar el cursor; la rebaja es una
+  calcomanía.
+- **Ficha** con la barra de compra fija y sugerencias en el carrito.
+
+### Atelier (`atelier`) — Carteras, bolsos y accesorios
+
+Una cartera se compra como un objeto: entera, de frente, con aire alrededor.
+
+| Token         | Valor                                                     |
+| ------------- | --------------------------------------------------------- |
+| Papel / tinta | Hueso `#f6f2ec` / cuero oscuro `#1f1a17` — 15,5:1         |
+| Señal         | Burdeos `#7b2234` — 8,9:1 contra papel, 9,9:1 con blanco  |
+| Titular       | Bodoni Moda 500, apretada; la cursiva en nombres y firmas |
+| Cuerpo        | Jost                                                      |
+| Forma         | Suave                                                     |
+| Tarjeta       | Cuadrada, la pieza entera sobre su paño, sin recortar     |
+
+- **Cabecera** con el nombre como una firma y las líneas de la casa en versalitas, sobre
+  una regla doble.
+- **Portada** de revista: el titular a un lado y la pieza dentro de un paspartú.
+- **Categorías** que se pasan de lado como vitrinas; todas a la vista en escritorio.
+- **Ficha** tipo vitrina: la galería muestra la foto entera (`fotoEntera`), no recortada.
+
+### Pisada (`pisada`) — Zapatillas y calzado
+
+El calzado se ve de perfil y se compara de a muchos.
+
+| Token         | Valor                                                            |
+| ------------- | ---------------------------------------------------------------- |
+| Papel / tinta | Blanco frío `#f0f1f3` / `#0f1216` — 16,6:1                       |
+| Señal         | Verde de cancha `#0a7240` — 5,3:1 contra papel, 6,0:1 con blanco |
+| Titular       | Barlow Condensed 800, mayúsculas, en cursiva                     |
+| Cuerpo        | Geist                                                            |
+| Forma         | Píldora                                                          |
+| Tarjeta       | Cuadrada sobre una placa redondeada, cuatro por fila             |
+
+- **Cabecera** oscura con las categorías como fichas redondas debajo.
+- **Portada** de lanzamiento: una placa oscura y, detrás, el nombre en contorno.
+- **Categorías** como fichas grandes con la foto en un círculo.
+- Cada título abre con una barra verde sesgada. La ficha trae la consulta de talla y la
+  barra de compra fija; el carrito va por pasos.
+
+### Fórmula (`formula`) — Perfumería de autor, decants y aceites
+
+La otra cara de Esencia: donde aquella es una vitrina dorada, esta es una botica.
+
+| Token         | Valor                                                        |
+| ------------- | ------------------------------------------------------------ |
+| Papel / tinta | Gris de etiqueta `#ebeae5` / carbón `#1c1c1a` — 14,2:1       |
+| Señal         | Verde oliva `#4f5a26` — 6,2:1 contra papel, 7,4:1 con blanco |
+| Titular       | Instrument Serif 400, apretada                               |
+| Cuerpo        | Geist, y los datos a máquina en Geist Mono                   |
+| Forma         | Recta                                                        |
+| Tarjeta       | Retrato, con una etiqueta pegada que sube sobre la foto      |
+
+- **Portada** como la primera página de un recetario, con reglas de un pixel.
+- **Categorías** como el índice: número, nombre, puntos y cantidad.
+- **Preguntas** como notas numeradas. El cierre es la ficha técnica de la casa.
+
+### Bazar (`bazar`) — De todo un poco
+
+Un bazar no tiene un producto estrella: tiene muchos, y quien entra viene a curiosear.
+Abre el rubro "Variedades".
+
+| Token         | Valor                                                        |
+| ------------- | ------------------------------------------------------------ |
+| Papel / tinta | Crema `#f8f2e2` / `#1e1b16` — 15,4:1                         |
+| Señal         | Fucsia `#b0225c` — 5,8:1 contra papel, 6,5:1 con blanco      |
+| Titular       | Bricolage Grotesque 800, apretada                            |
+| Cuerpo        | Geist                                                        |
+| Forma         | Píldora                                                      |
+| Tarjeta       | Cuadrada y redondeada, con el precio en una etiqueta torcida |
+
+- **Cabecera** con el buscador al centro: en una tienda de todo un poco, primero se busca.
+- **Portada** como un mostrador: tres productos de la tienda apoyados un poco torcidos.
+- **Categorías** en un tablero de recuadros; el primero es grande, y de dos por dos solo
+  si hay cinco o más.
+- La etiqueta de precio va en fucsia **solo con rebaja**: si todas lo fueran, ninguna se
+  notaría. Los títulos llevan un subrayado a mano.
+
+### Las pantallas compartidas
+
+Pasarela y Esencia escriben sus tres pantallas enteras. Las cinco de arriba se ordenan
+igual —vitrina de bloques, catálogo con filtros, ficha con galería— y las arman con
+`paginasDeKit()` (`components/plantillas/comunes/paginas.tsx`), que recibe las piezas del
+kit: la tarjeta, el título de sección, el rótulo, la grilla, el cierre de la portada, cómo
+se enmarca una foto y los textos. No sabe de qué plantilla son.
+
+Dos trampas que salieron al hacerlas:
+
+- **`cn()` descarta un interlineado que va antes de un tamaño de letra.** tailwind-merge
+  entiende que `text-[…]` también fija la altura de línea. En un `cn()`, `leading-*` va
+  después del tamaño.
+- **Las mayúsculas del titular no alcanzan a las cifras.** `cssDeApariencia` las aplica a
+  `.font-titular:not(.tabular)`: en una plantilla en mayúsculas, "Bs 180" salía "BS 180".
+  Todo monto lleva `.tabular`.
+
 ### La editorial (`clasica`) — respaldo
 
 No se ofrece. Es la base de todos los kits y la que dibuja las tiendas con plantillas
@@ -582,11 +706,18 @@ contra señal ≥ 4,5:1. `contraste()` de `apariencia.ts` sirve.
 **2. Registrarla** en `PLANTILLAS` (`lib/plantillas/index.ts`).
 
 **3. Las fuentes**, si son nuevas: declararlas en `lib/fuentes.ts` con `preload: false` y
-sumarlas a `FUENTES` en `lib/plantillas/fuentes.ts` con **la misma variable**.
+sumarlas a `FUENTES` en `lib/plantillas/fuentes.ts` con **la misma variable**. El catálogo
+en PDF también las usa: un TTF estático por peso en `public/fuentes/{clave}-{peso}.ttf`
+(la API de Google Fonts los da con un agente de usuario sin soporte de woff2), y sus
+`PESOS`, `METRICAS` y `ANCHOS` en `lib/catalogos/estilo.ts`, medidos sobre esos archivos
+con `fontkit`: `hhea` para sube y baja, y el ancho promedio de cada clase de carácter en
+el peso más pesado. Sumar una pareja a `COMBINACIONES` (`lib/editor/sugerencias.ts`).
 
 **4. El kit** — `components/plantillas/{clave}/`, empezando por `{ ...KIT_CLASICO }` y
-reemplazando lo que cambia. Registrarlo en `KITS`: TypeScript avisa si falta. Agregar su
-dibujo a `DIBUJOS` en `miniatura.tsx`.
+reemplazando lo que cambia —o con `paginasDeKit()` si sigue el esqueleto compartido—.
+Registrarlo en `KITS`: TypeScript avisa si falta. Agregar su dibujo a `DIBUJOS` en
+`miniatura.tsx` y sus productos de ejemplo a `EJEMPLOS` en `lib/editor/muestras.ts`, con
+fotos verificadas. Sumarla al espejo del modo demo (`RUBROS_DEMO`).
 
 **5. La migración** — insertar la fila en `templates` (con `sector` y `version = 1`) y sus
 `template_pages`.

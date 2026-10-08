@@ -23,6 +23,11 @@ export const PESOS: Record<ClaveFuente, number[]> = {
   oswald: [500, 600, 700],
   cormorant: [500, 600, 700],
   jost: [400, 500, 600],
+  anton: [400],
+  bodoni: [500, 600, 700],
+  barlow: [600, 700, 800],
+  instrument: [400],
+  bricolage: [600, 700, 800],
 }
 
 /**
@@ -39,6 +44,11 @@ export const METRICAS: Record<ClaveFuente, { sube: number; baja: number }> = {
   oswald: { sube: 1.193, baja: 0.289 },
   cormorant: { sube: 0.924, baja: 0.287 },
   jost: { sube: 1.07, baja: 0.375 },
+  anton: { sube: 1.176, baja: 0.329 },
+  bodoni: { sube: 1.125, baja: 0.4 },
+  barlow: { sube: 1, baja: 0.2 },
+  instrument: { sube: 0.99, baja: 0.31 },
+  bricolage: { sube: 0.93, baja: 0.27 },
 }
 
 /**
@@ -93,6 +103,41 @@ const ANCHOS: Record<
     digito: 0.61,
     espacio: 0.3,
     signo: 0.448,
+  },
+  anton: {
+    mayuscula: 0.474,
+    minuscula: 0.455,
+    digito: 0.478,
+    espacio: 0.234,
+    signo: 0.374,
+  },
+  bodoni: {
+    mayuscula: 0.733,
+    minuscula: 0.563,
+    digito: 0.586,
+    espacio: 0.25,
+    signo: 0.465,
+  },
+  barlow: {
+    mayuscula: 0.477,
+    minuscula: 0.423,
+    digito: 0.437,
+    espacio: 0.2,
+    signo: 0.379,
+  },
+  instrument: {
+    mayuscula: 0.481,
+    minuscula: 0.392,
+    digito: 0.386,
+    espacio: 0.17,
+    signo: 0.337,
+  },
+  bricolage: {
+    mayuscula: 0.674,
+    minuscula: 0.574,
+    digito: 0.601,
+    espacio: 0.223,
+    signo: 0.405,
   },
 }
 

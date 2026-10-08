@@ -1,8 +1,13 @@
 import {
+  Anton,
   Archivo,
+  Barlow_Condensed,
+  Bodoni_Moda,
+  Bricolage_Grotesque,
   Cormorant_Garamond,
   Geist,
   Geist_Mono,
+  Instrument_Serif,
   Jost,
   Oswald,
 } from "next/font/google"
@@ -69,6 +74,54 @@ export const jost = Jost({
   preload: false,
 })
 
+/** Titular de la plantilla `calle`: una de cartel, pesada y angosta. */
+export const anton = Anton({
+  variable: "--fuente-anton",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  preload: false,
+})
+
+/** Titular de la plantilla `atelier`: una didona, de revista de moda. */
+export const bodoni = Bodoni_Moda({
+  variable: "--fuente-bodoni",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  preload: false,
+})
+
+/** Titular de la plantilla `pisada`: condensada y en cursiva, de cancha. */
+export const barlow = Barlow_Condensed({
+  variable: "--fuente-barlow",
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  style: ["normal", "italic"],
+  display: "swap",
+  preload: false,
+})
+
+/** Titular de la plantilla `formula`: una romana fina, de etiqueta. */
+export const instrument = Instrument_Serif({
+  variable: "--fuente-instrument",
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
+  preload: false,
+})
+
+/** Titular de la plantilla `bazar`: un grotesco con carácter, de letrero. */
+export const bricolage = Bricolage_Grotesque({
+  variable: "--fuente-bricolage",
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  display: "swap",
+  preload: false,
+})
+
 /** Las clases que declaran las variables. Van en `<html>`. */
 export const VARIABLES_DE_FUENTES = [
   geist,
@@ -77,6 +130,11 @@ export const VARIABLES_DE_FUENTES = [
   oswald,
   cormorant,
   jost,
+  anton,
+  bodoni,
+  barlow,
+  instrument,
+  bricolage,
 ]
   .map((fuente) => fuente.variable)
   .join(" ")

@@ -136,6 +136,12 @@ components/
     clasica/          La base editorial. Los demás kits heredan de esta
     fashion/          Pasarela
     perfume/          Esencia
+    calle/            Calle: ropa urbana
+    atelier/          Atelier: carteras y accesorios
+    pisada/           Pisada: zapatillas y calzado
+    formula/          Fórmula: perfumería de autor
+    bazar/            Bazar: de todo un poco
+    comunes/          Portada, catálogo y ficha armados con las piezas de un kit
   tienda/             Lo compartido por todas las plantillas: carrito, el pedido
                       por WhatsApp, agregar, barra de compra, filtros y buscador
   catalogos/          Catálogos en PDF. `primitivas.ts` es el contrato de dibujo,

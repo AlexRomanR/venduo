@@ -519,6 +519,11 @@ export interface EstiloSugerido {
 const PLANTILLA_POR_TIENDA: Record<string, ClavePlantilla> = {
   fashion: "lookbook",
   perfume: "destacado",
+  calle: "feria",
+  atelier: "lujo",
+  pisada: "lookbook",
+  formula: "minimal",
+  bazar: "precios",
   clasica: "revista",
 }
 

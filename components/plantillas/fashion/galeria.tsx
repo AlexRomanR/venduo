@@ -18,10 +18,16 @@ export function Galeria({
   imagenes,
   nombre,
   retrato,
+  marco,
+  entera = false,
 }: {
   imagenes: string[]
   nombre: string
   retrato: boolean
+  /** Cómo enmarca cada foto la plantilla que la usa: un radio, un paño. */
+  marco?: string
+  /** La foto entera sobre su paño, sin recortar: una cartera, un frasco. */
+  entera?: boolean
 }) {
   const [actual, setActual] = React.useState(0)
   const carril = React.useRef<HTMLDivElement>(null)
@@ -33,7 +39,8 @@ export function Galeria({
       <div
         className={cn(
           "flex w-full items-center justify-center bg-tinta/[0.06]",
-          proporcion
+          proporcion,
+          marco
         )}
       >
         <ImageOff aria-hidden="true" className="size-10 opacity-20" />
@@ -57,8 +64,9 @@ export function Galeria({
             <div
               key={url}
               className={cn(
-                "relative w-full shrink-0 snap-center bg-tinta/[0.06]",
-                proporcion
+                "relative w-full shrink-0 snap-center overflow-hidden bg-tinta/[0.06]",
+                proporcion,
+                marco
               )}
             >
               <Image
@@ -68,7 +76,7 @@ export function Galeria({
                 unoptimized
                 priority={i === 0}
                 sizes="100vw"
-                className="object-cover"
+                className={entera ? "object-contain p-[8%]" : "object-cover"}
               />
             </div>
           ))}
@@ -93,7 +101,11 @@ export function Galeria({
         {imagenes.slice(0, 6).map((url, i) => (
           <div
             key={url}
-            className={cn("relative w-full bg-tinta/[0.06]", proporcion)}
+            className={cn(
+              "relative w-full overflow-hidden bg-tinta/[0.06]",
+              proporcion,
+              marco
+            )}
           >
             <Image
               src={url}
@@ -102,7 +114,7 @@ export function Galeria({
               unoptimized
               priority={i === 0}
               sizes="(max-width: 1280px) 30vw, 380px"
-              className="object-cover"
+              className={entera ? "object-contain p-[8%]" : "object-cover"}
             />
           </div>
         ))}
