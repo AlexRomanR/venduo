@@ -17,7 +17,7 @@
  *     asetpts=PTS-STARTPTS[b];[a][b]acrossfade=d=0.04,loudnorm=I=-14:TP=-1.5[o]"
  *     -map "[o]" -ar 48000 -b:a 256k <salida>.mp3
  *
- *   <FIN> = 25.739 para la vertical y 42.883 para la horizontal.
+ *   <FIN> = 25.739 para la vertical y 38.595 para la horizontal.
  */
 
 import fs from "node:fs"
@@ -36,9 +36,9 @@ const T = 60 / 112
 const b = (n) => Math.round(n * T * 1000) / 1000
 
 /** El empalme de la música: de acá en adelante suena su última frase. */
-const EMPALME = { vertical: 25.673, horizontal: 42.817 }
+const EMPALME = { vertical: 25.673, horizontal: 38.529 }
 /** El golpe final de la pista, ya empalmada. */
-const GOLPE = { vertical: 29.154, horizontal: 46.298 }
+const GOLPE = { vertical: 29.154, horizontal: 42.01 }
 
 /* ---------------------------------------------------------------------------
  * El caos: lo que le escriben a quien vende por redes
@@ -134,45 +134,47 @@ function ubicar(mensajes, zona, letra, semilla) {
 }
 
 /* ---------------------------------------------------------------------------
- * Las escenas: una pregunta y su respuesta
+ * Las escenas: una pantalla y su frase, o su paso
  * ------------------------------------------------------------------------ */
 
-// En la respuesta, *esto* va en rojo y lleva la regla trazada debajo.
+// *Esto* va en rojo y lleva la regla trazada debajo.
+// `frase`: el resultado, en el vertical. `num`, `titulo` y `sub`: el paso, en el horizontal.
 const ESCENAS = {
   crear: {
-    red: "Tú · a Venduo",
-    pregunta: "¿Cómo armo mi tienda?",
-    respuesta: ["Tu tienda online,", "*lista* en minutos."],
+    frase: ["Tu tienda online,", "lista en *minutos*."],
+    num: 1,
+    titulo: ["Crea tu *tienda*"],
+    sub: "Eliges una plantilla y queda lista en minutos.",
+  },
+  precios: {
+    frase: ["Tus precios,", "siempre *a la vista*."],
+  },
+  productos: {
+    num: 2,
+    titulo: ["Sube tus *productos*"],
+    sub: "Con su foto, su precio y cuántas te quedan.",
   },
   catalogo: {
-    red: "WhatsApp · Mariela",
-    pregunta: "¿Tienes catálogo?",
-    respuesta: ["Catálogo en *PDF*,", "con tus precios de hoy."],
-  },
-  precio: {
-    red: "TikTok · @carla.scz",
-    pregunta: "¿Precio?",
-    respuesta: ["Cada producto,", "con su *precio*."],
-  },
-  stock: {
-    red: "Instagram · Kevin",
-    pregunta: "¿Todavía tienes?",
-    respuesta: ["Ven *lo que hay*,", "sin preguntarte."],
+    frase: ["Tu catálogo,", "listo para *mandar*."],
+    num: 3,
+    titulo: ["Comparte tu *catálogo*"],
+    sub: "Un PDF con tus precios de hoy, para mandar por WhatsApp.",
   },
   pedido: {
-    red: "Instagram · Fernanda",
-    pregunta: "¿Cómo te pido?",
-    respuesta: ["El pedido te llega", "por *WhatsApp*."],
+    frase: ["Los pedidos te llegan", "*ordenados*."],
+    num: 4,
+    titulo: ["Recibe pedidos", "por *WhatsApp*"],
+    sub: "Tu cliente arma su carrito y te lo manda con el total.",
   },
   ventas: {
-    red: "Tú · a Venduo",
-    pregunta: "¿Qué se vendió más?",
-    respuesta: ["Tus ventas te responden", "*preguntando*."],
+    num: 5,
+    titulo: ["Mira qué *vendes* más"],
+    sub: "Le preguntas a tus ventas y te responde con un gráfico.",
   },
   ia: {
-    red: "Tú · a la IA",
-    pregunta: "Ponle colores de verano",
-    respuesta: ["Tu tienda la editas tú,", "o se la pides a la *IA*."],
+    num: 6,
+    titulo: ["Cámbiala cuando", "*quieras*"],
+    sub: "A mano, o pidiéndoselo a la IA en tus palabras.",
   },
 }
 
@@ -187,17 +189,22 @@ const FORMATOS = {
     H: 1920,
     duracion: 30.6,
     musica: "assets/musica/lanzamiento-vertical.mp3",
+    texto: "frase",
     escenas: [
-      ["catalogo", 24, 32],
-      ["precio", 32, 37],
-      ["stock", 37, 42],
+      ["crear", 24, 30],
+      ["precios", 30, 36],
+      ["catalogo", 36, 42],
       ["pedido", 42, null],
     ],
     caos: { zona: { x0: 50, x1: 1030, y0: 150, y1: 1760 }, letra: 44, n: 26 },
-    sello: { size: 196, sub: 54 },
+    gancho: {
+      size: 118,
+      lineas: ["¿Y si tu tienda", "contestara", "*por ti*?"],
+    },
+    foto: { x: 190, y: 290, w: 700, h: 1050 },
     logo: { cx: 540, cy: 820, h: 330 },
     marcaS2: { top: 1030, size: 168, lema: 50, lemaTop: 1238 },
-    equipo: { x: 315, y: 430, w: 450, h: 940 },
+    equipo: { x: 300, y: 330, w: 480, h: 1010 },
     hojas: { h: 600, a: -300, b: 300 },
     pregunta: { top: 226, left: 90, width: 900, align: "center", size: 52 },
     respuesta: { top: 1392, left: 60, width: 960, align: "center", size: 66 },
@@ -217,26 +224,27 @@ const FORMATOS = {
     archivo: "index.html",
     W: 1920,
     H: 1080,
-    duracion: 47.7,
+    duracion: 43.5,
     musica: "assets/musica/lanzamiento-horizontal.mp3",
+    texto: "pasos",
     escenas: [
       ["crear", 24, 32],
-      ["catalogo", 32, 40],
-      ["precio", 40, 48],
-      ["stock", 48, 56],
-      ["pedido", 56, 64],
-      ["ventas", 64, 72],
-      ["ia", 72, null],
+      ["productos", 32, 40],
+      ["catalogo", 40, 48],
+      ["pedido", 48, 56],
+      ["ventas", 56, 64],
+      ["ia", 64, null],
     ],
     caos: { zona: { x0: 60, x1: 1860, y0: 60, y1: 1020 }, letra: 40, n: 28 },
-    sello: { size: 300, sub: 52 },
+    gancho: { size: 128, lineas: ["¿Y si tu tienda", "contestara *por ti*?"] },
+    foto: { x: 660, y: 60, w: 600, h: 960 },
     logo: { cx: 960, cy: 360, h: 340 },
     marcaS2: { top: 568, size: 160, lema: 46, lemaTop: 770 },
     equipo: { x: 220, y: 90, w: 430, h: 900 },
     // En horizontal las dos hojas salen hacia la izquierda: a la derecha está el texto.
     hojas: { h: 500, a: -265, b: -150 },
-    pregunta: { top: 250, left: 760, width: 1080, align: "left", size: 48 },
-    respuesta: { top: 450, left: 760, width: 1100, align: "left", size: 90 },
+    pregunta: { top: 210, left: 760, width: 1080, align: "left", size: 48 },
+    respuesta: { top: 380, left: 760, width: 1100, align: "left", size: 92 },
     cierre: {
       logoH: 210,
       cy: 290,
@@ -318,12 +326,14 @@ function pantallas(f) {
         </div>
         <i class="toque" id="toque-catalogo"></i>
       </div>`,
-    precio: `<div class="pant" id="p-precio">
-        <img class="llena" id="p-precio-img" src="assets/pantallas/rosa-tienda.jpg" alt="" />
-        <i class="subraya" id="p-precio-marca"></i>
+    precios: `<div class="pant" id="p-precios">
+        <img class="llena" src="assets/pantallas/rosa-tienda.jpg" alt="" />
+        <i class="subraya" id="p-precios-marca"></i>
       </div>`,
-    stock: `<div class="pant" id="p-stock">
-        <img class="llena" id="p-stock-img" src="assets/pantallas/rosa-producto-top.jpg" alt="" />
+    productos: `<div class="pant" id="p-productos">
+        <img class="paso" id="prod-1" src="assets/pantallas/productos/1-ficha.jpg" alt="" />
+        <img class="paso" id="prod-2" src="assets/pantallas/productos/2-precio.jpg" alt="" />
+        <img class="paso" id="prod-3" src="assets/pantallas/productos/3-lista.jpg" alt="" />
       </div>`,
     pedido: `<div class="pant chat" id="p-pedido">
         <div class="chat-cab"><span class="chat-av">RD</span><div><b>Rosa Deportes</b><small>en línea</small></div></div>
@@ -412,10 +422,9 @@ function escribir(nombre) {
       .burbuja { position: absolute; background: #fbfaf8; border: 2px solid ${C.tinta}; padding: 16px 26px 18px; }
       .burbuja .de { display: block; font-weight: 600; font-size: ${Math.round(f.caos.letra * 0.45)}px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.6; margin-bottom: 6px; white-space: nowrap; }
       .burbuja .tx { display: block; font-weight: 600; font-size: ${f.caos.letra}px; line-height: 1.15; white-space: nowrap; }
-      #sello { position: absolute; left: 0; right: 0; top: 50%; display: flex; flex-direction: column; align-items: center; gap: 28px; transform-origin: 50% 50%; }
-      #sello-tx { font-size: ${f.sello.size}px; color: ${C.senal}; }
-      #sello-sub { background: ${C.papel}; padding: 12px 30px; font-weight: 600; font-size: ${f.sello.sub}px; }
-
+      #vendedora { position: absolute; left: ${f.foto.x}px; top: ${f.foto.y}px; width: ${f.foto.w}px; height: ${f.foto.h}px; object-fit: cover; filter: grayscale(1); }
+      #gancho { position: absolute; left: 0; right: 0; top: 50%; text-align: center; font-size: ${f.gancho.size}px; }
+      #gancho .l { display: block; }
       /* El celular */
       #cuerpo { position: absolute; background: ${C.tinta}; overflow: hidden; }
       #pantalla { position: absolute; background: ${C.papel}; overflow: hidden; }
@@ -458,11 +467,10 @@ function escribir(nombre) {
       .ia-ok { background: ${C.tinta}; color: ${C.papel}; padding: 8px 12px; font-size: 16px; }
 
       /* Pregunta y respuesta */
-      .preg { position: absolute; top: ${f.pregunta.top}px; left: ${f.pregunta.left}px; width: ${f.pregunta.width}px; display: flex; flex-direction: column; align-items: ${f.pregunta.align === "center" ? "center" : "flex-start"}; gap: 10px; }
-      .preg .de { font-weight: 600; font-size: ${Math.round(f.pregunta.size * 0.42)}px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.65; }
-      .preg .globo { background: #fbfaf8; border: 2px solid ${C.tinta}; padding: 20px 32px 22px; font-weight: 600; font-size: ${f.pregunta.size}px; white-space: nowrap; }
       .resp { position: absolute; top: ${f.respuesta.top}px; left: ${f.respuesta.left}px; width: ${f.respuesta.width}px; text-align: ${f.respuesta.align}; font-size: ${f.respuesta.size}px; }
       .resp .l { display: block; white-space: nowrap; }
+      .num { position: absolute; top: ${f.pregunta.top}px; left: ${f.pregunta.left}px; font-size: 140px; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+      .sub { position: absolute; left: ${f.pregunta.left}px; width: 900px; font-size: 38px; line-height: 1.3; opacity: 0.72; }
       .rojo { position: relative; color: ${C.senal}; }
       .regla { position: absolute; left: 0; right: 0; bottom: -0.06em; height: 0.075em; background: ${C.senal}; transform-origin: 0 50%; }
 
@@ -494,14 +502,24 @@ function escribir(nombre) {
     .join("")
 
   const clipsEscenas = escenas
-    .map(
-      (
-        e
-      ) => `<section class="clip capa" id="e-${e.clave}" data-start="${e.t0}" data-duration="${Math.round((e.t1 - e.t0) * 1000) / 1000}" data-track-index="3">
-        <div class="preg" id="e-${e.clave}-preg"><span class="de">${esc(e.red)}</span><span class="globo">${letras(e.pregunta)}</span></div>
-        <div class="resp titular" id="e-${e.clave}-resp">${e.respuesta.map((l) => `<span class="l">${linea(l)}</span>`).join("")}</div>
+    .map((e) => {
+      const lineas = f.texto === "frase" ? e.frase : e.titulo
+      const subTop =
+        f.respuesta.top + lineas.length * f.respuesta.size * 1.02 + 34
+      const paso =
+        f.texto === "pasos"
+          ? `<div class="num titular" id="e-${e.clave}-n">0${e.num}</div>`
+          : ""
+      const sub =
+        f.texto === "pasos"
+          ? `<p class="sub" id="e-${e.clave}-sub" style="top:${Math.round(subTop)}px">${esc(e.sub)}</p>`
+          : ""
+      return `<section class="clip capa" id="e-${e.clave}" data-start="${e.t0}" data-duration="${Math.round((e.t1 - e.t0) * 1000) / 1000}" data-track-index="3">
+        ${paso}
+        <div class="resp titular" id="e-${e.clave}-resp">${lineas.map((l) => `<span class="l">${linea(l)}</span>`).join("")}</div>
+        ${sub}
       </section>`
-    )
+    })
     .join("\n      ")
 
   // Los datos que el timeline necesita, escritos en el HTML: nada se calcula al azar.
@@ -520,7 +538,7 @@ function escribir(nombre) {
     empalme,
     golpe,
     b: Object.fromEntries(
-      [8, 10, 13.5, 14, 16, 17.5, 18.5, 23, 23.25].map((n) => [n, b(n)])
+      [8, 13.5, 14, 16, 17.5, 18.5, 23, 23.25].map((n) => [n, b(n)])
     ),
   }
 
@@ -538,9 +556,10 @@ function escribir(nombre) {
     <div id="root" data-composition-id="${id}" data-start="0" data-duration="${f.duracion}" data-width="${f.W}" data-height="${f.H}">
       <section class="clip capa" id="caos" data-start="0" data-duration="${b(16) + 0.1}" data-track-index="0">
         <div class="capa" id="lluvia">
+        <img id="vendedora" src="assets/pantallas/vendedora.jpg" alt="" />
         ${caos}
         </div>
-        <div id="sello"><span class="titular" id="sello-tx">¿PRECIO?</span><span id="sello-sub">cincuenta veces al día.</span></div>
+        <div class="titular" id="gancho">${f.gancho.lineas.map((l) => `<span class="l">${linea(l)}</span>`).join("")}</div>
       </section>
 
       <section class="clip capa" id="celular" data-start="${b(15)}" data-duration="${Math.round((f.duracion - b(15)) * 1000) / 1000}" data-track-index="1">
@@ -564,7 +583,7 @@ function escribir(nombre) {
         <div class="titular" id="marca-cierre">Venduo</div>
         <div class="titular" id="lema-cierre">${f.cierre.lemaLineas.map((l) => `<span class="l">${esc(l)}</span>`).join("")}</div>
         <div id="enlace"><span class="titular" id="enlace-caja">${ENLACE}</span></div>
-        <div id="nota">Abrir tu tienda no cuesta nada.</div>
+        <div id="nota">Crea tu tienda gratis.</div>
       </section>
 
       <audio id="musica" src="${f.musica}" data-start="0" data-duration="${f.duracion}" data-track-index="5" data-volume="1"></audio>
@@ -600,9 +619,8 @@ const LINEA_DE_TIEMPO = String.raw`
       /* Estado inicial, fuera del timeline: un set en el cero no se dibuja mientras
          el cabezal está justo en el cero, y HyperFrames lo marca. */
       D.lugares.forEach((_, i) => gsap.set("#m" + i, i < 2 ? { opacity: 1 } : { opacity: 0 }));
-      gsap.set("#sello", { yPercent: -50, opacity: 0 });
-      gsap.set("#sello-tx", { scale: 1.08 });
-      gsap.set("#sello-sub", { opacity: 0, y: 30 });
+      gsap.set("#gancho", { yPercent: -50 });
+      gsap.set("#gancho .l", { opacity: 0, y: 40 });
       gsap.set("#cuerpo", { ...D.logo.cuerpo, opacity: 0, scale: 0.4 });
       gsap.set("#pantalla", D.logo.pantalla);
       gsap.set(".raya", { scaleY: 0 });
@@ -610,8 +628,7 @@ const LINEA_DE_TIEMPO = String.raw`
       gsap.set(".pant", { yPercent: 100 });
       gsap.set(".hoja", { x: 0, opacity: 0 });
       gsap.set(["#marca-s2", "#lema-s2 .l"], { opacity: 0, y: 40 });
-      gsap.set([".preg", ".resp .l"], { opacity: 0, y: 40 });
-      gsap.set(".preg .ch", { opacity: 0 });
+      gsap.set([".num", ".resp .l", ".sub"], { opacity: 0, y: 40 });
       gsap.set(".regla", { scaleX: 0 });
       gsap.set(["#marca-cierre", "#lema-cierre .l", "#nota"], { opacity: 0, y: 40 });
       gsap.set("#enlace-caja", { opacity: 0, scale: 1.25 });
@@ -621,13 +638,13 @@ const LINEA_DE_TIEMPO = String.raw`
         if (i < 2) return;
         ft("#m" + i, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: ENTRA }, D.tiempos[i]);
       });
-      // "¿PRECIO?" en el tiempo 8; los mensajes quedan detrás.
-      ft("#lluvia", { opacity: 1 }, { opacity: 0.22, duration: 0.3, ease: "power2.out" }, D.b[8]);
-      ft("#sello", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: ENTRA }, D.b[8]);
-      ft("#sello-tx", { scale: 1.08 }, { scale: 1, duration: 0.5, ease: ENTRA }, D.b[8]);
-      ft("#sello-sub", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: ENTRA }, D.b[10]);
-      ft("#sello", { opacity: 1, y: 0 }, { opacity: 0, y: -24, duration: 0.25, ease: "power2.in" }, D.b[13.5]);
-      ft("#lluvia", { opacity: 0.22 }, { opacity: 1, duration: 0.2, ease: "power2.out" }, D.b[13.5]);
+      // La pregunta en el tiempo 8; los mensajes y la foto quedan detrás.
+      ft("#lluvia", { opacity: 1 }, { opacity: 0.16, duration: 0.3, ease: "power2.out" }, D.b[8]);
+      ft("#gancho .l", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: ENTRA, stagger: 0.12 }, D.b[8]);
+      ft("#gancho .regla", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: ENTRA }, D.b[8] + 0.6);
+      ft("#gancho .l", { opacity: 1, y: 0 }, { opacity: 0, y: -24, duration: 0.25, ease: "power2.in" }, D.b[13.5]);
+      ft("#lluvia", { opacity: 0.16 }, { opacity: 1, duration: 0.2, ease: "power2.out" }, D.b[13.5]);
+      ft("#vendedora", { opacity: 1 }, { opacity: 0, duration: 0.35, ease: "power2.in" }, D.b[13.5]);
       // Del tiempo 14 al 16 los mensajes se juntan donde va a nacer el celular.
       const lejos = D.lugares
         .map((l, i) => ({ i, d: Math.hypot(l.x + l.w / 2 - D.centro.x, l.y + l.h / 2 - D.centro.y) }))
@@ -654,15 +671,14 @@ const LINEA_DE_TIEMPO = String.raw`
       ft(".raya", { scaleY: 1 }, { scaleY: 0, duration: 0.3, ease: "power2.in", stagger: { each: 0.03, from: "end" } }, D.b[23.25]);
       ft("#mostrador", { opacity: 1 }, { opacity: 0, duration: 0.2 }, D.b[23.25]);
 
-      /* 3. Cada pregunta y su respuesta. */
+      /* 3. Cada escena: su pantalla y su frase (o su paso). */
       D.escenas.forEach(({ clave, t0, t1 }) => {
         const p = "#e-" + clave;
-        ft(p + "-preg", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: ENTRA }, t0);
-        ft(p + "-preg .ch", { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: 0.028 }, t0 + 0.08);
-        ft("#p-" + clave, { yPercent: 100 }, { yPercent: 0, duration: 0.5, ease: ENTRA }, t0 + 0.1);
-        ft(p + "-resp .l", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: ENTRA, stagger: 0.09 }, t0 + 0.35);
-        ft(p + "-resp .regla", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: ENTRA }, t0 + 0.8);
-        ft([p + "-preg", p + "-resp .l"], { opacity: 1, y: 0 }, { opacity: 0, y: -24, duration: 0.25, ease: "power2.in" }, t1 - 0.27);
+        const textos = [p + "-n", p + "-resp .l", p + "-sub"].filter((x) => document.querySelector(x));
+        ft("#p-" + clave, { yPercent: 100 }, { yPercent: 0, duration: 0.5, ease: ENTRA }, t0 + 0.05);
+        ft(textos, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: ENTRA, stagger: 0.09 }, t0 + 0.15);
+        ft(p + "-resp .regla", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: ENTRA }, t0 + 0.7);
+        ft(textos, { opacity: 1, y: 0 }, { opacity: 0, y: -24, duration: 0.25, ease: "power2.in" }, t1 - 0.27);
         const extra = ESCENA[clave];
         if (extra) extra(t0, t1);
       });
@@ -694,28 +710,28 @@ const ESCENAS_JS = String.raw`
       };
       const paso = (sel, t) => ft(sel, { yPercent: 100 }, { yPercent: 0, duration: 0.45, ease: ENTRA }, t);
       const ESCENA = {
-        crear(t0) {
-          toque("#toque-crear", 76.7, 95.2, t0 + 0.75);
-          paso("#crear-2", t0 + 1.0);
-          paso("#crear-3", t0 + 2.2);
-          ft("#crear-3", { scale: 1 }, { scale: 1.05, duration: 1.8, ease: "none", transformOrigin: "50% 30%" }, t0 + 2.4);
+        crear(t0, t1) {
+          const d = t1 - t0;
+          toque("#toque-crear", 76.7, 95.2, t0 + 0.17 * d);
+          paso("#crear-2", t0 + 0.23 * d);
+          paso("#crear-3", t0 + 0.5 * d);
+        },
+        productos(t0, t1) {
+          const d = t1 - t0;
+          paso("#prod-2", t0 + 0.33 * d);
+          paso("#prod-3", t0 + 0.64 * d);
         },
         catalogo(t0, t1) {
-          toque("#toque-catalogo", 50, 95.8, t0 + 0.7);
-          paso("#cat-2", t0 + 0.95);
-          toque("#toque-catalogo", 25, 60, t0 + 1.55);
-          paso("#cat-3", t0 + 1.8);
-          toque("#toque-catalogo", 60, 40.5, t0 + 2.35);
-          paso("#cat-4", t0 + 2.6);
-          ft("#hoja-a", { x: 0, opacity: 0 }, { x: D.hojasA, opacity: 1, duration: 0.6, ease: "expo.out" }, t0 + 2.85);
-          ft("#hoja-b", { x: 0, opacity: 0 }, { x: D.hojasB, opacity: 1, duration: 0.6, ease: "expo.out" }, t0 + 2.95);
+          const d = t1 - t0;
+          toque("#toque-catalogo", 50, 95.8, t0 + 0.16 * d);
+          paso("#cat-2", t0 + 0.22 * d);
+          toque("#toque-catalogo", 25, 60, t0 + 0.36 * d);
+          paso("#cat-3", t0 + 0.42 * d);
+          toque("#toque-catalogo", 60, 40.5, t0 + 0.55 * d);
+          paso("#cat-4", t0 + 0.61 * d);
+          ft("#hoja-a", { x: 0, opacity: 0 }, { x: D.hojasA, opacity: 1, duration: 0.6, ease: "expo.out" }, t0 + 0.66 * d);
+          ft("#hoja-b", { x: 0, opacity: 0 }, { x: D.hojasB, opacity: 1, duration: 0.6, ease: "expo.out" }, t0 + 0.69 * d);
           ft(".hoja", { opacity: 1 }, { opacity: 0, duration: 0.25, ease: "power2.in" }, t1 - 0.27);
-        },
-        precio(t0, t1) {
-          ft("#p-precio-img", { scale: 1 }, { scale: 1.06, duration: t1 - t0, ease: "none", transformOrigin: "50% 40%" }, t0);
-        },
-        stock(t0, t1) {
-          ft("#p-stock-img", { scale: 1 }, { scale: 1.32, duration: t1 - t0, ease: "power1.inOut", transformOrigin: "30% 100%" }, t0 + 0.3);
         },
         pedido(t0) {
           ft("#msj-sale .ml", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out", stagger: 0.1 }, t0 + 0.4);
@@ -745,19 +761,18 @@ const INICIALES_JS = String.raw`
       gsap.set(".barra", { scaleX: 0 });
       gsap.set("#p-ia-verano", { clipPath: "inset(0% 0% 100% 0%)" });
       gsap.set(".paso", { yPercent: 100 });
-      if (document.querySelector("#crear-1")) gsap.set("#crear-1", { yPercent: 0 });
-      gsap.set("#cat-1", { yPercent: 0 });
+      ["#crear-1", "#cat-1", "#prod-1"].forEach((x) => { if (document.querySelector(x)) gsap.set(x, { yPercent: 0 }); });
       gsap.set(".toque", { opacity: 0, scale: 0.3 });
       gsap.set("#ia-ok", { opacity: 0.35 });
 `
 
 // El marcador del precio: debajo de "Bs 450", la primera ficha de la tienda.
 const MARCA_PRECIO_JS = String.raw`
-      if (document.getElementById("p-precio-marca")) {
+      if (document.getElementById("p-precios-marca")) {
         const pant = document.getElementById("pantalla");
-        gsap.set("#p-precio-marca", { left: "5%", top: "57.6%", width: "10.2%", scaleX: 0 });
-        const e = D.escenas.find((x) => x.clave === "precio");
-        ft("#p-precio-marca", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, e.t0 + 0.9);
+        gsap.set("#p-precios-marca", { left: "5%", top: "57.6%", width: "10.2%", scaleX: 0 });
+        const e = D.escenas.find((x) => x.clave === "precios");
+        ft("#p-precios-marca", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, e.t0 + 0.9);
       }
 `
 

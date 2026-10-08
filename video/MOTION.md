@@ -16,9 +16,15 @@ curva de entrada y el logo; cambia el ritmo, porque un video sin movimiento no s
 que manda cuando aparece, reglas de un píxel y titulares enormes con las letras juntas.
 Nada flota, nada brilla, nada gira.
 
-Y una estructura que se repite: **una pregunta y su respuesta.** Quien vende por redes
-vive contestando "¿precio?", "¿tienes catálogo?", "¿todavía tienes?". El video cuenta
-Venduo como la respuesta a cada una.
+El gancho es el problema de todos los días: llueven "¿precio?", "¿hay en M?", "¿tienes
+catálogo?" alrededor de quien vende, y aparece **"¿Y si tu tienda contestara por ti?"**.
+Lo que sigue lo cuenta **en el orden en que se usa**: crear la tienda, los precios a la
+vista, el catálogo, el pedido por WhatsApp. Sin cifras inventadas: cuántos mensajes
+recibe cada quien no lo decimos.
+
+Los dos formatos hacen trabajos distintos. **El vertical es el lanzamiento**: corto, y
+cada pantalla con una frase de resultado ("Tus precios, siempre a la vista"). **El
+horizontal es "así funciona"**: pasos numerados para quien ya está interesado.
 
 ## 2. Lo que se hereda de DESIGN.md, sin cambios
 
@@ -93,7 +99,7 @@ distribuirla como música. Va **sin voz**.
 |                | Vertical (TikTok, Reels) | Horizontal (portada, YouTube) |
 | -------------- | ------------------------ | ----------------------------- |
 | Lienzo         | 1080 × 1920, 30 fps      | 1920 × 1080, 30 fps           |
-| Duración       | 30,6 s                   | 47,7 s                        |
+| Duración       | 30,6 s                   | 43,5 s                        |
 | Zona segura    | x 80–940, y 230–1540     | 96 px de cada borde           |
 | Titular mínimo | 64 px                    | 80 px                         |
 | Texto mínimo   | 40 px                    | 32 px                         |
@@ -102,14 +108,14 @@ La zona segura vertical deja libres los botones y el texto de TikTok e Instagram
 columna derecha y el tercio de abajo.
 
 **La misma historia, recompuesta, no recortada.** En vertical, todo va centrado y el
-celular al medio. En horizontal, el celular va a la izquierda y la pregunta y la respuesta
-a la derecha. El horizontal suma tres respuestas que el vertical no tiene tiempo de contar:
-cómo se arma la tienda, las estadísticas y la IA.
+celular al medio, con la frase debajo. En horizontal, el celular va a la izquierda y el
+paso —número, título y bajada— a la derecha, y suma tres pasos que el vertical no tiene
+tiempo de contar: subir productos, las estadísticas y la IA.
 
 ## 7. El texto en pantalla
 
 - Español neutro boliviano, tratando de tú, como en la app.
-- Una pregunta: menos de cinco palabras. Una respuesta: dos líneas, una palabra en rojo.
+- Una frase de resultado o un paso: dos líneas como mucho, una palabra en rojo.
 - Ningún texto dura menos de cuatro tiempos (2,1 s) en pantalla.
 - No se promete lo que la app no hace. El stock **se ve** en la tienda, pero baja cuando
   la tienda marca el pedido pagado, no solo. No hay talles ni envíos.
@@ -121,13 +127,14 @@ Son reales, de la tienda de demostración **Rosa Deportes** en su versión rosa 
 Rosa, botones suaves, ropa deportiva de mujer—, capturadas en producción a 390 px con
 densidad 3×:
 
-| Escena                  | De dónde sale                                                         |
-| ----------------------- | --------------------------------------------------------------------- |
-| ¿Cómo armo mi tienda?   | El alta (`crear/`), con la cuenta de Ana y sin enviar el formulario   |
-| ¿Tienes catálogo?       | El editor de catálogos (`catalogo-editor/`) y el PDF "Temporada rosa" |
-| ¿Precio?                | La grilla de la tienda (`rosa-tienda.jpg`)                            |
-| ¿Todavía tienes?        | La ficha del Top deportivo rosa                                       |
-| Ponle colores de verano | La vista previa del editor en Rosa y en Terracota, sin publicar       |
+| Escena                  | De dónde sale                                                            |
+| ----------------------- | ------------------------------------------------------------------------ |
+| El gancho               | La foto de la portada de Venduo (`vendedora.jpg`), en blanco y negro     |
+| Crea tu tienda          | El alta (`crear/`), con la cuenta de Ana y sin enviar el formulario      |
+| Precios a la vista      | La grilla de la tienda (`rosa-tienda.jpg`), quieta                       |
+| Sube tus productos      | La ficha del Top deportivo rosa y el resumen del catálogo (`productos/`) |
+| Comparte tu catálogo    | El editor de catálogos (`catalogo-editor/`) y el PDF "Temporada rosa"    |
+| Cámbiala cuando quieras | La vista previa del editor en Rosa y en Terracota, sin publicar          |
 
 Los toques que se ven sobre las grabaciones —un círculo que aparece y se va— marcan dónde
 se tocó. El chat del pedido y el gráfico se dibujan en HTML con los mismos colores,

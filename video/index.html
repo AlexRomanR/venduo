@@ -19,10 +19,9 @@
       .burbuja { position: absolute; background: #fbfaf8; border: 2px solid #16171a; padding: 16px 26px 18px; }
       .burbuja .de { display: block; font-weight: 600; font-size: 20px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.6; margin-bottom: 6px; white-space: nowrap; }
       .burbuja .tx { display: block; font-weight: 600; font-size: 44px; line-height: 1.15; white-space: nowrap; }
-      #sello { position: absolute; left: 0; right: 0; top: 50%; display: flex; flex-direction: column; align-items: center; gap: 28px; transform-origin: 50% 50%; }
-      #sello-tx { font-size: 196px; color: #d62d12; }
-      #sello-sub { background: #f1f0ee; padding: 12px 30px; font-weight: 600; font-size: 54px; }
-
+      #vendedora { position: absolute; left: 190px; top: 290px; width: 700px; height: 1050px; object-fit: cover; filter: grayscale(1); }
+      #gancho { position: absolute; left: 0; right: 0; top: 50%; text-align: center; font-size: 118px; }
+      #gancho .l { display: block; }
       /* El celular */
       #cuerpo { position: absolute; background: #16171a; overflow: hidden; }
       #pantalla { position: absolute; background: #f1f0ee; overflow: hidden; }
@@ -32,7 +31,7 @@
       #mostrador { position: absolute; left: 11.3%; top: 73.2%; width: 77.4%; height: 9.76%; background: #16171a; transform-origin: 50% 50%; }
       .pant { position: absolute; inset: 0; background: #f1f0ee; overflow: hidden; }
       .llena { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-      #hojas { position: absolute; left: 540px; top: 900px; }
+      #hojas { position: absolute; left: 540px; top: 835px; }
       .hoja { position: absolute; height: 600px; left: -212.1px; top: -300px; border: 1px solid rgba(22, 23, 26, 0.25); }
 
       /* Las pantallas dibujadas */
@@ -65,11 +64,10 @@
       .ia-ok { background: #16171a; color: #f1f0ee; padding: 8px 12px; font-size: 16px; }
 
       /* Pregunta y respuesta */
-      .preg { position: absolute; top: 226px; left: 90px; width: 900px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-      .preg .de { font-weight: 600; font-size: 22px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.65; }
-      .preg .globo { background: #fbfaf8; border: 2px solid #16171a; padding: 20px 32px 22px; font-weight: 600; font-size: 52px; white-space: nowrap; }
       .resp { position: absolute; top: 1392px; left: 60px; width: 960px; text-align: center; font-size: 66px; }
       .resp .l { display: block; white-space: nowrap; }
+      .num { position: absolute; top: 226px; left: 90px; font-size: 140px; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+      .sub { position: absolute; left: 90px; width: 900px; font-size: 38px; line-height: 1.3; opacity: 0.72; }
       .rojo { position: relative; color: #d62d12; }
       .regla { position: absolute; left: 0; right: 0; bottom: -0.06em; height: 0.075em; background: #d62d12; transform-origin: 0 50%; }
 
@@ -91,6 +89,7 @@
     <div id="root" data-composition-id="vertical" data-start="0" data-duration="30.6" data-width="1080" data-height="1920">
       <section class="clip capa" id="caos" data-start="0" data-duration="8.671" data-track-index="0">
         <div class="capa" id="lluvia">
+        <img id="vendedora" src="assets/pantallas/vendedora.jpg" alt="" />
         <div class="burbuja" id="m0" style="left:90px;top:210px"><span class="de">WhatsApp · Valeria</span><span class="tx">¿precio?</span></div>
         <div class="burbuja" id="m1" style="left:436px;top:1029px"><span class="de">TikTok · @jhon.lpz</span><span class="tx">¿hay en M?</span></div>
         <div class="burbuja" id="m2" style="left:336px;top:821px"><span class="de">Instagram · Mariela</span><span class="tx">¿tienes catálogo?</span></div>
@@ -118,13 +117,23 @@
         <div class="burbuja" id="m24" style="left:413px;top:294px"><span class="de">WhatsApp · Wilmer</span><span class="tx">¿todavía?</span></div>
         <div class="burbuja" id="m25" style="left:115px;top:911px"><span class="de">TikTok · @lu.mendez</span><span class="tx">¿precio?</span></div>
         </div>
-        <div id="sello"><span class="titular" id="sello-tx">¿PRECIO?</span><span id="sello-sub">cincuenta veces al día.</span></div>
+        <div class="titular" id="gancho"><span class="l">¿Y si tu tienda</span><span class="l">contestara</span><span class="l"><span class="rojo">por ti<i class="regla"></i></span>?</span></div>
       </section>
 
       <section class="clip capa" id="celular" data-start="8.036" data-duration="22.564" data-track-index="1">
         <div id="hojas"><img class="hoja" id="hoja-a" src="assets/pantallas/rosa-hoja-2.jpg" alt="" /><img class="hoja" id="hoja-b" src="assets/pantallas/rosa-hoja-3.jpg" alt="" /></div>
         <div id="cuerpo">
           <div id="pantalla">
+      <div class="pant" id="p-crear">
+        <img class="paso" id="crear-1" src="assets/pantallas/crear/2-elegida.jpg" alt="" />
+        <img class="paso" id="crear-2" src="assets/pantallas/crear/4-negocio-lleno.jpg" alt="" />
+        <img class="paso" id="crear-3" src="assets/pantallas/rosa-portada.jpg" alt="" />
+        <i class="toque" id="toque-crear"></i>
+      </div>
+      <div class="pant" id="p-precios">
+        <img class="llena" src="assets/pantallas/rosa-tienda.jpg" alt="" />
+        <i class="subraya" id="p-precios-marca"></i>
+      </div>
       <div class="pant" id="p-catalogo">
         <img class="paso" id="cat-1" src="assets/pantallas/catalogo-editor/2-elegidos.jpg" alt="" />
         <img class="paso" id="cat-2" src="assets/pantallas/catalogo-editor/3-estilos.jpg" alt="" />
@@ -134,13 +143,6 @@
           <img class="visor-hoja" src="assets/pantallas/rosa-hoja-1.jpg" alt="" />
         </div>
         <i class="toque" id="toque-catalogo"></i>
-      </div>
-      <div class="pant" id="p-precio">
-        <img class="llena" id="p-precio-img" src="assets/pantallas/rosa-tienda.jpg" alt="" />
-        <i class="subraya" id="p-precio-marca"></i>
-      </div>
-      <div class="pant" id="p-stock">
-        <img class="llena" id="p-stock-img" src="assets/pantallas/rosa-producto-top.jpg" alt="" />
       </div>
       <div class="pant chat" id="p-pedido">
         <div class="chat-cab"><span class="chat-av">RD</span><div><b>Rosa Deportes</b><small>en línea</small></div></div>
@@ -165,34 +167,38 @@
         <div class="marca-s2" id="lema-s2"><span class="l">Tu puesto de siempre,</span><span class="l">ahora en tus redes.</span></div>
       </section>
 
-      <section class="clip capa" id="e-catalogo" data-start="12.857" data-duration="4.286" data-track-index="3">
-        <div class="preg" id="e-catalogo-preg"><span class="de">WhatsApp · Mariela</span><span class="globo"><span class="ch">¿</span><span class="ch">T</span><span class="ch">i</span><span class="ch">e</span><span class="ch">n</span><span class="ch">e</span><span class="ch">s</span><span class="ch">&nbsp;</span><span class="ch">c</span><span class="ch">a</span><span class="ch">t</span><span class="ch">á</span><span class="ch">l</span><span class="ch">o</span><span class="ch">g</span><span class="ch">o</span><span class="ch">?</span></span></div>
-        <div class="resp titular" id="e-catalogo-resp"><span class="l">Catálogo en <span class="rojo">PDF<i class="regla"></i></span>,</span><span class="l">con tus precios de hoy.</span></div>
+      <section class="clip capa" id="e-crear" data-start="12.857" data-duration="3.214" data-track-index="3">
+        
+        <div class="resp titular" id="e-crear-resp"><span class="l">Tu tienda online,</span><span class="l">lista en <span class="rojo">minutos<i class="regla"></i></span>.</span></div>
+        
       </section>
-      <section class="clip capa" id="e-precio" data-start="17.143" data-duration="2.678" data-track-index="3">
-        <div class="preg" id="e-precio-preg"><span class="de">TikTok · @carla.scz</span><span class="globo"><span class="ch">¿</span><span class="ch">P</span><span class="ch">r</span><span class="ch">e</span><span class="ch">c</span><span class="ch">i</span><span class="ch">o</span><span class="ch">?</span></span></div>
-        <div class="resp titular" id="e-precio-resp"><span class="l">Cada producto,</span><span class="l">con su <span class="rojo">precio<i class="regla"></i></span>.</span></div>
+      <section class="clip capa" id="e-precios" data-start="16.071" data-duration="3.215" data-track-index="3">
+        
+        <div class="resp titular" id="e-precios-resp"><span class="l">Tus precios,</span><span class="l">siempre <span class="rojo">a la vista<i class="regla"></i></span>.</span></div>
+        
       </section>
-      <section class="clip capa" id="e-stock" data-start="19.821" data-duration="2.679" data-track-index="3">
-        <div class="preg" id="e-stock-preg"><span class="de">Instagram · Kevin</span><span class="globo"><span class="ch">¿</span><span class="ch">T</span><span class="ch">o</span><span class="ch">d</span><span class="ch">a</span><span class="ch">v</span><span class="ch">í</span><span class="ch">a</span><span class="ch">&nbsp;</span><span class="ch">t</span><span class="ch">i</span><span class="ch">e</span><span class="ch">n</span><span class="ch">e</span><span class="ch">s</span><span class="ch">?</span></span></div>
-        <div class="resp titular" id="e-stock-resp"><span class="l">Ven <span class="rojo">lo que hay<i class="regla"></i></span>,</span><span class="l">sin preguntarte.</span></div>
+      <section class="clip capa" id="e-catalogo" data-start="19.286" data-duration="3.214" data-track-index="3">
+        
+        <div class="resp titular" id="e-catalogo-resp"><span class="l">Tu catálogo,</span><span class="l">listo para <span class="rojo">mandar<i class="regla"></i></span>.</span></div>
+        
       </section>
       <section class="clip capa" id="e-pedido" data-start="22.5" data-duration="3.173" data-track-index="3">
-        <div class="preg" id="e-pedido-preg"><span class="de">Instagram · Fernanda</span><span class="globo"><span class="ch">¿</span><span class="ch">C</span><span class="ch">ó</span><span class="ch">m</span><span class="ch">o</span><span class="ch">&nbsp;</span><span class="ch">t</span><span class="ch">e</span><span class="ch">&nbsp;</span><span class="ch">p</span><span class="ch">i</span><span class="ch">d</span><span class="ch">o</span><span class="ch">?</span></span></div>
-        <div class="resp titular" id="e-pedido-resp"><span class="l">El pedido te llega</span><span class="l">por <span class="rojo">WhatsApp<i class="regla"></i></span>.</span></div>
+        
+        <div class="resp titular" id="e-pedido-resp"><span class="l">Los pedidos te llegan</span><span class="l"><span class="rojo">ordenados<i class="regla"></i></span>.</span></div>
+        
       </section>
 
       <section class="clip capa" id="cierre" data-start="25.673" data-duration="4.927" data-track-index="4">
         <div class="titular" id="marca-cierre">Venduo</div>
         <div class="titular" id="lema-cierre"><span class="l">Tu tienda online,</span><span class="l">tu inventario</span><span class="l">y tus ventas.</span></div>
         <div id="enlace"><span class="titular" id="enlace-caja">venduo.vercel.app</span></div>
-        <div id="nota">Abrir tu tienda no cuesta nada.</div>
+        <div id="nota">Crea tu tienda gratis.</div>
       </section>
 
       <audio id="musica" src="assets/musica/lanzamiento-vertical.mp3" data-start="0" data-duration="30.6" data-track-index="5" data-volume="1"></audio>
     </div>
     <script>
-      const D = {"W":1080,"H":1920,"tiempos":[0,0,0.536,1.071,1.607,2.143,2.411,2.679,2.946,3.214,3.482,3.75,4.018,4.286,4.554,4.821,5.089,5.357,5.625,5.893,6.161,6.429,6.563,6.696,6.83,6.964],"lugares":[{"x":90,"y":210,"w":345,"h":120},{"x":436,"y":1029,"w":345,"h":120},{"x":336,"y":821,"w":509,"h":120},{"x":289,"y":1407,"w":482,"h":120},{"x":483,"y":390,"w":345,"h":120},{"x":129,"y":561,"w":535,"h":120},{"x":380,"y":1607,"w":535,"h":120},{"x":77,"y":1243,"w":430,"h":120},{"x":482,"y":161,"w":456,"h":120},{"x":135,"y":441,"w":535,"h":120},{"x":56,"y":1097,"w":329,"h":120},{"x":653,"y":1234,"w":377,"h":120},{"x":244,"y":1077,"w":482,"h":120},{"x":119,"y":1165,"w":430,"h":120},{"x":184,"y":967,"w":403,"h":120},{"x":565,"y":1520,"w":456,"h":120},{"x":329,"y":1051,"w":667,"h":120},{"x":684,"y":582,"w":313,"h":120},{"x":205,"y":554,"w":329,"h":120},{"x":591,"y":968,"w":377,"h":120},{"x":299,"y":1495,"w":298,"h":120},{"x":322,"y":937,"w":329,"h":120},{"x":497,"y":951,"w":350,"h":120},{"x":430,"y":947,"w":329,"h":120},{"x":413,"y":294,"w":329,"h":120},{"x":115,"y":911,"w":361,"h":120}],"centro":{"x":540,"y":820},"logo":{"cuerpo":{"left":423.8888888888889,"top":655,"width":232.2222222222222,"height":330,"borderRadius":36.666666666666664},"pantalla":{"left":21.388888888888886,"right":21.388888888888886,"top":39.72222222222222,"bottom":39.72222222222222,"borderRadius":15.277777777777777}},"equipo":{"cuerpo":{"left":315,"top":430,"width":450,"height":940,"borderRadius":58},"pantalla":{"left":14,"right":14,"top":14,"bottom":14,"borderRadius":44}},"cierreLogo":{"cuerpo":{"left":157.57407407407408,"top":575,"width":161.85185185185185,"height":230,"borderRadius":25.555555555555557},"pantalla":{"left":14.907407407407408,"right":14.907407407407408,"top":27.685185185185187,"bottom":27.685185185185187,"borderRadius":10.648148148148149}},"escenas":[{"clave":"catalogo","t0":12.857,"t1":17.143},{"clave":"precio","t0":17.143,"t1":19.821},{"clave":"stock","t0":19.821,"t1":22.5},{"clave":"pedido","t0":22.5,"t1":25.673}],"hojasA":-300,"hojasB":300,"empalme":25.673,"golpe":29.154,"b":{"8":4.286,"10":5.357,"14":7.5,"16":8.571,"23":12.321,"13.5":7.232,"17.5":9.375,"18.5":9.911,"23.25":12.455}};
+      const D = {"W":1080,"H":1920,"tiempos":[0,0,0.536,1.071,1.607,2.143,2.411,2.679,2.946,3.214,3.482,3.75,4.018,4.286,4.554,4.821,5.089,5.357,5.625,5.893,6.161,6.429,6.563,6.696,6.83,6.964],"lugares":[{"x":90,"y":210,"w":345,"h":120},{"x":436,"y":1029,"w":345,"h":120},{"x":336,"y":821,"w":509,"h":120},{"x":289,"y":1407,"w":482,"h":120},{"x":483,"y":390,"w":345,"h":120},{"x":129,"y":561,"w":535,"h":120},{"x":380,"y":1607,"w":535,"h":120},{"x":77,"y":1243,"w":430,"h":120},{"x":482,"y":161,"w":456,"h":120},{"x":135,"y":441,"w":535,"h":120},{"x":56,"y":1097,"w":329,"h":120},{"x":653,"y":1234,"w":377,"h":120},{"x":244,"y":1077,"w":482,"h":120},{"x":119,"y":1165,"w":430,"h":120},{"x":184,"y":967,"w":403,"h":120},{"x":565,"y":1520,"w":456,"h":120},{"x":329,"y":1051,"w":667,"h":120},{"x":684,"y":582,"w":313,"h":120},{"x":205,"y":554,"w":329,"h":120},{"x":591,"y":968,"w":377,"h":120},{"x":299,"y":1495,"w":298,"h":120},{"x":322,"y":937,"w":329,"h":120},{"x":497,"y":951,"w":350,"h":120},{"x":430,"y":947,"w":329,"h":120},{"x":413,"y":294,"w":329,"h":120},{"x":115,"y":911,"w":361,"h":120}],"centro":{"x":540,"y":820},"logo":{"cuerpo":{"left":423.8888888888889,"top":655,"width":232.2222222222222,"height":330,"borderRadius":36.666666666666664},"pantalla":{"left":21.388888888888886,"right":21.388888888888886,"top":39.72222222222222,"bottom":39.72222222222222,"borderRadius":15.277777777777777}},"equipo":{"cuerpo":{"left":300,"top":330,"width":480,"height":1010,"borderRadius":58},"pantalla":{"left":14,"right":14,"top":14,"bottom":14,"borderRadius":44}},"cierreLogo":{"cuerpo":{"left":157.57407407407408,"top":575,"width":161.85185185185185,"height":230,"borderRadius":25.555555555555557},"pantalla":{"left":14.907407407407408,"right":14.907407407407408,"top":27.685185185185187,"bottom":27.685185185185187,"borderRadius":10.648148148148149}},"escenas":[{"clave":"crear","t0":12.857,"t1":16.071},{"clave":"precios","t0":16.071,"t1":19.286},{"clave":"catalogo","t0":19.286,"t1":22.5},{"clave":"pedido","t0":22.5,"t1":25.673}],"hojasA":-300,"hojasB":300,"empalme":25.673,"golpe":29.154,"b":{"8":4.286,"14":7.5,"16":8.571,"23":12.321,"13.5":7.232,"17.5":9.375,"18.5":9.911,"23.25":12.455}};
 
       const tl = gsap.timeline({ paused: true });
       const ENTRA = "expo.out";
@@ -205,9 +211,8 @@
       /* Estado inicial, fuera del timeline: un set en el cero no se dibuja mientras
          el cabezal está justo en el cero, y HyperFrames lo marca. */
       D.lugares.forEach((_, i) => gsap.set("#m" + i, i < 2 ? { opacity: 1 } : { opacity: 0 }));
-      gsap.set("#sello", { yPercent: -50, opacity: 0 });
-      gsap.set("#sello-tx", { scale: 1.08 });
-      gsap.set("#sello-sub", { opacity: 0, y: 30 });
+      gsap.set("#gancho", { yPercent: -50 });
+      gsap.set("#gancho .l", { opacity: 0, y: 40 });
       gsap.set("#cuerpo", { ...D.logo.cuerpo, opacity: 0, scale: 0.4 });
       gsap.set("#pantalla", D.logo.pantalla);
       gsap.set(".raya", { scaleY: 0 });
@@ -215,8 +220,7 @@
       gsap.set(".pant", { yPercent: 100 });
       gsap.set(".hoja", { x: 0, opacity: 0 });
       gsap.set(["#marca-s2", "#lema-s2 .l"], { opacity: 0, y: 40 });
-      gsap.set([".preg", ".resp .l"], { opacity: 0, y: 40 });
-      gsap.set(".preg .ch", { opacity: 0 });
+      gsap.set([".num", ".resp .l", ".sub"], { opacity: 0, y: 40 });
       gsap.set(".regla", { scaleX: 0 });
       gsap.set(["#marca-cierre", "#lema-cierre .l", "#nota"], { opacity: 0, y: 40 });
       gsap.set("#enlace-caja", { opacity: 0, scale: 1.25 });
@@ -226,8 +230,7 @@
       gsap.set(".barra", { scaleX: 0 });
       gsap.set("#p-ia-verano", { clipPath: "inset(0% 0% 100% 0%)" });
       gsap.set(".paso", { yPercent: 100 });
-      if (document.querySelector("#crear-1")) gsap.set("#crear-1", { yPercent: 0 });
-      gsap.set("#cat-1", { yPercent: 0 });
+      ["#crear-1", "#cat-1", "#prod-1"].forEach((x) => { if (document.querySelector(x)) gsap.set(x, { yPercent: 0 }); });
       gsap.set(".toque", { opacity: 0, scale: 0.3 });
       gsap.set("#ia-ok", { opacity: 0.35 });
 
@@ -238,28 +241,28 @@
       };
       const paso = (sel, t) => ft(sel, { yPercent: 100 }, { yPercent: 0, duration: 0.45, ease: ENTRA }, t);
       const ESCENA = {
-        crear(t0) {
-          toque("#toque-crear", 76.7, 95.2, t0 + 0.75);
-          paso("#crear-2", t0 + 1.0);
-          paso("#crear-3", t0 + 2.2);
-          ft("#crear-3", { scale: 1 }, { scale: 1.05, duration: 1.8, ease: "none", transformOrigin: "50% 30%" }, t0 + 2.4);
+        crear(t0, t1) {
+          const d = t1 - t0;
+          toque("#toque-crear", 76.7, 95.2, t0 + 0.17 * d);
+          paso("#crear-2", t0 + 0.23 * d);
+          paso("#crear-3", t0 + 0.5 * d);
+        },
+        productos(t0, t1) {
+          const d = t1 - t0;
+          paso("#prod-2", t0 + 0.33 * d);
+          paso("#prod-3", t0 + 0.64 * d);
         },
         catalogo(t0, t1) {
-          toque("#toque-catalogo", 50, 95.8, t0 + 0.7);
-          paso("#cat-2", t0 + 0.95);
-          toque("#toque-catalogo", 25, 60, t0 + 1.55);
-          paso("#cat-3", t0 + 1.8);
-          toque("#toque-catalogo", 60, 40.5, t0 + 2.35);
-          paso("#cat-4", t0 + 2.6);
-          ft("#hoja-a", { x: 0, opacity: 0 }, { x: D.hojasA, opacity: 1, duration: 0.6, ease: "expo.out" }, t0 + 2.85);
-          ft("#hoja-b", { x: 0, opacity: 0 }, { x: D.hojasB, opacity: 1, duration: 0.6, ease: "expo.out" }, t0 + 2.95);
+          const d = t1 - t0;
+          toque("#toque-catalogo", 50, 95.8, t0 + 0.16 * d);
+          paso("#cat-2", t0 + 0.22 * d);
+          toque("#toque-catalogo", 25, 60, t0 + 0.36 * d);
+          paso("#cat-3", t0 + 0.42 * d);
+          toque("#toque-catalogo", 60, 40.5, t0 + 0.55 * d);
+          paso("#cat-4", t0 + 0.61 * d);
+          ft("#hoja-a", { x: 0, opacity: 0 }, { x: D.hojasA, opacity: 1, duration: 0.6, ease: "expo.out" }, t0 + 0.66 * d);
+          ft("#hoja-b", { x: 0, opacity: 0 }, { x: D.hojasB, opacity: 1, duration: 0.6, ease: "expo.out" }, t0 + 0.69 * d);
           ft(".hoja", { opacity: 1 }, { opacity: 0, duration: 0.25, ease: "power2.in" }, t1 - 0.27);
-        },
-        precio(t0, t1) {
-          ft("#p-precio-img", { scale: 1 }, { scale: 1.06, duration: t1 - t0, ease: "none", transformOrigin: "50% 40%" }, t0);
-        },
-        stock(t0, t1) {
-          ft("#p-stock-img", { scale: 1 }, { scale: 1.32, duration: t1 - t0, ease: "power1.inOut", transformOrigin: "30% 100%" }, t0 + 0.3);
         },
         pedido(t0) {
           ft("#msj-sale .ml", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out", stagger: 0.1 }, t0 + 0.4);
@@ -282,11 +285,11 @@
         },
       };
 
-      if (document.getElementById("p-precio-marca")) {
+      if (document.getElementById("p-precios-marca")) {
         const pant = document.getElementById("pantalla");
-        gsap.set("#p-precio-marca", { left: "5%", top: "57.6%", width: "10.2%", scaleX: 0 });
-        const e = D.escenas.find((x) => x.clave === "precio");
-        ft("#p-precio-marca", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, e.t0 + 0.9);
+        gsap.set("#p-precios-marca", { left: "5%", top: "57.6%", width: "10.2%", scaleX: 0 });
+        const e = D.escenas.find((x) => x.clave === "precios");
+        ft("#p-precios-marca", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, e.t0 + 0.9);
       }
 
       /* 1. El caos: los mensajes llueven. */
@@ -294,13 +297,13 @@
         if (i < 2) return;
         ft("#m" + i, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: ENTRA }, D.tiempos[i]);
       });
-      // "¿PRECIO?" en el tiempo 8; los mensajes quedan detrás.
-      ft("#lluvia", { opacity: 1 }, { opacity: 0.22, duration: 0.3, ease: "power2.out" }, D.b[8]);
-      ft("#sello", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: ENTRA }, D.b[8]);
-      ft("#sello-tx", { scale: 1.08 }, { scale: 1, duration: 0.5, ease: ENTRA }, D.b[8]);
-      ft("#sello-sub", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: ENTRA }, D.b[10]);
-      ft("#sello", { opacity: 1, y: 0 }, { opacity: 0, y: -24, duration: 0.25, ease: "power2.in" }, D.b[13.5]);
-      ft("#lluvia", { opacity: 0.22 }, { opacity: 1, duration: 0.2, ease: "power2.out" }, D.b[13.5]);
+      // La pregunta en el tiempo 8; los mensajes y la foto quedan detrás.
+      ft("#lluvia", { opacity: 1 }, { opacity: 0.16, duration: 0.3, ease: "power2.out" }, D.b[8]);
+      ft("#gancho .l", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: ENTRA, stagger: 0.12 }, D.b[8]);
+      ft("#gancho .regla", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: ENTRA }, D.b[8] + 0.6);
+      ft("#gancho .l", { opacity: 1, y: 0 }, { opacity: 0, y: -24, duration: 0.25, ease: "power2.in" }, D.b[13.5]);
+      ft("#lluvia", { opacity: 0.16 }, { opacity: 1, duration: 0.2, ease: "power2.out" }, D.b[13.5]);
+      ft("#vendedora", { opacity: 1 }, { opacity: 0, duration: 0.35, ease: "power2.in" }, D.b[13.5]);
       // Del tiempo 14 al 16 los mensajes se juntan donde va a nacer el celular.
       const lejos = D.lugares
         .map((l, i) => ({ i, d: Math.hypot(l.x + l.w / 2 - D.centro.x, l.y + l.h / 2 - D.centro.y) }))
@@ -327,15 +330,14 @@
       ft(".raya", { scaleY: 1 }, { scaleY: 0, duration: 0.3, ease: "power2.in", stagger: { each: 0.03, from: "end" } }, D.b[23.25]);
       ft("#mostrador", { opacity: 1 }, { opacity: 0, duration: 0.2 }, D.b[23.25]);
 
-      /* 3. Cada pregunta y su respuesta. */
+      /* 3. Cada escena: su pantalla y su frase (o su paso). */
       D.escenas.forEach(({ clave, t0, t1 }) => {
         const p = "#e-" + clave;
-        ft(p + "-preg", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: ENTRA }, t0);
-        ft(p + "-preg .ch", { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: 0.028 }, t0 + 0.08);
-        ft("#p-" + clave, { yPercent: 100 }, { yPercent: 0, duration: 0.5, ease: ENTRA }, t0 + 0.1);
-        ft(p + "-resp .l", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: ENTRA, stagger: 0.09 }, t0 + 0.35);
-        ft(p + "-resp .regla", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: ENTRA }, t0 + 0.8);
-        ft([p + "-preg", p + "-resp .l"], { opacity: 1, y: 0 }, { opacity: 0, y: -24, duration: 0.25, ease: "power2.in" }, t1 - 0.27);
+        const textos = [p + "-n", p + "-resp .l", p + "-sub"].filter((x) => document.querySelector(x));
+        ft("#p-" + clave, { yPercent: 100 }, { yPercent: 0, duration: 0.5, ease: ENTRA }, t0 + 0.05);
+        ft(textos, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: ENTRA, stagger: 0.09 }, t0 + 0.15);
+        ft(p + "-resp .regla", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: ENTRA }, t0 + 0.7);
+        ft(textos, { opacity: 1, y: 0 }, { opacity: 0, y: -24, duration: 0.25, ease: "power2.in" }, t1 - 0.27);
         const extra = ESCENA[clave];
         if (extra) extra(t0, t1);
       });
