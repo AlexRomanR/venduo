@@ -177,7 +177,7 @@ export function FormularioProducto({
                   <Textarea
                     {...field}
                     rows={4}
-                    placeholder="De qué es, qué talles hay, para qué sirve."
+                    placeholder="De qué es, qué tallas hay, para qué sirve."
                     className="resize-none rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-senal focus-visible:ring-0"
                   />
                 </FormControl>

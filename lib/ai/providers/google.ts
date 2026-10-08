@@ -1,6 +1,8 @@
 import { buildJsonInstruction, parseAndValidate } from "../json"
 import {
   AIError,
+  LIMITE_POR_DEFECTO_MS,
+  MENSAJE_DE_DEMORA,
   type AIProvider,
   type GenerateObjectOptions,
   type GenerateObjectResult,
@@ -61,10 +63,16 @@ export function createGoogleProvider(config: {
   async function call(
     options: GenerateTextOptions,
     jsonMode: boolean,
-    intento = 0
+    intento = 0,
+    hasta = Date.now() + (options.limiteMs ?? LIMITE_POR_DEFECTO_MS)
   ): Promise<GenerateContentResponse> {
     if (!config.apiKey) {
       throw new AIError("Falta AI_API_KEY para Google.", "google")
+    }
+
+    const restante = hasta - Date.now()
+    if (restante <= 0) {
+      throw new AIError(MENSAJE_DE_DEMORA, "google")
     }
 
     let response: Response
@@ -89,16 +97,26 @@ export function createGoogleProvider(config: {
               ...(thinkingConfig ? { thinkingConfig } : {}),
             },
           }),
+          signal: AbortSignal.timeout(restante),
         }
       )
     } catch (cause) {
+      if (cause instanceof Error && cause.name === "TimeoutError") {
+        throw new AIError(MENSAJE_DE_DEMORA, "google", cause)
+      }
       throw new AIError(`No se pudo contactar a ${baseURL}`, "google", cause)
     }
 
     if (!response.ok) {
-      if (vuelveAIntentarse(response.status) && intento < 2) {
-        await new Promise((listo) => setTimeout(listo, 700 * (intento + 1)))
-        return call(options, jsonMode, intento + 1)
+      // Se reintenta solo si queda tiempo para que la respuesta llegue.
+      const espera = 700 * (intento + 1)
+      if (
+        vuelveAIntentarse(response.status) &&
+        intento < 2 &&
+        hasta - Date.now() > espera + 5000
+      ) {
+        await new Promise((listo) => setTimeout(listo, espera))
+        return call(options, jsonMode, intento + 1, hasta)
       }
 
       throw new AIError(

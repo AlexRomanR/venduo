@@ -13,6 +13,12 @@ export interface GenerateTextOptions {
   messages: AIMessage[]
   maxTokens?: number
   temperature?: number
+  /**
+   * Cuánto puede tardar el pedido, reintentos incluidos. Pasado ese tiempo el
+   * proveedor corta y avisa: si no, la función del servidor espera hasta que
+   * la mata la plataforma y la pantalla nunca se entera.
+   */
+  limiteMs?: number
 }
 
 export interface AIUsage {
@@ -57,6 +63,16 @@ export interface AIProvider {
     options: GenerateObjectOptions<T>
   ): Promise<GenerateObjectResult<T>>
 }
+
+/**
+ * Lo que puede tardar un pedido si la tarea no dice otra cosa. Una respuesta
+ * normal tarda de 6 a 18 segundos; las funciones del servidor tienen 60, y el
+ * editor puede necesitar dos vueltas.
+ */
+export const LIMITE_POR_DEFECTO_MS = 28_000
+
+/** El mensaje de un pedido que se pasó de su límite, igual en todos los adaptadores. */
+export const MENSAJE_DE_DEMORA = "La IA tardó demasiado en responder."
 
 export class AIError extends Error {
   constructor(

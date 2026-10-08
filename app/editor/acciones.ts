@@ -3,11 +3,15 @@
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
+import { mensajeDeErrorDeIa } from "@/lib/ai/mensajes"
 import { proponerEdicion, type TiendaParaLaIa } from "@/lib/ai/tasks"
 import type { PropuestaDeDiseno } from "@/lib/ai/schemas"
 import { leerDisenoParaEditar, type DisenoParaEditar } from "@/lib/data/editor"
 import { borradorSchema } from "@/lib/editor/protocolo"
-import { combinarApariencia } from "@/lib/plantillas/apariencia"
+import {
+  combinarApariencia,
+  type Apariencia,
+} from "@/lib/plantillas/apariencia"
 import {
   aplicarOperaciones,
   contextoDeDiseno,
@@ -147,13 +151,35 @@ function errorDeLaIa(error: unknown): { ok: false; error: string } {
   // Se registra en el servidor: sin esto, un fallo del proveedor no se puede
   // distinguir de un pedido mal entendido.
   console.error("[editor] el proveedor de IA falló:", error)
-  const detalle = error instanceof Error ? error.message : ""
-  return {
-    ok: false,
-    error: /503|UNAVAILABLE|429|high demand/i.test(detalle)
-      ? "La IA está saturada en este momento. Vuelve a pedirlo en unos segundos."
-      : "La IA no pudo responder ahora. Inténtalo de nuevo en un momento.",
+  return { ok: false, error: mensajeDeErrorDeIa(error) }
+}
+
+/** Si una operación de la IA cambia algo del borrador tal como está. */
+function cambiaAlgo(
+  operacion: Operacion,
+  borrador: Borrador,
+  base: Apariencia
+): boolean {
+  if (operacion.op !== "apariencia" && operacion.op !== "restablecer") {
+    return true
   }
+  const [grupo, clave] = operacion.ruta.split(".") as [keyof Apariencia, string]
+  if (operacion.op === "restablecer") {
+    const propio = borrador.personalizacion[grupo] as
+      Record<string, unknown> | undefined
+    return propio !== undefined && clave in propio
+  }
+  const actual = (
+    combinarApariencia(base, borrador.personalizacion)[grupo] as Record<
+      string,
+      unknown
+    >
+  )[clave]
+  const igual = (a: unknown, b: unknown) =>
+    typeof a === "string" && typeof b === "string"
+      ? a.toLowerCase() === b.toLowerCase()
+      : a === b
+  return !igual(actual, operacion.valor)
 }
 
 async function registrarPropuesta(
@@ -271,6 +297,9 @@ export async function proponerCambios(entrada: {
       exigirContraste: true,
     })
 
+  // Las dos vueltas al modelo tienen que entrar en los 60 segundos de la
+  // función: la segunda, que corrige a la primera, solo si queda tiempo.
+  const inicio = Date.now()
   let intento
   try {
     intento = await proponerEdicion({
@@ -284,7 +313,7 @@ export async function proponerCambios(entrada: {
   let resultado = probar(intento.propuesta.operaciones)
   let aviso: string | undefined
 
-  if (!resultado.ok) {
+  if (!resultado.ok && Date.now() - inicio < 25_000) {
     try {
       intento = await proponerEdicion({
         pedido: pedido.data,
@@ -331,6 +360,28 @@ export async function proponerCambios(entrada: {
           "La IA no logró armar un cambio que funcione. Prueba pedirlo de otra forma, con algo más concreto.",
       }
     }
+  }
+
+  // Un ajuste que la tienda ya tiene no es un cambio: proponer "botones
+  // redondos" a una tienda con botones redondos le hace creer a la persona
+  // que algo va a cambiar. Solo se miran los de apariencia, que no dependen
+  // de otras operaciones.
+  const efectivas = intento.propuesta.operaciones.filter((operacion) =>
+    cambiaAlgo(operacion, borrador, diseno.base)
+  )
+  if (efectivas.length === 0) {
+    return {
+      ok: false,
+      error:
+        "Tu tienda ya está así. Pídele otro cambio, o cuéntale con más detalle qué quieres.",
+    }
+  }
+  if (efectivas.length < intento.propuesta.operaciones.length) {
+    intento = {
+      ...intento,
+      propuesta: { ...intento.propuesta, operaciones: efectivas },
+    }
+    aviso ??= "Dejé afuera lo que tu tienda ya tenía así."
   }
 
   const id = await registrarPropuesta(diseno, {

@@ -1,6 +1,8 @@
 import { buildJsonInstruction, parseAndValidate } from "../json"
 import {
   AIError,
+  LIMITE_POR_DEFECTO_MS,
+  MENSAJE_DE_DEMORA,
   type AIProvider,
   type GenerateObjectOptions,
   type GenerateObjectResult,
@@ -57,8 +59,12 @@ export function createOpenAICompatibleProvider(config: {
           temperature: options.temperature ?? 0.7,
           ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
         }),
+        signal: AbortSignal.timeout(options.limiteMs ?? LIMITE_POR_DEFECTO_MS),
       })
     } catch (cause) {
+      if (cause instanceof Error && cause.name === "TimeoutError") {
+        throw new AIError(MENSAJE_DE_DEMORA, "openai-compatible", cause)
+      }
       throw new AIError(
         `No se pudo contactar a ${baseURL}`,
         "openai-compatible",

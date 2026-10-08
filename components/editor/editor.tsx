@@ -53,6 +53,7 @@ import {
   PASOS,
   PestanasDePasos,
 } from "@/components/editor/pasos"
+import { MENSAJE_SIN_RESPUESTA } from "@/lib/ai/mensajes"
 
 function distinto(a: unknown, b: unknown) {
   return JSON.stringify(a) !== JSON.stringify(b)
@@ -302,10 +303,12 @@ export function Editor({
       setPropuesta(null)
       setMirandoAntes(false)
 
+      // Si la plataforma corta la función, la acción no devuelve nada: lanza.
+      // Sin esto la barra se quedaba en "pensando" para siempre.
       const resultado = await proponer({
         pedido: limpio,
         borrador: presente.current,
-      })
+      }).catch(() => ({ ok: false as const, error: MENSAJE_SIN_RESPUESTA }))
       setCargandoIa(false)
 
       if (!resultado.ok) {

@@ -5,6 +5,10 @@ import { getMiTienda } from "@/lib/data/panel"
 import { isCanvaConfigured, isSupabaseConfigured } from "@/lib/env"
 import { Constructor } from "@/components/catalogos/editor/constructor"
 
+// La IA de esta pantalla corre en sus acciones: con un tope explícito, un
+// pedido que se demora termina con un aviso en vez de quedar colgado.
+export const maxDuration = 60
+
 export const metadata = { title: "Nuevo catálogo" }
 
 /** Armar un catálogo: productos, plantilla y edición, en la misma pantalla. */

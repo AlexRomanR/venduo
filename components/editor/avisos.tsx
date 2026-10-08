@@ -64,7 +64,10 @@ export function Bienvenida({ alEmpezar }: { alEmpezar: () => void }) {
       <ul className="mt-3 flex flex-col gap-1.5 text-sm leading-relaxed opacity-80">
         <li>Lo que cambies lo ves al instante, en tu tienda real.</li>
         <li>Toca una sección de la vista previa para editarla.</li>
-        <li>Tus clientes no ven nada hasta que publiques.</li>
+        <li>
+          Tu tienda ya está en línea: tus clientes ven tus cambios cuando los
+          publiques.
+        </li>
       </ul>
       <div className="mt-3 flex flex-wrap gap-x-5">
         <button

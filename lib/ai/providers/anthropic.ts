@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk"
 import { buildJsonInstruction, parseAndValidate } from "../json"
 import {
   AIError,
+  LIMITE_POR_DEFECTO_MS,
   type AIProvider,
   type GenerateObjectOptions,
   type GenerateObjectResult,
@@ -26,16 +27,19 @@ export function createAnthropicProvider(config: {
 
   async function call(options: GenerateTextOptions) {
     try {
-      return await client.messages.create({
-        model,
-        max_tokens: options.maxTokens ?? 16000,
-        thinking: { type: "adaptive" },
-        ...(options.system ? { system: options.system } : {}),
-        messages: options.messages.map((m) => ({
-          role: m.role,
-          content: m.content,
-        })),
-      })
+      return await client.messages.create(
+        {
+          model,
+          max_tokens: options.maxTokens ?? 16000,
+          thinking: { type: "adaptive" },
+          ...(options.system ? { system: options.system } : {}),
+          messages: options.messages.map((m) => ({
+            role: m.role,
+            content: m.content,
+          })),
+        },
+        { timeout: options.limiteMs ?? LIMITE_POR_DEFECTO_MS }
+      )
     } catch (cause) {
       throw new AIError(
         cause instanceof Error ? cause.message : "Error llamando a Anthropic",

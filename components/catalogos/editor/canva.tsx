@@ -150,6 +150,7 @@ export function BotonDeCanva({
             "",
             `/panel/catalogos/${resultado.id}`
           )
+          document.title = "Editar catálogo · Venduo"
         }
         id = resultado.id
       }
@@ -167,7 +168,10 @@ export function BotonDeCanva({
         type="button"
         onClick={modo === "directo" ? directo : aMano}
         disabled={deshabilitado || trabajando}
-        className={cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")}
+        className={cn(
+          BOTON_SECUNDARIO,
+          "min-h-11 px-3 text-sm whitespace-nowrap sm:px-4"
+        )}
       >
         {trabajando ? (
           <LoaderCircle
@@ -251,7 +255,10 @@ export function BotonDeCanva({
               href={CANVA_PDF}
               target="_blank"
               rel="noopener"
-              className={cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")}
+              className={cn(
+                BOTON_SECUNDARIO,
+                "min-h-11 px-3 text-sm whitespace-nowrap sm:px-4"
+              )}
             >
               <ExternalLink aria-hidden="true" className="size-4" />
               Abrir Canva otra vez
@@ -259,7 +266,10 @@ export function BotonDeCanva({
             <DialogClose asChild>
               <button
                 type="button"
-                className={cn(BOTON_PRIMARIO, "min-h-11 px-4 text-sm")}
+                className={cn(
+                  BOTON_PRIMARIO,
+                  "min-h-11 px-3 text-sm whitespace-nowrap sm:px-4"
+                )}
               >
                 Listo
               </button>

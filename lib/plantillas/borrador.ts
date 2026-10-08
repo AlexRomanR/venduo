@@ -13,6 +13,7 @@ import {
   type RutaDeAjuste,
 } from "@/lib/plantillas/apariencia"
 import { TIPOS_DE_BLOQUE, type TipoDeBloque } from "@/lib/plantillas/bloques"
+import { cambioDeColor, nombreDeColor } from "@/lib/plantillas/color"
 import { FUENTES } from "@/lib/plantillas/fuentes"
 import {
   camposVacios,
@@ -464,6 +465,9 @@ export function problemasParaPublicar(
 function valorLegible(ruta: RutaDeAjuste, valor: unknown): string {
   if (valor === null || valor === undefined) return "el de la plantilla"
   if (typeof valor === "boolean") return valor ? "sí" : "no"
+  if (ruta.startsWith("colores.") && typeof valor === "string") {
+    return /^#[0-9a-f]{6}$/i.test(valor) ? nombreDeColor(valor) : valor
+  }
   if (ruta.startsWith("tipografia.") && typeof valor === "string") {
     return valor in FUENTES
       ? FUENTES[valor as keyof typeof FUENTES].nombre
@@ -527,6 +531,8 @@ export interface Cambio {
   texto: string
   /** Para dibujar la muestra de un color al lado del texto. */
   color?: string
+  /** El color que tenía, para dibujar el antes y el después. */
+  colorAntes?: string
 }
 
 /**
@@ -552,10 +558,17 @@ export function cambiosEntre(
     const valorDespues = (despues[grupo] as Record<string, unknown>)[clave]
     if (valorAntes === valorDespues) continue
 
+    const esColor =
+      grupo === "colores" &&
+      typeof valorAntes === "string" &&
+      typeof valorDespues === "string"
     cambios.push({
       tipo: "apariencia",
-      texto: `${NOMBRES_DE_AJUSTE[ruta]}: ${valorLegible(ruta, valorAntes)} → ${valorLegible(ruta, valorDespues)}`,
-      color: grupo === "colores" ? String(valorDespues) : undefined,
+      texto: esColor
+        ? `${NOMBRES_DE_AJUSTE[ruta]}: ${cambioDeColor(valorAntes, valorDespues)}`
+        : `${NOMBRES_DE_AJUSTE[ruta]}: ${valorLegible(ruta, valorAntes)} → ${valorLegible(ruta, valorDespues)}`,
+      color: esColor ? valorDespues : undefined,
+      colorAntes: esColor ? valorAntes : undefined,
     })
   }
 

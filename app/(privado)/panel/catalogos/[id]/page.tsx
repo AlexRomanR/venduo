@@ -8,6 +8,10 @@ import {
 import { isCanvaConfigured } from "@/lib/env"
 import { Constructor } from "@/components/catalogos/editor/constructor"
 
+// La IA de esta pantalla corre en sus acciones: con un tope explícito, un
+// pedido que se demora termina con un aviso en vez de quedar colgado.
+export const maxDuration = 60
+
 export const metadata = { title: "Editar catálogo" }
 
 /** Un catálogo guardado, abierto en el editor con los productos de hoy. */

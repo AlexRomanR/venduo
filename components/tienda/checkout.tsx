@@ -373,7 +373,7 @@ function Lineas({
                 type="button"
                 onClick={() => cambiar(linea.productoId, linea.cantidad - 1)}
                 aria-label={`Quitar una unidad de ${linea.nombre}`}
-                className="flex size-11 items-center justify-center border border-tinta/25 transition-colors hover:border-senal hover:text-senal"
+                className="flex size-11 items-center justify-center rounded-plantilla border border-tinta/25 transition-colors hover:border-senal hover:text-senal"
               >
                 <Minus aria-hidden="true" className="size-3.5" />
               </button>
@@ -388,7 +388,7 @@ function Lineas({
                 onClick={() => cambiar(linea.productoId, linea.cantidad + 1)}
                 disabled={linea.cantidad >= linea.stock}
                 aria-label={`Agregar una unidad de ${linea.nombre}`}
-                className="flex size-11 items-center justify-center border border-tinta/25 transition-colors hover:border-senal hover:text-senal disabled:opacity-30"
+                className="flex size-11 items-center justify-center rounded-plantilla border border-tinta/25 transition-colors hover:border-senal hover:text-senal disabled:opacity-30"
               >
                 <Plus aria-hidden="true" className="size-3.5" />
               </button>

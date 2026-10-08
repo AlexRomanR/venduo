@@ -8,6 +8,10 @@ import { Estudio } from "@/components/insights/estudio"
 import { Cabecera } from "@/components/panel/piezas"
 import { borrar, guardar, preguntar } from "./acciones"
 
+// La IA de esta pantalla corre en sus acciones: con un tope explícito, un
+// pedido que se demora termina con un aviso en vez de quedar colgado.
+export const maxDuration = 60
+
 export const metadata = { title: "Estadísticas" }
 
 /**

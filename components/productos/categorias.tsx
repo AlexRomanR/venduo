@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils"
 import type { CategoriaConUso } from "@/lib/data/catalogo"
 import type { CategoriaInput } from "@/lib/validation/producto"
 import { Seccion, SinDatos } from "@/components/panel/piezas"
+import { useConfirmacion } from "@/components/panel/confirmar"
 
 interface Props {
   categorias: CategoriaConUso[]
@@ -48,6 +49,7 @@ export function Categorias({
   const [descripcion, setDescripcion] = React.useState("")
   const [creando, setCreando] = React.useState(false)
   const [editando, setEditando] = React.useState<string | null>(null)
+  const { preguntar, dialogo } = useConfirmacion()
 
   function bloqueado() {
     if (!soloLectura) return false
@@ -76,6 +78,7 @@ export function Categorias({
 
   return (
     <>
+      {dialogo}
       <Seccion
         id="nueva-categoria"
         icono={FolderPlus}
@@ -206,15 +209,15 @@ export function Categorias({
                         aria-label={`Borrar ${categoria.name}`}
                         onClick={async () => {
                           if (bloqueado()) return
-                          if (
-                            !window.confirm(
+                          const confirmada = await preguntar({
+                            titulo: `¿Borrar «${categoria.name}»?`,
+                            texto:
                               categoria.productos > 0
-                                ? `"${categoria.name}" tiene ${categoria.productos} producto(s). Se quedan en tu catálogo, pero sin categoría. ¿Borrarla?`
-                                : `¿Borrar "${categoria.name}"?`
-                            )
-                          ) {
-                            return
-                          }
+                                ? `Tiene ${categoria.productos} ${categoria.productos === 1 ? "producto" : "productos"}. Se quedan en tu catálogo, pero sin categoría.`
+                                : "No tiene productos: no cambia nada de tu catálogo.",
+                            confirmar: "Borrar la categoría",
+                          })
+                          if (!confirmada) return
                           const resultado = await borrar(categoria.id)
                           if (!resultado.ok) {
                             toast.error(

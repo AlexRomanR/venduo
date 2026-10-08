@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 
 import type { PropuestaDeCatalogo } from "@/lib/ai/schemas"
+import { mensajeDeErrorDeIa } from "@/lib/ai/mensajes"
 import { proponerCatalogo } from "@/lib/ai/tasks"
 import { CONDICIONES } from "@/lib/catalogos/datos"
 import { problemasDeEstilo } from "@/lib/catalogos/estilo"
@@ -161,13 +162,7 @@ export async function pedirCatalogoALaIa(
     // Se registra en el servidor: sin esto, un fallo del proveedor no se
     // distingue de un pedido mal entendido.
     console.error("[catalogos] el proveedor de IA falló:", error)
-    const detalle = error instanceof Error ? error.message : ""
-    return {
-      ok: false,
-      error: /503|UNAVAILABLE|429|high demand/i.test(detalle)
-        ? "La IA está saturada en este momento. Vuelve a pedirlo en unos segundos."
-        : "La IA no pudo responder ahora. Inténtalo de nuevo en un momento.",
-    }
+    return { ok: false, error: mensajeDeErrorDeIa(error) }
   }
 
   const permitidos = new Set(actuales ?? productos.map((p) => p.id))

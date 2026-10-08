@@ -15,6 +15,7 @@ import { leerGrafico } from "@/lib/insights/lectura"
 import { cn } from "@/lib/utils"
 import { Grafico } from "@/components/insights/grafico"
 import type { GraficoEnTablero } from "@/components/insights/tablero"
+import { MENSAJE_SIN_RESPUESTA } from "@/lib/ai/mensajes"
 
 const SUGERENCIAS = [
   "¿Cuánto vendí en los últimos 30 días?",
@@ -116,7 +117,13 @@ export function Consola({
     setTexto("")
     setEnCurso(true)
 
-    const respuesta = await preguntar(limpia, anterior)
+    // Si la plataforma corta la función, la acción lanza en vez de responder.
+    const respuesta = await preguntar(limpia, anterior).catch(() => ({
+      ok: false as const,
+      error: MENSAJE_SIN_RESPUESTA,
+      consulta: undefined,
+      filas: undefined,
+    }))
 
     setEnCurso(false)
     setEntradas((previas) => [
