@@ -114,6 +114,61 @@ export const COMBINACIONES: CombinacionDeLetra[] = [
     },
   },
   {
+    nombre: "Afiche",
+    ideal: "Ropa urbana, gorras, tandas",
+    tipografia: {
+      titular: "anton",
+      cuerpo: "geist",
+      pesoTitular: 400,
+      espaciadoTitular: "normal",
+      mayusculas: true,
+    },
+  },
+  {
+    nombre: "Revista",
+    ideal: "Carteras, joyas, accesorios",
+    tipografia: {
+      titular: "bodoni",
+      cuerpo: "jost",
+      pesoTitular: 500,
+      espaciadoTitular: "apretado",
+      mayusculas: false,
+    },
+  },
+  {
+    nombre: "Cancha",
+    ideal: "Zapatillas, deporte, calzado",
+    tipografia: {
+      titular: "barlow",
+      cuerpo: "geist",
+      pesoTitular: 800,
+      espaciadoTitular: "normal",
+      mayusculas: true,
+    },
+  },
+  {
+    nombre: "Botica",
+    ideal: "Perfumes de autor, velas, cosmética natural",
+    tipografia: {
+      titular: "instrument",
+      cuerpo: "geist",
+      pesoTitular: 400,
+      espaciadoTitular: "apretado",
+      mayusculas: false,
+    },
+  },
+  {
+    nombre: "Mostrador",
+    ideal: "Bazar, regalos, de todo un poco",
+    tipografia: {
+      titular: "bricolage",
+      cuerpo: "geist",
+      pesoTitular: 800,
+      espaciadoTitular: "apretado",
+      mayusculas: false,
+    },
+  },
+  {
     nombre: "Letrero",
     ideal: "Ferias, ofertas, segunda mano",
     tipografia: {

@@ -1,7 +1,7 @@
 # Estado del proyecto
 
 Qué está construido en Venduo y qué falta, contra el alcance del MVP de `VENDUO.md` §6.
-Actualizado el 6 de octubre de 2026.
+Actualizado el 8 de octubre de 2026.
 
 **Leyenda:** ✅ hecho · 🟡 hecho con un flujo provisorio o a medias · ❌ falta
 
@@ -86,7 +86,11 @@ Actualizado el 6 de octubre de 2026.
 
 ### Plantillas de tienda
 
-- Dos plantillas con identidad propia: **Pasarela** (moda) y **Esencia** (perfumería).
+- Siete plantillas con identidad propia: **Pasarela** (moda), **Calle** (ropa urbana),
+  **Atelier** (carteras y accesorios), **Pisada** (zapatillas y calzado), **Esencia**
+  (perfumería), **Fórmula** (perfumería de autor) y **Bazar** (de todo un poco, rubro
+  "Variedades"). Cada una con su letra, su paleta medida y su kit; las cinco nuevas se
+  dan de alta con `20261008120000_plantillas_nuevas.sql`.
 - La identidad llega a toda la tienda pública **y al panel del emprendedor**.
 - Cambio de plantilla desde `/panel/apariencia` sin perder productos ni pedidos, con
   historial de versiones que se pueden **restaurar**.
@@ -230,7 +234,7 @@ Falta:
 ### 3. Plantillas — prioridad baja
 
 - Más plantillas para los rubros que quedaron en la base editorial (tecnología, hogar,
-  belleza).
+  cosmética).
 - Atributos por rubro: talla y color en moda, mililitros o familia olfativa en
   perfumería. Piden variantes en el carrito y en `create_order`.
 

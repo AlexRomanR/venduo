@@ -73,7 +73,14 @@ function aparienciaDeDemostracion(): AparienciaDeMiTienda {
       retirada: false,
       personalizada: false,
     },
-    disponibles: [elegible("perfume", null, null, "Belleza")],
+    disponibles: [
+      elegible("calle", null, null, "Moda"),
+      elegible("atelier", null, null, "Moda"),
+      elegible("pisada", null, null, "Moda"),
+      elegible("perfume", null, null, "Belleza"),
+      elegible("formula", null, null, "Belleza"),
+      elegible("bazar", null, null, "Variedades"),
+    ],
     versiones: [
       {
         id: "demo",

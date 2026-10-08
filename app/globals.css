@@ -255,4 +255,24 @@
       opacity: 1;
     }
   }
+
+  /*
+   * Una cinta que corre sola, como la de un local de la calle. El contenido va
+   * dos veces seguido y la cinta se corre la mitad: cuando termina, el segundo
+   * tramo está donde empezó el primero y no se nota el salto. Con menos
+   * movimiento queda quieta.
+   */
+  .cinta {
+    animation: cinta 38s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cinta {
+      animation: none;
+    }
+  }
+  @keyframes cinta {
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }

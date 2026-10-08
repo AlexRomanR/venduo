@@ -59,7 +59,8 @@ Para **cambiar** la plantilla de una tienda existente no se usa esta, sino
 `change_store_template(p_template_key, p_keep_sections)`, que conserva las secciones por
 defecto.
 
-Las plantillas que se ofrecen son `fashion` (Pasarela) y `perfume` (Esencia). Las del
+Las plantillas que se ofrecen son `fashion` (Pasarela), `perfume` (Esencia), `calle`,
+`atelier`, `pisada`, `formula` (Fórmula) y `bazar`. Las del
 catálogo anterior —`abarrotes`, `moda`, `belleza` y demás— siguen en la tabla con
 `is_active = false` y se dibujan con la base editorial.
 
@@ -125,11 +126,11 @@ jsonb y lo valida zod—, pero sí todos estos lugares, o el ajuste existe a med
 - [ ] El esquema en `aparienciaSchema` y su grupo en `personalizacionSchema` y
       `combinarApariencia` (`lib/plantillas/apariencia.ts`). **Un valor cerrado**, nunca
       texto libre.
-- [ ] El valor de la base en las tres plantillas (`lib/plantillas/{clave}.ts`): el que
+- [ ] El valor de la base en todas las plantillas (`lib/plantillas/{clave}.ts`): el que
       reproduce cómo se veían antes, para no cambiar ninguna tienda sin que lo pida.
 - [ ] Su nombre en `NOMBRES_DE_AJUSTE` y el de sus valores en `NOMBRES_DE_VALOR`: de ahí
       salen el resumen de publicar y lo que la IA dice que cambia.
-- [ ] Los **tres kits** lo dibujan. Si uno lo ignora, el control no hace nada en esa
+- [ ] **Todos los kits** lo dibujan. Si uno lo ignora, el control no hace nada en esa
       plantilla.
 - [ ] El control en su paso, y el punto de "con cambios" y la pantalla de la propuesta en
       `components/editor/editor.tsx` (`conCambios`, `VISTA_DE_AJUSTE`).

@@ -16,6 +16,11 @@ export const FUENTES = {
   oswald: { nombre: "Oswald", variable: "--fuente-oswald" },
   cormorant: { nombre: "Cormorant Garamond", variable: "--fuente-cormorant" },
   jost: { nombre: "Jost", variable: "--fuente-jost" },
+  anton: { nombre: "Anton", variable: "--fuente-anton" },
+  bodoni: { nombre: "Bodoni Moda", variable: "--fuente-bodoni" },
+  barlow: { nombre: "Barlow Condensed", variable: "--fuente-barlow" },
+  instrument: { nombre: "Instrument Serif", variable: "--fuente-instrument" },
+  bricolage: { nombre: "Bricolage Grotesque", variable: "--fuente-bricolage" },
 } as const
 
 export type ClaveFuente = keyof typeof FUENTES

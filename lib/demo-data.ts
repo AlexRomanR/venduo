@@ -171,6 +171,50 @@ export const RUBROS_DEMO: RubroConPlantillas[] = [
           "product_grid",
         ],
       },
+      {
+        key: "calle",
+        name: "Calle",
+        sector: "moda",
+        description:
+          "Ropa urbana y de tanda. Letra de afiche, prendas enmarcadas como un fanzine y una cinta que corre con lo nuevo.",
+        bloques: [
+          "hero",
+          "product_grid",
+          "categories",
+          "product_grid",
+          "cta",
+          "product_grid",
+        ],
+      },
+      {
+        key: "atelier",
+        name: "Atelier",
+        sector: "moda",
+        description:
+          "Carteras, bolsos y accesorios. Cada pieza sobre su paño, títulos de revista de moda y una ficha que la muestra entera.",
+        bloques: [
+          "hero",
+          "categories",
+          "product_grid",
+          "about",
+          "product_grid",
+        ],
+      },
+      {
+        key: "pisada",
+        name: "Pisada",
+        sector: "moda",
+        description:
+          "Zapatillas y calzado. Cada par de perfil sobre su placa, titulares en cursiva que van hacia adelante y precios a la vista.",
+        bloques: [
+          "hero",
+          "categories",
+          "product_grid",
+          "product_grid",
+          "product_grid",
+          "faq",
+        ],
+      },
     ],
   },
   {
@@ -184,6 +228,34 @@ export const RUBROS_DEMO: RubroConPlantillas[] = [
         description:
           "Perfumes, fragancias y cuidado personal. Una vitrina serena, fichas con presencia y asesoría por WhatsApp.",
         bloques: ["hero", "product_grid", "categories", "product_grid", "faq"],
+      },
+      {
+        key: "formula",
+        name: "Fórmula",
+        sector: "belleza",
+        description:
+          "Perfumería de autor, decants y aceites. Una botica moderna: cada frasco con su etiqueta numerada y su ficha sin adornos.",
+        bloques: ["hero", "categories", "product_grid", "product_grid", "faq"],
+      },
+    ],
+  },
+  {
+    key: "variedades",
+    name: "Variedades",
+    plantillas: [
+      {
+        key: "bazar",
+        name: "Bazar",
+        sector: "variedades",
+        description:
+          "Tiendas de todo un poco: regalos, accesorios, hogar y tecnología. Muchas cosas a la vista, categorías grandes y precios que se ven.",
+        bloques: [
+          "hero",
+          "categories",
+          "product_grid",
+          "product_grid",
+          "product_grid",
+        ],
       },
     ],
   },
