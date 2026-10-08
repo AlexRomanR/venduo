@@ -2,3 +2,9 @@
 node_modules
 package-lock.json
 components/ui
+
+# El video: lo generado no sigue el formato del proyecto
+video/index.html
+video/assets
+video/renders
+video/snapshots*

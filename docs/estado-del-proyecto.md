@@ -44,6 +44,15 @@ Actualizado el 6 de octubre de 2026.
   segunda mano—, no de comida casera. Cómo se le habla al cliente está en
   `ui-styling.md`.
 
+### El video de lanzamiento
+
+- En `video/`, con HyperFrames: vertical de 30,6 s para TikTok y Reels, y horizontal de
+  47,7 s para la portada y YouTube, con música Upbeat Funk (Pixabay) y sin voz. Cada
+  pregunta que le hacen a quien vende —«¿precio?», «¿tienes catálogo?»— recibe su
+  respuesta con pantallas reales de Rosa Deportes.
+- Cómo se mueve la marca en video está en `video/MOTION.md`, que es solo para video. Se
+  regenera con `video/construir.mjs`; los MP4 no se versionan.
+
 ### La marca
 
 - El logo es la feria en el celular: el toldo a rayas de un puesto dentro de la pantalla.
