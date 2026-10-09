@@ -55,7 +55,7 @@ function Mover({
   nombre: string
 }) {
   return (
-    <div className="flex">
+    <div className="flex shrink-0 flex-col">
       <button
         type="button"
         aria-label={`Subir ${nombre}`}
@@ -97,6 +97,8 @@ export function PlantillasDeTiendaAdmin({
     nueva: boolean
     recomendada: boolean
     tiendas: number
+    /** La miniatura de la plantilla, dibujada en el servidor. */
+    vista: React.ReactNode
   }[]
 }) {
   const { enCurso, correr } = useAccion()
@@ -111,7 +113,7 @@ export function PlantillasDeTiendaAdmin({
             !p.visible && "bg-tinta/[0.03]"
           )}
         >
-          <div className="flex min-w-0 items-start gap-2">
+          <div className="flex min-w-0 items-start gap-3">
             <Mover
               nombre={p.nombre}
               arriba={i > 0}
@@ -130,7 +132,15 @@ export function PlantillasDeTiendaAdmin({
                 )
               }
             />
-            <div className="min-w-0 pt-2">
+            <div
+              className={cn(
+                "w-28 shrink-0 sm:w-44",
+                !p.visible && "opacity-55"
+              )}
+            >
+              {p.vista}
+            </div>
+            <div className="min-w-0">
               <p className="font-semibold">
                 {p.nombre}{" "}
                 <span className="text-xs font-normal tracking-[0.12em] uppercase opacity-65">
@@ -211,6 +221,8 @@ export function PlantillasDeCatalogoAdmin({
     nombre: string
     detalle: string
     visible: boolean
+    /** Sus dos primeras hojas, dibujadas en el servidor. */
+    vista: React.ReactNode
   }[]
 }) {
   const { enCurso, correr } = useAccion()
@@ -221,11 +233,11 @@ export function PlantillasDeCatalogoAdmin({
         <li
           key={p.clave}
           className={cn(
-            "flex flex-col gap-3 border-t border-tinta/15 px-4 py-3 first:border-t-0 sm:flex-row sm:items-center sm:justify-between sm:px-5",
+            "flex flex-col gap-3 border-t border-tinta/15 px-4 py-4 first:border-t-0 sm:flex-row sm:items-center sm:justify-between sm:px-5",
             !p.visible && "bg-tinta/[0.03]"
           )}
         >
-          <div className="flex min-w-0 items-start gap-2">
+          <div className="flex min-w-0 items-start gap-3">
             <Mover
               nombre={p.nombre}
               arriba={i > 0}
@@ -244,7 +256,12 @@ export function PlantillasDeCatalogoAdmin({
                 )
               }
             />
-            <div className="min-w-0 pt-2">
+            <div
+              className={cn("w-[9.75rem] shrink-0", !p.visible && "opacity-55")}
+            >
+              {p.vista}
+            </div>
+            <div className="min-w-0">
               <p className="font-semibold">{p.nombre}</p>
               <p className="text-sm opacity-70">{p.detalle}</p>
             </div>
