@@ -1,6 +1,10 @@
 import { redirect } from "next/navigation"
 
-import { getMaterialDelCatalogo } from "@/lib/data/catalogos"
+import {
+  getMaterialDelCatalogo,
+  plantillasDeCatalogoVisibles,
+} from "@/lib/data/catalogos"
+import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 import { isCanvaConfigured, isSupabaseConfigured } from "@/lib/env"
 import { Constructor } from "@/components/catalogos/editor/constructor"
@@ -13,11 +17,16 @@ export const metadata = { title: "Nuevo catálogo" }
 
 /** Armar un catálogo: productos, plantilla y edición, en la misma pantalla. */
 export default async function NuevoCatalogoPage() {
-  const tienda = await getMiTienda()
+  const [tienda, material, funciones, plantillas] = await Promise.all([
+    getMiTienda(),
+    getMaterialDelCatalogo(),
+    funcionesDeMiTienda(),
+    plantillasDeCatalogoVisibles(),
+  ])
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
+  if (funciones.catalogos !== "activa") redirect("/panel")
 
-  const { datos, estiloDeTienda, plantillaDeLaTienda, esDemo } =
-    await getMaterialDelCatalogo()
+  const { datos, estiloDeTienda, plantillaDeLaTienda, esDemo } = material
 
   return (
     <Constructor
@@ -26,6 +35,12 @@ export default async function NuevoCatalogoPage() {
       plantillaDeLaTienda={plantillaDeLaTienda}
       esDemo={esDemo}
       canva={isCanvaConfigured && !esDemo ? "directo" : "a-mano"}
+      funciones={{
+        ia: funciones.ia_catalogos,
+        canva: funciones.canva,
+        compartir: funciones.catalogo_compartido,
+      }}
+      plantillas={plantillas}
       inicial={null}
     />
   )

@@ -1,10 +1,12 @@
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 
 import {
   enlaceDeCatalogo,
   getCatalogo,
   getMaterialDelCatalogo,
+  plantillasDeCatalogoVisibles,
 } from "@/lib/data/catalogos"
+import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { isCanvaConfigured } from "@/lib/env"
 import { Constructor } from "@/components/catalogos/editor/constructor"
 
@@ -23,8 +25,18 @@ export default async function CatalogoPage({
   searchParams: Promise<{ canva?: string | string[] }>
 }) {
   const [{ id }, { canva: aviso }] = await Promise.all([params, searchParams])
-  const [abierto, { datos, estiloDeTienda, plantillaDeLaTienda, esDemo }] =
-    await Promise.all([getCatalogo(id), getMaterialDelCatalogo()])
+  const [
+    abierto,
+    { datos, estiloDeTienda, plantillaDeLaTienda, esDemo },
+    funciones,
+    plantillas,
+  ] = await Promise.all([
+    getCatalogo(id),
+    getMaterialDelCatalogo(),
+    funcionesDeMiTienda(),
+    plantillasDeCatalogoVisibles(),
+  ])
+  if (funciones.catalogos !== "activa") redirect("/panel")
   if (!abierto) notFound()
 
   return (
@@ -35,6 +47,12 @@ export default async function CatalogoPage({
       esDemo={esDemo}
       canva={isCanvaConfigured && !esDemo ? "directo" : "a-mano"}
       avisoDeCanva={typeof aviso === "string" ? aviso : null}
+      funciones={{
+        ia: funciones.ia_catalogos,
+        canva: funciones.canva,
+        compartir: funciones.catalogo_compartido,
+      }}
+      plantillas={plantillas}
       inicial={{
         id: abierto.id,
         catalogo: abierto.catalogo,

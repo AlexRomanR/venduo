@@ -4,6 +4,7 @@ import {
   type DatosDelCatalogo,
   type ProductoDelCatalogo,
 } from "@/lib/catalogos/datos"
+import { CLAVES_PLANTILLA } from "@/lib/catalogos/constantes"
 import { estiloDeTienda } from "@/lib/catalogos/estilo"
 import {
   catalogoSchema,
@@ -21,6 +22,7 @@ import { aparienciaDeTienda } from "@/lib/plantillas"
 import { toDataURL } from "@/lib/qr"
 import { createClient } from "@/lib/supabase/server"
 import { enlaceLegible, urlDeTienda } from "@/lib/tienda"
+import { conOrigen } from "@/lib/visitas"
 import type { Product } from "@/types"
 
 /*
@@ -110,6 +112,9 @@ async function armarDatos(
   filas: Product[]
 ): Promise<DatosDelCatalogo> {
   const url = urlDeTienda(tienda.slug)
+  // El QR y el enlace del PDF llevan su marca: así la tienda sabe cuántas
+  // visitas le trajo el catálogo. El que se lee en voz alta va limpio.
+  const desdeElCatalogo = conOrigen(url, "catalogo")
   const productos = filas.map(aProducto)
 
   return {
@@ -117,9 +122,9 @@ async function armarDatos(
       nombre: tienda.name,
       logo: tienda.logo_url,
       whatsapp: tienda.whatsapp,
-      url,
+      url: desdeElCatalogo,
       enlace: enlaceLegible(url),
-      qr: await toDataURL(url, { size: 480, margin: 2 }),
+      qr: await toDataURL(desdeElCatalogo, { size: 480, margin: 2 }),
     },
     productos: Object.fromEntries(productos.map((p) => [p.id, p])),
     categorias: categoriasDe(productos),
@@ -214,6 +219,7 @@ export const getMaterialDelCatalogo = cache(
       .select("*")
       .eq("store_id", tienda.id)
       .eq("is_active", true)
+      .is("moderated_at", null)
       .is("deleted_at", null)
       .order("is_featured", { ascending: false })
       .order("created_at", { ascending: false })
@@ -317,9 +323,39 @@ export async function getCatalogo(id: string): Promise<CatalogoAbierto | null> {
  * `catalogo_compartido`; la tienda y sus productos, por las políticas de
  * siempre, que ya exponen lo de una tienda publicada.
  */
-export async function getCatalogoCompartido(
-  token: string
-): Promise<{ catalogo: Catalogo; datos: DatosDelCatalogo } | null> {
+/**
+ * Las plantillas de catálogo que se ofrecen, en el orden que eligió Venduo
+ * desde la administración. Un catálogo guardado con una que se dejó de
+ * ofrecer se sigue dibujando igual: esto decide solo qué se ofrece.
+ */
+export const plantillasDeCatalogoVisibles = cache(
+  async function plantillasDeCatalogoVisibles(): Promise<ClavePlantilla[]> {
+    const supabase = await createClient()
+    if (!supabase) return [...CLAVES_PLANTILLA]
+    const { data, error } = await supabase
+      .from("catalog_template_settings")
+      .select("key, is_active, position")
+    if (error || !data) return [...CLAVES_PLANTILLA]
+
+    const ajustes = new Map(data.map((fila) => [fila.key, fila]))
+    const visibles = CLAVES_PLANTILLA.map((clave, indice) => ({
+      clave,
+      activa: ajustes.get(clave)?.is_active ?? true,
+      posicion: ajustes.get(clave)?.position ?? (indice + 1) * 10,
+    }))
+      .filter((p) => p.activa)
+      .sort((a, b) => a.posicion - b.posicion)
+      .map((p) => p.clave)
+    // Si se ocultaran todas, se ofrecen todas: sin ninguna no se puede armar nada.
+    return visibles.length > 0 ? visibles : [...CLAVES_PLANTILLA]
+  }
+)
+
+export async function getCatalogoCompartido(token: string): Promise<{
+  catalogo: Catalogo
+  datos: DatosDelCatalogo
+  tienda: string | null
+} | null> {
   const supabase = await createClient()
 
   if (!supabase) {
@@ -327,7 +363,9 @@ export async function getCatalogoCompartido(
     const demo = catalogosDeDemostracion(material.estiloDeTienda).find(
       (c) => c.token === token
     )
-    return demo ? { catalogo: demo.catalogo, datos: material.datos } : null
+    return demo
+      ? { catalogo: demo.catalogo, datos: material.datos, tienda: null }
+      : null
   }
 
   const { data: filas } = await supabase.rpc("catalogo_compartido", {
@@ -351,6 +389,7 @@ export async function getCatalogoCompartido(
       .select("*")
       .eq("store_id", fila.store_id)
       .eq("is_active", true)
+      .is("moderated_at", null)
       .is("deleted_at", null),
   ])
   if (!tienda) return null
@@ -358,6 +397,7 @@ export async function getCatalogoCompartido(
   return {
     catalogo: catalogo.data,
     datos: await armarDatos(tienda, productos ?? []),
+    tienda: fila.store_id,
   }
 }
 

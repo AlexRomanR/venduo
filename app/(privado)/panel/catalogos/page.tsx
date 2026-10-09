@@ -2,7 +2,7 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { BookOpen, LayoutTemplate, Palette, Plus } from "lucide-react"
 
-import { CLAVES_PLANTILLA, HOJAS } from "@/lib/catalogos/constantes"
+import { HOJAS } from "@/lib/catalogos/constantes"
 import { elegidos } from "@/lib/catalogos/datos"
 import {
   PLANTILLAS_DE_CATALOGO,
@@ -10,7 +10,12 @@ import {
   armarConEstilo,
   estilosDeLaTienda,
 } from "@/lib/catalogos/plantillas"
-import { getCatalogos, getMaterialDelCatalogo } from "@/lib/data/catalogos"
+import {
+  getCatalogos,
+  getMaterialDelCatalogo,
+  plantillasDeCatalogoVisibles,
+} from "@/lib/data/catalogos"
+import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
 import { BOTON_PRIMARIO } from "@/lib/estilos"
@@ -26,19 +31,25 @@ export const metadata = { title: "Catálogos" }
  * Los catálogos en PDF de la tienda.
  *
  * Arriba los guardados, que se mandan tal como están y siempre salen con los
- * precios del día; abajo las doce plantillas dibujadas con los productos de
+ * precios del día; abajo las plantillas que se ofrecen, con los productos de
  * la tienda, que es lo que convence de armar el primero.
  */
 export default async function CatalogosPage() {
-  const tienda = await getMiTienda()
+  const [tienda, { catalogos, esDemo }, material, funciones, plantillas] =
+    await Promise.all([
+      getMiTienda(),
+      getCatalogos(),
+      getMaterialDelCatalogo(),
+      funcionesDeMiTienda(),
+      plantillasDeCatalogoVisibles(),
+    ])
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
-
-  const [{ catalogos, esDemo }, material] = await Promise.all([
-    getCatalogos(),
-    getMaterialDelCatalogo(),
-  ])
+  if (funciones.catalogos !== "activa") redirect("/panel")
   const { datos, estiloDeTienda, plantillaDeLaTienda } = material
-  const sugeridos = estilosDeLaTienda(estiloDeTienda, plantillaDeLaTienda)
+  const sugeridos = estilosDeLaTienda(
+    estiloDeTienda,
+    plantillaDeLaTienda
+  ).filter((sugerido) => plantillas.includes(sugerido.plantilla))
   const productos = Object.values(datos.productos)
 
   // Las muestras se arman con los primeros productos: alcanzan para ver cómo
@@ -128,6 +139,7 @@ export default async function CatalogosPage() {
                     nombre={guardado.nombre}
                     tienda={datos.tienda.nombre}
                     enlace={guardado.enlace}
+                    compartir={funciones.catalogo_compartido}
                     esDemo={esDemo}
                   />
                 </li>
@@ -183,7 +195,7 @@ export default async function CatalogosPage() {
       <Seccion
         id="plantillas"
         icono={LayoutTemplate}
-        titulo="Doce plantillas para empezar"
+        titulo="Plantillas para empezar"
         bajada="Dibujadas con tus productos y los colores de tu tienda. Cualquier hoja de una sirve en otra."
         accion={{ href: "/panel/catalogos/nuevo", texto: "Armar un catálogo" }}
       >
@@ -203,7 +215,7 @@ export default async function CatalogosPage() {
           </SinDatos>
         ) : (
           <ul className="grid grid-cols-2 gap-px bg-tinta/15 sm:grid-cols-3 xl:grid-cols-4">
-            {CLAVES_PLANTILLA.map((clave) => {
+            {plantillas.map((clave) => {
               const plantilla = PLANTILLAS_DE_CATALOGO[clave]
               const catalogo = armarCatalogo({
                 plantilla: clave,

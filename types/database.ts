@@ -39,6 +39,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_id: string
+          after: Json | null
+          before: Json | null
+          created_at: string
+          id: string
+          note: string | null
+          target_id: string | null
+          target_type: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          target_id?: string | null
+          target_type: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          target_id?: string | null
+          target_type?: string
+        }
+        Relationships: []
+      }
       ai_generations: {
         Row: {
           created_at: string
@@ -76,6 +112,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "ai_generations_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_requests: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: number
+          kind: string
+          ms: number
+          ok: boolean
+          store_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: never
+          kind: string
+          ms: number
+          ok: boolean
+          store_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: never
+          kind?: string
+          ms?: number
+          ok?: boolean
+          store_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_requests_store_id_fkey"
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
@@ -176,6 +250,27 @@ export type Database = {
         }
         Relationships: []
       }
+      catalog_template_settings: {
+        Row: {
+          is_active: boolean
+          key: string
+          position: number
+          updated_at: string
+        }
+        Insert: {
+          is_active?: boolean
+          key: string
+          position?: number
+          updated_at?: string
+        }
+        Update: {
+          is_active?: boolean
+          key?: string
+          position?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       catalogs: {
         Row: {
           config: Json
@@ -219,6 +314,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      feature_states: {
+        Row: {
+          feature: string
+          state: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          feature: string
+          state: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          feature?: string
+          state?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       insights: {
         Row: {
@@ -266,6 +382,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      invitations: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          note: string | null
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          note?: string | null
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          note?: string | null
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: []
       }
       order_items: {
         Row: {
@@ -416,6 +562,42 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_admins: {
+        Row: {
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      platform_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       product_categories: {
         Row: {
           created_at: string
@@ -462,8 +644,6 @@ export type Database = {
           category: string | null
           category_id: string | null
           compare_at_price_cents: number | null
-          condition: Database["public"]["Enums"]["product_condition"]
-          condition_note: string | null
           created_at: string
           deleted_at: string | null
           description: string | null
@@ -473,6 +653,8 @@ export type Database = {
           is_active: boolean
           is_featured: boolean
           low_stock_threshold: number
+          moderated_at: string | null
+          moderation_reason: string | null
           name: string
           price_cents: number
           sku: string | null
@@ -484,8 +666,6 @@ export type Database = {
           category?: string | null
           category_id?: string | null
           compare_at_price_cents?: number | null
-          condition?: Database["public"]["Enums"]["product_condition"]
-          condition_note?: string | null
           created_at?: string
           deleted_at?: string | null
           description?: string | null
@@ -495,6 +675,8 @@ export type Database = {
           is_active?: boolean
           is_featured?: boolean
           low_stock_threshold?: number
+          moderated_at?: string | null
+          moderation_reason?: string | null
           name: string
           price_cents: number
           sku?: string | null
@@ -506,8 +688,6 @@ export type Database = {
           category?: string | null
           category_id?: string | null
           compare_at_price_cents?: number | null
-          condition?: Database["public"]["Enums"]["product_condition"]
-          condition_note?: string | null
           created_at?: string
           deleted_at?: string | null
           description?: string | null
@@ -517,6 +697,8 @@ export type Database = {
           is_active?: boolean
           is_featured?: boolean
           low_stock_threshold?: number
+          moderated_at?: string | null
+          moderation_reason?: string | null
           name?: string
           price_cents?: number
           sku?: string | null
@@ -840,6 +1022,73 @@ export type Database = {
           },
         ]
       }
+      store_feature_states: {
+        Row: {
+          feature: string
+          state: string
+          store_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          feature: string
+          state: string
+          store_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          feature?: string
+          state?: string
+          store_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_feature_states_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_notes: {
+        Row: {
+          admin_id: string
+          body: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          store_id: string
+        }
+        Insert: {
+          admin_id: string
+          body: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          store_id: string
+        }
+        Update: {
+          admin_id?: string
+          body?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          store_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_notes_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       store_pages: {
         Row: {
           created_at: string
@@ -887,6 +1136,85 @@ export type Database = {
           },
         ]
       }
+      store_visits: {
+        Row: {
+          created_at: string
+          device: string
+          id: number
+          kind: string
+          product_id: string | null
+          source: string
+          store_id: string
+          visitor: string
+        }
+        Insert: {
+          created_at?: string
+          device: string
+          id?: never
+          kind: string
+          product_id?: string | null
+          source: string
+          store_id: string
+          visitor: string
+        }
+        Update: {
+          created_at?: string
+          device?: string
+          id?: never
+          kind?: string
+          product_id?: string | null
+          source?: string
+          store_id?: string
+          visitor?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_visits_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_visits_daily: {
+        Row: {
+          day: string
+          kind: string
+          product_id: string
+          source: string
+          store_id: string
+          visitors: number
+          visits: number
+        }
+        Insert: {
+          day: string
+          kind: string
+          product_id?: string
+          source: string
+          store_id: string
+          visitors?: number
+          visits?: number
+        }
+        Update: {
+          day?: string
+          kind?: string
+          product_id?: string
+          source?: string
+          store_id?: string
+          visitors?: number
+          visits?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_visits_daily_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stores: {
         Row: {
           created_at: string
@@ -898,6 +1226,8 @@ export type Database = {
           name: string
           owner_id: string
           slug: string
+          suspended_at: string | null
+          suspension_reason: string | null
           tagline: string | null
           template_key: string | null
           theme_overrides: Json
@@ -914,6 +1244,8 @@ export type Database = {
           name: string
           owner_id: string
           slug: string
+          suspended_at?: string | null
+          suspension_reason?: string | null
           tagline?: string | null
           template_key?: string | null
           theme_overrides?: Json
@@ -930,6 +1262,8 @@ export type Database = {
           name?: string
           owner_id?: string
           slug?: string
+          suspended_at?: string | null
+          suspension_reason?: string | null
           tagline?: string | null
           template_key?: string | null
           theme_overrides?: Json
@@ -1034,8 +1368,11 @@ export type Database = {
           created_at: string
           description: string | null
           is_active: boolean
+          is_new: boolean
+          is_recommended: boolean
           key: string
           name: string
+          position: number
           preview_image_url: string | null
           sector: string
           version: number
@@ -1044,8 +1381,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           is_active?: boolean
+          is_new?: boolean
+          is_recommended?: boolean
           key: string
           name: string
+          position?: number
           preview_image_url?: string | null
           sector: string
           version?: number
@@ -1054,8 +1394,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           is_active?: boolean
+          is_new?: boolean
+          is_recommended?: boolean
           key?: string
           name?: string
+          position?: number
           preview_image_url?: string | null
           sector?: string
           version?: number
@@ -1069,6 +1412,21 @@ export type Database = {
             referencedColumns: ["key"]
           },
         ]
+      }
+      visit_salts: {
+        Row: {
+          day: string
+          salt: string
+        }
+        Insert: {
+          day: string
+          salt?: string
+        }
+        Update: {
+          day?: string
+          salt?: string
+        }
+        Relationships: []
       }
     }
     Views: {
@@ -1104,7 +1462,6 @@ export type Database = {
         Row: {
           category: string | null
           compare_at_price_cents: number | null
-          condition: Database["public"]["Enums"]["product_condition"] | null
           created_at: string | null
           id: string | null
           is_active: boolean | null
@@ -1118,7 +1475,6 @@ export type Database = {
         Insert: {
           category?: string | null
           compare_at_price_cents?: number | null
-          condition?: Database["public"]["Enums"]["product_condition"] | null
           created_at?: string | null
           id?: string | null
           is_active?: boolean | null
@@ -1132,7 +1488,6 @@ export type Database = {
         Update: {
           category?: string | null
           compare_at_price_cents?: number | null
-          condition?: Database["public"]["Enums"]["product_condition"] | null
           created_at?: string | null
           id?: string | null
           is_active?: boolean | null
@@ -1169,8 +1524,42 @@ export type Database = {
         }
         Relationships: []
       }
+      mis_visitas: {
+        Row: {
+          dia: string | null
+          origen: string | null
+          producto: string | null
+          producto_id: string | null
+          tipo: string | null
+          visitantes: number | null
+          visitas: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      admin_resumen: { Args: never; Returns: Json }
+      admin_tiendas: {
+        Args: never
+        Returns: {
+          creada: string
+          dueno: string
+          id: string
+          nombre: string
+          pausada: boolean
+          pedidos_30d: number
+          plantilla: string
+          productos: number
+          prueba_hasta: string
+          publicada: boolean
+          slug: string
+          suscripcion: string
+          ultima_actividad: string
+          ventas_30d_cents: number
+          visitas_30d: number
+          visitas_7d: number
+        }[]
+      }
       apply_template: {
         Args: { p_store_id: string; p_template_key: string }
         Returns: undefined
@@ -1209,11 +1598,31 @@ export type Database = {
         }
         Returns: string
       }
+      estado_del_registro: { Args: never; Returns: string }
+      funcion_activa: { Args: { p_feature: string }; Returns: boolean }
+      funcion_de_tienda: {
+        Args: { p_feature: string; p_store_id: string }
+        Returns: string
+      }
+      funciones_de_mi_tienda: { Args: never; Returns: Json }
+      is_platform_admin: { Args: never; Returns: boolean }
       my_store_id: { Args: never; Returns: string }
       portada_de_tienda: { Args: { p_store_id: string }; Returns: string }
       publicar_diseno: {
         Args: { p_bloques: Json; p_logo_url: string; p_theme_overrides: Json }
         Returns: string
+      }
+      registrar_visita: {
+        Args: {
+          p_device: string
+          p_firma: string
+          p_kind: string
+          p_product_id: string
+          p_source: string
+          p_store_id: string
+          p_usuario: string
+        }
+        Returns: undefined
       }
       restaurar_version: { Args: { p_version_id: string }; Returns: string }
       run_insight_sql: {
@@ -1240,7 +1649,6 @@ export type Database = {
         | "antes_de_restaurar"
       order_status: "pendiente" | "pagado" | "cancelado"
       page_status: "borrador" | "publicada"
-      product_condition: "nuevo" | "segunda_mano" | "reacondicionado"
       social_post_status: "borrador" | "publicado" | "compartido" | "fallido"
       social_provider: "facebook" | "whatsapp" | "canva"
       subscription_status: "prueba" | "activa" | "bloqueada" | "cancelada"
@@ -1382,7 +1790,6 @@ export const Constants = {
       ],
       order_status: ["pendiente", "pagado", "cancelado"],
       page_status: ["borrador", "publicada"],
-      product_condition: ["nuevo", "segunda_mano", "reacondicionado"],
       social_post_status: ["borrador", "publicado", "compartido", "fallido"],
       social_provider: ["facebook", "whatsapp", "canva"],
       subscription_status: ["prueba", "activa", "bloqueada", "cancelada"],

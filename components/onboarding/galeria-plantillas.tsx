@@ -160,8 +160,14 @@ export function GaleriaPlantillas({
                     </span>
                   </div>
 
-                  <p className="mt-1 text-xs tracking-[0.12em] uppercase opacity-40">
-                    {plantilla.rubro}
+                  <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs tracking-[0.12em] uppercase">
+                    <span className="opacity-40">{plantilla.rubro}</span>
+                    {plantilla.recomendada ? (
+                      <span className="font-semibold">Recomendada</span>
+                    ) : null}
+                    {plantilla.nueva ? (
+                      <span className="font-semibold opacity-70">Nueva</span>
+                    ) : null}
                   </p>
 
                   {plantilla.description ? (

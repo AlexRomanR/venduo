@@ -44,6 +44,7 @@ export default async function CarritoPage({
         <div className="mt-10">
           <Checkout
             slug={slug}
+            tienda={tienda.esDemo ? undefined : tienda.id}
             nombreTienda={tienda.nombre}
             whatsapp={tienda.whatsapp}
             demo={tienda.esDemo}

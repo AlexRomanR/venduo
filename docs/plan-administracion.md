@@ -1,19 +1,29 @@
 # Plan: administración de Venduo y visitas
 
 Lo que viene después del MVP de hackathon, ahora que Venduo es una startup: un panel
-para operar la plataforma y un sistema de visitas por tienda. Está acordado y todavía no
-construido. Cada fase se publica por separado; al terminar una, se marca acá y en
-`docs/estado-del-proyecto.md`.
+para operar la plataforma y un sistema de visitas por tienda. **Está construido**: este
+documento queda como el porqué de cada decisión. Cómo se usa cada pieza está en las
+reglas (`architecture.md`, `database-rls.md`, `domain-venduo.md`, `ai-layer.md`).
 
-| Fase | Qué                                                                 | Estado    |
-| ---- | ------------------------------------------------------------------- | --------- |
-| 0    | Quitar la segunda mano                                              | Pendiente |
-| 1    | Base del administrador y empezar a contar visitas                   | Pendiente |
-| 2    | Plantillas de tienda y de catálogo                                  | Pendiente |
-| 3    | Funciones con tres estados, generales y por tienda                  | Pendiente |
-| 4    | Tiendas: lista, ficha, pausar, suscripción, moderación              | Pendiente |
-| 5    | Resumen, uso de IA, salud del sistema y las visitas del emprendedor | Pendiente |
-| 6    | Registro abierto o cerrado y exportación                            | Pendiente |
+| Fase | Qué                                                                 | Estado |
+| ---- | ------------------------------------------------------------------- | ------ |
+| 0    | Quitar la segunda mano                                              | Hecho  |
+| 1    | Base del administrador y empezar a contar visitas                   | Hecho  |
+| 2    | Plantillas de tienda y de catálogo                                  | Hecho  |
+| 3    | Funciones con tres estados, generales y por tienda                  | Hecho  |
+| 4    | Tiendas: lista, ficha, pausar, suscripción, moderación              | Hecho  |
+| 5    | Resumen, uso de IA, salud del sistema y las visitas del emprendedor | Hecho  |
+| 6    | Registro abierto o cerrado y exportación                            | Hecho  |
+
+**Lo que quedó distinto de lo planeado:**
+
+- El uso de IA no sale de `ai_generations` sino de **`ai_requests`**, una fila por
+  pedido al modelo con cuánto tardó y si falló (`lib/data/uso-ia.ts`).
+  `ai_generations` guarda lo que generó, no lo que falló.
+- La salud del sistema no muestra el último despliegue: no hay de dónde leerlo sin una
+  clave de Vercel en el servidor.
+- La exportación a CSV es de las tiendas con sus métricas; los datos de una tienda en
+  CSV siguen siendo el pendiente de la suscripción bloqueada.
 
 ---
 

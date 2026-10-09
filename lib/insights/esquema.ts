@@ -38,12 +38,28 @@ mis_productos — el catálogo de hoy, no depende de ventas
   created_at              timestamptz
 `.trim()
 
+/**
+ * La vista de visitas. Se le muestra al modelo solo si Venduo le activó las
+ * visitas a la tienda: si no, la vista no devuelve nada y la IA prometería un
+ * gráfico vacío.
+ */
+export const ESQUEMA_DE_VISITAS = `
+mis_visitas — visitas de mi tienda, una fila por día, tipo, origen y producto
+  dia          date
+  tipo         text: portada | catalogo | producto | carrito | pedido
+  origen       text: whatsapp | tiktok | instagram | facebook | qr | catalogo | otro | directo
+  producto_id  uuid, solo en tipo producto, si no nulo
+  producto     text, el nombre del producto, si no nulo
+  visitas      integer, aperturas
+  visitantes   integer, personas distintas en ese día (no se suman entre días)
+`.trim()
+
 /** Las reglas que la consulta tiene que cumplir para poder ejecutarse. */
 export const REGLAS_SQL = `
 - Devuelve EXACTAMENTE dos columnas, con estos nombres: "etiqueta" y "valor".
   etiqueta es texto (la categoría, la fecha, el nombre); valor es numérico.
 - Una sola sentencia SELECT. Sin punto y coma al final. Se permite WITH.
-- Solo las tres vistas de arriba. Nombrar una tabla real corta la consulta.
+- Solo las vistas de arriba. Nombrar una tabla real corta la consulta.
 - Para series de tiempo agrupa con date_trunc y devuelve la etiqueta con
   to_char: día 'YYYY-MM-DD', mes 'YYYY-MM'. Ordena por la fecha ascendente.
 - Para rankings ordena por valor descendente y pon un LIMIT razonable.

@@ -10,7 +10,9 @@ import {
   normalizarForma,
   type FilaInsight,
 } from "@/lib/data/insights"
+import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
+import { anotarUsoDeIa, permisoDeIa } from "@/lib/data/uso-ia"
 import { createClient, getUsuario } from "@/lib/supabase/server"
 
 export interface Respuesta {
@@ -39,17 +41,26 @@ export async function preguntar(
     return { ok: false, error: "Escribe un poco más para poder responderte." }
   }
 
-  const tienda = await getMiTienda()
+  const [tienda, permiso, funciones] = await Promise.all([
+    getMiTienda(),
+    permisoDeIa("estadisticas"),
+    funcionesDeMiTienda(),
+  ])
   if (!tienda) return { ok: false, error: "Todavía no tienes una tienda." }
+  if (!permiso.ok) return permiso
 
+  const inicio = Date.now()
   let propuesta
   try {
     propuesta = await buildInsightSql({
       pregunta: limpia,
       anterior,
       hoy: new Date().toISOString().slice(0, 10),
+      conVisitas: funciones.visitas === "activa",
     })
+    await anotarUsoDeIa("estadisticas", inicio)
   } catch (error) {
+    await anotarUsoDeIa("estadisticas", inicio, error)
     // Se registra en el servidor: sin esto, un fallo del proveedor es
     // indistinguible de una pregunta mal entendida y no hay por dónde empezar.
     console.error("[insights] el proveedor de IA falló:", error)

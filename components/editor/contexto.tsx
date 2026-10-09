@@ -3,6 +3,7 @@
 import * as React from "react"
 
 import type { ClaveDePaso } from "@/lib/editor/pasos"
+import type { EstadoDeFuncion } from "@/lib/funciones"
 import type { Vista } from "@/lib/editor/protocolo"
 import type { Apariencia } from "@/lib/plantillas/apariencia"
 import type {
@@ -82,6 +83,8 @@ export interface ValorDelEditor {
     error: string | null
     /** Si responde el modo demo y no un modelo. */
     demo: boolean
+    /** Si Venduo dejó la IA del editor activa para esta tienda. */
+    estado: EstadoDeFuncion
     aplicar: () => void
     descartar: () => void
     /** Mirar la tienda sin la propuesta, para comparar. */

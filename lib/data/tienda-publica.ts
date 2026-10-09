@@ -202,6 +202,9 @@ export async function completarTienda(
         .select("*")
         .eq("store_id", tienda.id)
         .eq("is_active", true)
+        // La política ya lo esconde al comprador; el dueño mirando su tienda
+        // entra por la suya, que no lo filtra.
+        .is("moderated_at", null)
         .is("deleted_at", null)
         .order("is_featured", { ascending: false })
         .order("created_at", { ascending: false }),

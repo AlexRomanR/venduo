@@ -132,11 +132,19 @@ cruza con la del día anterior. Llegan por `/api/visita`, nunca por una inserci�
 el navegador, y se guardan 90 días en detalle y después resumidas por día.
 
 No se cuentan robots, precargas, la vista previa del editor, el dueño mirando su propia
-tienda ni la misma persona recargando dentro de 30 minutos.
+tienda, el administrador ni la misma persona recargando dentro de 30 minutos. La sal de
+cada día se borra con la primera visita del siguiente.
+
+**De dónde viene** sale del referente —WhatsApp, TikTok, Instagram, Facebook— o de la
+marca `?o=` que pone `conOrigen` (`lib/visitas.ts`): `?o=qr` en el QR del Resumen y
+`?o=catalogo` en el enlace y el QR del catálogo en PDF. **Todo enlace nuevo que se
+imprima o se reparta lleva su marca**, o sus visitas se cuentan como directas.
 
 **El emprendedor no ve sus visitas por defecto.** Es una función más del sistema de
 funciones, oculta para todas las tiendas hasta que el administrador la activa; el
-administrador las ve siempre. Plan completo en `docs/plan-administracion.md`.
+administrador las ve siempre. Con la función activa aparecen en el Resumen, en
+Productos y en las preguntas a las estadísticas (`mis_visitas`); sin ella, RLS no le
+devuelve nada aunque la pantalla las pidiera.
 
 ## Las funciones de cada tienda
 
@@ -146,6 +154,34 @@ Canva, el editor, cambiar de plantilla, las visitas— tiene tres estados: **act
 **desactivada y oculta**. Hay un estado general y uno por tienda; el de la tienda manda.
 **Apagado se comprueba en el servidor**, no solo en el botón. Y apagarle algo a una
 tienda no le avisa nada.
+
+Las piezas, siempre las mismas:
+
+- **`funcionesDeMiTienda()`** (`lib/data/funciones.ts`) lee las diez de una vez, con
+  memoria por pedido. La barra lateral ya las trae (`barra.funciones`).
+- **`ConFuncion`** (`components/panel/funcion.tsx`) es la cara: oculta no dibuja nada,
+  desactivada atenúa y corta el clic con el único aviso, `AVISO_DE_NO_DISPONIBLE`.
+- **`exigirFuncion(clave)`** en cada acción y ruta que hace lo que la función permite.
+  Una página de una función apagada redirige sin explicar; una ruta de PDF responde 403.
+- La IA pide **`permisoDeIa(tipo)`** (`lib/data/uso-ia.ts`), que suma el tope diario, y
+  anota cada pedido con `anotarUsoDeIa`. El interruptor general de la IA lo resuelve la
+  base: con `ia_apagada`, las tres funciones de IA llegan ocultas.
+
+Una función nueva se suma a `FUNCIONES` en `lib/funciones.ts` y a `feature_states` con
+una migración; sin la fila, la base la da por activa.
+
+## Pausa y moderación
+
+Dos herramientas del administrador que no pasan por la suscripción:
+
+- **Pausar una tienda** (`stores.suspended_at`) la saca del público al instante:
+  `store_is_live` la da por apagada, así que no se sirve ni recibe pedidos. El dueño
+  sigue entrando a su panel y la ve "Pausada por Venduo"; el motivo es solo para el
+  administrador.
+- **Ocultar un producto** (`products.moderated_at`) lo saca de la tienda pública, de los
+  catálogos y de `create_order`. El dueño lo ve en Productos como "Oculto por Venduo".
+  Toda lectura pública de productos filtra `moderated_at is null`: la política lo hace
+  para el comprador, pero el dueño mirando su tienda entra por la suya.
 
 ## Las ofertas
 

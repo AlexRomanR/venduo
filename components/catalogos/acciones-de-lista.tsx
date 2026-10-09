@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 
+import { AVISO_DE_NO_DISPONIBLE, type EstadoDeFuncion } from "@/lib/funciones"
 import { cn } from "@/lib/utils"
 
 import {
@@ -38,12 +39,15 @@ export function AccionesDeCatalogo({
   nombre,
   tienda,
   enlace,
+  compartir = "activa",
   esDemo,
 }: {
   id: string
   nombre: string
   tienda: string
   enlace: string
+  /** Si Venduo dejó activo el enlace público de catálogo. */
+  compartir?: EstadoDeFuncion
   esDemo: boolean
 }) {
   const [borrando, empezar] = React.useTransition()
@@ -104,29 +108,43 @@ export function AccionesDeCatalogo({
               Descargar el PDF
             </a>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            disabled={esDemo}
-            onSelect={() =>
-              window.open(
-                enlaceDeWhatsApp(`${nombre} · ${tienda}\n${enlace}`),
-                "_blank",
-                "noopener"
-              )
-            }
-          >
-            <Send aria-hidden="true" className="size-4" />
-            Mandar por WhatsApp
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            disabled={esDemo}
-            onSelect={async () => {
-              await navigator.clipboard.writeText(enlace)
-              toast.success("Enlace copiado.")
-            }}
-          >
-            <Copy aria-hidden="true" className="size-4" />
-            Copiar el enlace
-          </DropdownMenuItem>
+          {compartir !== "oculta" ? (
+            <>
+              <DropdownMenuItem
+                disabled={esDemo}
+                className={cn(compartir === "desactivada" && "opacity-55")}
+                onSelect={() => {
+                  if (compartir !== "activa") {
+                    toast.info(AVISO_DE_NO_DISPONIBLE)
+                    return
+                  }
+                  window.open(
+                    enlaceDeWhatsApp(`${nombre} · ${tienda}\n${enlace}`),
+                    "_blank",
+                    "noopener"
+                  )
+                }}
+              >
+                <Send aria-hidden="true" className="size-4" />
+                Mandar por WhatsApp
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={esDemo}
+                className={cn(compartir === "desactivada" && "opacity-55")}
+                onSelect={async () => {
+                  if (compartir !== "activa") {
+                    toast.info(AVISO_DE_NO_DISPONIBLE)
+                    return
+                  }
+                  await navigator.clipboard.writeText(enlace)
+                  toast.success("Enlace copiado.")
+                }}
+              >
+                <Copy aria-hidden="true" className="size-4" />
+                Copiar el enlace
+              </DropdownMenuItem>
+            </>
+          ) : null}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             variant="destructive"

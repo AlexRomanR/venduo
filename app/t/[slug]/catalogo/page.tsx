@@ -4,6 +4,7 @@ import { filtrarCatalogo, leerFiltros } from "@/lib/catalogo"
 import { getTiendaPublica, marcoDeTienda } from "@/lib/data/tienda-publica"
 import { kitDePlantilla } from "@/components/plantillas"
 import { BarraDelCarrito } from "@/components/tienda/barra-del-carrito"
+import { RegistroDeVisita } from "@/components/tienda/visita"
 
 export async function generateMetadata({
   params,
@@ -54,6 +55,9 @@ export default async function CatalogoPage({
 
       <kit.Pie marco={marco} />
       <BarraDelCarrito slug={tienda.slug} />
+      {tienda.esDemo ? null : (
+        <RegistroDeVisita tienda={tienda.id} tipo="catalogo" />
+      )}
     </>
   )
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { registrarEvento } from "@/components/tienda/visita"
 
 export interface LineaCarrito {
   productoId: string
@@ -39,10 +40,13 @@ const Contexto = React.createContext<EstadoCarrito | null>(null)
  */
 export function ProveedorCarrito({
   slug,
+  tienda,
   muestra,
   children,
 }: {
   slug: string
+  /** El id de la tienda, para anotar que se agregó algo. Sin él, no se anota. */
+  tienda?: string
   /**
    * Un carrito de ejemplo que vive solo en memoria: ni se lee ni se escribe
    * el del navegador. Es el de la vista previa del editor, donde el dueño mira
@@ -98,6 +102,8 @@ export function ProveedorCarrito({
       listo,
 
       agregar(linea, cantidad) {
+        if (tienda && !muestra)
+          registrarEvento(tienda, "carrito", linea.productoId)
         setLineas((previas) => {
           const existente = previas.find(
             (l) => l.productoId === linea.productoId

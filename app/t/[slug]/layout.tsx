@@ -63,7 +63,10 @@ export default async function TiendaLayout({
   const tienda = await getTiendaPublica(slug)
 
   return (
-    <ProveedorCarrito slug={slug}>
+    <ProveedorCarrito
+      slug={slug}
+      tienda={tienda && !tienda.esDemo ? tienda.id : undefined}
+    >
       {/* El tema se pinta en el servidor, junto con el HTML: si esperara al
           navegador, la tienda aparecería un instante con los colores de
           Venduo antes de tomar los suyos. */}

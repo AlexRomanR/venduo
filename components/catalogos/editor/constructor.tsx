@@ -21,7 +21,11 @@ import {
 import { toast } from "sonner"
 
 import type { PropuestaDeCatalogo } from "@/lib/ai/schemas"
-import { HOJAS, type ClavePlantilla } from "@/lib/catalogos/constantes"
+import {
+  CLAVES_PLANTILLA,
+  HOJAS,
+  type ClavePlantilla,
+} from "@/lib/catalogos/constantes"
 import {
   elegidos,
   hojasDe,
@@ -38,7 +42,9 @@ import {
   type EstiloSugerido,
 } from "@/lib/catalogos/plantillas"
 import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
+import { AVISO_DE_NO_DISPONIBLE, type EstadoDeFuncion } from "@/lib/funciones"
 import { cn } from "@/lib/utils"
+import { ConFuncion } from "@/components/panel/funcion"
 import { Cabecera, Seccion } from "@/components/panel/piezas"
 import { Aviso } from "@/components/editor/piezas"
 import {
@@ -92,6 +98,19 @@ const PANELES: { clave: Panel; nombre: string }[] = [
   { clave: "estilo", nombre: "Estilo" },
 ]
 
+/** Lo que Venduo dejó activo en esta tienda, de lo que toca este editor. */
+export interface FuncionesDelCatalogo {
+  ia: EstadoDeFuncion
+  canva: EstadoDeFuncion
+  compartir: EstadoDeFuncion
+}
+
+const TODO_ACTIVO: FuncionesDelCatalogo = {
+  ia: "activa",
+  canva: "activa",
+  compartir: "activa",
+}
+
 export interface CatalogoInicial {
   id: string
   catalogo: Catalogo
@@ -114,20 +133,28 @@ export function Constructor({
   inicial,
   canva,
   avisoDeCanva = null,
+  funciones = TODO_ACTIVO,
+  plantillas = CLAVES_PLANTILLA,
 }: {
   datos: DatosDelCatalogo
   estiloDeTienda: Estilo
   plantillaDeLaTienda: string | null
   esDemo: boolean
   inicial: CatalogoInicial | null
+  funciones?: FuncionesDelCatalogo
+  /** Las plantillas que Venduo ofrece, en su orden. */
+  plantillas?: readonly ClavePlantilla[]
   /** Directo si la integración con Canva está configurada; si no, a mano. */
   canva: ModoDeCanva
   /** Lo que pasó al volver de Canva, si se volvió con un problema. */
   avisoDeCanva?: string | null
 }) {
   const sugeridos = React.useMemo(
-    () => estilosDeLaTienda(estiloDeTienda, plantillaDeLaTienda),
-    [estiloDeTienda, plantillaDeLaTienda]
+    () =>
+      estilosDeLaTienda(estiloDeTienda, plantillaDeLaTienda).filter((s) =>
+        plantillas.includes(s.plantilla)
+      ),
+    [estiloDeTienda, plantillaDeLaTienda, plantillas]
   )
   const [catalogo, setCatalogo] = React.useState<Catalogo | null>(
     inicial?.catalogo ?? null
@@ -201,22 +228,26 @@ export function Constructor({
             "Estás en modo demo: los productos son de ejemplo y el catálogo no se guarda, pero el PDF sí se descarga."
           }
         />
-        <Seccion
-          id="ia"
-          icono={WandSparkles}
-          titulo="Pídeselo a la IA"
-          bajada="Dile qué catálogo quieres y lo arma con tus productos."
-          relleno
-        >
-          <PedidoALaIa
-            titulo="¿Qué catálogo quieres?"
-            ayuda="Elige los productos, el orden y la plantilla. Tú revisas antes de usarlo."
-            ejemplos={ideasParaLaIa(datos)}
-            actuales={null}
-            textoDeUsar="Armarlo así"
-            alUsar={usarPropuesta}
-          />
-        </Seccion>
+        {funciones.ia !== "oculta" ? (
+          <Seccion
+            id="ia"
+            icono={WandSparkles}
+            titulo="Pídeselo a la IA"
+            bajada="Dile qué catálogo quieres y lo arma con tus productos."
+            relleno
+          >
+            <ConFuncion estado={funciones.ia}>
+              <PedidoALaIa
+                titulo="¿Qué catálogo quieres?"
+                ayuda="Elige los productos, el orden y la plantilla. Tú revisas antes de usarlo."
+                ejemplos={ideasParaLaIa(datos)}
+                actuales={null}
+                textoDeUsar="Armarlo así"
+                alUsar={usarPropuesta}
+              />
+            </ConFuncion>
+          </Seccion>
+        ) : null}
         <Seccion
           id="productos"
           icono={Package}
@@ -292,7 +323,7 @@ export function Constructor({
         <Seccion
           id="plantillas"
           icono={LayoutTemplate}
-          titulo="Las doce plantillas"
+          titulo="Todas las plantillas"
           bajada={`Con tus ${productos.length} ${productos.length === 1 ? "producto" : "productos"}.`}
         >
           <GaleriaDePlantillas
@@ -303,6 +334,7 @@ export function Constructor({
             packs={catalogo?.packs}
             actual={catalogo?.plantilla}
             sugerida={sugerida}
+            claves={plantillas}
             alElegir={(nuevo) => {
               cambiar(nuevo)
               setFase("editar")
@@ -324,6 +356,7 @@ export function Constructor({
       esDemo={esDemo}
       canva={canva}
       avisoDeCanva={avisoDeCanva}
+      funciones={funciones}
       guardado={guardado}
       sinGuardar={sinGuardar}
       alCambiar={cambiar}
@@ -363,6 +396,7 @@ function Editor({
   esDemo,
   canva,
   avisoDeCanva,
+  funciones,
   guardado,
   sinGuardar,
   alCambiar,
@@ -376,6 +410,7 @@ function Editor({
   esDemo: boolean
   canva: ModoDeCanva
   avisoDeCanva: string | null
+  funciones: FuncionesDelCatalogo
   guardado: { id: string; enlace: string } | null
   sinGuardar: boolean
   alCambiar: (catalogo: Catalogo) => void
@@ -521,15 +556,17 @@ function Editor({
                 Guardar
               </button>
             )}
-            <BotonDeCanva
-              catalogo={catalogo}
-              modo={canva}
-              aviso={avisoDeCanva}
-              guardado={guardado}
-              sinGuardar={sinGuardar}
-              deshabilitado={ocupado !== null || bloqueado}
-              alGuardar={alGuardar}
-            />
+            <ConFuncion estado={funciones.canva}>
+              <BotonDeCanva
+                catalogo={catalogo}
+                modo={canva}
+                aviso={avisoDeCanva}
+                guardado={guardado}
+                sinGuardar={sinGuardar}
+                deshabilitado={ocupado !== null || bloqueado}
+                alGuardar={alGuardar}
+              />
+            </ConFuncion>
             <DropdownMenu>
               <DropdownMenuTrigger
                 disabled={ocupado !== null || bloqueado}
@@ -555,40 +592,58 @@ function Editor({
                     Mandar el PDF: WhatsApp y más
                   </DropdownMenuItem>
                 ) : null}
-                <DropdownMenuItem
-                  disabled={!guardado || sinGuardar}
-                  onSelect={() => {
-                    if (!guardado) return
-                    window.open(
-                      enlaceDeWhatsApp(
-                        `${catalogo.nombre} · ${datos.tienda.nombre}\n${guardado.enlace}`
-                      ),
-                      "_blank",
-                      "noopener"
-                    )
-                  }}
-                >
-                  <Send aria-hidden="true" className="size-4" />
-                  Mandar el enlace por WhatsApp
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  disabled={!guardado || sinGuardar}
-                  onSelect={async () => {
-                    if (!guardado) return
-                    await navigator.clipboard.writeText(guardado.enlace)
-                    toast.success("Enlace copiado.")
-                  }}
-                >
-                  <Copy aria-hidden="true" className="size-4" />
-                  Copiar el enlace
-                </DropdownMenuItem>
-                <p className="px-2 py-2 text-xs leading-relaxed opacity-65">
-                  {esDemo
-                    ? "En modo demo no hay enlace: baja el PDF y compártelo."
-                    : !guardado || sinGuardar
-                      ? "Guarda para tener el enlace. El enlace abre el catálogo con los precios y el stock del día."
-                      : "El enlace abre el catálogo con los precios y el stock del día."}
-                </p>
+                {funciones.compartir !== "oculta" ? (
+                  <>
+                    <DropdownMenuItem
+                      disabled={!guardado || sinGuardar}
+                      className={cn(
+                        funciones.compartir === "desactivada" && "opacity-55"
+                      )}
+                      onSelect={() => {
+                        if (!guardado) return
+                        if (funciones.compartir !== "activa") {
+                          toast.info(AVISO_DE_NO_DISPONIBLE)
+                          return
+                        }
+                        window.open(
+                          enlaceDeWhatsApp(
+                            `${catalogo.nombre} · ${datos.tienda.nombre}\n${guardado.enlace}`
+                          ),
+                          "_blank",
+                          "noopener"
+                        )
+                      }}
+                    >
+                      <Send aria-hidden="true" className="size-4" />
+                      Mandar el enlace por WhatsApp
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      disabled={!guardado || sinGuardar}
+                      className={cn(
+                        funciones.compartir === "desactivada" && "opacity-55"
+                      )}
+                      onSelect={async () => {
+                        if (!guardado) return
+                        if (funciones.compartir !== "activa") {
+                          toast.info(AVISO_DE_NO_DISPONIBLE)
+                          return
+                        }
+                        await navigator.clipboard.writeText(guardado.enlace)
+                        toast.success("Enlace copiado.")
+                      }}
+                    >
+                      <Copy aria-hidden="true" className="size-4" />
+                      Copiar el enlace
+                    </DropdownMenuItem>
+                    <p className="px-2 py-2 text-xs leading-relaxed opacity-65">
+                      {esDemo
+                        ? "En modo demo no hay enlace: baja el PDF y compártelo."
+                        : !guardado || sinGuardar
+                          ? "Guarda para tener el enlace. El enlace abre el catálogo con los precios y el stock del día."
+                          : "El enlace abre el catálogo con los precios y el stock del día."}
+                    </p>
+                  </>
+                ) : null}
               </DropdownMenuContent>
             </DropdownMenu>
             <button
@@ -598,8 +653,9 @@ function Editor({
               className={cn(
                 BOTON_PRIMARIO,
                 "min-h-11 px-3 text-sm whitespace-nowrap sm:px-4",
-                // En demo no hay "Guardar": quedan tres y el PDF ocupa la fila.
-                esDemo && "col-span-2"
+                // Sin "Guardar" en demo, o sin Canva: quedan tres y el PDF
+                // ocupa la fila. Sin los dos, quedan dos y cada uno su mitad.
+                esDemo !== (funciones.canva === "oculta") && "col-span-2"
               )}
             >
               {ocupado === "descargar" ? (
@@ -680,6 +736,7 @@ function Editor({
               <PanelDeProductos
                 catalogo={catalogo}
                 datos={datos}
+                ia={funciones.ia}
                 alCambiar={alCambiar}
               />
             ) : panel === "packs" ? (

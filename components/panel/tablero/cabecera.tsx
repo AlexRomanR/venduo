@@ -31,6 +31,7 @@ export function CabeceraDeTienda({
     url: string
     logoUrl: string | null
     publicada: boolean
+    pausada?: boolean
   }
   apariencia: Apariencia
   /** El nombre de su plantilla, como lo ve la persona. */
@@ -74,17 +75,22 @@ export function CabeceraDeTienda({
           <span
             className={cn(
               "inline-flex items-center gap-1.5",
-              !tienda.publicada && "font-semibold text-senal"
+              (!tienda.publicada || tienda.pausada) &&
+                "font-semibold text-senal"
             )}
           >
             <span
               aria-hidden="true"
               className={cn(
                 "size-2 rounded-full",
-                tienda.publicada ? "bg-tinta" : "bg-senal"
+                tienda.publicada && !tienda.pausada ? "bg-tinta" : "bg-senal"
               )}
             />
-            {tienda.publicada ? "Publicada" : "En borrador"}
+            {tienda.pausada
+              ? "Pausada por Venduo"
+              : tienda.publicada
+                ? "Publicada"
+                : "En borrador"}
           </span>
           <span aria-hidden="true" className="opacity-30">
             ·

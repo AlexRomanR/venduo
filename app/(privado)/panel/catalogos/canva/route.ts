@@ -9,6 +9,7 @@ import {
   leerPedido,
   pedirPermiso,
 } from "@/lib/canva"
+import { exigirFuncion } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 
 export const dynamic = "force-dynamic"
@@ -27,7 +28,11 @@ export const maxDuration = 60
 export async function GET(peticion: Request) {
   const direccion = new URL(peticion.url)
   const origen = direccion.origin
-  const [almacen, tienda] = await Promise.all([cookies(), getMiTienda()])
+  const [almacen, tienda, permiso] = await Promise.all([
+    cookies(),
+    getMiTienda(),
+    exigirFuncion("canva"),
+  ])
   const pedido = leerPedido(almacen.get(COOKIE_DE_CANVA)?.value)
 
   const ir = (ruta: string) => {
@@ -41,6 +46,7 @@ export async function GET(peticion: Request) {
   }
 
   if (!pedido || !tienda) return ir("/panel/catalogos")
+  if (!permiso.ok) return ir(`/panel/catalogos/${pedido.catalogo}`)
   const volver = (motivo: string) =>
     ir(`/panel/catalogos/${pedido.catalogo}?canva=${motivo}`)
 

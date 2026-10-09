@@ -5,6 +5,7 @@ import { getProductoPublico, marcoDeTienda } from "@/lib/data/tienda-publica"
 import { kitDePlantilla } from "@/components/plantillas"
 import { BarraDeCompra } from "@/components/tienda/barra-de-compra"
 import { BarraDelCarrito } from "@/components/tienda/barra-del-carrito"
+import { RegistroDeVisita } from "@/components/tienda/visita"
 
 export async function generateMetadata({
   params,
@@ -66,6 +67,13 @@ export default async function ProductoPublicoPage({
         <BarraDeCompra producto={producto} slug={tienda.slug} />
       ) : (
         <BarraDelCarrito slug={tienda.slug} />
+      )}
+      {tienda.esDemo ? null : (
+        <RegistroDeVisita
+          tienda={tienda.id}
+          tipo="producto"
+          producto={producto.id}
+        />
       )}
     </>
   )

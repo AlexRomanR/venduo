@@ -37,8 +37,11 @@ const ORDENES = [
  */
 export function FiltrosCatalogo({
   categorias,
+  conVistas = false,
 }: {
   categorias: CategoriaConUso[]
+  /** Si la tienda ve sus visitas: suma el filtro de lo muy visto y poco vendido. */
+  conVistas?: boolean
 }) {
   const router = useRouter()
   const ruta = usePathname()
@@ -131,7 +134,12 @@ export function FiltrosCatalogo({
         className={cn("flex-col gap-3", abiertos ? "flex" : "hidden lg:flex")}
       >
         <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
-          {ESTADOS.map((e) => (
+          {[
+            ...ESTADOS,
+            ...(conVistas
+              ? [{ valor: "muy_vistos", etiqueta: "Muy vistos, poco vendidos" }]
+              : []),
+          ].map((e) => (
             <Ficha
               key={e.valor}
               activa={estado === e.valor}

@@ -24,6 +24,7 @@ import type { Apariencia } from "@/lib/plantillas/apariencia"
 import { cn } from "@/lib/utils"
 import type { PedidoInput, ResultadoPedido } from "@/app/t/[slug]/acciones"
 import { useCarrito } from "@/components/tienda/carrito"
+import { registrarEvento } from "@/components/tienda/visita"
 
 /** El último pedido mandado, para mostrarlo al volver de WhatsApp. */
 interface Enviado {
@@ -70,6 +71,7 @@ function firmaDelCarrito(
  */
 export function Checkout({
   slug,
+  tienda,
   nombreTienda,
   whatsapp,
   demo = false,
@@ -78,6 +80,8 @@ export function Checkout({
   sugeridos = [],
 }: {
   slug: string
+  /** El id de la tienda, para anotar el pedido enviado. Sin él, no se anota. */
+  tienda?: string
   nombreTienda: string
   /** Sin número, la tienda no puede recibir el pedido: no se ofrece el botón. */
   whatsapp: string | null
@@ -166,6 +170,7 @@ export function Checkout({
     vaciar()
     setEnviado(nuevo)
     setEnCurso(false)
+    if (tienda) registrarEvento(tienda, "pedido")
 
     // Si el navegador no dejó abrir la pestaña —algunos navegadores dentro de
     // TikTok o Instagram no lo permiten—, WhatsApp se abre en esta misma.

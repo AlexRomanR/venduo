@@ -1,5 +1,6 @@
 import { cache } from "react"
 
+import { esAdmin } from "@/lib/admin"
 import { createClient, getUsuario } from "@/lib/supabase/server"
 import type { ResumenPanel, Suscripcion } from "@/lib/demo-data"
 import type { SubscriptionStatus } from "@/types"
@@ -23,7 +24,9 @@ export const DIAS_DE_AVISO = 7
  * o con una a medio crear, se sigue en `/crear`.
  */
 export async function resolverDestino(): Promise<string> {
-  const tienda = await getMiTienda()
+  // El administrador de Venduo no tiene tienda: entra a su panel.
+  const [tienda, admin] = await Promise.all([getMiTienda(), esAdmin()])
+  if (admin) return "/admin"
   return tienda?.template_key ? "/panel" : "/crear"
 }
 
@@ -47,7 +50,7 @@ export const getMiTienda = cache(async function getMiTienda() {
   const { data } = await supabase
     .from("stores")
     .select(
-      "id, name, slug, is_published, template_key, logo_url, theme_overrides, whatsapp"
+      "id, name, slug, is_published, template_key, logo_url, theme_overrides, whatsapp, suspended_at"
     )
     .eq("owner_id", user.id)
     .is("deleted_at", null)

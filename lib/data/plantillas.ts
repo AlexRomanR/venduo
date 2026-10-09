@@ -23,8 +23,10 @@ export async function getPlantillasPorRubro(): Promise<RubroConPlantillas[]> {
       .order("position"),
     supabase
       .from("templates")
-      .select("key, name, sector, description")
+      .select("key, name, sector, description, is_new, is_recommended")
       .eq("is_active", true)
+      // El orden que eligió Venduo desde la administración.
+      .order("position")
       .order("name"),
     supabase
       .from("template_pages")
@@ -63,12 +65,16 @@ export async function getPlantillasPorRubro(): Promise<RubroConPlantillas[]> {
       name: rubro.name,
       plantillas: plantillas
         .filter((plantilla) => plantilla.sector === rubro.key)
+        // La recomendada va primera en su rubro; las demás, en su orden.
+        .sort((a, b) => Number(b.is_recommended) - Number(a.is_recommended))
         .map((plantilla) => ({
           key: plantilla.key,
           name: plantilla.name,
           sector: plantilla.sector,
           description: plantilla.description,
           bloques: bloquesPorPlantilla.get(plantilla.key) ?? [],
+          nueva: plantilla.is_new,
+          recomendada: plantilla.is_recommended,
         })),
     }))
     .filter((rubro) => rubro.plantillas.length > 0)

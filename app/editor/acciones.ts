@@ -7,6 +7,8 @@ import { mensajeDeErrorDeIa } from "@/lib/ai/mensajes"
 import { proponerEdicion, type TiendaParaLaIa } from "@/lib/ai/tasks"
 import type { PropuestaDeDiseno } from "@/lib/ai/schemas"
 import { leerDisenoParaEditar, type DisenoParaEditar } from "@/lib/data/editor"
+import { exigirFuncion } from "@/lib/data/funciones"
+import { anotarUsoDeIa, permisoDeIa } from "@/lib/data/uso-ia"
 import { borradorSchema } from "@/lib/editor/protocolo"
 import {
   combinarApariencia,
@@ -49,7 +51,11 @@ export async function publicarDiseno(
     }
   }
 
-  const diseno = await leerDisenoParaEditar()
+  const [permiso, diseno] = await Promise.all([
+    exigirFuncion("editor"),
+    leerDisenoParaEditar(),
+  ])
+  if (!permiso.ok) return permiso
   if (!diseno) {
     return { ok: false, error: "No encontramos tu tienda. Vuelve a ingresar." }
   }
@@ -263,7 +269,11 @@ export async function proponerCambios(entrada: {
     }
   }
 
-  const diseno = await leerDisenoParaEditar()
+  const [permiso, diseno] = await Promise.all([
+    permisoDeIa("editor"),
+    leerDisenoParaEditar(),
+  ])
+  if (!permiso.ok) return permiso
   if (!diseno) {
     return { ok: false, error: "No encontramos tu tienda. Vuelve a ingresar." }
   }
@@ -307,6 +317,7 @@ export async function proponerCambios(entrada: {
       contexto: tiendaParaLaIa,
     })
   } catch (error) {
+    await anotarUsoDeIa("editor", inicio, error)
     return errorDeLaIa(error)
   }
 
@@ -321,10 +332,12 @@ export async function proponerCambios(entrada: {
         errores: resultado.errores,
       })
     } catch (error) {
+      await anotarUsoDeIa("editor", inicio, error)
       return errorDeLaIa(error)
     }
     resultado = probar(intento.propuesta.operaciones)
   }
+  await anotarUsoDeIa("editor", inicio)
 
   if (!resultado.ok) {
     const sinColores = intento.propuesta.operaciones.filter(

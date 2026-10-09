@@ -1,5 +1,6 @@
 import { renderToBuffer } from "@react-pdf/renderer"
 
+import { exigirFuncion } from "@/lib/data/funciones"
 import { getGraficoConDatos, getGraficosGuardados } from "@/lib/data/insights"
 import { getMiTienda } from "@/lib/data/panel"
 import { formatDate } from "@/lib/format"
@@ -25,10 +26,14 @@ export const dynamic = "force-dynamic"
  * vea el panel.
  */
 export async function GET(peticion: Request) {
-  const tienda = await getMiTienda()
+  const [tienda, permiso] = await Promise.all([
+    getMiTienda(),
+    exigirFuncion("estadisticas"),
+  ])
   if (!tienda) {
     return new Response("No tienes una tienda.", { status: 404 })
   }
+  if (!permiso.ok) return new Response(permiso.error, { status: 403 })
 
   const uno = new URL(peticion.url).searchParams.get("g")
 

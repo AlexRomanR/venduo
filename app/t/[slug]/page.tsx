@@ -4,6 +4,7 @@ import { leerFiltros } from "@/lib/catalogo"
 import { getTiendaPublica, marcoDeTienda } from "@/lib/data/tienda-publica"
 import { kitDePlantilla } from "@/components/plantillas"
 import { BarraDelCarrito } from "@/components/tienda/barra-del-carrito"
+import { RegistroDeVisita } from "@/components/tienda/visita"
 
 /**
  * La portada de la tienda pública.
@@ -38,6 +39,9 @@ export default async function TiendaPage({
 
       <kit.Pie marco={marco} />
       <BarraDelCarrito slug={tienda.slug} />
+      {tienda.esDemo ? null : (
+        <RegistroDeVisita tienda={tienda.id} tipo="portada" />
+      )}
     </>
   )
 }

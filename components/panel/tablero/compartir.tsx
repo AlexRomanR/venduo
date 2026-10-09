@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { conOrigen } from "@/lib/visitas"
 
 /**
  * Compartir la tienda: el enlace, el QR y un mensaje listo para WhatsApp.
@@ -55,7 +56,13 @@ export function CompartirTienda({
     // A 1024 px sirve para imprimirlo grande; en pantalla se muestra chico.
     import("@/lib/qr")
       .then(({ toDataURL }) =>
-        toDataURL(url, { size: 1024, margin: 2, dark: "#16171a" })
+        // El QR lleva su marca, para que las visitas que trae se cuenten
+        // como de QR. El enlace que se copia va limpio.
+        toDataURL(conOrigen(url, "qr"), {
+          size: 1024,
+          margin: 2,
+          dark: "#16171a",
+        })
       )
       .then((imagen) => {
         if (vigente) setQr(imagen)

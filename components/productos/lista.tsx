@@ -15,7 +15,7 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 
-import { formatMoney } from "@/lib/format"
+import { formatMoney, formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { Product } from "@/types"
 import {
@@ -53,11 +53,14 @@ export function ListaProductos({
   productos,
   acciones,
   soloLectura = false,
+  vistas = null,
 }: {
   productos: Product[]
   acciones: Acciones
   /** En modo demo se ve todo pero no se guarda nada. */
   soloLectura?: boolean
+  /** Las vistas de 30 días por producto, si Venduo le activó las visitas. */
+  vistas?: Record<string, number> | null
 }) {
   return (
     <ul className="flex flex-col">
@@ -67,6 +70,7 @@ export function ListaProductos({
           producto={producto}
           acciones={acciones}
           soloLectura={soloLectura}
+          vistas={vistas ? (vistas[producto.id] ?? 0) : null}
         />
       ))}
     </ul>
@@ -77,10 +81,12 @@ function Fila({
   producto,
   acciones,
   soloLectura,
+  vistas,
 }: {
   producto: Product
   acciones: Acciones
   soloLectura: boolean
+  vistas: number | null
 }) {
   const router = useRouter()
   const [ocupado, setOcupado] = React.useState(false)
@@ -159,6 +165,15 @@ function Fila({
                     <span className="tabular">{producto.sku}</span>
                   </>
                 ) : null}
+                {vistas !== null ? (
+                  <>
+                    <span aria-hidden="true">·</span>
+                    <span className="tabular">
+                      {formatNumber(vistas)} {vistas === 1 ? "vista" : "vistas"}{" "}
+                      en 30 días
+                    </span>
+                  </>
+                ) : null}
               </p>
             </div>
 
@@ -188,7 +203,9 @@ function Fila({
               }
             />
 
-            {!producto.is_active ? (
+            {producto.moderated_at ? (
+              <Insignia tono="senal">Oculto por Venduo</Insignia>
+            ) : !producto.is_active ? (
               <Insignia tono="suave">Oculto</Insignia>
             ) : null}
             {producto.is_featured ? <Insignia>Destacado</Insignia> : null}
