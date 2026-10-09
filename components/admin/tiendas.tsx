@@ -185,14 +185,26 @@ export function TablaDeTiendas({
         />
       ) : (
         <ul>
+          {/* En escritorio, los rótulos de las columnas; en el celular cada
+              cifra lleva el suyo al lado. */}
+          <li
+            aria-hidden="true"
+            className="hidden gap-x-6 px-4 py-2.5 text-xs font-semibold tracking-[0.12em] uppercase opacity-65 sm:px-5 lg:grid lg:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,0.7fr))_1rem]"
+          >
+            <span>Tienda</span>
+            <span>Ventas, 30 días</span>
+            <span>Visitas, 30 días</span>
+            <span>Productos</span>
+            <span />
+          </li>
           {lista.map((t) => (
             <li
               key={t.id}
-              className="border-t border-tinta/15 first:border-t-0"
+              className="border-t border-tinta/15 max-lg:[&:nth-child(2)]:border-t-0"
             >
               <Link
                 href={`/admin/tiendas/${t.id}`}
-                className="group grid gap-x-6 gap-y-2 px-4 py-4 transition-colors hover:bg-tinta/[0.03] sm:px-5 lg:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,0.7fr))_auto] lg:items-center"
+                className="group grid gap-x-6 gap-y-2 px-4 py-4 transition-colors hover:bg-tinta/[0.03] sm:px-5 lg:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,0.7fr))_1rem] lg:items-center"
               >
                 <div className="min-w-0">
                   <p className="flex flex-wrap items-center gap-2">

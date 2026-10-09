@@ -62,7 +62,7 @@ export default async function IaPage() {
           />
           <Cifra
             etiqueta="Proveedor"
-            valor={uso.ia.demo ? "Demo" : uso.ia.provider}
+            valor={uso.ia.nombre}
             detalle={uso.ia.model}
           />
           <Cifra
