@@ -143,7 +143,8 @@ const TIENDA_DEMO: TiendaBasica = {
   whatsapp: "+591 712 34567",
 }
 
-async function materialDeDemostracion(): Promise<MaterialDelCatalogo> {
+/** Los productos y la tienda de ejemplo: el modo demo y las vistas previas de `/admin`. */
+export async function materialDeDemostracion(): Promise<MaterialDelCatalogo> {
   const url = urlDeTienda(TIENDA_DEMO.slug)
   return {
     datos: {

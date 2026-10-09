@@ -278,39 +278,6 @@ export function Acceso({
               onSubmit={form.handleSubmit(onSubmit)}
               className="mt-8 flex flex-col gap-7"
             >
-              {esRegistro && conInvitacion ? (
-                <FormField
-                  control={form.control}
-                  name="invitacion"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormLabel className={ETIQUETA_CAMPO}>
-                        Código de invitación
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className={cn(
-                            CAMPO,
-                            "font-mono tracking-wider uppercase"
-                          )}
-                          placeholder="XXXX-XXXX"
-                          autoComplete="off"
-                          autoCapitalize="characters"
-                          spellCheck={false}
-                          {...field}
-                        />
-                      </FormControl>
-                      {!fieldState.error ? (
-                        <FormDescription className="text-xs text-tinta/55">
-                          Por ahora las cuentas nuevas son por invitación.
-                        </FormDescription>
-                      ) : null}
-                      <FormMessage className="text-sm text-senal" />
-                    </FormItem>
-                  )}
-                />
-              ) : null}
-
               {esRegistro ? (
                 <>
                   <FormField
@@ -380,6 +347,39 @@ export function Acceso({
                   </FormItem>
                 )}
               />
+
+              {esRegistro && conInvitacion ? (
+                <FormField
+                  control={form.control}
+                  name="invitacion"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormLabel className={ETIQUETA_CAMPO}>
+                        Código de invitación
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          className={cn(
+                            CAMPO,
+                            "font-mono tracking-wider uppercase"
+                          )}
+                          placeholder="XXXX-XXXX"
+                          autoComplete="off"
+                          autoCapitalize="characters"
+                          spellCheck={false}
+                          {...field}
+                        />
+                      </FormControl>
+                      {!fieldState.error ? (
+                        <FormDescription className="text-xs text-tinta/55">
+                          Por ahora las cuentas nuevas son por invitación.
+                        </FormDescription>
+                      ) : null}
+                      <FormMessage className="text-sm text-senal" />
+                    </FormItem>
+                  )}
+                />
+              ) : null}
 
               <button
                 type="submit"
