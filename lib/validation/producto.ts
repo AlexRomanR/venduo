@@ -40,8 +40,6 @@ export const productoSchema = z
       .max(999_999),
     avisoStock: z.number().int().min(0).max(9999).default(3),
     categoriaId: z.uuid().nullable().default(null),
-    condicion: z.enum(["nuevo", "segunda_mano", "reacondicionado"]),
-    notaCondicion: z.string().trim().max(300).default(""),
     sku: z.string().trim().max(40, "El código es muy largo.").default(""),
     fotos: z
       .array(z.url())
@@ -63,16 +61,6 @@ export const productoSchema = z
         message: "El precio anterior tiene que ser mayor que el actual.",
       })
     }
-
-    // Quien compra usado quiere saber en qué estado está. Pedirlo acá evita
-    // catálogos de segunda mano sin una sola descripción.
-    if (valores.condicion !== "nuevo" && valores.notaCondicion.length < 10) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["notaCondicion"],
-        message: "Cuenta en qué estado está: quien compra usado lo pregunta.",
-      })
-    }
   })
 
 export type ProductoInput = z.input<typeof productoSchema>
@@ -89,10 +77,3 @@ export const categoriaSchema = z.object({
 })
 
 export type CategoriaInput = z.input<typeof categoriaSchema>
-
-/** Las etiquetas de la condición, en un solo lugar. */
-export const CONDICIONES = [
-  { valor: "nuevo", etiqueta: "Nuevo" },
-  { valor: "segunda_mano", etiqueta: "Segunda mano" },
-  { valor: "reacondicionado", etiqueta: "Reacondicionado" },
-] as const

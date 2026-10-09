@@ -74,9 +74,8 @@ es lo que se le pasa a la IA como catálogo y contra lo que se valida lo que dev
 Los tipos sembrados son `hero`, `categories`, `product_grid`, `about`, `testimonials`,
 `cta`, `contact` y `faq`.
 
-**El filtro de segunda mano no es un tipo aparte:** es la propiedad `condition` del bloque
-`product_grid`, que acepta `todos`, `nuevo`, `segunda_mano` o `reacondicionado`. La
-propiedad `featured` la limita a los destacados.
+El bloque `product_grid` filtra por categoría (`category`) y por destacados
+(`featured`). **No hay filtro de condición**: la segunda mano se retiró.
 
 Para agregar un tipo nuevo: una migración que lo inserte en `block_types` con su
 `props_schema`, su clave en `TIPOS_DE_BLOQUE` (`lib/plantillas/bloques.ts`) y **su

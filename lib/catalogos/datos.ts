@@ -16,8 +16,6 @@ import type { EstiloResuelto } from "@/lib/catalogos/estilo"
  * mismo dibujo, y por eso lo que se ve al editar es lo que sale en el archivo.
  */
 
-export type Condicion = "nuevo" | "segunda_mano" | "reacondicionado"
-
 export interface ProductoDelCatalogo {
   id: string
   nombre: string
@@ -29,7 +27,6 @@ export interface ProductoDelCatalogo {
   /** La categoría para filtrar. Sin tabla de categorías, sale del nombre. */
   categoriaId: string | null
   categoria: string | null
-  condicion: Condicion
   codigo: string | null
   /** La foto de portada: una URL en la vista previa, un JPEG en el PDF. */
   foto: string | null
@@ -67,12 +64,6 @@ export interface Contexto {
   /** La hoja que se dibuja y cuántas hay, para el pie. */
   numero: number
   total: number
-}
-
-export const CONDICIONES: Record<Condicion, string> = {
-  nuevo: "Nuevo",
-  segunda_mano: "Segunda mano",
-  reacondicionado: "Reacondicionado",
 }
 
 /**

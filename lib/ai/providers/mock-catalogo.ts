@@ -16,7 +16,6 @@ interface ProductoLeido {
   nombre: string
   categoria: string | null
   rebaja: number | null
-  condicion: string
   stock: number
   destacado: boolean
 }
@@ -60,10 +59,10 @@ const INTENCIONES: {
     bajada: "Hasta agotar stock. Escríbenos y te lo separamos.",
   },
   {
-    patron: /segunda|usad|feria|reacondicion/,
+    patron: /feria|liquid|remate/,
     plantilla: "feria",
-    nombre: "Feria de segunda mano",
-    bajada: "Prendas revisadas, a precio de feria.",
+    nombre: "Feria de precios",
+    bajada: "Precios de feria, hasta agotar stock.",
   },
   {
     patron: /mayor|cantidad|revend|distribui/,
@@ -148,13 +147,6 @@ export function catalogoDeDemostracion(mensaje: string): PropuestaDeCatalogo {
     if (rebajados.length > 0) {
       lista = rebajados
       criterios.push("con descuento")
-    }
-  }
-  if (plantilla === "feria") {
-    const usados = lista.filter((producto) => producto.condicion !== "nuevo")
-    if (usados.length > 0) {
-      lista = usados
-      criterios.push("de segunda mano")
     }
   }
 

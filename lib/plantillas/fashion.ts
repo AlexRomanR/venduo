@@ -11,7 +11,7 @@ import type { DefinicionDePlantilla } from "@/lib/plantillas/definicion"
 export const fashion: DefinicionDePlantilla = {
   nombre: "Pasarela",
   descripcion:
-    "Ropa, calzado y carteras. Fotos grandes en retrato, las categorías a la vista y la segunda mano con vitrina propia.",
+    "Ropa, calzado y carteras. Fotos grandes en retrato, las categorías a la vista y lo más buscado con vitrina propia.",
   rasgos: [
     "Titulares condensados en mayúsculas",
     "Fotos en retrato, dos por fila en el celular",

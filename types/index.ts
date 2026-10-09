@@ -25,7 +25,11 @@ export type Subscription = Tables<"subscriptions">
 export type Plan = Tables<"plans">
 
 // Catálogo
-export type Product = Tables<"products">
+/**
+ * Un producto. La condición (nuevo, segunda mano) se retiró del producto: la
+ * columna se borra en una migración aparte, y hasta entonces no se lee.
+ */
+export type Product = Omit<Tables<"products">, "condition" | "condition_note">
 export type ProductInsert = TablesInsert<"products">
 export type ProductUpdate = TablesUpdate<"products">
 export type ProductCategory = Tables<"product_categories">
@@ -54,7 +58,6 @@ export type SocialPost = Tables<"social_posts">
 
 // Enums
 export type OrderStatus = Enums<"order_status">
-export type ProductCondition = Enums<"product_condition">
 export type DesignOrigin = Enums<"design_origin">
 export type SubscriptionStatus = Enums<"subscription_status">
 export type PageStatus = Enums<"page_status">

@@ -15,7 +15,7 @@ Actualizado el 9 de octubre de 2026.
 | 2   | Selección de plantilla según rubro, con WhatsApp obligatorio | ✅     |
 | 3   | Edición de la tienda asistida por IA                         | ✅     |
 | 4   | Tienda pública real, navegable en móvil, con URL propia      | ✅     |
-| 5   | Productos con imagen, stock y condición                      | ✅     |
+| 5   | Productos con imagen, stock y categoría                      | ✅     |
 | 6   | Carrito que manda el pedido al WhatsApp de la tienda         | ✅     |
 | 7   | Panel de pedidos que descuenta stock al marcarse pagado      | ✅     |
 | 8   | Estadísticas en lenguaje natural                             | ✅     |
@@ -25,8 +25,12 @@ Actualizado el 9 de octubre de 2026.
 > **6 de octubre:** se quitaron la red de vendedores, el cobro dentro de la plataforma
 > (PagoFácil, la custodia, el QR de pago y el comprobante) y los estados de envío. La
 > compra se cierra por WhatsApp. La migración `20261006120000_compra_por_whatsapp.sql`
-> borra de la base las tablas, funciones y columnas de la red de vendedores: **hay que
-> aplicarla** antes de publicar el código (ver "Lo que falta").
+> ya está aplicada en producción.
+>
+> **8 y 9 de octubre:** cinco plantillas nuevas y una revisión general en producción,
+> con sus arreglos (abajo, "Revisión general"). Venduo deja de ser un proyecto de
+> hackathon y pasa a ser una startup: lo que existía solo para la demostración se va
+> quitando, empezando por la segunda mano.
 
 ---
 
@@ -77,8 +81,9 @@ Actualizado el 9 de octubre de 2026.
 
 ### Cuentas y altas
 
-- Registro e ingreso con correo y contraseña. Un solo tipo de cuenta: toda cuenta nueva
-  va a crear su tienda.
+- Registro e ingreso con correo y contraseña. Toda cuenta que sale del registro es de
+  emprendedor y va a crear su tienda. La de administrador de Venduo está decidida
+  (`VENDUO.md` §7) y su panel, `/admin`, es lo próximo (ver "Lo que falta").
 - `/auth/destino` decide a dónde entra cada cuenta según sus datos.
 - Alta de la tienda en tres pasos (`/crear`): elegir plantilla, contar el negocio con su
   **WhatsApp obligatorio** y, en `/crear/listo`, la oferta de personalizarla en el editor
@@ -91,10 +96,27 @@ Actualizado el 9 de octubre de 2026.
   (perfumería), **Fórmula** (perfumería de autor) y **Bazar** (de todo un poco, rubro
   "Variedades"). Cada una con su letra, su paleta medida y su kit; las cinco nuevas se
   dan de alta con `20261008120000_plantillas_nuevas.sql`.
-- La identidad llega a toda la tienda pública **y al panel del emprendedor**.
+- La identidad llega a toda la tienda pública. El panel es de Venduo, igual para
+  todas; la tienda aparece en su sello y en su tarjeta de la barra lateral.
 - Cambio de plantilla desde `/panel/apariencia` sin perder productos ni pedidos, con
   historial de versiones que se pueden **restaurar**.
 - Todo documentado en `docs/store-templates.md`.
+
+### Revisión general (8 y 9 de octubre)
+
+Un recorrido completo en producción con una cuenta nueva —registro, alta, productos,
+pedido por WhatsApp, pago y cancelación, catálogo, apariencia, editor y cuenta— y lo
+que se arregló:
+
+- **La IA ya no se cuelga.** Cada pedido al modelo tiene un tope de tiempo, reintentos
+  incluidos; las pantallas con IA fijan `maxDuration` y atrapan el corte con un aviso.
+- **El número de pedido es de cada tienda**, no de una secuencia global.
+- "Lo que más se vende" cuenta por la fecha del pedido, y los gráficos guardados cuentan
+  solo pedidos pagados.
+- Las confirmaciones son un diálogo propio (`useConfirmacion`), nunca `window.confirm`.
+- La IA no propone lo que la tienda ya tiene, y los colores se dicen en palabras.
+- Botones del catálogo en una grilla pareja en el celular, botones de cantidad con la
+  forma de la plantilla y textos corregidos.
 
 ### Editor de la tienda (`/editor`)
 
@@ -138,7 +160,7 @@ Actualizado el 9 de octubre de 2026.
 
 - Portada armada con bloques, catálogo con filtros, búsqueda y orden, ficha de producto
   con galería y sugerencias.
-- Filtro de segunda mano, reacondicionado y ofertas.
+- Filtros de ofertas y categorías.
 - **Carrito que manda el pedido por WhatsApp**: quien compra ve sus productos y el total,
   y un botón abre el chat con la tienda y el pedido escrito —líneas, total y número—. No
   deja ningún dato. El pedido queda en el panel; al volver del chat ve su número y puede
@@ -160,7 +182,7 @@ Actualizado el 9 de octubre de 2026.
   el teclado), **Últimos pedidos**, **Lo que más se vende** y **Se está acabando**.
   Si la tienda no tiene WhatsApp, es lo primero que pide. Compartir la tienda abre el enlace, el QR para descargar y
   un mensaje listo para WhatsApp.
-- **Productos**: alta y edición con fotos, stock, umbral de aviso, condición, precio
+- **Productos**: alta y edición con fotos, stock, umbral de aviso, precio
   anterior, código y destacado. Categorías propias.
 - **Pedidos**: lista y detalle con el mismo número que llegó por WhatsApp. Tres estados:
   pendiente, pagado y cancelado. Marcar pagado descuenta el stock; cancelar un pagado lo
@@ -199,7 +221,28 @@ Actualizado el 9 de octubre de 2026.
 
 ## Lo que falta
 
-### 1. Aplicar la migración de la compra por WhatsApp — antes de publicar
+### 1. Administración y visitas — prioridad alta
+
+El plan completo, por fases, está en **`docs/plan-administracion.md`**:
+
+0. Quitar la segunda mano, que era para la hackathon.
+1. La base del administrador (`/admin`, solo su cuenta, registro de cambios) y
+   empezar a contar visitas de forma anónima.
+2. Qué plantillas de tienda y de catálogo se ofrecen.
+3. Funciones con tres estados —activa, desactivada, oculta—, generales y por tienda,
+   incluidas la IA y las visitas del emprendedor (ocultas por defecto).
+4. Tiendas: lista, ficha con sus visitas, pausar, suscripción y moderación.
+5. Resumen con el embudo, uso de IA, salud del sistema y las pantallas de visitas del
+   emprendedor.
+6. Registro abierto o cerrado y exportación.
+
+### 2. Borrar la columna de la condición — al publicar la fase 0
+
+La segunda mano ya no se usa (`20261009120000_sin_segunda_mano.sql`). Falta borrar
+`products.condition`, `condition_note` y el tipo `product_condition` cuando el código
+que los escribía deje de estar publicado, y regenerar `types/database.ts`.
+
+### Historia: la migración de la compra por WhatsApp (aplicada)
 
 `supabase/migrations/20261006120000_compra_por_whatsapp.sql` cambia producción:
 
@@ -220,7 +263,7 @@ uno y otro, el código viejo falla contra la base nueva: conviene hacerlos segui
 Las tiendas de la demostración que no tengan WhatsApp no reciben pedidos hasta cargarlo
 en `/cuenta`.
 
-### 2. Marketing — prioridad media
+### 3. Marketing — prioridad media
 
 `/panel/marketing` es un marcador "Pronto". La tarea `generateCampaign` existe en la capa
 de IA pero no se usa.
@@ -231,19 +274,19 @@ Falta:
 - Publicar: plan A por API de Meta, plan B con enlaces de compartir y copiar. Se recomienda
   ir directo al plan B por el tiempo de revisión de Meta.
 
-### 3. Plantillas — prioridad baja
+### 4. Plantillas — prioridad baja
 
 - Más plantillas para los rubros que quedaron en la base editorial (tecnología, hogar,
   cosmética).
 - Atributos por rubro: talla y color en moda, mililitros o familia olfativa en
   perfumería. Piden variantes en el carrito y en `create_order`.
 
-### 4. Suscripción — prioridad baja
+### 5. Suscripción — prioridad baja
 
 Se modela el estado, no el cobro. Falta el bloqueo real al vencer la prueba (panel en
 solo lectura con exportación a CSV) y la purga a los 90 días.
 
-### 5. Pendientes chicos
+### 6. Pendientes chicos
 
 - **Una vez, entrar a `/panel/apariencia` después de horas sin uso terminó en `/panel`**
   (revisión del 8 de octubre). El registro muestra pedidos a `/auth/destino` y `/crear`
@@ -253,8 +296,9 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 - **La plantilla editorial no dibuja las grillas de productos de su portada**: muestra
   su catálogo completo. El editor lo avisa en esas tiendas, pero editar una grilla ahí no
   se ve.
-- **Una propuesta de la IA puede tardar** entre 6 y 45 segundos: si la primera no pasa la
-  validación, hay un segundo intento. El editor lo dice mientras espera.
+- **Una propuesta de la IA puede tardar** entre 6 y 55 segundos: si la primera no pasa
+  la validación y queda tiempo, hay un segundo intento. Pasado el tope, la pantalla lo
+  dice y se puede volver a pedir.
 - **`generateStoreBlueprint` sigue sin usarse**: inventa una tienda entera, con slug y
   productos. "Que la IA escriba tu portada" se resolvió con la tarea del editor.
 

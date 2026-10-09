@@ -18,9 +18,12 @@ panel es una comparación directa.
 **Correo y contraseña, sin verificación.** Quien se registra entra al instante. No hay
 enlace mágico ni ingreso con Google: el proveedor no está habilitado.
 
-**Hay un solo tipo de cuenta: la de quien tiene una tienda.** El registro no pregunta
-rol; toda cuenta nueva va a `/crear`. Los permisos derivan de los datos: sos dueño si
-tenés una fila viva en `stores`, y eso lo decide RLS.
+**Hay dos tipos de cuenta.** La del emprendedor es la de todo el que se registra: el
+registro no pregunta rol, toda cuenta nueva va a `/crear`, y es dueño quien tiene una
+fila viva en `stores`, cosa que decide RLS. La del **administrador de Venduo** no sale
+del registro: se da de alta a mano y opera la plataforma desde `/admin` —plantillas
+visibles, funciones por tienda, suscripciones, uso de la IA—. Para cualquier otra cuenta
+`/admin` responde 404, y todo cambio de un administrador queda registrado.
 
 ## El pedido sale por WhatsApp
 
@@ -121,13 +124,37 @@ Un producto lleva además las fotos en `images` —la primera es la portada—, 
 código interno opcional, el umbral de aviso de stock y si va destacado. La foto
 que ve la vitrina sale siempre de `image_url`, que es la portada derivada.
 
-## Segunda mano
+## Las visitas
 
-No es una sección aparte ni un tipo de bloque propio: es un **filtro del catálogo**. Lo
-que define la condición es `products.condition` (`nuevo`, `segunda_mano`,
-`reacondicionado`), que elige el emprendedor al cargar el producto.
+Se cuentan **sin identificar a nadie**: sin cookies, sin guardar la dirección de red,
+con una huella diaria —tienda, red, navegador y una sal que cambia cada día— que no se
+cruza con la del día anterior. Llegan por `/api/visita`, nunca por una inserción desde
+el navegador, y se guardan 90 días en detalle y después resumidas por día.
 
-`compare_at_price_cents` es el precio anterior y es lo que produce el descuento destacado.
+No se cuentan robots, precargas, la vista previa del editor, el dueño mirando su propia
+tienda ni la misma persona recargando dentro de 30 minutos.
+
+**El emprendedor no ve sus visitas por defecto.** Es una función más del sistema de
+funciones, oculta para todas las tiendas hasta que el administrador la activa; el
+administrador las ve siempre. Plan completo en `docs/plan-administracion.md`.
+
+## Las funciones de cada tienda
+
+Cada función —la IA del editor, de estadísticas y de catálogos, los catálogos en PDF,
+Canva, el editor, cambiar de plantilla, las visitas— tiene tres estados: **activa**,
+**desactivada** (se ve pero no responde, y al tocarla dice que no está disponible) y
+**desactivada y oculta**. Hay un estado general y uno por tienda; el de la tienda manda.
+**Apagado se comprueba en el servidor**, no solo en el botón. Y apagarle algo a una
+tienda no le avisa nada.
+
+## Las ofertas
+
+`compare_at_price_cents` es el precio anterior y es lo que produce el descuento
+destacado y el filtro "En oferta" del catálogo (`?oferta=1`).
+
+**No hay segunda mano.** Era un filtro pensado para la demostración de la hackathon y se
+retiró (`20261009120000_sin_segunda_mano.sql`): un producto no tiene condición, y las
+grillas de la portada filtran por categoría y destacados. No volver a sumarlo.
 
 ## Lo que NO se construye
 

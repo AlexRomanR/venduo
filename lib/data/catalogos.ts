@@ -81,7 +81,6 @@ function aProducto(producto: Product): ProductoDelCatalogo {
       producto.category_id ??
       (producto.category ? `nombre:${producto.category}` : null),
     categoria: producto.category,
-    condicion: producto.condition,
     codigo: producto.sku,
     foto: producto.image_url ?? producto.images[0] ?? null,
     destacado: producto.is_featured,

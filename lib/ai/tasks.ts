@@ -341,7 +341,6 @@ export interface ProductoParaCatalogo {
   precio: string
   /** El descuento en puntos porcentuales, si está rebajado. */
   rebaja: number | null
-  condicion: string
   stock: number
   destacado: boolean
 }

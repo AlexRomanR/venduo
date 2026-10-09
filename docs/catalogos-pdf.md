@@ -237,14 +237,14 @@ va por el camino a mano.
 ## 8. La IA
 
 `proponerCatalogo` (`lib/ai/tasks.ts`) recibe una frase y los productos de la tienda
-—nombre, categoría, precio, descuento, condición, stock y si es destacado— y devuelve qué
+—nombre, categoría, precio, descuento, stock y si es destacado— y devuelve qué
 productos van, en qué orden, con qué plantilla, un nombre, una bajada para la portada y
 por qué. El servidor descarta los ids que no son de esa tienda —o que no están en el
 catálogo abierto, si se pidió un orden— y la persona decide si la usa. Queda en
 `ai_generations` como `marketing`.
 
 En modo demo responde `lib/ai/providers/mock-catalogo.ts`, que lee la frase por palabras
-clave —oferta, segunda mano, mayorista, una categoría nombrada— y elige entre los
+clave —oferta, feria, mayorista, una categoría nombrada— y elige entre los
 productos reales.
 
 ---

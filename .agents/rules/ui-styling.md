@@ -209,7 +209,7 @@ Lo mismo aplica a los textos que **genera la IA**: la instrucción de sistema en
 ### Cómo le hablamos al cliente
 
 Nuestro cliente **ya vende por TikTok, Instagram, Facebook o WhatsApp**: ropa,
-zapatillas, maquillaje, perfumes, accesorios, tecnología, segunda mano. No se levanta
+zapatillas, maquillaje, perfumes, accesorios, tecnología, regalos. No se levanta
 pensando "necesito una página web"; se levanta respondiendo "¿precio?" por mensaje. Por
 eso Venduo es **más que una tienda online**: la tienda se nombra, pero siempre con lo
 que hay detrás —el stock, los pedidos por WhatsApp, las estadísticas, los catálogos—.

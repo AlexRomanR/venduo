@@ -10,7 +10,6 @@ import {
   FileText,
   Images,
   Loader2,
-  Tag,
   type LucideIcon,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -25,11 +24,7 @@ import {
 } from "@/lib/estilos"
 import { CURRENCY_SYMBOL } from "@/lib/format"
 import { cn } from "@/lib/utils"
-import {
-  CONDICIONES,
-  productoSchema,
-  type ProductoInput,
-} from "@/lib/validation/producto"
+import { productoSchema, type ProductoInput } from "@/lib/validation/producto"
 import type { Product, ProductCategory } from "@/types"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -111,8 +106,6 @@ export function FormularioProducto({
       stock: producto?.stock ?? 0,
       avisoStock: producto?.low_stock_threshold ?? 3,
       categoriaId: producto?.category_id ?? null,
-      condicion: producto?.condition ?? "nuevo",
-      notaCondicion: producto?.condition_note ?? "",
       sku: producto?.sku ?? "",
       fotos: producto?.images ?? [],
       activo: producto?.is_active ?? true,
@@ -120,7 +113,6 @@ export function FormularioProducto({
     },
   })
 
-  const condicion = form.watch("condicion")
   const enCurso = form.formState.isSubmitting
 
   async function alEnviar(valores: ProductoInput) {
@@ -415,69 +407,6 @@ export function FormularioProducto({
               )}
             />
           </div>
-        </Bloque>
-
-        <Bloque
-          id="condicion"
-          icono={Tag}
-          titulo="En qué estado está"
-          detalle="Nuevo, de segunda mano o reacondicionado."
-        >
-          <FormField
-            control={form.control}
-            name="condicion"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className={ETIQUETA_CAMPO}>Condición</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger
-                      className={cn(
-                        CAMPO_LINEA,
-                        "w-full data-[size=default]:h-12"
-                      )}
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {CONDICIONES.map((c) => (
-                      <SelectItem key={c.valor} value={c.valor}>
-                        {c.etiqueta}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormDescription className={AYUDA_CAMPO}>
-                  Es lo que alimenta el filtro de segunda mano de tu tienda.
-                </FormDescription>
-                <FormMessage className="text-senal" />
-              </FormItem>
-            )}
-          />
-
-          {condicion !== "nuevo" ? (
-            <FormField
-              control={form.control}
-              name="notaCondicion"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className={ETIQUETA_CAMPO}>
-                    En qué estado está
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      rows={3}
-                      placeholder="Usada una temporada. Sin roturas ni manchas, cierre nuevo."
-                      className="resize-none rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-senal focus-visible:ring-0"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-senal" />
-                </FormItem>
-              )}
-            />
-          ) : null}
         </Bloque>
 
         <Bloque

@@ -20,7 +20,7 @@ export async function generateMetadata({
 /**
  * El catálogo completo, con filtros, búsqueda y orden.
  *
- * Los filtros viven en la URL: "solo segunda mano, de menor a mayor precio" es
+ * Los filtros viven en la URL: "lo que está en oferta, de menor a mayor precio" es
  * un enlace que la tienda puede mandar por WhatsApp tal cual.
  */
 export default async function CatalogoPage({

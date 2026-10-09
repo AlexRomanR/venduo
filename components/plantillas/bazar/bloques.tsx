@@ -5,7 +5,6 @@ import { ArrowRight } from "lucide-react"
 import {
   accionDePortada,
   categoriasConFoto,
-  filtroDeGrilla,
   fotoDePortada,
   numero,
   productosDeGrilla,
@@ -215,9 +214,7 @@ function Grilla({ bloque, tienda }: PropsBloque) {
         titulo={texto(bloque, "title") ?? "Productos"}
         enlace={{
           etiqueta: "Ver todo",
-          href: rutaDeTienda(tienda.slug, "/catalogo", {
-            condicion: filtroDeGrilla(bloque).condicion,
-          }),
+          href: rutaDeTienda(tienda.slug, "/catalogo"),
         }}
       />
       <div className={cn("mt-6", grilla(columnas))}>

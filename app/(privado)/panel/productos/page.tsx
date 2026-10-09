@@ -8,7 +8,6 @@ import { isSupabaseConfigured } from "@/lib/env"
 import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
 import { formatMoney, formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
-import type { ProductCondition } from "@/types"
 import {
   Cabecera,
   Cifra,
@@ -47,7 +46,6 @@ export default async function ProductosPage({
   const filtros: FiltrosCatalogo = {
     buscar: texto("buscar"),
     categoria: texto("categoria"),
-    condicion: texto("condicion") as ProductCondition | undefined,
     estado: texto("estado"),
     orden: texto("orden"),
   }

@@ -1,12 +1,8 @@
 import Link from "next/link"
-import { ArrowRight, MessageCircle, Repeat, ShoppingBag } from "lucide-react"
+import { ArrowRight, MessageCircle, ShoppingBag } from "lucide-react"
 
 import { numeroDeWhatsApp } from "@/lib/pedidos"
-import {
-  CONDICIONES,
-  descuento,
-  enlaceDeConsulta,
-} from "@/lib/plantillas/bloques"
+import { descuento, enlaceDeConsulta } from "@/lib/plantillas/bloques"
 import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
@@ -32,7 +28,7 @@ import { FiltrosTienda } from "@/components/tienda/filtros"
  * Las pantallas de Pasarela.
  *
  * A diferencia de la base editorial, la portada no carga el catálogo entero:
- * es una vitrina armada —lo nuevo, lo más buscado, la segunda mano— y el
+ * es una vitrina armada —lo nuevo, lo más buscado, las categorías— y el
  * catálogo vive en su propia pantalla, con búsqueda y orden. Una tienda de
  * ropa con cuarenta prendas en la portada no deja ver ninguna.
  */
@@ -107,8 +103,6 @@ export function Inicio({ tienda }: PropsInicio) {
 
 /** Quién vende y cómo se compra. En moda, eso decide tanto como la prenda. */
 function SobreLaTienda({ tienda }: { tienda: TiendaPublica }) {
-  const usados = tienda.productos.some((p) => p.condition !== "nuevo")
-
   return (
     <section className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-14 md:grid-cols-[1.2fr_1fr] md:gap-16 md:py-20">
       <div>
@@ -143,11 +137,6 @@ function SobreLaTienda({ tienda }: { tienda: TiendaPublica }) {
             </a>
           </Servicio>
         ) : null}
-        {usados ? (
-          <Servicio icono={<Repeat aria-hidden="true" className="size-5" />}>
-            Segunda mano con el estado de cada prenda descrito
-          </Servicio>
-        ) : null}
       </ul>
     </section>
   )
@@ -170,17 +159,13 @@ function Servicio({
 
 export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
   const categoria = tienda.categorias.find((c) => c.id === filtros.categoria)
-  const usados = tienda.productos.filter((p) => p.condition !== "nuevo").length
+  const ofertas = tienda.productos.filter(
+    (p) => p.compare_at_price_cents
+  ).length
   const titulo =
-    categoria?.nombre ??
-    (filtros.condicion === "oferta"
-      ? "En oferta"
-      : filtros.condicion
-        ? CONDICIONES[filtros.condicion]
-        : null) ??
-    "Catálogo"
+    categoria?.nombre ?? (filtros.oferta ? "En oferta" : null) ?? "Catálogo"
   const hayFiltro = Boolean(
-    filtros.categoria || filtros.condicion || filtros.buscar
+    filtros.categoria || filtros.oferta || filtros.buscar
   )
 
   return (
@@ -208,7 +193,7 @@ export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
       <div className="mt-6 flex flex-col gap-5">
         <FiltrosTienda
           categorias={tienda.categorias}
-          usados={usados}
+          ofertas={ofertas}
           total={tienda.productos.length}
           mostrando={productos.length}
         />
@@ -351,12 +336,6 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
               vitrina && "justify-center"
             )}
           >
-            <span className="opacity-60">
-              {CONDICIONES[producto.condition] ?? producto.condition}
-            </span>
-            <span aria-hidden="true" className="opacity-30">
-              ·
-            </span>
             <span className={cn(pocas ? "text-senal" : "opacity-60")}>
               {producto.stock === 0
                 ? "Agotado"
@@ -392,13 +371,6 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
               <Detalle titulo="Descripción">
                 <p className="leading-relaxed whitespace-pre-line opacity-80">
                   {producto.description}
-                </p>
-              </Detalle>
-            ) : null}
-            {producto.condition !== "nuevo" && producto.condition_note ? (
-              <Detalle titulo="Estado de la prenda">
-                <p className="leading-relaxed opacity-80">
-                  {producto.condition_note}
                 </p>
               </Detalle>
             ) : null}

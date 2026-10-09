@@ -5,7 +5,6 @@ import { Plus } from "lucide-react"
 import {
   accionDePortada,
   categoriasConFoto,
-  filtroDeGrilla,
   fotoDePortada,
   items,
   numero,
@@ -124,11 +123,7 @@ function Grilla({ bloque, tienda }: PropsBloque) {
       </div>
 
       <div className="mt-14 text-center">
-        <EnlacePildora
-          href={rutaDeTienda(tienda.slug, "/catalogo", {
-            condicion: filtroDeGrilla(bloque).condicion,
-          })}
-        >
+        <EnlacePildora href={rutaDeTienda(tienda.slug, "/catalogo")}>
           Ver toda la colección
         </EnlacePildora>
       </div>

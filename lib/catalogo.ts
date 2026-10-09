@@ -1,4 +1,4 @@
-import type { Product, ProductCondition } from "@/types"
+import type { Product } from "@/types"
 
 /**
  * Filtrar y ordenar el catálogo de la tienda pública.
@@ -20,8 +20,8 @@ export type OrdenDeCatalogo = keyof typeof ORDENES_DE_CATALOGO
 
 export interface FiltrosDeCatalogo {
   categoria: string | null
-  /** Una condición del producto, o `oferta`: tener precio anterior. */
-  condicion: string | null
+  /** Solo lo que tiene precio anterior: lo que está en oferta. */
+  oferta: boolean
   buscar: string | null
   orden: OrdenDeCatalogo
 }
@@ -39,7 +39,7 @@ export function leerFiltros(
 
   return {
     categoria: texto("categoria"),
-    condicion: texto("condicion"),
+    oferta: texto("oferta") === "1",
     buscar: texto("buscar"),
     orden:
       orden && Object.hasOwn(ORDENES_DE_CATALOGO, orden)
@@ -64,12 +64,8 @@ export function filtrarCatalogo(
     salida = salida.filter((p) => p.category_id === filtros.categoria)
   }
 
-  if (filtros.condicion === "oferta") {
+  if (filtros.oferta) {
     salida = salida.filter((p) => Boolean(p.compare_at_price_cents))
-  } else if (filtros.condicion) {
-    salida = salida.filter(
-      (p) => p.condition === (filtros.condicion as ProductCondition)
-    )
   }
 
   const buscar = filtros.buscar?.trim().toLowerCase()

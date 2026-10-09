@@ -80,8 +80,6 @@ export async function guardarProducto(
     stock: v.stock,
     low_stock_threshold: v.avisoStock,
     category_id: v.categoriaId,
-    condition: v.condicion,
-    condition_note: v.notaCondicion || null,
     sku: v.sku || null,
     images: v.fotos,
     is_active: v.activo,

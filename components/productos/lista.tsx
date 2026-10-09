@@ -28,12 +28,6 @@ import {
 import { Insignia } from "@/components/panel/piezas"
 import { useConfirmacion } from "@/components/panel/confirmar"
 
-const CONDICION: Record<string, string> = {
-  nuevo: "Nuevo",
-  segunda_mano: "Segunda mano",
-  reacondicionado: "Reacondicionado",
-}
-
 interface Acciones {
   alternar: (
     id: string,
@@ -159,10 +153,6 @@ function Fila({
 
               <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs opacity-70">
                 <span>{producto.category ?? "Sin categoría"}</span>
-                <span aria-hidden="true">·</span>
-                <span>
-                  {CONDICION[producto.condition] ?? producto.condition}
-                </span>
                 {producto.sku ? (
                   <>
                     <span aria-hidden="true">·</span>

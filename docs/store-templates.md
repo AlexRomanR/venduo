@@ -841,7 +841,7 @@ A propósito, **no existe**:
 
 ## 13. Límites conocidos
 
-- **Los datos de ejemplo no tienen fotos para casi ningún producto.** Las dos plantillas
+- **Los datos de ejemplo no tienen fotos para casi ningún producto.** Todas las plantillas
   resuelven ese caso con dignidad, pero se lucen con fotos. Para una demostración, cargar
   fotos en Rosa Deportes y Bella Piel.
 - **Al publicar las páginas en borrador, algunos textos de ejemplo quedaron a la vista** del

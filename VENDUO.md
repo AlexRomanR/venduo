@@ -20,7 +20,7 @@ Quien vende por redes no se levanta pensando "necesito una página web". Se leva
 
 ## 2. El problema
 
-Un volumen enorme del comercio boliviano ocurre informalmente por TikTok, Instagram, Facebook Marketplace y WhatsApp, sin plataforma detrás. Menos del 30% de las pymes bolivianas tiene sitio web, y quien vende por redes no siente que le falte uno: lo que le falta es orden. Responde el precio por mensaje cincuenta veces al día, vende lo que ya no tiene porque el stock lo lleva de memoria, pierde pedidos entre mensajes, manda fotos sueltas por WhatsApp y no tiene números de su negocio.
+Un volumen enorme del comercio boliviano ocurre informalmente por TikTok, Instagram, Facebook Marketplace y WhatsApp, sin plataforma detrás. Menos del 30% de las pymes bolivianas tiene sitio web, y quien vende por redes no siente que le falte uno: lo que le falta es orden. Responde el precio por mensaje varias veces al día, vende lo que ya no tiene porque el stock lo lleva de memoria, pierde pedidos entre mensajes, manda fotos sueltas por WhatsApp y no tiene números de su negocio.
 
 Lo que **no** le falta es el canal: sus clientes ya le escriben por WhatsApp, y ahí es donde cierra cada venta. Venduo no lo saca de ese chat; le ordena todo lo que pasa antes y después.
 
@@ -30,7 +30,7 @@ Lo que **no** le falta es el canal: sus clientes ya le escriben por WhatsApp, y 
 
 1. Elige una plantilla según su rubro. Cada una tiene su propia identidad —letra, colores, cómo muestra los productos— y la puede cambiar después sin perder nada.
 2. Describe su negocio en un párrafo y deja **el WhatsApp de la tienda**, que es obligatorio: ahí le llega cada pedido. La IA ajusta la plantilla: agrega y quita bloques, reordena secciones, adapta textos y colores.
-3. Carga sus productos, marcando cuáles son nuevos y cuáles de segunda mano o reacondicionados.
+3. Carga sus productos con sus fotos, su precio, su stock y su categoría.
 4. Publica. Obtiene una URL propia y un código QR de su tienda.
 5. **Recibe los pedidos por WhatsApp.** Quien compra no deja datos: arma su carrito, ve el total y toca "Enviar pedido por WhatsApp". Se abre el chat con la tienda y el pedido ya escrito —productos, cantidades, total y el número del pedido—. La tienda cobra como ya lo hace, por QR, transferencia o en efectivo, y lo acuerdan en ese mismo chat.
 6. Cuando le pagan, marca el pedido **pagado** en su panel y el stock se descuenta solo. Consulta sus estadísticas preguntando en lenguaje natural, arma catálogos en PDF y genera piezas de promoción con IA.
@@ -39,16 +39,21 @@ Lo que **no** le falta es el canal: sus clientes ya le escriben por WhatsApp, y 
 
 ## 4. Los módulos
 
-| Módulo                      | Qué hace                                                                                                                       |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **Editor de tienda con IA** | Sobre una plantilla del rubro, la IA agrega, elimina y edita bloques visuales según lo que el emprendedor pide en texto        |
-| **Pedidos por WhatsApp**    | El carrito se manda a WhatsApp de la tienda con su número y su total; el pedido queda en el panel y descuenta stock al pagarse |
-| **Inteligencia de negocio** | Preguntas en lenguaje natural que devuelven gráficos y estadísticas                                                            |
-| **Marketing con IA**        | Genera copys y piezas adaptadas a cada red social, listos para publicar en Facebook y WhatsApp                                 |
-| **Segunda mano**            | Filtro del catálogo que reúne los productos usados y reacondicionados, con los descuentos destacados                           |
-| **Catálogos en PDF**        | Catálogos armados con productos elegidos, una categoría o un pack, en una de doce plantillas con los colores de la tienda      |
+| Módulo                      | Qué hace                                                                                                                                |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Editor de tienda con IA** | Sobre una plantilla del rubro, la IA agrega, elimina y edita bloques visuales según lo que el emprendedor pide en texto                 |
+| **Pedidos por WhatsApp**    | El carrito se manda a WhatsApp de la tienda con su número y su total; el pedido queda en el panel y descuenta stock al pagarse          |
+| **Inteligencia de negocio** | Preguntas en lenguaje natural que devuelven gráficos y estadísticas                                                                     |
+| **Marketing con IA**        | Genera copys y piezas adaptadas a cada red social, listos para publicar en Facebook y WhatsApp                                          |
+| **Catálogos en PDF**        | Catálogos armados con productos elegidos, una categoría o un pack, en una de doce plantillas con los colores de la tienda               |
+| **Visitas**                 | Cuántos visitan cada tienda y cada producto, de dónde vienen y cuántos terminan en pedido. El emprendedor las ve si Venduo se lo activa |
+| **Administración**          | El panel de Venduo, `/admin`: plantillas visibles, funciones por tienda, suscripciones, visitas, uso de la IA y moderación              |
 
-**Sobre la segunda mano:** no es una sección aparte que se genera sola. Es un **filtro dentro del catálogo** de cada tienda. Lo que define que un producto sea de segunda mano es un campo que el emprendedor elige al cargarlo, junto con un precio de comparación opcional que produce el descuento destacado.
+**La segunda mano se retira.** Era un filtro del catálogo pensado para la demostración de la hackathon y no tiene lugar en el producto; su eliminación es la fase 0 de `docs/plan-administracion.md`.
+
+**Las visitas se cuentan sin identificar a nadie.** Quien compra no deja datos, y eso vale también para quien solo mira: sin cookies, sin guardar la dirección de red, con una huella que cambia cada día y no se puede cruzar con la del día anterior. Se cuentan vistas de la portada, del catálogo y de cada producto, el carrito y el pedido enviado, y de dónde vino la visita —WhatsApp, TikTok, Instagram, Facebook, un QR o un catálogo en PDF—. No se cuentan robots, precargas, la vista previa del editor ni al dueño mirando su tienda.
+
+**Venduo decide qué funciones tiene cada tienda.** Cada una puede estar activa, desactivada —se ve pero no responde— o desactivada y oculta, con un valor para toda la plataforma y otro por tienda. Apagarle algo a una tienda no le avisa nada. El plan completo está en `docs/plan-administracion.md`.
 
 ---
 
@@ -101,7 +106,7 @@ Flujo de demostración completo:
 2. Selección de plantilla según rubro, con el WhatsApp de la tienda obligatorio en el alta
 3. Edición de la tienda asistida por IA sobre el catálogo de bloques
 4. Tienda pública real, navegable en móvil, con URL propia
-5. Gestión de productos con imagen y stock, marcables como nuevos, de segunda mano o reacondicionados
+5. Gestión de productos con imagen, stock, categoría y precio anterior para las ofertas
 6. Carrito con el total y un botón que manda el pedido al WhatsApp de la tienda, sin pedirle datos al comprador
 7. Panel de pedidos: cada pedido con su número, que descuenta stock al marcarse pagado
 8. Inteligencia de negocio: estadísticas consultadas en lenguaje natural
@@ -139,7 +144,10 @@ Se intenta el plan A; si no llega, entra el plan B. **El modelo de datos soporta
 
 El correo **se guarda igual**, así que exigir verificación más adelante es cambiar un ajuste del proyecto, sin migrar datos ni rehacer el formulario.
 
-**Hay un solo tipo de cuenta: la de quien tiene una tienda.** Al registrarse no se elige rol; toda cuenta nueva va a crear su tienda. Los permisos derivan de los datos: sos dueño si tenés una tienda.
+**Hay dos tipos de cuenta.**
+
+- **La del emprendedor**, que es la de todo el que se registra. Al registrarse no se elige rol: toda cuenta nueva va a crear su tienda, y los permisos derivan de los datos —eres dueño si tienes una tienda—.
+- **La del administrador de Venduo**, que no sale del registro: se da de alta a mano, en la base. Entra a un panel propio, `/admin`, para operar la plataforma: qué plantillas de tienda y de catálogo se ofrecen, qué funciones tiene cada tienda —la IA incluida—, el estado de las suscripciones y cuánto se usa la IA. Todo lo que cambia queda registrado con quién y cuándo. Para cualquier otra cuenta, `/admin` no existe.
 
 **Quien compra no tiene cuenta ni deja datos.** Su nombre y su teléfono ya van en el chat de WhatsApp donde manda el pedido.
 
@@ -185,7 +193,7 @@ Tan importante como la lista de lo que sí:
 - **Crear** — elección de plantilla y alta de la tienda, con su WhatsApp
 - **Panel del emprendedor** — resumen, y desde ahí productos, pedidos, estadísticas, apariencia, marketing. Es de Venduo, igual para toda tienda, y la tienda se reconoce en su sello
 - **Catálogos en PDF** — dentro del panel, en `/panel/catalogos`: los catálogos guardados, las doce plantillas dibujadas con los productos de la tienda y el constructor, donde se eligen los productos —o se le pide el catálogo a la IA en una frase—, la plantilla —o uno de los cuatro estilos sacados de la tienda—, y se edita hoja por hoja con la vista previa siguiendo lo que se edita. Se descarga en PDF, se manda un enlace que siempre abre con los precios del día o se lleva a Canva para editarlo entero allá
-- **Tienda pública** — portada, catálogo con filtro de segunda mano, ficha de producto y carrito, que manda el pedido por WhatsApp. Se dibuja con el kit de su plantilla
+- **Tienda pública** — portada, catálogo con filtros de ofertas y categorías, ficha de producto y carrito, que manda el pedido por WhatsApp. Se dibuja con el kit de su plantilla
 
 ### Estrategia de multi-tenancy
 
@@ -251,12 +259,10 @@ No hay columna de moneda: es constante del sistema.
 
 **`products`**
 
-| Columna                  | Nota                                                                                                                                          |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `condition`              | `nuevo`, `segunda_mano` o `reacondicionado`. **Lo elige el emprendedor al cargar el producto** y es lo que alimenta el filtro de segunda mano |
-| `condition_note`         | Descripción del estado, para usados                                                                                                           |
-| `compare_at_price_cents` | Precio anterior, opcional. Debe ser mayor o igual al precio. Es lo que produce el descuento destacado                                         |
-| `deleted_at`             | Borrado lógico                                                                                                                                |
+| Columna                  | Nota                                                                                                  |
+| ------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `compare_at_price_cents` | Precio anterior, opcional. Debe ser mayor o igual al precio. Es lo que produce el descuento destacado |
+| `deleted_at`             | Borrado lógico                                                                                        |
 
 #### Venta
 
@@ -288,8 +294,6 @@ Sin marca de borrado: un pedido se cancela, no se borra.
 | `store_design_versions`       | Puntos de restauración del diseño: plantilla, personalización y páginas con bloques. Se toman antes de cada cambio; solo las escriben funciones |
 
 El vínculo de un bloque con su tipo **no se puede romper**: no se retira del catálogo un tipo de bloque que alguna tienda esté usando.
-
-El filtro de segunda mano no es un tipo de bloque aparte: es una **propiedad del bloque de grilla de productos**.
 
 #### Catálogos en PDF
 
@@ -368,7 +372,7 @@ Una venta es un pedido **pagado**: un pendiente puede ser un carrito que se mand
 
 ### Catálogos en PDF
 
-Recibe una frase —«las zapatillas en oferta», «lista de precios para revendedores»— y los productos de la tienda con su precio, su descuento, su condición y su stock. Devuelve qué productos van, en qué orden, con qué plantilla, un nombre y una bajada para la portada, y en una línea por qué. El sistema descarta los productos que no son de esa tienda antes de armar nada, y el emprendedor ve la propuesta y decide si la usa. Con un catálogo abierto, la misma tarea elige y ordena solo entre sus productos.
+Recibe una frase —«las zapatillas en oferta», «lista de precios para revendedores»— y los productos de la tienda con su precio, su descuento y su stock. Devuelve qué productos van, en qué orden, con qué plantilla, un nombre y una bajada para la portada, y en una línea por qué. El sistema descarta los productos que no son de esa tienda antes de armar nada, y el emprendedor ve la propuesta y decide si la usa. Con un catálogo abierto, la misma tarea elige y ordena solo entre sus productos.
 
 ### Marketing
 

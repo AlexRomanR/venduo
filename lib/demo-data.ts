@@ -105,7 +105,7 @@ const DEMO_TOP_PRODUCTS = [
   },
   { name: "Cargador rápido 20W", unitsSold: 118, revenueCents: 1_026_000 },
   {
-    name: "Celular reacondicionado",
+    name: "Celular 128 GB",
     unitsSold: 7,
     revenueCents: 462_000,
   },
@@ -162,7 +162,7 @@ export const RUBROS_DEMO: RubroConPlantillas[] = [
         name: "Pasarela",
         sector: "moda",
         description:
-          "Ropa, calzado y carteras. Fotos grandes en retrato, las categorías a la vista y la segunda mano con vitrina propia.",
+          "Ropa, calzado y carteras. Fotos grandes en retrato, las categorías a la vista y lo más buscado con vitrina propia.",
         bloques: [
           "hero",
           "categories",
@@ -267,8 +267,6 @@ const NOW = new Date().toISOString()
 const DEMO_PRODUCT_BASE = {
   store_id: "demo-store",
   compare_at_price_cents: null,
-  condition: "nuevo" as const,
-  condition_note: null,
   image_url: null,
   images: [],
   category_id: null,
@@ -304,12 +302,10 @@ export const DEMO_PRODUCTS: Product[] = [
   {
     ...DEMO_PRODUCT_BASE,
     id: "demo-3",
-    name: "Celular reacondicionado",
+    name: "Celular 128 GB",
     description: "128 GB, batería al 89% y seis meses de garantía.",
     price_cents: 66000,
     compare_at_price_cents: 89000,
-    condition: "reacondicionado",
-    condition_note: "Marcas leves en el borde, pantalla impecable.",
     stock: 3,
     category: "Celulares",
     is_active: true,
@@ -503,7 +499,6 @@ function productoDeCatalogo(
     stock: 6,
     categoriaId: `demo-cat-${categoria.toLowerCase()}`,
     categoria,
-    condicion: "nuevo",
     codigo: `RD-${id.toUpperCase()}`,
     foto: fotoDemo(foto),
     destacado: false,
@@ -512,8 +507,8 @@ function productoDeCatalogo(
 }
 
 /**
- * El catálogo de Rosa Deportes: con fotos, categorías, rebajas, una prenda de
- * segunda mano y una agotada, para que cada plantilla tenga qué mostrar.
+ * El catálogo de Rosa Deportes: con fotos, categorías, rebajas y una prenda
+ * casi agotada, para que cada plantilla tenga qué mostrar.
  */
 export const PRODUCTOS_DE_CATALOGO_DEMO: ProductoDelCatalogo[] = [
   productoDeCatalogo(
@@ -585,10 +580,8 @@ export const PRODUCTOS_DE_CATALOGO_DEMO: ProductoDelCatalogo[] = [
     "1556906781-9a412961c28c",
     38000,
     {
-      condicion: "segunda_mano",
       stock: 1,
-      descripcion:
-        "Usada dos veces, talla 41. Sin marcas ni desgaste en la suela.",
+      descripcion: "Caña alta acolchada, talla 41. Última unidad.",
     }
   ),
   productoDeCatalogo(

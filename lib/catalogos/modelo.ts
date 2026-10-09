@@ -73,7 +73,6 @@ export const camposSchema = z.object({
   precioAnterior: z.boolean(),
   descripcion: z.boolean(),
   categoria: z.boolean(),
-  condicion: z.boolean(),
   stock: z.boolean(),
   codigo: z.boolean(),
 })

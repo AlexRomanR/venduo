@@ -109,7 +109,7 @@ const PASOS = [
     n: "01",
     titulo: "Subes tus productos",
     detalle:
-      "Con su foto, su precio y cuántas unidades tienes. Lo nuevo y lo de segunda mano, en el mismo lugar.",
+      "Con su foto, su precio y cuántas unidades tienes. Ordenados por categoría y con lo más buscado al frente.",
   },
   {
     n: "02",
@@ -166,7 +166,7 @@ const RUBROS = [
   "Accesorios y joyas",
   "Celulares y tecnología",
   "Deporte",
-  "Segunda mano",
+  "Regalos y variedades",
 ]
 
 const PREGUNTAS = [

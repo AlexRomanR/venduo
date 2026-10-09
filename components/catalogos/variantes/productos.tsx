@@ -1,7 +1,6 @@
 import type { ReactElement } from "react"
 
 import {
-  CONDICIONES,
   type Contexto,
   type Hoja,
   type ProductoDelCatalogo,
@@ -125,7 +124,7 @@ function repartir(
 }
 
 function hayDetalle(campos: Campos): boolean {
-  return campos.categoria || campos.condicion || campos.stock || campos.codigo
+  return campos.categoria || campos.stock || campos.codigo
 }
 
 /** Lo que ocupa debajo de la foto una celda de grilla. */
@@ -528,11 +527,7 @@ function CeldaDeTabla({
       )
     case "producto": {
       const segunda =
-        campos.descripcion && producto.descripcion
-          ? producto.descripcion
-          : campos.condicion && producto.condicion !== "nuevo"
-            ? CONDICIONES[producto.condicion]
-            : null
+        campos.descripcion && producto.descripcion ? producto.descripcion : null
       return (
         <P.Caja estilo={{ rowGap: 1 }}>
           <P.Texto estilo={fuerte(ctx, m.cuerpo)} lineas={1}>
@@ -603,10 +598,7 @@ function VarianteTabla({ P, ctx, hoja }: Props) {
     (m.alto - altoDeEncabezado(m, true) - cabecera) / bloque.porPagina,
     m.vertical ? 56 : 42
   )
-  const segunda =
-    bloque.campos.descripcion ||
-    bloque.campos.condicion ||
-    bloque.campos.precioAnterior
+  const segunda = bloque.campos.descripcion || bloque.campos.precioAnterior
   const necesario = m.cuerpo * 1.25 + (segunda ? m.chico * 1.25 + 1 : 0) + 6
   const escala = Math.min(1, fila / necesario)
 
@@ -1219,12 +1211,9 @@ function VarianteEtiquetas({ P, ctx, hoja }: Props) {
   const { bloque } = hoja
   const { campos } = bloque
   const { colores, radio } = ctx.estilo
-  const sinCondicion = { ...campos, condicion: false }
   const alto = m.alto - (bloque.titulo ? altoDeEncabezado(m) : 0)
   const texto =
-    8 +
-    m.nombre * 1.25 * 2 +
-    (hayDetalle(sinCondicion) ? m.chico * 1.38 + 3 : 0)
+    8 + m.nombre * 1.25 * 2 + (hayDetalle(campos) ? m.chico * 1.38 + 3 : 0)
   const reparto = repartir(porHoja(hoja), m.ancho, alto, m.gap, texto, 1, 1.25)
 
   return (
@@ -1240,13 +1229,8 @@ function VarianteEtiquetas({ P, ctx, hoja }: Props) {
             campos.precioAnterior && rebaja(producto)
               ? producto.precioAnteriorCents
               : null
-          const estado =
-            producto.stock <= 0
-              ? "Agotado"
-              : campos.condicion && producto.condicion !== "nuevo"
-                ? CONDICIONES[producto.condicion]
-                : null
-          const detalle = detalles(producto, sinCondicion)
+          const estado = producto.stock <= 0 ? "Agotado" : null
+          const detalle = detalles(producto, campos)
 
           return (
             <P.Caja estilo={{ rowGap: 4 }}>

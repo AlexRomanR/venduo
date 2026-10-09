@@ -4,7 +4,7 @@ import { ArrowRight, ImageOff, MessageCircle } from "lucide-react"
 import type { ReactNode } from "react"
 
 import { numeroDeWhatsApp } from "@/lib/pedidos"
-import { CONDICIONES, descuento } from "@/lib/plantillas/bloques"
+import { descuento } from "@/lib/plantillas/bloques"
 import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
@@ -59,12 +59,6 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
             <ImageOff aria-hidden="true" className="size-7 opacity-25" />
           </div>
         )}
-
-        {producto.condition !== "nuevo" ? (
-          <span className="absolute top-2 left-2 rounded-full bg-papel px-2.5 py-1 text-[10px] font-semibold">
-            {CONDICIONES[producto.condition]}
-          </span>
-        ) : null}
 
         {/* La etiqueta de precio, pegada y torcida como en una góndola. */}
         <span

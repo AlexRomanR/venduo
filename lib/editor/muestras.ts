@@ -23,7 +23,6 @@ interface Ejemplo {
   antes?: number
   categoria: string
   foto: string
-  condicion?: Product["condition"]
   destacado?: boolean
 }
 
@@ -69,7 +68,6 @@ const EJEMPLOS: Record<ClavePlantilla, Ejemplo[]> = {
       precio: 24000,
       categoria: "Mochilas",
       foto: foto("1553062407-98eeb64c6a62"),
-      condicion: "segunda_mano",
     },
     {
       nombre: "Gorra deportiva",
@@ -143,7 +141,6 @@ const EJEMPLOS: Record<ClavePlantilla, Ejemplo[]> = {
       precio: 45000,
       categoria: "Chamarras",
       foto: foto("1551028719-00167b16eac5"),
-      condicion: "segunda_mano",
     },
     {
       nombre: "Jean recto",
@@ -195,11 +192,10 @@ const EJEMPLOS: Record<ClavePlantilla, Ejemplo[]> = {
     },
     {
       nombre: "Bolso estampado",
-      descripcion: "Usado dos veces, sin marcas. Con su correa original.",
+      descripcion: "Estampado floral, asas firmes y correa larga desmontable.",
       precio: 30000,
       categoria: "Bolsos",
       foto: foto("1591561954557-26941169b49e"),
-      condicion: "segunda_mano",
     },
     {
       nombre: "Billetera de cuero",
@@ -243,11 +239,10 @@ const EJEMPLOS: Record<ClavePlantilla, Ejemplo[]> = {
     },
     {
       nombre: "Deportiva tricolor",
-      descripcion: "Usada pocas veces, con su caja.",
+      descripcion: "Malla transpirable y suela de goma con buen agarre.",
       precio: 39000,
       categoria: "Running",
       foto: foto("1560769629-975ec94e6a86"),
-      condicion: "segunda_mano",
     },
     {
       nombre: "Tacón estampado",
@@ -328,7 +323,6 @@ const EJEMPLOS: Record<ClavePlantilla, Ejemplo[]> = {
       precio: 52000,
       categoria: "Tecnología",
       foto: foto("1526170375885-4d8ecf77b99f"),
-      condicion: "segunda_mano",
     },
     {
       nombre: "Botella térmica",
@@ -390,7 +384,6 @@ const EJEMPLOS: Record<ClavePlantilla, Ejemplo[]> = {
       precio: 26000,
       categoria: "Tecnología",
       foto: foto("1609091839311-d5365f9ff1c5"),
-      condicion: "reacondicionado",
     },
     {
       nombre: "Teclado mecánico",
@@ -422,8 +415,6 @@ export function productosDeEjemplo(
     image_url: ejemplo.foto,
     category: ejemplo.categoria,
     category_id: `ejemplo-${ejemplo.categoria}`,
-    condition: ejemplo.condicion ?? "nuevo",
-    condition_note: null,
     is_active: true,
     is_featured: ejemplo.destacado ?? false,
     sku: null,

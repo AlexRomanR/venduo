@@ -7,24 +7,21 @@ import { cn } from "@/lib/utils"
 import type { CategoriaPublica } from "@/lib/data/tienda-publica"
 
 /**
- * El filtro del catálogo.
+ * El filtro del catálogo: lo que está en oferta y las categorías.
  *
- * El de segunda mano no es una sección aparte: es un filtro, porque un mismo
- * comercio vende nuevo y usado y quien busca una ganga quiere verlos juntos.
- *
- * Va por URL: así el enlace de "solo segunda mano" se puede compartir, que es
- * exactamente lo que hace una tienda en un grupo de WhatsApp.
+ * Va por URL: así el enlace de "lo que está en oferta" se puede compartir, que
+ * es exactamente lo que hace una tienda en un grupo de WhatsApp.
  */
 export function FiltrosTienda({
   categorias,
-  usados,
+  ofertas,
   total,
   mostrando,
   redondeadas = false,
 }: {
   categorias: CategoriaPublica[]
-  /** Cuántos productos no son nuevos. Con cero, el filtro no se dibuja. */
-  usados: number
+  /** Cuántos productos tienen precio anterior. Con cero, "En oferta" no se dibuja. */
+  ofertas: number
   total: number
   mostrando: number
   /** Con el radio de la plantilla. La base editorial las quiere rectas. */
@@ -34,7 +31,7 @@ export function FiltrosTienda({
   const ruta = usePathname()
   const parametros = useSearchParams()
 
-  const condicion = parametros.get("condicion")
+  const oferta = parametros.get("oferta") === "1"
   const categoria = parametros.get("categoria")
 
   function aplicar(cambios: Record<string, string | null>) {
@@ -47,7 +44,7 @@ export function FiltrosTienda({
     router.replace(consulta ? `${ruta}?${consulta}` : ruta, { scroll: false })
   }
 
-  const hayFiltro = Boolean(condicion || categoria)
+  const hayFiltro = Boolean(oferta || categoria)
 
   return (
     <div className="flex flex-col gap-4">
@@ -56,51 +53,19 @@ export function FiltrosTienda({
           <FichaDeFiltro
             redondeada={redondeadas}
             activa={!hayFiltro}
-            onClick={() => aplicar({ condicion: null, categoria: null })}
+            onClick={() => aplicar({ oferta: null, categoria: null })}
           >
             Todo
           </FichaDeFiltro>
 
-          {usados > 0 ? (
-            <>
-              <FichaDeFiltro
-                redondeada={redondeadas}
-                activa={condicion === "segunda_mano"}
-                onClick={() =>
-                  aplicar({
-                    condicion:
-                      condicion === "segunda_mano" ? null : "segunda_mano",
-                  })
-                }
-              >
-                Segunda mano
-              </FichaDeFiltro>
-              <FichaDeFiltro
-                redondeada={redondeadas}
-                activa={condicion === "reacondicionado"}
-                onClick={() =>
-                  aplicar({
-                    condicion:
-                      condicion === "reacondicionado"
-                        ? null
-                        : "reacondicionado",
-                  })
-                }
-              >
-                Reacondicionado
-              </FichaDeFiltro>
-              <FichaDeFiltro
-                redondeada={redondeadas}
-                activa={condicion === "oferta"}
-                onClick={() =>
-                  aplicar({
-                    condicion: condicion === "oferta" ? null : "oferta",
-                  })
-                }
-              >
-                En oferta
-              </FichaDeFiltro>
-            </>
+          {ofertas > 0 ? (
+            <FichaDeFiltro
+              redondeada={redondeadas}
+              activa={oferta}
+              onClick={() => aplicar({ oferta: oferta ? null : "1" })}
+            >
+              En oferta
+            </FichaDeFiltro>
           ) : null}
 
           {categorias

@@ -1,11 +1,7 @@
 import Link from "next/link"
 import { MessageCircle } from "lucide-react"
 
-import {
-  CONDICIONES,
-  descuento,
-  enlaceDeConsulta,
-} from "@/lib/plantillas/bloques"
+import { descuento, enlaceDeConsulta } from "@/lib/plantillas/bloques"
 import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
@@ -149,9 +145,11 @@ function LaCasa({ tienda }: { tienda: TiendaPublica }) {
 
 export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
   const categoria = tienda.categorias.find((c) => c.id === filtros.categoria)
-  const usados = tienda.productos.filter((p) => p.condition !== "nuevo").length
+  const ofertas = tienda.productos.filter(
+    (p) => p.compare_at_price_cents
+  ).length
   const hayFiltro = Boolean(
-    filtros.categoria || filtros.condicion || filtros.buscar
+    filtros.categoria || filtros.oferta || filtros.buscar
   )
 
   return (
@@ -160,11 +158,7 @@ export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
         antetitulo="La colección"
         titulo={
           categoria?.nombre ??
-          (filtros.condicion === "oferta"
-            ? "En oferta"
-            : filtros.condicion
-              ? (CONDICIONES[filtros.condicion] ?? "La colección")
-              : "Toda la colección")
+          (filtros.oferta ? "En oferta" : "Toda la colección")
         }
         como="h1"
       />
@@ -172,7 +166,7 @@ export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
       <div className="mt-12 flex flex-col gap-5 border-y border-tinta/10 py-6">
         <FiltrosTienda
           categorias={tienda.categorias}
-          usados={usados}
+          ofertas={ofertas}
           total={tienda.productos.length}
           mostrando={productos.length}
           redondeadas
@@ -296,17 +290,6 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
             </p>
           ) : null}
 
-          {producto.condition !== "nuevo" && producto.condition_note ? (
-            <p
-              className={cn(
-                "mx-auto mt-5 max-w-[50ch] text-sm leading-relaxed italic opacity-70",
-                !vitrina && "md:mx-0"
-              )}
-            >
-              {CONDICIONES[producto.condition]}: {producto.condition_note}
-            </p>
-          ) : null}
-
           <div className={cn("mt-10 text-left", vitrina && "mx-auto max-w-md")}>
             <AgregarAlCarrito producto={producto} slug={tienda.slug} />
           </div>
@@ -319,10 +302,10 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
           >
             <div className="bg-papel px-4 py-5">
               <dt className="text-[10px] tracking-[0.24em] uppercase opacity-55">
-                Condición
+                Familia
               </dt>
               <dd className="mt-1.5 text-sm">
-                {CONDICIONES[producto.condition] ?? producto.condition}
+                {producto.category ?? "Sin familia"}
               </dd>
             </div>
             <div className="bg-papel px-4 py-5">

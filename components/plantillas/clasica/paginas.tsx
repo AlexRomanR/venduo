@@ -3,11 +3,7 @@ import Link from "next/link"
 import { ArrowLeft, ImageOff, MessageCircle } from "lucide-react"
 
 import { filtrarCatalogo } from "@/lib/catalogo"
-import {
-  CONDICIONES,
-  descuento,
-  enlaceDeConsulta,
-} from "@/lib/plantillas/bloques"
+import { descuento, enlaceDeConsulta } from "@/lib/plantillas/bloques"
 import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
@@ -38,9 +34,11 @@ import { FiltrosTienda } from "@/components/tienda/filtros"
 export function Inicio({ tienda, filtros }: PropsInicio) {
   const catalogo = filtrarCatalogo(tienda.productos, {
     categoria: filtros.categoria,
-    condicion: filtros.condicion,
+    oferta: filtros.oferta,
   })
-  const usados = tienda.productos.filter((p) => p.condition !== "nuevo").length
+  const ofertas = tienda.productos.filter(
+    (p) => p.compare_at_price_cents
+  ).length
 
   return (
     <>
@@ -100,7 +98,7 @@ export function Inicio({ tienda, filtros }: PropsInicio) {
             <div className="mt-8">
               <FiltrosTienda
                 categorias={tienda.categorias}
-                usados={usados}
+                ofertas={ofertas}
                 total={tienda.productos.length}
                 mostrando={catalogo.length}
               />
@@ -211,7 +209,9 @@ function DatosDeLaTienda({
 
 export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
   const categoria = tienda.categorias.find((c) => c.id === filtros.categoria)
-  const usados = tienda.productos.filter((p) => p.condition !== "nuevo").length
+  const ofertas = tienda.productos.filter(
+    (p) => p.compare_at_price_cents
+  ).length
 
   return (
     <section className="py-12 md:py-16">
@@ -235,7 +235,7 @@ export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
           <BuscarYOrdenar />
           <FiltrosTienda
             categorias={tienda.categorias}
-            usados={usados}
+            ofertas={ofertas}
             total={tienda.productos.length}
             mostrando={productos.length}
           />
@@ -359,8 +359,6 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
               vitrina && "justify-center"
             )}
           >
-            <span>{CONDICIONES[producto.condition] ?? producto.condition}</span>
-            <span aria-hidden="true">·</span>
             <span>
               {producto.stock > 0
                 ? `${producto.stock} disponibles`
@@ -377,22 +375,6 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
             >
               {producto.description}
             </p>
-          ) : null}
-
-          {producto.condition !== "nuevo" && producto.condition_note ? (
-            <div
-              className={cn(
-                "mt-6 border-l-2 border-senal pl-4",
-                vitrina && "mx-auto max-w-md text-left"
-              )}
-            >
-              <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-                Estado del artículo
-              </p>
-              <p className="mt-2 max-w-[52ch] leading-relaxed opacity-75">
-                {producto.condition_note}
-              </p>
-            </div>
           ) : null}
 
           <div className={cn("mt-10", vitrina && "mx-auto max-w-md text-left")}>

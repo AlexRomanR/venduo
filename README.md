@@ -27,16 +27,16 @@
 
 **Venduo es una plataforma que genera tiendas online para emprendedores que venden por
 TikTok, Instagram, Facebook y WhatsApp.** Quien vende por redes no necesita "una página
-web": necesita dejar de responder "¿precio?" cincuenta veces al día, no vender lo que ya
+web": necesita dejar de responder "¿precio?" varias veces al día, no vender lo que ya
 no tiene y dejar de perder pedidos entre mensajes.
 
 Con Venduo, el emprendedor:
 
-1. **Elige una plantilla** según su rubro (moda, perfumería o editorial).
+1. **Elige una plantilla** entre siete, según lo que vende: ropa, ropa urbana, carteras, calzado, perfumes o de todo un poco.
 2. **Cuenta su negocio** en un párrafo, deja el **WhatsApp de su tienda** y la **IA
    ajusta la tienda**: secciones, textos, colores y tipografía.
-3. **Carga sus productos** con fotos, stock y condición (nuevo, segunda mano o
-   reacondicionado).
+3. **Carga sus productos** con fotos, stock, categoría y precio anterior para sus
+   ofertas.
 4. **Publica** y obtiene el enlace de su tienda y un código QR para sus redes y WhatsApp.
 5. **Recibe los pedidos por WhatsApp**: su cliente arma el carrito y se lo manda con el
    total y el número del pedido, sin llenar formularios.
@@ -55,7 +55,7 @@ Con Venduo, el emprendedor:
 | 🛍️ **Generador de tiendas**             | Alta en tres pasos: plantilla, datos del negocio y tienda publicada con URL propia (`/t/{slug}`) y QR                                       |
 | 🎨 **Editor visual con IA**             | Seis pasos con vista previa real: marca, portada, catálogo, ficha de producto, carrito y publicar. Arrastrar secciones, deshacer, versiones |
 | 🤖 **La IA edita por bloques**          | Se le pide en palabras ("ponla en tonos de verano") y devuelve operaciones que el sistema valida antes de mostrarlas                        |
-| 📦 **Productos y stock**                | Fotos, stock con umbral de aviso, categorías, precio anterior para descuentos, segunda mano y reacondicionados                              |
+| 📦 **Productos y stock**                | Fotos, stock con umbral de aviso, categorías, precio anterior para descuentos y productos destacados                                        |
 | 🧾 **Pedidos por WhatsApp**             | El carrito se manda al WhatsApp de la tienda con su número y su total; en el panel se marca pagado y el stock baja solo                     |
 | 📊 **Estadísticas en lenguaje natural** | "¿Qué producto se vende más este mes?" → la IA arma la consulta y la respuesta llega como gráfico, con informe descargable en PDF           |
 | 📄 **Catálogos en PDF**                 | Doce plantillas, packs y ofertas, con los colores de la tienda. Se descargan, se comparten por enlace o se siguen editando en Canva         |
@@ -198,7 +198,7 @@ npm run setup   # crea .env.local desde .env.example y dice qué falta
 | Generación de la tienda desde una plantilla del rubro  | ✅     |
 | Editor visual de la tienda asistido por IA             | ✅     |
 | Tienda pública con URL propia, navegable en el celular | ✅     |
-| Productos con fotos, stock, categorías y condición     | ✅     |
+| Productos con fotos, stock, categorías y ofertas       | ✅     |
 | Carrito que manda el pedido por WhatsApp, sin datos    | ✅     |
 | Pedidos en el panel, con stock que baja al pagar       | ✅     |
 | Estadísticas en lenguaje natural con informe en PDF    | ✅     |

@@ -28,7 +28,6 @@ mis_items — una línea de pedido por fila (qué producto se vendió)
 mis_productos — el catálogo de hoy, no depende de ventas
   name                    text
   category                text, puede ser nulo
-  condition               text: nuevo | segunda_mano | reacondicionado
   price_cents             integer, centavos
   compare_at_price_cents  integer, centavos, puede ser nulo
   stock                   integer
