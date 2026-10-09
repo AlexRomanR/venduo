@@ -27,12 +27,12 @@
 
 **Venduo es una plataforma que genera tiendas online para emprendedores que venden por
 TikTok, Instagram, Facebook y WhatsApp.** Quien vende por redes no necesita "una página
-web": necesita dejar de responder "¿precio?" cincuenta veces al día, no vender lo que ya
+web": necesita dejar de responder "¿precio?" varias veces al día, no vender lo que ya
 no tiene y dejar de perder pedidos entre mensajes.
 
 Con Venduo, el emprendedor:
 
-1. **Elige una plantilla** según su rubro (moda, perfumería o editorial).
+1. **Elige una plantilla** entre siete, según lo que vende: ropa, ropa urbana, carteras, calzado, perfumes o de todo un poco.
 2. **Cuenta su negocio** en un párrafo, deja el **WhatsApp de su tienda** y la **IA
    ajusta la tienda**: secciones, textos, colores y tipografía.
 3. **Carga sus productos** con fotos, stock y condición (nuevo, segunda mano o

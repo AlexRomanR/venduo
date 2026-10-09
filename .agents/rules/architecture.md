@@ -53,7 +53,7 @@ barra": en corto, toda pantalla de la cuenta de quien ya tiene panel.
 
 ## A dónde entra cada cuenta
 
-Hay un solo tipo de cuenta, y el destino lo decide el estado de sus datos. Lo
+Para la cuenta de un emprendedor, el destino lo decide el estado de sus datos. Lo
 resuelve un `redirect()` en el componente de servidor:
 
 | Situación                              | Va a     |
@@ -63,6 +63,9 @@ resuelve un `redirect()` en el componente de servidor:
 
 La comprobación es sobre `stores.template_key` y no sobre la existencia de la fila:
 es lo que marca que el alta terminó.
+
+La cuenta de administrador de Venduo opera la plataforma desde `/admin`; no tiene
+tienda y no pasa por esta tabla. Ver `domain-venduo.md`.
 
 **El ingreso no adivina el destino: manda a `/auth/destino`.** Ese route handler
 resuelve en el servidor y redirige una sola vez. Antes empujaba a `/panel` y esa
