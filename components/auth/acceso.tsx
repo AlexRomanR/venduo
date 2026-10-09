@@ -63,6 +63,7 @@ const baseSchema = z.object({
   fullName: z.string().max(80),
   email: z.email("Escribe un correo válido."),
   password: z.string(),
+  invitacion: z.string().max(20),
 })
 
 const signInSchema = baseSchema.extend({
@@ -76,6 +77,17 @@ const signUpSchema = baseSchema.extend({
     .min(MIN_PASSWORD, `Mínimo ${MIN_PASSWORD} caracteres.`)
     .max(72, "Máximo 72 caracteres."),
 })
+
+/** Con el registro por invitación, el código es obligatorio. */
+const signUpConInvitacionSchema = signUpSchema.extend({
+  invitacion: z
+    .string()
+    .trim()
+    .min(4, "Escribe el código de tu invitación.")
+    .max(20),
+})
+
+export type EstadoDelRegistro = "abierto" | "cerrado" | "invitacion"
 
 type Values = z.infer<typeof baseSchema>
 
@@ -92,25 +104,37 @@ export function Acceso({
   configured,
   initialError,
   registro = false,
+  estadoDelRegistro = "abierto",
 }: {
   next?: string
   configured: boolean
   initialError?: string
   /** Quien llega desde "Crear mi tienda" viene a registrarse, no a entrar. */
   registro?: boolean
+  /** Lo decide Venduo desde la administración; la base lo hace cumplir. */
+  estadoDelRegistro?: EstadoDelRegistro
 }) {
   const [modo, setModo] = React.useState<Modo>(
     registro ? "registrarse" : "ingresar"
   )
 
   const esRegistro = modo === "registrarse"
+  const conInvitacion = estadoDelRegistro === "invitacion"
+  const cerrado = estadoDelRegistro === "cerrado"
 
   const form = useForm<Values>({
-    resolver: zodResolver(esRegistro ? signUpSchema : signInSchema),
+    resolver: zodResolver(
+      esRegistro
+        ? conInvitacion
+          ? signUpConInvitacionSchema
+          : signUpSchema
+        : signInSchema
+    ),
     defaultValues: {
       fullName: "",
       email: "",
       password: "",
+      invitacion: "",
     },
   })
 
@@ -136,15 +160,29 @@ export function Acceso({
       const { error } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
-        // El disparador de la base lee el nombre para crear el perfil.
-        options: { data: { full_name: values.fullName } },
+        // El disparador de la base lee el nombre para crear el perfil, y el
+        // código para dejar pasar a quien tiene invitación.
+        options: {
+          data: {
+            full_name: values.fullName,
+            ...(conInvitacion
+              ? { invitacion: values.invitacion.trim().toUpperCase() }
+              : {}),
+          },
+        },
       })
 
       if (error) {
+        // Lo que rechaza el disparador llega como un error genérico de la
+        // base: el estado del registro dice qué fue.
         toast.error(
           error.message.includes("already registered")
             ? "Ese correo ya tiene cuenta. Prueba ingresando."
-            : error.message
+            : error.message.includes("Database error")
+              ? conInvitacion
+                ? "Ese código de invitación no sirve: puede que ya se haya usado o que haya vencido."
+                : "No pudimos crear tu cuenta. Puede que el registro esté cerrado por ahora."
+              : "No pudimos crear tu cuenta. Inténtalo de nuevo."
         )
         return
       }
@@ -220,93 +258,142 @@ export function Acceso({
           ))}
         </div>
 
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="mt-8 flex flex-col gap-7"
-          >
-            {esRegistro ? (
-              <>
+        {esRegistro && cerrado ? (
+          <div className="mt-8 flex flex-col gap-5">
+            <p className="max-w-[46ch] leading-relaxed">
+              Por ahora no estamos abriendo cuentas nuevas. Si ya tienes una,
+              ingresa con tu correo.
+            </p>
+            <button
+              type="button"
+              onClick={() => cambiarModo("ingresar")}
+              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border-2 border-tinta px-5 font-semibold transition-colors hover:bg-tinta hover:text-papel"
+            >
+              Ya tengo cuenta
+            </button>
+          </div>
+        ) : (
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="mt-8 flex flex-col gap-7"
+            >
+              {esRegistro && conInvitacion ? (
                 <FormField
                   control={form.control}
-                  name="fullName"
-                  render={({ field }) => (
+                  name="invitacion"
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel className={ETIQUETA_CAMPO}>Nombre</FormLabel>
+                      <FormLabel className={ETIQUETA_CAMPO}>
+                        Código de invitación
+                      </FormLabel>
                       <FormControl>
                         <Input
-                          className={CAMPO}
-                          placeholder="Tu nombre"
-                          autoComplete="name"
+                          className={cn(
+                            CAMPO,
+                            "font-mono tracking-wider uppercase"
+                          )}
+                          placeholder="XXXX-XXXX"
+                          autoComplete="off"
+                          autoCapitalize="characters"
+                          spellCheck={false}
                           {...field}
                         />
                       </FormControl>
+                      {!fieldState.error ? (
+                        <FormDescription className="text-xs text-tinta/55">
+                          Por ahora las cuentas nuevas son por invitación.
+                        </FormDescription>
+                      ) : null}
                       <FormMessage className="text-sm text-senal" />
                     </FormItem>
                   )}
                 />
-              </>
-            ) : null}
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className={ETIQUETA_CAMPO}>Correo</FormLabel>
-                  <FormControl>
-                    <Input
-                      className={CAMPO}
-                      type="email"
-                      placeholder="tu@ejemplo.com"
-                      autoComplete="email"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-sm text-senal" />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field, fieldState }) => (
-                <FormItem>
-                  <FormLabel className={ETIQUETA_CAMPO}>Contraseña</FormLabel>
-                  <FormControl>
-                    <Input
-                      className={CAMPO}
-                      type="password"
-                      autoComplete={
-                        esRegistro ? "new-password" : "current-password"
-                      }
-                      {...field}
-                    />
-                  </FormControl>
-                  {/* La pista y el error dicen lo mismo: el error la reemplaza. */}
-                  {esRegistro && !fieldState.error ? (
-                    <FormDescription className="text-xs text-tinta/55">
-                      Mínimo {MIN_PASSWORD} caracteres.
-                    </FormDescription>
-                  ) : null}
-                  <FormMessage className="text-sm text-senal" />
-                </FormItem>
-              )}
-            />
-
-            <button
-              type="submit"
-              disabled={form.formState.isSubmitting}
-              className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-sm bg-senal px-5 font-semibold text-white transition-colors hover:bg-senal-alta disabled:opacity-60"
-            >
-              {form.formState.isSubmitting ? (
-                <Loader2 aria-hidden="true" className="size-4 animate-spin" />
               ) : null}
-              {esRegistro ? "Crear cuenta" : "Ingresar"}
-            </button>
-          </form>
-        </Form>
+
+              {esRegistro ? (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="fullName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className={ETIQUETA_CAMPO}>Nombre</FormLabel>
+                        <FormControl>
+                          <Input
+                            className={CAMPO}
+                            placeholder="Tu nombre"
+                            autoComplete="name"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-sm text-senal" />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              ) : null}
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className={ETIQUETA_CAMPO}>Correo</FormLabel>
+                    <FormControl>
+                      <Input
+                        className={CAMPO}
+                        type="email"
+                        placeholder="tu@ejemplo.com"
+                        autoComplete="email"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm text-senal" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormLabel className={ETIQUETA_CAMPO}>Contraseña</FormLabel>
+                    <FormControl>
+                      <Input
+                        className={CAMPO}
+                        type="password"
+                        autoComplete={
+                          esRegistro ? "new-password" : "current-password"
+                        }
+                        {...field}
+                      />
+                    </FormControl>
+                    {/* La pista y el error dicen lo mismo: el error la reemplaza. */}
+                    {esRegistro && !fieldState.error ? (
+                      <FormDescription className="text-xs text-tinta/55">
+                        Mínimo {MIN_PASSWORD} caracteres.
+                      </FormDescription>
+                    ) : null}
+                    <FormMessage className="text-sm text-senal" />
+                  </FormItem>
+                )}
+              />
+
+              <button
+                type="submit"
+                disabled={form.formState.isSubmitting}
+                className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-sm bg-senal px-5 font-semibold text-white transition-colors hover:bg-senal-alta disabled:opacity-60"
+              >
+                {form.formState.isSubmitting ? (
+                  <Loader2 aria-hidden="true" className="size-4 animate-spin" />
+                ) : null}
+                {esRegistro ? "Crear cuenta" : "Ingresar"}
+              </button>
+            </form>
+          </Form>
+        )}
       </div>
 
       {/* En el ingreso no hay nada que vender: quien vuelve ya conoce esto. */}

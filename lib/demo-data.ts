@@ -137,6 +137,9 @@ export interface PlantillaResumen {
   sector: string
   description: string | null
   bloques: string[]
+  /** Lo que Venduo marcó desde la administración. */
+  nueva?: boolean
+  recomendada?: boolean
 }
 
 export interface RubroConPlantillas {
@@ -268,6 +271,8 @@ const DEMO_PRODUCT_BASE = {
   store_id: "demo-store",
   compare_at_price_cents: null,
   image_url: null,
+  moderated_at: null,
+  moderation_reason: null,
   images: [],
   category_id: null,
   sku: null,

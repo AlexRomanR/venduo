@@ -4,6 +4,7 @@ import { Boxes, Package, Plus, Tags } from "lucide-react"
 
 import { getCatalogo, type FiltrosCatalogo } from "@/lib/data/catalogo"
 import { getMiTienda } from "@/lib/data/panel"
+import { visitasDeMiTienda } from "@/lib/data/visitas"
 import { isSupabaseConfigured } from "@/lib/env"
 import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
 import { formatMoney, formatNumber } from "@/lib/format"
@@ -50,7 +51,18 @@ export default async function ProductosPage({
     orden: texto("orden"),
   }
 
-  const { productos, categorias, resumen, esDemo } = await getCatalogo(filtros)
+  const [catalogo, visitas] = await Promise.all([
+    getCatalogo(filtros),
+    visitasDeMiTienda().catch(() => null),
+  ])
+  const { categorias, resumen, esDemo } = catalogo
+  // "Muy vistos, poco vendidos" sale de las visitas, no del catálogo: se
+  // filtra acá. Sin visitas activas, el filtro no existe y no filtra nada.
+  const muyVistos = new Set(visitas?.idsMuyVistosPocoVendidos ?? [])
+  const productos =
+    filtros.estado === "muy_vistos" && visitas
+      ? catalogo.productos.filter((p) => muyVistos.has(p.id))
+      : catalogo.productos
   const hayFiltros = Object.values(filtros).some(Boolean)
   const porReponer = resumen.sinStock + resumen.pocoStock
 
@@ -126,7 +138,9 @@ export default async function ProductosPage({
           ) : null
         }
       >
-        {resumen.total > 0 ? <Filtros categorias={categorias} /> : null}
+        {resumen.total > 0 ? (
+          <Filtros categorias={categorias} conVistas={Boolean(visitas)} />
+        ) : null}
 
         {productos.length === 0 ? (
           hayFiltros ? (
@@ -154,6 +168,7 @@ export default async function ProductosPage({
           <ListaProductos
             productos={productos}
             soloLectura={esDemo}
+            vistas={visitas?.vistasPorProducto ?? null}
             acciones={{
               alternar: alternarProducto,
               ajustarStock,

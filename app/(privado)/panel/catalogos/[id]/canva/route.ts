@@ -10,6 +10,7 @@ import {
   permisoGuardado,
 } from "@/lib/canva"
 import { getCatalogo } from "@/lib/data/catalogos"
+import { exigirFuncion } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 
 export const dynamic = "force-dynamic"
@@ -44,7 +45,14 @@ export async function GET(
   // a producción, sin sesión: mejor decirlo antes de salir.
   if (direccion.hostname === "localhost") return volver("local")
 
-  const [tienda, abierto] = await Promise.all([getMiTienda(), getCatalogo(id)])
+  const [tienda, abierto, permiso] = await Promise.all([
+    getMiTienda(),
+    getCatalogo(id),
+    exigirFuncion("canva"),
+  ])
+  if (!permiso.ok) {
+    return NextResponse.redirect(new URL(`/panel/catalogos/${id}`, origen))
+  }
   if (!tienda || !abierto) {
     return NextResponse.redirect(new URL("/panel/catalogos", origen))
   }

@@ -31,6 +31,9 @@ Actualizado el 9 de octubre de 2026.
 > con sus arreglos (abajo, "Revisión general"). Venduo deja de ser un proyecto de
 > hackathon y pasa a ser una startup: lo que existía solo para la demostración se va
 > quitando, empezando por la segunda mano.
+>
+> **9 de octubre:** la administración de Venduo (`/admin`) y las visitas por tienda,
+> las siete fases de `docs/plan-administracion.md`.
 
 ---
 
@@ -82,8 +85,10 @@ Actualizado el 9 de octubre de 2026.
 ### Cuentas y altas
 
 - Registro e ingreso con correo y contraseña. Toda cuenta que sale del registro es de
-  emprendedor y va a crear su tienda. La de administrador de Venduo está decidida
-  (`VENDUO.md` §7) y su panel, `/admin`, es lo próximo (ver "Lo que falta").
+  emprendedor y va a crear su tienda. La de administrador de Venduo se da de alta a mano
+  (`platform_admins`) y entra a `/admin`.
+- El registro puede estar **abierto, cerrado o con invitación**; lo decide el
+  administrador y lo hace cumplir el disparador `handle_new_user`.
 - `/auth/destino` decide a dónde entra cada cuenta según sus datos.
 - Alta de la tienda en tres pasos (`/crear`): elegir plantilla, contar el negocio con su
   **WhatsApp obligatorio** y, en `/crear/listo`, la oferta de personalizarla en el editor
@@ -197,6 +202,33 @@ que se arregló:
 - Barra lateral con contadores de lo que pide atención; se puede plegar y recuerda cómo
   quedó.
 
+### Administración (`/admin`)
+
+- Solo para la cuenta de administrador; para cualquier otra, con sesión o sin ella, 404.
+  Todo cambio queda en `admin_audit_log` y se ve en "Cambios".
+- **Resumen:** tiendas y su suscripción, ventas, pedidos y visitas de la plataforma, el
+  embudo de activación, las más visitadas y la salud del sistema.
+- **Tiendas:** lista con búsqueda, filtros —trabadas, sin publicar, en prueba,
+  bloqueadas, pausadas— y orden; exportación a CSV. La ficha de cada una trae sus
+  visitas, la suscripción (extender, marcar activa, bloquear), pausarla con motivo, sus
+  funciones, ocultar productos y notas internas, con un enlace a su WhatsApp.
+- **Plantillas:** cuáles se ofrecen, en qué orden y cuáles van marcadas como nuevas o
+  recomendadas, de tienda y de catálogo.
+- **Funciones:** diez, cada una activa, desactivada u oculta, para todas o por tienda; el
+  interruptor que apaga toda la IA y el tope diario de pedidos a la IA por tienda.
+- **IA:** pedidos, fallas y demoras, por tipo y por tienda.
+- **Registro:** abierto, cerrado o con invitación, y los códigos de invitación.
+
+### Visitas
+
+- Se cuentan sin cookies ni datos de nadie: una huella diaria con sal que se borra. De
+  dónde llega cada visita —WhatsApp, TikTok, Instagram, Facebook, QR, catálogo— sale del
+  referente o de la marca `?o=` que llevan el QR y el catálogo en PDF.
+- No cuentan el dueño, el administrador, los robots ni las precargas.
+- El administrador las ve siempre; el emprendedor, solo si se le activa la función
+  "Visitas" (oculta de fábrica): en su Resumen, en Productos —con el filtro "Muy vistos,
+  poco vendidos"— y en las preguntas a sus estadísticas.
+
 ### Base y seguridad
 
 - Supabase con RLS en todas las tablas y borrado lógico.
@@ -221,26 +253,11 @@ que se arregló:
 
 ## Lo que falta
 
-### 1. Administración y visitas — prioridad alta
+### 1. Funciones por plan — cuando se decida
 
-El plan completo, por fases, está en **`docs/plan-administracion.md`**:
-
-0. Quitar la segunda mano, que era para la hackathon.
-1. La base del administrador (`/admin`, solo su cuenta, registro de cambios) y
-   empezar a contar visitas de forma anónima.
-2. Qué plantillas de tienda y de catálogo se ofrecen.
-3. Funciones con tres estados —activa, desactivada, oculta—, generales y por tienda,
-   incluidas la IA y las visitas del emprendedor (ocultas por defecto).
-4. Tiendas: lista, ficha con sus visitas, pausar, suscripción y moderación.
-5. Resumen con el embudo, uso de IA, salud del sistema y las pantallas de visitas del
-   emprendedor.
-6. Registro abierto o cerrado y exportación.
-
-### 2. Borrar la columna de la condición — al publicar la fase 0
-
-La segunda mano ya no se usa (`20261009120000_sin_segunda_mano.sql`). Falta borrar
-`products.condition`, `condition_note` y el tipo `product_condition` cuando el código
-que los escribía deje de estar publicado, y regenerar `types/database.ts`.
+Hoy hay un solo plan. Las funciones ya se resuelven por tienda en la base
+(`funcion_de_tienda`), así que un plan sería una capa más entre la general y la de la
+tienda. No se construye hasta que estén pensados los planes.
 
 ### Historia: la migración de la compra por WhatsApp (aplicada)
 
@@ -263,7 +280,7 @@ uno y otro, el código viejo falla contra la base nueva: conviene hacerlos segui
 Las tiendas de la demostración que no tengan WhatsApp no reciben pedidos hasta cargarlo
 en `/cuenta`.
 
-### 3. Marketing — prioridad media
+### 2. Marketing — prioridad media
 
 `/panel/marketing` es un marcador "Pronto". La tarea `generateCampaign` existe en la capa
 de IA pero no se usa.
@@ -274,19 +291,19 @@ Falta:
 - Publicar: plan A por API de Meta, plan B con enlaces de compartir y copiar. Se recomienda
   ir directo al plan B por el tiempo de revisión de Meta.
 
-### 4. Plantillas — prioridad baja
+### 3. Plantillas — prioridad baja
 
 - Más plantillas para los rubros que quedaron en la base editorial (tecnología, hogar,
   cosmética).
 - Atributos por rubro: talla y color en moda, mililitros o familia olfativa en
   perfumería. Piden variantes en el carrito y en `create_order`.
 
-### 5. Suscripción — prioridad baja
+### 4. Suscripción — prioridad baja
 
 Se modela el estado, no el cobro. Falta el bloqueo real al vencer la prueba (panel en
 solo lectura con exportación a CSV) y la purga a los 90 días.
 
-### 6. Pendientes chicos
+### 5. Pendientes chicos
 
 - **Una vez, entrar a `/panel/apariencia` después de horas sin uso terminó en `/panel`**
   (revisión del 8 de octubre). El registro muestra pedidos a `/auth/destino` y `/crear`

@@ -1,6 +1,7 @@
 import { catalogoSchema } from "@/lib/catalogos/modelo"
 import { aviso, respuestaDePdf } from "@/lib/catalogos/pdf"
 import { getMaterialDelCatalogo } from "@/lib/data/catalogos"
+import { exigirFuncion } from "@/lib/data/funciones"
 
 /** Los precios y el stock se leen en el momento: nunca de caché. */
 export const dynamic = "force-dynamic"
@@ -19,6 +20,9 @@ export const dynamic = "force-dynamic"
  * otra tienda aunque el borrador nombre su id.
  */
 export async function POST(peticion: Request) {
+  const permiso = await exigirFuncion("catalogos")
+  if (!permiso.ok) return aviso(permiso.error, 403)
+
   let cuerpo: unknown
   let descarga: string | null = null
   try {

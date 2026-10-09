@@ -14,12 +14,19 @@ import {
   getAparienciaDeMiTienda,
   type PlantillaElegible,
 } from "@/lib/data/apariencia"
+import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { isSupabaseConfigured } from "@/lib/env"
 import { BOTON_PRIMARIO } from "@/lib/estilos"
 import { formatDate } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { CambiarPlantilla } from "@/components/panel/cambiar-plantilla"
-import { Cabecera, Seccion, SinDatos } from "@/components/panel/piezas"
+import { ConFuncion } from "@/components/panel/funcion"
+import {
+  Cabecera,
+  Insignia,
+  Seccion,
+  SinDatos,
+} from "@/components/panel/piezas"
 import { RestaurarVersion } from "@/components/panel/restaurar-version"
 import { Miniatura } from "@/components/plantillas/miniatura"
 import type { DesignOrigin } from "@/types"
@@ -42,7 +49,10 @@ const ORIGENES: Record<DesignOrigin, string> = {
  * El editor vive aparte, en `/editor`, a pantalla completa: acá se entra.
  */
 export default async function AparienciaPage() {
-  const datos = await getAparienciaDeMiTienda()
+  const [datos, funciones] = await Promise.all([
+    getAparienciaDeMiTienda(),
+    funcionesDeMiTienda(),
+  ])
   if (!datos) {
     if (isSupabaseConfigured) redirect("/crear")
     return null
@@ -58,31 +68,35 @@ export default async function AparienciaPage() {
         demo={esDemo && "Estás en modo demo: los cambios no se guardan."}
       />
 
-      <Seccion
-        id="editor"
-        icono={Palette}
-        titulo="Edita tu tienda"
-        bajada="Tu logo, tus colores, tu portada y tus textos."
-        relleno
-      >
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="flex max-w-[52ch] items-start gap-2 text-sm leading-relaxed">
-            <WandSparkles
-              aria-hidden="true"
-              className="mt-0.5 size-4 shrink-0 text-senal"
-            />
-            Con tu tienda de verdad al lado, deshacer cuando quieras y la IA
-            para pedirle cambios en tus palabras.
-          </p>
-          <Link
-            href="/editor"
-            className={cn(BOTON_PRIMARIO, "shrink-0 px-6 text-sm")}
-          >
-            Abrir el editor
-            <ArrowRight aria-hidden="true" className="size-4" />
-          </Link>
-        </div>
-      </Seccion>
+      {funciones.editor !== "oculta" ? (
+        <Seccion
+          id="editor"
+          icono={Palette}
+          titulo="Edita tu tienda"
+          bajada="Tu logo, tus colores, tu portada y tus textos."
+          relleno
+        >
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="flex max-w-[52ch] items-start gap-2 text-sm leading-relaxed">
+              <WandSparkles
+                aria-hidden="true"
+                className="mt-0.5 size-4 shrink-0 text-senal"
+              />
+              Con tu tienda de verdad al lado, deshacer cuando quieras y la IA
+              para pedirle cambios en tus palabras.
+            </p>
+            <ConFuncion estado={funciones.editor} className="shrink-0">
+              <Link
+                href="/editor"
+                className={cn(BOTON_PRIMARIO, "shrink-0 px-6 text-sm")}
+              >
+                Abrir el editor
+                <ArrowRight aria-hidden="true" className="size-4" />
+              </Link>
+            </ConFuncion>
+          </div>
+        </Seccion>
+      ) : null}
 
       <Seccion
         id="plantilla"
@@ -130,67 +144,77 @@ export default async function AparienciaPage() {
         </div>
       </Seccion>
 
-      <Seccion
-        id="otras"
-        icono={Shapes}
-        titulo="Cambia de plantilla"
-        bajada="Cambia la cara, no el negocio: antes de cambiar guardamos cómo estaba."
-      >
-        {disponibles.length === 0 ? (
-          <SinDatos
-            icono={Shapes}
-            titulo="Por ahora no hay otras plantillas"
-            texto="Cuando sumemos una nueva para tu rubro, aparece acá para que la pruebes."
-          />
-        ) : (
-          // Una plantilla por fila, con su miniatura al lado: en una grilla de
-          // dos, la única que hay hoy quedaba a todo el ancho y gigante.
-          <ul>
-            {disponibles.map((plantilla) => (
-              <li
-                key={plantilla.clave}
-                className="grid border-t border-tinta/15 first:border-t-0 lg:grid-cols-[1.15fr_1fr]"
-              >
-                <div className="border-b border-tinta/15 p-4 sm:p-5 lg:border-r lg:border-b-0">
-                  <Miniatura
-                    clave={plantilla.clave}
-                    className="border border-tinta/25"
-                  />
-                </div>
-
-                <div className="flex flex-col p-4 sm:p-5">
-                  <h3 className="font-titular text-xl font-bold tracking-[-0.02em]">
-                    {plantilla.nombre}
-                  </h3>
-                  {plantilla.rubro ? (
-                    <p className="mt-1 text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
-                      {plantilla.rubro}
-                    </p>
-                  ) : null}
-                  {plantilla.descripcion ? (
-                    <p className="mt-3 text-sm leading-relaxed opacity-80">
-                      {plantilla.descripcion}
-                    </p>
-                  ) : null}
-                  <Rasgos plantilla={plantilla} />
-                  <div className="mt-6 pt-1 lg:mt-auto">
-                    <CambiarPlantilla
+      {funciones.cambiar_plantilla !== "oculta" ? (
+        <Seccion
+          id="otras"
+          icono={Shapes}
+          titulo="Cambia de plantilla"
+          bajada="Cambia la cara, no el negocio: antes de cambiar guardamos cómo estaba."
+        >
+          {disponibles.length === 0 ? (
+            <SinDatos
+              icono={Shapes}
+              titulo="Por ahora no hay otras plantillas"
+              texto="Cuando sumemos una nueva para tu rubro, aparece acá para que la pruebes."
+            />
+          ) : (
+            // Una plantilla por fila, con su miniatura al lado: en una grilla de
+            // dos, la única que hay hoy quedaba a todo el ancho y gigante.
+            <ul>
+              {disponibles.map((plantilla) => (
+                <li
+                  key={plantilla.clave}
+                  className="grid border-t border-tinta/15 first:border-t-0 lg:grid-cols-[1.15fr_1fr]"
+                >
+                  <div className="border-b border-tinta/15 p-4 sm:p-5 lg:border-r lg:border-b-0">
+                    <Miniatura
                       clave={plantilla.clave}
-                      nombre={plantilla.nombre}
-                      plantillaActual={
-                        actual.retirada
-                          ? "tu plantilla anterior"
-                          : actual.nombre
-                      }
-                      cambiar={cambiarPlantilla}
+                      className="border border-tinta/25"
                     />
                   </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Seccion>
+
+                  <div className="flex flex-col p-4 sm:p-5">
+                    <h3 className="flex flex-wrap items-center gap-2 font-titular text-xl font-bold tracking-[-0.02em]">
+                      {plantilla.nombre}
+                      {plantilla.recomendada ? (
+                        <Insignia tono="llena">Recomendada</Insignia>
+                      ) : null}
+                      {plantilla.nueva ? (
+                        <Insignia tono="tinta">Nueva</Insignia>
+                      ) : null}
+                    </h3>
+                    {plantilla.rubro ? (
+                      <p className="mt-1 text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
+                        {plantilla.rubro}
+                      </p>
+                    ) : null}
+                    {plantilla.descripcion ? (
+                      <p className="mt-3 text-sm leading-relaxed opacity-80">
+                        {plantilla.descripcion}
+                      </p>
+                    ) : null}
+                    <Rasgos plantilla={plantilla} />
+                    <div className="mt-6 pt-1 lg:mt-auto">
+                      <ConFuncion estado={funciones.cambiar_plantilla}>
+                        <CambiarPlantilla
+                          clave={plantilla.clave}
+                          nombre={plantilla.nombre}
+                          plantillaActual={
+                            actual.retirada
+                              ? "tu plantilla anterior"
+                              : actual.nombre
+                          }
+                          cambiar={cambiarPlantilla}
+                        />
+                      </ConFuncion>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Seccion>
+      ) : null}
 
       <Seccion
         id="historial"

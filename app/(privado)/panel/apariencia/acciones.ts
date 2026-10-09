@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
+import { exigirFuncion } from "@/lib/data/funciones"
 import { esClavePlantilla } from "@/lib/plantillas"
 import { createClient } from "@/lib/supabase/server"
 
@@ -28,13 +29,17 @@ export async function cambiarPlantilla(
     return { ok: false, error: "Esa plantilla no existe." }
   }
 
-  const supabase = await createClient()
+  const [supabase, permiso] = await Promise.all([
+    createClient(),
+    exigirFuncion("cambiar_plantilla"),
+  ])
   if (!supabase) {
     return {
       ok: false,
       error: "En modo demo no se puede cambiar la plantilla.",
     }
   }
+  if (!permiso.ok) return permiso
 
   const { error } = await supabase.rpc("change_store_template", {
     p_template_key: datos.data.clave,

@@ -7,8 +7,14 @@ import { mensajeDeErrorDeIa } from "@/lib/ai/mensajes"
 import { proponerCatalogo } from "@/lib/ai/tasks"
 import { problemasDeEstilo } from "@/lib/catalogos/estilo"
 import { catalogoSchema } from "@/lib/catalogos/modelo"
-import { enlaceDeCatalogo, getMaterialDelCatalogo } from "@/lib/data/catalogos"
+import {
+  enlaceDeCatalogo,
+  getMaterialDelCatalogo,
+  plantillasDeCatalogoVisibles,
+} from "@/lib/data/catalogos"
+import { exigirFuncion } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
+import { anotarUsoDeIa, permisoDeIa } from "@/lib/data/uso-ia"
 import { formatMoney } from "@/lib/format"
 import { createClient, getUsuario } from "@/lib/supabase/server"
 
@@ -36,6 +42,8 @@ export async function guardarCatalogo(
   }
   const [problema] = problemasDeEstilo(catalogo.data.estilo)
   if (problema) return { ok: false, error: problema }
+  const permiso = await exigirFuncion("catalogos")
+  if (!permiso.ok) return permiso
 
   const supabase = await createClient()
   const tienda = supabase ? await getMiTienda() : null
@@ -125,7 +133,12 @@ export async function pedirCatalogoALaIa(
     return { ok: false, error: "Es un poco largo: dilo en una o dos frases." }
   }
 
-  const { datos, esDemo } = await getMaterialDelCatalogo()
+  const [{ datos, esDemo }, permiso, plantillas] = await Promise.all([
+    getMaterialDelCatalogo(),
+    permisoDeIa("catalogos"),
+    plantillasDeCatalogoVisibles(),
+  ])
+  if (!permiso.ok) return permiso
   const productos = Object.values(datos.productos)
   if (productos.length === 0) {
     return {
@@ -134,6 +147,7 @@ export async function pedirCatalogoALaIa(
     }
   }
 
+  const inicio = Date.now()
   let resultado: Awaited<ReturnType<typeof proponerCatalogo>>
   try {
     resultado = await proponerCatalogo({
@@ -156,7 +170,9 @@ export async function pedirCatalogoALaIa(
       })),
       actuales,
     })
+    await anotarUsoDeIa("catalogos", inicio)
   } catch (error) {
+    await anotarUsoDeIa("catalogos", inicio, error)
     // Se registra en el servidor: sin esto, un fallo del proveedor no se
     // distingue de un pedido mal entendido.
     console.error("[catalogos] el proveedor de IA falló:", error)
@@ -175,7 +191,14 @@ export async function pedirCatalogoALaIa(
     }
   }
 
-  const propuesta = { ...resultado.propuesta, productos: elegidos }
+  const propuesta = {
+    ...resultado.propuesta,
+    productos: elegidos,
+    // Una plantilla que Venduo dejó de ofrecer no se propone.
+    plantilla: plantillas.includes(resultado.propuesta.plantilla)
+      ? resultado.propuesta.plantilla
+      : plantillas[0],
+  }
 
   if (!esDemo) {
     const [user, tienda, supabase] = await Promise.all([

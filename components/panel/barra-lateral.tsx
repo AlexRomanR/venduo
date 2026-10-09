@@ -31,6 +31,8 @@ import { estiloDelTitular } from "@/lib/plantillas/fuentes"
 import { COOKIE_BARRA } from "@/lib/preferencias"
 import { cn } from "@/lib/utils"
 import type { BarraLateral } from "@/lib/data/barra"
+import type { EstadoDeFuncion } from "@/lib/funciones"
+import { ConFuncion } from "@/components/panel/funcion"
 import { SelloDeTienda } from "@/components/panel/tablero/sello"
 import { Logo, Simbolo } from "@/components/marca/logo"
 import {
@@ -54,6 +56,8 @@ interface Item {
   exacto?: boolean
   contador?: { valor: number; urgente: boolean; etiqueta: string }
   pronto?: boolean
+  /** Si Venduo la apagó: oculta no aparece, desactivada se ve y no responde. */
+  funcion?: EstadoDeFuncion
   hijos?: Array<{ href: string; nombre: string; icono: LucideIcon }>
 }
 
@@ -117,7 +121,7 @@ function Contenido({
   alPlegar?: () => void
 }) {
   const pathname = usePathname()
-  const { tienda, contadores: c, persona, apariencia } = datos
+  const { tienda, contadores: c, persona, apariencia, funciones } = datos
 
   const reposicion = c.productosSinStock + c.productosPocoStock
 
@@ -161,11 +165,13 @@ function Contenido({
           href: "/panel/catalogos",
           nombre: "Catálogos",
           icono: BookOpen,
+          funcion: funciones.catalogos,
         },
         {
           href: "/panel/estadisticas",
           nombre: "Estadísticas",
           icono: ChartColumn,
+          funcion: funciones.estadisticas,
         },
         {
           href: "/panel/apariencia",
@@ -178,7 +184,7 @@ function Contenido({
           icono: Megaphone,
           pronto: true,
         },
-      ]
+      ].filter((item: Item) => item.funcion !== "oculta")
     : []
 
   async function copiarEnlace() {
@@ -376,13 +382,23 @@ function Contenido({
                     aria-hidden="true"
                     className={cn(
                       "size-1.5 rounded-full",
-                      tienda.publicada ? "bg-tinta" : "bg-senal"
+                      tienda.publicada && !tienda.pausada
+                        ? "bg-tinta"
+                        : "bg-senal"
                     )}
                   />
                   <span
-                    className={tienda.publicada ? "opacity-55" : "text-senal"}
+                    className={
+                      tienda.publicada && !tienda.pausada
+                        ? "opacity-55"
+                        : "text-senal"
+                    }
                   >
-                    {tienda.publicada ? "Publicada" : "Sin publicar"}
+                    {tienda.pausada
+                      ? "Pausada"
+                      : tienda.publicada
+                        ? "Publicada"
+                        : "Sin publicar"}
                   </span>
                 </p>
               </div>
@@ -629,37 +645,39 @@ function Entrada({
     return (
       <li>
         <ConNombre nombre={nombre} plegada>
-          <Link
-            href={item.href}
-            prefetch
-            aria-label={nombre}
-            aria-current={actual}
-            className={cn(
-              "relative flex size-11 items-center justify-center border-l-2 transition-colors",
-              activo
-                ? "border-tinta bg-tinta/[0.06]"
-                : "border-transparent hover:bg-tinta/[0.04]"
-            )}
-          >
-            <Abriendo className="inset-y-0 -left-0.5 w-0.5 bg-tinta" />
-            <Icono
-              aria-hidden="true"
-              className={cn("size-[18px]", activo ? "" : "opacity-60")}
-            />
-            {item.contador ? (
-              <span
+          <ConFuncion estado={item.funcion ?? "activa"}>
+            <Link
+              href={item.href}
+              prefetch
+              aria-label={nombre}
+              aria-current={actual}
+              className={cn(
+                "relative flex size-11 items-center justify-center border-l-2 transition-colors",
+                activo
+                  ? "border-tinta bg-tinta/[0.06]"
+                  : "border-transparent hover:bg-tinta/[0.04]"
+              )}
+            >
+              <Abriendo className="inset-y-0 -left-0.5 w-0.5 bg-tinta" />
+              <Icono
                 aria-hidden="true"
-                className={cn(
-                  "tabular absolute top-1 right-0.5 flex h-4 min-w-4 items-center justify-center px-1 text-[9px] font-bold",
-                  item.contador.urgente
-                    ? "bg-senal text-white"
-                    : "bg-tinta text-papel"
-                )}
-              >
-                {item.contador.valor > 9 ? "9+" : item.contador.valor}
-              </span>
-            ) : null}
-          </Link>
+                className={cn("size-[18px]", activo ? "" : "opacity-60")}
+              />
+              {item.contador ? (
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "tabular absolute top-1 right-0.5 flex h-4 min-w-4 items-center justify-center px-1 text-[9px] font-bold",
+                    item.contador.urgente
+                      ? "bg-senal text-white"
+                      : "bg-tinta text-papel"
+                  )}
+                >
+                  {item.contador.valor > 9 ? "9+" : item.contador.valor}
+                </span>
+              ) : null}
+            </Link>
+          </ConFuncion>
         </ConNombre>
       </li>
     )
@@ -667,50 +685,52 @@ function Entrada({
 
   return (
     <li>
-      <Link
-        href={item.href}
-        prefetch
-        onClick={alNavegar}
-        aria-current={actual}
-        className={cn(
-          // La regla de 2 px a la izquierda es el mismo trazo que abre un tema
-          // en el resto del sistema, girado para una columna.
-          "relative flex min-h-11 items-center gap-3 border-l-2 px-3 text-sm transition-colors",
-          activo
-            ? "border-tinta bg-tinta/[0.06] font-semibold"
-            : "border-transparent hover:border-tinta/25 hover:bg-tinta/[0.03]"
-        )}
-      >
-        <Abriendo className="inset-y-0 -left-0.5 w-0.5 bg-tinta" />
-        <Icono
-          aria-hidden="true"
-          className={cn("size-4 shrink-0", activo ? "" : "opacity-55")}
-        />
-        <span className={cn("flex-1 truncate", activo ? "" : "opacity-80")}>
-          {item.nombre}
-        </span>
-
-        {item.pronto ? (
-          <span className="text-[10px] font-semibold tracking-[0.1em] uppercase opacity-40">
-            Pronto
+      <ConFuncion estado={item.funcion ?? "activa"}>
+        <Link
+          href={item.href}
+          prefetch
+          onClick={alNavegar}
+          aria-current={actual}
+          className={cn(
+            // La regla de 2 px a la izquierda es el mismo trazo que abre un tema
+            // en el resto del sistema, girado para una columna.
+            "relative flex min-h-11 items-center gap-3 border-l-2 px-3 text-sm transition-colors",
+            activo
+              ? "border-tinta bg-tinta/[0.06] font-semibold"
+              : "border-transparent hover:border-tinta/25 hover:bg-tinta/[0.03]"
+          )}
+        >
+          <Abriendo className="inset-y-0 -left-0.5 w-0.5 bg-tinta" />
+          <Icono
+            aria-hidden="true"
+            className={cn("size-4 shrink-0", activo ? "" : "opacity-55")}
+          />
+          <span className={cn("flex-1 truncate", activo ? "" : "opacity-80")}>
+            {item.nombre}
           </span>
-        ) : null}
 
-        {item.contador ? (
-          <span
-            aria-label={item.contador.etiqueta}
-            title={item.contador.etiqueta}
-            className={cn(
-              "tabular flex h-5 min-w-5 items-center justify-center px-1.5 text-[11px] font-bold",
-              item.contador.urgente
-                ? "bg-senal text-white"
-                : "border border-tinta/25 text-tinta/70"
-            )}
-          >
-            {item.contador.valor > 99 ? "99+" : item.contador.valor}
-          </span>
-        ) : null}
-      </Link>
+          {item.pronto ? (
+            <span className="text-[10px] font-semibold tracking-[0.1em] uppercase opacity-40">
+              Pronto
+            </span>
+          ) : null}
+
+          {item.contador ? (
+            <span
+              aria-label={item.contador.etiqueta}
+              title={item.contador.etiqueta}
+              className={cn(
+                "tabular flex h-5 min-w-5 items-center justify-center px-1.5 text-[11px] font-bold",
+                item.contador.urgente
+                  ? "bg-senal text-white"
+                  : "border border-tinta/25 text-tinta/70"
+              )}
+            >
+              {item.contador.valor > 99 ? "99+" : item.contador.valor}
+            </span>
+          ) : null}
+        </Link>
+      </ConFuncion>
 
       {abierto ? (
         <ul className="mb-1 ml-5 border-l border-tinta/15">

@@ -31,6 +31,9 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
   un identificador y toda política es una comparación directa.
 - **Dos tipos de cuenta**: la del emprendedor, que sale del registro, y la del
   administrador de Venduo, que se da de alta a mano y opera la plataforma desde `/admin`.
+- **Lo que el administrador apaga, se apaga en el servidor.** Cada acción de una función
+  la pide con `exigirFuncion` y cada llamada a la IA con `permisoDeIa`; ocultar el botón
+  no alcanza. Detalle en `domain-venduo.md`.
 - **Dinero en centavos enteros, porcentajes en puntos básicos.** Nunca punto flotante. La
   moneda es el boliviano y es constante del sistema: no hay columna de moneda.
 - **Borrado lógico en todas partes.** Toda consulta filtra `deleted_at is null`, y los
@@ -76,7 +79,7 @@ quien compra · cobro de la suscripción · notificaciones por correo · app mó
 | `VENDUO.md`                   | La especificación del producto. Fuente de verdad             |
 | `DESIGN.md`                   | El mundo visual de Venduo y la base editorial                |
 | `docs/estado-del-proyecto.md` | Qué está hecho y qué falta. **Leerlo antes de elegir tarea** |
-| `docs/plan-administracion.md` | El plan por fases del panel `/admin` y las visitas           |
+| `docs/plan-administracion.md` | El panel `/admin` y las visitas: qué se hizo y por qué       |
 | `docs/store-templates.md`     | El sistema de plantillas de tienda                           |
 | `docs/catalogos-pdf.md`       | Los catálogos en PDF: un dibujo, dos salidas, sus trampas    |
 

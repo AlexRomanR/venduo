@@ -47,6 +47,20 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/auth/destino`               | Resuelve a dónde entra la cuenta y redirige            | Requiere sesión |
 | `/auth/*`                     | Callback y cierre de sesión                            | —               |
 | `/api/health`                 | Estado del servidor y sus capas                        | Público         |
+| `/api/visita`                 | Anota una visita a una tienda, sin identificar a nadie | Público         |
+| `/admin`                      | Resumen de la plataforma: tiendas, embudo, salud       | Administrador   |
+| `/admin/tiendas`              | Todas las tiendas, con filtros y orden                 | Administrador   |
+| `/admin/tiendas/{id}`         | La ficha de una tienda: visitas, suscripción, notas    | Administrador   |
+| `/admin/tiendas/exportar`     | Las tiendas con sus métricas, en CSV                   | Administrador   |
+| `/admin/plantillas`           | Qué plantillas se ofrecen y en qué orden               | Administrador   |
+| `/admin/funciones`            | Funciones por tienda, la IA y su tope diario           | Administrador   |
+| `/admin/ia`                   | Uso, fallas y demoras de la IA                         | Administrador   |
+| `/admin/registro`             | Registro abierto, cerrado o con invitación             | Administrador   |
+| `/admin/cambios`              | Todo lo que se cambió desde la administración          | Administrador   |
+
+**`/admin` es un 404 para cualquier otra cuenta, y también sin sesión**: por eso no
+está en `PROTECTED_PREFIXES` del middleware, que mandaría al ingreso y contaría que hay
+algo detrás. Cada página y cada acción vuelve a pedir `exigirAdmin()`.
 
 **Qué pantallas llevan la barra lateral** está en `ui-styling.md`, "Cuándo aparece la
 barra": en corto, toda pantalla de la cuenta de quien ya tiene panel.
@@ -64,8 +78,8 @@ resuelve un `redirect()` en el componente de servidor:
 La comprobación es sobre `stores.template_key` y no sobre la existencia de la fila:
 es lo que marca que el alta terminó.
 
-La cuenta de administrador de Venduo opera la plataforma desde `/admin`; no tiene
-tienda y no pasa por esta tabla. Ver `domain-venduo.md`.
+La cuenta de administrador de Venduo opera la plataforma desde `/admin`: no pasa por
+esta tabla, `/auth/destino` la manda ahí. Ver `domain-venduo.md`.
 
 **El ingreso no adivina el destino: manda a `/auth/destino`.** Ese route handler
 resuelve en el servidor y redirige una sola vez. Antes empujaba a `/panel` y esa
@@ -125,6 +139,9 @@ app/
   auth/destino/       Resuelve a dónde entra la cuenta
   auth/sign-out/
   api/health/
+  api/visita/         Recibe las visitas de la tienda pública y las anota
+  admin/              La administración de Venduo: su armazón, sus pantallas y
+                      `acciones.ts`, que escribe con la clave de servicio
 
 components/
   ui/                 shadcn/ui. No editar a mano: se regeneran
@@ -146,7 +163,8 @@ components/
     bazar/            Bazar: de todo un poco
     comunes/          Portada, catálogo y ficha armados con las piezas de un kit
   tienda/             Lo compartido por todas las plantillas: carrito, el pedido
-                      por WhatsApp, agregar, barra de compra, filtros y buscador
+                      por WhatsApp, agregar, barra de compra, filtros, buscador y
+                      `visita.tsx`, que anota las visitas
   catalogos/          Catálogos en PDF. `primitivas.ts` es el contrato de dibujo,
                       `html.tsx` su versión para la pantalla y `documento.tsx`
                       las hojas; el PDF usa las mismas variantes
@@ -156,9 +174,13 @@ components/
                       estilo, vista previa, IA, exportar y Canva
   panel/              Shell y piezas del panel. `piezas.tsx` son los
                       paneles, cifras y estados vacíos de toda pantalla;
-                      `armazon.tsx` es la barra con su contenido y decide cuándo va
+                      `armazon.tsx` es la barra con su contenido y decide cuándo va;
+                      `funcion.tsx` apaga lo que Venduo desactivó y `visitas.tsx`
+                      es el panel de visitas, el mismo en `/admin`
     tablero/          El Resumen: sus secciones, el gráfico de ventas, el sello de
                       la tienda y compartirla
+  admin/              El armazón de `/admin`, su navegación y los controles de
+                      cada pantalla: funciones, plantillas, tiendas, ficha, registro
   landing/            Piezas de la portada
   marca/              `Logo` y `Simbolo`: la marca de Venduo, desde `lib/marca.ts`
   config-status.tsx   Checklist de capas configuradas
@@ -195,6 +217,11 @@ lib/
   pedidos.ts          Los estados de un pedido y el mensaje de WhatsApp, sin
                       dependencias de servidor
   qr.ts               Códigos QR
+  admin.ts            La puerta de `/admin` y el registro de cambios. Solo servidor
+  funciones.ts        Las funciones que se apagan, sus estados y el aviso, sin
+                      dependencias de servidor
+  visitas.ts          De dónde viene una visita y la marca `?o=` de los enlaces
+  visitas-resumen.ts  Las cuentas de las visitas, las mismas para los dos paneles
   env.ts              Entorno validado con zod
 
 types/

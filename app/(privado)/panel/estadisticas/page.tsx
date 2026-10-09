@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 
 import { getAIStatus } from "@/lib/ai"
+import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { getGraficoConDatos, getGraficosGuardados } from "@/lib/data/insights"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
@@ -25,11 +26,13 @@ export const metadata = { title: "Estadísticas" }
 export default async function EstadisticasPage() {
   // Los guardados no esperan a la tienda: RLS ya los acota a la suya, y
   // pedirlos en serie era un viaje más antes de ejecutar cada gráfico.
-  const [tienda, guardados] = await Promise.all([
+  const [tienda, guardados, funciones] = await Promise.all([
     getMiTienda(),
     getGraficosGuardados(),
+    funcionesDeMiTienda(),
   ])
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
+  if (funciones.estadisticas !== "activa") redirect("/panel")
 
   const graficos = await Promise.all(guardados.map(getGraficoConDatos))
   const ai = getAIStatus()
@@ -50,6 +53,7 @@ export default async function EstadisticasPage() {
         preguntar={preguntar}
         guardar={guardar}
         borrar={borrar}
+        ia={funciones.ia_estadisticas}
       />
     </div>
   )

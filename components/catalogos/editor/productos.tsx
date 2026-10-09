@@ -30,7 +30,9 @@ import type { Catalogo } from "@/lib/catalogos/modelo"
 import { ponerProductos } from "@/lib/catalogos/operaciones"
 import { BOTON_SECUNDARIO } from "@/lib/estilos"
 import { formatMoney } from "@/lib/format"
+import type { EstadoDeFuncion } from "@/lib/funciones"
 import { cn } from "@/lib/utils"
+import { ConFuncion } from "@/components/panel/funcion"
 import { Miniatura } from "@/components/panel/piezas"
 import { PedidoALaIa } from "@/components/catalogos/editor/ia"
 import { SelectorDeProductos } from "@/components/catalogos/editor/selector"
@@ -45,10 +47,13 @@ import { SelectorDeProductos } from "@/components/catalogos/editor/selector"
 export function PanelDeProductos({
   catalogo,
   datos,
+  ia = "activa",
   alCambiar,
 }: {
   catalogo: Catalogo
   datos: DatosDelCatalogo
+  /** Si Venduo dejó la IA de catálogos activa en esta tienda. */
+  ia?: EstadoDeFuncion
   alCambiar: (catalogo: Catalogo) => void
 }) {
   const [eligiendo, setEligiendo] = React.useState(
@@ -73,20 +78,24 @@ export function PanelDeProductos({
 
   return (
     <div className="flex flex-col">
-      <div className="border-b border-tinta/15 px-4 py-5 sm:px-5">
-        <PedidoALaIa
-          titulo="Pídele a la IA un orden"
-          ayuda="Elige y ordena entre los productos de este catálogo, y propone un nombre. Tú decides si lo usas."
-          ejemplos={[
-            "Lo más vendible primero",
-            "Solo lo que está en oferta",
-            "Agrupado por categoría",
-          ]}
-          actuales={catalogo.productos}
-          textoDeUsar="Usar este orden"
-          alUsar={usar}
-        />
-      </div>
+      {ia !== "oculta" ? (
+        <div className="border-b border-tinta/15 px-4 py-5 sm:px-5">
+          <ConFuncion estado={ia}>
+            <PedidoALaIa
+              titulo="Pídele a la IA un orden"
+              ayuda="Elige y ordena entre los productos de este catálogo, y propone un nombre. Tú decides si lo usas."
+              ejemplos={[
+                "Lo más vendible primero",
+                "Solo lo que está en oferta",
+                "Agrupado por categoría",
+              ]}
+              actuales={catalogo.productos}
+              textoDeUsar="Usar este orden"
+              alUsar={usar}
+            />
+          </ConFuncion>
+        </div>
+      ) : null}
 
       {eligiendo ? (
         <>

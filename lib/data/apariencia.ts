@@ -17,6 +17,9 @@ export interface PlantillaElegible {
   descripcion: string | null
   rubro: string | null
   rasgos: string[]
+  /** Lo que Venduo marcó desde la administración. */
+  nueva: boolean
+  recomendada: boolean
 }
 
 export interface VersionDeDiseno {
@@ -46,7 +49,8 @@ function elegible(
   clave: string,
   nombre: string | null,
   descripcion: string | null,
-  rubro: string | null
+  rubro: string | null,
+  marcas: { nueva?: boolean; recomendada?: boolean } = {}
 ): PlantillaElegible {
   const base = plantillaDeTienda(clave)
   const definicion = PLANTILLAS[base]
@@ -58,6 +62,8 @@ function elegible(
     descripcion: descripcion ?? definicion.descripcion,
     rubro,
     rasgos: definicion.rasgos,
+    nueva: marcas.nueva ?? false,
+    recomendada: marcas.recomendada ?? false,
   }
 }
 
@@ -115,7 +121,12 @@ export async function getAparienciaDeMiTienda(): Promise<AparienciaDeMiTienda | 
   const [plantillasRes, rubrosRes, versionesRes] = await Promise.all([
     // La política solo deja leer las activas. Una plantilla retirada no llega,
     // y eso es lo que la marca como retirada.
-    supabase.from("templates").select("key, name, description, sector"),
+    // En el orden que eligió Venduo desde la administración.
+    supabase
+      .from("templates")
+      .select("key, name, description, sector, is_new, is_recommended")
+      .order("position")
+      .order("name"),
     supabase.from("sectors").select("key, name"),
     supabase
       .from("store_design_versions")
@@ -149,7 +160,9 @@ export async function getAparienciaDeMiTienda(): Promise<AparienciaDeMiTienda | 
         fila?.description ?? null,
         fila ? (rubros.get(fila.sector) ?? null) : null
       ),
-      retirada: !fila,
+      // Retirada es sin kit en código. Una que Venduo dejó de ofrecer no llega
+      // en la lectura, pero se sigue dibujando con su kit: no está retirada.
+      retirada: plantillaDeTienda(tienda.template_key) !== tienda.template_key,
       personalizada:
         typeof personalizacion === "object" &&
         personalizacion !== null &&
@@ -162,7 +175,8 @@ export async function getAparienciaDeMiTienda(): Promise<AparienciaDeMiTienda | 
           otra.key,
           otra.name,
           otra.description,
-          rubros.get(otra.sector) ?? null
+          rubros.get(otra.sector) ?? null,
+          { nueva: otra.is_new, recomendada: otra.is_recommended }
         )
       ),
     versiones: (versionesRes.data ?? []).map((version) => ({

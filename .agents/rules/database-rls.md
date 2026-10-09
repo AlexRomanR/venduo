@@ -179,6 +179,33 @@ Las imágenes de la tienda van al bucket **`store-assets`**, no a `product-image
 tienda escribe y lista solo su carpeta —`{store_id}/…`— y el bucket rechaza lo que no sea
 JPG, PNG o WebP o pase de 5 MB. SVG no: puede traer código.
 
+## La administración
+
+`/admin` lee y escribe con la clave de servicio, así que sus tablas **no tienen
+políticas** —`platform_admins`, `admin_audit_log`, `platform_settings`,
+`store_notes`, `invitations`, `ai_requests`, `visit_salts`, `store_visits`— o solo una
+de lectura acotada. La puerta es `exigirAdmin()` (`lib/admin.ts`), y ninguna pantalla
+ni acción del administrador usa `createAdminClient()` sin pasar antes por ella. Toda
+escritura deja su fila en `admin_audit_log` con `registrarCambio`.
+
+| Función                              | Qué hace                                                   | La llama         |
+| ------------------------------------ | ---------------------------------------------------------- | ---------------- |
+| `is_platform_admin()`                | Si la sesión es de un administrador                        | Autenticados     |
+| `funcion_de_tienda(store, clave)`    | El estado de una función: la tienda manda sobre lo general | Solo servidor    |
+| `funciones_de_mi_tienda()`           | Las diez de la tienda de la sesión, en un jsonb            | Autenticados     |
+| `funcion_activa(clave)`              | Para políticas y vistas: si está activa en mi tienda       | Autenticados     |
+| `estado_del_registro()`              | Abierto, cerrado o con invitación                          | Anónimos también |
+| `registrar_visita(...)`              | Anota una visita y su resumen diario                       | Solo servidor    |
+| `admin_resumen()`, `admin_tiendas()` | Las cifras del panel del administrador                     | Solo servidor    |
+
+**Las visitas del emprendedor se cortan en la política**, no en la pantalla:
+`store_visits_daily` se lee con `store_id = my_store_id()` **y**
+`funcion_activa('visitas')`. Lo mismo `mis_visitas`, la vista de la IA.
+
+**El registro lo hace cumplir `handle_new_user`**: con el registro cerrado, o con
+invitación y un código que no sirve, levanta un error y Auth no crea la cuenta. El
+formulario lo lee del mensaje genérico que devuelve Auth.
+
 ## Migraciones
 
 Van en `supabase/migrations/` con **marca de tiempo** en el nombre:
@@ -200,6 +227,8 @@ Las políticas RLS van juntas en su propio archivo, para poder auditarlas de una
 ## Tablas sin políticas
 
 `social_connections` tiene RLS activo y **cero políticas**, a propósito. No agregarle.
+Lo mismo las tablas de la administración (arriba): se leen con la clave de servicio,
+detrás de `exigirAdmin()`.
 
 `social_connections` guarda los tokens de las conexiones de la tienda —Meta y Canva— y solo
 se accede con la clave de servicio. El de Canva llega además cifrado por la aplicación

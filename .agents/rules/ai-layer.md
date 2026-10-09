@@ -127,6 +127,18 @@ await supabase.from("ai_generations").insert({
 No hay columna de tokens consumidos. El `usage` que devuelve el proveedor es opcional y
 sirve para instrumentación, no para persistir.
 
+## Permiso, tope y cuenta de cada pedido
+
+Antes de llamar al modelo, cada acción pide **`permisoDeIa(tipo)`**
+(`lib/data/uso-ia.ts`): la función de IA activa en esa tienda —el administrador puede
+apagarla para una tienda o para todas— y el tope diario, si hay uno. Después,
+**`anotarUsoDeIa`** deja una fila en `ai_requests` con el tipo, cuánto tardó y si falló.
+Es lo que lee la pantalla de IA del administrador. Corre con `after()`: no demora la
+respuesta.
+
+Una tarea nueva que llama al modelo desde una acción **pide permiso y anota**, o queda
+fuera del interruptor de emergencia y de la cuenta.
+
 ## Inteligencia de negocio: las defensas
 
 Tres reglas que no son negociables:
@@ -157,13 +169,18 @@ tablas base a la vista, "mis productos más vendidos" podía mezclar los de todo
 datos privados, pero sí **una respuesta incorrecta**, que en una herramienta de
 análisis es igual de grave.
 
-Por eso la IA escribe contra tres vistas ya acotadas a `my_store_id()`:
+Por eso la IA escribe contra cuatro vistas ya acotadas a `my_store_id()`:
 
 | Vista           | Qué trae                       |
 | --------------- | ------------------------------ |
 | `mis_ventas`    | Pedidos, con su número         |
 | `mis_items`     | Líneas de pedido, por producto |
 | `mis_productos` | Catálogo y stock               |
+| `mis_visitas`   | Visitas por día y origen       |
+
+`mis_visitas` solo devuelve filas si la tienda tiene la función de visitas activa, y el
+modelo solo la conoce en ese caso: `buildInsightSql` suma `ESQUEMA_DE_VISITAS` con
+`conVisitas`. Sin eso, prometería un gráfico que llega vacío.
 
 **Una venta es un pedido pagado.** El esquema se lo dice al modelo: un pendiente
 puede ser un carrito que se mandó por WhatsApp y nunca se concretó.

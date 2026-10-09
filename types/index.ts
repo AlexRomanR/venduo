@@ -25,11 +25,7 @@ export type Subscription = Tables<"subscriptions">
 export type Plan = Tables<"plans">
 
 // Catálogo
-/**
- * Un producto. La condición (nuevo, segunda mano) se retiró del producto: la
- * columna se borra en una migración aparte, y hasta entonces no se lee.
- */
-export type Product = Omit<Tables<"products">, "condition" | "condition_note">
+export type Product = Tables<"products">
 export type ProductInsert = TablesInsert<"products">
 export type ProductUpdate = TablesUpdate<"products">
 export type ProductCategory = Tables<"product_categories">

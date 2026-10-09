@@ -5,6 +5,7 @@ import { EyeOff, MessageCircle, PackageX, ShoppingBag } from "lucide-react"
 import { getBarraLateral, type Contadores } from "@/lib/data/barra"
 import { getMiTienda, getResumenPanel } from "@/lib/data/panel"
 import { getTablero } from "@/lib/data/tablero"
+import { visitasDeMiTienda } from "@/lib/data/visitas"
 import { RESUMEN_DEMO, tableroDeDemostracion } from "@/lib/demo-data"
 import { isSupabaseConfigured } from "@/lib/env"
 import { formatNumber } from "@/lib/format"
@@ -15,6 +16,7 @@ import {
 } from "@/lib/plantillas"
 import { pasosPendientes, type Tablero } from "@/lib/tablero"
 import { urlDeTienda } from "@/lib/tienda"
+import type { ResumenDeVisitas } from "@/lib/visitas-resumen"
 import { AvisoSuscripcion } from "@/components/panel/aviso-suscripcion"
 import { CabeceraDeTienda } from "@/components/panel/tablero/cabecera"
 import { ComoTeVa } from "@/components/panel/tablero/como-te-va"
@@ -23,6 +25,7 @@ import { ParaHoy, type Pendiente } from "@/components/panel/tablero/para-hoy"
 import { UltimosPedidos } from "@/components/panel/tablero/pedidos"
 import { PrimerosPasos } from "@/components/panel/tablero/primeros-pasos"
 import { MasVendidos, PorAcabarse } from "@/components/panel/tablero/productos"
+import { PanelDeVisitas } from "@/components/panel/visitas"
 
 export const metadata = { title: "Resumen" }
 
@@ -43,6 +46,9 @@ export default async function PanelPage() {
   // cuando ella terminaba, y sus consultas se sumaban a las de arriba en vez
   // de correr a la vez. Llega por el `Suspense` de abajo.
   const tablero = getTablero().catch(() => null)
+  // Las visitas, solo si Venduo se las activó: si no, llega `null` y no se
+  // dibuja nada. También arrancan ya.
+  const visitas = visitasDeMiTienda().catch(() => null)
 
   const [tienda, resumen, barra] = await Promise.all([
     getMiTienda(),
@@ -64,6 +70,7 @@ export default async function PanelPage() {
     url: barra.tienda?.url ?? urlDeTienda(datos.tienda.slug),
     logoUrl: barra.tienda?.logoUrl ?? null,
     publicada: barra.tienda?.publicada ?? datos.tienda.isPublished,
+    pausada: barra.tienda?.pausada ?? false,
   }
 
   return (
@@ -80,6 +87,8 @@ export default async function PanelPage() {
       <Suspense fallback={<EsqueletoDelTablero />}>
         <ContenidoDelTablero
           tablero={tablero}
+          visitas={visitas}
+          conEstadisticas={barra.funciones.estadisticas === "activa"}
           contadores={barra.contadores}
           tienda={deLaTienda}
           sinWhatsApp={isSupabaseConfigured && !tienda?.whatsapp}
@@ -95,16 +104,21 @@ export default async function PanelPage() {
  */
 async function ContenidoDelTablero({
   tablero: lectura,
+  visitas: lecturaDeVisitas,
+  conEstadisticas,
   contadores,
   tienda,
   sinWhatsApp,
 }: {
   tablero: Promise<Tablero | null>
+  visitas: Promise<ResumenDeVisitas | null>
+  conEstadisticas: boolean
   contadores: Contadores
   tienda: { nombre: string; slug: string; url: string; publicada: boolean }
   sinWhatsApp: boolean
 }) {
-  const tablero = (await lectura) ?? tableroDeDemostracion()
+  const [leido, visitas] = await Promise.all([lectura, lecturaDeVisitas])
+  const tablero = leido ?? tableroDeDemostracion()
   const pendientes = armarPendientes(
     tablero,
     contadores,
@@ -123,7 +137,13 @@ async function ContenidoDelTablero({
 
       <PrimerosPasos pasos={tablero.pasos} tienda={tienda} />
 
-      <ComoTeVa serie={tablero.serie} hoy={tablero.hoy} />
+      <ComoTeVa
+        serie={tablero.serie}
+        hoy={tablero.hoy}
+        conEstadisticas={conEstadisticas}
+      />
+
+      {visitas ? <PanelDeVisitas visitas={visitas} /> : null}
 
       <div className="grid gap-6 md:gap-8 xl:grid-cols-2">
         <UltimosPedidos pedidos={tablero.ultimosPedidos} />

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 
 import { getAIStatus } from "@/lib/ai"
 import { getDisenoParaEditar } from "@/lib/data/editor"
+import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { esClaveDePaso } from "@/lib/editor/pasos"
 import { Editor } from "@/components/editor/editor"
 import { decidirPropuesta, proponerCambios, publicarDiseno } from "./acciones"
@@ -28,10 +29,15 @@ export default async function EditorPage({
   searchParams: Promise<{ paso?: string; bienvenida?: string }>
 }) {
   const { paso, bienvenida } = await searchParams
-  const diseno = await getDisenoParaEditar()
+  const [diseno, funciones] = await Promise.all([
+    getDisenoParaEditar(),
+    funcionesDeMiTienda(),
+  ])
 
   // Sin tienda terminada no hay nada que editar: primero el alta.
   if (!diseno) redirect("/crear")
+  // Si Venduo apagó el editor, se vuelve a Apariencia sin explicar nada.
+  if (funciones.editor !== "activa") redirect("/panel/apariencia")
 
   return (
     <Editor
@@ -42,6 +48,7 @@ export default async function EditorPage({
       proponer={proponerCambios}
       decidir={decidirPropuesta}
       iaDemo={getAIStatus().demo}
+      iaEstado={funciones.ia_editor}
     />
   )
 }

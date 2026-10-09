@@ -92,16 +92,19 @@ export function GaleriaDePlantillas({
   estilo,
   actual,
   sugerida,
+  claves = CLAVES_PLANTILLA,
   ...comunes
 }: Comunes & {
   estilo: Estilo
   actual?: ClavePlantilla
   sugerida?: ClavePlantilla | null
+  /** Las que Venduo ofrece, en su orden. */
+  claves?: readonly ClavePlantilla[]
 }) {
   const { productos, datos, nombre, packs } = comunes
   const muestras = React.useMemo(
     () =>
-      CLAVES_PLANTILLA.map((clave) => {
+      claves.map((clave) => {
         const catalogo = armarCatalogo({
           plantilla: clave,
           nombre,
@@ -119,7 +122,7 @@ export function GaleriaDePlantillas({
           hojas: hojasConContexto(catalogo, datos).slice(0, 2),
         }
       }),
-    [productos, datos, estilo, nombre, packs]
+    [claves, productos, datos, estilo, nombre, packs]
   )
 
   return (

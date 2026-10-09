@@ -1,5 +1,5 @@
 import { PLANTILLAS_DE_CATALOGO } from "@/lib/catalogos/plantillas"
-import { ESQUEMA, REGLAS_SQL } from "@/lib/insights/esquema"
+import { ESQUEMA, ESQUEMA_DE_VISITAS, REGLAS_SQL } from "@/lib/insights/esquema"
 import type { Apariencia } from "@/lib/plantillas/apariencia"
 import type { TipoDeBloque } from "@/lib/plantillas/bloques"
 import { FUENTES } from "@/lib/plantillas/fuentes"
@@ -95,6 +95,8 @@ export async function buildInsightSql(input: {
   pregunta: string
   anterior?: InsightSql | null
   hoy: string
+  /** Si la tienda puede ver sus visitas: suma `mis_visitas` al esquema. */
+  conVisitas?: boolean
 }): Promise<{ consulta: InsightSql; provider: string; model: string }> {
   const ai = getAIProvider()
 
@@ -121,6 +123,7 @@ export async function buildInsightSql(input: {
       "",
       "Esquema disponible:",
       ESQUEMA,
+      ...(input.conVisitas ? ["", ESQUEMA_DE_VISITAS] : []),
       "",
       "Reglas de la consulta:",
       REGLAS_SQL,

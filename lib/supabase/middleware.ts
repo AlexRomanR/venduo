@@ -5,6 +5,8 @@ import { env, isSupabaseConfigured } from "@/lib/env"
 import { slugDesdeHost } from "@/lib/tienda"
 
 /** Rutas que exigen sesión iniciada. */
+// `/admin` no va acá: sin sesión también es un 404, no una vuelta al ingreso
+// que contaría que hay algo detrás. Lo resuelve `exigirAdmin()`.
 const PROTECTED_PREFIXES = ["/panel", "/editor", "/cuenta", "/crear"]
 
 /**

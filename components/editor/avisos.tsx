@@ -3,6 +3,7 @@
 import { ArrowRight, History, WandSparkles } from "lucide-react"
 
 import { formatDate } from "@/lib/format"
+import { ConFuncion } from "@/components/panel/funcion"
 import { useEditor } from "@/components/editor/contexto"
 
 /**
@@ -79,20 +80,22 @@ export function Bienvenida({ alEmpezar }: { alEmpezar: () => void }) {
           <ArrowRight aria-hidden="true" className="size-4" />
         </button>
         {tienda.descripcion ? (
-          <button
-            type="button"
-            onClick={() => {
-              alEmpezar()
-              irAPaso("portada")
-              ia.pedir(
-                "Escribe los textos de mi portada con lo que conté de mi negocio"
-              )
-            }}
-            className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-senal transition-colors hover:text-senal-alta"
-          >
-            <WandSparkles aria-hidden="true" className="size-4" />
-            Que la IA escriba mi portada
-          </button>
+          <ConFuncion estado={ia.estado} className="inline-flex">
+            <button
+              type="button"
+              onClick={() => {
+                alEmpezar()
+                irAPaso("portada")
+                ia.pedir(
+                  "Escribe los textos de mi portada con lo que conté de mi negocio"
+                )
+              }}
+              className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-senal transition-colors hover:text-senal-alta"
+            >
+              <WandSparkles aria-hidden="true" className="size-4" />
+              Que la IA escriba mi portada
+            </button>
+          </ConFuncion>
         ) : null}
       </div>
     </div>

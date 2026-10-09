@@ -10,6 +10,7 @@ import type {
   ResultadoDePublicar,
 } from "@/app/editor/acciones"
 import { ErrorDeImagen, subirImagen } from "@/lib/editor/imagenes"
+import type { EstadoDeFuncion } from "@/lib/funciones"
 import type { ClaveDePaso } from "@/lib/editor/pasos"
 import type {
   EstadoParaLaVistaPrevia,
@@ -29,6 +30,7 @@ import {
 } from "@/lib/plantillas/borrador"
 import { SECCIONES } from "@/lib/plantillas/secciones"
 import { cn } from "@/lib/utils"
+import { ConFuncion } from "@/components/panel/funcion"
 import type { DisenoParaEditar } from "@/lib/data/editor"
 import { Asistente } from "@/components/editor/asistente"
 import { Bienvenida, Recuperar } from "@/components/editor/avisos"
@@ -120,6 +122,7 @@ export function Editor({
   proponer,
   decidir,
   iaDemo,
+  iaEstado = "activa",
 }: {
   diseno: DisenoParaEditar
   pasoInicial: ClaveDePaso
@@ -131,6 +134,7 @@ export function Editor({
   }) => Promise<ResultadoDePropuesta>
   decidir: (entrada: { id: string; aplicada: boolean }) => Promise<void>
   iaDemo: boolean
+  iaEstado?: EstadoDeFuncion
 }) {
   const contexto = React.useMemo(
     () => contextoDeDiseno(diseno.base, diseno.datos),
@@ -465,6 +469,7 @@ export function Editor({
       cargando: cargandoIa,
       error: errorIa,
       demo: iaDemo,
+      estado: iaEstado,
       aplicar: aplicarPropuesta,
       descartar: descartarPropuesta,
       mirandoAntes,
@@ -562,9 +567,14 @@ export function Editor({
           </div>
 
           {/* Fuera del desplazamiento: la IA queda a mano en todos los pasos. */}
-          <div className={cn(!panelAbierto && "hidden lg:block")}>
-            <Asistente />
-          </div>
+          <ConFuncion
+            estado={iaEstado}
+            className={cn(!panelAbierto && "hidden lg:block")}
+          >
+            <div className={cn(!panelAbierto && "hidden lg:block")}>
+              <Asistente />
+            </div>
+          </ConFuncion>
         </section>
 
         <div className="row-start-4 lg:hidden">

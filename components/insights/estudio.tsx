@@ -5,6 +5,8 @@ import { FileText, LayoutDashboard, MessageSquareText } from "lucide-react"
 
 import type { InsightSql } from "@/lib/ai/schemas"
 import type { FilaInsight } from "@/lib/data/insights"
+import type { EstadoDeFuncion } from "@/lib/funciones"
+import { ConFuncion } from "@/components/panel/funcion"
 import { Consola } from "@/components/insights/consola"
 import { Tablero, type GraficoEnTablero } from "@/components/insights/tablero"
 import { Seccion, SinDatos } from "@/components/panel/piezas"
@@ -25,6 +27,8 @@ interface Props {
     pregunta: string
   ) => Promise<{ ok: boolean; error?: string }>
   borrar: (id: string) => Promise<{ ok: boolean; error?: string }>
+  /** Si Venduo dejó activa la IA de estadísticas en esta tienda. */
+  ia?: EstadoDeFuncion
 }
 
 /**
@@ -34,7 +38,13 @@ interface Props {
  * al cuaderno como la entrada más reciente, y desde ahí se lo modifica con
  * otra frase. Ese estado no puede vivir en ninguna de las dos por separado.
  */
-export function Estudio({ graficos, preguntar, guardar, borrar }: Props) {
+export function Estudio({
+  graficos,
+  preguntar,
+  guardar,
+  borrar,
+  ia = "activa",
+}: Props) {
   const [paraEditar, setParaEditar] = React.useState<GraficoEnTablero | null>(
     null
   )
@@ -54,19 +64,23 @@ export function Estudio({ graficos, preguntar, guardar, borrar }: Props) {
 
   return (
     <>
-      <Seccion
-        id="preguntar"
-        icono={MessageSquareText}
-        titulo="Haz una pregunta"
-        bajada="Con tus palabras: te armo el gráfico con los datos de tu tienda."
-      >
-        <Consola
-          preguntar={preguntar}
-          guardar={guardar}
-          paraEditar={paraEditar}
-          alConsumirEdicion={olvidarEdicion}
-        />
-      </Seccion>
+      {ia !== "oculta" ? (
+        <Seccion
+          id="preguntar"
+          icono={MessageSquareText}
+          titulo="Haz una pregunta"
+          bajada="Con tus palabras: te armo el gráfico con los datos de tu tienda."
+        >
+          <ConFuncion estado={ia}>
+            <Consola
+              preguntar={preguntar}
+              guardar={guardar}
+              paraEditar={paraEditar}
+              alConsumirEdicion={olvidarEdicion}
+            />
+          </ConFuncion>
+        </Seccion>
+      ) : null}
 
       <Seccion
         id="tablero"

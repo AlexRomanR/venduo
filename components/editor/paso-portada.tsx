@@ -46,6 +46,7 @@ import type { TipoDeBloque } from "@/lib/plantillas/bloques"
 import type { Seccion } from "@/lib/plantillas/borrador"
 import { SECCIONES } from "@/lib/plantillas/secciones"
 import { cn } from "@/lib/utils"
+import { ConFuncion } from "@/components/panel/funcion"
 import { CamposDeSeccion } from "@/components/editor/campos"
 import { useEditor } from "@/components/editor/contexto"
 import {
@@ -117,27 +118,29 @@ export function PasoPortada() {
         />
       ) : (
         <>
-          {tienda.descripcion ? (
+          {tienda.descripcion && ia.estado !== "oculta" ? (
             <div className="px-5 pb-4">
-              <button
-                type="button"
-                onClick={() => ia.pedir(ESCRIBIR_PORTADA)}
-                disabled={ia.cargando}
-                className="group flex w-full items-center gap-3 border-2 border-tinta p-3 text-left transition-colors hover:bg-tinta hover:text-papel disabled:opacity-50"
-              >
-                <WandSparkles
-                  aria-hidden="true"
-                  className="size-6 shrink-0 text-senal"
-                />
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold">
-                    Que la IA escriba tu portada
+              <ConFuncion estado={ia.estado}>
+                <button
+                  type="button"
+                  onClick={() => ia.pedir(ESCRIBIR_PORTADA)}
+                  disabled={ia.cargando}
+                  className="group flex w-full items-center gap-3 border-2 border-tinta p-3 text-left transition-colors hover:bg-tinta hover:text-papel disabled:opacity-50"
+                >
+                  <WandSparkles
+                    aria-hidden="true"
+                    className="size-6 shrink-0 text-senal"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold">
+                      Que la IA escriba tu portada
+                    </span>
+                    <span className="mt-0.5 block text-xs leading-relaxed opacity-65">
+                      Con lo que contaste de tu negocio al crear la tienda.
+                    </span>
                   </span>
-                  <span className="mt-0.5 block text-xs leading-relaxed opacity-65">
-                    Con lo que contaste de tu negocio al crear la tienda.
-                  </span>
-                </span>
-              </button>
+                </button>
+              </ConFuncion>
             </div>
           ) : null}
           {productos.length === 0 ? (

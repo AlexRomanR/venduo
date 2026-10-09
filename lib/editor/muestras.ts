@@ -418,6 +418,8 @@ export function productosDeEjemplo(
     is_active: true,
     is_featured: ejemplo.destacado ?? false,
     sku: null,
+    moderated_at: null,
+    moderation_reason: null,
     created_at: ahora,
     updated_at: ahora,
     deleted_at: null,

@@ -38,9 +38,12 @@ import { Seccion, SinDatos } from "@/components/panel/piezas"
 export function ComoTeVa({
   serie,
   hoy,
+  conEstadisticas = true,
 }: {
   serie: DiaDeVentas[]
   hoy: string
+  /** Si la tienda puede abrir Estadísticas: si no, el pie no la ofrece. */
+  conEstadisticas?: boolean
 }) {
   const [periodo, setPeriodo] = React.useState<Periodo>(30)
 
@@ -63,10 +66,14 @@ export function ComoTeVa({
           <SelectorDePeriodo valor={periodo} alCambiar={setPeriodo} />
         ) : null
       }
-      accion={{
-        href: "/panel/estadisticas",
-        texto: "Pregúntale más a tus estadísticas",
-      }}
+      accion={
+        conEstadisticas
+          ? {
+              href: "/panel/estadisticas",
+              texto: "Pregúntale más a tus estadísticas",
+            }
+          : undefined
+      }
     >
       {hayVentas ? (
         <>

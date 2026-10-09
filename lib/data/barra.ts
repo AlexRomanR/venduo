@@ -1,7 +1,9 @@
 import { cache } from "react"
 
+import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
+import { TODAS_ACTIVAS, type FuncionesDeTienda } from "@/lib/funciones"
 import { limiteParaConcretar } from "@/lib/pedidos"
 import { aparienciaDeTienda } from "@/lib/plantillas"
 import type { Apariencia } from "@/lib/plantillas/apariencia"
@@ -27,6 +29,8 @@ export interface BarraLateral {
     slug: string
     logoUrl: string | null
     publicada: boolean
+    /** Si Venduo la pausó: no se ve aunque esté publicada. */
+    pausada: boolean
     url: string
   } | null
   contadores: Contadores
@@ -36,6 +40,8 @@ export interface BarraLateral {
    * para todos. `null` mientras no termine el alta.
    */
   apariencia: Apariencia | null
+  /** Lo que Venduo le dejó usar: una sección oculta no aparece en la barra. */
+  funciones: FuncionesDeTienda
   esDemo: boolean
 }
 
@@ -53,6 +59,7 @@ function barraDeDemostracion(): BarraLateral {
       slug: "rosa-deportes",
       logoUrl: null,
       publicada: true,
+      pausada: false,
       url: urlDeTienda("rosa-deportes"),
     },
     contadores: {
@@ -61,6 +68,7 @@ function barraDeDemostracion(): BarraLateral {
       productosPocoStock: 2,
     },
     apariencia: aparienciaDeTienda("fashion", {}),
+    funciones: TODAS_ACTIVAS,
     esDemo: true,
   }
 }
@@ -89,13 +97,14 @@ export const getBarraLateral = cache(
 
     // La tienda es la misma lectura que hace la página: con memoria por
     // pedido, no es un viaje más.
-    const [perfilRes, tienda] = await Promise.all([
+    const [perfilRes, tienda, funciones] = await Promise.all([
       supabase
         .from("profiles")
         .select("full_name, avatar_url")
         .eq("id", user.id)
         .maybeSingle(),
       getMiTienda(),
+      funcionesDeMiTienda(),
     ])
 
     const tiendaFila = tienda?.template_key ? tienda : null
@@ -147,6 +156,7 @@ export const getBarraLateral = cache(
             slug: tiendaFila.slug,
             logoUrl: tiendaFila.logo_url,
             publicada: tiendaFila.is_published,
+            pausada: Boolean(tiendaFila.suspended_at),
             url: urlDeTienda(tiendaFila.slug),
           }
         : null,
@@ -157,6 +167,7 @@ export const getBarraLateral = cache(
             tiendaFila.theme_overrides
           )
         : null,
+      funciones,
       esDemo: false,
     }
   }
