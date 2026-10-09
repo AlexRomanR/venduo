@@ -56,11 +56,20 @@ export function getAIProvider(
   return provider
 }
 
+/** Cómo se nombra cada proveedor en una pantalla. */
+const NOMBRES_DE_PROVEEDOR: Record<AIProviderName, string> = {
+  anthropic: "Anthropic",
+  "openai-compatible": "OpenAI",
+  google: "Google",
+  mock: "Demo",
+}
+
 /** Información del proveedor activo, para mostrar en la UI. */
 export function getAIStatus() {
   const provider = getAIProvider()
   return {
     provider: provider.name,
+    nombre: NOMBRES_DE_PROVEEDOR[provider.name],
     model: provider.model,
     demo: provider.name === "mock",
   }

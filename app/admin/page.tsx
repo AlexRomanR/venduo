@@ -112,7 +112,7 @@ export default async function AdminPage() {
               id="embudo"
               icono={Filter}
               titulo="Dónde se quedan"
-              bajada="De cada cuenta nueva, hasta dónde llega."
+              bajada="De cada cuenta, hasta dónde llegó. Las visitas se cuentan desde el 9 de octubre: antes no hay registro."
               relleno
             >
               <Barras
@@ -211,7 +211,7 @@ export default async function AdminPage() {
                 ? "Apagada desde Funciones"
                 : salud.ia.demo
                   ? "En modo demo: respuestas de ejemplo"
-                  : `${salud.ia.provider} · ${salud.ia.model}`
+                  : `${salud.ia.nombre} · ${salud.ia.model}`
             }
             href="/admin/ia"
           />
