@@ -147,15 +147,14 @@ Canva, el editor, cambiar de plantilla, las visitas— tiene tres estados: **act
 **Apagado se comprueba en el servidor**, no solo en el botón. Y apagarle algo a una
 tienda no le avisa nada.
 
-## Segunda mano (se retira)
+## Las ofertas
 
-Se quita en la fase 0 de `docs/plan-administracion.md`. Mientras siga en el código:
+`compare_at_price_cents` es el precio anterior y es lo que produce el descuento
+destacado y el filtro "En oferta" del catálogo (`?oferta=1`).
 
-No es una sección aparte ni un tipo de bloque propio: es un **filtro del catálogo**. Lo
-que define la condición es `products.condition` (`nuevo`, `segunda_mano`,
-`reacondicionado`), que elige el emprendedor al cargar el producto.
-
-`compare_at_price_cents` es el precio anterior y es lo que produce el descuento destacado.
+**No hay segunda mano.** Era un filtro pensado para la demostración de la hackathon y se
+retiró (`20261009120000_sin_segunda_mano.sql`): un producto no tiene condición, y las
+grillas de la portada filtran por categoría y destacados. No volver a sumarlo.
 
 ## Lo que NO se construye
 

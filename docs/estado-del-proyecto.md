@@ -15,7 +15,7 @@ Actualizado el 9 de octubre de 2026.
 | 2   | Selección de plantilla según rubro, con WhatsApp obligatorio | ✅     |
 | 3   | Edición de la tienda asistida por IA                         | ✅     |
 | 4   | Tienda pública real, navegable en móvil, con URL propia      | ✅     |
-| 5   | Productos con imagen, stock y condición                      | ✅     |
+| 5   | Productos con imagen, stock y categoría                      | ✅     |
 | 6   | Carrito que manda el pedido al WhatsApp de la tienda         | ✅     |
 | 7   | Panel de pedidos que descuenta stock al marcarse pagado      | ✅     |
 | 8   | Estadísticas en lenguaje natural                             | ✅     |
@@ -160,7 +160,7 @@ que se arregló:
 
 - Portada armada con bloques, catálogo con filtros, búsqueda y orden, ficha de producto
   con galería y sugerencias.
-- Filtro de segunda mano, reacondicionado y ofertas.
+- Filtros de ofertas y categorías.
 - **Carrito que manda el pedido por WhatsApp**: quien compra ve sus productos y el total,
   y un botón abre el chat con la tienda y el pedido escrito —líneas, total y número—. No
   deja ningún dato. El pedido queda en el panel; al volver del chat ve su número y puede
@@ -182,7 +182,7 @@ que se arregló:
   el teclado), **Últimos pedidos**, **Lo que más se vende** y **Se está acabando**.
   Si la tienda no tiene WhatsApp, es lo primero que pide. Compartir la tienda abre el enlace, el QR para descargar y
   un mensaje listo para WhatsApp.
-- **Productos**: alta y edición con fotos, stock, umbral de aviso, condición, precio
+- **Productos**: alta y edición con fotos, stock, umbral de aviso, precio
   anterior, código y destacado. Categorías propias.
 - **Pedidos**: lista y detalle con el mismo número que llegó por WhatsApp. Tres estados:
   pendiente, pagado y cancelado. Marcar pagado descuenta el stock; cancelar un pagado lo
@@ -236,10 +236,11 @@ El plan completo, por fases, está en **`docs/plan-administracion.md`**:
    emprendedor.
 6. Registro abierto o cerrado y exportación.
 
-### 2. Quitar la segunda mano — prioridad alta
+### 2. Borrar la columna de la condición — al publicar la fase 0
 
-Es la fase 0 del plan. Hasta entonces sigue en el código y en la base, aunque
-`VENDUO.md` ya no la cuenta como módulo.
+La segunda mano ya no se usa (`20261009120000_sin_segunda_mano.sql`). Falta borrar
+`products.condition`, `condition_note` y el tipo `product_condition` cuando el código
+que los escribía deje de estar publicado, y regenerar `types/database.ts`.
 
 ### Historia: la migración de la compra por WhatsApp (aplicada)
 

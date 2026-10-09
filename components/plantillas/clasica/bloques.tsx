@@ -6,7 +6,6 @@ import { numeroDeWhatsApp } from "@/lib/pedidos"
 import {
   accionDePortada,
   categoriasConFoto,
-  filtroDeGrilla,
   items,
   numero,
   preguntaYRespuesta,
@@ -163,14 +162,6 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
           </span>
         ) : null}
       </p>
-
-      {producto.condition !== "nuevo" ? (
-        <p className="mt-1 text-xs tracking-[0.1em] text-senal uppercase">
-          {producto.condition === "segunda_mano"
-            ? "Segunda mano"
-            : "Reacondicionado"}
-        </p>
-      ) : null}
     </Link>
   )
 }
@@ -186,9 +177,7 @@ function Grilla({ bloque, tienda }: PropsBloque) {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <Titulo>{texto(bloque, "title") ?? "Productos"}</Titulo>
         <Link
-          href={rutaDeTienda(tienda.slug, "/catalogo", {
-            condicion: filtroDeGrilla(bloque).condicion,
-          })}
+          href={rutaDeTienda(tienda.slug, "/catalogo")}
           className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
         >
           Ver todo

@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache"
 import type { PropuestaDeCatalogo } from "@/lib/ai/schemas"
 import { mensajeDeErrorDeIa } from "@/lib/ai/mensajes"
 import { proponerCatalogo } from "@/lib/ai/tasks"
-import { CONDICIONES } from "@/lib/catalogos/datos"
 import { problemasDeEstilo } from "@/lib/catalogos/estilo"
 import { catalogoSchema } from "@/lib/catalogos/modelo"
 import { enlaceDeCatalogo, getMaterialDelCatalogo } from "@/lib/data/catalogos"
@@ -152,7 +151,6 @@ export async function pedirCatalogoALaIa(
                 (1 - producto.precioCents / producto.precioAnteriorCents) * 100
               )
             : null,
-        condicion: CONDICIONES[producto.condicion],
         stock: producto.stock,
         destacado: producto.destacado,
       })),

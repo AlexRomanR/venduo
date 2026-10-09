@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ArrowRight, ImageOff } from "lucide-react"
 
 import { numeroDeWhatsApp } from "@/lib/pedidos"
-import { CONDICIONES, descuento } from "@/lib/plantillas/bloques"
+import { descuento } from "@/lib/plantillas/bloques"
 import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
@@ -76,11 +76,6 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
           {rebaja && !agotado ? (
             <span className="bg-senal px-2 py-1 text-[10px] font-semibold tracking-[0.12em] text-white uppercase">
               −{rebaja}%
-            </span>
-          ) : null}
-          {producto.condition !== "nuevo" ? (
-            <span className="bg-papel px-2 py-1 text-[10px] font-semibold tracking-[0.12em] uppercase">
-              {CONDICIONES[producto.condition]}
             </span>
           ) : null}
         </div>

@@ -4,7 +4,7 @@ import { ArrowRight, ImageOff, MessageCircle } from "lucide-react"
 import type { ReactNode } from "react"
 
 import { numeroDeWhatsApp } from "@/lib/pedidos"
-import { CONDICIONES, descuento } from "@/lib/plantillas/bloques"
+import { descuento } from "@/lib/plantillas/bloques"
 import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
@@ -63,11 +63,6 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
         {rebaja && !agotado ? (
           <span className="absolute top-2 right-2 -rotate-6 bg-senal px-2 py-1 font-titular text-base leading-none text-white">
             −{rebaja}%
-          </span>
-        ) : null}
-        {producto.condition !== "nuevo" ? (
-          <span className="absolute top-2 left-2 rotate-3 border-2 border-tinta bg-papel px-1.5 py-0.5 text-[10px] font-bold tracking-[0.1em] uppercase">
-            {CONDICIONES[producto.condition]}
           </span>
         ) : null}
         {agotado ? (

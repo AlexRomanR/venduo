@@ -1,10 +1,6 @@
 import type { ReactNode } from "react"
 
-import {
-  CONDICIONES,
-  type Contexto,
-  type ProductoDelCatalogo,
-} from "@/lib/catalogos/datos"
+import type { Contexto, ProductoDelCatalogo } from "@/lib/catalogos/datos"
 import { anchoEnEme, pesoDe } from "@/lib/catalogos/estilo"
 import type { Campos } from "@/lib/catalogos/modelo"
 import { formatMoney } from "@/lib/format"
@@ -215,16 +211,13 @@ export function rebaja(producto: ProductoDelCatalogo): number | null {
   return porcentaje > 0 ? porcentaje : null
 }
 
-/** La línea de detalle de un producto: categoría, condición, stock, código. */
+/** La línea de detalle de un producto: categoría, stock, código. */
 export function detalles(
   producto: ProductoDelCatalogo,
   campos: Campos
 ): string {
   const partes: string[] = []
   if (campos.categoria && producto.categoria) partes.push(producto.categoria)
-  if (campos.condicion && producto.condicion !== "nuevo") {
-    partes.push(CONDICIONES[producto.condicion])
-  }
   if (campos.stock && producto.stock > 0) {
     partes.push(producto.stock === 1 ? "Queda 1" : `Quedan ${producto.stock}`)
   }

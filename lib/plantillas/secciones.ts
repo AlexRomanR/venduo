@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { CONDICIONES, type TipoDeBloque } from "@/lib/plantillas/bloques"
+import type { TipoDeBloque } from "@/lib/plantillas/bloques"
 
 /**
  * Las secciones que se pueden poner en la portada, dichas para una persona.
@@ -143,18 +143,6 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
     campos: [
       { ...TITULO, ejemplo: "Lo más pedido" },
       {
-        clave: "condition",
-        etiqueta: "Qué productos",
-        tipo: "opciones",
-        opciones: [
-          { valor: "todos", etiqueta: "Todos" },
-          ...Object.entries(CONDICIONES).map(([valor, etiqueta]) => ({
-            valor,
-            etiqueta,
-          })),
-        ],
-      },
-      {
         clave: "category",
         etiqueta: "De una categoría",
         tipo: "categoria",
@@ -183,7 +171,6 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
     ],
     inicial: {
       title: "Nuestros productos",
-      condition: "todos",
       limit: 8,
       columns: 4,
     },

@@ -30,7 +30,7 @@ Lo que **no** le falta es el canal: sus clientes ya le escriben por WhatsApp, y 
 
 1. Elige una plantilla según su rubro. Cada una tiene su propia identidad —letra, colores, cómo muestra los productos— y la puede cambiar después sin perder nada.
 2. Describe su negocio en un párrafo y deja **el WhatsApp de la tienda**, que es obligatorio: ahí le llega cada pedido. La IA ajusta la plantilla: agrega y quita bloques, reordena secciones, adapta textos y colores.
-3. Carga sus productos, marcando cuáles son nuevos y cuáles de segunda mano o reacondicionados.
+3. Carga sus productos con sus fotos, su precio, su stock y su categoría.
 4. Publica. Obtiene una URL propia y un código QR de su tienda.
 5. **Recibe los pedidos por WhatsApp.** Quien compra no deja datos: arma su carrito, ve el total y toca "Enviar pedido por WhatsApp". Se abre el chat con la tienda y el pedido ya escrito —productos, cantidades, total y el número del pedido—. La tienda cobra como ya lo hace, por QR, transferencia o en efectivo, y lo acuerdan en ese mismo chat.
 6. Cuando le pagan, marca el pedido **pagado** en su panel y el stock se descuenta solo. Consulta sus estadísticas preguntando en lenguaje natural, arma catálogos en PDF y genera piezas de promoción con IA.
@@ -106,7 +106,7 @@ Flujo de demostración completo:
 2. Selección de plantilla según rubro, con el WhatsApp de la tienda obligatorio en el alta
 3. Edición de la tienda asistida por IA sobre el catálogo de bloques
 4. Tienda pública real, navegable en móvil, con URL propia
-5. Gestión de productos con imagen y stock, marcables como nuevos, de segunda mano o reacondicionados
+5. Gestión de productos con imagen, stock, categoría y precio anterior para las ofertas
 6. Carrito con el total y un botón que manda el pedido al WhatsApp de la tienda, sin pedirle datos al comprador
 7. Panel de pedidos: cada pedido con su número, que descuenta stock al marcarse pagado
 8. Inteligencia de negocio: estadísticas consultadas en lenguaje natural
@@ -193,7 +193,7 @@ Tan importante como la lista de lo que sí:
 - **Crear** — elección de plantilla y alta de la tienda, con su WhatsApp
 - **Panel del emprendedor** — resumen, y desde ahí productos, pedidos, estadísticas, apariencia, marketing. Es de Venduo, igual para toda tienda, y la tienda se reconoce en su sello
 - **Catálogos en PDF** — dentro del panel, en `/panel/catalogos`: los catálogos guardados, las doce plantillas dibujadas con los productos de la tienda y el constructor, donde se eligen los productos —o se le pide el catálogo a la IA en una frase—, la plantilla —o uno de los cuatro estilos sacados de la tienda—, y se edita hoja por hoja con la vista previa siguiendo lo que se edita. Se descarga en PDF, se manda un enlace que siempre abre con los precios del día o se lleva a Canva para editarlo entero allá
-- **Tienda pública** — portada, catálogo con filtro de segunda mano, ficha de producto y carrito, que manda el pedido por WhatsApp. Se dibuja con el kit de su plantilla
+- **Tienda pública** — portada, catálogo con filtros de ofertas y categorías, ficha de producto y carrito, que manda el pedido por WhatsApp. Se dibuja con el kit de su plantilla
 
 ### Estrategia de multi-tenancy
 
@@ -259,12 +259,10 @@ No hay columna de moneda: es constante del sistema.
 
 **`products`**
 
-| Columna                  | Nota                                                                                                                                          |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `condition`              | `nuevo`, `segunda_mano` o `reacondicionado`. **Lo elige el emprendedor al cargar el producto** y es lo que alimenta el filtro de segunda mano |
-| `condition_note`         | Descripción del estado, para usados                                                                                                           |
-| `compare_at_price_cents` | Precio anterior, opcional. Debe ser mayor o igual al precio. Es lo que produce el descuento destacado                                         |
-| `deleted_at`             | Borrado lógico                                                                                                                                |
+| Columna                  | Nota                                                                                                  |
+| ------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `compare_at_price_cents` | Precio anterior, opcional. Debe ser mayor o igual al precio. Es lo que produce el descuento destacado |
+| `deleted_at`             | Borrado lógico                                                                                        |
 
 #### Venta
 
@@ -296,8 +294,6 @@ Sin marca de borrado: un pedido se cancela, no se borra.
 | `store_design_versions`       | Puntos de restauración del diseño: plantilla, personalización y páginas con bloques. Se toman antes de cada cambio; solo las escriben funciones |
 
 El vínculo de un bloque con su tipo **no se puede romper**: no se retira del catálogo un tipo de bloque que alguna tienda esté usando.
-
-El filtro de segunda mano no es un tipo de bloque aparte: es una **propiedad del bloque de grilla de productos**.
 
 #### Catálogos en PDF
 
@@ -376,7 +372,7 @@ Una venta es un pedido **pagado**: un pendiente puede ser un carrito que se mand
 
 ### Catálogos en PDF
 
-Recibe una frase —«las zapatillas en oferta», «lista de precios para revendedores»— y los productos de la tienda con su precio, su descuento, su condición y su stock. Devuelve qué productos van, en qué orden, con qué plantilla, un nombre y una bajada para la portada, y en una línea por qué. El sistema descarta los productos que no son de esa tienda antes de armar nada, y el emprendedor ve la propuesta y decide si la usa. Con un catálogo abierto, la misma tarea elige y ordena solo entre sus productos.
+Recibe una frase —«las zapatillas en oferta», «lista de precios para revendedores»— y los productos de la tienda con su precio, su descuento y su stock. Devuelve qué productos van, en qué orden, con qué plantilla, un nombre y una bajada para la portada, y en una línea por qué. El sistema descarta los productos que no son de esa tienda antes de armar nada, y el emprendedor ve la propuesta y decide si la usa. Con un catálogo abierto, la misma tarea elige y ordena solo entre sus productos.
 
 ### Marketing
 

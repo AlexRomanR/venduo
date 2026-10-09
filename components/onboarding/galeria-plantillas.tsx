@@ -270,7 +270,7 @@ function Flecha({
 /**
  * Lista los bloques agrupando los repetidos consecutivos.
  *
- * Varias plantillas llevan dos grillas —una de nuevo y otra de segunda mano—,
+ * Varias plantillas llevan más de una grilla —lo nuevo y lo más buscado—,
  * y enumerarlas por separado se lee como un error de la pantalla en vez de
  * como una decisión de la plantilla.
  */

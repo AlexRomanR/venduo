@@ -4,7 +4,7 @@ import { ArrowRight, ImageOff, MessageCircle } from "lucide-react"
 import type { ReactNode } from "react"
 
 import { numeroDeWhatsApp } from "@/lib/pedidos"
-import { CONDICIONES, descuento } from "@/lib/plantillas/bloques"
+import { descuento } from "@/lib/plantillas/bloques"
 import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
@@ -78,8 +78,6 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
             <span>Agotado</span>
           ) : rebaja ? (
             <span className="text-senal">−{rebaja}%</span>
-          ) : producto.condition !== "nuevo" ? (
-            <span>{CONDICIONES[producto.condition]}</span>
           ) : null}
         </p>
         <h3 className="px-2.5 pt-2 font-titular text-[1.35rem] leading-[1.05] md:text-2xl">

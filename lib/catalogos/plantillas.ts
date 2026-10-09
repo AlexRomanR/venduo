@@ -109,7 +109,7 @@ export const PLANTILLAS_DE_CATALOGO: Record<
     clave: "feria",
     nombre: "Feria",
     detalle: "Etiquetas de precio grandes, como en un puesto.",
-    ideal: "Segunda mano, liquidaciones",
+    ideal: "Liquidaciones, ofertas, ferias",
     hoja: "a4",
   },
   packs: {
@@ -352,7 +352,7 @@ const COMPOSICIONES: Record<ClavePlantilla, Composicion> = {
       productos(
         "menu",
         22,
-        { categoria: true, condicion: false },
+        { categoria: true },
         { titulo: nombre || "Lista de precios" }
       ),
       contraportada("contacto", tienda),
@@ -372,7 +372,7 @@ const COMPOSICIONES: Record<ClavePlantilla, Composicion> = {
   lujo: ({ nombre, tienda }, packs) => ({
     bloques: [
       portada("marco", tienda.nombre, nombre),
-      productos("pedestal", 2, { descripcion: true, condicion: false }),
+      productos("pedestal", 2, { descripcion: true }),
       {
         id: idNuevo("texto"),
         tipo: "texto",
@@ -401,7 +401,7 @@ const COMPOSICIONES: Record<ClavePlantilla, Composicion> = {
       productos(
         "tabla",
         18,
-        { codigo: true, stock: true, condicion: false },
+        { codigo: true, stock: true },
         { titulo: "Lista mayorista" }
       ),
       {
@@ -420,7 +420,7 @@ const COMPOSICIONES: Record<ClavePlantilla, Composicion> = {
   feria: ({ nombre, tienda }, packs) => ({
     bloques: [
       portada("collage", tienda.nombre, nombre),
-      productos("etiquetas", 6, { condicion: true }),
+      productos("etiquetas", 6),
       contraportada("contacto", tienda),
     ],
     packs,

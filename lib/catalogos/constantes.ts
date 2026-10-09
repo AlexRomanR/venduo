@@ -135,7 +135,6 @@ export const CAMPOS = {
   precioAnterior: "Precio anterior",
   descripcion: "Descripción corta",
   categoria: "Categoría",
-  condicion: "Nuevo o de segunda mano",
   stock: "Unidades disponibles",
   codigo: "Código",
 } as const
@@ -151,7 +150,6 @@ export const CAMPOS_POR_DEFECTO: Campos = {
   precioAnterior: true,
   descripcion: false,
   categoria: false,
-  condicion: true,
   stock: false,
   codigo: false,
 }

@@ -54,17 +54,12 @@ export function accionDePortada(bloque: BloquePublico) {
   return texto(bloque, "ctaLabel") ?? texto(bloque, "ctaText")
 }
 
-/** Los productos de una grilla: su condición, su categoría y su tope. */
+/** Los productos de una grilla: su categoría, si son destacados y su tope. */
 export function productosDeGrilla(
   bloque: BloquePublico,
   productos: Product[]
 ): Product[] {
   let salida = productos
-
-  const condicion = texto(bloque, "condition")
-  if (condicion && condicion !== "todos") {
-    salida = salida.filter((p) => p.condition === condicion)
-  }
 
   const categoria = texto(bloque, "category")
   if (categoria) {
@@ -78,18 +73,6 @@ export function productosDeGrilla(
   }
 
   return salida.slice(0, numero(bloque, "limit") ?? 12)
-}
-
-/**
- * A qué filtro del catálogo lleva el "ver todo" de una grilla.
- *
- * Una grilla de destacados no tiene filtro propio: lleva al catálogo entero.
- */
-export function filtroDeGrilla(bloque: BloquePublico): {
-  condicion: string | null
-} {
-  const condicion = texto(bloque, "condition")
-  return { condicion: condicion && condicion !== "todos" ? condicion : null }
 }
 
 export interface CategoriaConFoto extends CategoriaPublica {
@@ -183,12 +166,6 @@ export function relacionados(
   )
   const resto = otros.filter((p) => !misma.includes(p))
   return [...misma, ...resto].slice(0, cantidad)
-}
-
-export const CONDICIONES: Record<string, string> = {
-  nuevo: "Nuevo",
-  segunda_mano: "Segunda mano",
-  reacondicionado: "Reacondicionado",
 }
 
 /** Los ítems de un bloque de preguntas o testimonios, ya leídos. */

@@ -6,7 +6,6 @@ import { Search, SlidersHorizontal, X } from "lucide-react"
 
 import { FICHA, FICHA_ELEGIDA, FICHA_LIBRE } from "@/lib/estilos"
 import { cn } from "@/lib/utils"
-import { CONDICIONES } from "@/lib/validation/producto"
 import type { CategoriaConUso } from "@/lib/data/catalogo"
 
 const ESTADOS = [
@@ -74,10 +73,9 @@ export function FiltrosCatalogo({
 
   const estado = parametros.get("estado")
   const categoria = parametros.get("categoria")
-  const condicion = parametros.get("condicion")
   const orden = parametros.get("orden") ?? ""
-  const hayFiltros = Boolean(estado || categoria || condicion || buscar)
-  const elegidos = [estado, categoria, condicion, orden].filter(Boolean).length
+  const hayFiltros = Boolean(estado || categoria || buscar)
+  const elegidos = [estado, categoria, orden].filter(Boolean).length
 
   // Abiertos de entrada si ya hay alguno puesto: esconder un filtro activo
   // deja una lista recortada sin decir por qué.
@@ -144,18 +142,6 @@ export function FiltrosCatalogo({
               {e.etiqueta}
             </Ficha>
           ))}
-
-          {CONDICIONES.filter((c) => c.valor !== "nuevo").map((c) => (
-            <Ficha
-              key={c.valor}
-              activa={condicion === c.valor}
-              onClick={() =>
-                aplicar({ condicion: condicion === c.valor ? null : c.valor })
-              }
-            >
-              {c.etiqueta}
-            </Ficha>
-          ))}
         </div>
 
         {categorias.length > 0 ? (
@@ -213,7 +199,6 @@ export function FiltrosCatalogo({
                   buscar: null,
                   estado: null,
                   categoria: null,
-                  condicion: null,
                 })
               }}
               className="flex min-h-11 items-center gap-1.5 text-xs font-semibold tracking-[0.12em] uppercase transition-colors hover:text-senal"

@@ -1,11 +1,10 @@
 import { getMiTienda } from "@/lib/data/panel"
 import { createClient } from "@/lib/supabase/server"
-import type { Product, ProductCategory, ProductCondition } from "@/types"
+import type { Product, ProductCategory } from "@/types"
 
 export interface FiltrosCatalogo {
   buscar?: string
   categoria?: string
-  condicion?: ProductCondition
   /** `activos`, `ocultos`, `sin_stock`, `poco_stock`, `destacados`. */
   estado?: string
   orden?: string
@@ -47,7 +46,6 @@ function catalogoDeDemostracion(): Catalogo {
     store_id: "demo",
     description: null,
     compare_at_price_cents: null,
-    condition_note: null,
     category_id: null,
     sku: null,
     images: [] as string[],
@@ -65,7 +63,6 @@ function catalogoDeDemostracion(): Catalogo {
       id: "demo-1",
       name: "Polera básica",
       category: "Poleras",
-      condition: "nuevo" as const,
       price_cents: 9000,
       stock: 24,
       is_active: true,
@@ -76,7 +73,6 @@ function catalogoDeDemostracion(): Catalogo {
       id: "demo-2",
       name: "Campera rompeviento",
       category: "Camperas",
-      condition: "nuevo" as const,
       price_cents: 32000,
       compare_at_price_cents: 38000,
       stock: 2,
@@ -87,8 +83,6 @@ function catalogoDeDemostracion(): Catalogo {
       id: "demo-3",
       name: "Mochila urbana",
       category: "Mochilas",
-      condition: "segunda_mano" as const,
-      condition_note: "Usada una temporada, sin roturas.",
       price_cents: 21000,
       stock: 0,
       is_active: true,
@@ -98,7 +92,6 @@ function catalogoDeDemostracion(): Catalogo {
       id: "demo-4",
       name: "Gorra deportiva",
       category: "Gorras",
-      condition: "nuevo" as const,
       price_cents: 5500,
       stock: 12,
       is_active: false,
@@ -214,10 +207,6 @@ function filtrar(productos: Product[], filtros: FiltrosCatalogo): Product[] {
     salida = salida.filter((p) => !p.category_id)
   } else if (filtros.categoria) {
     salida = salida.filter((p) => p.category_id === filtros.categoria)
-  }
-
-  if (filtros.condicion) {
-    salida = salida.filter((p) => p.condition === filtros.condicion)
   }
 
   switch (filtros.estado) {

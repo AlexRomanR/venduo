@@ -3,11 +3,11 @@
 import * as React from "react"
 import { Check, Package, Search } from "lucide-react"
 
-import { CONDICIONES, type ProductoDelCatalogo } from "@/lib/catalogos/datos"
+import type { ProductoDelCatalogo } from "@/lib/catalogos/datos"
 import { FICHA, FICHA_ELEGIDA, FICHA_LIBRE } from "@/lib/estilos"
 import { formatMoney } from "@/lib/format"
 import { cn } from "@/lib/utils"
-import { Insignia, Miniatura } from "@/components/panel/piezas"
+import { Miniatura } from "@/components/panel/piezas"
 
 /*
  * Elegir qué productos van en el catálogo: buscar, filtrar y marcar.
@@ -17,7 +17,7 @@ import { Insignia, Miniatura } from "@/components/panel/piezas"
  * filtros: todo lo rebajado, toda una categoría.
  */
 
-type Filtro = "todos" | "rebaja" | "segunda" | "destacados" | `cat:${string}`
+type Filtro = "todos" | "rebaja" | "destacados" | `cat:${string}`
 
 function plano(texto: string): string {
   return texto.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase()
@@ -26,7 +26,6 @@ function plano(texto: string): string {
 function cumple(producto: ProductoDelCatalogo, filtro: Filtro): boolean {
   if (filtro === "todos") return true
   if (filtro === "rebaja") return producto.precioAnteriorCents !== null
-  if (filtro === "segunda") return producto.condicion !== "nuevo"
   if (filtro === "destacados") return producto.destacado
   return producto.categoriaId === filtro.slice(4)
 }
@@ -70,9 +69,6 @@ export function SelectorDeProductos({
     })),
     ...(productos.some((p) => p.precioAnteriorCents !== null)
       ? [{ valor: "rebaja" as Filtro, etiqueta: "Con descuento" }]
-      : []),
-    ...(productos.some((p) => p.condicion !== "nuevo")
-      ? [{ valor: "segunda" as Filtro, etiqueta: "Segunda mano" }]
       : []),
     ...(productos.some((p) => p.destacado)
       ? [{ valor: "destacados" as Filtro, etiqueta: "Destacados" }]
@@ -229,11 +225,6 @@ export function SelectorDeProductos({
                       </span>
                     </span>
                   </span>
-                  {producto.condicion !== "nuevo" ? (
-                    <Insignia tono="suave">
-                      {CONDICIONES[producto.condicion]}
-                    </Insignia>
-                  ) : null}
                 </button>
               </li>
             )

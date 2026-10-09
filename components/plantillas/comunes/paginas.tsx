@@ -2,11 +2,7 @@ import Link from "next/link"
 import { ArrowRight, MessageCircle } from "lucide-react"
 import type { ComponentType, ReactNode } from "react"
 
-import {
-  CONDICIONES,
-  descuento,
-  enlaceDeConsulta,
-} from "@/lib/plantillas/bloques"
+import { descuento, enlaceDeConsulta } from "@/lib/plantillas/bloques"
 import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
@@ -121,19 +117,13 @@ export function paginasDeKit(
 
   function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
     const categoria = tienda.categorias.find((c) => c.id === filtros.categoria)
-    const usados = tienda.productos.filter(
-      (p) => p.condition !== "nuevo"
+    const ofertas = tienda.productos.filter(
+      (p) => p.compare_at_price_cents
     ).length
     const titulo =
-      categoria?.nombre ??
-      (filtros.condicion === "oferta"
-        ? "En oferta"
-        : filtros.condicion
-          ? CONDICIONES[filtros.condicion]
-          : null) ??
-      "Catálogo"
+      categoria?.nombre ?? (filtros.oferta ? "En oferta" : null) ?? "Catálogo"
     const hayFiltro = Boolean(
-      filtros.categoria || filtros.condicion || filtros.buscar
+      filtros.categoria || filtros.oferta || filtros.buscar
     )
 
     return (
@@ -150,7 +140,7 @@ export function paginasDeKit(
         <div className="mt-6 flex flex-col gap-5">
           <FiltrosTienda
             categorias={tienda.categorias}
-            usados={usados}
+            ofertas={ofertas}
             total={tienda.productos.length}
             mostrando={productos.length}
           />
@@ -285,12 +275,6 @@ export function paginasDeKit(
                 vitrina && "justify-center"
               )}
             >
-              <span className="opacity-65">
-                {CONDICIONES[producto.condition] ?? producto.condition}
-              </span>
-              <span aria-hidden="true" className="opacity-30">
-                ·
-              </span>
               <span className={cn(pocas ? "text-senal" : "opacity-65")}>
                 {producto.stock === 0
                   ? "Agotado"
@@ -328,13 +312,6 @@ export function paginasDeKit(
                 <Detalle titulo="Descripción" Rotulo={Rotulo}>
                   <p className="leading-relaxed whitespace-pre-line opacity-80">
                     {producto.description}
-                  </p>
-                </Detalle>
-              ) : null}
-              {producto.condition !== "nuevo" && producto.condition_note ? (
-                <Detalle titulo={textos.estado} Rotulo={Rotulo}>
-                  <p className="leading-relaxed opacity-80">
-                    {producto.condition_note}
                   </p>
                 </Detalle>
               ) : null}

@@ -16,7 +16,7 @@ Este skill detalla el procedimiento para escribir migraciones SQL seguras e idem
 
 1. **Ubicación y Nomenclatura:**
    - Ubicación: `supabase/migrations/`.
-   - Formato: `YYYYMMDDHHMMSS_descripcion_corta.sql` (ej. `20260913120000_agregar_vistas_segunda_mano.sql`).
+   - Formato: `YYYYMMDDHHMMSS_descripcion_corta.sql` (ej. `20260913120000_agregar_vistas_de_ventas.sql`).
 2. **Idempotencia Obligatoria:**
    - Las migraciones deben ser reejecutables sin fallar.
    - Para extensiones: `create extension if not exists "pgcrypto";`
