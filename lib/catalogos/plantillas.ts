@@ -177,6 +177,38 @@ export function armarCatalogo(entrada: EntradaDePlantilla): Catalogo {
 }
 
 /**
+ * El catálogo que sale de una propuesta de la IA: la composición de la
+ * plantilla que eligió, con su nombre y su bajada en la portada.
+ *
+ * Lo usan el editor, que lo deja abierto para revisarlo, y la API de la app,
+ * que lo guarda directo: los dos arman lo mismo.
+ */
+export function armarDesdePropuesta(
+  propuesta: {
+    plantilla: ClavePlantilla
+    nombre: string
+    bajada: string
+  },
+  entrada: Omit<EntradaDePlantilla, "plantilla" | "nombre">
+): Catalogo {
+  const catalogo = armarCatalogo({
+    ...entrada,
+    plantilla: propuesta.plantilla,
+    nombre: propuesta.nombre,
+  })
+  if (!propuesta.bajada) return catalogo
+
+  return {
+    ...catalogo,
+    bloques: catalogo.bloques.map((bloque) =>
+      bloque.tipo === "portada"
+        ? { ...bloque, bajada: propuesta.bajada }
+        : bloque
+    ),
+  }
+}
+
+/**
  * Cambia la composición a la de otra plantilla, conservando lo que la persona
  * eligió: los productos, los packs, el estilo y el nombre.
  */
