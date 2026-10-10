@@ -26,6 +26,13 @@ const envSchema = z.object({
   // desarrolladores de Canva. Sin esto, el botón lleva el PDF a mano.
   CANVA_CLIENT_ID: z.string().min(1).optional(),
   CANVA_CLIENT_SECRET: z.string().min(1).optional(),
+
+  // La app del emprendedor: con esto la web le confirma al teléfono que un
+  // enlace del panel se puede abrir en la app. Su forma se comprueba en
+  // `lib/app-movil.ts` y no acá: una variable inválida en este esquema tira
+  // todas las demás a sus valores por defecto.
+  APP_ANDROID_HUELLAS: z.string().optional(),
+  APP_IOS_ID: z.string().optional(),
 })
 
 const parsed = envSchema.safeParse({
@@ -40,6 +47,8 @@ const parsed = envSchema.safeParse({
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || undefined,
   CANVA_CLIENT_ID: process.env.CANVA_CLIENT_ID || undefined,
   CANVA_CLIENT_SECRET: process.env.CANVA_CLIENT_SECRET || undefined,
+  APP_ANDROID_HUELLAS: process.env.APP_ANDROID_HUELLAS || undefined,
+  APP_IOS_ID: process.env.APP_IOS_ID || undefined,
 })
 
 if (!parsed.success) {
