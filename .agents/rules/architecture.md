@@ -48,6 +48,9 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/auth/*`                     | Callback y cierre de sesión                            | —               |
 | `/api/health`                 | Estado del servidor y sus capas                        | Público         |
 | `/api/visita`                 | Anota una visita a una tienda, sin identificar a nadie | Público         |
+| `/api/v1/resumen`             | La app: todo lo del Inicio, en un viaje                | Token de la app |
+| `/api/v1/plantillas`          | La app: las plantillas del alta, con su miniatura      | Token de la app |
+| `/api/v1/catalogos/{id}/pdf`  | La app: el PDF de un catálogo guardado                 | Token de la app |
 | `/admin`                      | Resumen de la plataforma: tiendas, embudo, salud       | Administrador   |
 | `/admin/tiendas`              | Todas las tiendas, con filtros y orden                 | Administrador   |
 | `/admin/tiendas/{id}`         | La ficha de una tienda: visitas, suscripción, notas    | Administrador   |
@@ -139,6 +142,7 @@ app/
   auth/destino/       Resuelve a dónde entra la cuenta
   auth/sign-out/
   api/health/
+  api/v1/             La API de la app móvil: entra con el token de la sesión
   api/visita/         Recibe las visitas de la tienda pública y las anota
   admin/              La administración de Venduo: su armazón, sus pantallas y
                       `acciones.ts`, que escribe con la clave de servicio
@@ -188,6 +192,7 @@ components/
 
 lib/
   supabase/           Clientes de navegador, servidor y administración
+  api/                Las respuestas y la puerta de `/api/v1`. Solo servidor
   data/               Consultas de lectura
   validation/         Esquemas zod compartidos
   ai/                 Capa de IA
@@ -232,6 +237,7 @@ supabase/migrations/  SQL con marca de tiempo en el nombre
 
 public/marca/         Íconos del manifiesto y la tarjeta de compartir. Generados
 public/portada/       La foto y la captura de la tienda del primer bloque de la portada
+public/plantillas/    La miniatura de cada plantilla como imagen, para la app
 
 scripts/marca.mjs     Genera todos los archivos del logo: `npm run marca`
 
@@ -278,6 +284,25 @@ interfaz sigue teniendo qué mostrar.
 **Quién es la persona lo dice `getUsuario()`**, del mismo archivo: verifica el token sin
 ir a Supabase y una sola vez por pedido. `supabase.auth.getUser()` no se llama en el
 código de la app; el porqué está en `performance.md`.
+
+## La API de la app
+
+`/api/v1` es para la app móvil, que vive en otro repositorio (`venduo-app`). No entra
+con cookies: manda el token de su sesión de Supabase en `Authorization` y la cabecera
+`x-venduo-app`, y con eso `createClient()` y `getUsuario()` arman la sesión igual que
+con una cookie. **Cada ruta corre como esa persona**: RLS, `exigirFuncion` y
+`permisoDeIa` valen lo mismo que en el panel.
+
+- Toda ruta empieza con `exigirSesion()` (`lib/api/respuestas.ts`): sin sesión, 401.
+- Un error es siempre `{ error }` con un texto en español que la app muestra tal cual.
+- **Una ruta de la API no escribe su propia lógica**: llama a las mismas funciones de
+  `lib/data/` y `lib/ai/` que las pantallas y las Server Actions. Si hace falta algo
+  que hoy vive dentro de una acción, se saca a una función y la llaman las dos.
+- Lo que la app puede hacer directo con RLS —leer pedidos y productos, marcar pagado,
+  ajustar stock— no pasa por acá: lo hace contra Supabase con su sesión.
+- Las miniaturas de `public/plantillas/` son capturas del componente `Miniatura`. Al
+  cambiar la base de una plantilla o sumar una, se vuelven a capturar y se agrega su
+  clave en `app/api/v1/plantillas/route.ts`.
 
 ## Tipos de la base
 
