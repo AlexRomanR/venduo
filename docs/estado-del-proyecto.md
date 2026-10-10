@@ -253,7 +253,14 @@ que se arregló:
 
 ## Lo que falta
 
-### 1. Funciones por plan — cuando se decida
+### 1. La app del emprendedor — prioridad alta
+
+Una app nativa en un repositorio aparte: Android primero, con los cimientos para iPhone.
+Pedidos, productos con la cámara, stock, compartir, números y avisos de pedido nuevo. De
+este repositorio necesita la API `/api/v1`, la tabla de avisos y los enlaces universales.
+Plan completo y fases en **`docs/plan-app-movil.md`**. Se hace con Expo (React Native).
+
+### 2. Funciones por plan — cuando se decida
 
 Hoy hay un solo plan. Las funciones ya se resuelven por tienda en la base
 (`funcion_de_tienda`), así que un plan sería una capa más entre la general y la de la
@@ -280,7 +287,7 @@ uno y otro, el código viejo falla contra la base nueva: conviene hacerlos segui
 Las tiendas de la demostración que no tengan WhatsApp no reciben pedidos hasta cargarlo
 en `/cuenta`.
 
-### 2. Marketing — prioridad media
+### 3. Marketing — prioridad media
 
 `/panel/marketing` es un marcador "Pronto". La tarea `generateCampaign` existe en la capa
 de IA pero no se usa.
@@ -291,19 +298,19 @@ Falta:
 - Publicar: plan A por API de Meta, plan B con enlaces de compartir y copiar. Se recomienda
   ir directo al plan B por el tiempo de revisión de Meta.
 
-### 3. Plantillas — prioridad baja
+### 4. Plantillas — prioridad baja
 
 - Más plantillas para los rubros que quedaron en la base editorial (tecnología, hogar,
   cosmética).
 - Atributos por rubro: talla y color en moda, mililitros o familia olfativa en
   perfumería. Piden variantes en el carrito y en `create_order`.
 
-### 4. Suscripción — prioridad baja
+### 5. Suscripción — prioridad baja
 
 Se modela el estado, no el cobro. Falta el bloqueo real al vencer la prueba (panel en
 solo lectura con exportación a CSV) y la purga a los 90 días.
 
-### 5. Pendientes chicos
+### 6. Pendientes chicos
 
 - **Una vez, entrar a `/panel/apariencia` después de horas sin uso terminó en `/panel`**
   (revisión del 8 de octubre). El registro muestra pedidos a `/auth/destino` y `/crear`
@@ -350,5 +357,5 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 
 No se construye, según `VENDUO.md` §7: multi-tienda por usuario, red de vendedores y
 comisiones, gestión de envíos, cobrar dentro de la plataforma, pedirle datos a quien
-compra, cobro de la suscripción, notificaciones por correo, app móvil nativa y tests
-automatizados.
+compra, cobro de la suscripción, notificaciones por correo y tests automatizados. La
+app móvil nativa salió de esta lista el 10 de octubre de 2026 (arriba, "Lo que falta").

@@ -206,8 +206,13 @@ detenerse y preguntar antes de escribir código:
 - **Pedirle datos a quien compra** — van en el chat
 - **Cobro de la suscripción** — se modela el estado, no el cobro
 - **Notificaciones por email**
-- **Aplicación móvil nativa** — la tienda es responsive y con eso alcanza
 - **Tests automatizados**
+
+**La app móvil nativa salió de esta lista**: era una exclusión de la hackathon. Es un
+producto aparte, en su propio repositorio, para el emprendedor; quien compra sigue en la
+web. Lo que la app necesita de este repositorio —la API `/api/v1`, los avisos de pedido
+nuevo, los enlaces universales— está en `docs/plan-app-movil.md`, y una regla de negocio
+se impone siempre en la base o en la API, nunca solo en la app.
 
 ## Los catálogos en PDF
 
