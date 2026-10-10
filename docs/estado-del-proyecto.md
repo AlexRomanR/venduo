@@ -229,6 +229,22 @@ que se arregló:
   "Visitas" (oculta de fábrica): en su Resumen, en Productos —con el filtro "Muy vistos,
   poco vendidos"— y en las preguntas a sus estadísticas.
 
+### La app del emprendedor (repositorio `venduo-app`)
+
+- Una app nativa para Android, con Expo, que entra con la misma cuenta y maneja la misma
+  tienda: Inicio con "Para hoy" y las ventas, pedidos —deslizar para marcar pagado o
+  cancelar—, productos con la cámara y el stock con más y menos, compartir el enlace, el
+  QR y los catálogos en PDF, estadísticas con preguntas a la IA, la apariencia en versión
+  liviana y el alta de la tienda. Con el mismo diseño de Venduo.
+- **Sin conexión** muestra lo último que cargó y guarda los cambios de stock y de estado
+  de un pedido para mandarlos cuando vuelve la señal.
+- Un enlace del panel abre su pantalla en la app, y el ícono tiene atajos a "Nuevo
+  producto" y "Ver pedidos".
+- De este repositorio usa la API `/api/v1` y las rutas de `/.well-known/`. Las reglas
+  las siguen imponiendo la base y la API: la app no puede hacer nada que el panel no
+  deje.
+- Probada en un emulador de Android y en el navegador. Falta publicarla: ver abajo.
+
 ### Base y seguridad
 
 - Supabase con RLS en todas las tablas y borrado lógico.
@@ -253,12 +269,14 @@ que se arregló:
 
 ## Lo que falta
 
-### 1. La app del emprendedor — prioridad alta
+### 1. Publicar la app del emprendedor — prioridad alta
 
-Una app nativa en un repositorio aparte: Android primero, con los cimientos para iPhone.
-Pedidos, productos con la cámara, stock, compartir, números y avisos de pedido nuevo. De
-este repositorio necesita la API `/api/v1`, la tabla de avisos y los enlaces universales.
-Plan completo y fases en **`docs/plan-app-movil.md`**. Se hace con Expo (React Native).
+La app está construida (arriba). Para que llegue a un teléfono falta, en este orden:
+aplicar la migración de los avisos de pedido nuevo —escrita en la rama
+`avisos-de-la-app`, sin aplicar—, las cuentas de Expo, Firebase y Play Console, borrar
+la cuenta desde la app, la política de privacidad y probarla en un teléfono de verdad.
+La lista completa, con qué hay que decidir antes, está en **`docs/plan-app-movil.md`**,
+"Lo que falta". iPhone viene después.
 
 ### 2. Funciones por plan — cuando se decida
 
