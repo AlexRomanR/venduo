@@ -206,6 +206,30 @@ escritura deja su fila en `admin_audit_log` con `registrarCambio`.
 invitación y un código que no sirve, levanta un error y Auth no crea la cuenta. El
 formulario lo lee del mensaje genérico que devuelve Auth.
 
+## Los avisos de la app
+
+La app móvil recibe avisos —pedido nuevo, cobros pendientes, stock bajo— y **los manda
+la base**, no un servidor: el hecho que los dispara ocurre acá.
+
+| Qué                               | Cuándo                                                         |
+| --------------------------------- | -------------------------------------------------------------- |
+| `on_order_created_notify`         | Al confirmarse un pedido nuevo. Diferido: lee el total final   |
+| `on_product_stock_low_notify`     | Cuando una venta deja un producto agotado o bajo su umbral     |
+| `enviar_recordatorios()` (`cron`) | A las 9:00 de Bolivia, si hay pedidos de más de 12 h sin pagar |
+
+Los tres pasan por `enviar_aviso`, que arma el mensaje para cada celular de la persona y
+lo manda a Expo con `pg_net`, **después de confirmada la transacción y sin esperar la
+respuesta**. Todo va dentro de un bloque que atrapa cualquier error: un aviso que no sale
+no puede hacer fallar la compra de nadie. Al tocar `create_order` o
+`handle_order_status_change`, esa garantía no se rompe.
+
+- **`push_tokens` no se escribe desde la app.** Registrar y olvidar un celular son
+  `registrar_dispositivo` y `olvidar_dispositivo`: el mismo celular puede pasar de una
+  cuenta a otra, y esa fila es de otra persona.
+- **El aviso de stock solo sale cuando lo movió una venta** (`pg_trigger_depth() >= 2`).
+  Si la persona cambió el número a mano, ya lo sabe.
+- `notification_preferences` es una fila por persona. Sin fila, quiere todos los avisos.
+
 ## Migraciones
 
 Van en `supabase/migrations/` con **marca de tiempo** en el nombre:
