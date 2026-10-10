@@ -14,52 +14,59 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 
 ## Rutas
 
-| Ruta                          | Qué es                                                 | Acceso          |
-| ----------------------------- | ------------------------------------------------------ | --------------- |
-| `/`                           | Portada pública                                        | Público         |
-| `/login`                      | Registro e ingreso                                     | Público         |
-| `/t/{slug}`                   | Tienda pública del emprendedor                         | Público         |
-| `/t/{slug}/catalogo`          | Catálogo completo: filtros, búsqueda y orden por URL   | Público         |
-| `/t/{slug}/p/{id}`            | Ficha de producto, con selector de cantidad            | Público         |
-| `/t/{slug}/carrito`           | Carrito: el total y el pedido por WhatsApp             | Público         |
-| `/crear`                      | Alta de la tienda, paso 1: elegir plantilla            | Requiere sesión |
-| `/crear/negocio`              | Alta de la tienda, paso 2: nombre, rubro y WhatsApp    | Requiere sesión |
-| `/crear/listo`                | Alta de la tienda, paso 3: ofrece el editor            | Requiere sesión |
-| `/editor`                     | Editor de la tienda, a pantalla completa. `?paso=`     | Requiere sesión |
-| `/editor/vista-previa`        | La tienda del dueño con su borrador, para el `iframe`  | Requiere sesión |
-| `/panel`                      | Resumen del emprendedor                                | Requiere sesión |
-| `/panel/{seccion}`            | Productos, pedidos, estadísticas, marketing            | Requiere sesión |
-| `/panel/pedidos/{id}`         | Un pedido: detalle y estados                           | Requiere sesión |
-| `/panel/productos/nuevo`      | Alta de un producto                                    | Requiere sesión |
-| `/panel/productos/{id}`       | Edición de un producto                                 | Requiere sesión |
-| `/panel/productos/categorias` | Las categorías del catálogo                            | Requiere sesión |
-| `/panel/apariencia`           | La puerta al editor, la plantilla y el historial       | Requiere sesión |
-| `/panel/estadisticas/pdf`     | El informe del tablero en PDF. `?g={id}` para uno solo | Requiere sesión |
-| `/panel/catalogos`            | Catálogos en PDF: los guardados y las doce plantillas  | Requiere sesión |
-| `/panel/catalogos/nuevo`      | Armar uno: productos, plantilla y edición              | Requiere sesión |
-| `/panel/catalogos/{id}`       | Editar un catálogo guardado                            | Requiere sesión |
-| `/panel/catalogos/pdf`        | El PDF del borrador del editor, por POST               | Requiere sesión |
-| `/panel/catalogos/{id}/pdf`   | El PDF de uno guardado, con los precios del día        | Requiere sesión |
-| `/panel/catalogos/{id}/canva` | Llevar uno a Canva: pide el permiso                    | Requiere sesión |
-| `/panel/catalogos/canva`      | La vuelta de Canva: importa el PDF y abre el diseño    | Requiere sesión |
-| `/c/{token}`                  | Un catálogo compartido, en PDF                         | Público         |
-| `/cuenta`                     | Datos de la persona y de su tienda, con su WhatsApp    | Requiere sesión |
-| `/auth/destino`               | Resuelve a dónde entra la cuenta y redirige            | Requiere sesión |
-| `/auth/*`                     | Callback y cierre de sesión                            | —               |
-| `/api/health`                 | Estado del servidor y sus capas                        | Público         |
-| `/api/visita`                 | Anota una visita a una tienda, sin identificar a nadie | Público         |
-| `/api/v1/resumen`             | La app: todo lo del Inicio, en un viaje                | Token de la app |
-| `/api/v1/plantillas`          | La app: las plantillas del alta, con su miniatura      | Token de la app |
-| `/api/v1/catalogos/{id}/pdf`  | La app: el PDF de un catálogo guardado                 | Token de la app |
-| `/admin`                      | Resumen de la plataforma: tiendas, embudo, salud       | Administrador   |
-| `/admin/tiendas`              | Todas las tiendas, con filtros y orden                 | Administrador   |
-| `/admin/tiendas/{id}`         | La ficha de una tienda: visitas, suscripción, notas    | Administrador   |
-| `/admin/tiendas/exportar`     | Las tiendas con sus métricas, en CSV                   | Administrador   |
-| `/admin/plantillas`           | Qué plantillas se ofrecen y en qué orden               | Administrador   |
-| `/admin/funciones`            | Funciones por tienda, la IA y su tope diario           | Administrador   |
-| `/admin/ia`                   | Uso, fallas y demoras de la IA                         | Administrador   |
-| `/admin/registro`             | Registro abierto, cerrado o con invitación             | Administrador   |
-| `/admin/cambios`              | Todo lo que se cambió desde la administración          | Administrador   |
+| Ruta                                      | Qué es                                                 | Acceso          |
+| ----------------------------------------- | ------------------------------------------------------ | --------------- |
+| `/`                                       | Portada pública                                        | Público         |
+| `/login`                                  | Registro e ingreso                                     | Público         |
+| `/t/{slug}`                               | Tienda pública del emprendedor                         | Público         |
+| `/t/{slug}/catalogo`                      | Catálogo completo: filtros, búsqueda y orden por URL   | Público         |
+| `/t/{slug}/p/{id}`                        | Ficha de producto, con selector de cantidad            | Público         |
+| `/t/{slug}/carrito`                       | Carrito: el total y el pedido por WhatsApp             | Público         |
+| `/crear`                                  | Alta de la tienda, paso 1: elegir plantilla            | Requiere sesión |
+| `/crear/negocio`                          | Alta de la tienda, paso 2: nombre, rubro y WhatsApp    | Requiere sesión |
+| `/crear/listo`                            | Alta de la tienda, paso 3: ofrece el editor            | Requiere sesión |
+| `/editor`                                 | Editor de la tienda, a pantalla completa. `?paso=`     | Requiere sesión |
+| `/editor/vista-previa`                    | La tienda del dueño con su borrador, para el `iframe`  | Requiere sesión |
+| `/panel`                                  | Resumen del emprendedor                                | Requiere sesión |
+| `/panel/{seccion}`                        | Productos, pedidos, estadísticas, marketing            | Requiere sesión |
+| `/panel/pedidos/{id}`                     | Un pedido: detalle y estados                           | Requiere sesión |
+| `/panel/productos/nuevo`                  | Alta de un producto                                    | Requiere sesión |
+| `/panel/productos/{id}`                   | Edición de un producto                                 | Requiere sesión |
+| `/panel/productos/categorias`             | Las categorías del catálogo                            | Requiere sesión |
+| `/panel/apariencia`                       | La puerta al editor, la plantilla y el historial       | Requiere sesión |
+| `/panel/estadisticas/pdf`                 | El informe del tablero en PDF. `?g={id}` para uno solo | Requiere sesión |
+| `/panel/catalogos`                        | Catálogos en PDF: los guardados y las doce plantillas  | Requiere sesión |
+| `/panel/catalogos/nuevo`                  | Armar uno: productos, plantilla y edición              | Requiere sesión |
+| `/panel/catalogos/{id}`                   | Editar un catálogo guardado                            | Requiere sesión |
+| `/panel/catalogos/pdf`                    | El PDF del borrador del editor, por POST               | Requiere sesión |
+| `/panel/catalogos/{id}/pdf`               | El PDF de uno guardado, con los precios del día        | Requiere sesión |
+| `/panel/catalogos/{id}/canva`             | Llevar uno a Canva: pide el permiso                    | Requiere sesión |
+| `/panel/catalogos/canva`                  | La vuelta de Canva: importa el PDF y abre el diseño    | Requiere sesión |
+| `/c/{token}`                              | Un catálogo compartido, en PDF                         | Público         |
+| `/cuenta`                                 | Datos de la persona y de su tienda, con su WhatsApp    | Requiere sesión |
+| `/auth/destino`                           | Resuelve a dónde entra la cuenta y redirige            | Requiere sesión |
+| `/auth/*`                                 | Callback y cierre de sesión                            | —               |
+| `/api/health`                             | Estado del servidor y sus capas                        | Público         |
+| `/api/visita`                             | Anota una visita a una tienda, sin identificar a nadie | Público         |
+| `/api/v1/resumen`                         | La app: todo lo del Inicio, en un viaje                | Token de la app |
+| `/api/v1/plantillas`                      | La app: las plantillas del alta, con su miniatura      | Token de la app |
+| `/api/v1/catalogos/{id}/pdf`              | La app: el PDF de un catálogo guardado                 | Token de la app |
+| `/api/v1/ia/catalogo`                     | La app: un catálogo desde una frase, ya guardado       | Token de la app |
+| `/api/v1/ia/estadisticas`                 | La app: una pregunta en palabras, un gráfico           | Token de la app |
+| `/api/v1/estadisticas`                    | La app: el tablero guardado; guardar y borrar gráficos | Token de la app |
+| `/api/v1/apariencia`                      | La app: logo, colores, letra y secciones; publicarlos  | Token de la app |
+| `/api/v1/apariencia/plantilla`            | La app: cambiar la plantilla de la tienda              | Token de la app |
+| `/.well-known/assetlinks.json`            | Le confirma a Android que la app es de esta web        | Público         |
+| `/.well-known/apple-app-site-association` | Lo mismo, para iPhone                                  | Público         |
+| `/admin`                                  | Resumen de la plataforma: tiendas, embudo, salud       | Administrador   |
+| `/admin/tiendas`                          | Todas las tiendas, con filtros y orden                 | Administrador   |
+| `/admin/tiendas/{id}`                     | La ficha de una tienda: visitas, suscripción, notas    | Administrador   |
+| `/admin/tiendas/exportar`                 | Las tiendas con sus métricas, en CSV                   | Administrador   |
+| `/admin/plantillas`                       | Qué plantillas se ofrecen y en qué orden               | Administrador   |
+| `/admin/funciones`                        | Funciones por tienda, la IA y su tope diario           | Administrador   |
+| `/admin/ia`                               | Uso, fallas y demoras de la IA                         | Administrador   |
+| `/admin/registro`                         | Registro abierto, cerrado o con invitación             | Administrador   |
+| `/admin/cambios`                          | Todo lo que se cambió desde la administración          | Administrador   |
 
 **`/admin` es un 404 para cualquier otra cuenta, y también sin sesión**: por eso no
 está en `PROTECTED_PREFIXES` del middleware, que mandaría al ingreso y contaría que hay
@@ -144,6 +151,8 @@ app/
   api/health/
   api/v1/             La API de la app móvil: entra con el token de la sesión
   api/visita/         Recibe las visitas de la tienda pública y las anota
+  .well-known/        Lo que Android y iPhone le preguntan a la web antes de abrir
+                      un enlace del panel dentro de la app
   admin/              La administración de Venduo: su armazón, sus pantallas y
                       `acciones.ts`, que escribe con la clave de servicio
 
@@ -223,6 +232,8 @@ lib/
                       dependencias de servidor
   qr.ts               Códigos QR
   admin.ts            La puerta de `/admin` y el registro de cambios. Solo servidor
+  app-movil.ts        Lo que la web sabe de la app: su paquete, las rutas que abre
+                      y las huellas de su firma
   funciones.ts        Las funciones que se apagan, sus estados y el aviso, sin
                       dependencias de servidor
   visitas.ts          De dónde viene una visita y la marca `?o=` de los enlaces
@@ -296,13 +307,24 @@ con una cookie. **Cada ruta corre como esa persona**: RLS, `exigirFuncion` y
 - Toda ruta empieza con `exigirSesion()` (`lib/api/respuestas.ts`): sin sesión, 401.
 - Un error es siempre `{ error }` con un texto en español que la app muestra tal cual.
 - **Una ruta de la API no escribe su propia lógica**: llama a las mismas funciones de
-  `lib/data/` y `lib/ai/` que las pantallas y las Server Actions. Si hace falta algo
-  que hoy vive dentro de una acción, se saca a una función y la llaman las dos.
+  `lib/data/` y `lib/ai/` que las pantallas, o a la misma Server Action del panel
+  —`preguntar`, `publicarDiseno`, `guardarCatalogo`—. Así el permiso, el tope de la IA
+  y cada validación valen igual por los dos caminos, y no hay dos lugares que cambiar.
 - Lo que la app puede hacer directo con RLS —leer pedidos y productos, marcar pagado,
   ajustar stock— no pasa por acá: lo hace contra Supabase con su sesión.
 - Las miniaturas de `public/plantillas/` son capturas del componente `Miniatura`. Al
   cambiar la base de una plantilla o sumar una, se vuelven a capturar y se agrega su
-  clave en `app/api/v1/plantillas/route.ts`.
+  clave en `lib/api/miniaturas.ts`.
+- **La app manda qué cambió, no un estado entero.** `PUT /api/v1/apariencia` parte de
+  lo publicado, le aplica los cambios y lo pasa por `publicarDiseno`: la app no puede
+  publicar algo que el editor no dejaría.
+- **Un enlace del panel abre la app** si el teléfono la tiene: `/panel`, pedidos,
+  productos, estadísticas, apariencia y `/cuenta`. La web lo autoriza en
+  `/.well-known/`, que se enciende con `APP_ANDROID_HUELLAS` y `APP_IOS_ID`; sin ellas
+  no confirma nada y todo sigue abriendo en el navegador. Las rutas están en
+  `lib/app-movil.ts` y en `app.config.ts` de la app: una nueva se suma en los dos.
+  `/editor` y `/panel/catalogos` quedan afuera a propósito, porque la app los abre en
+  el navegador.
 
 ## Tipos de la base
 

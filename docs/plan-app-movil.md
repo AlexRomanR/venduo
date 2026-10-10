@@ -4,19 +4,52 @@ Una app nativa donde el emprendedor entra a su cuenta y maneja su negocio desde 
 celular: pedidos, productos, stock, compartir y números. **Quien compra sigue usando la
 tienda web**: la app es para quien vende.
 
-Estado: **planificada, no empezada.** Al terminar cada fase se marca acá y en
+Estado: **construida y probada en Android; falta encender los avisos y publicarla.** Vive
+en el repositorio `venduo-app`. Al terminar cada fase se marca acá y en
 `docs/estado-del-proyecto.md`.
 
-| Fase | Qué                                                  | Estado    |
-| ---- | ---------------------------------------------------- | --------- |
-| 0    | Cimientos: repositorio, API v1, diseño, tiendas      | Pendiente |
-| 1    | Entrar y cobrar: ingreso, Inicio y Pedidos           | Pendiente |
-| 2    | Avisos: pedido nuevo, cobros pendientes y stock bajo | Pendiente |
-| 3    | Productos: alta con la cámara, stock y categorías    | Pendiente |
-| 4    | Compartir y alta de la tienda desde la app           | Pendiente |
-| 5    | Números e IA, y la apariencia en versión liviana     | Pendiente |
-| 6    | Sin conexión, enlaces universales y Play Store       | Pendiente |
-| 7    | iPhone: cuentas de Apple, revisión y App Store       | Pendiente |
+| Fase | Qué                                                  | Estado                                      |
+| ---- | ---------------------------------------------------- | ------------------------------------------- |
+| 0    | Cimientos: repositorio, API v1, diseño, tiendas      | Hecha. Falta la cuenta de Play Console      |
+| 1    | Entrar y cobrar: ingreso, Inicio y Pedidos           | Hecha                                       |
+| 2    | Avisos: pedido nuevo, cobros pendientes y stock bajo | Escrita, sin encender: ver "Lo que falta"   |
+| 3    | Productos: alta con la cámara, stock y categorías    | Hecha                                       |
+| 4    | Compartir y alta de la tienda desde la app           | Hecha                                       |
+| 5    | Números e IA, y la apariencia en versión liviana     | Hecha                                       |
+| 6    | Sin conexión, enlaces universales y Play Store       | A medias: falta borrar la cuenta y publicar |
+| 7    | iPhone: cuentas de Apple, revisión y App Store       | Pendiente                                   |
+
+Lo hecho se probó contra la base real, en el navegador y en un emulador de Android
+(Pixel 6, Android 15), con una tienda de prueba. **No se probó en un teléfono de
+verdad**: es lo primero que hay que hacer con el APK de `eas build --profile preview`.
+
+## Lo que falta
+
+En orden. Los tres primeros pasos encienden los avisos; el resto es para publicar.
+
+1. **Aplicar la migración de los avisos.** Está escrita en la rama `avisos-de-la-app`
+   (`20261010100000_avisos_de_la_app.sql` y su archivo de políticas): las tablas
+   `push_tokens` y `notification_preferences`, el disparador que avisa de un pedido
+   nuevo y del stock bajo, y el recordatorio diario con `pg_cron`. Necesita las
+   extensiones `pg_net` y `pg_cron`. Después: `npm run db:types` acá y en la app, y
+   abrir el PR de esa rama.
+2. **El proyecto de Expo** (`eas init` en la app): sin su identificador el teléfono no
+   recibe un token de avisos.
+3. **Firebase** para los avisos en Android: `google-services.json` en la app y la clave
+   de la cuenta de servicio en EAS. Los pasos están en el README de la app.
+4. **Borrar la cuenta**, en la app y en una página de la web: lo exigen Google y Apple.
+   Falta decidir antes de escribirlo: si la tienda se da de baja en el acto y se purga
+   a los 90 días —la purga todavía no existe en la base—, y si el mismo correo puede
+   volver a registrarse.
+5. **La política de privacidad** publicada y un correo de contacto.
+6. **La huella de la firma** en `APP_ANDROID_HUELLAS`, en Vercel, para que un enlace del
+   panel abra la app sin preguntar.
+7. **Play Console**: la cuenta, la ficha —los textos y las capturas están en `tienda/`
+   de la app— y la prueba cerrada que Google pide a las cuentas nuevas.
+
+Lo que el plan nombraba y **no se construyó**: el recorrido de la primera vez. El
+Inicio ya dice qué falta —cargar un producto, publicar, activar los avisos—, y se
+prefirió eso a unas pantallas que se pasan sin leer.
 
 ---
 
@@ -42,7 +75,9 @@ Estado: **planificada, no empezada.** Al terminar cada fase se marca acá y en
 
 ## Pendiente de decidir
 
-- El identificador de la app (`bo.venduo.app` propuesto) y su nombre en las tiendas.
+- El identificador de la app: se usa `bo.venduo.app`. Se puede cambiar hasta el día de
+  publicarla; después, nunca.
+- Su nombre en las tiendas: la ficha propone "Venduo: tu tienda y tus ventas".
 
 ---
 
@@ -160,19 +195,20 @@ Sin un paquete común, lo compartido se mantiene así:
 
 ## Lo que hay que construir en este repositorio
 
-1. **API `/api/v1`:** valida el token de Supabase y sirve la IA (las tres tareas, con
+1. **API `/api/v1`, hecha:** valida el token de Supabase y sirve la IA (las tres tareas, con
    `permisoDeIa` y `anotarUsoDeIa`), los PDF de catálogos, publicar el diseño, las
    visitas del emprendedor y sus funciones (`exigirFuncion`). Reutiliza la lógica de las
    Server Actions sin duplicarla: las acciones y la API llaman a las mismas funciones.
-2. **Notificaciones:** tabla `push_tokens` (usuario, token, plataforma, borrado lógico)
+2. **Notificaciones, escritas y sin aplicar:** tabla `push_tokens` (usuario, token, plataforma, borrado lógico)
    con política de cada uno a lo suyo; un disparador al crearse un pedido que avisa por
    Expo Push (o FCM y APNs si se elige Flutter); una tarea diaria con `pg_cron` para los
    cobros pendientes y el stock bajo.
 3. **Enlaces universales:** `/.well-known/assetlinks.json` (Android) y
-   `/.well-known/apple-app-site-association` (iPhone) servidos por la web.
-4. **Borrar la cuenta:** una función que da de baja a la persona y su tienda con el
+   `/.well-known/apple-app-site-association` (iPhone) servidos por la web. **Hechos**:
+   se encienden con `APP_ANDROID_HUELLAS` y `APP_IOS_ID` (`lib/app-movil.ts`).
+4. **Borrar la cuenta, pendiente:** una función que da de baja a la persona y su tienda con el
    borrado lógico de siempre, y la purga a los 90 días.
-5. **Política de privacidad** publicada en la web: la piden las dos tiendas.
+5. **Política de privacidad, pendiente,** publicada en la web: la piden las dos tiendas.
 
 ---
 
