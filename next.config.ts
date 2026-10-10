@@ -25,6 +25,30 @@ const nextConfig: NextConfig = {
     },
   },
 
+  // `/api/v1` es la API de la app móvil. Se abre a cualquier origen porque no
+  // entra con cookies sino con un token en `Authorization`: sin ese token no
+  // devuelve nada, y un navegador ajeno no lo tiene. Hace falta para probar la
+  // app en el navegador, que la llama desde otro origen.
+  async headers() {
+    return [
+      {
+        source: "/api/v1/:ruta*",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          {
+            key: "Access-Control-Allow-Methods",
+            value: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+          },
+          {
+            key: "Access-Control-Allow-Headers",
+            value: "authorization, content-type, x-venduo-app",
+          },
+          { key: "Access-Control-Max-Age", value: "86400" },
+        ],
+      },
+    ]
+  },
+
   images: {
     remotePatterns: [
       ...(supabaseHost
