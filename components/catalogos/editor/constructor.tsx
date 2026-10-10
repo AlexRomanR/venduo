@@ -37,7 +37,7 @@ import { problemasDeEstilo } from "@/lib/catalogos/estilo"
 import type { Catalogo, Estilo } from "@/lib/catalogos/modelo"
 import { faltantes } from "@/lib/catalogos/operaciones"
 import {
-  armarCatalogo,
+  armarDesdePropuesta,
   estilosDeLaTienda,
   type EstiloSugerido,
 } from "@/lib/catalogos/plantillas"
@@ -192,24 +192,16 @@ export function Constructor({
   }, [sinGuardar, esDemo])
 
   function usarPropuesta(propuesta: PropuestaDeCatalogo) {
-    const nuevo = armarCatalogo({
-      plantilla: propuesta.plantilla,
-      nombre: propuesta.nombre,
-      productos: productosDe(propuesta.productos),
-      tienda: { nombre: datos.tienda.nombre, whatsapp: datos.tienda.whatsapp },
-      estilo: estiloDeTienda,
-    })
-    const conBajada = propuesta.bajada
-      ? {
-          ...nuevo,
-          bloques: nuevo.bloques.map((bloque) =>
-            bloque.tipo === "portada"
-              ? { ...bloque, bajada: propuesta.bajada }
-              : bloque
-          ),
-        }
-      : nuevo
-    cambiar(conBajada)
+    cambiar(
+      armarDesdePropuesta(propuesta, {
+        productos: productosDe(propuesta.productos),
+        tienda: {
+          nombre: datos.tienda.nombre,
+          whatsapp: datos.tienda.whatsapp,
+        },
+        estilo: estiloDeTienda,
+      })
+    )
     setSeleccion(propuesta.productos)
     setSugerida(propuesta.plantilla)
     setFase("editar")
