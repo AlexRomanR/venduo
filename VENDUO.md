@@ -180,8 +180,22 @@ Tan importante como la lista de lo que sí:
 - **Cobrar dentro de la plataforma.** No hay pasarela, custodia, QR de pago ni comprobantes: el pago se acuerda por WhatsApp y la tienda lo marca en su panel.
 - **Cobro de la suscripción.** Se modela el estado de la suscripción, no el cobro.
 - **Notificaciones por email.**
-- **Aplicación móvil nativa.** La tienda es responsive; con eso alcanza.
 - **Tests automatizados.**
+
+La aplicación móvil nativa estuvo en esta lista durante la hackathon y salió de ella el
+10 de octubre de 2026: ahora es parte del producto (abajo, "La app del emprendedor").
+
+### La app del emprendedor
+
+Una app nativa, en un **repositorio aparte**, para que el emprendedor maneje su negocio
+desde el celular: pedidos, productos con la cámara, stock, compartir, números y avisos de
+pedido nuevo. **Quien compra sigue en la tienda web.** Se publica primero en Android y
+después en iPhone, con los cimientos listos para las dos desde el principio.
+
+Usa el mismo Supabase con la sesión del usuario, así que RLS y los disparadores imponen
+lo mismo que en la web. Lo que necesita claves del servidor —la IA, los PDF, publicar el
+diseño— lo pide a una API de la web (`/api/v1`). El plan completo está en
+`docs/plan-app-movil.md`.
 
 ---
 

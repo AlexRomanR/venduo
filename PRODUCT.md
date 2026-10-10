@@ -60,7 +60,9 @@ suscripción del emprendedor. El pago se acuerda en el chat, como hoy.
   correo es una barrera más antes de tener la tienda funcionando.
 - **Fuera de alcance, confirmado:** red de vendedores y comisiones, gestión de envíos,
   cobrar dentro de la plataforma, pedirle datos a quien compra, cobro de la suscripción,
-  notificaciones por correo, aplicación móvil nativa y tests automatizados.
+  notificaciones por correo y tests automatizados.
+- **La app nativa del emprendedor sí entra** desde el 10 de octubre de 2026, en un
+  repositorio aparte: `docs/plan-app-movil.md`.
 
 La especificación funcional completa vive en `VENDUO.md` y es la fuente de verdad.
 

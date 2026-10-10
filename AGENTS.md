@@ -69,8 +69,11 @@ acá, frena y pregunta antes de escribir código:
 
 multi-tienda por usuario · red de vendedores, comisiones o referidos · gestión de envíos
 · cobrar dentro de la plataforma (el pago se acuerda por WhatsApp) · pedirle datos a
-quien compra · cobro de la suscripción · notificaciones por correo · app móvil nativa ·
+quien compra · cobro de la suscripción · notificaciones por correo ·
 **tests automatizados**.
+
+La app móvil nativa ya no está en esta lista: era de la hackathon. Va en un repositorio
+aparte y su plan es `docs/plan-app-movil.md`.
 
 ## Documentos
 
@@ -80,6 +83,7 @@ quien compra · cobro de la suscripción · notificaciones por correo · app mó
 | `DESIGN.md`                   | El mundo visual de Venduo y la base editorial                |
 | `docs/estado-del-proyecto.md` | Qué está hecho y qué falta. **Leerlo antes de elegir tarea** |
 | `docs/plan-administracion.md` | El panel `/admin` y las visitas: qué se hizo y por qué       |
+| `docs/plan-app-movil.md`      | La app nativa del emprendedor: decisiones, pantallas, fases  |
 | `docs/store-templates.md`     | El sistema de plantillas de tienda                           |
 | `docs/catalogos-pdf.md`       | Los catálogos en PDF: un dibujo, dos salidas, sus trampas    |
 
