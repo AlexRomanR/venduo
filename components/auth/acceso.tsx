@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
+import { CORREO_DE_CONTACTO } from "@/lib/legal"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import {
@@ -198,7 +199,10 @@ export function Acceso({
         toast.error(
           error.message.includes("Invalid login credentials")
             ? "Correo o contraseña incorrectos."
-            : error.message
+            : // Una cuenta dada de baja queda bloqueada en Auth.
+              error.code === "user_banned" || /banned/i.test(error.message)
+              ? `Esta cuenta fue dada de baja. Si crees que es un error, escríbenos a ${CORREO_DE_CONTACTO}.`
+              : "No pudimos hacerte entrar. Inténtalo de nuevo en un rato."
         )
         return
       }
