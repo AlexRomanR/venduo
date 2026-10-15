@@ -350,12 +350,13 @@ con una cookie. **Cada ruta corre como esa persona**: RLS, `exigirFuncion` y
   lo publicado, le aplica los cambios y lo pasa por `publicarDiseno`: la app no puede
   publicar algo que el editor no dejaría.
 - **Un enlace del panel abre la app** si el teléfono la tiene: `/panel`, pedidos,
-  productos, estadísticas, apariencia y `/cuenta`. La web lo autoriza en
+  productos, estadísticas, apariencia, `/cuenta`, `/editor` y la lista y el alta de
+  catálogos. La web lo autoriza en
   `/.well-known/`, que se enciende con `APP_ANDROID_HUELLAS` y `APP_IOS_ID`; sin ellas
   no confirma nada y todo sigue abriendo en el navegador. Las rutas están en
   `lib/app-movil.ts` y en `app.config.ts` de la app: una nueva se suma en los dos.
-  `/editor` y `/panel/catalogos` quedan afuera a propósito, porque la app los abre en
-  el navegador.
+  Los editores van como rutas exactas: un PDF de un catálogo o la vuelta de Canva
+  cuelgan de `/panel/catalogos/…` y tienen que seguir abriendo en el navegador.
 
 ## Tipos de la base
 

@@ -250,6 +250,9 @@ que se arregló:
 - **Barra de abajo y menú lateral**: la barra con lo de todos los días, también en las
   pantallas de ajustes, y un menú con todo lo demás y su estado, que se abre con un
   cuadro de tres rayitas. Abre con el logo de Venduo que se arma.
+- **Los editores de la tienda y de catálogos, completos en la app**: la vista previa es
+  la web real en un WebView y la app manda cambios; publicar, versiones, la IA, guardar,
+  mandar el PDF y Canva, todo desde el celular.
 - **Formularios que se ven como lo que editan**: producto, tienda, cuenta, apariencia,
   categorías y plantillas, con guardar fijo abajo y la pregunta antes de salir sin
   guardar.

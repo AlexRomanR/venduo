@@ -149,15 +149,14 @@ escondía lo que no estaba en la barra.
    lista; filtros de agotados, por acabarse, ocultos, destacados y "muy vistos, poco
    vendidos"; categorías, precio anterior y destacado; "Oculto por Venduo" cuando el
    administrador lo moderó.
-4. **Catálogos:** pedirle uno a la IA con una frase, y los guardados en cuadrícula con la
-   portada de sus fotos; al tocar uno, mandar el enlace o el PDF con los precios del día,
-   verlo o editarlo en la computadora.
+4. **Catálogos:** pedirle uno a la IA con una frase, armarlo en el editor o abrir uno
+   guardado; al tocarlo, mandar el enlace o el PDF con los precios del día, verlo o
+   editarlo.
 5. **Compartir:** enlace y QR con la hoja de compartir del celular, un botón por red y
    tarjetas para historias con los colores de la tienda.
 
-En el menú, además: estadísticas y preguntas a la IA; apariencia liviana —logo, colores,
-textos de la portada, secciones y plantilla— con "Editar en la computadora" para el
-editor completo; los datos de la tienda con su WhatsApp, los avisos, la cuenta, cerrar
+En el menú, además: estadísticas y preguntas a la IA; **editar la tienda** (abajo); los
+datos de la tienda con su WhatsApp, los avisos, la cuenta, cerrar
 sesión y **borrar la cuenta**, que exigen Apple y Google. Esas pantallas viven en la pila
 del Inicio: llevan la barra de abajo y el botón del menú, como las demás.
 
@@ -178,11 +177,33 @@ cambios sin guardar pregunta.
 - **Lo que Venduo apaga en `/admin` se apaga también en la app**: la pantalla lo oculta o
   lo atenúa, y la API lo rechaza.
 
+### Los dos editores, completos
+
+El editor de la tienda y el de catálogos hacen en la app todo lo que hacen en la web,
+a pantalla completa: arriba la tienda o las hojas reales, abajo un panel que se sube y se
+baja con el dedo.
+
+- **La web dibuja y la app manda cambios.** La vista previa es `/editor/app` o
+  `/editor/app/catalogo` en un WebView, con la sesión de la app. La app manda
+  operaciones —las mismas del editor y del constructor de la web— y la página las aplica,
+  valida y devuelve el estado. Las plantillas y las validaciones no se copian: una
+  sección, una plantilla o un ajuste nuevo de la web aparece solo en la app, porque sus
+  formularios se arman con lo que manda `/api/v1/editor`.
+- **Editor de la tienda:** Marca (logo, paletas, colores a mano con un selector táctil,
+  letras, mayúsculas, forma de los botones, plantilla), Portada (secciones con sus
+  campos, fotos de la cámara, la galería o la biblioteca), Catálogo, Producto y Carrito
+  con sus opciones dibujadas, la IA y Publicar con lo que cambió, lo que lo impide y el
+  historial para volver atrás. Deshacer y rehacer; el borrador queda en el teléfono.
+- **Editor de catálogos:** elegir productos por sus fotos, la galería de estilos con
+  cada plantilla ya armada, y después hojas, productos, packs, estilo, la IA y guardar.
+  Desde ahí se manda el enlace o el PDF, y **Canva** abre su app si está instalada: si la
+  tienda no aprobó todavía a Venduo, se aprueba una vez en el navegador, que vuelve solo a
+  la app (`venduo://canva`).
+- Editar pide internet, como el resto de la app.
+
 ### Lo que no va
 
 - El panel de administración: sigue solo en la web.
-- El editor completo de la tienda y el constructor de catálogos hoja por hoja: se abren
-  en la web.
 
 ---
 
