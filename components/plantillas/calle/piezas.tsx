@@ -99,7 +99,8 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
 /** Dos de ancho en el celular, tres o cuatro en la computadora, pegadas. */
 export function grilla(columnas: number) {
   return cn(
-    "grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4",
+    "grid grid-cols-2 gap-3 md:gap-4",
+    columnas >= 3 && "md:grid-cols-3",
     columnas >= 4 && "lg:grid-cols-4"
   )
 }

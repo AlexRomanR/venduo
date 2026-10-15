@@ -224,7 +224,10 @@ export function Checkout({
 
   if (opciones.diseno === "boleta") {
     return (
-      <div className="mx-auto flex w-full max-w-xl flex-col gap-10">
+      <div
+        data-ajuste="carrito.diseno"
+        className="mx-auto flex w-full max-w-xl flex-col gap-10"
+      >
         {/* Una nota de venta: angosta, con los renglones separados por un
             punteado y el total abajo, como la que se lleva uno de la tienda. */}
         <section className="border-2 border-tinta px-5 pt-5 pb-6 sm:px-7">
@@ -255,7 +258,10 @@ export function Checkout({
 
   if (opciones.diseno === "pasos") {
     return (
-      <div className="mx-auto flex w-full max-w-2xl flex-col">
+      <div
+        data-ajuste="carrito.diseno"
+        className="mx-auto flex w-full max-w-2xl flex-col"
+      >
         <Paso numero={1} titulo="Revisa tu pedido" detalle={articulos}>
           <Lineas slug={slug} />
           {sugerencias}
@@ -270,7 +276,10 @@ export function Checkout({
   }
 
   return (
-    <div className="grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
+    <div
+      data-ajuste="carrito.diseno"
+      className="grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-16"
+    >
       <section>
         <h2 className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
           Tu carrito · {articulos}
@@ -436,7 +445,11 @@ function Sugerencias({ sugeridos }: { sugeridos: ProductoSugerido[] }) {
   if (libres.length === 0) return null
 
   return (
-    <section aria-labelledby="suma-a-tu-pedido" className="mt-10">
+    <section
+      data-ajuste="carrito.sugerencias"
+      aria-labelledby="suma-a-tu-pedido"
+      className="mt-10"
+    >
       <h3
         id="suma-a-tu-pedido"
         className="text-xs font-semibold tracking-[0.12em] uppercase opacity-60"

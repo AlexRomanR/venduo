@@ -85,7 +85,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
         </div>
 
         {fotos.length > 0 ? (
-          <div className="relative mx-auto aspect-[5/4] w-full max-w-md md:max-w-none">
+          <div className="relative isolate mx-auto aspect-[5/4] w-full max-w-md md:max-w-none">
             {fotos.map((foto, i) => (
               <div
                 key={foto}
@@ -217,7 +217,10 @@ function Grilla({ bloque, tienda }: PropsBloque) {
           href: rutaDeTienda(tienda.slug, "/catalogo"),
         }}
       />
-      <div className={cn("mt-6", grilla(columnas))}>
+      <div
+        data-ajuste="disposicion.tarjeta disposicion.columnas"
+        className={cn("mt-6", grilla(columnas))}
+      >
         {productos.map((producto) => (
           <Tarjeta key={producto.id} producto={producto} tienda={tienda} />
         ))}

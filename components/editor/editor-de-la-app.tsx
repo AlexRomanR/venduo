@@ -37,6 +37,34 @@ function alaApp(mensaje: MensajeAlaApp) {
   window.ReactNativeWebView?.postMessage(JSON.stringify(mensaje))
 }
 
+/** El ancho al que la tienda se arma como en una computadora. */
+const ANCHO_DE_COMPUTADORA = 1280
+
+/**
+ * La tienda como en un celular o como en una computadora.
+ *
+ * Lo que cambia entre las dos lo deciden las media queries de cada plantilla,
+ * que miran el ancho de la ventana: achicar la página con CSS no las mueve.
+ * Se cambia entonces el `viewport`: el WebView arma la página a 1280 px y la
+ * achica hasta que entra en el teléfono, como la vería alguien en su
+ * computadora.
+ */
+function ponerPantalla(pantalla: "celular" | "computadora") {
+  let meta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]')
+  if (!meta) {
+    meta = document.createElement("meta")
+    meta.name = "viewport"
+    meta.content = "width=device-width, initial-scale=1"
+    document.head.append(meta)
+  }
+  meta.dataset.original ??= meta.content
+  const escala = Math.min(1, window.screen.width / ANCHO_DE_COMPUTADORA)
+  meta.content =
+    pantalla === "computadora"
+      ? `width=${ANCHO_DE_COMPUTADORA}, initial-scale=${escala.toFixed(4)}`
+      : meta.dataset.original
+}
+
 /**
  * Lo que llega de la app viaja en JSON, que no tiene `undefined`: un campo que
  * se vacía —una foto que se quita— llega como `null`. Las secciones lo
@@ -140,6 +168,8 @@ export function EditorDeLaApp({
           alaApp({ tipo: "seleccionar", seccion: mensaje.seccion })
         } else if (mensaje.tipo === "fija") {
           alaApp({ tipo: "fija", nombre: mensaje.nombre, ayuda: mensaje.ayuda })
+        } else if (mensaje.tipo === "sin-senal") {
+          alaApp({ tipo: "sin-senal", ruta: mensaje.ruta })
         }
         // Soltar una foto encima es del mouse: en el celular no pasa.
       },
@@ -210,6 +240,13 @@ export function EditorDeLaApp({
             oyente({ tipo: "enfocar", seccion: mensaje.seccion })
           )
           return
+        case "senalar":
+          oyentes.current.forEach((oyente) =>
+            oyente({ tipo: "senalar", ruta: mensaje.ruta })
+          )
+          return
+        case "pantalla":
+          return ponerPantalla(mensaje.pantalla)
         case "mirar": {
           if (!mensaje.operaciones) return setMirando(null)
           const resultado = aplicarOperaciones(

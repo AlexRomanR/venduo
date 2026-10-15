@@ -131,8 +131,10 @@ function GrillaDelCatalogo({
 
   return (
     <div
+      data-ajuste="disposicion.tarjeta disposicion.columnas"
       className={cn(
-        "mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3",
+        "mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2",
+        tienda.apariencia.disposicion.columnas >= 3 && "lg:grid-cols-3",
         tienda.apariencia.disposicion.columnas === 4 && "xl:grid-cols-4"
       )}
     >

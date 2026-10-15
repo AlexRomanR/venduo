@@ -92,7 +92,8 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
 
 export function grilla(columnas: number) {
   return cn(
-    "grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 md:gap-x-8 md:gap-y-14",
+    "grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-8 md:gap-y-14",
+    columnas >= 3 && "md:grid-cols-3",
     columnas >= 4 && "lg:grid-cols-4"
   )
 }

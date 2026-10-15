@@ -1,6 +1,10 @@
 import { z } from "zod"
 
-import { VISTAS, borradorSchema } from "@/lib/editor/protocolo"
+import {
+  VISTAS,
+  borradorSchema,
+  rutaDeAjusteSchema,
+} from "@/lib/editor/protocolo"
 import { operacionSchema } from "@/lib/plantillas/borrador"
 
 /**
@@ -35,6 +39,17 @@ export const mensajeDeLaApp = z.discriminatedUnion("tipo", [
   }),
   z.object({ tipo: z.literal("seleccionar"), seccion: z.string().nullable() }),
   z.object({ tipo: z.literal("enfocar"), seccion: z.string() }),
+  /** Llevar la vista hasta lo que cambia un ajuste y hacerlo latir. */
+  z.object({ tipo: z.literal("senalar"), ruta: rutaDeAjusteSchema }),
+  /**
+   * Ver la tienda como en un celular o como en una computadora. Hay ajustes
+   * que solo se notan en una de las dos: las columnas del catálogo son de la
+   * pantalla ancha, la barra fija de compra es del celular.
+   */
+  z.object({
+    tipo: z.literal("pantalla"),
+    pantalla: z.enum(["celular", "computadora"]),
+  }),
   /**
    * Mirar una propuesta de la IA sin aplicarla: se dibuja encima del borrador
    * y se marcan las secciones que toca. `null` vuelve al borrador.
@@ -78,4 +93,6 @@ export type MensajeAlaApp =
   | { tipo: "rechazado"; motivos: string[] }
   | { tipo: "seleccionar"; seccion: string }
   | { tipo: "fija"; nombre: string; ayuda: string }
+  /** Lo que cambia ese ajuste no se ve en esta pantalla. */
+  | { tipo: "sin-senal"; ruta: string }
   | { tipo: "sin-tienda" }

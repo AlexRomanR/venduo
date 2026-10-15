@@ -53,7 +53,14 @@ export function Inicio({ tienda }: PropsInicio) {
       ) : (
         <section className="mx-auto w-full max-w-7xl px-5 py-14">
           <TituloDeSeccion titulo={tienda.nombre} como="h1" />
-          <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-3 md:gap-x-5 lg:grid-cols-4">
+          <div
+            data-ajuste="disposicion.tarjeta disposicion.columnas"
+            className={cn(
+              "mt-6 grid grid-cols-2 gap-x-3 gap-y-8 md:gap-x-5",
+              tienda.apariencia.disposicion.columnas >= 3 && "md:grid-cols-3",
+              tienda.apariencia.disposicion.columnas >= 4 && "lg:grid-cols-4"
+            )}
+          >
             {tienda.productos.slice(0, 12).map((producto) => (
               <Tarjeta key={producto.id} producto={producto} tienda={tienda} />
             ))}
@@ -221,8 +228,10 @@ export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
         </div>
       ) : (
         <div
+          data-ajuste="disposicion.tarjeta disposicion.columnas"
           className={cn(
-            "mt-8 grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-3 md:gap-x-5",
+            "mt-8 grid grid-cols-2 gap-x-3 gap-y-8 md:gap-x-5",
+            tienda.apariencia.disposicion.columnas >= 3 && "md:grid-cols-3",
             tienda.apariencia.disposicion.columnas >= 4 && "lg:grid-cols-4"
           )}
         >

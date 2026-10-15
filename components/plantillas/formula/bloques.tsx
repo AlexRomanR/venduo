@@ -168,7 +168,10 @@ function Grilla({ bloque, tienda }: PropsBloque) {
           href: rutaDeTienda(tienda.slug, "/catalogo"),
         }}
       />
-      <div className={cn("mt-8", grilla(columnas))}>
+      <div
+        data-ajuste="disposicion.tarjeta disposicion.columnas"
+        className={cn("mt-8", grilla(columnas))}
+      >
         {productos.map((producto) => (
           <Tarjeta key={producto.id} producto={producto} tienda={tienda} />
         ))}
