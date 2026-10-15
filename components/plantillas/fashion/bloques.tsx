@@ -221,8 +221,10 @@ function Grilla({ bloque, tienda }: PropsBloque) {
       />
 
       <div
+        data-ajuste="disposicion.tarjeta disposicion.columnas"
         className={cn(
-          "mt-6 grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-3 md:gap-x-5",
+          "mt-6 grid grid-cols-2 gap-x-3 gap-y-8 md:gap-x-5",
+          columnas >= 3 && "md:grid-cols-3",
           columnas >= 4 && "lg:grid-cols-4"
         )}
       >

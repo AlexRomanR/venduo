@@ -151,14 +151,47 @@ export function VistaPrevia({
     window.setTimeout(() => setDestello(null), 1400)
   }, [])
 
+  // Lo que cambia un ajuste se busca un momento después: el mensaje llega
+  // junto con el estado nuevo, y lo que señala puede aparecer recién con él.
+  const [senal, setSenal] = React.useState<string | null>(null)
+  const relojes = React.useRef<number[]>([])
+  const senalar = React.useCallback(
+    (ruta: string) => {
+      relojes.current.forEach((reloj) => window.clearTimeout(reloj))
+      relojes.current = [
+        window.setTimeout(() => {
+          const elemento = Array.from(
+            document.querySelectorAll(`[data-ajuste~="${ruta}"]`)
+          ).find((e) => e.getClientRects().length > 0)
+          if (!elemento) {
+            setSenal(null)
+            puente.enviar({ tipo: "sin-senal", ruta })
+            return
+          }
+          const quieto = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+          ).matches
+          elemento.scrollIntoView({
+            behavior: quieto ? "auto" : "smooth",
+            block: "center",
+          })
+          setSenal(ruta)
+          relojes.current.push(window.setTimeout(() => setSenal(null), 1700))
+        }, 260),
+      ]
+    },
+    [puente]
+  )
+
   React.useEffect(() => {
     const dejar = puente.escuchar((mensaje) => {
       if (mensaje.tipo === "estado") setEstado(mensaje)
+      else if (mensaje.tipo === "senalar") senalar(mensaje.ruta)
       else enfocar(mensaje.seccion)
     })
     puente.enviar({ tipo: "lista" })
     return dejar
-  }, [enfocar, puente])
+  }, [enfocar, senalar, puente])
 
   React.useEffect(() => {
     if (pendiente.current) enfocar(pendiente.current)
@@ -308,6 +341,11 @@ export function VistaPrevia({
       (id) =>
         `${marcada(id)}{outline:3px solid ${MARCA};outline-offset:-3px;animation:vp-destello 1.6s ease-out 2}`
     ),
+    ...(senal
+      ? [
+          `[data-ajuste~="${senal}"]{outline:3px solid ${MARCA};outline-offset:-3px;animation:vp-destello .8s ease-out 2}`,
+        ]
+      : []),
     `@keyframes vp-destello{0%,100%{outline-color:${MARCA}}50%{outline-color:transparent}}`,
     // Los colores nuevos se derraman sobre la tienda en vez de saltar: es lo
     // que hace sentir que el cambio es de verdad y no otra pantalla.

@@ -7,20 +7,56 @@
  * variable es la que declara `lib/fuentes.ts`, y las dos listas tienen que
  * coincidir.
  *
+ * `pesos` son los que compila `lib/fuentes.ts`, y `nombre` es el de la familia
+ * en Google Fonts: con eso la API le da a la app los archivos de cada letra
+ * (`/api/v1/fuentes`), y una letra nueva llega sola a la app.
+ *
  * Este módulo no importa `next/font` a propósito: lo leen la galería de
  * plantillas, que es de cliente, y la validación de lo que venga de la base.
  */
 export const FUENTES = {
-  archivo: { nombre: "Archivo", variable: "--fuente-archivo" },
-  geist: { nombre: "Geist", variable: "--fuente-geist" },
-  oswald: { nombre: "Oswald", variable: "--fuente-oswald" },
-  cormorant: { nombre: "Cormorant Garamond", variable: "--fuente-cormorant" },
-  jost: { nombre: "Jost", variable: "--fuente-jost" },
-  anton: { nombre: "Anton", variable: "--fuente-anton" },
-  bodoni: { nombre: "Bodoni Moda", variable: "--fuente-bodoni" },
-  barlow: { nombre: "Barlow Condensed", variable: "--fuente-barlow" },
-  instrument: { nombre: "Instrument Serif", variable: "--fuente-instrument" },
-  bricolage: { nombre: "Bricolage Grotesque", variable: "--fuente-bricolage" },
+  archivo: {
+    nombre: "Archivo",
+    variable: "--fuente-archivo",
+    pesos: [600, 700, 800],
+  },
+  geist: {
+    nombre: "Geist",
+    variable: "--fuente-geist",
+    pesos: [400, 500, 600, 700],
+  },
+  oswald: {
+    nombre: "Oswald",
+    variable: "--fuente-oswald",
+    pesos: [500, 600, 700],
+  },
+  cormorant: {
+    nombre: "Cormorant Garamond",
+    variable: "--fuente-cormorant",
+    pesos: [500, 600, 700],
+  },
+  jost: { nombre: "Jost", variable: "--fuente-jost", pesos: [400, 500, 600] },
+  anton: { nombre: "Anton", variable: "--fuente-anton", pesos: [400] },
+  bodoni: {
+    nombre: "Bodoni Moda",
+    variable: "--fuente-bodoni",
+    pesos: [500, 600, 700],
+  },
+  barlow: {
+    nombre: "Barlow Condensed",
+    variable: "--fuente-barlow",
+    pesos: [600, 700, 800],
+  },
+  instrument: {
+    nombre: "Instrument Serif",
+    variable: "--fuente-instrument",
+    pesos: [400],
+  },
+  bricolage: {
+    nombre: "Bricolage Grotesque",
+    variable: "--fuente-bricolage",
+    pesos: [600, 700, 800],
+  },
 } as const
 
 export type ClaveFuente = keyof typeof FUENTES

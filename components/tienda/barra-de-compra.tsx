@@ -72,6 +72,7 @@ export function BarraDeCompra({
 
   return (
     <div
+      data-ajuste="ficha.barraFija"
       inert={!aLaVista}
       className={cn(
         "sticky bottom-0 z-30 border-t-2 border-tinta bg-papel/95 backdrop-blur transition-transform duration-300 motion-reduce:transition-none md:hidden",

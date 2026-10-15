@@ -121,12 +121,15 @@ export function Vitrina({
 }) {
   return (
     <div
+      data-ajuste="disposicion.tarjeta disposicion.columnas"
       className={cn(
         "flex flex-wrap justify-center gap-x-4 gap-y-12 md:gap-x-8",
         "*:w-[calc(50%-0.5rem)]",
         columnas >= 4
           ? "md:*:w-[calc((100%-6rem)/4)]"
-          : "md:*:w-[calc((100%-4rem)/3)]"
+          : columnas === 3
+            ? "md:*:w-[calc((100%-4rem)/3)]"
+            : "md:*:w-[calc(50%-1rem)]"
       )}
     >
       {children}

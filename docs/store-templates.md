@@ -442,6 +442,12 @@ que habría si la plantilla redefiniera la variable de la propia fuente.
 Las de plantilla van con `preload: false`. Declararlas en `<html>` suma unas líneas de
 `@font-face`, pero el navegador baja solo el archivo de la que se usa.
 
+**La app las baja de la web.** `FUENTES` (`lib/plantillas/fuentes.ts`) lleva, además
+de la variable, el nombre de la familia en Google Fonts y sus grosores. Con eso
+`/api/v1/fuentes` le dice a la app dónde está el archivo TTF de cada grosor, y la app
+escribe cada opción de letra con la letra misma. Una letra nueva se suma en `FUENTES`
+y en `lib/fuentes.ts`, y aparece sola en los editores de la app.
+
 ### Estados
 
 | Estado    | Dónde                        | Cómo toma la identidad                                                         |
@@ -796,6 +802,14 @@ con el kit de su plantilla. El editor le manda el borrador por `postMessage`
   productos de ejemplo (`TiendaPublica.productosDeEjemplo`), porque el comprador no los ve.
 - **El celular o la computadora lo elige el editor**, no el marco: la barra de compra solo
   existe en el celular, y prenderla mirando la computadora cambia a celular para que se vea.
+  En la app, la vista previa es el WebView del teléfono: el modo computadora cambia el
+  `viewport` a 1280 px, que es lo que mueven las media queries de las plantillas.
+- **Lo que cambia cada ajuste lleva `data-ajuste`** con su ruta —`ficha.consulta`,
+  `disposicion.columnas`—, y la vista previa lo señala cuando se cambia: lleva la vista
+  hasta ahí y lo hace latir. Si no está —la tienda no tiene WhatsApp, no hay productos
+  que sugerir—, avisa con `sin-senal` y el editor dice por qué con `GUIA_DE_AJUSTES`
+  (`lib/editor/guia-de-ajustes.ts`), que también dice en qué pantalla se nota cada uno.
+  Un ajuste nuevo que cambie algo visible lleva su `data-ajuste` en el kit y su guía.
 
 ### Publicar y restaurar
 

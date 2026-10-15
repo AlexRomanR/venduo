@@ -5,6 +5,10 @@ import { getAparienciaDeMiTienda } from "@/lib/data/apariencia"
 import { leerDisenoParaEditar } from "@/lib/data/editor"
 import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { BUCKET } from "@/lib/editor/imagenes"
+import {
+  GUIA_DE_AJUSTES,
+  type GuiaDeAjuste,
+} from "@/lib/editor/guia-de-ajustes"
 import { COMBINACIONES, PALETAS } from "@/lib/editor/sugerencias"
 import {
   NOMBRES_DE_AJUSTE,
@@ -18,16 +22,16 @@ import { createClient } from "@/lib/supabase/server"
 
 export const dynamic = "force-dynamic"
 
-type Ajuste =
-  | { ruta: RutaDeAjuste; nombre: string; tipo: "color" }
-  | { ruta: RutaDeAjuste; nombre: string; tipo: "fuente" }
-  | { ruta: RutaDeAjuste; nombre: string; tipo: "si-no" }
-  | {
-      ruta: RutaDeAjuste
-      nombre: string
-      tipo: "opciones"
-      opciones: { valor: string | number | null; nombre: string }[]
-    }
+type Ajuste = { ruta: RutaDeAjuste; nombre: string } & Partial<GuiaDeAjuste> &
+  (
+    | { tipo: "color" }
+    | { tipo: "fuente" }
+    | { tipo: "si-no" }
+    | {
+        tipo: "opciones"
+        opciones: { valor: string | number | null; nombre: string }[]
+      }
+  )
 
 /** Los valores cerrados de cada ajuste, con su nombre para la persona. */
 const OPCIONES: Partial<Record<RutaDeAjuste, (string | number | null)[]>> = {
@@ -49,7 +53,7 @@ const PESOS: Record<number, string> = {
 }
 
 function nombreDeValor(valor: string | number | null): string {
-  if (valor === null) return "Como viene"
+  if (valor === null) return "De tu plantilla"
   if (typeof valor === "number") return PESOS[valor] ?? `${valor} columnas`
   return NOMBRES_DE_VALOR[valor] ?? valor
 }
@@ -58,22 +62,27 @@ function nombreDeValor(valor: string | number | null): string {
 function ajustes(): Ajuste[] {
   return RUTAS_DE_AJUSTE.filter((ruta) => ruta !== "colores.senalAlta").map(
     (ruta): Ajuste => {
-      const nombre = NOMBRES_DE_AJUSTE[ruta]
-      if (ruta.startsWith("colores.")) return { ruta, nombre, tipo: "color" }
+      // Qué cambia y en qué pantalla se nota: la app lo muestra junto a cada
+      // opción y pasa su vista previa a esa pantalla.
+      const base = {
+        ruta,
+        nombre: NOMBRES_DE_AJUSTE[ruta],
+        ...GUIA_DE_AJUSTES[ruta],
+      }
+      if (ruta.startsWith("colores.")) return { ...base, tipo: "color" }
       if (ruta === "tipografia.titular" || ruta === "tipografia.cuerpo") {
-        return { ruta, nombre, tipo: "fuente" }
+        return { ...base, tipo: "fuente" }
       }
       const opciones = OPCIONES[ruta]
-      if (!opciones) return { ruta, nombre, tipo: "si-no" }
+      if (!opciones) return { ...base, tipo: "si-no" }
       return {
-        ruta,
-        nombre,
+        ...base,
         tipo: "opciones",
         opciones: opciones.map((valor) => ({
           valor,
           nombre:
             ruta === "disposicion.columnas"
-              ? `${valor} columnas`
+              ? `${valor} por fila`
               : nombreDeValor(valor),
         })),
       }

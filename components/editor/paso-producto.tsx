@@ -5,7 +5,8 @@ import Link from "next/link"
 import { ImageOff } from "lucide-react"
 import { toast } from "sonner"
 
-import type { Apariencia } from "@/lib/plantillas/apariencia"
+import { GUIA_DE_AJUSTES as GUIA } from "@/lib/editor/guia-de-ajustes"
+import { NOMBRES_DE_AJUSTE, type Apariencia } from "@/lib/plantillas/apariencia"
 import { cn } from "@/lib/utils"
 import { useEditor } from "@/components/editor/contexto"
 import {
@@ -111,8 +112,8 @@ export function PasoProducto() {
       <Grupo titulo="Qué la acompaña">
         <div className="border-t border-tinta/15">
           <Interruptor
-            etiqueta="Botón de compra siempre a mano"
-            ayuda="En el celular, una barra con el precio y «Agregar» que sigue a tu cliente mientras mira la foto."
+            etiqueta={NOMBRES_DE_AJUSTE["ficha.barraFija"]}
+            ayuda={`${GUIA["ficha.barraFija"]?.ayuda} Solo en el celular.`}
             activo={ficha.barraFija}
             alCambiar={(activo) => {
               ajustar("barraFija", activo)
@@ -126,10 +127,10 @@ export function PasoProducto() {
             }}
           />
           <Interruptor
-            etiqueta="Preguntar por WhatsApp"
+            etiqueta={NOMBRES_DE_AJUSTE["ficha.consulta"]}
             ayuda={
               tienda.whatsapp
-                ? "Un enlace para que te escriban sobre ese producto, con el mensaje ya escrito."
+                ? GUIA["ficha.consulta"]?.ayuda
                 : "Necesita el WhatsApp de tu tienda. Agrégalo en Cuenta y vuelve."
             }
             activo={ficha.consulta && Boolean(tienda.whatsapp)}
@@ -137,8 +138,8 @@ export function PasoProducto() {
             alCambiar={(activo) => ajustar("consulta", activo)}
           />
           <Interruptor
-            etiqueta="Productos parecidos"
-            ayuda="«También te puede gustar» al pie: cuatro productos más para seguir mirando."
+            etiqueta={NOMBRES_DE_AJUSTE["ficha.relacionados"]}
+            ayuda={GUIA["ficha.relacionados"]?.ayuda}
             activo={ficha.relacionados}
             alCambiar={(activo) => ajustar("relacionados", activo)}
           />

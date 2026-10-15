@@ -252,7 +252,10 @@ que se arregló:
   cuadro de tres rayitas. Abre con el logo de Venduo que se arma.
 - **Los editores de la tienda y de catálogos, completos en la app**: la vista previa es
   la web real en un WebView y la app manda cambios; publicar, versiones, la IA, guardar,
-  mandar el PDF y Canva, todo desde el celular.
+  mandar el PDF y Canva, todo desde el celular. Cada opción señala en la tienda lo que
+  cambia, la vista previa se mira como en un celular o en una computadora, y las letras
+  se eligen escritas con ellas mismas: la app las baja de la web, así que una letra
+  nueva aparece sola.
 - **Formularios que se ven como lo que editan**: producto, tienda, cuenta, apariencia,
   categorías y plantillas, con guardar fijo abajo y la pregunta antes de salir sin
   guardar.

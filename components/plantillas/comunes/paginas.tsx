@@ -88,6 +88,7 @@ export function paginasDeKit(
           <section className="mx-auto w-full max-w-7xl px-5 py-14">
             <Titulo titulo={tienda.nombre} como="h1" />
             <div
+              data-ajuste="disposicion.tarjeta disposicion.columnas"
               className={cn(
                 "mt-6",
                 grilla(tienda.apariencia.disposicion.columnas)
@@ -168,6 +169,7 @@ export function paginasDeKit(
           </div>
         ) : (
           <div
+            data-ajuste="disposicion.tarjeta disposicion.columnas"
             className={cn(
               "mt-8",
               grilla(tienda.apariencia.disposicion.columnas)
@@ -220,6 +222,7 @@ export function paginasDeKit(
         </div>
 
         <div
+          data-ajuste="ficha.diseno"
           className={cn(
             vitrina
               ? "mx-auto flex max-w-2xl flex-col items-center gap-8"
@@ -291,6 +294,7 @@ export function paginasDeKit(
 
               {consulta ? (
                 <a
+                  data-ajuste="ficha.consulta"
                   href={consulta}
                   target="_blank"
                   rel="noreferrer noopener"
@@ -331,7 +335,10 @@ export function paginasDeKit(
         </div>
 
         {ficha.relacionados && relacionados.length > 0 ? (
-          <section className="mt-16 px-5 md:mt-24 md:px-0">
+          <section
+            data-ajuste="ficha.relacionados"
+            className="mt-16 px-5 md:mt-24 md:px-0"
+          >
             <Titulo titulo="También te puede gustar" />
             <div className={cn("mt-6", grilla(4))}>
               {relacionados.map((otro) => (

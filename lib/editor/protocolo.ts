@@ -27,6 +27,16 @@ const seccionSchema = z.object({
 })
 
 /** La forma de un borrador, sin juzgar su contenido: eso lo hacen las operaciones. */
+/**
+ * Un ajuste de la apariencia, por su ruta: `ficha.consulta`. Las partes de la
+ * tienda que cambia llevan `data-ajuste` con esa ruta, y la vista previa las
+ * busca para señalarlas. Termina en un selector de CSS: solo letras y puntos.
+ */
+export const rutaDeAjusteSchema = z
+  .string()
+  .regex(/^[a-zA-Z]+(\.[a-zA-Z]+)*$/)
+  .max(64)
+
 export const borradorSchema = z.object({
   personalizacion: personalizacionSchema,
   logoUrl: z.string().nullable(),
@@ -44,6 +54,8 @@ export const mensajeAlaVistaPrevia = z.discriminatedUnion("tipo", [
     marcas: z.array(z.string()),
   }),
   z.object({ tipo: z.literal("enfocar"), seccion: z.string() }),
+  /** Llevar la vista hasta lo que cambia un ajuste y hacerlo latir. */
+  z.object({ tipo: z.literal("senalar"), ruta: rutaDeAjusteSchema }),
 ])
 
 export const mensajeAlEditor = z.discriminatedUnion("tipo", [
@@ -55,6 +67,11 @@ export const mensajeAlEditor = z.discriminatedUnion("tipo", [
     nombre: z.string().max(80),
     ayuda: z.string().max(300),
   }),
+  /**
+   * Lo que cambia ese ajuste no está en esta pantalla: la tienda no tiene
+   * WhatsApp, no hay otros productos que sugerir, o es de la otra pantalla.
+   */
+  z.object({ tipo: z.literal("sin-senal"), ruta: rutaDeAjusteSchema }),
   z.object({
     tipo: z.literal("soltar-imagen"),
     seccion: z.string(),

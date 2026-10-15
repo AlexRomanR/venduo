@@ -55,6 +55,7 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/api/visita`                             | Anota una visita a una tienda, sin identificar a nadie  | Público         |
 | `/api/v1/resumen`                         | La app: todo lo del Inicio, en un viaje                 | Token de la app |
 | `/api/v1/plantillas`                      | La app: las plantillas del alta, con su miniatura       | Token de la app |
+| `/api/v1/fuentes`                         | La app: las letras de las tiendas y sus archivos        | Público         |
 | `/api/v1/catalogos/{id}/pdf`              | La app: el PDF de un catálogo guardado                  | Token de la app |
 | `/api/v1/ia/catalogo`                     | La app: un catálogo desde una frase, ya guardado        | Token de la app |
 | `/api/v1/ia/estadisticas`                 | La app: una pregunta en palabras, un gráfico            | Token de la app |
@@ -225,9 +226,9 @@ lib/
   ai/                 Capa de IA
   insights/           Lo que se puede preguntar, la lectura y el documento PDF
   editor/             Del editor, sin dependencias de servidor: el protocolo con la
-                      vista previa, las paletas y letras sugeridas, los pasos, los
-                      productos de ejemplo y las imágenes (comprimir y subir, solo
-                      navegador)
+                      vista previa, las paletas y letras sugeridas, los pasos, qué
+                      cambia cada ajuste y en qué pantalla, los productos de ejemplo
+                      y las imágenes (comprimir y subir, solo navegador)
   plantillas/         La base de cada plantilla: tokens, esquema de la apariencia,
                       registro, qué significa cada bloque, los campos de cada
                       sección y el borrador del editor con sus operaciones.

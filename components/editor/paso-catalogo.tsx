@@ -49,11 +49,11 @@ export function PasoCatalogo() {
       />
 
       <Grupo
-        titulo="Foto de los productos"
+        titulo="Forma de las fotos"
         ayuda="Vertical luce la ropa puesta; cuadrada ordena mejor objetos y cajas."
       >
         <Opciones
-          etiqueta="Foto de los productos"
+          etiqueta="Forma de las fotos"
           valor={apariencia.disposicion.tarjeta}
           opciones={[
             {
@@ -76,15 +76,15 @@ export function PasoCatalogo() {
       </Grupo>
 
       <Grupo
-        titulo="Columnas en la computadora"
+        titulo="Productos por fila en la computadora"
         ayuda="En el celular siempre van de a dos, para que se lean."
       >
         <Opciones
-          etiqueta="Columnas en la computadora"
+          etiqueta="Productos por fila en la computadora"
           valor={apariencia.disposicion.columnas}
           opciones={([2, 3, 4] as const).map((cantidad) => ({
             valor: cantidad,
-            etiqueta: `${cantidad} columnas`,
+            etiqueta: `${cantidad} por fila`,
             dibujo: <Columnas cantidad={cantidad} />,
           }))}
           alCambiar={(columnas) =>
