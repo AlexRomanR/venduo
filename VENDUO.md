@@ -151,6 +151,8 @@ El correo **se guarda igual**, así que exigir verificación más adelante es ca
 
 **Quien compra no tiene cuenta ni deja datos.** Su nombre y su teléfono ya van en el chat de WhatsApp donde manda el pedido.
 
+**Quien vende puede dar de baja su cuenta**, desde la web o la app, como exigen Google y Apple. En el acto su tienda deja de servirse y de recibir pedidos, y ya no puede volver a entrar; a los 90 días corre el borrado lógico de su tienda y su contenido, y se vacían su nombre, su foto y el WhatsApp. La baja no se deshace. Lo que se le promete por escrito está en `/privacidad`, `/terminos` y `/borrar-cuenta`, con el correo de soporte, VenduoSupport@gmail.com.
+
 > El ingreso con Google queda para después: el proveedor no está habilitado y hacerlo exige credenciales de Google Cloud.
 
 ### Moneda

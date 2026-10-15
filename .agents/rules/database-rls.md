@@ -248,6 +248,18 @@ de cada `create policy`. Así el archivo se puede volver a correr sin romper nad
 
 Las políticas RLS van juntas en su propio archivo, para poder auditarlas de una lectura.
 
+## Las cuentas dadas de baja
+
+`stores.closed_at` y `profiles.closed_at` marcan una cuenta dada de baja: **una tienda
+con `closed_at` no es de nadie** —`my_store_id()` la excluye— **ni se sirve** —
+`store_is_live` tampoco—. Una función o una consulta nueva que busque "la tienda de la
+persona" pasa por `my_store_id()`, o tiene que filtrar `closed_at is null` ella misma.
+
+`account_closures` anota cada baja y cuándo se borra; no tiene políticas, como las
+tablas de la administración. `dar_de_baja_mi_cuenta()` la llama la persona;
+`aplicar_bajas_de_cuenta()` es interna y la corre `pg_cron` todos los días. El detalle
+de negocio está en `domain-venduo.md`.
+
 ## Tablas sin políticas
 
 `social_connections` tiene RLS activo y **cero políticas**, a propósito. No agregarle.

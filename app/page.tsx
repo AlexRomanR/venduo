@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 
 import { getSiteUrl } from "@/lib/env"
+import { CORREO_DE_CONTACTO } from "@/lib/legal"
 import { getUsuario } from "@/lib/supabase/server"
 import { Entra } from "@/components/landing/entra"
 import { Foto } from "@/components/landing/foto"
@@ -588,8 +589,17 @@ export default async function Inicio() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-2 px-5 py-8 text-sm opacity-70">
           <Logo className="opacity-100" />
           <span className="flex-1">Santa Cruz · La Paz · Cochabamba</span>
-          <a href="mailto:hola@venduo.bo" className="hover:opacity-100">
-            hola@venduo.bo
+          <Link href="/privacidad" className="hover:opacity-100">
+            Privacidad
+          </Link>
+          <Link href="/terminos" className="hover:opacity-100">
+            Términos
+          </Link>
+          <a
+            href={`mailto:${CORREO_DE_CONTACTO}`}
+            className="hover:opacity-100"
+          >
+            {CORREO_DE_CONTACTO}
           </a>
         </div>
       </footer>
