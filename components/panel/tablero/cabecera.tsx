@@ -1,12 +1,13 @@
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowUpRight, Clock, Palette, Share2 } from "lucide-react"
+import { ArrowUpRight, Palette, Share2 } from "lucide-react"
 
 import type { Suscripcion } from "@/lib/data/panel"
 import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
 import { enlaceLegible } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
 import { CompartirTienda } from "@/components/panel/tablero/compartir"
+import { FichaDePrueba } from "@/components/panel/tablero/prueba"
 
 const SECUNDARIO = cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")
 
@@ -36,14 +37,17 @@ export function CabeceraDeTienda({
   persona: string
   tienda: TiendaDelResumen
   suscripcion: Suscripcion | null
-  /** La captura de la portada, o la miniatura de su plantilla. */
-  vista: string | null
+  /**
+   * La captura de la portada, o la miniatura de su plantilla mientras no la
+   * haya (`real` en falso).
+   */
+  vista: { url: string; real: boolean } | null
 }) {
   const primerNombre = persona.trim().split(/\s+/)[0]
 
   return (
     <header className="flex flex-col gap-5">
-      <div className="flex items-end gap-4">
+      <div className="flex items-center gap-4 lg:items-end">
         {vista ? (
           <a
             href={tienda.url}
@@ -52,7 +56,7 @@ export function CabeceraDeTienda({
             aria-label={`Ver ${tienda.nombre} como la ve tu cliente`}
             className="shrink-0 lg:hidden"
           >
-            <CelularConCaptura src={vista} />
+            <CelularConCaptura vista={vista} />
           </a>
         ) : null}
 
@@ -101,18 +105,17 @@ function EstadoDeTienda({
           )}
         />
         {tienda.pausada
-          ? "Pausada por Venduo"
+          ? "Pausada"
           : tienda.publicada
             ? "Publicada"
-            : "En borrador"}
+            : "Borrador"}
       </Ficha>
-      {prueba ? (
-        <Ficha urgente={prueba.porVencer}>
-          <Clock aria-hidden="true" className="size-3.5" />
-          {prueba.diasRestantes !== null && prueba.diasRestantes <= 0
-            ? "Prueba · vence hoy"
-            : `Prueba · ${prueba.diasRestantes} ${prueba.diasRestantes === 1 ? "día" : "días"}`}
-        </Ficha>
+      {prueba && prueba.diasRestantes !== null ? (
+        <FichaDePrueba
+          dias={prueba.diasRestantes}
+          hasta={prueba.trialEndsAt}
+          porVencer={prueba.porVencer}
+        />
       ) : null}
     </div>
   )
@@ -188,22 +191,31 @@ export function AccionesDeTienda({
 }
 
 /**
- * La portada de la tienda dentro de un celular chico. Es la captura que saca
- * la web para la app: una imagen, liviana para los datos del celular.
+ * La portada de la tienda dentro de un celular, la misma de la app: la captura
+ * real que saca la web, alineada arriba, en la proporción en que se saca
+ * (1:2). Mientras no la haya va la miniatura de su plantilla, entera, y lo
+ * dice.
  */
-function CelularConCaptura({ src }: { src: string }) {
+function CelularConCaptura({
+  vista,
+}: {
+  vista: { url: string; real: boolean }
+}) {
   return (
-    <span className="block w-[88px] rounded-[1.05rem] bg-tinta p-1 transition-transform duration-300 hover:-translate-y-0.5 motion-reduce:transform-none">
-      <span className="relative block aspect-[9/19] overflow-hidden rounded-[0.8rem] bg-papel">
-        <Image
-          src={src}
-          alt=""
-          fill
-          sizes="88px"
-          quality={85}
-          className="object-cover object-top"
-        />
-      </span>
+    <span className="relative block aspect-[1/2] w-[88px] overflow-hidden rounded-[14px] border-[3px] border-tinta bg-papel transition-transform duration-200 active:scale-[0.98] motion-reduce:transform-none">
+      <Image
+        src={vista.url}
+        alt=""
+        fill
+        sizes="88px"
+        quality={85}
+        className={vista.real ? "object-cover object-top" : "object-contain"}
+      />
+      {vista.real ? null : (
+        <span className="absolute inset-x-0 bottom-0 bg-tinta/85 py-1 text-center text-[11px] leading-tight text-papel">
+          Tu plantilla
+        </span>
+      )}
     </span>
   )
 }

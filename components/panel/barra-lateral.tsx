@@ -5,27 +5,24 @@ import Image from "next/image"
 import Link, { useLinkStatus } from "next/link"
 import { usePathname } from "next/navigation"
 import {
+  ArrowUpRight,
   BookOpen,
   ChartColumn,
-  Copy,
-  ExternalLink,
-  LayoutGrid,
+  House,
   LogOut,
-  Megaphone,
-  Menu,
   Package,
   PanelLeftClose,
   PanelLeftOpen,
   Palette,
   Plus,
   Receipt,
-  Settings,
+  Share2,
   Store,
   Tags,
+  UserRound,
   X,
   type LucideIcon,
 } from "lucide-react"
-import { toast } from "sonner"
 
 import { estiloDelTitular } from "@/lib/plantillas/fuentes"
 import { COOKIE_BARRA } from "@/lib/preferencias"
@@ -33,7 +30,7 @@ import { cn } from "@/lib/utils"
 import type { BarraLateral } from "@/lib/data/barra"
 import type { EstadoDeFuncion } from "@/lib/funciones"
 import { ConFuncion } from "@/components/panel/funcion"
-import { SelloDeTienda } from "@/components/panel/tablero/sello"
+import { CompartirTienda } from "@/components/panel/tablero/compartir"
 import { Logo, Simbolo } from "@/components/marca/logo"
 import {
   Sheet,
@@ -54,19 +51,29 @@ interface Item {
   icono: LucideIcon
   /** Coincidencia exacta: `/panel` coincidiría con todas sus secciones. */
   exacto?: boolean
+  /** La ruta que la marca como elegida, si no es la de `href`. */
+  marca?: string
+  /** Nunca se marca elegida: lleva a una parte de otra pantalla. */
+  sinMarca?: boolean
   contador?: { valor: number; urgente: boolean; etiqueta: string }
-  pronto?: boolean
+  /** Lo que le falta, en dos palabras y en rojo: "Falta WhatsApp". */
+  estado?: string
+  /** No es una pantalla: abre compartir la tienda. */
+  compartir?: boolean
   /** Si Venduo la apagó: oculta no aparece, desactivada se ve y no responde. */
   funcion?: EstadoDeFuncion
   hijos?: Array<{ href: string; nombre: string; icono: LucideIcon }>
 }
 
-function estaActivo(
-  pathname: string,
-  item: { href: string; exacto?: boolean }
-) {
-  const ruta = item.href.split("?")[0]
+function estaActivo(pathname: string, item: Item) {
+  if (item.sinMarca || item.compartir) return false
+  const ruta = item.marca ?? item.href.split(/[?#]/)[0]
   return item.exacto ? pathname === ruta : pathname.startsWith(ruta)
+}
+
+/** El enlace de la tienda sin `https://`, como se dicta y se lee. */
+function legible(url: string) {
+  return url.replace(/^https?:\/\//, "")
 }
 
 /**
@@ -102,11 +109,13 @@ function ConNombre({
 
 /**
  * Lo que hay adentro de la barra: en escritorio, desplegada o plegada, y en el
- * cajón del móvil.
+ * cajón del celular.
  *
- * El rojo aparece solo donde algo pide una acción: un pedido que espera que
- * confirmes su pago, un producto que se quedó sin stock. Un contador que no
- * exige nada va en tinta. Si todo fuera rojo, el acento dejaría de avisar.
+ * Es el mismo menú de la app, con su orden y sus nombres: quien usa las dos no
+ * aprende dos menús. Arriba la persona, después su tienda con su propia cara,
+ * y tres grupos —el negocio, la tienda y la cuenta—. El rojo aparece solo
+ * donde algo pide una acción: un pedido que espera que confirmes su pago, un
+ * producto sin stock, la tienda sin WhatsApp.
  */
 function Contenido({
   datos,
@@ -122,352 +131,383 @@ function Contenido({
 }) {
   const pathname = usePathname()
   const { tienda, contadores: c, persona, apariencia, funciones } = datos
+  const enCajon = Boolean(alNavegar)
 
   const reposicion = c.productosSinStock + c.productosPocoStock
 
-  const deTienda: Item[] = tienda
+  const grupos: Array<{ titulo: string; items: Item[] }> = tienda
     ? [
-        { href: "/panel", nombre: "Resumen", icono: LayoutGrid, exacto: true },
         {
-          href: "/panel/pedidos",
-          nombre: "Pedidos",
-          icono: Receipt,
-          contador:
-            c.pedidosPendientes > 0
-              ? {
-                  valor: c.pedidosPendientes,
-                  urgente: true,
-                  etiqueta: `${c.pedidosPendientes} pendientes`,
-                }
-              : undefined,
+          titulo: "Tu negocio",
+          items: [
+            { href: "/panel", nombre: "Inicio", icono: House, exacto: true },
+            {
+              href: "/panel/pedidos",
+              nombre: "Pedidos",
+              icono: Receipt,
+              contador:
+                c.pedidosPendientes > 0
+                  ? {
+                      valor: c.pedidosPendientes,
+                      urgente: true,
+                      etiqueta: `${c.pedidosPendientes} por cobrar`,
+                    }
+                  : undefined,
+            },
+            {
+              href: "/panel/productos",
+              nombre: "Productos",
+              icono: Package,
+              contador:
+                reposicion > 0
+                  ? {
+                      valor: reposicion,
+                      urgente: c.productosSinStock > 0,
+                      etiqueta: `${reposicion} por reponer`,
+                    }
+                  : undefined,
+              hijos: [
+                {
+                  href: "/panel/productos/categorias",
+                  nombre: "Categorías",
+                  icono: Tags,
+                },
+              ],
+            },
+            {
+              href: "/panel/catalogos",
+              nombre: "Catálogos",
+              icono: BookOpen,
+              funcion: funciones.catalogos,
+            },
+            { href: "", nombre: "Compartir", icono: Share2, compartir: true },
+          ],
         },
         {
-          href: "/panel/productos",
-          nombre: "Productos",
-          icono: Package,
-          contador:
-            reposicion > 0
-              ? {
-                  valor: reposicion,
-                  urgente: c.productosSinStock > 0,
-                  etiqueta: `${reposicion} por reponer`,
-                }
-              : undefined,
-          hijos: [
+          titulo: "Tu tienda",
+          items: [
             {
-              href: "/panel/productos/categorias",
-              nombre: "Categorías",
-              icono: Tags,
+              href: "/panel/estadisticas",
+              nombre: "Estadísticas",
+              icono: ChartColumn,
+              funcion: funciones.estadisticas,
+            },
+            // Apariencia es la puerta al editor, y además guarda la plantilla
+            // y el historial, que el editor de la web no tiene.
+            {
+              href: "/panel/apariencia",
+              nombre: "Editar tu tienda",
+              icono: Palette,
+            },
+            {
+              href: "/cuenta#tienda",
+              nombre: "Datos de la tienda",
+              icono: Store,
+              sinMarca: true,
+              estado: tienda.conWhatsApp ? undefined : "Falta WhatsApp",
             },
           ],
         },
         {
-          href: "/panel/catalogos",
-          nombre: "Catálogos",
-          icono: BookOpen,
-          funcion: funciones.catalogos,
+          titulo: "Tu cuenta",
+          items: [
+            {
+              href: "/cuenta#persona",
+              nombre: "Tus datos",
+              icono: UserRound,
+              marca: "/cuenta",
+            },
+          ],
         },
-        {
-          href: "/panel/estadisticas",
-          nombre: "Estadísticas",
-          icono: ChartColumn,
-          funcion: funciones.estadisticas,
-        },
-        {
-          href: "/panel/apariencia",
-          nombre: "Apariencia",
-          icono: Palette,
-        },
-        {
-          href: "/panel/marketing",
-          nombre: "Marketing",
-          icono: Megaphone,
-          pronto: true,
-        },
-      ].filter((item: Item) => item.funcion !== "oculta")
+      ].map((grupo) => ({
+        ...grupo,
+        items: grupo.items.filter((item: Item) => item.funcion !== "oculta"),
+      }))
     : []
-
-  async function copiarEnlace() {
-    if (!tienda) return
-    try {
-      await navigator.clipboard.writeText(tienda.url)
-      toast.success("Enlace de tu tienda copiado.")
-    } catch {
-      toast.error("No pudimos copiarlo. Cópialo desde tu resumen.")
-    }
-  }
-
-  const botonCuadrado =
-    "flex size-11 items-center justify-center border border-tinta/25 transition-colors hover:border-tinta"
 
   return (
     <div className="flex h-full flex-col">
-      {/* Marca y, en escritorio, el botón que pliega la barra */}
-      <div
-        className={cn(
-          "flex items-center gap-3 pt-5 pb-4",
-          plegada ? "flex-col px-3" : "justify-between px-5"
-        )}
-      >
-        {plegada ? (
-          // Plegada no entra el nombre: queda el símbolo, que también lleva
-          // al panel.
-          <Link
-            href="/auth/destino"
-            onClick={alNavegar}
-            className="flex size-11 items-center justify-center"
-          >
-            <Simbolo titulo="Venduo" className="size-7" />
-          </Link>
-        ) : (
-          <Link
-            href="/auth/destino"
-            onClick={alNavegar}
-            className="flex min-h-11 items-center text-xl"
-          >
-            <Logo />
-          </Link>
-        )}
-
-        <div className="flex items-center gap-2">
-          {datos.esDemo && !plegada ? (
-            <span className="border border-senal px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-senal uppercase">
-              Demo
-            </span>
-          ) : null}
-
-          {alPlegar ? (
-            <ConNombre
-              nombre={plegada ? "Mostrar la barra (Ctrl+B)" : ""}
-              plegada={plegada}
+      {/* En escritorio, la marca y el botón que pliega la barra. El cajón del
+          celular es el menú de la app, que no la lleva. */}
+      {enCajon ? null : (
+        <div
+          className={cn(
+            "flex items-center gap-3 pt-5 pb-2",
+            plegada ? "flex-col px-3" : "justify-between px-5"
+          )}
+        >
+          {plegada ? (
+            <Link
+              href="/auth/destino"
+              className="flex size-11 items-center justify-center"
             >
-              <button
-                type="button"
-                onClick={alPlegar}
-                aria-label={
-                  plegada
-                    ? "Mostrar la barra lateral"
-                    : "Ocultar la barra lateral"
-                }
-                aria-expanded={!plegada}
-                title={plegada ? undefined : "Ocultar la barra (Ctrl+B)"}
-                className={cn(
-                  "flex size-11 items-center justify-center transition-colors hover:text-senal",
-                  plegada ? "" : "-mr-2"
-                )}
+              <Simbolo titulo="Venduo" className="size-7" />
+            </Link>
+          ) : (
+            <Link
+              href="/auth/destino"
+              className="flex min-h-11 items-center text-xl"
+            >
+              <Logo />
+            </Link>
+          )}
+
+          <div className="flex items-center gap-2">
+            {datos.esDemo && !plegada ? (
+              <span className="border border-senal px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-senal uppercase">
+                Demo
+              </span>
+            ) : null}
+            {alPlegar ? (
+              <ConNombre
+                nombre={plegada ? "Mostrar la barra (Ctrl+B)" : ""}
+                plegada={plegada}
               >
-                {plegada ? (
-                  <PanelLeftOpen aria-hidden="true" className="size-5" />
-                ) : (
-                  <PanelLeftClose aria-hidden="true" className="size-5" />
-                )}
-              </button>
-            </ConNombre>
-          ) : null}
-
-          {/* Solo en el cajón. El cierre que trae shadcn mide 28 px y dice
-              "Close": se apaga y va este, en la misma fila que la marca. */}
-          {alNavegar ? (
-            <button
-              type="button"
-              onClick={alNavegar}
-              aria-label="Cerrar el menú"
-              className="-mr-2 flex size-11 items-center justify-center transition-colors hover:text-senal"
-            >
-              <X aria-hidden="true" className="size-5" />
-            </button>
-          ) : null}
+                <button
+                  type="button"
+                  onClick={alPlegar}
+                  aria-label={
+                    plegada
+                      ? "Mostrar la barra lateral"
+                      : "Ocultar la barra lateral"
+                  }
+                  aria-expanded={!plegada}
+                  title={plegada ? undefined : "Ocultar la barra (Ctrl+B)"}
+                  className={cn(
+                    "flex size-11 items-center justify-center transition-colors hover:text-senal",
+                    plegada ? "" : "-mr-2"
+                  )}
+                >
+                  {plegada ? (
+                    <PanelLeftOpen aria-hidden="true" className="size-5" />
+                  ) : (
+                    <PanelLeftClose aria-hidden="true" className="size-5" />
+                  )}
+                </button>
+              </ConNombre>
+            ) : null}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* El desplazamiento de la página es rojo por sistema; acá sería un segundo
           trazo rojo pegado al contenido, así que se apaga a tinta. */}
       <div
         className={cn(
-          "flex-1 [scrollbar-width:thin] [scrollbar-color:color-mix(in_oklab,var(--tinta)_20%,transparent)_transparent] overflow-x-hidden overflow-y-auto pb-6",
-          "px-3"
+          "flex-1 [scrollbar-width:thin] [scrollbar-color:color-mix(in_oklab,var(--tinta)_20%,transparent)_transparent] overflow-x-hidden overflow-y-auto pb-4",
+          plegada ? "px-3" : "px-2",
+          enCajon ? "pt-5" : "pt-3"
         )}
       >
-        {/* La tienda: lo primero que se reconoce, y su enlace a mano */}
-        {tienda && plegada ? (
-          <div className="flex flex-col items-center gap-2 border-t-2 border-tinta pt-4">
-            <ConNombre nombre={tienda.nombre} plegada>
-              <a
-                href={tienda.url}
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label={`Ver ${tienda.nombre}`}
-                className="flex size-11 items-center justify-center overflow-hidden border border-tinta/20 bg-tinta/5"
-              >
-                {tienda.logoUrl ? (
-                  <Image
-                    src={tienda.logoUrl}
-                    alt=""
-                    width={88}
-                    height={88}
-                    unoptimized
-                    className="size-full object-cover"
-                  />
-                ) : (
-                  <Store aria-hidden="true" className="size-4 opacity-45" />
-                )}
-              </a>
-            </ConNombre>
+        {plegada ? (
+          <RielDeTienda datos={datos} />
+        ) : (
+          <>
+            <div className="flex items-center gap-3 px-3">
+              <Avatar persona={persona} tamano="size-12 text-lg" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-semibold">{persona.nombre}</p>
+                {persona.correo ? (
+                  <p className="truncate text-sm opacity-65">
+                    {persona.correo}
+                  </p>
+                ) : null}
+              </div>
+              {/* El cierre que trae shadcn mide 28 px y dice "Close": se apaga
+                  y va este. */}
+              {enCajon ? (
+                <button
+                  type="button"
+                  onClick={alNavegar}
+                  aria-label="Cerrar el menú"
+                  className="-mr-1 flex size-11 shrink-0 items-center justify-center transition-colors hover:text-senal"
+                >
+                  <X aria-hidden="true" className="size-5" />
+                </button>
+              ) : null}
+            </div>
 
-            <ConNombre nombre="Copiar el enlace" plegada>
-              <button
-                type="button"
-                onClick={copiarEnlace}
-                aria-label="Copiar el enlace de tu tienda"
-                className={botonCuadrado}
-              >
-                <Copy aria-hidden="true" className="size-4" />
-              </button>
-            </ConNombre>
+            {tienda ? (
+              <TarjetaDeTienda tienda={tienda} apariencia={apariencia} />
+            ) : null}
 
-            <ConNombre nombre="Nuevo producto" plegada>
+            {/* Un atajo de la computadora: en el celular, Productos tiene su
+                botón para cargar uno. */}
+            {tienda && !enCajon ? (
               <Link
                 href="/panel/productos/nuevo"
-                aria-label="Nuevo producto"
-                className="flex size-11 items-center justify-center border-2 border-tinta transition-colors hover:bg-tinta hover:text-papel"
+                className="mx-1 mt-3 flex min-h-11 items-center justify-center gap-2 rounded-plantilla border-2 border-tinta text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
               >
                 <Plus aria-hidden="true" className="size-4" />
+                Nuevo producto
               </Link>
-            </ConNombre>
-          </div>
-        ) : null}
+            ) : null}
+          </>
+        )}
 
-        {tienda && !plegada ? (
-          <div className="mx-2 border-t-2 border-tinta pt-4">
-            <div className="flex items-center gap-3">
-              {/* La tienda con su cara: su papel, su letra y su color de
-                  acción. El resto de la barra es de Venduo. */}
-              {apariencia ? (
-                <SelloDeTienda
-                  nombre={tienda.nombre}
-                  logoUrl={tienda.logoUrl}
-                  apariencia={apariencia}
-                  compacto
-                  className="size-11"
-                />
-              ) : (
-                <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden border border-tinta/20 bg-tinta/5">
-                  {tienda.logoUrl ? (
-                    <Image
-                      src={tienda.logoUrl}
-                      alt=""
-                      width={88}
-                      height={88}
-                      unoptimized
-                      className="size-full object-cover"
-                    />
-                  ) : (
-                    <Store aria-hidden="true" className="size-4 opacity-45" />
-                  )}
-                </div>
-              )}
-              <div className="min-w-0">
-                <p
-                  className="truncate text-base leading-tight"
-                  style={
-                    apariencia
-                      ? estiloDelTitular(apariencia.tipografia)
-                      : undefined
-                  }
-                >
-                  {tienda.nombre}
-                </p>
-                <p className="mt-0.5 flex items-center gap-1.5 text-xs">
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      "size-1.5 rounded-full",
-                      tienda.publicada && !tienda.pausada
-                        ? "bg-tinta"
-                        : "bg-senal"
-                    )}
-                  />
-                  <span
-                    className={
-                      tienda.publicada && !tienda.pausada
-                        ? "opacity-55"
-                        : "text-senal"
-                    }
-                  >
-                    {tienda.pausada
-                      ? "Pausada"
-                      : tienda.publicada
-                        ? "Publicada"
-                        : "Sin publicar"}
-                  </span>
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <a
-                href={tienda.url}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="flex min-h-11 items-center justify-center gap-1.5 border border-tinta/25 text-xs font-semibold transition-colors hover:border-tinta"
-              >
-                <ExternalLink aria-hidden="true" className="size-3.5" />
-                Ver tienda
-              </a>
-              <button
-                type="button"
-                onClick={copiarEnlace}
-                className="flex min-h-11 items-center justify-center gap-1.5 border border-tinta/25 text-xs font-semibold transition-colors hover:border-tinta"
-              >
-                <Copy aria-hidden="true" className="size-3.5" />
-                Copiar enlace
-              </button>
-            </div>
-
-            <Link
-              href="/panel/productos/nuevo"
-              onClick={alNavegar}
-              className="mt-2 flex min-h-11 items-center justify-center gap-2 rounded-plantilla border-2 border-tinta text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
-            >
-              <Plus aria-hidden="true" className="size-4" />
-              Nuevo producto
-            </Link>
-          </div>
-        ) : null}
-
-        {deTienda.length > 0 ? (
-          <Grupo titulo="Tu negocio" plegada={plegada}>
-            {deTienda.map((item) => (
+        {grupos.map((grupo) => (
+          <Grupo key={grupo.titulo} titulo={grupo.titulo} plegada={plegada}>
+            {grupo.items.map((item) => (
               <Entrada
-                key={item.href}
+                key={item.nombre}
                 item={item}
+                tienda={tienda}
                 pathname={pathname}
                 alNavegar={alNavegar}
                 plegada={plegada}
               />
             ))}
           </Grupo>
-        ) : null}
-      </div>
+        ))}
 
-      {/* Quién está adentro, y la salida */}
-      {plegada ? (
-        <div className="flex flex-col items-center gap-2 border-t border-tinta/15 px-3 py-4">
-          <ConNombre nombre="Mi cuenta" plegada>
-            <Link
-              href="/cuenta"
-              aria-label={`Mi cuenta, ${persona.nombre}`}
-              aria-current={pathname.startsWith("/cuenta") ? "page" : undefined}
+        <form action="/auth/sign-out" method="post" className="mt-6">
+          <ConNombre nombre="Cerrar sesión" plegada={plegada}>
+            <button
+              type="submit"
+              aria-label={plegada ? "Cerrar sesión" : undefined}
               className={cn(
-                "flex size-11 items-center justify-center overflow-hidden rounded-full border font-titular text-sm font-bold",
-                pathname.startsWith("/cuenta")
-                  ? "border-tinta bg-tinta/[0.06]"
-                  : "border-tinta/20 bg-tinta/5"
+                "flex items-center transition-colors hover:text-senal",
+                plegada
+                  ? "mx-auto size-11 justify-center border border-tinta/25"
+                  : "min-h-12 w-full gap-3 px-3 font-semibold"
               )}
             >
-              {persona.avatarUrl ? (
+              <LogOut aria-hidden="true" className="size-5 shrink-0" />
+              {plegada ? null : "Cerrar sesión"}
+            </button>
+          </ConNombre>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+/** La foto de la persona, o su inicial. */
+function Avatar({
+  persona,
+  tamano,
+}: {
+  persona: BarraLateral["persona"]
+  tamano: string
+}) {
+  return (
+    <span
+      className={cn(
+        "flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-tinta font-titular font-bold text-papel",
+        tamano
+      )}
+    >
+      {persona.avatarUrl ? (
+        <Image
+          src={persona.avatarUrl}
+          alt=""
+          width={96}
+          height={96}
+          unoptimized
+          className="size-full object-cover"
+        />
+      ) : (
+        persona.nombre.charAt(0).toUpperCase()
+      )}
+    </span>
+  )
+}
+
+/**
+ * La tienda, con su propia cara: su papel, su letra y su color de acción. Es
+ * la única parte del menú que no es de Venduo, igual que en la app. Tocarla
+ * la abre.
+ */
+function TarjetaDeTienda({
+  tienda,
+  apariencia,
+}: {
+  tienda: NonNullable<BarraLateral["tienda"]>
+  apariencia: BarraLateral["apariencia"]
+}) {
+  const colores = apariencia?.colores
+  const alAire = tienda.publicada && !tienda.pausada
+
+  return (
+    <a
+      href={tienda.url}
+      target="_blank"
+      rel="noreferrer noopener"
+      aria-label={`${tienda.nombre}. Abrir tu tienda`}
+      className="mx-1 mt-4 block border p-4 transition-transform active:scale-[0.98] motion-reduce:transform-none"
+      style={{
+        backgroundColor: colores?.papel,
+        color: colores?.tinta,
+        borderColor: colores?.tinta ?? "var(--tinta)",
+        borderBottomWidth: 5,
+        borderBottomColor: colores?.senal ?? "var(--senal)",
+      }}
+    >
+      <span className="flex items-center gap-2">
+        {tienda.logoUrl ? (
+          <Image
+            src={tienda.logoUrl}
+            alt=""
+            width={56}
+            height={56}
+            unoptimized
+            className="size-7 object-contain"
+          />
+        ) : null}
+        <span
+          className="line-clamp-2 flex-1 text-xl leading-tight"
+          style={
+            apariencia ? estiloDelTitular(apariencia.tipografia) : undefined
+          }
+        >
+          {tienda.nombre}
+        </span>
+        <ArrowUpRight aria-hidden="true" className="size-[18px] shrink-0" />
+      </span>
+      <span className="mt-2 flex items-center gap-1.5 text-[13px] font-medium opacity-80">
+        <span
+          aria-hidden="true"
+          className="size-[7px] shrink-0 rounded-full"
+          style={{
+            backgroundColor: alAire ? colores?.tinta : colores?.senal,
+          }}
+        />
+        <span className="truncate">
+          {tienda.pausada
+            ? "Pausada"
+            : tienda.publicada
+              ? "Publicada"
+              : "Borrador"}{" "}
+          · {legible(tienda.url)}
+        </span>
+      </span>
+    </a>
+  )
+}
+
+/** La barra plegada: la persona, la tienda y el atajo de un producto nuevo. */
+function RielDeTienda({ datos }: { datos: BarraLateral }) {
+  const { tienda, persona } = datos
+  return (
+    <div className="flex flex-col items-center gap-2 border-t-2 border-tinta pt-4">
+      <ConNombre nombre={persona.nombre} plegada>
+        <Link href="/cuenta" aria-label={`Tus datos, ${persona.nombre}`}>
+          <Avatar persona={persona} tamano="size-11 text-sm" />
+        </Link>
+      </ConNombre>
+      {tienda ? (
+        <>
+          <ConNombre nombre={tienda.nombre} plegada>
+            <a
+              href={tienda.url}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label={`Ver ${tienda.nombre}`}
+              className="flex size-11 items-center justify-center overflow-hidden border border-tinta/20 bg-tinta/5"
+            >
+              {tienda.logoUrl ? (
                 <Image
-                  src={persona.avatarUrl}
+                  src={tienda.logoUrl}
                   alt=""
                   width={88}
                   height={88}
@@ -475,118 +515,45 @@ function Contenido({
                   className="size-full object-cover"
                 />
               ) : (
-                persona.nombre.charAt(0).toUpperCase()
+                <Store aria-hidden="true" className="size-4 opacity-45" />
               )}
+            </a>
+          </ConNombre>
+          <ConNombre nombre="Nuevo producto" plegada>
+            <Link
+              href="/panel/productos/nuevo"
+              aria-label="Nuevo producto"
+              className="flex size-11 items-center justify-center border-2 border-tinta transition-colors hover:bg-tinta hover:text-papel"
+            >
+              <Plus aria-hidden="true" className="size-4" />
             </Link>
           </ConNombre>
-
-          <form action="/auth/sign-out" method="post">
-            <ConNombre nombre="Salir" plegada>
-              <button
-                type="submit"
-                aria-label="Salir"
-                className="flex size-11 items-center justify-center border border-tinta/25 transition-colors hover:border-senal hover:text-senal"
-              >
-                <LogOut aria-hidden="true" className="size-4" />
-              </button>
-            </ConNombre>
-          </form>
-        </div>
-      ) : (
-        <div className="border-t border-tinta/15 px-5 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-tinta/20 bg-tinta/5 font-titular text-sm font-bold">
-              {persona.avatarUrl ? (
-                <Image
-                  src={persona.avatarUrl}
-                  alt=""
-                  width={72}
-                  height={72}
-                  unoptimized
-                  className="size-full object-cover"
-                />
-              ) : (
-                persona.nombre.charAt(0).toUpperCase()
-              )}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold">{persona.nombre}</p>
-              {persona.correo ? (
-                <p className="truncate text-xs opacity-45">{persona.correo}</p>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <Link
-              href="/cuenta"
-              onClick={alNavegar}
-              aria-current={pathname.startsWith("/cuenta") ? "page" : undefined}
-              className={cn(
-                "flex min-h-11 items-center justify-center gap-1.5 border text-xs font-semibold transition-colors",
-                pathname.startsWith("/cuenta")
-                  ? "border-tinta bg-tinta/[0.06]"
-                  : "border-tinta/25 hover:border-tinta"
-              )}
-            >
-              <Settings aria-hidden="true" className="size-3.5" />
-              Mi cuenta
-            </Link>
-
-            <form action="/auth/sign-out" method="post">
-              <button
-                type="submit"
-                className="flex min-h-11 w-full items-center justify-center gap-1.5 border border-tinta/25 text-xs font-semibold transition-colors hover:border-senal hover:text-senal"
-              >
-                <LogOut aria-hidden="true" className="size-3.5" />
-                Salir
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+        </>
+      ) : null}
     </div>
   )
 }
 
 function Grupo({
   titulo,
-  detalle,
-  detalleUrgente = false,
   plegada,
   children,
 }: {
   titulo: string
-  detalle?: string
-  detalleUrgente?: boolean
   plegada: boolean
   children: React.ReactNode
 }) {
   return (
     <nav
       aria-label={titulo}
-      className={cn(plegada ? "mt-4 border-t border-tinta/15 pt-4" : "mt-7")}
+      className={cn(plegada ? "mt-4 border-t border-tinta/15 pt-4" : "mt-6")}
     >
       {plegada ? null : (
-        <>
-          <p className="px-2 text-[11px] font-semibold tracking-[0.14em] uppercase opacity-55">
-            {titulo}
-          </p>
-          {detalle ? (
-            <p
-              className={cn(
-                "tabular mt-1 px-2 text-xs",
-                detalleUrgente ? "font-semibold" : "opacity-45"
-              )}
-            >
-              {detalle}
-            </p>
-          ) : null}
-        </>
+        <p className="px-3 pb-1 text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
+          {titulo}
+        </p>
       )}
-      <ul
-        className={cn("flex flex-col", plegada ? "items-center gap-1" : "mt-2")}
-      >
+      <ul className={cn("flex flex-col", plegada && "items-center gap-1")}>
         {children}
       </ul>
     </nav>
@@ -599,7 +566,7 @@ function Grupo({
  * Una pantalla que no estaba en memoria tarda lo que tarda la base, y en ese
  * rato la anterior seguía quieta: parecía que el toque no había entrado. Va
  * dentro del `Link`, que es lo que le dice si su navegación está pendiente, y
- * se dibuja sobre el trazo que el enlace ya tiene.
+ * se dibuja sobre el borde del enlace.
  */
 function Abriendo({ className }: { className: string }) {
   const { pending } = useLinkStatus()
@@ -618,11 +585,13 @@ function Abriendo({ className }: { className: string }) {
 
 function Entrada({
   item,
+  tienda,
   pathname,
   alNavegar,
   plegada,
 }: {
   item: Item
+  tienda: BarraLateral["tienda"]
   pathname: string
   alNavegar?: () => void
   plegada: boolean
@@ -630,110 +599,108 @@ function Entrada({
   const activo = estaActivo(pathname, item)
   const Icono = item.icono
   // Los hijos se abren solo dentro de su sección: listados siempre, la barra
-  // crecería hasta obligar a desplazarla para llegar a "Salir".
+  // crecería hasta obligar a desplazarla para llegar a "Cerrar sesión".
   const abierto = !plegada && activo && item.hijos && item.hijos.length > 0
   const actual =
-    activo && pathname === item.href.split("?")[0] ? "page" : undefined
+    activo && pathname === item.href.split(/[?#]/)[0] ? "page" : undefined
+  const nombre = item.contador
+    ? `${item.nombre} · ${item.contador.etiqueta}`
+    : item.estado
+      ? `${item.nombre} · ${item.estado}`
+      : item.nombre
 
-  if (plegada) {
-    const nombre = item.contador
-      ? `${item.nombre} · ${item.contador.etiqueta}`
-      : item.pronto
-        ? `${item.nombre} · pronto`
-        : item.nombre
+  // Como en la app: la elegida va en tinta llena.
+  const clases = plegada
+    ? cn(
+        "relative flex size-11 items-center justify-center transition-colors",
+        activo ? "bg-tinta text-papel" : "hover:bg-tinta/[0.06]"
+      )
+    : cn(
+        "relative flex min-h-12 w-full items-center gap-3 px-3 text-left font-semibold transition-colors",
+        activo ? "bg-tinta text-papel" : "hover:bg-tinta/[0.06]"
+      )
 
+  const interior = (
+    <>
+      <Icono
+        aria-hidden="true"
+        className={cn(
+          "size-5 shrink-0",
+          item.estado && !activo && "text-senal"
+        )}
+      />
+      {plegada ? null : <span className="flex-1 truncate">{item.nombre}</span>}
+      {!plegada && item.estado ? (
+        <span className={cn("text-sm font-normal", !activo && "text-senal")}>
+          {item.estado}
+        </span>
+      ) : null}
+      {item.contador ? (
+        <span
+          aria-hidden={plegada ? true : undefined}
+          aria-label={plegada ? undefined : item.contador.etiqueta}
+          title={item.contador.etiqueta}
+          className={cn(
+            "tabular flex items-center justify-center rounded-full font-bold",
+            plegada
+              ? "absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 text-[9px]"
+              : "h-[22px] min-w-[22px] px-1.5 text-xs",
+            item.contador.urgente
+              ? "bg-senal text-white"
+              : activo
+                ? "bg-papel text-tinta"
+                : "bg-tinta text-papel"
+          )}
+        >
+          {item.contador.valor > 99 ? "99+" : item.contador.valor}
+        </span>
+      ) : null}
+    </>
+  )
+
+  if (item.compartir) {
+    if (!tienda) return null
     return (
       <li>
-        <ConNombre nombre={nombre} plegada>
-          <ConFuncion estado={item.funcion ?? "activa"}>
-            <Link
-              href={item.href}
-              prefetch
-              aria-label={nombre}
-              aria-current={actual}
-              className={cn(
-                "relative flex size-11 items-center justify-center border-l-2 transition-colors",
-                activo
-                  ? "border-tinta bg-tinta/[0.06]"
-                  : "border-transparent hover:bg-tinta/[0.04]"
-              )}
-            >
-              <Abriendo className="inset-y-0 -left-0.5 w-0.5 bg-tinta" />
-              <Icono
-                aria-hidden="true"
-                className={cn("size-[18px]", activo ? "" : "opacity-60")}
-              />
-              {item.contador ? (
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    "tabular absolute top-1 right-0.5 flex h-4 min-w-4 items-center justify-center px-1 text-[9px] font-bold",
-                    item.contador.urgente
-                      ? "bg-senal text-white"
-                      : "bg-tinta text-papel"
-                  )}
-                >
-                  {item.contador.valor > 9 ? "9+" : item.contador.valor}
-                </span>
-              ) : null}
-            </Link>
-          </ConFuncion>
-        </ConNombre>
+        <CompartirTienda
+          nombre={tienda.nombre}
+          slug={tienda.slug}
+          url={tienda.url}
+          legible={legible(tienda.url)}
+        >
+          <button
+            type="button"
+            aria-label={plegada ? nombre : undefined}
+            title={plegada ? nombre : undefined}
+            className={clases}
+          >
+            {interior}
+          </button>
+        </CompartirTienda>
       </li>
     )
   }
 
   return (
     <li>
-      <ConFuncion estado={item.funcion ?? "activa"}>
-        <Link
-          href={item.href}
-          prefetch
-          onClick={alNavegar}
-          aria-current={actual}
-          className={cn(
-            // La regla de 2 px a la izquierda es el mismo trazo que abre un tema
-            // en el resto del sistema, girado para una columna.
-            "relative flex min-h-11 items-center gap-3 border-l-2 px-3 text-sm transition-colors",
-            activo
-              ? "border-tinta bg-tinta/[0.06] font-semibold"
-              : "border-transparent hover:border-tinta/25 hover:bg-tinta/[0.03]"
-          )}
-        >
-          <Abriendo className="inset-y-0 -left-0.5 w-0.5 bg-tinta" />
-          <Icono
-            aria-hidden="true"
-            className={cn("size-4 shrink-0", activo ? "" : "opacity-55")}
-          />
-          <span className={cn("flex-1 truncate", activo ? "" : "opacity-80")}>
-            {item.nombre}
-          </span>
-
-          {item.pronto ? (
-            <span className="text-[10px] font-semibold tracking-[0.1em] uppercase opacity-40">
-              Pronto
-            </span>
-          ) : null}
-
-          {item.contador ? (
-            <span
-              aria-label={item.contador.etiqueta}
-              title={item.contador.etiqueta}
-              className={cn(
-                "tabular flex h-5 min-w-5 items-center justify-center px-1.5 text-[11px] font-bold",
-                item.contador.urgente
-                  ? "bg-senal text-white"
-                  : "border border-tinta/25 text-tinta/70"
-              )}
-            >
-              {item.contador.valor > 99 ? "99+" : item.contador.valor}
-            </span>
-          ) : null}
-        </Link>
-      </ConFuncion>
+      <ConNombre nombre={nombre} plegada={plegada}>
+        <ConFuncion estado={item.funcion ?? "activa"}>
+          <Link
+            href={item.href}
+            prefetch
+            onClick={alNavegar}
+            aria-label={plegada ? nombre : undefined}
+            aria-current={actual}
+            className={clases}
+          >
+            <Abriendo className="inset-y-0 left-0 w-0.5 bg-senal" />
+            {interior}
+          </Link>
+        </ConFuncion>
+      </ConNombre>
 
       {abierto ? (
-        <ul className="mb-1 ml-5 border-l border-tinta/15">
+        <ul className="mt-1 mb-1 ml-6 border-l border-tinta/15">
           {item.hijos!.map((hijo) => {
             const Hijo = hijo.icono
             const hijoActivo = pathname === hijo.href
@@ -745,14 +712,14 @@ function Entrada({
                   onClick={alNavegar}
                   aria-current={hijoActivo ? "page" : undefined}
                   className={cn(
-                    "relative flex min-h-11 items-center gap-2.5 pl-4 text-xs transition-colors",
+                    "relative flex min-h-11 items-center gap-2.5 pl-4 text-sm transition-colors",
                     hijoActivo
                       ? "font-semibold"
-                      : "opacity-60 hover:opacity-100"
+                      : "opacity-65 hover:opacity-100"
                   )}
                 >
                   <Abriendo className="inset-y-0 -left-px w-0.5 bg-tinta" />
-                  <Hijo aria-hidden="true" className="size-3.5 shrink-0" />
+                  <Hijo aria-hidden="true" className="size-4 shrink-0" />
                   {hijo.nombre}
                 </Link>
               </li>
@@ -832,42 +799,104 @@ export function BarraLateralEscritorio({
   )
 }
 
+/** Las tres rayitas del botón del menú: largos distintos, como renglones. */
+const RAYITAS = [18, 12, 22]
+
 /**
- * En el celular, una barra delgada arriba y la navegación en un cajón.
- *
- * Una columna fija de 272 px en una pantalla de 375 deja 100 px para trabajar,
- * así que no hay sidebar permanente por debajo de `lg`. El botón del menú lleva
- * un punto rojo si adentro hay algo urgente: si no, lo pendiente quedaría
- * escondido detrás de un ícono que nadie tiene motivo para tocar.
+ * El botón que abre el menú, el mismo de la app: un cuadro con tres rayitas de
+ * distinto largo. Al apretarlo se llena de tinta; mientras el menú está
+ * abierto, las rayitas se doblan en una flecha que apunta hacia él. Lleva un
+ * punto rojo si adentro hay algo que pide atención.
+ */
+function BotonDeMenu({
+  abierto,
+  urgente,
+}: {
+  abierto: boolean
+  urgente: boolean
+}) {
+  return (
+    <span className="relative block">
+      <span
+        className={cn(
+          "flex size-11 items-center justify-center border-[1.5px] border-tinta transition-colors duration-200",
+          abierto ? "bg-tinta" : "group-active:bg-tinta"
+        )}
+      >
+        <span className="flex h-3.5 w-[22px] flex-col justify-between">
+          {RAYITAS.map((largo, indice) => {
+            const brazo = indice === 0 ? -1 : indice === 2 ? 1 : 0
+            return (
+              <span
+                key={indice}
+                aria-hidden="true"
+                className={cn(
+                  "block h-0.5 origin-left transition-[width,transform,background-color] duration-[240ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+                  abierto ? "bg-papel" : "bg-tinta group-active:bg-papel"
+                )}
+                style={{
+                  width: abierto ? (brazo === 0 ? 20 : 11) : largo,
+                  transform: abierto
+                    ? `translateY(${-brazo * 6}px) rotate(${brazo * 40}deg)`
+                    : undefined,
+                }}
+              />
+            )
+          })}
+        </span>
+      </span>
+      {urgente ? (
+        <span
+          aria-hidden="true"
+          className="absolute -top-1 -right-1 size-3 rounded-full border-2 border-papel bg-senal"
+        />
+      ) : null}
+    </span>
+  )
+}
+
+/**
+ * En el celular, la barra de arriba y el menú en un cajón: los mismos de la
+ * app. Arriba solo el botón del menú; cuando el nombre de la tienda se va de
+ * la pantalla aparece en la barra, con una regla abajo para que se sepa dónde
+ * termina lo fijo. Lo de todos los días está en las pestañas de abajo.
  */
 export function BarraLateralMovil({ datos }: { datos: BarraLateral }) {
   const [abierta, setAbierta] = React.useState(false)
+  const [desplazada, setDesplazada] = React.useState(false)
   const pathname = usePathname()
 
   React.useEffect(() => {
     setAbierta(false)
   }, [pathname])
 
-  const c = datos.contadores
-  const urgente = c.pedidosPendientes > 0 || c.productosSinStock > 0
+  React.useEffect(() => {
+    const medir = () => setDesplazada(window.scrollY > 120)
+    medir()
+    window.addEventListener("scroll", medir, { passive: true })
+    return () => window.removeEventListener("scroll", medir)
+  }, [])
+
+  const urgente =
+    datos.contadores.pedidosPendientes > 0 ||
+    datos.tienda?.conWhatsApp === false
 
   return (
-    <header className="sticky top-0 z-30 border-b border-tinta/15 bg-papel/92 backdrop-blur lg:hidden">
-      <div className="flex items-center gap-3 px-5 py-2">
+    <header
+      className={cn(
+        "sticky top-0 z-30 border-b bg-papel transition-colors duration-200 lg:hidden",
+        desplazada ? "border-tinta" : "border-transparent"
+      )}
+    >
+      <div className="flex h-14 items-center gap-4 px-4">
         <Sheet open={abierta} onOpenChange={setAbierta}>
           <SheetTrigger
             aria-label={
-              urgente ? "Abrir el menú, hay pendientes" : "Abrir el menú"
+              urgente ? "Abrir el menú. Hay algo que atender" : "Abrir el menú"
             }
-            className="relative -ml-2 flex size-11 items-center justify-center transition-colors hover:text-senal"
+            className="group"
           >
-            <Menu aria-hidden="true" className="size-5" />
-            {urgente ? (
-              <span
-                aria-hidden="true"
-                className="absolute top-2 right-2 size-2 rounded-full bg-senal"
-              />
-            ) : null}
+            <BotonDeMenu abierto={abierta} urgente={urgente} />
           </SheetTrigger>
 
           <SheetContent
@@ -883,32 +912,15 @@ export function BarraLateralMovil({ datos }: { datos: BarraLateral }) {
           </SheetContent>
         </Sheet>
 
-        <Link
-          href="/auth/destino"
-          className="flex min-h-11 flex-1 items-center font-titular text-lg font-extrabold tracking-[-0.02em]"
+        <p
+          aria-hidden={!desplazada}
+          className={cn(
+            "min-w-0 flex-1 truncate font-titular text-[19px] leading-6 font-extrabold tracking-[-0.02em] transition-[opacity,transform] duration-200 motion-reduce:transition-none",
+            desplazada ? "opacity-100" : "translate-y-2 opacity-0"
+          )}
         >
           {datos.tienda?.nombre ?? "Venduo"}
-        </Link>
-
-        {datos.tienda ? (
-          <Link
-            href="/panel/pedidos"
-            aria-label={`Pedidos, ${c.pedidosPendientes} pendientes`}
-            className="relative flex size-11 items-center justify-center transition-colors hover:text-senal"
-          >
-            <Receipt aria-hidden="true" className="size-5" />
-            {c.pedidosPendientes > 0 ? (
-              <span
-                className={cn(
-                  "tabular absolute top-1 right-0 flex h-4 min-w-4 items-center justify-center px-1 text-[10px] font-bold",
-                  "bg-senal text-white"
-                )}
-              >
-                {c.pedidosPendientes > 9 ? "9+" : c.pedidosPendientes}
-              </span>
-            ) : null}
-          </Link>
-        ) : null}
+        </p>
       </div>
     </header>
   )

@@ -203,7 +203,10 @@ que se arregló:
   título que dice para qué sirve y su estado vacío dentro. Pedidos, Productos y las
   demás pantallas todavía llevan su bajada: se convierten en las fases siguientes.
 - Barra lateral con contadores de lo que pide atención; se puede plegar y recuerda cómo
-  quedó.
+  quedó. **En el celular el panel es la app**: la misma barra de arriba con el cuadro de
+  rayitas, el mismo menú lateral —la persona, la tarjeta de la tienda y tres grupos—, las
+  mismas pestañas de abajo y la misma cabecera del Resumen. Lo que cambia en una cambia
+  en la otra.
 
 ### Administración (`/admin`)
 

@@ -206,6 +206,7 @@ components/
   panel/              Shell y piezas del panel. `piezas.tsx` son los
                       paneles, cifras y estados vacíos de toda pantalla;
                       `armazon.tsx` es la barra con su contenido y decide cuándo va;
+                      `pestanas.tsx`, las pestañas de abajo en el celular;
                       `funcion.tsx` apaga lo que Venduo desactivó, `visitas.tsx`
                       es el panel de visitas, el mismo en `/admin`, y `contador.tsx`
                       y `festejo.tsx` son los números que suben y el check al cobrar

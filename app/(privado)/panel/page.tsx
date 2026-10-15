@@ -86,9 +86,11 @@ export default async function PanelPage() {
     const id = tienda.id
     after(() => pedirVista(id))
   }
-  const vista =
-    tienda?.vista_url ??
-    (miniaturaDePlantilla(clave) ? `/plantillas/${clave}.webp` : null)
+  const vista = tienda?.vista_url
+    ? { url: tienda.vista_url, real: true }
+    : miniaturaDePlantilla(clave)
+      ? { url: `/plantillas/${clave}.webp`, real: false }
+      : null
 
   return (
     <div className="grid items-start gap-6 md:gap-8 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_320px] xl:gap-10">

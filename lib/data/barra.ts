@@ -32,6 +32,8 @@ export interface BarraLateral {
     /** Si Venduo la pausó: no se ve aunque esté publicada. */
     pausada: boolean
     url: string
+    /** Sin WhatsApp no recibe pedidos: el menú lo marca en rojo. */
+    conWhatsApp: boolean
   } | null
   contadores: Contadores
   /**
@@ -61,6 +63,7 @@ function barraDeDemostracion(): BarraLateral {
       publicada: true,
       pausada: false,
       url: urlDeTienda("rosa-deportes"),
+      conWhatsApp: true,
     },
     contadores: {
       pedidosPendientes: 2,
@@ -158,6 +161,7 @@ export const getBarraLateral = cache(
             publicada: tiendaFila.is_published,
             pausada: Boolean(tiendaFila.suspended_at),
             url: urlDeTienda(tiendaFila.slug),
+            conWhatsApp: Boolean(tiendaFila.whatsapp),
           }
         : null,
       contadores,

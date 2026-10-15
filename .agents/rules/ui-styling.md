@@ -64,6 +64,20 @@ una portada y un panel no es la paleta ni la tipografía, es el ritmo:
 "Rojo" en esta regla quiere decir **la señal**: en Venduo es rojo, en Pasarela azul y en
 Esencia oro viejo. La regla de usarla poco no cambia con el color.
 
+### El celular es uno solo
+
+**El panel de la web abierto en un celular y la app (`venduo-app`) son la misma
+pantalla**: la misma barra de arriba (`BarraLateralMovil`, el cuadro de rayitas), el
+mismo menú lateral, las mismas pestañas de abajo (`Pestanas`), la misma cabecera, los
+mismos nombres y el mismo orden. Quien vende usa las dos y no tiene por qué aprender dos.
+
+- **Todo cambio a algo que existe en las dos se hace en los dos repositorios en la misma
+  tarea.** Una pantalla del panel que cambia en la web cambia en la app, y al revés.
+- **Se mira lado a lado antes de darlo por hecho**: el emulador y el navegador a 375 px.
+- **Lo único distinto es lo que es de una sola plataforma**: los avisos al teléfono y
+  "Venduo en la computadora" son de la app; la barra de escritorio, su riel plegado, los
+  atajos de teclado y la tienda en vivo de la pantalla ancha son de la web.
+
 ### El panel se mira, no se lee
 
 El panel de la web sigue la misma idea que la app (`venduo-app`, "Se mira, no se lee" en
@@ -112,13 +126,17 @@ Las pantallas del panel comparten una barra lateral fija desde `lg` y un cajón 
 cajón es el `Sheet` de shadcn con `showCloseButton={false}` y `shadow-none` —el suyo mide
 28 px y dice "Close"— y un cierre propio de 44 px.
 
-Lo que muestra sale de `lib/data/barra.ts`: la tienda con su enlace, "Tu negocio" con
-sus secciones, y la cuenta.
+Lo que muestra sale de `lib/data/barra.ts` y es el menú de la app: la persona arriba, la
+tarjeta de su tienda con su propia cara, y tres grupos —"Tu negocio" (Inicio, Pedidos,
+Productos, Catálogos, Compartir), "Tu tienda" (Estadísticas, Editar tu tienda, Datos de
+la tienda) y "Tu cuenta"—, con "Cerrar sesión" al final. La elegida va en tinta llena.
+En el celular, abajo, las pestañas de la app (`components/panel/pestanas.tsx`).
 
 Los contadores siguen la regla del rojo: **rojo solo si pide una acción** —un pedido que
-espera que confirmes su pago, un producto sin stock—; en tinta si solo informa. El atajo "Nuevo producto" va con trazo y no relleno rojo por lo mismo: vive en
-todas las pantallas y competiría con el botón principal de cada una. En el móvil, el botón
-del menú lleva un punto rojo si adentro hay algo urgente.
+espera que confirmes su pago, un producto sin stock, la tienda sin WhatsApp—; en tinta si
+solo informa. El atajo "Nuevo producto", solo en la barra de escritorio, va con trazo y
+no relleno rojo por lo mismo: competiría con el botón principal de cada pantalla. En el
+celular, el botón del menú lleva un punto rojo si adentro hay algo urgente.
 
 ### Las pantallas del panel
 

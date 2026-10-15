@@ -228,7 +228,7 @@ function SelectorDePeriodo({
     <div
       role="radiogroup"
       aria-label="Período"
-      className="relative grid grid-cols-3 border border-tinta"
+      className="relative grid w-full grid-cols-3 border border-tinta sm:w-auto"
     >
       {/* La ficha elegida se corre hasta su lugar en vez de saltar. */}
       <span
