@@ -79,7 +79,19 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl
   const needsAuth = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
 
-  if (!conSesion && needsAuth) {
+  // La app móvil abre algunas páginas privadas —el editor y los catálogos—
+  // dentro de su vista previa, con su token en vez de cookies. Acá solo se la
+  // deja pasar: la página arma el cliente con ese token y lo verifica igual que
+  // una cookie, así que sin un token válido no ve nada.
+  const conTokenDeLaApp =
+    Boolean(request.headers.get("x-venduo-app")) &&
+    /^Bearer .+/i.test(request.headers.get("authorization") ?? "")
+
+  // La vuelta de Canva puede llegar al navegador del teléfono, sin sesión: es
+  // una autorización que empezó en la app. La ruta resuelve sola qué hacer.
+  const vueltaDeCanva = pathname === "/panel/catalogos/canva"
+
+  if (!conSesion && !conTokenDeLaApp && !vueltaDeCanva && needsAuth) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
     url.searchParams.set("next", pathname)

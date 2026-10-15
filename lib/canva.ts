@@ -110,6 +110,14 @@ const pedidoSchema = z.object({
   vence: z.number(),
 })
 
+/**
+ * El pedido que empieza en la app: viaja entero, cifrado, como el `state` de
+ * Canva. La vuelta la atiende el navegador del teléfono, que no tiene cookies
+ * ni la sesión de Venduo; por eso lleva la tienda que lo pidió —leída del
+ * token de la app, no de lo que mande nadie— y nadie más puede abrirlo.
+ */
+const pedidoDeLaAppSchema = pedidoSchema.extend({ tienda: z.string().min(1) })
+
 export type PedidoACanva = z.infer<typeof pedidoSchema>
 
 /**
@@ -140,6 +148,36 @@ export function leerPedido(cookie: string | undefined): PedidoACanva | null {
   if (!texto) return null
   try {
     const pedido = pedidoSchema.parse(JSON.parse(texto))
+    return pedido.vence > Date.now() ? pedido : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Un pedido para la app: el estado es el pedido mismo, cifrado. Devuelve el
+ * pedido listo para `direccionDeAutorizacion`.
+ */
+export function pedidoDeLaApp(catalogo: string, tienda: string): PedidoACanva {
+  const pedido = {
+    estado: aBase64Url(randomBytes(24)),
+    verificador: aBase64Url(randomBytes(48)),
+    catalogo,
+    tienda,
+    vence: Date.now() + 10 * 60_000,
+  }
+  return { ...pedido, estado: cifrar(JSON.stringify(pedido), "pedido") }
+}
+
+/** El pedido de la app que vuelve como `state`, si es auténtico y no venció. */
+export function leerPedidoDeLaApp(
+  estado: string | null
+): z.infer<typeof pedidoDeLaAppSchema> | null {
+  if (!estado || !isCanvaConfigured) return null
+  const texto = descifrar(estado, "pedido")
+  if (!texto) return null
+  try {
+    const pedido = pedidoDeLaAppSchema.parse(JSON.parse(texto))
     return pedido.vence > Date.now() ? pedido : null
   } catch {
     return null

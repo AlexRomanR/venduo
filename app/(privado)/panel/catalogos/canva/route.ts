@@ -7,6 +7,7 @@ import {
   direccionDeVuelta,
   guardarConexion,
   leerPedido,
+  leerPedidoDeLaApp,
   pedirPermiso,
 } from "@/lib/canva"
 import { exigirFuncion } from "@/lib/data/funciones"
@@ -28,6 +29,9 @@ export const maxDuration = 60
 export async function GET(peticion: Request) {
   const direccion = new URL(peticion.url)
   const origen = direccion.origin
+
+  const deLaApp = leerPedidoDeLaApp(direccion.searchParams.get("state"))
+  if (deLaApp) return vueltaALaApp(direccion, deLaApp)
   const [almacen, tienda, permiso] = await Promise.all([
     cookies(),
     getMiTienda(),
@@ -91,6 +95,46 @@ export async function GET(peticion: Request) {
     // Se registra en el servidor: sin esto, un rechazo de Canva no se
     // distingue de un PDF que no se pudo armar.
     console.error("[catalogos] no se pudo abrir en Canva:", error)
+    return volver("fallo")
+  }
+}
+
+/** El enlace con el que el navegador le devuelve el control a la app. */
+const VUELTA_A_LA_APP = "venduo://canva"
+
+/**
+ * La vuelta de una autorización que empezó en la app.
+ *
+ * El navegador del teléfono no tiene la sesión de Venduo: acá solo se cambia
+ * el código por el permiso y se guarda la conexión de la tienda que venía en
+ * el pedido. El diseño lo arma la app después, pidiéndolo con su sesión: con
+ * la conexión guardada ya no hace falta aprobar nada.
+ */
+async function vueltaALaApp(
+  direccion: URL,
+  pedido: NonNullable<ReturnType<typeof leerPedidoDeLaApp>>
+) {
+  const volver = (resultado: string) =>
+    NextResponse.redirect(`${VUELTA_A_LA_APP}?resultado=${resultado}`)
+
+  const error = direccion.searchParams.get("error")
+  if (error)
+    return volver(error === "access_denied" ? "cancelado" : "rechazado")
+
+  const codigo = direccion.searchParams.get("code")
+  if (!codigo) return volver("fallo")
+
+  try {
+    const permiso = await pedirPermiso(
+      codigo,
+      pedido.verificador,
+      direccionDeVuelta(direccion.origin)
+    )
+    if (!permiso.renovacion) return volver("fallo")
+    await guardarConexion(pedido.tienda, permiso.renovacion)
+    return volver("conectado")
+  } catch (error) {
+    console.error("[catalogos] la app no pudo conectar Canva:", error)
     return volver("fallo")
   }
 }
