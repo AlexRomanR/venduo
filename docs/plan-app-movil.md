@@ -131,9 +131,12 @@ Sin un paquete común, lo compartido se mantiene así:
 ### Barra inferior y menú lateral
 
 Lo de todos los días va en la barra de abajo; todo lo demás, en un menú lateral que se
-abre desde la foto de la persona en la cabecera. El menú tiene la tarjeta de la tienda
-con sus colores y dice el estado de cada cosa —"Falta WhatsApp", "Sin activar", cuántos
-pedidos esperan—. Ya no hay pestaña "Más": escondía lo que no estaba en la barra.
+abre desde la foto de la persona, arriba a la izquierda de toda pantalla —en el Inicio,
+en una barra fija que no se va al bajar—. Al abrirlo, la app se achica y se corre como
+una tarjeta y deja ver el menú detrás, en tinta, con lo de todos los días en letra
+grande. Tiene la tarjeta de la tienda con sus colores y dice el estado de cada cosa
+—"Falta WhatsApp", "Sin activar", cuántos pedidos esperan—. Ya no hay pestaña "Más":
+escondía lo que no estaba en la barra.
 
 1. **Inicio:** "Para hoy" (pedidos por cobrar, agotados, lo que falta configurar), "Cómo
    te va" con ventas de hoy, la semana y el mes, el sello de la tienda con su estado
@@ -155,8 +158,14 @@ pedidos esperan—. Ya no hay pestaña "Más": escondía lo que no estaba en la 
 En el menú, además: estadísticas y preguntas a la IA; apariencia liviana —logo, colores,
 textos de la portada, secciones y plantilla— con "Editar en la computadora" para el
 editor completo; los datos de la tienda con su WhatsApp, los avisos, la cuenta, cerrar
-sesión y **borrar la cuenta**, que exigen Apple y Google. Esas pantallas se abren encima
-de las pestañas, con la flecha de volver.
+sesión y **borrar la cuenta**, que exigen Apple y Google. Esas pantallas viven en la pila
+del Inicio: llevan la barra de abajo y el botón del menú, como las demás.
+
+Los formularios se ven como lo que editan: el producto con su foto grande, el nombre en
+letra de titular, el precio como una etiqueta con el descuento en vivo y las unidades con
+más y menos; la tienda con su nombre nuevo mientras se escribe; la apariencia con una
+vidriera en miniatura que cambia con cada color. Guardar va fijo abajo, y salir con
+cambios sin guardar pregunta.
 
 ### Lo que la hace valer más que la web
 
