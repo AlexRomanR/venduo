@@ -101,7 +101,7 @@ export function CampoImagen({
         ) : (
           <span className="flex flex-col items-center gap-2 px-6 text-center text-xs opacity-55">
             <ImagePlus aria-hidden="true" className="size-6" />
-            {encima ? "Suéltala acá" : "Arrastra una foto acá"}
+            {encima ? "Suéltala aquí" : "Arrastra una foto aquí"}
           </span>
         )}
         {subiendo ? (
@@ -217,7 +217,7 @@ function Biblioteca({
         </div>
       ) : propias.length === 0 ? (
         <p className="mt-2 text-xs opacity-55">
-          Todavía ninguna. Las fotos que subas quedan acá para reusarlas.
+          Todavía ninguna. Las fotos que subas quedan aquí para reusarlas.
         </p>
       ) : (
         <Grilla

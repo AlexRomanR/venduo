@@ -93,7 +93,7 @@ export function PasoPublicar() {
         <EncabezadoDePaso
           numero={6}
           titulo="Todo al día"
-          bajada="Tu tienda ya se ve así para tus clientes. Cuando cambies algo, lo vas a ver acá para publicarlo."
+          bajada="Tu tienda ya se ve así para tus clientes. Cuando cambies algo, lo vas a ver aquí para publicarlo."
         />
         <div className="px-5 pb-6">
           <button

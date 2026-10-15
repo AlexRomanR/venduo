@@ -204,6 +204,28 @@ tienes cuenta?". Funciona en todo el país, en el altiplano y en el oriente.
 **Nada de voseo rioplatense.** "Ingresá", "Escribí", "tenés" son argentinos: le hablan a
 un boliviano con acento extranjero, y un jurado local lo nota.
 
+**Se lee como una app, no como una charla.** El "tú" se queda; lo que no va es el habla
+de pasillo: frases que en una conversación se entienden y en una pantalla suenan raras o
+extranjeras. Cada rótulo dice qué es o qué pasa, con la palabra de siempre:
+
+| No                                | Sí                                           |
+| --------------------------------- | -------------------------------------------- |
+| "Se nota en la computadora"       | "Solo cambia en computadora"                 |
+| "Ahí se nota", "Mírala arriba"    | "Cambiamos a la vista…", "Puedes verla…"     |
+| "Tirar los cambios"               | "Descartar los cambios"                      |
+| "Sale del catálogo"               | "Se quita del catálogo"                      |
+| "Dale tu estilo"                  | "Personaliza tu tienda"                      |
+| "Al pie de la ficha", "Parecidos" | "Debajo del producto", "Similares"           |
+| "Bajada", "Llamado a la acción"   | "Subtítulo", "Cierre con botón"              |
+| "Acá", "se manda", "la señal"     | "Aquí", "se enviará", "la conexión"          |
+| "Soltar", "sacar" en un error     | Lo que la persona hacía: "borrar", "guardar" |
+
+Un interruptor dice qué aparece y su estado en palabras llanas. Un error nombra lo que la
+persona estaba haciendo, no el paso interno que falló. Vale también para lo que la API
+le manda a la app —los nombres y las ayudas de los ajustes y de las secciones—, que la
+app muestra tal cual. Lo que lee el comprador en la tienda puede ser más cercano: es la
+voz de la tienda, no la de Venduo.
+
 Preferir **"correo"** sobre "email", que es la palabra que usa la gente.
 
 Los mensajes de error dicen qué hacer, no qué falló internamente:

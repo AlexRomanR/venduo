@@ -113,7 +113,7 @@ export function PasoProducto() {
         <div className="border-t border-tinta/15">
           <Interruptor
             etiqueta={NOMBRES_DE_AJUSTE["ficha.barraFija"]}
-            ayuda={`${GUIA["ficha.barraFija"]?.ayuda} Solo en el celular.`}
+            ayuda={GUIA["ficha.barraFija"]?.ayuda}
             activo={ficha.barraFija}
             alCambiar={(activo) => {
               ajustar("barraFija", activo)

@@ -8,7 +8,7 @@ export interface Paso {
 export const PASOS_CREAR: Paso[] = [
   { nombre: "Elige plantilla" },
   { nombre: "Cuenta tu negocio" },
-  { nombre: "Dale tu estilo" },
+  { nombre: "Personaliza tu tienda" },
 ]
 
 /**

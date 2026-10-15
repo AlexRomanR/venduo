@@ -32,7 +32,7 @@ export function UltimosPedidos({ pedidos }: { pedidos: PedidoReciente[] }) {
         <SinDatos
           icono={ShoppingBag}
           titulo="Todavía no llegó ningún pedido"
-          texto="Cuando alguien te mande su carrito por WhatsApp, el pedido aparece acá con el mismo número."
+          texto="Cuando alguien te mande su carrito por WhatsApp, el pedido aparece aquí con el mismo número."
         />
       ) : (
         <ul>

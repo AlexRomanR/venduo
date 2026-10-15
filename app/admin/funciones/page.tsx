@@ -23,7 +23,7 @@ export default async function FuncionesPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <Cabecera
         titulo="Funciones."
-        bajada="Qué puede usar cada tienda. Lo de acá vale para todas; desde la ficha de una tienda se cambia solo para ella. Ninguna tienda recibe aviso cuando le apagas algo."
+        bajada="Qué puede usar cada tienda. Lo de aquí vale para todas; desde la ficha de una tienda se cambia solo para ella. Ninguna tienda recibe aviso cuando le apagas algo."
       />
 
       <Seccion

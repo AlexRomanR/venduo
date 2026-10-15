@@ -20,7 +20,7 @@ export const metadata = { title: "Pedido" }
 /** Qué toca hacer con el pedido, según dónde está. */
 const QUE_SIGUE: Record<OrderStatus, string> = {
   pendiente:
-    "Te llegó por WhatsApp con este número. Cuando te paguen, márcalo pagado: ahí se descuenta del stock.",
+    "Te llegó por WhatsApp con este número. Cuando te paguen, márcalo pagado y se descontará del stock.",
   pagado: "Este pedido ya está pagado y descontado de tu stock.",
   cancelado: "Este pedido se canceló. No cuenta en tus ventas.",
 }

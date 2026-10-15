@@ -248,7 +248,7 @@ export async function borrarCategoria(id: string): Promise<Resultado> {
   if (errorProductos) {
     return {
       ok: false,
-      error: "No pudimos soltar los productos de esa categoría.",
+      error: "No pudimos borrar la categoría. Inténtalo de nuevo.",
     }
   }
 

@@ -33,7 +33,7 @@ export function PanelDeVisitas({
         <SinDatos
           icono={Radar}
           titulo="Todavía sin visitas"
-          texto="Cuando alguien abra la tienda desde WhatsApp, TikTok, un QR o un catálogo, va a aparecer acá."
+          texto="Cuando alguien abra la tienda desde WhatsApp, TikTok, un QR o un catálogo, va a aparecer aquí."
         />
       ) : (
         <>

@@ -50,7 +50,7 @@ export function ParaHoy({ pendientes }: { pendientes: Pendiente[] }) {
           <span>
             <span className="font-semibold">Estás al día.</span>{" "}
             <span className="opacity-65">
-              Cuando llegue un pedido o una solicitud, aparece acá.
+              Cuando llegue un pedido o una solicitud, aparece aquí.
             </span>
           </span>
         </p>

@@ -97,7 +97,7 @@ export function PasoPortada() {
       <EncabezadoDePaso
         numero={2}
         titulo="Portada"
-        bajada="Las secciones de tu página de inicio. Arrástralas para cambiar el orden y tócalas para editarlas, acá o en la vista previa."
+        bajada="Las secciones de tu página de inicio. Arrástralas para cambiar el orden y tócalas para editarlas, aquí o en la vista previa."
       />
 
       {elegida ? (

@@ -202,7 +202,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
     })
     partes.push("dejo el botón de compra siempre a la vista en el celular")
   }
-  if (quiere("parecid", "relacionad")) {
+  if (quiere("parecid", "relacionad", "similar")) {
     operaciones.push({
       op: "apariencia",
       ruta: "ficha.relacionados",
@@ -210,8 +210,8 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
     })
     partes.push(
       sin
-        ? "saco los productos parecidos del pie de la ficha"
-        : "muestro productos parecidos al pie de la ficha"
+        ? "quito los productos similares de la ficha"
+        : "muestro productos similares debajo del producto"
     )
   }
   if (quiere("whatsapp") && !quiere("contacto")) {

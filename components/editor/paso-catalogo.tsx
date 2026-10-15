@@ -77,7 +77,7 @@ export function PasoCatalogo() {
 
       <Grupo
         titulo="Productos por fila en la computadora"
-        ayuda="En el celular siempre van de a dos, para que se lean."
+        ayuda="En el celular siempre se ven dos productos por fila."
       >
         <Opciones
           etiqueta="Productos por fila en la computadora"

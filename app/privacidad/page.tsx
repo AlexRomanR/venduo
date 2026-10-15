@@ -226,7 +226,7 @@ export default function Privacidad() {
 
       <Apartado numero={11} titulo="Si cambiamos esta política">
         <p>
-          Publicamos la nueva versión acá, con su fecha. Si el cambio afecta
+          Publicamos la nueva versión aquí, con su fecha. Si el cambio afecta
           cómo usamos tus datos, te lo decimos antes por correo o en tu panel.
         </p>
       </Apartado>

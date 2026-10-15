@@ -59,7 +59,7 @@ export default async function CuentaPage() {
           <SinDatos
             icono={UserRound}
             titulo="En modo demo no hay una cuenta que editar"
-            texto="Configura Supabase en .env.local y vuelve a entrar: acá vas a cambiar tu nombre, tu foto, los datos de tu tienda y su WhatsApp."
+            texto="Configura Supabase en .env.local y vuelve a entrar: aquí vas a cambiar tu nombre, tu foto, los datos de tu tienda y su WhatsApp."
           />
         </Seccion>
       </div>
