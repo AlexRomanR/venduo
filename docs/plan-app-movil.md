@@ -128,7 +128,12 @@ Sin un paquete común, lo compartido se mantiene así:
   negocio con el WhatsApp obligatorio, y listo.
 - Un recorrido corto la primera vez: cargar el primer producto y compartir la tienda.
 
-### Barra inferior: cinco pestañas
+### Barra inferior y menú lateral
+
+Lo de todos los días va en la barra de abajo; todo lo demás, en un menú lateral que se
+abre desde la foto de la persona en la cabecera. El menú tiene la tarjeta de la tienda
+con sus colores y dice el estado de cada cosa —"Falta WhatsApp", "Sin activar", cuántos
+pedidos esperan—. Ya no hay pestaña "Más": escondía lo que no estaba en la barra.
 
 1. **Inicio:** "Para hoy" (pedidos por cobrar, agotados, lo que falta configurar), "Cómo
    te va" con ventas de hoy, la semana y el mes, el sello de la tienda con su estado
@@ -141,12 +146,17 @@ Sin un paquete común, lo compartido se mantiene así:
    lista; filtros de agotados, por acabarse, ocultos, destacados y "muy vistos, poco
    vendidos"; categorías, precio anterior y destacado; "Oculto por Venduo" cuando el
    administrador lo moderó.
-4. **Compartir:** enlace y QR con la hoja de compartir del celular; catálogos guardados,
-   el PDF con los precios del día como archivo o enlace; pedirle un catálogo a la IA.
-5. **Más:** estadísticas y preguntas a la IA; apariencia liviana —logo, colores, textos
-   de la portada, secciones y plantilla— con "Editar en la computadora" para el editor
-   completo; cuenta, WhatsApp de la tienda, estado de la suscripción, cerrar sesión y
-   **borrar la cuenta**, que exigen Apple y Google.
+4. **Catálogos:** pedirle uno a la IA con una frase, y los guardados en cuadrícula con la
+   portada de sus fotos; al tocar uno, mandar el enlace o el PDF con los precios del día,
+   verlo o editarlo en la computadora.
+5. **Compartir:** enlace y QR con la hoja de compartir del celular, un botón por red y
+   tarjetas para historias con los colores de la tienda.
+
+En el menú, además: estadísticas y preguntas a la IA; apariencia liviana —logo, colores,
+textos de la portada, secciones y plantilla— con "Editar en la computadora" para el
+editor completo; los datos de la tienda con su WhatsApp, los avisos, la cuenta, cerrar
+sesión y **borrar la cuenta**, que exigen Apple y Google. Esas pantallas se abren encima
+de las pestañas, con la flecha de volver.
 
 ### Lo que la hace valer más que la web
 
@@ -176,7 +186,9 @@ algo es un número grande que se toca y lleva a la lista filtrada; los productos
 pedidos se muestran con su foto; la tienda, con la captura real de su portada, que
 saca la web (`lib/vista.ts`) y se actualiza sola con cada edición. Cobrar un pedido se
 festeja con un check, y Compartir arma tarjetas para historias con los colores de la
-tienda. Las reglas completas están en el `AGENTS.md` de la app, "Se mira, no se lee".
+tienda. La app abre con el logo que se arma: el toldo baja raya por raya y aparece
+"Venduo" letra por letra, mientras carga. Las reglas completas están en el `AGENTS.md`
+de la app, "Se mira, no se lee" y "Cómo se navega".
 
 Lo que sigue igual que en la web:
 

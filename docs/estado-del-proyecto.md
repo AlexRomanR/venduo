@@ -243,9 +243,12 @@ que se arregló:
 - **Se mira, no se lee**: el Inicio muestra la tienda con la captura real de su
   portada —la saca la web y se renueva sola con cada edición— y lo que espera en
   números grandes que se tocan. Pedidos va por día y con la foto de lo que pidieron,
-  con "Cobrado" en la fila; Compartir tiene un botón por red, tarjetas para historias
-  con los colores de la tienda y el QR a pantalla completa; Más es una cuadrícula de
-  piezas con su estado.
+  con "Cobrado" en la fila; Productos filtra con sus números —sin stock, queda poco,
+  cuánto vale el stock—; Catálogos tiene su propia pestaña; Compartir tiene un botón
+  por red, tarjetas para historias con los colores de la tienda y el QR a pantalla
+  completa.
+- **Barra de abajo y menú lateral**: la barra con lo de todos los días y un menú con
+  todo lo demás y su estado. Abre con el logo de Venduo que se arma.
 - De este repositorio usa la API `/api/v1` y las rutas de `/.well-known/`. Las reglas
   las siguen imponiendo la base y la API: la app no puede hacer nada que el panel no
   deje.
