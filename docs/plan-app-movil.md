@@ -130,11 +130,11 @@ Sin un paquete común, lo compartido se mantiene así:
 
 ### Barra inferior y menú lateral
 
-Lo de todos los días va en la barra de abajo; todo lo demás, en un menú lateral que se
-abre desde la foto de la persona, arriba a la izquierda de toda pantalla —en el Inicio,
-en una barra fija que no se va al bajar—. Al abrirlo, la app se achica y se corre como
-una tarjeta y deja ver el menú detrás, en tinta, con lo de todos los días en letra
-grande. Tiene la tarjeta de la tienda con sus colores y dice el estado de cada cosa
+Lo de todos los días va en la barra de abajo; todo lo demás, en un menú lateral claro
+que entra desde la izquierda. Se abre con un cuadro de tres rayitas, arriba a la
+izquierda de toda pantalla —en el Inicio, en una barra fija que no se va al bajar—, que
+lleva un punto rojo si adentro algo pide atención. El menú tiene la tarjeta de la tienda
+con sus colores y dice el estado de cada cosa
 —"Falta WhatsApp", "Sin activar", cuántos pedidos esperan—. Ya no hay pestaña "Más":
 escondía lo que no estaba en la barra.
 
