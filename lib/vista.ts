@@ -2,7 +2,6 @@ import "server-only"
 
 import { createHmac, timingSafeEqual } from "node:crypto"
 import { after } from "next/server"
-import sharp from "sharp"
 
 import { getMiTienda } from "@/lib/data/panel"
 import { env, getSiteUrl } from "@/lib/env"
@@ -21,8 +20,13 @@ import { urlDeTienda } from "@/lib/tienda"
 
 /** El ancho de un celular común, y cuánto de la portada entra en la captura. */
 const PANTALLA = { width: 390, height: 780 }
-/** El ancho de la imagen guardada: alcanza para la tarjeta del Inicio. */
-const ANCHO_GUARDADO = 540
+/**
+ * La densidad de la captura: 390 × 1,4 da unos 540 px de ancho, lo que pide la
+ * tarjeta del Inicio. Chrome la guarda en JPEG ya de ese tamaño, sin `sharp`:
+ * en Vercel `sharp` necesita sus binarios declarados en cada ruta que lo
+ * importa, y este módulo lo importan varias.
+ */
+const DENSIDAD = 1.4
 /** Cuánto vale el candado: una captura que tarde más se da por perdida. */
 const CANDADO_MS = 2 * 60 * 1000
 const BUCKET = "store-assets"
@@ -104,17 +108,13 @@ async function fotografiar(url: string): Promise<Buffer> {
     const pagina = await navegador.newPage()
     await pagina.setViewport({
       ...PANTALLA,
-      deviceScaleFactor: 2,
+      deviceScaleFactor: DENSIDAD,
       isMobile: true,
       hasTouch: true,
     })
     await pagina.goto(url, { waitUntil: "networkidle0", timeout: 25_000 })
     await pagina.evaluate(() => document.fonts.ready)
-    const crudo = await pagina.screenshot({ type: "png" })
-    return await sharp(crudo)
-      .resize({ width: ANCHO_GUARDADO })
-      .jpeg({ quality: 80, mozjpeg: true })
-      .toBuffer()
+    return Buffer.from(await pagina.screenshot({ type: "jpeg", quality: 80 }))
   } finally {
     await navegador.close()
   }
