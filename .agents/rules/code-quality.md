@@ -71,7 +71,7 @@ No agregar dependencias sin necesidad. Todo lo que hace falta para el MVP ya est
 instalado; una biblioteca nueva es peso que alguien tiene que entender a las tres de la
 mañana.
 
-Se sumaron tres después del arranque. La primera es **`@react-pdf/renderer`**, para el informe
+Se sumaron cuatro después del arranque. La primera es **`@react-pdf/renderer`**, para el informe
 del tablero: el PDF tiene que ser un archivo de verdad —que se abra en su pestaña, se
 guarde y se mande por WhatsApp— y eso no lo da imprimir la pantalla. Corre solo en el
 servidor y está declarada en `serverExternalPackages`. Arrastra un `postcss` con un aviso
@@ -88,6 +88,12 @@ La tercera es **`sharp`**, que ya venía con Next para optimizar imágenes: se d
 porque el catálogo en PDF convierte las fotos de la tienda, que se guardan en WebP, a
 JPEG —`@react-pdf` no lee WebP— y las achica para que el archivo se pueda mandar por
 WhatsApp. Corre solo en el servidor.
+
+La cuarta es **`@sparticuz/chromium` con `puppeteer-core`**, para la vista de la tienda
+que muestra la app: una captura real de la portada, que ningún dibujo reemplaza. Es un
+Chrome comprimido para funciones sin servidor y pesa unos 60 MB, así que **va solo en la
+ruta `/api/v1/vista`** (`outputFileTracingIncludes` en `next.config.ts`); el resto del
+servidor se la pide con `pedirVista`. Nunca importarla desde otra ruta.
 
 No construir para requisitos hipotéticos. Si algo está en la lista de lo que no entra, no
 se escribe el andamiaje "por si acaso".

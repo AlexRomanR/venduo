@@ -6,6 +6,7 @@ import { z } from "zod"
 import { exigirFuncion } from "@/lib/data/funciones"
 import { esClavePlantilla } from "@/lib/plantillas"
 import { createClient } from "@/lib/supabase/server"
+import { actualizarVistaDespues } from "@/lib/vista"
 
 const cambioSchema = z.object({
   clave: z.string().refine(esClavePlantilla, "Esa plantilla no existe."),
@@ -58,6 +59,7 @@ export async function cambiarPlantilla(
   // Cambia cómo se ve todo: el panel, que toma la identidad de la plantilla, y
   // cada pantalla de la tienda pública.
   revalidatePath("/", "layout")
+  await actualizarVistaDespues()
   return { ok: true }
 }
 
@@ -100,5 +102,6 @@ export async function restaurarVersion(entrada: {
   }
 
   revalidatePath("/", "layout")
+  await actualizarVistaDespues()
   return { ok: true }
 }

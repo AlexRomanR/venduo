@@ -1,10 +1,14 @@
+import { after } from "next/server"
+
 import { esAdmin } from "@/lib/admin"
+import { miniaturaDePlantilla } from "@/lib/api/miniaturas"
 import { exigirSesion, respuesta } from "@/lib/api/respuestas"
 import { getBarraLateral } from "@/lib/data/barra"
 import { getMiTienda, getResumenPanel } from "@/lib/data/panel"
 import { getTablero } from "@/lib/data/tablero"
 import { visitasDeMiTienda } from "@/lib/data/visitas"
 import { PLANTILLAS, plantillaDeTienda } from "@/lib/plantillas"
+import { pedirVista } from "@/lib/vista"
 
 export const dynamic = "force-dynamic"
 
@@ -32,6 +36,18 @@ export async function GET() {
 
   const terminada = tienda?.template_key && barra.tienda ? tienda : null
 
+  // La captura de la portada, o la miniatura de su plantilla mientras no la
+  // haya. Si quedó vieja, se saca otra después de responder: la app la ve la
+  // próxima vez que pida el resumen.
+  const vieja =
+    terminada &&
+    (!terminada.vista_at ||
+      new Date(terminada.vista_at) < new Date(terminada.vista_cambio_at))
+  if (vieja && barra.tienda?.publicada && !barra.tienda.pausada) {
+    const id = terminada.id
+    after(() => pedirVista(id))
+  }
+
   return respuesta({
     persona: barra.persona,
     esAdmin: admin,
@@ -48,6 +64,13 @@ export async function GET() {
             whatsapp: terminada.whatsapp,
             plantilla:
               PLANTILLAS[plantillaDeTienda(terminada.template_key)].nombre,
+            vista: {
+              url:
+                terminada.vista_url ??
+                miniaturaDePlantilla(plantillaDeTienda(terminada.template_key)),
+              // Si es la captura de su portada o la miniatura de la plantilla.
+              real: Boolean(terminada.vista_url),
+            },
             // Solo los tres colores: alcanzan para el sello de la tienda.
             sello: barra.apariencia
               ? {

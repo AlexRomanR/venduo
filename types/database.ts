@@ -1328,6 +1328,10 @@ export type Database = {
           template_key: string | null
           theme_overrides: Json
           updated_at: string
+          vista_at: string | null
+          vista_cambio_at: string
+          vista_pedida_at: string | null
+          vista_url: string | null
           whatsapp: string | null
         }
         Insert: {
@@ -1347,6 +1351,10 @@ export type Database = {
           template_key?: string | null
           theme_overrides?: Json
           updated_at?: string
+          vista_at?: string | null
+          vista_cambio_at?: string
+          vista_pedida_at?: string | null
+          vista_url?: string | null
           whatsapp?: string | null
         }
         Update: {
@@ -1366,6 +1374,10 @@ export type Database = {
           template_key?: string | null
           theme_overrides?: Json
           updated_at?: string
+          vista_at?: string | null
+          vista_cambio_at?: string
+          vista_pedida_at?: string | null
+          vista_url?: string | null
           whatsapp?: string | null
         }
         Relationships: [
@@ -1718,6 +1730,7 @@ export type Database = {
       }
       funciones_de_mi_tienda: { Args: never; Returns: Json }
       is_platform_admin: { Args: never; Returns: boolean }
+      marcar_vista_vieja: { Args: { p_store_id: string }; Returns: undefined }
       monto_en_texto: { Args: { p_cents: number }; Returns: string }
       my_store_id: { Args: never; Returns: string }
       olvidar_dispositivo: { Args: { p_token: string }; Returns: undefined }
