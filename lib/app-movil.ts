@@ -17,11 +17,20 @@ export const PAQUETE_DE_LA_APP = "bo.venduo.app"
  * Las rutas que la app sabe abrir. Son las mismas de `app.config.ts` en el
  * repositorio de la app: una ruta nueva se suma en los dos lados.
  *
- * `/editor` y `/panel/catalogos` no están a propósito: la app los abre en el
- * navegador, y si estuvieran acá ese enlace volvería a abrir la app.
+ * Los editores van como rutas exactas: un PDF de un catálogo o la vuelta de
+ * Canva cuelgan de `/panel/catalogos/…` y tienen que seguir abriendo en el
+ * navegador.
  */
 export const RUTAS_DE_LA_APP = {
-  exactas: ["/panel", "/panel/estadisticas", "/panel/apariencia", "/cuenta"],
+  exactas: [
+    "/panel",
+    "/panel/estadisticas",
+    "/panel/apariencia",
+    "/cuenta",
+    "/editor",
+    "/panel/catalogos",
+    "/panel/catalogos/nuevo",
+  ],
   conTodoLoQueCuelga: ["/panel/pedidos", "/panel/productos"],
 } as const
 
