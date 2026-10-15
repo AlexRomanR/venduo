@@ -7,17 +7,17 @@ export const CURRENCY = "BOB"
 export const LOCALE = "es-BO"
 
 /**
- * El símbolo suelto, para rotular el campo donde alguien escribe un monto.
+ * El símbolo del boliviano, fijo.
  *
- * Sale del mismo formateador que `formatMoney` y no de un "Bs" escrito a mano:
- * así hay un solo lugar del que depende la moneda.
+ * No se le pide a `Intl`: el símbolo sale de los datos de idioma de cada
+ * navegador, y el de Android no sabe que en Bolivia se escribe "Bs" —escribe
+ * el código, "BOB"—. El servidor decía "Bs 240", el celular del comprador
+ * "BOB 240", y React rehacía la página al no coincidir. La moneda es una
+ * constante del sistema, así que su símbolo también.
  */
-export const CURRENCY_SYMBOL =
-  new Intl.NumberFormat(LOCALE, { style: "currency", currency: CURRENCY })
-    .formatToParts(0)
-    .find((parte) => parte.type === "currency")?.value ?? "Bs"
+export const CURRENCY_SYMBOL = "Bs"
 
-/** Formatea un monto guardado en centavos. */
+/** Formatea un monto guardado en centavos: "Bs 8.500". */
 export function formatMoney(
   cents: number,
   currency = CURRENCY,
@@ -27,7 +27,14 @@ export function formatMoney(
     style: "currency",
     currency,
     maximumFractionDigits: 0,
-  }).format(cents / 100)
+  })
+    .formatToParts(cents / 100)
+    .map((parte) =>
+      parte.type === "currency" && currency === CURRENCY
+        ? CURRENCY_SYMBOL
+        : parte.value
+    )
+    .join("")
 }
 
 /**
