@@ -248,6 +248,16 @@ de cada `create policy`. Así el archivo se puede volver a correr sin romper nad
 
 Las políticas RLS van juntas en su propio archivo, para poder auditarlas de una lectura.
 
+## La vista de la tienda
+
+`stores.vista_url` es una captura real de la portada, para el Inicio de la app. **Cuándo
+quedó vieja lo decide la base**: `vista_cambio_at` lo mueven disparadores sobre `stores`,
+`store_blocks`, `store_pages` y `products` cada vez que cambia algo que se ve —el stock,
+solo al agotarse o volver—. Si es más nueva que `vista_at`, hace falta otra. La captura la
+saca la web (`lib/vista.ts`) con la clave de servicio; `vista_pedida_at` es el candado
+para no sacar dos a la vez. Un cambio nuevo que se vea en la portada —una columna, una
+tabla— se suma a esos disparadores, o la app muestra una vista vieja.
+
 ## Las cuentas dadas de baja
 
 `stores.closed_at` y `profiles.closed_at` marcan una cuenta dada de baja: **una tienda

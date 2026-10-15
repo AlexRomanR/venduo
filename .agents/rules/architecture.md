@@ -60,6 +60,7 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/api/v1/apariencia`                      | La app: logo, colores, letra y secciones; publicarlos  | Token de la app |
 | `/api/v1/apariencia/plantilla`            | La app: cambiar la plantilla de la tienda              | Token de la app |
 | `/api/v1/cuenta`                          | La app: dar de baja la cuenta (`DELETE`)               | Token de la app |
+| `/api/v1/vista`                           | Saca la captura de la portada si quedó vieja           | Token o firma   |
 | `/.well-known/assetlinks.json`            | Le confirma a Android que la app es de esta web        | Público         |
 | `/.well-known/apple-app-site-association` | Lo mismo, para iPhone                                  | Público         |
 | `/admin`                                  | Resumen de la plataforma: tiendas, embudo, salud       | Administrador   |
@@ -225,6 +226,7 @@ lib/
   catalogos/          El catálogo en PDF: modelo y esquema, constantes sin zod,
                       estilo, datos, las doce plantillas, las operaciones del
                       editor y `pdf.tsx`, que lo arma en el servidor
+  vista.ts            La captura de la portada para la app, con Chrome. Solo servidor
   cuenta.ts           Dar de baja la cuenta: la base y el bloqueo en Auth. Solo servidor
   legal.ts            El correo de soporte y desde cuándo valen los textos legales
   canva.ts            Llevar un catálogo a Canva: el permiso con PKCE y la

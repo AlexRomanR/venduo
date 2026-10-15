@@ -22,6 +22,7 @@ import {
   type Operacion,
 } from "@/lib/plantillas/borrador"
 import { createClient, getUsuario } from "@/lib/supabase/server"
+import { actualizarVistaDespues } from "@/lib/vista"
 import type { Json } from "@/types"
 
 export type ResultadoDePublicar =
@@ -97,6 +98,7 @@ export async function publicarDiseno(
   // Cambia la tienda pública entera y el panel del dueño, que se viste con
   // su plantilla.
   revalidatePath("/", "layout")
+  await actualizarVistaDespues()
 
   const releido = await leerDisenoParaEditar()
   return { ok: true, publicado: releido?.publicado ?? borrador }

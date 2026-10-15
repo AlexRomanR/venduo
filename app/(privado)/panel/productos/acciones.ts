@@ -9,6 +9,7 @@ import {
   type CategoriaInput,
   type ProductoInput,
 } from "@/lib/validation/producto"
+import { actualizarVistaDespues } from "@/lib/vista"
 import type { ProductUpdate } from "@/types"
 
 export interface Resultado {
@@ -104,6 +105,7 @@ export async function guardarProducto(
   }
 
   revalidatePath(RUTA)
+  await actualizarVistaDespues()
   revalidatePath("/panel")
   return { ok: true, id: respuesta.data.id }
 }
@@ -123,6 +125,7 @@ export async function borrarProducto(id: string): Promise<Resultado> {
   if (error) return { ok: false, error: "No pudimos borrar el producto." }
 
   revalidatePath(RUTA)
+  await actualizarVistaDespues()
   return { ok: true }
 }
 
@@ -156,6 +159,7 @@ export async function alternarProducto(
   if (error) return { ok: false, error: "No pudimos guardar el cambio." }
 
   revalidatePath(RUTA)
+  await actualizarVistaDespues()
   return { ok: true }
 }
 
@@ -181,6 +185,7 @@ export async function ajustarStock(
   if (error) return { ok: false, error: "No pudimos guardar el stock." }
 
   revalidatePath(RUTA)
+  await actualizarVistaDespues()
   return { ok: true }
 }
 

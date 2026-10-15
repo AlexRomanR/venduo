@@ -9,7 +9,19 @@ const nextConfig: NextConfig = {
   // `@react-pdf/renderer` arma el documento con un reconciliador propio y
   // lee las fuentes del disco: empaquetarlo lo rompe. Se deja que el runtime
   // lo cargue tal cual desde node_modules.
-  serverExternalPackages: ["@react-pdf/renderer"],
+  // `@sparticuz/chromium` y `puppeteer-core` sacan la vista de la tienda
+  // (`lib/vista.ts`): el Chrome viaja comprimido y se descomprime al usarlo.
+  serverExternalPackages: [
+    "@react-pdf/renderer",
+    "@sparticuz/chromium",
+    "puppeteer-core",
+  ],
+
+  // El rastreo de archivos no ve el Chrome comprimido, que se lee del disco.
+  // Va solo en la ruta que saca la vista: en las demás pesaría 60 MB de más.
+  outputFileTracingIncludes: {
+    "/api/v1/vista": ["./node_modules/@sparticuz/chromium/bin/**"],
+  },
 
   experimental: {
     // Cuánto reutiliza el navegador una pantalla ya traída antes de volver a
