@@ -240,6 +240,12 @@ que se arregló:
   de un pedido para mandarlos cuando vuelve la señal.
 - Un enlace del panel abre su pantalla en la app, y el ícono tiene atajos a "Nuevo
   producto" y "Ver pedidos".
+- **Se mira, no se lee**: el Inicio muestra la tienda con la captura real de su
+  portada —la saca la web y se renueva sola con cada edición— y lo que espera en
+  números grandes que se tocan. Pedidos va por día y con la foto de lo que pidieron,
+  con "Cobrado" en la fila; Compartir tiene un botón por red, tarjetas para historias
+  con los colores de la tienda y el QR a pantalla completa; Más es una cuadrícula de
+  piezas con su estado.
 - De este repositorio usa la API `/api/v1` y las rutas de `/.well-known/`. Las reglas
   las siguen imponiendo la base y la API: la app no puede hacer nada que el panel no
   deje.
