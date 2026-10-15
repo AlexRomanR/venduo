@@ -247,8 +247,12 @@ que se arregló:
   cuánto vale el stock—; Catálogos tiene su propia pestaña; Compartir tiene un botón
   por red, tarjetas para historias con los colores de la tienda y el QR a pantalla
   completa.
-- **Barra de abajo y menú lateral**: la barra con lo de todos los días y un menú con
-  todo lo demás y su estado. Abre con el logo de Venduo que se arma.
+- **Barra de abajo y menú lateral**: la barra con lo de todos los días, también en las
+  pantallas de ajustes, y un menú con todo lo demás y su estado, que corre la app a un
+  costado como una tarjeta. Abre con el logo de Venduo que se arma.
+- **Formularios que se ven como lo que editan**: producto, tienda, cuenta, apariencia,
+  categorías y plantillas, con guardar fijo abajo y la pregunta antes de salir sin
+  guardar.
 - De este repositorio usa la API `/api/v1` y las rutas de `/.well-known/`. Las reglas
   las siguen imponiendo la base y la API: la app no puede hacer nada que el panel no
   deje.
