@@ -378,6 +378,7 @@ export function tableroDeDemostracion(): Tablero {
         estado: "pendiente",
         creado: hace(26),
         articulos: 1,
+        fotos: ["1553062407-98eeb64c6a62"].map(fotoDemo),
       },
       {
         id: "demo-pedido-2",
@@ -388,6 +389,11 @@ export function tableroDeDemostracion(): Tablero {
         estado: "pagado",
         creado: hace(134),
         articulos: 3,
+        fotos: [
+          "1521572163474-6864f9cf17ab",
+          "1588850561407-ed78c282e89b",
+          "1556905055-8f358a7a47b2",
+        ].map(fotoDemo),
       },
       {
         id: "demo-pedido-3",
@@ -398,6 +404,7 @@ export function tableroDeDemostracion(): Tablero {
         estado: "pagado",
         creado: hace(60 * 27),
         articulos: 1,
+        fotos: ["1542291026-7eec264c27ff"].map(fotoDemo),
       },
       {
         id: "demo-pedido-4",
@@ -408,6 +415,9 @@ export function tableroDeDemostracion(): Tablero {
         estado: "pagado",
         creado: hace(60 * 24 * 3 + 95),
         articulos: 2,
+        fotos: ["1548883354-7622d03aca27", "1521572163474-6864f9cf17ab"].map(
+          fotoDemo
+        ),
       },
       {
         id: "demo-pedido-5",
@@ -418,6 +428,7 @@ export function tableroDeDemostracion(): Tablero {
         estado: "cancelado",
         creado: hace(60 * 24 * 4 + 300),
         articulos: 1,
+        fotos: ["1588850561407-ed78c282e89b"].map(fotoDemo),
       },
     ],
     porGestionar: { pendientes: 1 },

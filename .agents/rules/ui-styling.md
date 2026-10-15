@@ -23,8 +23,9 @@ tienda pública. Cómo funciona, y cómo se agrega una, está en `docs/store-tem
 plantilla, y una letra o un color elegidos para vender —una condensada en mayúsculas, el
 azul de un botón de compra, una antigua fina para las cifras— terminaban en cada rótulo de
 una pantalla de trabajo. La tienda sigue reconocible donde se la nombra: su tarjeta en la
-barra lateral y su sello en el Resumen (`SelloDeTienda`), con su papel, su letra y su
-color de acción en un recuadro.
+barra lateral (`SelloDeTienda`), con su papel, su letra y su color de acción en un
+recuadro, y la tienda misma en el Resumen: viva dentro de un celular (`TiendaEnVivo`),
+que no pinta nada fuera de su marco.
 
 Tres reglas que se desprenden:
 
@@ -63,15 +64,27 @@ una portada y un panel no es la paleta ni la tipografía, es el ritmo:
 "Rojo" en esta regla quiere decir **la señal**: en Venduo es rojo, en Pasarela azul y en
 Esencia oro viejo. La regla de usarla poco no cambia con el color.
 
-### La app del emprendedor es otra cosa
+### El panel se mira, no se lee
 
-La app (`venduo-app`) usa el mismo mundo —papel, tinta, la señal, Archivo y Geist,
-reglas de un píxel— pero **no la regla de "título y bajada"** de este panel: allá los
-paneles llevan solo su título, lo que espera algo es un número grande que se toca y los
-productos se muestran con su foto. Quien la abre la mira unos segundos desde el
-celular. Sus reglas están en el `AGENTS.md` de ese repositorio, "Se mira, no se lee".
-Lo que una pantalla de la app necesita de la web —la captura de la tienda, por
-ejemplo— sale de `/api/v1`.
+El panel de la web sigue la misma idea que la app (`venduo-app`, "Se mira, no se lee" en
+su `AGENTS.md`): quien vende lo abre entre dos mensajes y no va a leer un párrafo.
+
+- **Un panel lleva solo su título.** Nada de bajadas que expliquen para qué sirve: si
+  un panel necesita explicarse, se rediseña. `Seccion` todavía acepta `bajada` porque
+  hay pantallas por convertir; una pantalla nueva no la usa.
+- **Lo que espera algo es un número grande que se toca** y lleva a la lista ya
+  filtrada (`ParaHoy`). Los números suben al aparecer (`Contador`).
+- **Fotos antes que nombres**: un pedido por las fotos de lo que pidieron, un producto
+  por la suya, en carruseles que se deslizan en el celular.
+- **La tienda se muestra, no se nombra**: viva dentro de un celular en una pantalla
+  ancha (`TiendaEnVivo`), y la captura de su portada en el celular.
+- **Lo que no pide nada no ocupa lugar**: sin ventas no hay "lo más vendido"; sin
+  pendientes, "Estás al día" es una línea.
+- **Lo de todos los días se hace donde se ve**: cobrar un pedido y reponer stock desde
+  el Resumen, con el festejo de la app al cobrar (`useFestejo`).
+- **El movimiento es corto y sin rebotes**: los paneles entran de a uno, las barras
+  crecen, el período se desliza. Todo queda quieto con "Reducir movimiento"
+  (`globals.css`).
 
 ### Cuándo aparece la barra
 
@@ -110,10 +123,9 @@ del menú lleva un punto rojo si adentro hay algo urgente.
 ### Las pantallas del panel
 
 **Toda pantalla del panel se arma igual que el Resumen**: cada cosa en su propio panel
-—regla estructural de un píxel, esquina viva, sin sombra— con un ícono, un título que
-dice **para qué sirve** ("Cómo van tus cobros", "Para hoy", "Se está
-acabando") y una bajada de una línea. El pie, si lo hay, es un enlace a todo el ancho
-hacia donde se sigue. Antes solo el Resumen se veía así, y en las demás pantallas las
+—regla estructural de un píxel, esquina viva, sin sombra— con un ícono y un título que
+dice **para qué sirve** ("Para hoy", "Se está acabando"). El pie, si lo hay, es un
+enlace a todo el ancho hacia donde se sigue. Antes solo el Resumen se veía así, y en las demás pantallas las
 cifras, los filtros y las listas quedaban sueltos bajo rótulos chicos: lo importante se
 perdía entre lo demás.
 

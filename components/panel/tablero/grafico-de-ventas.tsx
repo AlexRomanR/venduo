@@ -211,7 +211,8 @@ export function GraficoDeVentas({
                     anchoBarra,
                     MARGEN.arriba + altoUtil - arriba
                   )}
-                  className="fill-senal transition-[fill-opacity] duration-150"
+                  className="barra-crece fill-senal transition-[fill-opacity] duration-150"
+                  style={{ "--i": indice } as React.CSSProperties}
                   fillOpacity={activo === null || activo === indice ? 1 : 0.3}
                 />
               )
@@ -255,11 +256,6 @@ export function GraficoDeVentas({
           <div style={{ height: ALTO }} />
         )}
       </div>
-
-      <p className="mt-2 text-xs opacity-65">
-        Toca o pasa el cursor por las barras para ver cada{" "}
-        {porSemana ? "semana" : "día"}.
-      </p>
     </div>
   )
 }

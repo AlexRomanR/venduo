@@ -206,10 +206,11 @@ components/
   panel/              Shell y piezas del panel. `piezas.tsx` son los
                       paneles, cifras y estados vacíos de toda pantalla;
                       `armazon.tsx` es la barra con su contenido y decide cuándo va;
-                      `funcion.tsx` apaga lo que Venduo desactivó y `visitas.tsx`
-                      es el panel de visitas, el mismo en `/admin`
-    tablero/          El Resumen: sus secciones, el gráfico de ventas, el sello de
-                      la tienda y compartirla
+                      `funcion.tsx` apaga lo que Venduo desactivó, `visitas.tsx`
+                      es el panel de visitas, el mismo en `/admin`, y `contador.tsx`
+                      y `festejo.tsx` son los números que suben y el check al cobrar
+    tablero/          El Resumen: sus secciones, el gráfico de ventas, la tienda en
+                      vivo, el sello de la tienda y compartirla
   admin/              El armazón de `/admin`, su navegación y los controles de
                       cada pantalla: funciones, plantillas, tiendas, ficha, registro
   landing/            Piezas de la portada

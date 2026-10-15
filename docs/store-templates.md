@@ -468,10 +468,11 @@ elegidos para vender —una condensada en mayúsculas, el azul de un botón de c
 antigua fina para las cifras— terminaban en cada rótulo de una herramienta de trabajo.
 
 La tienda sigue reconocible donde se la nombra. `getBarraLateral()` calcula su apariencia
-con la misma función que la tienda pública, y la usan la tarjeta de la barra —el sello
-chico y el nombre con la letra de su plantilla— y `SelloDeTienda` en el Resumen —su papel,
-su nombre con su letra y su color de acción—. Las dos dibujan con valores en línea dentro
-de un recuadro y no tocan `:root`.
+con la misma función que la tienda pública, y la usa la tarjeta de la barra —el sello
+chico (`SelloDeTienda`) y el nombre con la letra de su plantilla—, que dibuja con
+valores en línea dentro de un recuadro y no toca `:root`. El Resumen ya no necesita un
+sello: muestra la tienda misma, en un `iframe` dentro de un celular (`TiendaEnVivo`), y
+la captura de su portada en el celular.
 
 Resumen, pedidos, productos, categorías, estadísticas y cuenta son las mismas
 pantallas en todas las tiendas: una herramienta que se aprende una vez.

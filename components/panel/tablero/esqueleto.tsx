@@ -37,14 +37,31 @@ export function EsqueletoDelTablero() {
       aria-label="Cargando tu resumen"
       className="flex flex-col gap-6 md:gap-8"
     >
-      <Panel filas={2} />
+      {/* Para hoy: tres números grandes. */}
+      <div className="border border-tinta/25">
+        <div className="flex items-center gap-3 border-b border-tinta/15 px-4 py-4 sm:px-5">
+          <Skeleton className={cn(BLOQUE_ESQUELETO, "size-5")} />
+          <Skeleton className={cn(BLOQUE_ESQUELETO, "h-5 w-28")} />
+        </div>
+        <div className="grid grid-cols-3 divide-x divide-tinta/10">
+          {Array.from({ length: 3 }, (_, indice) => (
+            <div
+              key={indice}
+              className="flex h-32 flex-col justify-end gap-2 px-4 py-4 sm:px-5"
+            >
+              <Skeleton className={cn(BLOQUE_ESQUELETO, "h-10 w-12")} />
+              <Skeleton className={cn(BLOQUE_ESQUELETO, "h-3.5 w-20")} />
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div className="border border-tinta/25">
         <div className="flex items-center gap-3 border-b border-tinta/15 px-4 py-4 sm:px-5">
           <Skeleton className={cn(BLOQUE_ESQUELETO, "size-5")} />
           <Skeleton className={cn(BLOQUE_ESQUELETO, "h-5 w-32")} />
         </div>
-        <div className="grid grid-cols-2 gap-px bg-tinta/10 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-px bg-tinta/10">
           {Array.from({ length: 4 }, (_, indice) => (
             <div key={indice} className="bg-papel px-4 py-4 sm:px-5">
               <Skeleton className={cn(BLOQUE_ESQUELETO, "h-3 w-16")} />
@@ -57,10 +74,7 @@ export function EsqueletoDelTablero() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:gap-8 xl:grid-cols-2">
-        <Panel filas={4} />
-        <Panel filas={4} />
-      </div>
+      <Panel filas={4} alto="h-14" />
     </div>
   )
 }

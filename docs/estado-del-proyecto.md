@@ -180,13 +180,15 @@ que se arregló:
 
 ### Panel del emprendedor (`/panel`)
 
-- **Resumen** con el estilo de Venduo, igual para toda tienda, y la tienda reconocible en
-  su sello. Cada sección en su panel: **Para hoy** (lo que espera respuesta, con los
-  mismos números de la barra), **Primeros pasos** mientras falten, **Cómo te va** (cifras
-  contra el período anterior y un gráfico de 7, 30 o 90 días que se recorre con el dedo o
-  el teclado), **Últimos pedidos**, **Lo que más se vende** y **Se está acabando**.
-  Si la tienda no tiene WhatsApp, es lo primero que pide. Compartir la tienda abre el enlace, el QR para descargar y
-  un mensaje listo para WhatsApp.
+- **Resumen que se mira, no se lee**, como el Inicio de la app. En una pantalla ancha,
+  la tienda viva dentro de un celular a la derecha, que se desplaza y se toca; en el
+  celular, la captura de su portada. **Para hoy** en números grandes que llevan a la
+  lista filtrada, **Cómo te va** con cifras que suben y barras que crecen,
+  **Últimos pedidos** con las fotos de lo que pidieron y el botón **Cobrado** ahí
+  mismo, **Lo más vendido** en fotos y **Se está acabando** con más y menos para
+  reponer sin salir. Lo que no pide nada no aparece. Si la tienda no tiene WhatsApp, es
+  lo primero que pide. Compartir la tienda abre el enlace, el QR y un mensaje listo
+  para WhatsApp.
 - **Productos**: alta y edición con fotos, stock, umbral de aviso, precio
   anterior, código y destacado. Categorías propias.
 - **Pedidos**: lista y detalle con el mismo número que llegó por WhatsApp. Tres estados:
@@ -198,7 +200,8 @@ que se arregló:
   **Restaurar** en cada versión. El resumen también lleva al editor, y pide darle estilo
   mientras la tienda luzca igual a la plantilla.
 - Todas las pantallas se arman como el Resumen: cada cosa en su panel con borde, un
-  título que dice para qué sirve y su estado vacío dentro.
+  título que dice para qué sirve y su estado vacío dentro. Pedidos, Productos y las
+  demás pantallas todavía llevan su bajada: se convierten en las fases siguientes.
 - Barra lateral con contadores de lo que pide atención; se puede plegar y recuerda cómo
   quedó.
 

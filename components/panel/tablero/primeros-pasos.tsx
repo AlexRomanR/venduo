@@ -13,7 +13,6 @@ const BOTON_DEL_PASO =
 interface Paso {
   hecho: boolean
   titulo: string
-  texto: string
   accion: React.ReactNode
 }
 
@@ -36,7 +35,6 @@ export function PrimerosPasos({
     {
       hecho: pasos.producto,
       titulo: "Carga tu primer producto",
-      texto: "Con su foto y su precio: es lo primero que ve tu cliente.",
       accion: (
         <Link href="/panel/productos/nuevo" className={BOTON_DEL_PASO}>
           Cargar producto
@@ -47,7 +45,6 @@ export function PrimerosPasos({
     {
       hecho: pasos.estilo,
       titulo: "Personaliza tu tienda",
-      texto: "Tu logo y tus colores, para que tu tienda se reconozca.",
       accion: (
         <Link href="/editor" className={BOTON_DEL_PASO}>
           Abrir el editor
@@ -58,7 +55,6 @@ export function PrimerosPasos({
     {
       hecho: pasos.primerPedido,
       titulo: "Recibe tu primer pedido",
-      texto: "Comparte tu enlace por WhatsApp, TikTok o donde ya vendes.",
       accion: (
         <CompartirTienda {...tienda} legible={enlaceLegible(tienda.url)}>
           <button type="button" className={BOTON_DEL_PASO}>
@@ -77,7 +73,6 @@ export function PrimerosPasos({
       id="primeros-pasos"
       icono={Flag}
       titulo="Primeros pasos"
-      bajada="Lo que falta para que tu tienda empiece a vender."
       extra={
         <div className="flex items-center gap-3">
           <span className="tabular text-sm font-semibold">
@@ -137,11 +132,6 @@ export function PrimerosPasos({
                     <span className="sr-only"> (hecho)</span>
                   ) : null}
                 </p>
-                {paso.hecho ? null : (
-                  <p className="mt-1 text-sm leading-snug opacity-70">
-                    {paso.texto}
-                  </p>
-                )}
               </div>
             </div>
             {paso.hecho ? null : (

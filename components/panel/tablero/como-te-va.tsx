@@ -24,6 +24,7 @@ import {
   type Periodo,
 } from "@/lib/tablero"
 import { cn } from "@/lib/utils"
+import { Contador } from "@/components/panel/contador"
 import { GraficoDeVentas } from "@/components/panel/tablero/grafico-de-ventas"
 import { Seccion, SinDatos } from "@/components/panel/piezas"
 
@@ -60,7 +61,7 @@ export function ComoTeVa({
       id="como-te-va"
       icono={ChartNoAxesColumn}
       titulo="Cómo te va"
-      bajada="Tus ventas: los pedidos que marcaste pagados."
+      className="@container"
       extra={
         hayVentas ? (
           <SelectorDePeriodo valor={periodo} alCambiar={setPeriodo} />
@@ -77,51 +78,44 @@ export function ComoTeVa({
     >
       {hayVentas ? (
         <>
-          <dl className="grid grid-cols-2 gap-px bg-tinta/15 lg:grid-cols-4">
+          <dl className="grid grid-cols-2 gap-px border-b border-tinta/15 bg-tinta/15 @2xl:grid-cols-4">
             <Cifra
               etiqueta="Ventas"
-              valor={formatMoney(ahora.ventasCents)}
-              cambio={variacion(ahora.ventasCents, antes.ventasCents)}
+              valor={ahora.ventasCents}
+              dinero
+              cambio={
+                comparable
+                  ? variacion(ahora.ventasCents, antes.ventasCents)
+                  : undefined
+              }
+              periodo={periodo}
             />
             <Cifra
               etiqueta="Pedidos"
-              valor={formatNumber(ahora.pedidos)}
-              cambio={variacion(ahora.pedidos, antes.pedidos)}
+              valor={ahora.pedidos}
+              cambio={
+                comparable ? variacion(ahora.pedidos, antes.pedidos) : undefined
+              }
+              periodo={periodo}
             />
             <Cifra
               etiqueta="Por pedido"
-              valor={
-                ahora.ticketCents === null
-                  ? "—"
-                  : formatMoney(ahora.ticketCents)
-              }
-              detalle="Promedio de cada compra"
+              valor={ahora.ticketCents}
+              dinero
+              periodo={periodo}
             />
             <Cifra
               etiqueta="Tu mejor día"
-              valor={
-                ahora.mejorDia ? formatMoney(ahora.mejorDia.ventasCents) : "—"
-              }
+              valor={ahora.mejorDia?.ventasCents ?? null}
+              dinero
               detalle={
-                ahora.mejorDia
-                  ? formatDia(ahora.mejorDia.dia)
-                  : "Sin ventas en este período"
+                ahora.mejorDia ? formatDia(ahora.mejorDia.dia) : undefined
               }
+              periodo={periodo}
             />
           </dl>
 
-          {comparable ? (
-            <p className="border-t border-tinta/15 px-4 pt-3 text-xs opacity-65 sm:px-5">
-              Las flechas comparan con los {periodo} días anteriores.
-            </p>
-          ) : null}
-
-          <div
-            className={cn(
-              "px-4 pt-4 pb-5 sm:px-5",
-              !comparable && "border-t border-tinta/15"
-            )}
-          >
+          <div className="px-4 pt-4 pb-5 sm:px-5">
             <GraficoDeVentas
               columnas={columnas(actual)}
               hoy={hoy}
@@ -143,14 +137,20 @@ export function ComoTeVa({
 function Cifra({
   etiqueta,
   valor,
+  dinero = false,
   cambio,
   detalle,
+  periodo,
 }: {
   etiqueta: string
-  valor: string
+  /** `null` cuando no hay de qué: un promedio sin pedidos. */
+  valor: number | null
+  /** Si `valor` es un monto en centavos. */
+  dinero?: boolean
   /** Cuánto cambió contra el período anterior; `null` si no hay con qué. */
   cambio?: number | null
   detalle?: string
+  periodo: Periodo
 }) {
   const Icono =
     cambio === undefined || cambio === null
@@ -166,25 +166,26 @@ function Cifra({
       <dt className="text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
         {etiqueta}
       </dt>
-      <dd className="tabular mt-2 font-titular text-[clamp(1.4rem,4vw,1.85rem)] leading-none font-extrabold tracking-[-0.04em]">
-        {valor}
+      <dd className="mt-2 font-titular text-[clamp(1.4rem,4vw,1.85rem)] leading-none font-extrabold tracking-[-0.04em]">
+        {valor === null ? (
+          "—"
+        ) : (
+          <Contador valor={valor} tipo={dinero ? "dinero" : "numero"} />
+        )}
       </dd>
-      {cambio !== undefined ? (
+      {cambio !== undefined && cambio !== null ? (
         <dd
-          className={cn(
-            "mt-2 flex items-center gap-1.5 text-sm",
-            cambio === null ? "opacity-65" : "font-semibold"
-          )}
+          className="mt-2 flex items-center gap-1.5 text-sm font-semibold"
+          title={`Contra los ${periodo} días anteriores`}
         >
           {Icono ? <Icono aria-hidden="true" className="size-4" /> : null}
-          {cambio === null ? (
-            "Sin datos para comparar"
-          ) : (
-            <span>
-              <span className="sr-only">{cambio >= 0 ? "Subió" : "Bajó"} </span>
-              {formatPercent(Math.abs(cambio) * 100)}
+          <span>
+            <span className="sr-only">
+              {cambio >= 0 ? "Subió" : "Bajó"} contra los {periodo} días
+              anteriores:{" "}
             </span>
-          )}
+            {formatPercent(Math.abs(cambio) * 100)}
+          </span>
         </dd>
       ) : detalle ? (
         <dd className="mt-2 text-sm leading-snug opacity-70">{detalle}</dd>
@@ -221,14 +222,22 @@ function SelectorDePeriodo({
     botones.current[siguiente]?.focus()
   }
 
+  const elegido = PERIODOS.indexOf(valor)
+
   return (
     <div
       role="radiogroup"
       aria-label="Período"
-      className="flex border border-tinta"
+      className="relative grid grid-cols-3 border border-tinta"
     >
+      {/* La ficha elegida se corre hasta su lugar en vez de saltar. */}
+      <span
+        aria-hidden="true"
+        className="absolute inset-y-0 left-0 w-1/3 bg-tinta transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+        style={{ transform: `translateX(${elegido * 100}%)` }}
+      />
       {PERIODOS.map((dias, indice) => {
-        const elegido = dias === valor
+        const esElegido = dias === valor
         return (
           <button
             key={dias}
@@ -237,14 +246,13 @@ function SelectorDePeriodo({
             }}
             type="button"
             role="radio"
-            aria-checked={elegido}
-            tabIndex={elegido ? 0 : -1}
+            aria-checked={esElegido}
+            tabIndex={esElegido ? 0 : -1}
             onClick={() => alCambiar(dias)}
             onKeyDown={(evento) => alTeclear(evento, indice)}
             className={cn(
-              "tabular min-h-11 px-3 text-sm font-semibold transition-colors",
-              indice > 0 && "border-l border-tinta",
-              elegido ? "bg-tinta text-papel" : "hover:bg-tinta/[0.06]"
+              "tabular relative min-h-11 px-3 text-sm font-semibold transition-colors duration-300",
+              esElegido ? "text-papel" : "hover:bg-tinta/[0.06]"
             )}
           >
             {dias} días

@@ -190,28 +190,38 @@ export function EsqueletoDelResumen() {
     <div
       aria-busy="true"
       aria-label="Cargando tu resumen"
-      className="flex flex-col gap-6 md:gap-8"
+      className="grid items-start gap-6 md:gap-8 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_320px] xl:gap-10"
     >
-      <div className="flex items-end gap-4 md:gap-6">
-        <Skeleton
-          className={cn(
-            BLOQUE_ESQUELETO,
-            "size-14 shrink-0 md:aspect-[4/3] md:h-auto md:w-44"
-          )}
-        />
-        <div className="min-w-0 flex-1">
-          <Skeleton className={cn(BLOQUE_ESQUELETO, "h-3 w-20")} />
+      <div className="flex min-w-0 flex-col gap-6 md:gap-8">
+        <div className="flex items-end gap-4">
           <Skeleton
             className={cn(
               BLOQUE_ESQUELETO,
-              "mt-2 h-[clamp(1.75rem,5vw,2.5rem)] w-full max-w-xs"
+              "aspect-[9/19] w-[88px] shrink-0 rounded-[1.05rem] lg:hidden"
             )}
           />
-          <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-3 h-4 w-48")} />
+          <div className="min-w-0 flex-1">
+            <Skeleton className={cn(BLOQUE_ESQUELETO, "h-3 w-20")} />
+            <Skeleton
+              className={cn(
+                BLOQUE_ESQUELETO,
+                "mt-2 h-[clamp(1.9rem,6vw,3rem)] w-full max-w-xs"
+              )}
+            />
+            <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-3 h-8 w-40")} />
+          </div>
         </div>
+
+        <EsqueletoDelTablero />
       </div>
 
-      <EsqueletoDelTablero />
+      {/* El celular de la derecha: la tienda en vivo. */}
+      <Skeleton
+        className={cn(
+          BLOQUE_ESQUELETO,
+          "hidden h-[600px] w-[300px] rounded-[2.4rem] lg:block"
+        )}
+      />
     </div>
   )
 }
