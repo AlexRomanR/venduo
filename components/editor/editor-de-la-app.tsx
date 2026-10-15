@@ -17,6 +17,7 @@ import {
   contextoDeDiseno,
   problemasParaPublicar,
   type Borrador,
+  type Operacion,
 } from "@/lib/plantillas/borrador"
 import type { Product } from "@/types"
 import { useBorrador } from "@/components/editor/estado"
@@ -34,6 +35,27 @@ declare global {
 
 function alaApp(mensaje: MensajeAlaApp) {
   window.ReactNativeWebView?.postMessage(JSON.stringify(mensaje))
+}
+
+/**
+ * Lo que llega de la app viaja en JSON, que no tiene `undefined`: un campo que
+ * se vacía —una foto que se quita— llega como `null`. Las secciones lo
+ * entienden como ausente, así que se traduce antes de aplicar.
+ */
+function sinNulos(operaciones: Operacion[]): Operacion[] {
+  return operaciones.map((operacion) =>
+    operacion.op === "editar" || operacion.op === "agregar"
+      ? {
+          ...operacion,
+          props: Object.fromEntries(
+            Object.entries(operacion.props).map(([clave, valor]) => [
+              clave,
+              valor === null ? undefined : valor,
+            ])
+          ),
+        }
+      : operacion
+  )
 }
 
 /** Las secciones que cambian entre dos borradores: las que marca una propuesta. */
@@ -161,7 +183,7 @@ export function EditorDeLaApp({
       switch (mensaje.tipo) {
         case "operaciones": {
           setMirando(null)
-          const resultado = borrador.aplicar(mensaje.operaciones, {
+          const resultado = borrador.aplicar(sinNulos(mensaje.operaciones), {
             agrupar: mensaje.agrupar,
           })
           if (!resultado.ok) {
@@ -192,7 +214,7 @@ export function EditorDeLaApp({
           if (!mensaje.operaciones) return setMirando(null)
           const resultado = aplicarOperaciones(
             borrador.presente,
-            mensaje.operaciones,
+            sinNulos(mensaje.operaciones),
             contexto
           )
           if (resultado.ok) setMirando(resultado.borrador)

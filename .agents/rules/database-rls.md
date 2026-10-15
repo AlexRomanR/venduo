@@ -124,6 +124,13 @@ con `my_store_id()`— y no tiene política de DELETE: se da de baja con
 `deleted_at`. Por eso la de UPDATE lleva su `with check` propio: sin él,
 Postgres usaría el `using`, que pide `deleted_at is null`, y rechazaría la baja.
 
+**La baja de un catálogo es `dar_de_baja_catalogo`, no un UPDATE.** Postgres rechaza
+el UPDATE que deja la fila invisible para quien la cambia, y la política de lectura pide
+`deleted_at is null`: poner `deleted_at` desde el cliente falla siempre con "new row
+violates row-level security policy". Lo mismo con los gráficos del tablero
+(`insights`), que se quitan con `quitar_grafico`. Una tabla nueva con borrado lógico y
+el filtro en su lectura necesita su función de baja.
+
 El enlace compartido lo abre cualquiera, sin cuenta, por
 `catalogo_compartido(p_token)`: `security definer`, un catálogo por su token y
 solo si `store_is_live`. No se abre la tabla con una política para anónimos:
