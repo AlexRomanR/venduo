@@ -63,6 +63,16 @@ una portada y un panel no es la paleta ni la tipografía, es el ritmo:
 "Rojo" en esta regla quiere decir **la señal**: en Venduo es rojo, en Pasarela azul y en
 Esencia oro viejo. La regla de usarla poco no cambia con el color.
 
+### La app del emprendedor es otra cosa
+
+La app (`venduo-app`) usa el mismo mundo —papel, tinta, la señal, Archivo y Geist,
+reglas de un píxel— pero **no la regla de "título y bajada"** de este panel: allá los
+paneles llevan solo su título, lo que espera algo es un número grande que se toca y los
+productos se muestran con su foto. Quien la abre la mira unos segundos desde el
+celular. Sus reglas están en el `AGENTS.md` de ese repositorio, "Se mira, no se lee".
+Lo que una pantalla de la app necesita de la web —la captura de la tienda, por
+ejemplo— sale de `/api/v1`.
+
 ### Cuándo aparece la barra
 
 **Desde que una persona tiene panel —una tienda con su alta terminada—, toda pantalla de

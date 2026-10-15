@@ -169,6 +169,17 @@ Sin un paquete común, lo compartido se mantiene así:
 
 ## Diseño
 
+**La app se mira, no se lee.** Es la diferencia más grande con el panel de la web, y
+es a propósito: quien vende la abre cinco segundos entre dos mensajes. Los paneles
+llevan solo su título —sin la bajada que lleva cada panel de la web—; lo que espera
+algo es un número grande que se toca y lleva a la lista filtrada; los productos y los
+pedidos se muestran con su foto; la tienda, con la captura real de su portada, que
+saca la web (`lib/vista.ts`) y se actualiza sola con cada edición. Cobrar un pedido se
+festeja con un check, y Compartir arma tarjetas para historias con los colores de la
+tienda. Las reglas completas están en el `AGENTS.md` de la app, "Se mira, no se lee".
+
+Lo que sigue igual que en la web:
+
 - **El mismo mundo de Venduo** (`DESIGN.md`): papel, tinta y la señal; Archivo y Geist.
   Los tokens se copian de `app/globals.css` a un archivo de tema de la app; si la paleta
   cambia acá, cambia allá.
