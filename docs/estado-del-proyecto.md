@@ -248,8 +248,8 @@ que se arregló:
   por red, tarjetas para historias con los colores de la tienda y el QR a pantalla
   completa.
 - **Barra de abajo y menú lateral**: la barra con lo de todos los días, también en las
-  pantallas de ajustes, y un menú con todo lo demás y su estado, que corre la app a un
-  costado como una tarjeta. Abre con el logo de Venduo que se arma.
+  pantallas de ajustes, y un menú con todo lo demás y su estado, que se abre con un
+  cuadro de tres rayitas. Abre con el logo de Venduo que se arma.
 - **Formularios que se ven como lo que editan**: producto, tienda, cuenta, apariencia,
   categorías y plantillas, con guardar fijo abajo y la pregunta antes de salir sin
   guardar.
