@@ -1709,6 +1709,7 @@ export type Database = {
         }
         Returns: string
       }
+      dar_de_baja_catalogo: { Args: { p_catalogo: string }; Returns: boolean }
       dar_de_baja_mi_cuenta: { Args: never; Returns: undefined }
       enviar_aviso: {
         Args: {
@@ -1739,6 +1740,7 @@ export type Database = {
         Args: { p_bloques: Json; p_logo_url: string; p_theme_overrides: Json }
         Returns: string
       }
+      quitar_grafico: { Args: { p_grafico: string }; Returns: boolean }
       registrar_dispositivo: {
         Args: { p_device_name?: string; p_platform: string; p_token: string }
         Returns: undefined

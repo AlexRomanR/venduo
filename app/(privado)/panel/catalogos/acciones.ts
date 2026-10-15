@@ -97,14 +97,15 @@ export async function borrarCatalogo(
     return { ok: false, error: "Estás en modo demo: no hay nada que borrar." }
   }
 
-  const { error } = await supabase
-    .from("catalogs")
-    .update({ deleted_at: new Date().toISOString() })
-    .eq("id", id)
-    .eq("store_id", tienda.id)
-    .is("deleted_at", null)
+  // Por una función y no con un UPDATE: la política de lectura pide
+  // `deleted_at is null`, y Postgres rechaza dejar la fila invisible para
+  // quien la cambia. La función solo toca un catálogo vivo de esta tienda.
+  const { data, error } = await supabase.rpc("dar_de_baja_catalogo", {
+    p_catalogo: id,
+  })
 
   if (error) return { ok: false, error: "No pudimos borrar el catálogo." }
+  if (!data) return { ok: false, error: "Ese catálogo ya no existe." }
 
   revalidatePath("/panel/catalogos")
   return { ok: true }

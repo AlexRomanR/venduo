@@ -146,10 +146,9 @@ export async function borrar(id: string) {
   const supabase = await createClient()
   if (!supabase) return { ok: false, error: "Supabase sin configurar." }
 
-  const { error } = await supabase
-    .from("insights")
-    .update({ deleted_at: new Date().toISOString() })
-    .eq("id", id)
+  // Por una función y no con un UPDATE: ver `dar_de_baja_catalogo`, que
+  // tiene el mismo motivo.
+  const { error } = await supabase.rpc("quitar_grafico", { p_grafico: id })
 
   if (error) return { ok: false, error: "No pudimos borrar el gráfico." }
 
