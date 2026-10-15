@@ -46,7 +46,7 @@ export function PrimerosPasos({
     },
     {
       hecho: pasos.estilo,
-      titulo: "Dale tu estilo",
+      titulo: "Personaliza tu tienda",
       texto: "Tu logo y tus colores, para que tu tienda se reconozca.",
       accion: (
         <Link href="/editor" className={BOTON_DEL_PASO}>

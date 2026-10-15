@@ -149,7 +149,7 @@ export default function Terminos() {
 
       <Apartado numero={11} titulo="Cambios y ley aplicable">
         <p>
-          Si cambiamos estos términos publicamos la nueva versión acá, con su
+          Si cambiamos estos términos publicamos la nueva versión aquí, con su
           fecha, y te avisamos antes si el cambio te afecta. Estos términos se
           rigen por las leyes del Estado Plurinacional de Bolivia.
         </p>

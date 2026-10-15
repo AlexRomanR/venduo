@@ -161,8 +161,8 @@ export function PasoCarrito() {
           </Aviso>
         ) : null}
         <Aviso>
-          Es una vista previa: acá no se crean pedidos aunque toques «Enviar por
-          WhatsApp».
+          Es una vista previa: aquí no se crean pedidos aunque toques «Enviar
+          por WhatsApp».
         </Aviso>
       </div>
 

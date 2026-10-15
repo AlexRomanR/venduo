@@ -54,7 +54,7 @@ export default async function CambiosPage() {
           <SinDatos
             icono={History}
             titulo="Todavía sin cambios"
-            texto="Cada cambio que hagas en funciones, plantillas, tiendas o registro va a quedar anotado acá."
+            texto="Cada cambio que hagas en funciones, plantillas, tiendas o registro va a quedar anotado aquí."
           />
         ) : (
           <ul>

@@ -294,9 +294,9 @@ export const NOMBRES_DE_AJUSTE = {
   "disposicion.tarjeta": "Forma de las fotos",
   "disposicion.columnas": "Productos por fila",
   "ficha.diseno": "Diseño de la ficha",
-  "ficha.barraFija": "Barra de compra fija abajo",
-  "ficha.consulta": "Botón para consultar por WhatsApp",
-  "ficha.relacionados": "Productos parecidos al pie",
+  "ficha.barraFija": "Botón de compra fijo",
+  "ficha.consulta": "Botón de WhatsApp",
+  "ficha.relacionados": "Productos similares",
   "carrito.diseno": "Diseño del carrito",
   "carrito.sugerencias": "Sugerencias en el carrito",
 } as const

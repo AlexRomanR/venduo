@@ -89,7 +89,7 @@ function marcada(id: string) {
 async function sinPedidos(): Promise<ResultadoPedido> {
   return {
     ok: false,
-    error: "Es una vista previa: acá no se crean pedidos.",
+    error: "Es una vista previa: aquí no se crean pedidos.",
   }
 }
 
@@ -405,7 +405,7 @@ export function VistaPrevia({
               <div className="mx-auto w-full max-w-6xl px-5 py-12">
                 <kit.Vacio
                   titulo="Todavía no hay productos"
-                  texto="Cuando cargues tu primer producto, vas a ver acá cómo queda su ficha."
+                  texto="Cuando cargues tu primer producto, vas a ver aquí cómo queda su ficha."
                 />
               </div>
             )

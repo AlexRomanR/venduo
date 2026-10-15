@@ -133,7 +133,7 @@ export function ComoTeVa({
         <SinDatos
           icono={ChartNoAxesColumn}
           titulo="Todavía no hay ventas para mostrar"
-          texto="Cuando llegue tu primer pedido, acá vas a ver cómo te va día a día y si vendes más o menos que antes."
+          texto="Cuando llegue tu primer pedido, aquí vas a ver cómo te va día a día y si vendes más o menos que antes."
         />
       )}
     </Seccion>

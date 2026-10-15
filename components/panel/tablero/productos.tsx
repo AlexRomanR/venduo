@@ -24,7 +24,7 @@ export function MasVendidos({ productos }: { productos: ProductoVendido[] }) {
         <SinDatos
           icono={Flame}
           titulo="Todavía no hay un favorito"
-          texto="Cuando empieces a vender, acá vas a ver qué productos salen más: los que conviene tener siempre con stock."
+          texto="Cuando empieces a vender, aquí vas a ver qué productos salen más: los que conviene tener siempre con stock."
         />
       ) : (
         <ol>
@@ -101,7 +101,7 @@ export function PorAcabarse({
         <SinDatos
           icono={PackageOpen}
           titulo="Tu stock está bien"
-          texto="Cuando a un producto le queden pocas unidades, te avisamos acá para que lo repongas a tiempo."
+          texto="Cuando a un producto le queden pocas unidades, te avisamos aquí para que lo repongas a tiempo."
         />
       ) : (
         <ul>

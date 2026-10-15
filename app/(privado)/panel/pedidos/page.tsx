@@ -148,7 +148,7 @@ export default async function PedidosPage({
               }
               texto={
                 filtro === "no_concretado"
-                  ? `Acá aparecen los pendientes que pasan ${DIAS_PARA_CONCRETAR} días sin concretarse: el cliente armó el carrito y no siguió. Se pueden marcar pagados igual si al final te pagan.`
+                  ? `Aquí aparecen los pendientes que pasan ${DIAS_PARA_CONCRETAR} días sin concretarse: el cliente armó el carrito y no siguió. Se pueden marcar pagados igual si al final te pagan.`
                   : "Prueba con otro filtro, o mira todos los pedidos de tu tienda."
               }
             >
@@ -163,7 +163,7 @@ export default async function PedidosPage({
             <SinDatos
               icono={ShoppingBag}
               titulo="Todavía no llegó ningún pedido"
-              texto="Cuando alguien te mande su carrito por WhatsApp, el pedido aparece acá con el mismo número. Comparte el enlace de tu tienda para que empiecen a llegar."
+              texto="Cuando alguien te mande su carrito por WhatsApp, el pedido aparece aquí con el mismo número. Comparte el enlace de tu tienda para que empiecen a llegar."
             >
               <Link
                 href="/panel"

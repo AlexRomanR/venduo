@@ -527,7 +527,7 @@ function CamposDeHoja({
           />
           <CampoArea
             id={id("bajada")}
-            etiqueta="Bajada"
+            etiqueta="Subtítulo"
             valor={bloque.bajada}
             maximo={200}
             filas={2}
@@ -577,7 +577,7 @@ function CamposDeHoja({
           />
           <CampoArea
             id={id("bajada")}
-            etiqueta="Bajada"
+            etiqueta="Subtítulo"
             valor={bloque.bajada}
             maximo={200}
             filas={2}

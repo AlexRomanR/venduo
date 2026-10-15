@@ -242,7 +242,7 @@ export const PEDIDOS_SUGERIDOS: Record<ClaveDePaso, string[]> = {
   producto: [
     "Ficha tipo vitrina, todo centrado",
     "Botón de compra siempre a la vista",
-    "Sin productos parecidos al pie",
+    "Sin productos similares",
   ],
   carrito: ["Carrito tipo boleta", "Sugiere otros productos en el carrito"],
   publicar: [],

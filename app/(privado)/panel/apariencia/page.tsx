@@ -155,7 +155,7 @@ export default async function AparienciaPage() {
             <SinDatos
               icono={Shapes}
               titulo="Por ahora no hay otras plantillas"
-              texto="Cuando sumemos una nueva para tu rubro, aparece acá para que la pruebes."
+              texto="Cuando sumemos una nueva para tu rubro, aparece aquí para que la pruebes."
             />
           ) : (
             // Una plantilla por fila, con su miniatura al lado: en una grilla de

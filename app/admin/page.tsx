@@ -156,7 +156,7 @@ export default async function AdminPage() {
                 <SinDatos
                   icono={Eye}
                   titulo="Todavía sin visitas"
-                  texto="Cuando alguien abra una tienda, va a aparecer acá."
+                  texto="Cuando alguien abra una tienda, va a aparecer aquí."
                 />
               ) : (
                 <ul>
@@ -232,7 +232,7 @@ export default async function AdminPage() {
 
       <p className="flex items-center gap-2 text-xs opacity-65">
         <History aria-hidden="true" className="size-3.5" />
-        Lo que cambias acá queda anotado en Cambios.
+        Lo que cambias aquí queda anotado en Cambios.
       </p>
     </div>
   )

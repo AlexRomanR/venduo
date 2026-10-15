@@ -28,7 +28,7 @@ export function SeccionPendiente({
       <Seccion
         id="pronto"
         icono={icono}
-        titulo="Lo que va a ir acá"
+        titulo="Lo que va a ir aquí"
         bajada="Esta sección todavía se está construyendo."
         accion={{ href: "/panel", texto: "Volver al resumen" }}
         relleno

@@ -101,7 +101,7 @@ export const NOMBRES_DE_BLOQUE_DEMO: Record<string, string> = {
   product_grid: "Grilla de productos",
   about: "Sobre el negocio",
   testimonials: "Testimonios",
-  cta: "Llamado a la acción",
+  cta: "Cierre con botón",
   contact: "Contacto",
   faq: "Preguntas frecuentes",
 }

@@ -248,7 +248,7 @@ export function BotonDeCanva({
           </DialogDescription>
           <p className="border-t border-tinta/15 px-5 py-4 text-xs leading-relaxed opacity-70">
             Lo que queda en Canva es una copia: si cambian tus precios o tu
-            stock, vuelve a mandarlo desde acá.
+            stock, vuelve a mandarlo desde aquí.
           </p>
           <div className="flex flex-col-reverse gap-3 border-t border-tinta/15 p-5 sm:flex-row sm:justify-end">
             <a

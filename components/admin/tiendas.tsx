@@ -179,7 +179,7 @@ export function TablaDeTiendas({
           }
           texto={
             tiendas.length === 0
-              ? "Cuando alguien termine su alta, va a aparecer acá."
+              ? "Cuando alguien termine su alta, va a aparecer aquí."
               : "Prueba con otro filtro o con otra búsqueda."
           }
         />

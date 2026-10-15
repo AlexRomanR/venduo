@@ -87,7 +87,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
       { ...TITULO, ejemplo: "Nueva temporada" },
       {
         clave: "subtitle",
-        etiqueta: "Bajada",
+        etiqueta: "Subtítulo",
         tipo: "parrafo",
         max: 240,
         ayuda: "Una o dos líneas que cuenten qué vendes.",
@@ -121,7 +121,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
     vacia: "Aparece cuando tus productos tengan categoría.",
     campos: [
       { ...TITULO, ejemplo: "Compra por categoría" },
-      { clave: "subtitle", etiqueta: "Bajada", tipo: "parrafo", max: 240 },
+      { clave: "subtitle", etiqueta: "Subtítulo", tipo: "parrafo", max: 240 },
       {
         clave: "limit",
         etiqueta: "Cuántas mostrar",
@@ -166,7 +166,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
         tipo: "numero",
         min: 2,
         max: 4,
-        ayuda: "En el celular siempre van de a dos.",
+        ayuda: "En el celular siempre se ven dos por fila.",
       },
     ],
     inicial: {
@@ -218,7 +218,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
         campos: [
           {
             clave: "quote",
-            etiqueta: "Lo que dijo",
+            etiqueta: "Comentario",
             tipo: "parrafo",
             max: 400,
             requerido: true,
@@ -246,7 +246,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
 
   cta: {
     tipo: "cta",
-    nombre: "Llamado a la acción",
+    nombre: "Cierre con botón",
     descripcion: "Un cierre con un botón grande que lleva a tu catálogo.",
     maximo: null,
     vacia: "Ponle un título.",

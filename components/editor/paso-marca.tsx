@@ -73,7 +73,7 @@ export function PasoMarca() {
       <EncabezadoDePaso
         numero={1}
         titulo="Tu marca"
-        bajada="Tu logo, tus colores y tu letra. Lo que elijas acá se aplica en toda tu tienda: la portada, el catálogo, cada producto y el carrito."
+        bajada="Tu logo, tus colores y tu letra. Lo que elijas aquí se aplica en toda tu tienda: la portada, el catálogo, cada producto y el carrito."
       />
 
       <Grupo titulo="Logo">

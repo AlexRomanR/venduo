@@ -111,7 +111,7 @@ export default async function IaPage() {
             <SinDatos
               icono={Bot}
               titulo="Todavía nadie la usó"
-              texto="Cada pedido a la IA desde el editor, las estadísticas o los catálogos se cuenta acá."
+              texto="Cada pedido a la IA desde el editor, las estadísticas o los catálogos se cuenta aquí."
             />
           ) : (
             <ul>
@@ -150,7 +150,7 @@ export default async function IaPage() {
             <SinDatos
               icono={AlertTriangle}
               titulo="Sin fallas"
-              texto="Si el proveedor no responde o devuelve algo que no pasa la validación, aparece acá."
+              texto="Si el proveedor no responde o devuelve algo que no pasa la validación, aparece aquí."
             />
           ) : (
             <ul>
