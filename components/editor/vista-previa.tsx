@@ -41,8 +41,35 @@ const NEUTRO = "#16171a"
 
 const SIN_FILTROS = leerFiltros({})
 
-function enviar(mensaje: MensajeAlEditor) {
-  window.parent.postMessage(mensaje, window.location.origin)
+/**
+ * Por dónde le llegan los mensajes a la vista previa y por dónde contesta.
+ *
+ * En el editor de la web es el `<iframe>`: escucha a su ventana madre. En la
+ * app es `EditorDeLaApp`, en la misma página, que traduce lo que manda la app.
+ */
+export interface Puente {
+  escuchar: (alRecibir: (mensaje: MensajeAlaVistaPrevia) => void) => () => void
+  enviar: (mensaje: MensajeAlEditor) => void
+}
+
+const PUENTE_DEL_IFRAME: Puente = {
+  escuchar(alRecibir) {
+    function recibir(evento: MessageEvent) {
+      if (
+        evento.origin !== window.location.origin ||
+        evento.source !== window.parent
+      ) {
+        return
+      }
+      const leido = mensajeAlaVistaPrevia.safeParse(evento.data)
+      if (leido.success) alRecibir(leido.data)
+    }
+    window.addEventListener("message", recibir)
+    return () => window.removeEventListener("message", recibir)
+  },
+  enviar(mensaje) {
+    window.parent.postMessage(mensaje, window.location.origin)
+  },
 }
 
 function selector(id: string) {
@@ -90,11 +117,14 @@ export function VistaPrevia({
   tienda,
   muestra,
   ejemplos,
+  puente = PUENTE_DEL_IFRAME,
 }: {
   tienda: TiendaPublica
   muestra: LineaCarrito[]
   /** Para llenar catálogo, ficha y carrito de una tienda todavía sin productos. */
   ejemplos: Product[]
+  /** Quién le habla. Sin decirlo, el editor de la web desde afuera del `<iframe>`. */
+  puente?: Puente
 }) {
   const [estado, setEstado] = React.useState<Estado | null>(null)
   const [destello, setDestello] = React.useState<string | null>(null)
@@ -122,24 +152,13 @@ export function VistaPrevia({
   }, [])
 
   React.useEffect(() => {
-    function recibir(evento: MessageEvent) {
-      if (
-        evento.origin !== window.location.origin ||
-        evento.source !== window.parent
-      ) {
-        return
-      }
-      const leido = mensajeAlaVistaPrevia.safeParse(evento.data)
-      if (!leido.success) return
-
-      if (leido.data.tipo === "estado") setEstado(leido.data)
-      else enfocar(leido.data.seccion)
-    }
-
-    window.addEventListener("message", recibir)
-    enviar({ tipo: "lista" })
-    return () => window.removeEventListener("message", recibir)
-  }, [enfocar])
+    const dejar = puente.escuchar((mensaje) => {
+      if (mensaje.tipo === "estado") setEstado(mensaje)
+      else enfocar(mensaje.seccion)
+    })
+    puente.enviar({ tipo: "lista" })
+    return dejar
+  }, [enfocar, puente])
 
   React.useEffect(() => {
     if (pendiente.current) enfocar(pendiente.current)
@@ -220,9 +239,9 @@ export function VistaPrevia({
       "[data-seccion], [data-fija]"
     )
     if (tocado?.dataset.seccion) {
-      enviar({ tipo: "seleccionar", seccion: tocado.dataset.seccion })
+      puente.enviar({ tipo: "seleccionar", seccion: tocado.dataset.seccion })
     } else if (tocado?.dataset.fija) {
-      enviar({
+      puente.enviar({
         tipo: "fija",
         nombre: tocado.dataset.fija,
         ayuda: tocado.dataset.ayuda ?? "",
@@ -251,7 +270,7 @@ export function VistaPrevia({
     const archivo = evento.dataTransfer.files[0]
     setSobre(null)
     if (seccion && archivo) {
-      enviar({ tipo: "soltar-imagen", seccion, archivo })
+      puente.enviar({ tipo: "soltar-imagen", seccion, archivo })
     }
   }
 
