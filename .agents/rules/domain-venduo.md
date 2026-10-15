@@ -232,3 +232,23 @@ habilitada, exportar los datos en CSV. A los 90 días del bloqueo se purgan.
 
 `store_is_live()` ya combina publicación y suscripción vigente. Usarla en vez de
 comprobar `is_published` suelto.
+
+## Dar de baja la cuenta
+
+Lo exigen Google y Apple para publicar la app. Dos tiempos:
+
+- **En el acto** (`darDeBajaLaCuenta` en `lib/cuenta.ts`, desde `/cuenta` y desde
+  `DELETE /api/v1/cuenta`): `dar_de_baja_mi_cuenta` marca `closed_at` en la tienda y el
+  perfil, y con eso `store_is_live` la apaga y `my_store_id()` deja de devolverla. El
+  ingreso lo bloquea Auth con la clave de servicio. Los teléfonos dejan de recibir avisos.
+- **A los 90 días**, `aplicar_bajas_de_cuenta` —con `pg_cron`, una vez al día— hace el
+  borrado lógico de la tienda y su contenido y vacía nombre, foto y WhatsApp. Los pedidos
+  no se tocan: no tienen borrado lógico.
+
+La baja **no se deshace**: lo dicen `/privacidad` y `/borrar-cuenta`. Si algún día se
+ofrece recuperarla dentro de los 90 días, se cambian también esos textos.
+
+**Los textos legales describen el sistema tal como es.** `/privacidad` nombra cada
+proveedor que recibe datos —Supabase, Vercel, Google por la IA, Expo y Firebase por los
+avisos, Canva si se conecta— y qué recibe. Un proveedor nuevo, o un dato de personas que
+se empiece a guardar, cambia ese texto y su fecha (`VIGENTE_DESDE` en `lib/legal.ts`).

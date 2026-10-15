@@ -18,6 +18,9 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | ----------------------------------------- | ------------------------------------------------------ | --------------- |
 | `/`                                       | Portada pública                                        | Público         |
 | `/login`                                  | Registro e ingreso                                     | Público         |
+| `/privacidad`                             | Política de privacidad                                 | Público         |
+| `/terminos`                               | Términos de uso                                        | Público         |
+| `/borrar-cuenta`                          | Cómo dar de baja la cuenta. `?hecho=1` tras la baja    | Público         |
 | `/t/{slug}`                               | Tienda pública del emprendedor                         | Público         |
 | `/t/{slug}/catalogo`                      | Catálogo completo: filtros, búsqueda y orden por URL   | Público         |
 | `/t/{slug}/p/{id}`                        | Ficha de producto, con selector de cantidad            | Público         |
@@ -56,6 +59,7 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/api/v1/estadisticas`                    | La app: el tablero guardado; guardar y borrar gráficos | Token de la app |
 | `/api/v1/apariencia`                      | La app: logo, colores, letra y secciones; publicarlos  | Token de la app |
 | `/api/v1/apariencia/plantilla`            | La app: cambiar la plantilla de la tienda              | Token de la app |
+| `/api/v1/cuenta`                          | La app: dar de baja la cuenta (`DELETE`)               | Token de la app |
 | `/.well-known/assetlinks.json`            | Le confirma a Android que la app es de esta web        | Público         |
 | `/.well-known/apple-app-site-association` | Lo mismo, para iPhone                                  | Público         |
 | `/admin`                                  | Resumen de la plataforma: tiendas, embudo, salud       | Administrador   |
@@ -145,6 +149,9 @@ app/
     vista-previa/     La tienda con el borrador, dentro del iframe del editor
   c/[token]/          El PDF de un catálogo compartido: público, por su token
   login/
+  privacidad/         La política de privacidad
+  terminos/           Los términos de uso
+  borrar-cuenta/      Cómo dar de baja la cuenta: la pide Google Play
   auth/callback/      Intercambio de código por sesión
   auth/destino/       Resuelve a dónde entra la cuenta
   auth/sign-out/
@@ -195,6 +202,7 @@ components/
   admin/              El armazón de `/admin`, su navegación y los controles de
                       cada pantalla: funciones, plantillas, tiendas, ficha, registro
   landing/            Piezas de la portada
+  legal/              El armazón de las páginas de texto: privacidad, términos y baja
   marca/              `Logo` y `Simbolo`: la marca de Venduo, desde `lib/marca.ts`
   config-status.tsx   Checklist de capas configuradas
   theme-provider.tsx
@@ -217,6 +225,8 @@ lib/
   catalogos/          El catálogo en PDF: modelo y esquema, constantes sin zod,
                       estilo, datos, las doce plantillas, las operaciones del
                       editor y `pdf.tsx`, que lo arma en el servidor
+  cuenta.ts           Dar de baja la cuenta: la base y el bloqueo en Auth. Solo servidor
+  legal.ts            El correo de soporte y desde cuándo valen los textos legales
   canva.ts            Llevar un catálogo a Canva: el permiso con PKCE y la
                       importación del PDF. Solo servidor
   marca.ts            La geometría y los colores del logo: la fuente de todo archivo

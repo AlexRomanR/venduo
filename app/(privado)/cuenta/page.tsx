@@ -1,11 +1,18 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { ArrowUpRight, Paintbrush, Store, UserRound } from "lucide-react"
+import {
+  ArrowUpRight,
+  Paintbrush,
+  Store,
+  UserRound,
+  UserRoundX,
+} from "lucide-react"
 
 import { estaConectado, isCanvaConfigured } from "@/lib/canva"
 import { getCuenta } from "@/lib/data/cuenta"
 import { isSupabaseConfigured } from "@/lib/env"
 import { getMiTienda } from "@/lib/data/panel"
+import { DarDeBaja } from "@/components/cuenta/baja"
 import { ConexionCanva } from "@/components/cuenta/canva"
 import { FormPersona, FormTienda } from "@/components/cuenta/formularios"
 import { Foto } from "@/components/cuenta/foto"
@@ -109,6 +116,16 @@ export default async function CuentaPage() {
           <ConexionCanva conectado={conCanva} />
         </Seccion>
       ) : null}
+
+      <Seccion
+        id="baja"
+        icono={UserRoundX}
+        titulo="Dar de baja tu cuenta"
+        bajada="Para irte de Venduo. Lo que pasa ahora y lo que pasa a los 90 días."
+        relleno
+      >
+        <DarDeBaja conTienda={Boolean(cuenta.tienda)} />
+      </Seccion>
     </div>
   )
 }

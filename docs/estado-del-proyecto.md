@@ -271,12 +271,11 @@ que se arregló:
 
 ### 1. Publicar la app del emprendedor — prioridad alta
 
-La app está construida (arriba). Para que llegue a un teléfono falta, en este orden:
-aplicar la migración de los avisos de pedido nuevo —escrita en la rama
-`avisos-de-la-app`, sin aplicar—, las cuentas de Expo, Firebase y Play Console, borrar
-la cuenta desde la app, la política de privacidad y probarla en un teléfono de verdad.
-La lista completa, con qué hay que decidir antes, está en **`docs/plan-app-movil.md`**,
-"Lo que falta". iPhone viene después.
+La app está construida (arriba) y la base ya tiene lo que necesita: los avisos y la baja
+de la cuenta están aplicados, y la política de privacidad, los términos y la página para
+borrar la cuenta están publicados. Falta lo que es de quien publica: las cuentas de Expo,
+Firebase y Play Console, y probarla en un teléfono de verdad. La lista está en
+**`docs/plan-app-movil.md`**, "Lo que falta". iPhone viene después.
 
 ### 2. Funciones por plan — cuando se decida
 

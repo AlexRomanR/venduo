@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   graphql_public: {
     Tables: {
@@ -39,6 +39,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_closures: {
+        Row: {
+          delete_at: string
+          deleted_at: string | null
+          requested_at: string
+          store_id: string | null
+          user_id: string
+        }
+        Insert: {
+          delete_at?: string
+          deleted_at?: string | null
+          requested_at?: string
+          store_id?: string | null
+          user_id: string
+        }
+        Update: {
+          delete_at?: string
+          deleted_at?: string | null
+          requested_at?: string
+          store_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_closures_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_audit_log: {
         Row: {
           action: string
@@ -413,6 +445,33 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          low_stock: boolean
+          new_orders: boolean
+          pending_orders: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          low_stock?: boolean
+          new_orders?: boolean
+          pending_orders?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          low_stock?: boolean
+          new_orders?: boolean
+          pending_orders?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -726,6 +785,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          closed_at: string | null
           created_at: string
           deleted_at: string | null
           full_name: string | null
@@ -734,6 +794,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          closed_at?: string | null
           created_at?: string
           deleted_at?: string | null
           full_name?: string | null
@@ -742,11 +803,45 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          closed_at?: string | null
           created_at?: string
           deleted_at?: string | null
           full_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      push_tokens: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          device_name: string | null
+          id: string
+          platform: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          device_name?: string | null
+          id?: string
+          platform: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          device_name?: string | null
+          id?: string
+          platform?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1217,6 +1312,7 @@ export type Database = {
       }
       stores: {
         Row: {
+          closed_at: string | null
           created_at: string
           deleted_at: string | null
           description: string | null
@@ -1235,6 +1331,7 @@ export type Database = {
           whatsapp: string | null
         }
         Insert: {
+          closed_at?: string | null
           created_at?: string
           deleted_at?: string | null
           description?: string | null
@@ -1253,6 +1350,7 @@ export type Database = {
           whatsapp?: string | null
         }
         Update: {
+          closed_at?: string | null
           created_at?: string
           deleted_at?: string | null
           description?: string | null
@@ -1560,6 +1658,7 @@ export type Database = {
           visitas_7d: number
         }[]
       }
+      aplicar_bajas_de_cuenta: { Args: never; Returns: number }
       apply_template: {
         Args: { p_store_id: string; p_template_key: string }
         Returns: undefined
@@ -1598,6 +1697,19 @@ export type Database = {
         }
         Returns: string
       }
+      dar_de_baja_mi_cuenta: { Args: never; Returns: undefined }
+      enviar_aviso: {
+        Args: {
+          p_canal: string
+          p_cuerpo: string
+          p_tipo: string
+          p_titulo: string
+          p_url: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      enviar_recordatorios: { Args: never; Returns: undefined }
       estado_del_registro: { Args: never; Returns: string }
       funcion_activa: { Args: { p_feature: string }; Returns: boolean }
       funcion_de_tienda: {
@@ -1606,11 +1718,17 @@ export type Database = {
       }
       funciones_de_mi_tienda: { Args: never; Returns: Json }
       is_platform_admin: { Args: never; Returns: boolean }
+      monto_en_texto: { Args: { p_cents: number }; Returns: string }
       my_store_id: { Args: never; Returns: string }
+      olvidar_dispositivo: { Args: { p_token: string }; Returns: undefined }
       portada_de_tienda: { Args: { p_store_id: string }; Returns: string }
       publicar_diseno: {
         Args: { p_bloques: Json; p_logo_url: string; p_theme_overrides: Json }
         Returns: string
+      }
+      registrar_dispositivo: {
+        Args: { p_device_name?: string; p_platform: string; p_token: string }
+        Returns: undefined
       }
       registrar_visita: {
         Args: {
