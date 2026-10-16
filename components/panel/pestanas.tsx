@@ -2,22 +2,21 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  Archive,
-  BookOpen,
-  House,
-  ReceiptText,
-  Share,
-  type LucideIcon,
-} from "lucide-react"
 
 import type { BarraLateral } from "@/lib/data/barra"
 import { cn } from "@/lib/utils"
+import {
+  IconoCatalogos,
+  IconoCompartir,
+  IconoInicio,
+  IconoPedidos,
+  IconoProductos,
+} from "@/components/panel/iconos-de-pestanas"
 import { CompartirTienda } from "@/components/panel/tablero/compartir"
 
 interface Pestana {
   nombre: string
-  icono: LucideIcon
+  icono: (props: React.SVGProps<SVGSVGElement>) => React.ReactElement
   href?: string
   exacto?: boolean
   insignia?: number
@@ -37,17 +36,23 @@ export function Pestanas({ datos }: { datos: BarraLateral }) {
   if (!tienda || /^\/panel\/catalogos\/.+/.test(pathname)) return null
 
   const pestanas: Pestana[] = [
-    { nombre: "Inicio", icono: House, href: "/panel", exacto: true },
+    { nombre: "Inicio", icono: IconoInicio, href: "/panel", exacto: true },
     {
       nombre: "Pedidos",
-      icono: ReceiptText,
+      icono: IconoPedidos,
       href: "/panel/pedidos",
       insignia: contadores.pedidosPendientes,
     },
-    { nombre: "Productos", icono: Archive, href: "/panel/productos" },
+    { nombre: "Productos", icono: IconoProductos, href: "/panel/productos" },
     ...(funciones.catalogos === "oculta"
       ? []
-      : [{ nombre: "Catálogos", icono: BookOpen, href: "/panel/catalogos" }]),
+      : [
+          {
+            nombre: "Catálogos",
+            icono: IconoCatalogos,
+            href: "/panel/catalogos",
+          },
+        ]),
   ]
 
   return (
@@ -86,7 +91,7 @@ export function Pestanas({ datos }: { datos: BarraLateral }) {
               className="group flex h-16 w-full flex-col items-center justify-center gap-1"
             >
               <Icono
-                pestana={{ nombre: "Compartir", icono: Share }}
+                pestana={{ nombre: "Compartir", icono: IconoCompartir }}
                 activa={false}
               />
               <Etiqueta activa={false}>Compartir</Etiqueta>
@@ -108,11 +113,7 @@ function Icono({ pestana, activa }: { pestana: Pestana; activa: boolean }) {
         activa ? "bg-tinta/10" : "group-active:bg-tinta/[0.06]"
       )}
     >
-      <Dibujo
-        aria-hidden="true"
-        className={cn("size-[22px]", activa ? "" : "opacity-60")}
-        strokeWidth={activa ? 2.25 : 2}
-      />
+      <Dibujo className={cn("size-6", activa ? "" : "opacity-60")} />
       {pestana.insignia ? (
         <span className="tabular absolute -top-0.5 right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-senal px-1 text-[10px] font-bold text-white">
           {pestana.insignia > 99 ? "99+" : pestana.insignia}

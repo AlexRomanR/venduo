@@ -22,11 +22,12 @@ export interface TiendaDelResumen {
 
 /**
  * Lo primero del Resumen: de quién es la tienda y cómo está, en dos o tres
- * palabras por cosa —"Publicada", "Prueba · 5 días"— y no en oraciones.
+ * palabras por cosa —"Publicada", "Prueba · 5 días"— y no en oraciones. Es la
+ * misma cabecera del Inicio de la app.
  *
- * En el celular la tienda se muestra al lado del nombre, con la captura de su
- * portada; en una pantalla ancha está viva en la columna de la derecha
- * (`TiendaEnVivo`), y las acciones van con ella.
+ * Al lado del nombre, la portada de la tienda en un celular chico: el Inicio
+ * es un resumen, no un lugar para mirar la tienda, así que tocarla abre el
+ * editor. Para verla está "Ver tienda".
  */
 export function CabeceraDeTienda({
   persona,
@@ -47,17 +48,15 @@ export function CabeceraDeTienda({
 
   return (
     <header className="flex flex-col gap-5">
-      <div className="flex items-center gap-4 lg:items-end">
+      <div className="flex items-center gap-4 lg:gap-6">
         {vista ? (
-          <a
-            href={tienda.url}
-            target="_blank"
-            rel="noreferrer noopener"
-            aria-label={`Ver ${tienda.nombre} como la ve tu cliente`}
-            className="shrink-0 lg:hidden"
+          <Link
+            href="/editor"
+            aria-label={`Editar ${tienda.nombre}`}
+            className="group shrink-0"
           >
             <CelularConCaptura vista={vista} />
-          </a>
+          </Link>
         ) : null}
 
         <div className="min-w-0 flex-1">
@@ -73,9 +72,7 @@ export function CabeceraDeTienda({
         </div>
       </div>
 
-      <div className="lg:hidden">
-        <AccionesDeTienda tienda={tienda} />
-      </div>
+      <AccionesDeTienda tienda={tienda} />
     </header>
   )
 }
@@ -144,21 +141,9 @@ function Ficha({
  * Compartir, ver y editar: lo que alguien busca más veces por día. Compartir
  * va en rojo porque es lo que trae ventas.
  */
-export function AccionesDeTienda({
-  tienda,
-  apilado = false,
-}: {
-  tienda: TiendaDelResumen
-  /** Uno debajo del otro, a todo el ancho: bajo el celular de la derecha. */
-  apilado?: boolean
-}) {
+function AccionesDeTienda({ tienda }: { tienda: TiendaDelResumen }) {
   return (
-    <div
-      className={cn(
-        "grid gap-2",
-        apilado ? "grid-cols-2" : "grid-cols-2 sm:flex sm:flex-wrap"
-      )}
-    >
+    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
       <CompartirTienda
         nombre={tienda.nombre}
         slug={tienda.slug}
@@ -193,8 +178,7 @@ export function AccionesDeTienda({
 /**
  * La portada de la tienda dentro de un celular, la misma de la app: la captura
  * real que saca la web, alineada arriba, en la proporción en que se saca
- * (1:2). Mientras no la haya va la miniatura de su plantilla, entera, y lo
- * dice.
+ * (1:2). Mientras no la haya va su plantilla vista en un celular, y lo dice.
  */
 function CelularConCaptura({
   vista,
@@ -202,14 +186,14 @@ function CelularConCaptura({
   vista: { url: string; real: boolean }
 }) {
   return (
-    <span className="relative block aspect-[1/2] w-[88px] overflow-hidden rounded-[14px] border-[3px] border-tinta bg-papel transition-transform duration-200 active:scale-[0.98] motion-reduce:transform-none">
+    <span className="relative block aspect-[1/2] w-[88px] overflow-hidden rounded-[14px] border-[3px] border-tinta bg-papel transition-transform duration-200 group-hover:-translate-y-0.5 group-active:scale-[0.98] motion-reduce:transform-none lg:w-[104px] lg:rounded-[16px]">
       <Image
         src={vista.url}
         alt=""
         fill
         sizes="88px"
         quality={85}
-        className={vista.real ? "object-cover object-top" : "object-contain"}
+        className="object-cover object-top"
       />
       {vista.real ? null : (
         <span className="absolute inset-x-0 bottom-0 bg-tinta/85 py-1 text-center text-[11px] leading-tight text-papel">

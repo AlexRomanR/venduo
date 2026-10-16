@@ -20,7 +20,9 @@ export function FichaDePrueba({
   porVencer: boolean
 }) {
   const [abierta, setAbierta] = React.useState(false)
-  const id = React.useId()
+  // Una sola ficha por pantalla: un id fijo. `useId` cambiaba entre el
+  // servidor y el navegador, y React lo marcaba como error de hidratación.
+  const id = "detalle-de-la-prueba"
 
   return (
     <>

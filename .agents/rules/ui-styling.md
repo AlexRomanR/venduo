@@ -22,10 +22,9 @@ tienda pública. Cómo funciona, y cómo se agrega una, está en `docs/store-tem
 **El panel de quien tiene tienda es de Venduo**, igual para todas. Antes tomaba la
 plantilla, y una letra o un color elegidos para vender —una condensada en mayúsculas, el
 azul de un botón de compra, una antigua fina para las cifras— terminaban en cada rótulo de
-una pantalla de trabajo. La tienda sigue reconocible donde se la nombra: su tarjeta en la
-barra lateral (`SelloDeTienda`), con su papel, su letra y su color de acción en un
-recuadro, y la tienda misma en el Resumen: viva dentro de un celular (`TiendaEnVivo`),
-que no pinta nada fuera de su marco.
+una pantalla de trabajo. La tienda sigue reconocible donde se la nombra: su tarjeta en el
+menú lateral, con su papel, su letra y su color de acción en un recuadro, y la portada de
+la tienda en el Resumen, dentro de un celular chico.
 
 Tres reglas que se desprenden:
 
@@ -76,7 +75,7 @@ mismos nombres y el mismo orden. Quien vende usa las dos y no tiene por qué apr
 - **Se mira lado a lado antes de darlo por hecho**: el emulador y el navegador a 375 px.
 - **Lo único distinto es lo que es de una sola plataforma**: los avisos al teléfono y
   "Venduo en la computadora" son de la app; la barra de escritorio, su riel plegado, los
-  atajos de teclado y la tienda en vivo de la pantalla ancha son de la web.
+  atajos de teclado y el atajo "Nuevo producto" de la pantalla ancha son de la web.
 
 ### El panel se mira, no se lee
 
@@ -90,8 +89,10 @@ su `AGENTS.md`): quien vende lo abre entre dos mensajes y no va a leer un párra
   filtrada (`ParaHoy`). Los números suben al aparecer (`Contador`).
 - **Fotos antes que nombres**: un pedido por las fotos de lo que pidieron, un producto
   por la suya, en carruseles que se deslizan en el celular.
-- **La tienda se muestra, no se nombra**: viva dentro de un celular en una pantalla
-  ancha (`TiendaEnVivo`), y la captura de su portada en el celular.
+- **La tienda se muestra, no se nombra**: la captura de su portada dentro de un celular
+  chico, al lado del nombre. El Resumen es un resumen, no un lugar para mirar la tienda:
+  tocarla abre el editor, y para verla está "Ver tienda". Sin captura todavía, va su
+  plantilla vista en un celular (`public/plantillas/celular/`).
 - **Lo que no pide nada no ocupa lugar**: sin ventas no hay "lo más vendido"; sin
   pendientes, "Estás al día" es una línea.
 - **Lo de todos los días se hace donde se ve**: cobrar un pedido y reponer stock desde

@@ -74,7 +74,10 @@ export function EsqueletoDelTablero() {
         </div>
       </div>
 
-      <Panel filas={4} alto="h-14" />
+      <div className="grid items-start gap-6 md:gap-8 xl:grid-cols-2">
+        <Panel filas={4} alto="h-14" />
+        <Panel filas={3} alto="h-14" />
+      </div>
     </div>
   )
 }

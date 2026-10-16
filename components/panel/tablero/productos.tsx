@@ -28,7 +28,7 @@ export function MasVendidos({ productos }: { productos: ProductoVendido[] }) {
       titulo="Lo que más se vende"
       className="@container"
     >
-      <ol className="flex snap-x snap-mandatory scroll-px-4 [scrollbar-width:none] gap-3 overflow-x-auto px-4 py-4 sm:scroll-px-5 sm:px-5 @md:grid @md:grid-cols-5 @md:overflow-visible">
+      <ol className="flex snap-x snap-mandatory scroll-px-4 [scrollbar-width:none] gap-3 overflow-x-auto px-4 py-4 sm:scroll-px-5 sm:px-5 @sm:grid @sm:grid-cols-5 @sm:overflow-visible">
         {productos.map((producto, indice) => {
           const tarjeta = (
             <>
@@ -69,7 +69,7 @@ export function MasVendidos({ productos }: { productos: ProductoVendido[] }) {
           return (
             <li
               key={producto.id ?? producto.nombre}
-              className="w-[40%] shrink-0 snap-start @md:w-auto"
+              className="w-[40%] shrink-0 snap-start @sm:w-auto"
             >
               {producto.id ? (
                 <Link

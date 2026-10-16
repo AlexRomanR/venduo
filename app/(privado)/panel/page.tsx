@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { after } from "next/server"
 import { PackageMinus, PackageX, ShoppingBag } from "lucide-react"
 
-import { miniaturaDePlantilla } from "@/lib/api/miniaturas"
+import { rutaDeVistaDePlantilla } from "@/lib/api/miniaturas"
 import { getBarraLateral, type Contadores } from "@/lib/data/barra"
 import { getMiTienda, getResumenPanel } from "@/lib/data/panel"
 import { getTablero } from "@/lib/data/tablero"
@@ -12,12 +12,11 @@ import { RESUMEN_DEMO, tableroDeDemostracion } from "@/lib/demo-data"
 import { isSupabaseConfigured } from "@/lib/env"
 import { plantillaDeTienda } from "@/lib/plantillas"
 import type { Tablero } from "@/lib/tablero"
-import { rutaDeTienda, urlDeTienda } from "@/lib/tienda"
+import { urlDeTienda } from "@/lib/tienda"
 import { pedirVista } from "@/lib/vista"
 import type { ResumenDeVisitas } from "@/lib/visitas-resumen"
 import { AvisoSuscripcion } from "@/components/panel/aviso-suscripcion"
 import {
-  AccionesDeTienda,
   CabeceraDeTienda,
   type TiendaDelResumen,
 } from "@/components/panel/tablero/cabecera"
@@ -31,7 +30,6 @@ import {
 import { UltimosPedidos } from "@/components/panel/tablero/pedidos"
 import { PrimerosPasos } from "@/components/panel/tablero/primeros-pasos"
 import { MasVendidos, PorAcabarse } from "@/components/panel/tablero/productos"
-import { TiendaEnVivo } from "@/components/panel/tablero/tienda-en-vivo"
 import { PanelDeVisitas } from "@/components/panel/visitas"
 import { cambiarEstado } from "./pedidos/acciones"
 import { ajustarStock } from "./productos/acciones"
@@ -42,10 +40,9 @@ export const metadata = { title: "Resumen" }
  * Resumen del emprendedor: la pantalla de entrada del panel.
  *
  * Se mira, no se lee, como el Inicio de la app: lo que espera algo en números
- * grandes que se tocan, las ventas que suben al aparecer, los pedidos y los
- * productos por sus fotos, y la tienda misma —viva, a la derecha, en una
- * pantalla ancha—. Lo que se hace todos los días se hace acá: cobrar un
- * pedido y reponer stock.
+ * grandes que se tocan, las ventas que suben al aparecer, y los pedidos y los
+ * productos por sus fotos. Lo que se hace todos los días se hace acá: cobrar
+ * un pedido y reponer stock.
  *
  * Quien todavía no eligió plantilla no tiene nada que resumir acá. La
  * comprobación es sobre `template_key` y no sobre la existencia de la tienda
@@ -88,45 +85,29 @@ export default async function PanelPage() {
   }
   const vista = tienda?.vista_url
     ? { url: tienda.vista_url, real: true }
-    : miniaturaDePlantilla(clave)
-      ? { url: `/plantillas/${clave}.webp`, real: false }
-      : null
+    : { url: rutaDeVistaDePlantilla(clave), real: false }
 
   return (
-    <div className="grid items-start gap-6 md:gap-8 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_320px] xl:gap-10">
-      <div className="flex min-w-0 flex-col gap-6 md:gap-8">
-        <CabeceraDeTienda
-          persona={barra.persona.nombre}
+    <div className="flex flex-col gap-6 md:gap-8">
+      <CabeceraDeTienda
+        persona={barra.persona.nombre}
+        tienda={deLaTienda}
+        suscripcion={datos.suscripcion}
+        vista={vista}
+      />
+
+      <AvisoSuscripcion suscripcion={datos.suscripcion} />
+
+      <Suspense fallback={<EsqueletoDelTablero />}>
+        <ContenidoDelTablero
+          tablero={tablero}
+          visitas={visitas}
+          conEstadisticas={barra.funciones.estadisticas === "activa"}
+          contadores={barra.contadores}
           tienda={deLaTienda}
-          suscripcion={datos.suscripcion}
-          vista={vista}
+          sinWhatsApp={isSupabaseConfigured && !tienda?.whatsapp}
         />
-
-        <AvisoSuscripcion suscripcion={datos.suscripcion} />
-
-        <Suspense fallback={<EsqueletoDelTablero />}>
-          <ContenidoDelTablero
-            tablero={tablero}
-            visitas={visitas}
-            conEstadisticas={barra.funciones.estadisticas === "activa"}
-            contadores={barra.contadores}
-            tienda={deLaTienda}
-            sinWhatsApp={isSupabaseConfigured && !tienda?.whatsapp}
-          />
-        </Suspense>
-      </div>
-
-      {/* La tienda, viva, mientras se baja por el Resumen. */}
-      <aside
-        aria-label="Tu tienda"
-        className="hidden flex-col gap-4 lg:sticky lg:top-6 lg:flex"
-      >
-        <TiendaEnVivo
-          ruta={rutaDeTienda(deLaTienda.slug)}
-          nombre={deLaTienda.nombre}
-        />
-        <AccionesDeTienda tienda={deLaTienda} apilado />
-      </aside>
+      </Suspense>
     </div>
   )
 }
@@ -161,7 +142,10 @@ async function ContenidoDelTablero({
     sinWhatsApp
   )
 
-  const partes = [
+  // Arriba, a todo el ancho, lo que pide algo y cómo vienen las ventas; abajo,
+  // en dos columnas en una pantalla ancha, los pedidos y los productos. En el
+  // celular, una sola columna en el mismo orden que el Inicio de la app.
+  const arriba = [
     <ParaHoy key="para-hoy" alertas={alertas} atajos={atajos} />,
     <PrimerosPasos key="pasos" pasos={tablero.pasos} tienda={tienda} />,
     <ComoTeVa
@@ -170,39 +154,55 @@ async function ContenidoDelTablero({
       hoy={tablero.hoy}
       conEstadisticas={conEstadisticas}
     />,
-    <UltimosPedidos
-      key="pedidos"
-      pedidos={tablero.ultimosPedidos}
-      cobrar={cambiarEstado}
-      soloLectura={soloLectura}
-    />,
-    // Sin productos no hay qué rankear ni qué reponer: lo dicen los primeros
-    // pasos.
-    tablero.pasos.producto ? (
-      <MasVendidos key="mas-vendidos" productos={tablero.masVendidos} />
-    ) : null,
-    tablero.pasos.producto ? (
-      <PorAcabarse
-        key="por-acabarse"
-        productos={tablero.porAcabarse}
-        ajustar={ajustarStock}
-        soloLectura={soloLectura}
-      />
-    ) : null,
-    visitas ? <PanelDeVisitas key="visitas" visitas={visitas} /> : null,
-  ].filter(Boolean)
+  ]
+  const productos = tablero.pasos.producto
+    ? [
+        // Sin productos no hay qué rankear ni qué reponer: lo dicen los
+        // primeros pasos.
+        <MasVendidos key="mas-vendidos" productos={tablero.masVendidos} />,
+        <PorAcabarse
+          key="por-acabarse"
+          productos={tablero.porAcabarse}
+          ajustar={ajustarStock}
+          soloLectura={soloLectura}
+        />,
+      ]
+    : []
+
+  let orden = 0
+  const entra = (parte: React.ReactNode, clave: string) => (
+    <div
+      key={clave}
+      className="panel-entra min-w-0 empty:hidden"
+      style={{ "--orden": orden++ } as React.CSSProperties}
+    >
+      {parte}
+    </div>
+  )
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
-      {partes.map((parte, orden) => (
-        <div
-          key={orden}
-          className="panel-entra min-w-0 empty:hidden"
-          style={{ "--orden": orden } as React.CSSProperties}
-        >
-          {parte}
-        </div>
-      ))}
+      {arriba.map((parte, indice) => entra(parte, `arriba-${indice}`))}
+
+      <div className="grid items-start gap-6 md:gap-8 xl:grid-cols-2">
+        {entra(
+          <UltimosPedidos
+            pedidos={tablero.ultimosPedidos}
+            cobrar={cambiarEstado}
+            soloLectura={soloLectura}
+          />,
+          "pedidos"
+        )}
+        {productos.length > 0 ? (
+          <div className="flex min-w-0 flex-col gap-6 empty:hidden md:gap-8">
+            {productos.map((parte, indice) =>
+              entra(parte, `productos-${indice}`)
+            )}
+          </div>
+        ) : null}
+      </div>
+
+      {visitas ? entra(<PanelDeVisitas visitas={visitas} />, "visitas") : null}
     </div>
   )
 }
