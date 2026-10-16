@@ -60,7 +60,7 @@ export default async function CatalogosPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <Cabecera
         titulo="Tus catálogos."
-        bajada="Catálogos en PDF con tus productos, para mandar por WhatsApp o imprimir. Se arman con el precio y el stock del día cada vez que se abren."
+        bajada="Tus productos en PDF, con los precios del día, para mandar por WhatsApp o imprimir."
         demo={
           esDemo &&
           "Estás en modo demo: los catálogos son de ejemplo y no se guardan."
@@ -79,7 +79,7 @@ export default async function CatalogosPage() {
         id="guardados"
         icono={BookOpen}
         titulo="Los que ya armaste"
-        bajada="Ábrelos para cambiarlos o mándalos como están: siempre salen con los precios de hoy."
+        bajada="Siempre salen con los precios de hoy."
       >
         {catalogos.length === 0 ? (
           <SinDatos
@@ -154,7 +154,7 @@ export default async function CatalogosPage() {
           id="con-tu-estilo"
           icono={Palette}
           titulo="Con el estilo de tu tienda"
-          bajada="Tus colores tal cual, tu color a toda hoja, en oscuro o en tonos de tu color."
+          bajada="Tus colores, a toda hoja o en oscuro."
           accion={{
             href: "/panel/catalogos/nuevo",
             texto: "Armar uno con tu estilo",
@@ -196,7 +196,7 @@ export default async function CatalogosPage() {
         id="plantillas"
         icono={LayoutTemplate}
         titulo="Plantillas para empezar"
-        bajada="Dibujadas con tus productos y los colores de tu tienda. Cualquier hoja de una sirve en otra."
+        bajada="Con tus productos y tus colores."
         accion={{ href: "/panel/catalogos/nuevo", texto: "Armar un catálogo" }}
       >
         {muestra.length === 0 ? (

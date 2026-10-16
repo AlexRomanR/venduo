@@ -1,9 +1,13 @@
+import { fotoDemo } from "@/lib/demo-data"
 import { getMiTienda } from "@/lib/data/panel"
 import { createClient } from "@/lib/supabase/server"
 import { noSeConcreto } from "@/lib/pedidos"
 import type { OrderStatus } from "@/types"
 
 export interface LineaPedido {
+  productoId: string | null
+  /** La foto del producto hoy; `null` si no tiene o ya no está. */
+  foto: string | null
   nombre: string
   cantidad: number
   precioCents: number
@@ -24,6 +28,8 @@ export interface Pedido {
   creado: string
   pagado: string | null
   items: LineaPedido[]
+  /** La foto del primer producto que tenga una: con eso se reconoce el pedido. */
+  foto: string | null
 }
 
 export interface ResumenPedidos {
@@ -45,56 +51,87 @@ export interface Pedidos {
 }
 
 function pedidosDeDemostracion(filtro?: FiltroPedidos): Pedidos {
-  const base = {
+  const hace = (minutos: number) =>
+    new Date(Date.now() - minutos * 60_000).toISOString()
+  const linea = (
+    nombre: string,
+    cantidad: number,
+    precioCents: number,
+    foto: string
+  ): LineaPedido => ({
+    productoId: null,
+    foto: fotoDemo(foto),
+    nombre,
+    cantidad,
+    precioCents,
+    totalCents: cantidad * precioCents,
+  })
+  const pedido = (
+    datos: Omit<
+      Pedido,
+      "comprador" | "telefono" | "pagado" | "foto" | "totalCents"
+    >
+  ): Pedido => ({
     comprador: null,
     telefono: null,
-    pagado: null,
-    creado: new Date().toISOString(),
-  }
+    pagado: datos.estado === "pagado" ? datos.creado : null,
+    ...datos,
+    totalCents: datos.items.reduce((t, i) => t + i.totalCents, 0),
+    foto: datos.items[0]?.foto ?? null,
+  })
 
   const pedidos: Pedido[] = [
-    {
-      ...base,
-      id: "demo-1",
-      numero: 104,
+    pedido({
+      id: "demo-pedido-1",
+      numero: 148,
       estado: "pendiente",
-      totalCents: 24000,
-      items: [
-        {
-          nombre: "Mochila urbana",
-          cantidad: 1,
-          precioCents: 24000,
-          totalCents: 24000,
-        },
-      ],
-    },
-    {
-      ...base,
-      id: "demo-2",
-      numero: 103,
+      creado: hace(26),
+      items: [linea("Mochila urbana", 1, 52_000, "1553062407-98eeb64c6a62")],
+    }),
+    pedido({
+      id: "demo-pedido-2",
+      numero: 147,
       estado: "pagado",
-      totalCents: 13000,
-      pagado: new Date().toISOString(),
+      creado: hace(134),
       items: [
-        {
-          nombre: "Polera básica",
-          cantidad: 2,
-          precioCents: 6500,
-          totalCents: 13000,
-        },
+        linea("Polera básica", 1, 6_500, "1521572163474-6864f9cf17ab"),
+        linea("Gorra deportiva", 1, 5_500, "1588850561407-ed78c282e89b"),
+        linea("Buzo oversize", 1, 12_500, "1556905055-8f358a7a47b2"),
       ],
-    },
-    {
-      ...base,
-      id: "demo-3",
-      numero: 101,
+    }),
+    pedido({
+      id: "demo-pedido-3",
+      numero: 146,
+      estado: "pagado",
+      creado: hace(60 * 27),
+      items: [
+        linea("Zapatillas running", 1, 18_000, "1542291026-7eec264c27ff"),
+      ],
+    }),
+    pedido({
+      id: "demo-pedido-4",
+      numero: 145,
+      estado: "pagado",
+      creado: hace(60 * 24 * 3 + 95),
+      items: [
+        linea("Campera rompeviento", 1, 64_000, "1548883354-7622d03aca27"),
+        linea("Polera básica", 1, 6_500, "1521572163474-6864f9cf17ab"),
+      ],
+    }),
+    pedido({
+      id: "demo-pedido-5",
+      numero: 144,
+      estado: "cancelado",
+      creado: hace(60 * 24 * 4 + 300),
+      items: [linea("Gorra deportiva", 1, 6_500, "1588850561407-ed78c282e89b")],
+    }),
+    pedido({
+      id: "demo-pedido-6",
+      numero: 139,
       estado: "pendiente",
-      totalCents: 5500,
-      creado: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-      items: [
-        { nombre: "Gorra", cantidad: 1, precioCents: 5500, totalCents: 5500 },
-      ],
-    },
+      creado: hace(60 * 24 * 10),
+      items: [linea("Mochila urbana", 1, 52_000, "1553062407-98eeb64c6a62")],
+    }),
   ]
 
   return {
@@ -153,27 +190,34 @@ export async function getPedidos(filtro?: FiltroPedidos): Promise<Pedidos> {
     .select(
       `id, order_number, status, buyer_name, buyer_phone, total_cents,
        created_at, paid_at,
-       order_items ( product_name, quantity, unit_price_cents )`
+       order_items ( product_id, product_name, quantity, unit_price_cents,
+                     products ( image_url ) )`
     )
     .eq("store_id", tienda.id)
     .order("created_at", { ascending: false })
 
-  const pedidos: Pedido[] = (filas ?? []).map((fila) => ({
-    id: fila.id,
-    numero: fila.order_number,
-    estado: fila.status,
-    comprador: fila.buyer_name,
-    telefono: fila.buyer_phone,
-    totalCents: fila.total_cents,
-    creado: fila.created_at,
-    pagado: fila.paid_at,
-    items: (fila.order_items ?? []).map((item) => ({
+  const pedidos: Pedido[] = (filas ?? []).map((fila) => {
+    const items = (fila.order_items ?? []).map((item) => ({
+      productoId: item.product_id,
+      foto: item.products?.image_url ?? null,
       nombre: item.product_name,
       cantidad: item.quantity,
       precioCents: item.unit_price_cents,
       totalCents: item.quantity * item.unit_price_cents,
-    })),
-  }))
+    }))
+    return {
+      id: fila.id,
+      numero: fila.order_number,
+      estado: fila.status,
+      comprador: fila.buyer_name,
+      telefono: fila.buyer_phone,
+      totalCents: fila.total_cents,
+      creado: fila.created_at,
+      pagado: fila.paid_at,
+      items,
+      foto: items.find((item) => item.foto)?.foto ?? null,
+    }
+  })
 
   return {
     // El resumen se calcula sobre todo, no sobre lo filtrado: es el estado del

@@ -26,6 +26,7 @@ export function MasVendidos({ productos }: { productos: ProductoVendido[] }) {
       id="mas-vendidos"
       icono={Flame}
       titulo="Lo que más se vende"
+      bajada="Por unidades vendidas."
       className="@container"
     >
       <ol className="flex snap-x snap-mandatory scroll-px-4 [scrollbar-width:none] gap-3 overflow-x-auto px-4 py-4 sm:scroll-px-5 sm:px-5 @sm:grid @sm:grid-cols-5 @sm:overflow-visible">
@@ -118,6 +119,7 @@ export function PorAcabarse({
       id="por-acabarse"
       icono={PackageOpen}
       titulo="Se está acabando"
+      bajada="Repón el stock aquí mismo."
       accion={{ href: "/panel/productos", texto: "Ver todos los productos" }}
     >
       <ul>

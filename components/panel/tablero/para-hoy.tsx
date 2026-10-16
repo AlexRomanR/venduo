@@ -54,7 +54,12 @@ export function ParaHoy({
   }
 
   return (
-    <Seccion id="para-hoy" icono={CircleAlert} titulo="Para hoy">
+    <Seccion
+      id="para-hoy"
+      icono={CircleAlert}
+      titulo="Para hoy"
+      bajada="Lo que espera algo de ti."
+    >
       {alertas.map((alerta) => (
         <Link
           key={alerta.texto}

@@ -1,3 +1,4 @@
+import { fotoDemo } from "@/lib/demo-data"
 import { getMiTienda } from "@/lib/data/panel"
 import { createClient } from "@/lib/supabase/server"
 import type { Product, ProductCategory } from "@/types"
@@ -20,6 +21,7 @@ export interface ResumenCatalogo {
   /** Precio por stock, en centavos. Lo que vale lo que tienes guardado. */
   valorInventarioCents: number
   unidades: number
+  sinCategoria: number
 }
 
 export interface Catalogo {
@@ -41,7 +43,7 @@ export interface CategoriaConUso extends ProductCategory {
  * quien clona el repositorio, y el respaldo si Supabase falla en la
  * demostración.
  */
-function catalogoDeDemostracion(): Catalogo {
+function catalogoDeDemostracion(filtros: FiltrosCatalogo = {}): Catalogo {
   const base = {
     store_id: "demo",
     description: null,
@@ -63,6 +65,9 @@ function catalogoDeDemostracion(): Catalogo {
       id: "demo-1",
       name: "Polera básica",
       category: "Poleras",
+      category_id: "demo-cat-0",
+      image_url: fotoDemo("1521572163474-6864f9cf17ab"),
+      images: [fotoDemo("1521572163474-6864f9cf17ab")],
       price_cents: 9000,
       stock: 24,
       is_active: true,
@@ -73,6 +78,9 @@ function catalogoDeDemostracion(): Catalogo {
       id: "demo-2",
       name: "Campera rompeviento",
       category: "Camperas",
+      category_id: "demo-cat-1",
+      image_url: fotoDemo("1548883354-7622d03aca27"),
+      images: [fotoDemo("1548883354-7622d03aca27")],
       price_cents: 32000,
       compare_at_price_cents: 38000,
       stock: 2,
@@ -83,6 +91,9 @@ function catalogoDeDemostracion(): Catalogo {
       id: "demo-3",
       name: "Mochila urbana",
       category: "Mochilas",
+      category_id: "demo-cat-2",
+      image_url: fotoDemo("1553062407-98eeb64c6a62"),
+      images: [fotoDemo("1553062407-98eeb64c6a62")],
       price_cents: 21000,
       stock: 0,
       is_active: true,
@@ -92,6 +103,9 @@ function catalogoDeDemostracion(): Catalogo {
       id: "demo-4",
       name: "Gorra deportiva",
       category: "Gorras",
+      category_id: "demo-cat-3",
+      image_url: fotoDemo("1588850561407-ed78c282e89b"),
+      images: [fotoDemo("1588850561407-ed78c282e89b")],
       price_cents: 5500,
       stock: 12,
       is_active: false,
@@ -113,7 +127,7 @@ function catalogoDeDemostracion(): Catalogo {
   )
 
   return {
-    productos,
+    productos: filtrar(productos, filtros),
     categorias,
     resumen: resumir(productos),
     esDemo: true,
@@ -135,6 +149,7 @@ function resumir(productos: Product[]): ResumenCatalogo {
       0
     ),
     unidades: productos.reduce((total, p) => total + p.stock, 0),
+    sinCategoria: productos.filter((p) => !p.category_id).length,
   }
 }
 
@@ -149,10 +164,10 @@ export async function getCatalogo(
   filtros: FiltrosCatalogo = {}
 ): Promise<Catalogo> {
   const supabase = await createClient()
-  if (!supabase) return catalogoDeDemostracion()
+  if (!supabase) return catalogoDeDemostracion(filtros)
 
   const tienda = await getMiTienda()
-  if (!tienda) return catalogoDeDemostracion()
+  if (!tienda) return catalogoDeDemostracion(filtros)
 
   const [{ data: productos }, { data: categorias }] = await Promise.all([
     supabase

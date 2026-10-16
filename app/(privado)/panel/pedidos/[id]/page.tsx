@@ -1,30 +1,32 @@
+import Image from "next/image"
 import { notFound, redirect } from "next/navigation"
-import { ListChecks, MessageCircle, ShoppingBag, UserRound } from "lucide-react"
+import { Package, ShoppingBag, UserRound } from "lucide-react"
 
-import { getPedido } from "@/lib/data/pedidos"
+import { getPedido, type Pedido } from "@/lib/data/pedidos"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
-import { formatDate, formatMoney } from "@/lib/format"
+import { formatDate, formatHora, formatMoney } from "@/lib/format"
 import {
   DIAS_PARA_CONCRETAR,
   numeroDeWhatsApp,
   noSeConcreto,
 } from "@/lib/pedidos"
-import type { OrderStatus } from "@/types"
+import { cn } from "@/lib/utils"
 import { Cabecera, Seccion, Volver } from "@/components/panel/piezas"
-import { CambiarEstado, Estado } from "@/components/pedidos/piezas"
+import { TituloDeLaBarra } from "@/components/panel/titulo-de-barra"
+import {
+  CancelarPedido,
+  CobrarPedido,
+  Estado,
+} from "@/components/pedidos/piezas"
 import { cambiarEstado } from "../acciones"
 
 export const metadata = { title: "Pedido" }
 
-/** Qué toca hacer con el pedido, según dónde está. */
-const QUE_SIGUE: Record<OrderStatus, string> = {
-  pendiente:
-    "Te llegó por WhatsApp con este número. Cuando te paguen, márcalo pagado y se descontará del stock.",
-  pagado: "Este pedido ya está pagado y descontado de tu stock.",
-  cancelado: "Este pedido se canceló. No cuenta en tus ventas.",
-}
-
+/**
+ * Un pedido, la misma pantalla de la app: cuánto es y en qué está, por dónde
+ * pasó, qué pidió con sus fotos, y lo que se hace con él a mano.
+ */
 export default async function PedidoPage({
   params,
 }: {
@@ -42,131 +44,205 @@ export default async function PedidoPage({
   const whatsapp = pedido.telefono
     ? `https://wa.me/${numeroDeWhatsApp(pedido.telefono)}`
     : null
+  const soloLectura = !isSupabaseConfigured
 
   return (
-    <div className="flex flex-col gap-6 md:gap-8">
-      <Volver href="/panel/pedidos">Tus pedidos</Volver>
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 max-lg:pb-20 md:gap-8">
+      <TituloDeLaBarra
+        titulo={`Pedido #${pedido.numero}`}
+        volver="/panel/pedidos"
+      />
+      <Volver href="/panel/pedidos">Pedidos</Volver>
+      {/* En el celular, el nombre del pedido va en la barra de arriba. */}
+      <div className="max-lg:sr-only">
+        <Cabecera titulo={`Pedido #${pedido.numero}`} />
+      </div>
 
-      <Cabecera
-        etiqueta="Pedido"
-        titulo={
-          <span className="flex flex-wrap items-center gap-3">
-            <span className="tabular">#{pedido.numero}</span>
-            <Estado estado={pedido.estado} noConcretado={noConcretado} />
-          </span>
-        }
-        bajada={
-          <>
-            Llegó el {formatDate(pedido.creado)}
-            {pedido.pagado ? ` · pagado el ${formatDate(pedido.pagado)}` : ""}
-          </>
-        }
-      >
-        <p className="tabular font-titular text-[clamp(1.5rem,5vw,2rem)] leading-none font-extrabold tracking-[-0.03em]">
-          {formatMoney(pedido.totalCents)}
-        </p>
-      </Cabecera>
-
-      {/* Lo primero es qué hacer con el pedido, no leerlo. */}
-      <Seccion
-        id="que-sigue"
-        icono={ListChecks}
-        titulo="Qué sigue"
-        bajada={
-          noConcretado
-            ? `Pasó más de ${DIAS_PARA_CONCRETAR} días sin concretarse, así que ya no cuenta en lo que tienes por cobrar. Si al final te pagan, márcalo pagado igual.`
-            : QUE_SIGUE[pedido.estado]
-        }
-        relleno
-      >
+      <header className="flex flex-col gap-5">
         <div className="flex flex-wrap items-center gap-3">
-          <CambiarEstado pedido={pedido} cambiar={cambiarEstado} />
+          <p className="tabular font-titular text-[40px] leading-[44px] font-extrabold tracking-[-0.03em] lg:text-5xl lg:leading-[52px]">
+            {formatMoney(pedido.totalCents)}
+          </p>
+          <Estado estado={pedido.estado} noConcretado={noConcretado} />
+        </div>
+        <LineaDeEstado pedido={pedido} />
+        {noConcretado ? (
+          <p className="text-sm opacity-70">
+            Pasaron más de {DIAS_PARA_CONCRETAR} días sin pagarse. Si te pagan,
+            márcalo igual.
+          </p>
+        ) : null}
+        <CobrarPedido
+          pedido={pedido}
+          cambiar={cambiarEstado}
+          whatsapp={whatsapp}
+          soloLectura={soloLectura}
+        />
+      </header>
 
-          {whatsapp ? (
-            <a
-              href={whatsapp}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="flex min-h-11 items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
+      <Seccion
+        id="que-pidio"
+        icono={ShoppingBag}
+        titulo="Qué pidió"
+        bajada="Con los precios del día del pedido."
+      >
+        <ul>
+          {pedido.items.map((item, indice) => (
+            <li
+              key={indice}
+              className="flex items-center gap-3 border-t border-tinta/15 px-4 py-3 first:border-t-0 sm:px-5"
             >
-              <MessageCircle aria-hidden="true" className="size-4" />
-              Escribir por WhatsApp
-            </a>
-          ) : null}
+              <span className="relative shrink-0">
+                <span className="relative flex size-[52px] items-center justify-center overflow-hidden border border-tinta/15 bg-tinta/[0.05]">
+                  {item.foto ? (
+                    <Image
+                      src={item.foto}
+                      alt=""
+                      fill
+                      sizes="52px"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <Package aria-hidden="true" className="size-5 opacity-35" />
+                  )}
+                </span>
+                {item.cantidad > 1 ? (
+                  <span
+                    aria-hidden="true"
+                    className="tabular absolute -top-1.5 -right-1.5 flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-tinta px-1.5 text-xs font-semibold text-papel"
+                  >
+                    {item.cantidad}
+                  </span>
+                ) : null}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="line-clamp-2 font-semibold">
+                  <span className="sr-only">{item.cantidad} de </span>
+                  {item.nombre}
+                </span>
+                <span className="tabular mt-0.5 block text-sm opacity-65">
+                  {item.cantidad} × {formatMoney(item.precioCents)}
+                </span>
+              </span>
+              <span className="tabular shrink-0 font-semibold">
+                {formatMoney(item.totalCents)}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <div className="flex items-baseline justify-between gap-4 border-t border-tinta/15 px-4 py-4 sm:px-5">
+          <span className="text-sm opacity-70">Total</span>
+          <span className="tabular font-titular text-xl font-bold tracking-[-0.02em]">
+            {formatMoney(pedido.totalCents)}
+          </span>
         </div>
       </Seccion>
 
-      <div className="grid gap-6 md:gap-8 lg:grid-cols-[1.3fr_1fr]">
+      {/* Solo los pedidos de antes de la compra por WhatsApp guardan quién
+          compró: en los nuevos, esa persona está en el chat. */}
+      {pedido.comprador || whatsapp ? (
         <Seccion
-          id="que-compro"
-          icono={ShoppingBag}
-          titulo="Qué pidió"
-          bajada="Los precios del pedido, aunque después cambien en tu catálogo."
+          id="quien-compro"
+          icono={UserRound}
+          titulo="Quién compró"
+          bajada="Lo que dejó al comprar."
         >
-          <ul>
-            {pedido.items.map((item, indice) => (
-              <li
-                key={indice}
-                className="flex items-baseline justify-between gap-4 border-t border-tinta/15 px-4 py-3.5 first:border-t-0 sm:px-5"
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="tabular mr-2 opacity-65">
-                    {item.cantidad}×
-                  </span>
-                  <span className="font-semibold">{item.nombre}</span>
-                  <span className="tabular mt-0.5 block text-xs opacity-65">
-                    {formatMoney(item.precioCents)} c/u
-                  </span>
-                </span>
-                <span className="tabular shrink-0 font-semibold">
-                  {formatMoney(item.totalCents)}
-                </span>
-              </li>
-            ))}
-          </ul>
-
-          <dl className="mt-auto border-t border-tinta/15 px-4 py-4 sm:px-5">
-            <div className="flex items-baseline justify-between gap-4 py-1">
-              <dt className="text-sm opacity-70">Total del pedido</dt>
-              <dd className="tabular font-titular text-lg font-bold">
-                {formatMoney(pedido.totalCents)}
-              </dd>
-            </div>
+          <dl>
+            {pedido.comprador ? (
+              <Dato etiqueta="Nombre">
+                <span className="font-semibold">{pedido.comprador}</span>
+              </Dato>
+            ) : null}
+            {whatsapp ? (
+              <Dato etiqueta="WhatsApp">
+                <a
+                  href={whatsapp}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="tabular inline-flex min-h-11 items-center font-semibold underline underline-offset-4 transition-colors hover:text-senal"
+                >
+                  {pedido.telefono}
+                </a>
+              </Dato>
+            ) : null}
           </dl>
         </Seccion>
+      ) : null}
 
-        {/* Solo los pedidos de antes de la compra por WhatsApp guardan quién
-            compró: en los nuevos, esa persona está en el chat. */}
-        {pedido.comprador || pedido.telefono ? (
-          <Seccion
-            id="quien-compro"
-            icono={UserRound}
-            titulo="Quién compró"
-            bajada="Los datos que dejó al comprar."
-          >
-            <dl>
-              {pedido.comprador ? (
-                <Dato etiqueta="Nombre">
-                  <span className="font-semibold">{pedido.comprador}</span>
-                </Dato>
-              ) : null}
-              {whatsapp ? (
-                <Dato etiqueta="WhatsApp">
-                  <a
-                    href={whatsapp}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="tabular inline-flex min-h-11 items-center font-semibold underline-offset-4 transition-colors hover:text-senal hover:underline"
-                  >
-                    {pedido.telefono}
-                  </a>
-                </Dato>
-              ) : null}
-            </dl>
-          </Seccion>
-        ) : null}
-      </div>
+      <CancelarPedido
+        pedido={pedido}
+        cambiar={cambiarEstado}
+        soloLectura={soloLectura}
+      />
     </div>
+  )
+}
+
+/**
+ * Por dónde pasó el pedido: llegó y después se pagó o se canceló. Dos puntos y
+ * una línea: se entiende de un vistazo dónde está y qué falta.
+ */
+function LineaDeEstado({ pedido }: { pedido: Pedido }) {
+  const cancelado = pedido.estado === "cancelado"
+  const pagado = pedido.estado === "pagado"
+  const pasos = [
+    {
+      titulo: "Llegó",
+      detalle: `${formatDate(pedido.creado)} · ${formatHora(pedido.creado)}`,
+      hecho: true,
+      rojo: false,
+    },
+    cancelado
+      ? { titulo: "Cancelado", detalle: "", hecho: true, rojo: false }
+      : {
+          titulo: "Pagado",
+          detalle: pedido.pagado ? formatDate(pedido.pagado) : "Falta cobrar",
+          hecho: pagado,
+          rojo: !pagado,
+        },
+  ]
+
+  return (
+    <ol className="flex max-w-md">
+      {pasos.map((paso, indice) => (
+        <li key={paso.titulo} className="flex flex-1 flex-col gap-2">
+          <span className="flex items-center">
+            <span
+              aria-hidden="true"
+              className={cn(
+                "size-3.5 shrink-0 rounded-full border-2",
+                paso.rojo ? "border-senal" : "border-tinta",
+                paso.hecho ? "bg-tinta" : "bg-papel"
+              )}
+            />
+            {indice < pasos.length - 1 ? (
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "mx-1 h-0.5 flex-1",
+                  pasos[indice + 1].hecho ? "bg-tinta" : "bg-tinta/15"
+                )}
+              />
+            ) : null}
+          </span>
+          <span>
+            <span
+              className={cn(
+                "block text-sm font-semibold",
+                paso.rojo && "text-senal"
+              )}
+            >
+              {paso.titulo}
+            </span>
+            {paso.detalle ? (
+              <span className="tabular block text-sm opacity-65">
+                {paso.detalle}
+              </span>
+            ) : null}
+          </span>
+        </li>
+      ))}
+    </ol>
   )
 }
 
@@ -183,7 +259,7 @@ function Dato({
       <dt className="text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
         {etiqueta}
       </dt>
-      <dd className="mt-1 text-sm leading-relaxed">{children}</dd>
+      <dd className="mt-1">{children}</dd>
     </div>
   )
 }

@@ -297,7 +297,7 @@ export function Constructor({
             id="con-tu-estilo"
             icono={Palette}
             titulo="Con el estilo de tu tienda"
-            bajada="Tus colores tal cual, tu color a toda hoja, en oscuro o en tonos de tu color."
+            bajada="Tus colores, a toda hoja o en oscuro."
           >
             <GaleriaDeEstilos
               sugeridos={sugeridos}

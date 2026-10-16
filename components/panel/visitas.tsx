@@ -27,7 +27,7 @@ export function PanelDeVisitas({
       id={id}
       icono={Eye}
       titulo={titulo}
-      bajada={`Los últimos ${visitas.dias} días. Se cuentan sin identificar a nadie.`}
+      bajada={`Últimos ${visitas.dias} días, sin identificar a nadie.`}
     >
       {sinVisitas ? (
         <SinDatos

@@ -4,71 +4,49 @@ import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import {
-  Eye,
-  EyeOff,
-  ImageOff,
-  MoreHorizontal,
-  Pencil,
-  Star,
-  Trash2,
-} from "lucide-react"
+import { Minus, Package, Plus, Star } from "lucide-react"
 import { toast } from "sonner"
 
 import { formatMoney, formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { Product } from "@/types"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Insignia } from "@/components/panel/piezas"
-import { useConfirmacion } from "@/components/panel/confirmar"
 
-interface Acciones {
-  alternar: (
-    id: string,
-    campo: "is_active" | "is_featured",
-    valor: boolean
-  ) => Promise<{ ok: boolean; error?: string }>
-  ajustarStock: (
-    id: string,
-    stock: number
-  ) => Promise<{ ok: boolean; error?: string }>
-  borrar: (id: string) => Promise<{ ok: boolean; error?: string }>
-}
+type Ajustar = (
+  id: string,
+  stock: number
+) => Promise<{ ok: boolean; error?: string }>
+
+/** Cuánto se espera después del último toque antes de guardar. */
+const ESPERA_MS = 700
 
 /**
- * El catálogo, una fila por producto.
+ * El catálogo, una fila por producto: la misma de la app.
  *
  * No es una tabla: a 375 px una tabla de ocho columnas obliga a desplazar en
- * horizontal, y este panel se usa desde el celular. Cada producto es un bloque
- * que se reacomoda, con la foto y el nombre siempre visibles y el resto
- * fluyendo debajo.
+ * horizontal, y este panel se usa desde el celular.
  */
 export function ListaProductos({
   productos,
-  acciones,
+  ajustarStock,
   soloLectura = false,
   vistas = null,
 }: {
   productos: Product[]
-  acciones: Acciones
+  ajustarStock: Ajustar
   /** En modo demo se ve todo pero no se guarda nada. */
   soloLectura?: boolean
   /** Las vistas de 30 días por producto, si Venduo le activó las visitas. */
   vistas?: Record<string, number> | null
 }) {
+  // Con lugar, cada fila va en una línea: el stock al lado del nombre y no
+  // abajo a la derecha, lejos de lo que cuenta.
   return (
-    <ul className="flex flex-col">
+    <ul className="@container">
       {productos.map((producto) => (
-        <Fila
+        <FilaDeProducto
           key={producto.id}
           producto={producto}
-          acciones={acciones}
+          ajustar={ajustarStock}
           soloLectura={soloLectura}
           vistas={vistas ? (vistas[producto.id] ?? 0) : null}
         />
@@ -77,294 +55,188 @@ export function ListaProductos({
   )
 }
 
-function Fila({
+/**
+ * Un producto en la lista: su foto grande, cuánto vale y cuánto queda.
+ *
+ * Lo que dice cómo está —agotado, oculto, destacado— va sobre la foto, no en
+ * una línea de texto aparte. El stock se cambia con más y menos donde se mira:
+ * contar unidades es lo que más veces por semana hace quien vende, y abrir un
+ * formulario para cambiar un número es lo que hace que deje de hacerlo. Se
+ * guarda un momento después del último toque, no con cada uno.
+ */
+function FilaDeProducto({
   producto,
-  acciones,
+  ajustar,
   soloLectura,
   vistas,
 }: {
   producto: Product
-  acciones: Acciones
+  ajustar: Ajustar
   soloLectura: boolean
   vistas: number | null
 }) {
   const router = useRouter()
-  const [ocupado, setOcupado] = React.useState(false)
-  const { preguntar, dialogo } = useConfirmacion()
+  const [stock, setStock] = React.useState(producto.stock)
+  const [guardando, setGuardando] = React.useState(false)
+  const reloj = React.useRef<number | undefined>(undefined)
 
-  const sinStock = producto.stock === 0
-  const pocoStock =
-    producto.stock > 0 && producto.stock <= producto.low_stock_threshold
+  React.useEffect(() => setStock(producto.stock), [producto.stock])
+  React.useEffect(() => () => window.clearTimeout(reloj.current), [])
 
-  async function correr(
-    trabajo: () => Promise<{ ok: boolean; error?: string }>,
-    exito: string
-  ) {
+  function cambiar(nuevo: number) {
     if (soloLectura) {
       toast.info("Estás en modo demo: los cambios no se guardan.")
       return
     }
-
-    setOcupado(true)
-    const resultado = await trabajo()
-    setOcupado(false)
-
-    if (!resultado.ok) {
-      toast.error(resultado.error ?? "No pudimos guardar el cambio.")
-      return
-    }
-
-    toast.success(exito)
-    router.refresh()
+    const valor = Math.max(0, Math.min(999_999, nuevo))
+    setStock(valor)
+    window.clearTimeout(reloj.current)
+    reloj.current = window.setTimeout(async () => {
+      setGuardando(true)
+      const resultado = await ajustar(producto.id, valor)
+      setGuardando(false)
+      if (!resultado.ok) {
+        setStock(producto.stock)
+        toast.error(resultado.error ?? "No pudimos guardar el stock.")
+        return
+      }
+      router.refresh()
+    }, ESPERA_MS)
   }
 
+  const agotado = stock === 0
+  const pocos = stock > 0 && stock <= producto.low_stock_threshold
+  const oculto = !producto.is_active || Boolean(producto.moderated_at)
+  const marca = producto.moderated_at
+    ? { texto: "Oculto por Venduo", rojo: true }
+    : !producto.is_active
+      ? { texto: "Oculto", rojo: false }
+      : agotado
+        ? { texto: "Agotado", rojo: true }
+        : pocos
+          ? { texto: "Queda poco", rojo: false }
+          : null
+  const href = `/panel/productos/${producto.id}`
+
   return (
-    <li
-      className={cn(
-        "border-t border-tinta/15 px-4 py-4 transition-opacity first:border-t-0 sm:px-5",
-        ocupado && "opacity-50",
-        !producto.is_active && "opacity-60"
-      )}
-    >
-      {dialogo}
-      <div className="flex gap-4">
-        <div className="size-16 shrink-0 overflow-hidden border border-tinta/20 bg-tinta/5 sm:size-20">
-          {producto.image_url ? (
-            <Image
-              src={producto.image_url}
-              alt={producto.name}
-              width={160}
-              height={160}
-              unoptimized
-              className="size-full object-cover"
-            />
-          ) : (
-            <div className="flex size-full items-center justify-center">
-              <ImageOff aria-hidden="true" className="size-5 opacity-25" />
-            </div>
-          )}
-        </div>
+    <li className="flex gap-3 border-t border-tinta/15 py-3 pr-3 pl-4 first:border-t-0 sm:pr-4 sm:pl-5 @2xl:items-center @2xl:gap-4">
+      <Link
+        href={href}
+        tabIndex={-1}
+        aria-hidden="true"
+        className={cn(
+          "relative block size-[76px] shrink-0 overflow-hidden border border-tinta/15 bg-tinta/[0.05] transition-opacity active:opacity-70",
+          oculto && "opacity-45"
+        )}
+      >
+        {producto.image_url ? (
+          <Image
+            src={producto.image_url}
+            alt=""
+            fill
+            sizes="76px"
+            className="object-cover"
+          />
+        ) : (
+          <Package className="absolute inset-0 m-auto size-5 opacity-35" />
+        )}
+        {producto.is_featured ? (
+          <span className="absolute top-1 right-1 flex size-[22px] items-center justify-center rounded-full bg-tinta text-papel">
+            <Star className="size-3 fill-current" strokeWidth={2} />
+          </span>
+        ) : null}
+        {marca ? (
+          <span
+            className={cn(
+              "absolute inset-x-0 bottom-0 truncate px-1 py-0.5 text-center text-[11px] leading-[14px] font-semibold text-papel",
+              marca.rojo ? "bg-senal" : "bg-tinta"
+            )}
+          >
+            {marca.texto}
+          </span>
+        ) : null}
+      </Link>
 
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-start gap-x-4 gap-y-1">
-            <div className="min-w-0 flex-1">
-              <h3 className="font-titular text-base font-bold tracking-[-0.01em]">
-                <Link
-                  href={`/panel/productos/${producto.id}`}
-                  className="inline-flex min-h-11 items-center transition-colors hover:text-senal"
-                >
-                  {producto.name}
-                </Link>
-              </h3>
-
-              <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs opacity-70">
-                <span>{producto.category ?? "Sin categoría"}</span>
-                {producto.sku ? (
-                  <>
-                    <span aria-hidden="true">·</span>
-                    <span className="tabular">{producto.sku}</span>
-                  </>
-                ) : null}
-                {vistas !== null ? (
-                  <>
-                    <span aria-hidden="true">·</span>
-                    <span className="tabular">
-                      {formatNumber(vistas)} {vistas === 1 ? "vista" : "vistas"}{" "}
-                      en 30 días
-                    </span>
-                  </>
-                ) : null}
-              </p>
-            </div>
-
-            <div className="text-right">
-              <p className="tabular font-titular text-base font-bold tracking-[-0.01em]">
-                {formatMoney(producto.price_cents)}
-              </p>
-              {producto.compare_at_price_cents ? (
-                <p className="tabular text-xs line-through opacity-65">
-                  {formatMoney(producto.compare_at_price_cents)}
-                </p>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-            <Stock
-              producto={producto}
-              sinStock={sinStock}
-              pocoStock={pocoStock}
-              soloLectura={soloLectura}
-              guardar={(stock) =>
-                correr(
-                  () => acciones.ajustarStock(producto.id, stock),
-                  "Stock actualizado."
-                )
-              }
-            />
-
-            {producto.moderated_at ? (
-              <Insignia tono="senal">Oculto por Venduo</Insignia>
-            ) : !producto.is_active ? (
-              <Insignia tono="suave">Oculto</Insignia>
+      <div className="flex min-w-0 flex-1 flex-col gap-2 @2xl:flex-row @2xl:items-center @2xl:gap-6">
+        <Link
+          href={href}
+          className="group flex min-w-0 flex-col gap-0.5 @2xl:flex-1"
+        >
+          <span className="line-clamp-2 font-titular text-base leading-5 font-bold tracking-[-0.01em] transition-colors group-hover:text-senal">
+            {producto.name}
+            {marca ? <span className="sr-only">, {marca.texto}</span> : null}
+          </span>
+          <span className="flex items-baseline gap-2">
+            <span className="tabular font-semibold">
+              {formatMoney(producto.price_cents)}
+            </span>
+            {producto.compare_at_price_cents ? (
+              <span className="tabular text-sm line-through opacity-65">
+                {formatMoney(producto.compare_at_price_cents)}
+              </span>
             ) : null}
-            {producto.is_featured ? <Insignia>Destacado</Insignia> : null}
+            {vistas !== null ? (
+              <span className="tabular min-w-0 flex-1 truncate text-right text-sm opacity-70">
+                {formatNumber(vistas)} {vistas === 1 ? "vista" : "vistas"}
+              </span>
+            ) : null}
+          </span>
+        </Link>
 
-            <div className="ml-auto flex items-center gap-1">
-              <Link
-                href={`/panel/productos/${producto.id}`}
-                aria-label={`Editar ${producto.name}`}
-                className="flex size-11 items-center justify-center opacity-65 transition-colors hover:text-senal hover:opacity-100"
-              >
-                <Pencil aria-hidden="true" className="size-4" />
-              </Link>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  aria-label={`Más acciones para ${producto.name}`}
-                  className="flex size-11 items-center justify-center opacity-65 transition-colors hover:text-senal hover:opacity-100"
-                >
-                  <MoreHorizontal aria-hidden="true" className="size-4" />
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent align="end" className="w-60">
-                  <DropdownMenuItem
-                    onSelect={() =>
-                      correr(
-                        () =>
-                          acciones.alternar(
-                            producto.id,
-                            "is_active",
-                            !producto.is_active
-                          ),
-                        producto.is_active
-                          ? "Ya no se ve en tu tienda."
-                          : "Publicado en tu tienda."
-                      )
-                    }
-                  >
-                    {producto.is_active ? (
-                      <EyeOff aria-hidden="true" className="size-4" />
-                    ) : (
-                      <Eye aria-hidden="true" className="size-4" />
-                    )}
-                    {producto.is_active ? "Ocultar de la tienda" : "Publicar"}
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem
-                    onSelect={() =>
-                      correr(
-                        () =>
-                          acciones.alternar(
-                            producto.id,
-                            "is_featured",
-                            !producto.is_featured
-                          ),
-                        producto.is_featured
-                          ? "Ya no está destacado."
-                          : "Destacado en tu portada."
-                      )
-                    }
-                  >
-                    <Star aria-hidden="true" className="size-4" />
-                    {producto.is_featured ? "Quitar destacado" : "Destacar"}
-                  </DropdownMenuItem>
-
-                  <DropdownMenuSeparator />
-
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onSelect={async () => {
-                      // Se pregunta porque saca el producto de la tienda y de
-                      // los enlaces que ya se compartieron.
-                      const borrar = await preguntar({
-                        titulo: `¿Sacar «${producto.name}» de tu catálogo?`,
-                        texto:
-                          "Deja de verse en tu tienda. Los pedidos que ya tenga se conservan.",
-                        confirmar: "Borrar del catálogo",
-                      })
-                      if (!borrar) return
-                      correr(
-                        () => acciones.borrar(producto.id),
-                        "Producto borrado."
-                      )
-                    }}
-                  >
-                    <Trash2 aria-hidden="true" className="size-4" />
-                    Borrar del catálogo
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
+        <div
+          role="group"
+          aria-label={`Unidades de ${producto.name}`}
+          className="flex items-center self-end @2xl:self-auto"
+        >
+          <Paso
+            etiqueta="Una unidad menos"
+            apagado={stock === 0}
+            alTocar={() => cambiar(stock - 1)}
+          >
+            <Minus aria-hidden="true" className="size-5" />
+          </Paso>
+          <span
+            aria-live="polite"
+            className={cn(
+              "tabular flex h-10 min-w-12 items-center justify-center border-y border-tinta px-1 font-titular text-base font-bold",
+              agotado && "text-senal"
+            )}
+          >
+            {guardando ? (
+              <span className="opacity-40">{formatNumber(stock)}</span>
+            ) : (
+              formatNumber(stock)
+            )}
+          </span>
+          <Paso etiqueta="Una unidad más" alTocar={() => cambiar(stock + 1)}>
+            <Plus aria-hidden="true" className="size-5" />
+          </Paso>
         </div>
       </div>
     </li>
   )
 }
 
-/**
- * El stock se edita donde se mira.
- *
- * Contar unidades es lo que más veces por semana hace un emprendedor, y abrir
- * un formulario entero para cambiar un número es lo que hace que deje de
- * hacerlo y el catálogo mienta.
- */
-function Stock({
-  producto,
-  sinStock,
-  pocoStock,
-  soloLectura,
-  guardar,
+function Paso({
+  etiqueta,
+  apagado = false,
+  alTocar,
+  children,
 }: {
-  producto: Product
-  sinStock: boolean
-  pocoStock: boolean
-  soloLectura: boolean
-  guardar: (stock: number) => void
+  etiqueta: string
+  apagado?: boolean
+  alTocar: () => void
+  children: React.ReactNode
 }) {
-  const [valor, setValor] = React.useState(String(producto.stock))
-
-  React.useEffect(() => setValor(String(producto.stock)), [producto.stock])
-
-  function confirmar() {
-    const numero = Number(valor)
-    if (!Number.isInteger(numero) || numero < 0) {
-      setValor(String(producto.stock))
-      return
-    }
-    if (numero !== producto.stock) guardar(numero)
-  }
-
   return (
-    <label
-      className={cn(
-        "flex items-center gap-2 text-xs",
-        sinStock && "text-senal",
-        pocoStock && "text-senal"
-      )}
+    <button
+      type="button"
+      onClick={alTocar}
+      disabled={apagado}
+      aria-label={etiqueta}
+      className="flex h-10 w-11 items-center justify-center border border-tinta transition-colors hover:bg-tinta/[0.06] active:bg-tinta active:text-papel disabled:opacity-30"
     >
-      <span className="font-semibold tracking-[0.1em] uppercase opacity-70">
-        {sinStock ? "Sin stock" : pocoStock ? "Queda poco" : "Stock"}
-      </span>
-      <input
-        type="number"
-        min="0"
-        step="1"
-        inputMode="numeric"
-        value={valor}
-        disabled={soloLectura}
-        onChange={(e) => setValor(e.target.value)}
-        onBlur={confirmar}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") e.currentTarget.blur()
-        }}
-        aria-label={`Unidades de ${producto.name}`}
-        className={cn(
-          "tabular h-11 w-16 border-b bg-transparent text-center text-sm font-semibold transition-colors outline-none focus:border-senal",
-          sinStock || pocoStock ? "border-senal" : "border-tinta/30"
-        )}
-      />
-    </label>
+      {children}
+    </button>
   )
 }

@@ -17,7 +17,7 @@ export default async function CategoriasPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 md:gap-8">
-      <Volver href="/panel/productos">Tu catálogo</Volver>
+      <Volver href="/panel/productos">Productos</Volver>
 
       <Cabecera
         titulo="Categorías."
