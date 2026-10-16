@@ -12,6 +12,11 @@ import {
   getMaterialDelCatalogo,
   plantillasDeCatalogoVisibles,
 } from "@/lib/data/catalogos"
+import type { ProductoDelCatalogo } from "@/lib/catalogos/datos"
+import {
+  armarDesdePropuesta,
+  PLANTILLAS_DE_CATALOGO,
+} from "@/lib/catalogos/plantillas"
 import { exigirFuncion } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 import { anotarUsoDeIa, permisoDeIa } from "@/lib/data/uso-ia"
@@ -221,4 +226,59 @@ export async function pedirCatalogoALaIa(
   }
 
   return { ok: true, propuesta }
+}
+
+export type ResultadoDeArmarConLaIa =
+  | {
+      ok: true
+      id: string
+      nombre: string
+      productos: number
+      plantilla: string
+      explicacion: string
+      enlace: string
+    }
+  | { ok: false; error: string }
+
+/**
+ * Un catálogo desde una frase, ya guardado: lo que hace "Pídeselo a la IA" en
+ * la lista de catálogos, la de la web y la de la app (`/api/v1/ia/catalogo`).
+ *
+ * La propuesta se arma con la composición de su plantilla y el estilo de la
+ * tienda, y se guarda; después se abre en el editor para retocarla. Pasa por
+ * `pedirCatalogoALaIa` y `guardarCatalogo`, así que valen el permiso, el tope
+ * de la IA, los productos de la tienda y el contraste.
+ */
+export async function armarCatalogoConLaIa(
+  frase: string
+): Promise<ResultadoDeArmarConLaIa> {
+  const permiso = await exigirFuncion("catalogos")
+  if (!permiso.ok) return { ok: false, error: permiso.error }
+
+  const propuesta = await pedirCatalogoALaIa(frase, null)
+  if (!propuesta.ok) return propuesta
+
+  const { datos, estiloDeTienda } = await getMaterialDelCatalogo()
+  const productos = propuesta.propuesta.productos
+    .map((id) => datos.productos[id])
+    .filter((producto): producto is ProductoDelCatalogo => Boolean(producto))
+
+  const catalogo = armarDesdePropuesta(propuesta.propuesta, {
+    productos,
+    tienda: { nombre: datos.tienda.nombre, whatsapp: datos.tienda.whatsapp },
+    estilo: estiloDeTienda,
+  })
+
+  const guardado = await guardarCatalogo(null, catalogo)
+  if (!guardado.ok) return guardado
+
+  return {
+    ok: true,
+    id: guardado.id,
+    nombre: catalogo.nombre,
+    productos: catalogo.productos.length,
+    plantilla: PLANTILLAS_DE_CATALOGO[catalogo.plantilla].nombre,
+    explicacion: propuesta.propuesta.explicacion,
+    enlace: guardado.enlace,
+  }
 }

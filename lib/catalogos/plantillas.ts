@@ -1,4 +1,5 @@
 import {
+  CLAVES_PLANTILLA,
   CAMPOS_POR_DEFECTO,
   idNuevo,
   type Campos,
@@ -689,4 +690,72 @@ export function armarConEstilo(
     estilo: sugerido.estilo,
     invertido: sugerido.estilo.invertido,
   })
+}
+
+/**
+ * Con qué empieza un catálogo nuevo cuando se tocó una plantilla en la lista:
+ * una de las doce, o uno de los estilos de la tienda. Viaja en la dirección
+ * —`?plantilla=revista`, `?estilo=oscuro`— a la web y a la app por igual.
+ */
+export type EleccionDePlantilla =
+  | { tipo: "plantilla"; clave: ClavePlantilla }
+  | { tipo: "estilo"; clave: ClaveDeEstiloSugerido }
+
+const CLAVES_DE_ESTILO: readonly ClaveDeEstiloSugerido[] = [
+  "tienda",
+  "pleno",
+  "oscuro",
+  "tonos",
+]
+
+/** Lee la elección de la dirección. Lo que no es una clave conocida, se ignora. */
+export function leerEleccion(parametros: {
+  plantilla?: string | string[]
+  estilo?: string | string[]
+}): EleccionDePlantilla | null {
+  const { plantilla, estilo } = parametros
+  if (typeof estilo === "string") {
+    const clave = CLAVES_DE_ESTILO.find((c) => c === estilo)
+    if (clave) return { tipo: "estilo", clave }
+  }
+  if (typeof plantilla === "string") {
+    const clave = CLAVES_PLANTILLA.find((c) => c === plantilla)
+    if (clave) return { tipo: "plantilla", clave }
+  }
+  return null
+}
+
+/** La dirección de la elección, para sumarla a una ruta. */
+export function consultaDeEleccion(eleccion: EleccionDePlantilla): string {
+  return eleccion.tipo === "estilo"
+    ? `estilo=${eleccion.clave}`
+    : `plantilla=${eleccion.clave}`
+}
+
+/** El nombre de lo elegido, para decir con qué se está armando. */
+export function nombreDeEleccion(
+  eleccion: EleccionDePlantilla,
+  sugeridos: EstiloSugerido[]
+): string | null {
+  if (eleccion.tipo === "plantilla") {
+    return PLANTILLAS_DE_CATALOGO[eleccion.clave].nombre
+  }
+  return sugeridos.find((s) => s.clave === eleccion.clave)?.nombre ?? null
+}
+
+/**
+ * El catálogo armado con lo elegido en la lista. `null` si era un estilo que
+ * esta tienda no ofrece —su color no da para "a toda hoja", por ejemplo—: se
+ * sigue por la galería, como si no se hubiera elegido nada.
+ */
+export function armarConEleccion(
+  eleccion: EleccionDePlantilla,
+  entrada: Omit<EntradaDePlantilla, "plantilla" | "invertido">,
+  sugeridos: EstiloSugerido[]
+): Catalogo | null {
+  if (eleccion.tipo === "plantilla") {
+    return armarCatalogo({ ...entrada, plantilla: eleccion.clave })
+  }
+  const sugerido = sugeridos.find((s) => s.clave === eleccion.clave)
+  return sugerido ? armarConEstilo(sugerido, entrada) : null
 }

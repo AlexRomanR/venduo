@@ -15,6 +15,15 @@ export interface TituloDeBarra {
   titulo: string
   /** A dónde lleva la flecha. Sin ella, la barra lleva el menú. */
   volver?: string
+  /**
+   * Lo que pasa al tocar la flecha, si no es solo volver: el editor de
+   * catálogos pregunta antes de salir con cambios sin guardar.
+   */
+  alVolver?: () => void
+  /** Botones a la derecha, como deshacer, rehacer y guardar en un editor. */
+  acciones?: React.ReactNode
+  /** Un editor a pantalla completa se cierra con una X, como en la app. */
+  cerrar?: boolean
 }
 
 const SECCIONES: Array<[RegExp, TituloDeBarra]> = [
@@ -49,28 +58,40 @@ export function tituloDeRuta(ruta: string): TituloDeBarra | null {
   return SECCIONES.find(([patron]) => patron.test(ruta))?.[1] ?? null
 }
 
-const Contexto = React.createContext<{
-  propio: TituloDeBarra | null
-  setPropio: (titulo: TituloDeBarra | null) => void
-}>({ propio: null, setPropio: () => {} })
+// Dos contextos: quien pone el título no se vuelve a dibujar cuando el título
+// cambia. Si fuera uno, la página que lo pone con botones —un elemento nuevo en
+// cada dibujo— entraría en un ciclo.
+const Valor = React.createContext<TituloDeBarra | null>(null)
+const Poner = React.createContext<(titulo: TituloDeBarra | null) => void>(
+  () => {}
+)
 
 export function ProveedorDeTitulo({ children }: { children: React.ReactNode }) {
   const [propio, setPropio] = React.useState<TituloDeBarra | null>(null)
-  const valor = React.useMemo(() => ({ propio, setPropio }), [propio])
-  return <Contexto.Provider value={valor}>{children}</Contexto.Provider>
+  return (
+    <Poner.Provider value={setPropio}>
+      <Valor.Provider value={propio}>{children}</Valor.Provider>
+    </Poner.Provider>
+  )
 }
 
 /** El título que puso la pantalla, si puso uno. */
 export function useTituloPropio() {
-  return React.useContext(Contexto).propio
+  return React.useContext(Valor)
 }
 
 /** Lo pone una página de detalle; al salir de ella, la barra vuelve a la ruta. */
-export function TituloDeLaBarra({ titulo, volver }: TituloDeBarra) {
-  const { setPropio } = React.useContext(Contexto)
+export function TituloDeLaBarra({
+  titulo,
+  volver,
+  alVolver,
+  acciones,
+  cerrar,
+}: TituloDeBarra) {
+  const poner = React.useContext(Poner)
   React.useEffect(() => {
-    setPropio({ titulo, volver })
-    return () => setPropio(null)
-  }, [titulo, volver, setPropio])
+    poner({ titulo, volver, alVolver, acciones, cerrar })
+  }, [titulo, volver, alVolver, acciones, cerrar, poner])
+  React.useEffect(() => () => poner(null), [poner])
   return null
 }

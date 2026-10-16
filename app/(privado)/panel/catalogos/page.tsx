@@ -1,13 +1,11 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { BookOpen, LayoutTemplate, Palette, Plus } from "lucide-react"
+import { BookOpen, Plus } from "lucide-react"
 
 import { HOJAS } from "@/lib/catalogos/constantes"
 import { elegidos } from "@/lib/catalogos/datos"
 import {
   PLANTILLAS_DE_CATALOGO,
-  armarCatalogo,
-  armarConEstilo,
   estilosDeLaTienda,
 } from "@/lib/catalogos/plantillas"
 import {
@@ -21,18 +19,24 @@ import { isSupabaseConfigured } from "@/lib/env"
 import { BOTON_PRIMARIO } from "@/lib/estilos"
 import { formatRelative } from "@/lib/format"
 import { cn } from "@/lib/utils"
-import { Cabecera, Seccion, SinDatos } from "@/components/panel/piezas"
+import { ConFuncion } from "@/components/panel/funcion"
+import { Cabecera, Seccion } from "@/components/panel/piezas"
 import { AccionesDeCatalogo } from "@/components/catalogos/acciones-de-lista"
 import { MiniaturaDeCatalogo } from "@/components/catalogos/miniatura"
+import { PedirCatalogoALaIa } from "@/components/catalogos/pedir-a-la-ia"
+import { PlantillasDeLaLista } from "@/components/catalogos/plantillas-de-la-lista"
+import { armarCatalogoConLaIa } from "./acciones"
 
 export const metadata = { title: "Catálogos" }
 
 /**
- * Los catálogos en PDF de la tienda.
+ * Los catálogos en PDF de la tienda, la misma pantalla de la app.
  *
- * Arriba los guardados, que se mandan tal como están y siempre salen con los
- * precios del día; abajo las plantillas que se ofrecen, con los productos de
- * la tienda, que es lo que convence de armar el primero.
+ * Arriba, la IA plegada en una fila; después los guardados —si hay—, que se
+ * mandan tal como están y siempre salen con los precios del día; y al final
+ * las plantillas, dibujadas con los productos de la tienda: tocar una empieza
+ * un catálogo con ella. "Nuevo catálogo" flota sobre las pestañas en el
+ * celular, como "Nuevo producto".
  */
 export default async function CatalogosPage() {
   const [tienda, { catalogos, esDemo }, material, funciones, plantillas] =
@@ -50,21 +54,13 @@ export default async function CatalogosPage() {
     estiloDeTienda,
     plantillaDeLaTienda
   ).filter((sugerido) => plantillas.includes(sugerido.plantilla))
-  const productos = Object.values(datos.productos)
-
-  // Las muestras se arman con los primeros productos: alcanzan para ver cómo
-  // queda cada plantilla sin dibujar el catálogo entero doce veces.
-  const muestra = productos.slice(0, 12)
 
   return (
-    <div className="flex flex-col gap-6 md:gap-8">
+    <div className="flex flex-col gap-6 max-lg:pb-16 md:gap-8">
       <Cabecera
         titulo="Tus catálogos."
         bajada="Tus productos en PDF, con los precios del día, para mandar por WhatsApp o imprimir."
-        demo={
-          esDemo &&
-          "Estás en modo demo: los catálogos son de ejemplo y no se guardan."
-        }
+        accionesSoloEnPantallaAncha
       >
         <Link
           href="/panel/catalogos/nuevo"
@@ -75,27 +71,19 @@ export default async function CatalogosPage() {
         </Link>
       </Cabecera>
 
-      <Seccion
-        id="guardados"
-        icono={BookOpen}
-        titulo="Los que ya armaste"
-        bajada="Siempre salen con los precios de hoy."
-      >
-        {catalogos.length === 0 ? (
-          <SinDatos
-            icono={BookOpen}
-            titulo="Todavía no tienes catálogos"
-            texto="Arma el primero en un minuto: eliges productos, eliges una plantilla y lo descargas en PDF o lo mandas por WhatsApp."
-          >
-            <Link
-              href="/panel/catalogos/nuevo"
-              className={cn(BOTON_PRIMARIO, "min-h-11 px-4 text-sm")}
-            >
-              <Plus aria-hidden="true" className="size-4" />
-              Armar mi primer catálogo
-            </Link>
-          </SinDatos>
-        ) : (
+      <ConFuncion estado={funciones.ia_catalogos}>
+        <PedirCatalogoALaIa armar={armarCatalogoConLaIa} />
+      </ConFuncion>
+
+      {/* Sin catálogos no hay nada que mostrar aquí: las plantillas de abajo
+          son las que invitan a armar el primero. */}
+      {catalogos.length > 0 ? (
+        <Seccion
+          id="guardados"
+          icono={BookOpen}
+          titulo="Los que ya armaste"
+          bajada="Siempre salen con los precios de hoy."
+        >
           <ul>
             {catalogos.map((guardado) => {
               const cuantos = elegidos(guardado.catalogo, datos).length
@@ -146,108 +134,26 @@ export default async function CatalogosPage() {
               )
             })}
           </ul>
-        )}
-      </Seccion>
-
-      {muestra.length > 0 && sugeridos.length > 0 ? (
-        <Seccion
-          id="con-tu-estilo"
-          icono={Palette}
-          titulo="Con el estilo de tu tienda"
-          bajada="Tus colores, a toda hoja o en oscuro."
-          accion={{
-            href: "/panel/catalogos/nuevo",
-            texto: "Armar uno con tu estilo",
-          }}
-        >
-          <ul className="grid grid-cols-2 gap-px bg-tinta/15 lg:grid-cols-4">
-            {sugeridos.map((sugerido) => (
-              <li
-                key={sugerido.clave}
-                className="flex flex-col gap-3 bg-papel p-4"
-              >
-                <MiniaturaDeCatalogo
-                  catalogo={armarConEstilo(sugerido, {
-                    nombre: "Catálogo de temporada",
-                    productos: muestra,
-                    tienda: {
-                      nombre: datos.tienda.nombre,
-                      whatsapp: datos.tienda.whatsapp,
-                    },
-                  })}
-                  datos={datos}
-                  ancho={112}
-                />
-                <div>
-                  <p className="font-titular leading-tight font-bold tracking-[-0.01em]">
-                    {sugerido.nombre}
-                  </p>
-                  <p className="mt-1 text-xs leading-relaxed opacity-70">
-                    {sugerido.detalle}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
         </Seccion>
       ) : null}
 
-      <Seccion
-        id="plantillas"
-        icono={LayoutTemplate}
-        titulo="Plantillas para empezar"
-        bajada="Con tus productos y tus colores."
-        accion={{ href: "/panel/catalogos/nuevo", texto: "Armar un catálogo" }}
-      >
-        {muestra.length === 0 ? (
-          <SinDatos
-            icono={LayoutTemplate}
-            titulo="Primero, tus productos"
-            texto="Las plantillas se dibujan con lo que vendes. Carga algunos productos y vuelve a verlas."
-          >
-            <Link
-              href="/panel/productos/nuevo"
-              className={cn(BOTON_PRIMARIO, "min-h-11 px-4 text-sm")}
-            >
-              <Plus aria-hidden="true" className="size-4" />
-              Cargar un producto
-            </Link>
-          </SinDatos>
-        ) : (
-          <ul className="grid grid-cols-2 gap-px bg-tinta/15 sm:grid-cols-3 xl:grid-cols-4">
-            {plantillas.map((clave) => {
-              const plantilla = PLANTILLAS_DE_CATALOGO[clave]
-              const catalogo = armarCatalogo({
-                plantilla: clave,
-                nombre: "Catálogo de temporada",
-                productos: muestra,
-                tienda: {
-                  nombre: datos.tienda.nombre,
-                  whatsapp: datos.tienda.whatsapp,
-                },
-                estilo: estiloDeTienda,
-              })
-              return (
-                <li key={clave} className="flex flex-col gap-3 bg-papel p-4">
-                  <MiniaturaDeCatalogo
-                    catalogo={catalogo}
-                    datos={datos}
-                    ancho={112}
-                  />
-                  <div>
-                    <p className="font-titular leading-tight font-bold tracking-[-0.01em]">
-                      {plantilla.nombre}
-                    </p>
-                    <p className="mt-1 text-xs leading-relaxed opacity-70">
-                      {plantilla.ideal}
-                    </p>
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
+      <PlantillasDeLaLista
+        datos={datos}
+        estiloDeTienda={estiloDeTienda}
+        sugeridos={sugeridos}
+        plantillas={plantillas}
+      />
+
+      <Link
+        href="/panel/catalogos/nuevo"
+        className={cn(
+          BOTON_PRIMARIO,
+          "fixed right-4 bottom-[calc(4rem+env(safe-area-inset-bottom)+0.75rem)] z-20 min-h-12 px-5 lg:hidden"
         )}
-      </Seccion>
+      >
+        <Plus aria-hidden="true" className="size-5" />
+        Nuevo catálogo
+      </Link>
     </div>
   )
 }

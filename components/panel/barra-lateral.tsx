@@ -915,7 +915,20 @@ export function BarraLateralMovil({ datos }: { datos: BarraLateral }) {
       )}
     >
       <div className="flex h-14 items-center gap-4 px-4">
-        {barra?.volver ? (
+        {barra?.volver && barra.alVolver ? (
+          <button
+            type="button"
+            onClick={barra.alVolver}
+            aria-label={barra.cerrar ? "Cerrar" : "Volver"}
+            className="-ml-1.5 flex size-11 shrink-0 items-center justify-center transition-opacity active:opacity-60"
+          >
+            {barra.cerrar ? (
+              <X aria-hidden="true" className="size-6" />
+            ) : (
+              <ArrowLeft aria-hidden="true" className="size-6" />
+            )}
+          </button>
+        ) : barra?.volver ? (
           <Link
             href={barra.volver}
             aria-label="Volver"
@@ -959,6 +972,11 @@ export function BarraLateralMovil({ datos }: { datos: BarraLateral }) {
         >
           {titulo}
         </p>
+        {barra?.acciones ? (
+          <div className="-mr-2 flex shrink-0 items-center">
+            {barra.acciones}
+          </div>
+        ) : null}
       </div>
     </header>
   )

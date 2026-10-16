@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 
+import { leerEleccion } from "@/lib/catalogos/plantillas"
 import {
   getMaterialDelCatalogo,
   plantillasDeCatalogoVisibles,
@@ -15,14 +16,23 @@ export const maxDuration = 60
 
 export const metadata = { title: "Nuevo catálogo" }
 
-/** Armar un catálogo: productos, plantilla y edición, en la misma pantalla. */
-export default async function NuevoCatalogoPage() {
-  const [tienda, material, funciones, plantillas] = await Promise.all([
-    getMiTienda(),
-    getMaterialDelCatalogo(),
-    funcionesDeMiTienda(),
-    plantillasDeCatalogoVisibles(),
-  ])
+/**
+ * Armar un catálogo: productos, plantilla y edición, en la misma pantalla.
+ * `?plantilla=` o `?estilo=` llegan de tocar una plantilla en la lista.
+ */
+export default async function NuevoCatalogoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ plantilla?: string; estilo?: string }>
+}) {
+  const [tienda, material, funciones, plantillas, parametros] =
+    await Promise.all([
+      getMiTienda(),
+      getMaterialDelCatalogo(),
+      funcionesDeMiTienda(),
+      plantillasDeCatalogoVisibles(),
+      searchParams,
+    ])
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
   if (funciones.catalogos !== "activa") redirect("/panel")
 
@@ -42,6 +52,7 @@ export default async function NuevoCatalogoPage() {
       }}
       plantillas={plantillas}
       inicial={null}
+      empezarCon={leerEleccion(parametros)}
     />
   )
 }
