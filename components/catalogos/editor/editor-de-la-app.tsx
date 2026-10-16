@@ -9,7 +9,7 @@ import {
   type DatosDelCatalogo,
   type ProductoDelCatalogo,
 } from "@/lib/catalogos/datos"
-import { problemasDeEstilo } from "@/lib/catalogos/estilo"
+import { problemasDeEstilo, resolverEstilo } from "@/lib/catalogos/estilo"
 import type { Catalogo, Estilo } from "@/lib/catalogos/modelo"
 import {
   agregarBloque,
@@ -25,8 +25,10 @@ import {
   quitarPack,
 } from "@/lib/catalogos/operaciones"
 import {
+  armarConEleccion,
   armarDesdePropuesta,
   estilosDeLaTienda,
+  type EleccionDePlantilla,
 } from "@/lib/catalogos/plantillas"
 import {
   mensajeDeLaAppAlCatalogo,
@@ -74,7 +76,9 @@ function nombreDelMes(): string {
  * La app manda cambios y acá se aplican con las mismas operaciones que el
  * constructor de la web, con su deshacer. En modo galería muestra cada
  * plantilla ya armada con los productos elegidos, como el constructor, y tocar
- * una la elige. Guardar y armar el PDF los hace la app por la API.
+ * una la elige. Si se llegó tocando una plantilla en la lista (`empezarCon`),
+ * los productos van directo a las hojas. Guardar y armar el PDF los hace la
+ * app por la API.
  */
 export function EditorDeCatalogoDeLaApp({
   datos,
@@ -82,12 +86,14 @@ export function EditorDeCatalogoDeLaApp({
   plantillaDeLaTienda,
   plantillas,
   inicial,
+  empezarCon = null,
 }: {
   datos: DatosDelCatalogo
   estiloDeTienda: Estilo
   plantillaDeLaTienda: string | null
   plantillas: readonly ClavePlantilla[]
   inicial: Catalogo | null
+  empezarCon?: EleccionDePlantilla | null
 }) {
   const [historial, setHistorial] = React.useState<Historial>({
     presente: inicial,
@@ -158,8 +164,17 @@ export function EditorDeCatalogoDeLaApp({
       puedeRehacer: historial.futuro.length > 0,
       sinGuardar:
         JSON.stringify(catalogo) !== JSON.stringify(historial.guardado),
+      sugeridos: sugeridos.map((sugerido) => {
+        const { papel, tinta, acento } = resolverEstilo(sugerido.estilo).colores
+        return {
+          clave: sugerido.clave,
+          nombre: sugerido.nombre,
+          estilo: sugerido.estilo,
+          muestra: { papel, tinta, acento },
+        }
+      }),
     })
-  }, [catalogo, modo, historial, datos])
+  }, [catalogo, modo, historial, datos, sugeridos])
 
   const recibir = React.useCallback(
     (mensaje: MensajeDeLaAppAlCatalogo) => {
@@ -169,9 +184,31 @@ export function EditorDeCatalogoDeLaApp({
       }
 
       switch (mensaje.tipo) {
-        case "productos":
+        case "productos": {
           setSeleccion(mensaje.ids)
-          return con((actual) => ponerProductos(actual, mensaje.ids))
+          if (catalogo) return poner(ponerProductos(catalogo, mensaje.ids))
+          const armado = empezarCon
+            ? armarConEleccion(
+                empezarCon,
+                {
+                  nombre: nombreDelMes(),
+                  productos: mensaje.ids
+                    .map((id) => datos.productos[id])
+                    .filter((producto): producto is ProductoDelCatalogo =>
+                      Boolean(producto)
+                    ),
+                  tienda,
+                  estilo: estiloDeTienda,
+                },
+                sugeridos
+              )
+            : null
+          if (armado) {
+            poner(armado)
+            setModo("hojas")
+          }
+          return
+        }
         case "galeria":
           return setModo("galeria")
         case "hojas":
@@ -263,7 +300,7 @@ export function EditorDeCatalogoDeLaApp({
           }))
       }
     },
-    [catalogo, poner, tienda, datos, estiloDeTienda]
+    [catalogo, poner, tienda, datos, estiloDeTienda, empezarCon, sugeridos]
   )
 
   React.useEffect(() => {

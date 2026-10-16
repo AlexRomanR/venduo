@@ -1,3 +1,4 @@
+import { leerEleccion } from "@/lib/catalogos/plantillas"
 import {
   getCatalogo,
   getMaterialDelCatalogo,
@@ -19,14 +20,16 @@ export const dynamic = "force-dynamic"
 /**
  * El editor de catálogos para la app móvil: las hojas del catálogo, o la
  * galería de plantillas, sin los controles de la web. `?id=` abre uno
- * guardado; sin él, empieza uno nuevo con los productos que mande la app.
+ * guardado; sin él, empieza uno nuevo con los productos que mande la app, y
+ * `?plantilla=` o `?estilo=` dicen con qué armarlo.
  */
 export default async function EditorDeCatalogoDeLaAppPage({
   searchParams,
 }: {
-  searchParams: Promise<{ id?: string }>
+  searchParams: Promise<{ id?: string; plantilla?: string; estilo?: string }>
 }) {
-  const { id } = await searchParams
+  const parametros = await searchParams
+  const { id } = parametros
   const [abierto, material, funciones, plantillas] = await Promise.all([
     id ? getCatalogo(id) : Promise.resolve(null),
     getMaterialDelCatalogo(),
@@ -45,6 +48,7 @@ export default async function EditorDeCatalogoDeLaAppPage({
       plantillaDeLaTienda={material.plantillaDeLaTienda}
       plantillas={plantillas}
       inicial={abierto?.catalogo ?? null}
+      empezarCon={leerEleccion(parametros)}
     />
   )
 }

@@ -80,6 +80,16 @@ export type MensajeDelCatalogoAlaApp =
       puedeDeshacer: boolean
       puedeRehacer: boolean
       sinGuardar: boolean
+      /**
+       * Los estilos de la tienda para el panel Estilo: se aplican mandando su
+       * `estilo`. `muestra` son sus tres colores ya resueltos, para dibujarlos.
+       */
+      sugeridos: {
+        clave: string
+        nombre: string
+        estilo: unknown
+        muestra: { papel: string; tinta: string; acento: string }
+      }[]
     }
   | { tipo: "tocar"; id: string }
   | { tipo: "sin-tienda" }

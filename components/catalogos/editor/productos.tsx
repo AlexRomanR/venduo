@@ -44,23 +44,20 @@ import { SelectorDeProductos } from "@/components/catalogos/editor/selector"
  * muestran así, y las de una categoría también, filtrando.
  */
 
-export function PanelDeProductos({
+/**
+ * La pestaña IA del editor, la misma de la app: un orden para los productos de
+ * este catálogo y un nombre. Nada cambia hasta "Usar este orden".
+ */
+export function PanelDeIa({
   catalogo,
-  datos,
   ia = "activa",
   alCambiar,
 }: {
   catalogo: Catalogo
-  datos: DatosDelCatalogo
   /** Si Venduo dejó la IA de catálogos activa en esta tienda. */
   ia?: EstadoDeFuncion
   alCambiar: (catalogo: Catalogo) => void
 }) {
-  const [eligiendo, setEligiendo] = React.useState(
-    catalogo.productos.length === 0
-  )
-  const lista = elegidos(catalogo, datos)
-
   function usar(propuesta: PropuestaDeCatalogo) {
     let nuevo = ponerProductos(catalogo, propuesta.productos)
     const portada = nuevo.bloques.find((bloque) => bloque.tipo === "portada")
@@ -76,27 +73,44 @@ export function PanelDeProductos({
     alCambiar(nuevo)
   }
 
+  if (ia === "oculta") return null
+
+  return (
+    <div className="px-4 py-5 sm:px-5">
+      <ConFuncion estado={ia}>
+        <PedidoALaIa
+          titulo="Pídele a la IA un orden"
+          ayuda="Ordena los productos de este catálogo y le pone nombre. Tú decides si lo usas."
+          ejemplos={[
+            "Lo más vendible primero",
+            "Solo lo que está en oferta",
+            "Agrupado por categoría",
+          ]}
+          actuales={catalogo.productos}
+          textoDeUsar="Usar este orden"
+          alUsar={usar}
+        />
+      </ConFuncion>
+    </div>
+  )
+}
+
+export function PanelDeProductos({
+  catalogo,
+  datos,
+  alCambiar,
+}: {
+  catalogo: Catalogo
+  datos: DatosDelCatalogo
+  alCambiar: (catalogo: Catalogo) => void
+}) {
+  const [eligiendo, setEligiendo] = React.useState(
+    catalogo.productos.length === 0
+  )
+  const lista = elegidos(catalogo, datos)
+
   return (
     <div className="flex flex-col">
-      {ia !== "oculta" ? (
-        <div className="border-b border-tinta/15 px-4 py-5 sm:px-5">
-          <ConFuncion estado={ia}>
-            <PedidoALaIa
-              titulo="Pídele a la IA un orden"
-              ayuda="Elige y ordena entre los productos de este catálogo, y propone un nombre. Tú decides si lo usas."
-              ejemplos={[
-                "Lo más vendible primero",
-                "Solo lo que está en oferta",
-                "Agrupado por categoría",
-              ]}
-              actuales={catalogo.productos}
-              textoDeUsar="Usar este orden"
-              alUsar={usar}
-            />
-          </ConFuncion>
-        </div>
-      ) : null}
-
       {eligiendo ? (
         <>
           <SelectorDeProductos

@@ -31,7 +31,8 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/editor`                                 | Editor de la tienda, a pantalla completa. `?paso=`      | Requiere sesión |
 | `/editor/vista-previa`                    | La tienda del dueño con su borrador, para el `iframe`   | Requiere sesión |
 | `/editor/app`                             | El editor de la tienda para la app: borrador y vista    | Token de la app |
-| `/editor/app/catalogo`                    | El editor de catálogos para la app. `?id=` uno guardado | Token de la app |
+| `/editor/app/catalogo`                    | El editor de catálogos para la app. `?id=` uno guardado |
+| `/editor/app/catalogo/plantillas`         | Las plantillas de la lista de catálogos, para la app    | Token de la app |
 | `/panel`                                  | Resumen del emprendedor                                 | Requiere sesión |
 | `/panel/{seccion}`                        | Productos, pedidos, estadísticas, marketing             | Requiere sesión |
 | `/panel/pedidos/{id}`                     | Un pedido: detalle y estados                            | Requiere sesión |
@@ -41,7 +42,7 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/panel/apariencia`                       | La puerta al editor, la plantilla y el historial        | Requiere sesión |
 | `/panel/estadisticas/pdf`                 | El informe del tablero en PDF. `?g={id}` para uno solo  | Requiere sesión |
 | `/panel/catalogos`                        | Catálogos en PDF: los guardados y las doce plantillas   | Requiere sesión |
-| `/panel/catalogos/nuevo`                  | Armar uno: productos, plantilla y edición               | Requiere sesión |
+| `/panel/catalogos/nuevo`                  | Armar uno. `?plantilla=` o `?estilo=` llega con ella    | Requiere sesión |
 | `/panel/catalogos/{id}`                   | Editar un catálogo guardado                             | Requiere sesión |
 | `/panel/catalogos/pdf`                    | El PDF del borrador del editor, por POST                | Requiere sesión |
 | `/panel/catalogos/{id}/pdf`               | El PDF de uno guardado, con los precios del día         | Requiere sesión |

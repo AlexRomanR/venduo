@@ -64,10 +64,14 @@ Actualizado el 9 de octubre de 2026.
 - Doce plantillas —grilla, revista, lookbook, lista de precios, una foto por hoja,
   vitrina de lujo, historia 9:16, mayorista, feria, packs, ofertas y flyer— hechas de
   siete bloques con 25 variantes. Cualquier bloque sirve en cualquier plantilla.
-- Constructor: elegir productos con búsqueda y filtros (o pedirle el catálogo a la IA
-  en una frase), elegir la plantilla viéndola con los propios productos y editar hoja
-  por hoja con la vista previa al lado. Packs con su precio, estilo de la tienda o
-  propio, fondo oscuro, A4 o 9:16, y el contraste controlado antes de descargar.
+- **La lista y el editor son los mismos que en la app.** La lista: la IA plegada en una
+  fila —arma el catálogo y lo abre en el editor—, los guardados si hay, las plantillas
+  con el estilo de la tienda y las doce, y "Nuevo catálogo" flotando. Tocar una
+  plantilla empieza un catálogo con ella. El editor en el celular: las hojas en
+  pantalla y el panel que sube desde abajo con Hojas, Productos, Packs, Estilo, IA y
+  Listo, con deshacer y rehacer. Los productos se eligen por sus fotos.
+- Packs con su precio, estilo de la tienda o propio, fondo oscuro, A4 o 9:16, y el
+  contraste controlado antes de descargar.
 - Cuatro estilos sacados de la tienda —tal cual, su color a toda hoja, en oscuro y en
   tonos de su acento—, cada uno con la plantilla que mejor lo luce. Se calculan de la
   tienda: si cambia sus colores, cambian con ella.

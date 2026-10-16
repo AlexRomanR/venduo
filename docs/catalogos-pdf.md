@@ -195,11 +195,28 @@ y dejan las hojas como están.
 
 ## 7. El editor
 
-| Pantalla                 | Qué hace                                                        |
-| ------------------------ | --------------------------------------------------------------- |
-| `/panel/catalogos`       | Los guardados y las doce plantillas dibujadas con tus productos |
-| `/panel/catalogos/nuevo` | Productos (o la IA) → plantilla → editar, en la misma pantalla  |
-| `/panel/catalogos/{id}`  | Uno guardado, con los productos de hoy                          |
+| Pantalla                 | Qué hace                                                                  |
+| ------------------------ | ------------------------------------------------------------------------- |
+| `/panel/catalogos`       | La IA plegada, los guardados y las plantillas dibujadas con tus productos |
+| `/panel/catalogos/nuevo` | Productos → estilo → editar. `?plantilla=` o `?estilo=` salta el estilo   |
+| `/panel/catalogos/{id}`  | Uno guardado, con los productos de hoy                                    |
+
+**La lista y el editor son los mismos en la web y en la app**, como todo el panel en el
+celular (`ui-styling.md`, "El celular es uno solo"):
+
+- **La lista**: arriba "Pídeselo a la IA", plegado en una fila; "Los que ya armaste", solo
+  si hay; "Plantillas con el estilo de tu tienda" y "Plantillas para empezar"; y "Nuevo
+  catálogo" flotando sobre las pestañas. Las plantillas las dibuja
+  `PlantillasDeLaLista`, y la app la muestra tal cual desde
+  `/editor/app/catalogo/plantillas`: la página avisa su alto y qué se tocó
+  (`ListaParaLaApp`), y la app abre su editor. Así no hay una segunda versión de cada
+  plantilla que mantener en la app.
+- **Tocar una plantilla empieza un catálogo con ella** (`EleccionDePlantilla`, en
+  `lib/catalogos/plantillas.ts`): se eligen los productos y `armarConEleccion` lo arma
+  directo, sin pasar por la galería. Un estilo que la tienda no ofrece sigue por la
+  galería.
+- **La IA de la lista** arma el catálogo y lo guarda (`armarCatalogoConLaIa`, la misma
+  acción en la web y en `/api/v1/ia/catalogo`); después se abre en el editor.
 
 Todo pasa en el navegador hasta que se guarda. Las operaciones son funciones puras en
 `lib/catalogos/operaciones.ts`; la más importante es `ponerProductos()`: un producto que
@@ -209,14 +226,20 @@ queda con menos de dos productos se quita con sus hojas.
 Las miniaturas de la lista se dibujan **en el servidor** (`MiniaturaDeCatalogo`): al
 teléfono llega HTML y no el catálogo con todos los productos.
 
-En el celular no entran las dos columnas: una barra abajo alterna entre editar y ver las
-hojas. Tocar una hoja abre su formulario.
+En el celular es el editor de la app: las hojas ocupan la pantalla y el panel sube
+desde abajo (`PanelDeslizable`, con tres alturas y su manija), con seis pestañas —Hojas,
+Productos, Packs, Estilo, IA y Listo— en una fila que se desliza. La barra de arriba
+lleva la X, el nombre, deshacer, rehacer y "Guardar", que abre Listo: el nombre,
+guardar, mandarlo y Canva. Tocar una hoja la abre en el panel. En una pantalla ancha
+el panel es la columna de la izquierda y Listo no existe: eso va en la cabecera.
+
+Deshacer y rehacer guardan hasta 60 pasos, igual que el editor de la app. Los productos
+se eligen por sus fotos (`SelectorConFotos`), como en la app.
 
 **La vista previa sigue a la hoja que se edita.** Al elegir un bloque —en la lista o al
 agregarlo— la vista previa va a su primera hoja: editar la oferta con la vista parada en
 la portada era editar a ciegas. En escritorio se desplaza dentro de su columna, para no
-correr el formulario; en el celular, al tocar "Ver", abre en esa hoja. Tres cosas que
-`VistaPrevia` cuida:
+correr el formulario. Tres cosas que `VistaPrevia` cuida:
 
 - Se mueve cuando **cambia lo elegido**, no en cada letra: quien recorre las hojas
   mientras escribe no vuelve a la suya a cada rato.
