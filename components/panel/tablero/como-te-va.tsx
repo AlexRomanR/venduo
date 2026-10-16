@@ -61,6 +61,7 @@ export function ComoTeVa({
       id="como-te-va"
       icono={ChartNoAxesColumn}
       titulo="Cómo te va"
+      bajada="Tus ventas cobradas, comparadas con el período anterior."
       className="@container"
       extra={
         hayVentas ? (

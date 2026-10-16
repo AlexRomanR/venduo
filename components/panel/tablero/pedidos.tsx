@@ -32,6 +32,7 @@ export function UltimosPedidos({
       id="ultimos-pedidos"
       icono={ShoppingBag}
       titulo="Últimos pedidos"
+      bajada="Los más nuevos. Márcalos cobrados apenas te paguen."
       accion={
         pedidos.length > 0
           ? { href: "/panel/pedidos", texto: "Ver todos" }
