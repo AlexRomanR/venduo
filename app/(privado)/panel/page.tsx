@@ -78,6 +78,7 @@ export default async function PanelPage() {
     deLaTienda.publicada &&
     !deLaTienda.pausada &&
     (!tienda.vista_at ||
+      !tienda.vista_escritorio_url ||
       new Date(tienda.vista_at) < new Date(tienda.vista_cambio_at))
   ) {
     const id = tienda.id
@@ -94,6 +95,11 @@ export default async function PanelPage() {
         tienda={deLaTienda}
         suscripcion={datos.suscripcion}
         vista={vista}
+        escritorio={{
+          url: tienda?.vista_escritorio_url ?? null,
+          clave,
+          apariencia: barra.apariencia,
+        }}
       />
 
       <AvisoSuscripcion suscripcion={datos.suscripcion} />

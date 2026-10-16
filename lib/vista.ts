@@ -10,7 +10,9 @@ import { urlDeTienda } from "@/lib/tienda"
 
 /*
  * La vista de la tienda: una captura real de su portada, como la ve quien
- * compra desde el celular. La muestra la app en su Inicio.
+ * compra desde el celular y desde una computadora. La del celular la muestran
+ * el Inicio de la app y el Resumen en el celular; la otra, el Resumen en una
+ * pantalla ancha.
  *
  * Cuándo hace falta una nueva lo decide la base (`vista_cambio_at`, ver la
  * migración `vista_de_tienda`). Acá se saca y se guarda. Solo la saca la ruta
@@ -20,6 +22,11 @@ import { urlDeTienda } from "@/lib/tienda"
 
 /** El ancho de un celular común, y cuánto de la portada entra en la captura. */
 const PANTALLA = { width: 390, height: 780 }
+/**
+ * La portada en una computadora común, para el Resumen de una pantalla ancha.
+ * A densidad 1 ya alcanza: se muestra en un recuadro de unos 400 px.
+ */
+const ESCRITORIO = { width: 1280, height: 800 }
 /**
  * La densidad de la captura: 390 × 1,4 da unos 540 px de ancho, lo que pide la
  * tarjeta del Inicio. Chrome la guarda en JPEG ya de ese tamaño, sin `sharp`:
@@ -101,20 +108,42 @@ async function abrirNavegador() {
   })
 }
 
-/** La portada de la tienda, en JPEG y achicada. */
-async function fotografiar(url: string): Promise<Buffer> {
+/**
+ * La portada de la tienda en JPEG: como la ve quien compra desde el celular y
+ * desde una computadora. Un solo Chrome para las dos: abrirlo es lo que más
+ * tarda.
+ */
+async function fotografiar(
+  url: string
+): Promise<{ celular: Buffer; escritorio: Buffer }> {
   const navegador = await abrirNavegador()
   try {
     const pagina = await navegador.newPage()
+    const sacar = async () => {
+      await pagina.goto(url, { waitUntil: "networkidle0", timeout: 20_000 })
+      await pagina.evaluate(() => document.fonts.ready)
+      return Buffer.from(await pagina.screenshot({ type: "jpeg", quality: 80 }))
+    }
+
     await pagina.setViewport({
       ...PANTALLA,
       deviceScaleFactor: DENSIDAD,
       isMobile: true,
       hasTouch: true,
     })
-    await pagina.goto(url, { waitUntil: "networkidle0", timeout: 25_000 })
-    await pagina.evaluate(() => document.fonts.ready)
-    return Buffer.from(await pagina.screenshot({ type: "jpeg", quality: 80 }))
+    const celular = await sacar()
+
+    // Otra carga y no un cambio de tamaño: salir del modo celular cambia cómo
+    // Chrome presenta la página, y eso vale desde que se carga.
+    await pagina.setViewport({
+      ...ESCRITORIO,
+      deviceScaleFactor: 1,
+      isMobile: false,
+      hasTouch: false,
+    })
+    const escritorio = await sacar()
+
+    return { celular, escritorio }
   } finally {
     await navegador.close()
   }
@@ -148,20 +177,31 @@ export async function capturarVista(tiendaId: string): Promise<string | null> {
     .update({ vista_pedida_at: ahora.toISOString() })
     .eq("id", tiendaId)
     .or(`vista_pedida_at.is.null,vista_pedida_at.lt.${vencido}`)
-    .select("id, slug, vista_url, vista_at, vista_cambio_at")
+    .select(
+      "id, slug, vista_url, vista_escritorio_url, vista_at, vista_cambio_at"
+    )
     .maybeSingle()
 
   if (!tienda) return null
 
-  const soltar = (cambios: { vista_url?: string; vista_at?: string } = {}) =>
+  const soltar = (
+    cambios: {
+      vista_url?: string
+      vista_escritorio_url?: string
+      vista_at?: string
+    } = {}
+  ) =>
     admin
       .from("stores")
       .update({ ...cambios, vista_pedida_at: null })
       .eq("id", tiendaId)
 
   try {
+    // Una tienda fotografiada antes de que existiera la de computadora no
+    // está al día aunque nada haya cambiado: le falta una.
     const alDia =
       tienda.vista_at &&
+      tienda.vista_escritorio_url &&
       new Date(tienda.vista_at) >= new Date(tienda.vista_cambio_at)
     const { data: enElAire } = await admin.rpc("store_is_live", {
       p_store_id: tiendaId,
@@ -172,20 +212,34 @@ export async function capturarVista(tiendaId: string): Promise<string | null> {
       return tienda.vista_url
     }
 
-    const imagen = await fotografiar(urlDeTienda(tienda.slug))
-    const ruta = `${tiendaId}/vista-${ahora.getTime()}.jpg`
-    const { error } = await admin.storage
-      .from(BUCKET)
-      .upload(ruta, imagen, { contentType: "image/jpeg", upsert: true })
-    if (error) throw new Error(error.message)
+    const fotos = await fotografiar(urlDeTienda(tienda.slug))
+    const subir = async (nombre: string, imagen: Buffer) => {
+      const ruta = `${tiendaId}/${nombre}-${ahora.getTime()}.jpg`
+      const { error } = await admin.storage
+        .from(BUCKET)
+        .upload(ruta, imagen, { contentType: "image/jpeg", upsert: true })
+      if (error) throw new Error(error.message)
+      return admin.storage.from(BUCKET).getPublicUrl(ruta).data.publicUrl
+    }
+    const [url, urlEscritorio] = await Promise.all([
+      subir("vista", fotos.celular),
+      subir("vista-escritorio", fotos.escritorio),
+    ])
 
-    const url = admin.storage.from(BUCKET).getPublicUrl(ruta).data.publicUrl
     // `vista_at` es cuando empezó la captura: lo que se editó mientras tanto
     // la deja vieja otra vez, y la próxima vez se saca de nuevo.
-    await soltar({ vista_url: url, vista_at: ahora.toISOString() })
+    await soltar({
+      vista_url: url,
+      vista_escritorio_url: urlEscritorio,
+      vista_at: ahora.toISOString(),
+    })
 
-    const anterior = rutaEnElBucket(tienda.vista_url)
-    if (anterior) await admin.storage.from(BUCKET).remove([anterior])
+    const anteriores = [tienda.vista_url, tienda.vista_escritorio_url]
+      .map(rutaEnElBucket)
+      .filter((ruta): ruta is string => Boolean(ruta))
+    if (anteriores.length > 0) {
+      await admin.storage.from(BUCKET).remove(anteriores)
+    }
 
     return url
   } catch (error) {

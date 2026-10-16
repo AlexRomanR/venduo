@@ -77,8 +77,11 @@ export function ComoTeVa({
       }
     >
       {hayVentas ? (
-        <>
-          <dl className="grid grid-cols-2 gap-px border-b border-tinta/15 bg-tinta/15 @2xl:grid-cols-4">
+        // Con lugar, dos zonas: las cifras de a dos a la izquierda y el gráfico
+        // a la derecha. Una debajo de la otra, a todo el ancho, el gráfico se
+        // estiraba en barras finas y el panel medía el doble de alto.
+        <div className="@3xl:grid @3xl:grid-cols-[minmax(0,23rem)_minmax(0,1fr)]">
+          <dl className="grid grid-cols-2 gap-px border-b border-tinta/15 bg-tinta/15 @2xl:grid-cols-4 @3xl:grid-cols-2 @3xl:border-r @3xl:border-b-0">
             <Cifra
               etiqueta="Ventas"
               valor={ahora.ventasCents}
@@ -115,14 +118,14 @@ export function ComoTeVa({
             />
           </dl>
 
-          <div className="px-4 pt-4 pb-5 sm:px-5">
+          <div className="px-4 pt-4 pb-5 sm:px-5 @3xl:self-center">
             <GraficoDeVentas
               columnas={columnas(actual)}
               hoy={hoy}
               descripcion={`Ventas de los últimos ${periodo} días: ${formatMoney(ahora.ventasCents)} en ${formatNumber(ahora.pedidos)} ${ahora.pedidos === 1 ? "pedido" : "pedidos"}`}
             />
           </div>
-        </>
+        </div>
       ) : (
         <SinDatos
           icono={ChartNoAxesColumn}

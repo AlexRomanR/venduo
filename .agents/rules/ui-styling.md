@@ -89,10 +89,16 @@ su `AGENTS.md`): quien vende lo abre entre dos mensajes y no va a leer un párra
   filtrada (`ParaHoy`). Los números suben al aparecer (`Contador`).
 - **Fotos antes que nombres**: un pedido por las fotos de lo que pidieron, un producto
   por la suya, en carruseles que se deslizan en el celular.
-- **La tienda se muestra, no se nombra**: la captura de su portada dentro de un celular
-  chico, al lado del nombre. El Resumen es un resumen, no un lugar para mirar la tienda:
-  tocarla abre el editor, y para verla está "Ver tienda". Sin captura todavía, va su
-  plantilla vista en un celular (`public/plantillas/celular/`).
+- **La tienda se muestra, no se nombra**, como la ve quien compra en esa pantalla: en el
+  celular, su portada en un celular chico al lado del nombre; en una pantalla ancha, su
+  portada en una ventana de computadora a la derecha. El Resumen es un resumen, no un
+  lugar para mirar la tienda: tocarla abre el editor, y para verla está "Ver tienda".
+  Sin captura todavía, va su plantilla: vista en un celular
+  (`public/plantillas/celular/`) o dibujada con sus colores (`Miniatura`).
+- **En una pantalla ancha nada queda a medio llenar**: la cabecera se alinea a dos bordes
+  con la computadora, "Para hoy" va en una fila y "Cómo te va" en dos zonas —cifras y
+  gráfico—. Los paneles se acomodan al lugar que les toca (`@container`), no al ancho de
+  la pantalla.
 - **Lo que no pide nada no ocupa lugar**: sin ventas no hay "lo más vendido"; sin
   pendientes, "Estás al día" es una línea.
 - **Lo de todos los días se hace donde se ve**: cobrar un pedido y reponer stock desde

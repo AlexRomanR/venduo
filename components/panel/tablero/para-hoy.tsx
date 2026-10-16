@@ -84,25 +84,22 @@ export function ParaHoy({
             const Icono = atajo.icono
             return (
               <li key={atajo.etiqueta}>
+                {/* En el celular, el número abajo de su ícono, como en la app;
+                    en una pantalla ancha, en una fila: ícono, número y nombre,
+                    sin el aire que dejaba una celda alta para tres cifras. */}
                 <Link
                   href={atajo.href}
                   aria-label={`${atajo.valor} ${atajo.etiqueta}`}
-                  className="group flex h-full min-h-32 flex-col justify-between gap-4 px-3 py-4 transition-colors hover:bg-tinta/[0.04] sm:px-5"
+                  className="group relative flex h-full min-h-32 flex-col justify-between gap-4 px-3 py-4 transition-colors hover:bg-tinta/[0.04] sm:px-5 lg:min-h-0 lg:flex-row lg:items-center lg:justify-start lg:gap-4 lg:py-5"
                 >
-                  <span className="flex items-center justify-between">
-                    <Icono
-                      aria-hidden="true"
-                      className={cn(
-                        "size-5",
-                        atajo.urgente ? "text-senal" : "opacity-60"
-                      )}
-                    />
-                    <ArrowRight
-                      aria-hidden="true"
-                      className="size-4 -translate-x-1 opacity-0 transition-[opacity,transform] duration-200 group-hover:translate-x-0 group-hover:opacity-100 motion-reduce:transform-none"
-                    />
-                  </span>
-                  <span>
+                  <Icono
+                    aria-hidden="true"
+                    className={cn(
+                      "size-5 shrink-0 lg:size-6",
+                      atajo.urgente ? "text-senal" : "opacity-60"
+                    )}
+                  />
+                  <span className="lg:flex lg:min-w-0 lg:items-baseline lg:gap-3">
                     <Contador
                       valor={atajo.valor}
                       className={cn(
@@ -110,10 +107,14 @@ export function ParaHoy({
                         atajo.urgente && "text-senal"
                       )}
                     />
-                    <span className="mt-1.5 block text-[13px] leading-tight font-semibold sm:text-sm">
+                    <span className="mt-1.5 block text-[13px] leading-tight font-semibold sm:text-sm lg:mt-0 lg:truncate lg:text-base">
                       {atajo.etiqueta}
                     </span>
                   </span>
+                  <ArrowRight
+                    aria-hidden="true"
+                    className="absolute top-4 right-3 size-4 -translate-x-1 opacity-0 transition-[opacity,transform] duration-200 group-hover:translate-x-0 group-hover:opacity-100 motion-reduce:transform-none sm:right-5 lg:static lg:ml-auto"
+                  />
                 </Link>
               </li>
             )

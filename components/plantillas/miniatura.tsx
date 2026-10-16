@@ -5,7 +5,7 @@ import {
   plantillaDeTienda,
   type ClavePlantilla,
 } from "@/lib/plantillas"
-import { variablesEnLinea } from "@/lib/plantillas/apariencia"
+import { variablesEnLinea, type Apariencia } from "@/lib/plantillas/apariencia"
 import { cn } from "@/lib/utils"
 
 /**
@@ -25,9 +25,15 @@ import { cn } from "@/lib/utils"
  */
 export function Miniatura({
   clave,
+  apariencia,
   className,
 }: {
   clave: string | null | undefined
+  /**
+   * La apariencia de una tienda, para dibujarla con sus colores y su letra.
+   * Sin decirlo, la base de la plantilla.
+   */
+  apariencia?: Apariencia | null
   className?: string
 }) {
   const plantilla = plantillaDeTienda(clave)
@@ -38,7 +44,9 @@ export function Miniatura({
       aria-hidden="true"
       data-miniatura={plantilla}
       style={
-        variablesEnLinea(PLANTILLAS[plantilla].apariencia) as CSSProperties
+        variablesEnLinea(
+          apariencia ?? PLANTILLAS[plantilla].apariencia
+        ) as CSSProperties
       }
       className={cn(
         "@container relative aspect-[4/3] w-full overflow-hidden bg-papel text-tinta select-none",

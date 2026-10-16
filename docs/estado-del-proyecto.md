@@ -181,7 +181,8 @@ que se arregló:
 ### Panel del emprendedor (`/panel`)
 
 - **Resumen que se mira, no se lee**, como el Inicio de la app. Al lado del nombre, la
-  captura de la portada en un celular chico, que abre el editor. **Para hoy** en números grandes que llevan a la
+  portada de la tienda como la ve quien compra en esa pantalla —en un celular chico, o en
+  una computadora en una pantalla ancha—, que abre el editor. **Para hoy** en números grandes que llevan a la
   lista filtrada, **Cómo te va** con cifras que suben y barras que crecen,
   **Últimos pedidos** con las fotos de lo que pidieron y el botón **Cobrado** ahí
   mismo, **Lo más vendido** en fotos y **Se está acabando** con más y menos para
