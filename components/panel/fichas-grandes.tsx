@@ -113,11 +113,14 @@ export function FichasGrandes({ fichas }: { fichas: FichaGrande[] }) {
                 tipo={ficha.tipo ?? "numero"}
                 className={cn(
                   "block truncate font-titular text-[30px] leading-9 font-extrabold tracking-[-0.03em] lg:text-4xl lg:leading-[44px]",
-                  ficha.tipo === "dinero" && "max-sm:text-[22px]",
+                  // Un monto es más largo que una cuenta: en el celular se
+                  // achica con el ancho, como la app achica la letra para que entre.
+                  ficha.tipo === "dinero" &&
+                    "max-sm:text-[clamp(1.125rem,5.2vw,1.875rem)]",
                   rojo && "text-senal"
                 )}
               />
-              <span className="block truncate text-sm font-semibold">
+              <span className="block text-sm leading-tight font-semibold">
                 {ficha.etiqueta}
               </span>
             </span>
@@ -125,7 +128,7 @@ export function FichasGrandes({ fichas }: { fichas: FichaGrande[] }) {
         )
         const clase = cn(
           claseDeCelda(Boolean(ficha.elegida), rojo, Boolean(ficha.href)),
-          "min-h-[104px] justify-between px-3 py-3 sm:px-4 lg:px-6 lg:py-5"
+          "min-h-[104px] justify-between px-2.5 py-3 sm:px-4 lg:px-6 lg:py-5"
         )
 
         return ficha.href ? (

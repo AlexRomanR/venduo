@@ -73,6 +73,12 @@ mismos nombres y el mismo orden. Quien vende usa las dos y no tiene por qué apr
 - **Todo cambio a algo que existe en las dos se hace en los dos repositorios en la misma
   tarea.** Una pantalla del panel que cambia en la web cambia en la app, y al revés.
 - **Se mira lado a lado antes de darlo por hecho**: el emulador y el navegador a 375 px.
+- **La barra de arriba dice dónde estás**, como en la app: en una sección, su nombre con
+  el menú al lado; en un detalle, la flecha para volver y el nombre de lo que se mira
+  —"Pedido #291"—. Lo general sale de la ruta (`tituloDeRuta`, en
+  `components/panel/titulo-de-barra.tsx`); una página que sabe más lo dice con
+  `TituloDeLaBarra`. Por eso en el celular la pantalla no repite su titular ni su
+  "Volver": `Volver` se esconde solo, y la `Cabecera` va en `max-lg:sr-only`.
 - **Lo único distinto es lo que es de una sola plataforma**: los avisos al teléfono y
   "Venduo en la computadora" son de la app; la barra de escritorio, su riel plegado, los
   atajos de teclado y el atajo "Nuevo producto" de la pantalla ancha son de la web.
@@ -165,6 +171,15 @@ perdía entre lo demás.
 | `SinDatos`         | El estado vacío dentro de un panel: qué va a aparecer y cómo      |
 | `Insignia`         | Un estado en versalita: un pedido, un producto oculto             |
 | `Miniatura`        | La foto chica de un producto en una fila                          |
+
+Y las de las listas, las mismas de la app:
+
+| Pieza                                      | Para qué                                                    |
+| ------------------------------------------ | ----------------------------------------------------------- |
+| `FichasDeCobro`, `FichasGrandes`           | Números grandes arriba de una lista que la filtran al tocar |
+| `FranjaDeFichas`                           | Los filtros de una lista: fichas que se deslizan, en la URL |
+| `ListaDePedidos` (`components/pedidos/`)   | Pedidos con foto y "Cobrado", en Pedidos y en el Resumen    |
+| `ListaProductos` (`components/productos/`) | Productos con foto, su marca encima y más y menos de stock  |
 
 Y el ritmo, el mismo en todas: la pantalla es una columna de paneles con `gap-6
 md:gap-8`. Dentro de un panel, las filas van de lado a lado con una regla arriba

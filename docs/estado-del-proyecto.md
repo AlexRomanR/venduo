@@ -200,8 +200,12 @@ que se arregló:
   **Restaurar** en cada versión. El resumen también lleva al editor, y pide darle estilo
   mientras la tienda luzca igual a la plantilla.
 - Todas las pantallas se arman como el Resumen: cada cosa en su panel con borde, un
-  título que dice para qué sirve y su estado vacío dentro. Pedidos, Productos y las
-  demás pantallas todavía llevan su bajada: se convierten en las fases siguientes.
+  título que dice para qué sirve y su estado vacío dentro. **Pedidos y Productos son
+  las pantallas de la app**: números grandes que filtran, fichas que se deslizan, los
+  pedidos por día con su foto y "Cobrado", el detalle con "Marcar pagado" fijo abajo, y
+  los productos con su marca sobre la foto y más y menos de stock. Apariencia,
+  Catálogos, Estadísticas, Cuenta y el formulario del producto todavía llevan su
+  bajada: son la fase 3.
 - Barra lateral con contadores de lo que pide atención; se puede plegar y recuerda cómo
   quedó. **En el celular el panel es la app**: la misma barra de arriba con el cuadro de
   rayitas, el mismo menú lateral —la persona, la tarjeta de la tienda y tres grupos—, las
