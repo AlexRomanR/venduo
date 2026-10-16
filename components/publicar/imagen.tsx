@@ -201,7 +201,17 @@ function Pie({
         gap: 32,
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      {/* El texto toma lo que sobra y se parte si no entra: un enlace largo
+          —el de una vista previa, un subdominio— empujaba el QR afuera. */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 6,
+          flex: 1,
+          minWidth: 0,
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -219,10 +229,12 @@ function Pie({
             fontFamily: estilo.cuerpo.fuente,
             fontWeight: estilo.cuerpo.peso,
             fontSize: historia ? 32 : 26,
+            lineHeight: 1.25,
             color: suave,
           }}
         >
-          {tienda.enlace}
+          {/* Se parte después de una barra o un punto, nunca a media palabra. */}
+          {tienda.enlace.replace(/([/.])/g, "$1\u200b")}
         </div>
       </div>
       {historia && qr ? (
@@ -232,7 +244,7 @@ function Pie({
           alt=""
           width={168}
           height={168}
-          style={{ borderRadius: estilo.radio * 2 }}
+          style={{ flexShrink: 0, borderRadius: estilo.radio * 2 }}
         />
       ) : null}
     </div>

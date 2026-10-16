@@ -144,27 +144,30 @@ export function textosSinIa(
   tienda: string
 ): TextosBase {
   const rebaja = rebajaDe(producto)
-  const extra = rebaja
-    ? `Ahora con ${rebaja}% de descuento.`
-    : quedanPocas(producto)
-      ? "Quedan pocas unidades."
-      : null
+  const pocas = quedanPocas(producto)
+  const nombre = producto.nombre.trim()
+  const gancho = rebaja
+    ? `${nombre}, ahora con ${rebaja}% de descuento.`
+    : `${nombre}, ya disponible en ${tienda}.`
+  const apuro = pocas ? "Quedan pocas unidades." : null
+  const descripcion = producto.descripcion?.trim() || null
   return {
-    whatsapp: [
-      `${producto.nombre}, en ${tienda}.`,
-      extra,
-      "Escríbeme y te lo separo.",
+    whatsapp: [gancho, apuro, "Escríbeme y te lo separo."]
+      .filter(Boolean)
+      .join("\n"),
+    instagram: [
+      gancho,
+      rebaja ? `Solo en ${tienda}, por tiempo limitado.` : null,
+      apuro,
+      "Pídelo por mensaje o desde el enlace.",
     ]
       .filter(Boolean)
       .join("\n"),
-    instagram: [`${producto.nombre}, en ${tienda}.`, extra]
-      .filter(Boolean)
-      .join("\n"),
     facebook: [
-      `${producto.nombre}, en ${tienda}.`,
-      producto.descripcion?.trim() || null,
-      extra,
-      "Haz tu pedido por WhatsApp desde el enlace.",
+      rebaja ? `${gancho} Lo encuentras en ${tienda}.` : gancho,
+      descripcion,
+      apuro,
+      "Haz tu pedido por WhatsApp desde el enlace: te respondemos enseguida.",
     ]
       .filter(Boolean)
       .join("\n\n"),
@@ -172,6 +175,7 @@ export function textosSinIa(
       etiqueta(tienda),
       producto.categoria ? etiqueta(producto.categoria) : null,
       "Bolivia",
+      "CompraLocal",
       rebaja ? "Oferta" : "Novedad",
     ].filter((valor): valor is string => Boolean(valor && valor.length >= 2)),
   }

@@ -304,7 +304,7 @@ function Publicacion({
   const texto = textos[canal]
 
   return (
-    <div className="flex flex-col gap-6 max-lg:pb-24 md:gap-8">
+    <div className="flex flex-col gap-6 max-lg:pb-32 md:gap-8">
       <ProductoElegido producto={producto} alCambiar={alCambiar} />
 
       <div className="grid grid-cols-1 items-start gap-6 md:gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
@@ -684,7 +684,7 @@ function Compartir({
           className="flex min-h-12 items-center justify-center gap-2 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
         >
           <MessageCircle aria-hidden="true" className="size-4" />
-          Abrir WhatsApp
+          Por WhatsApp
         </a>
       </div>
 
@@ -706,6 +706,11 @@ function Compartir({
             )}
             {archivo ? "Compartir imagen y texto" : "Preparando la imagen…"}
           </button>
+          {/* El navegador no puede elegir la app por la persona: se le dice
+              qué va a encontrar en la hoja de compartir del teléfono. */}
+          <p className="mt-2 text-center text-xs opacity-70">
+            A tu estado, chats, grupos, Instagram o TikTok.
+          </p>
         </div>
       ) : null}
     </>
