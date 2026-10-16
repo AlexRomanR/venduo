@@ -1330,6 +1330,7 @@ export type Database = {
           updated_at: string
           vista_at: string | null
           vista_cambio_at: string
+          vista_escritorio_url: string | null
           vista_pedida_at: string | null
           vista_url: string | null
           whatsapp: string | null
@@ -1353,6 +1354,7 @@ export type Database = {
           updated_at?: string
           vista_at?: string | null
           vista_cambio_at?: string
+          vista_escritorio_url?: string | null
           vista_pedida_at?: string | null
           vista_url?: string | null
           whatsapp?: string | null
@@ -1376,6 +1378,7 @@ export type Database = {
           updated_at?: string
           vista_at?: string | null
           vista_cambio_at?: string
+          vista_escritorio_url?: string | null
           vista_pedida_at?: string | null
           vista_url?: string | null
           whatsapp?: string | null

@@ -192,11 +192,11 @@ export function EsqueletoDelResumen() {
       aria-label="Cargando tu resumen"
       className="flex flex-col gap-6 md:gap-8"
     >
-      <div className="flex items-end gap-4 md:gap-6">
+      <div className="flex items-center gap-4 lg:gap-6">
         <Skeleton
           className={cn(
             BLOQUE_ESQUELETO,
-            "size-14 shrink-0 md:aspect-[4/3] md:h-auto md:w-44"
+            "aspect-[1/2] w-[88px] shrink-0 rounded-[14px] lg:w-[104px]"
           )}
         />
         <div className="min-w-0 flex-1">
@@ -204,10 +204,10 @@ export function EsqueletoDelResumen() {
           <Skeleton
             className={cn(
               BLOQUE_ESQUELETO,
-              "mt-2 h-[clamp(1.75rem,5vw,2.5rem)] w-full max-w-xs"
+              "mt-2 h-[clamp(1.9rem,6vw,3rem)] w-full max-w-xs"
             )}
           />
-          <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-3 h-4 w-48")} />
+          <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-3 h-8 w-40")} />
         </div>
       </div>
 

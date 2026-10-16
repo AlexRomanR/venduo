@@ -50,6 +50,9 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
   antes de tocar la base o la pantalla.
 - **Toda pantalla de la cuenta lleva la barra lateral** desde que la persona tiene panel.
   Se decide en `components/panel/armazon.tsx`, no en cada layout. Detalle en `ui-styling.md`.
+- **El celular es uno solo.** El panel de la web en un celular y la app son la misma
+  pantalla: todo cambio a algo que existe en las dos se hace en los dos repositorios en
+  la misma tarea. Detalle en `ui-styling.md`.
 - **Toda pantalla del panel se arma como el Resumen**: cada cosa en su panel con borde,
   con las piezas de `components/panel/piezas.tsx`. Detalle en `ui-styling.md`.
 - **Una tienda se ve con su plantilla, y ningún componente pregunta cuál es.** La base

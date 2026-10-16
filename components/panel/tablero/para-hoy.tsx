@@ -1,105 +1,126 @@
 import Link from "next/link"
-import { ArrowRight, CircleCheck, type LucideIcon } from "lucide-react"
+import {
+  ArrowRight,
+  CircleAlert,
+  CircleCheck,
+  type LucideIcon,
+} from "lucide-react"
 
-import { formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
+import { Contador } from "@/components/panel/contador"
 import { Seccion } from "@/components/panel/piezas"
 
-export interface Pendiente {
-  icono: LucideIcon
+/** Lo que impide vender, dicho como lo que hay que hacer: "Agrega tu WhatsApp". */
+export interface Alerta {
   texto: string
-  detalle?: string
   href: string
-  /** El verbo del botón: "Ver pedidos", "Reponer". */
-  accion: string
-  /** Lo que frena una venta. Es lo único que va en rojo. */
+}
+
+/** Algo que espera, contado: un número grande y dos palabras. */
+export interface Atajo {
+  valor: number
+  etiqueta: string
+  icono: LucideIcon
+  /** La lista ya filtrada en lo que hay que atender. */
+  href: string
+  /** Frena una venta o un cobro. Es lo único que va en rojo. */
   urgente: boolean
 }
 
 /**
  * Lo que espera algo de la tienda, primero en la pantalla.
  *
- * Cada fila dice qué pasa, qué hacer y lleva ahí con un toque. El orden lo
- * decide quien arma la lista: primero lo que frena vender, después lo que
- * ayuda. Los números son los mismos de la barra lateral, así que las dos
- * nunca se contradicen.
+ * Se mira, no se lee: arriba lo que impide vender, en rojo y como una orden;
+ * abajo lo que espera, en números grandes que se tocan y llevan a la lista ya
+ * filtrada. Lo que está en cero no aparece, y si no queda nada, una línea.
+ * Los números son los de la barra lateral: los dos nunca se contradicen.
  */
-export function ParaHoy({ pendientes }: { pendientes: Pendiente[] }) {
+export function ParaHoy({
+  alertas,
+  atajos,
+}: {
+  alertas: Alerta[]
+  atajos: Atajo[]
+}) {
+  const conAlgo = atajos.filter((atajo) => atajo.valor > 0)
+
+  if (alertas.length === 0 && conAlgo.length === 0) {
+    return (
+      <p className="flex items-center gap-2.5 font-titular text-lg font-bold">
+        <CircleCheck aria-hidden="true" className="size-5" />
+        Estás al día
+      </p>
+    )
+  }
+
   return (
-    <Seccion
-      id="para-hoy"
-      icono={CircleCheck}
-      titulo="Para hoy"
-      bajada={
-        pendientes.length > 0
-          ? "Lo que espera tu respuesta, lo más importante primero."
-          : undefined
-      }
-      extra={
-        pendientes.length > 0 ? (
-          <span className="tabular text-sm opacity-70">
-            {formatNumber(pendientes.length)}{" "}
-            {pendientes.length === 1 ? "pendiente" : "pendientes"}
-          </span>
-        ) : null
-      }
-    >
-      {pendientes.length === 0 ? (
-        <p className="flex items-center gap-3 px-4 py-4 text-sm sm:px-5">
-          <CircleCheck aria-hidden="true" className="size-5 shrink-0" />
-          <span>
-            <span className="font-semibold">Estás al día.</span>{" "}
-            <span className="opacity-65">
-              Cuando llegue un pedido o una solicitud, aparece aquí.
-            </span>
-          </span>
-        </p>
-      ) : (
-        <ul>
-          {pendientes.map((pendiente) => {
-            const Icono = pendiente.icono
+    <Seccion id="para-hoy" icono={CircleAlert} titulo="Para hoy">
+      {alertas.map((alerta) => (
+        <Link
+          key={alerta.texto}
+          href={alerta.href}
+          className="group flex min-h-14 items-center gap-3 border-b border-tinta/15 px-4 text-senal transition-colors last:border-b-0 hover:bg-senal/[0.06] sm:px-5"
+        >
+          <span aria-hidden="true" className="size-2 rounded-full bg-senal" />
+          <span className="flex-1 font-semibold">{alerta.texto}</span>
+          <ArrowRight
+            aria-hidden="true"
+            className="size-4 transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transform-none"
+          />
+        </Link>
+      ))}
+
+      {conAlgo.length > 0 ? (
+        <ul
+          className={cn(
+            "grid divide-x divide-tinta/15",
+            alertas.length > 0 && "border-t border-tinta/15"
+          )}
+          style={{
+            gridTemplateColumns: `repeat(${conAlgo.length}, minmax(0, 1fr))`,
+          }}
+        >
+          {conAlgo.map((atajo) => {
+            const Icono = atajo.icono
             return (
-              <li
-                key={pendiente.texto}
-                className="border-t border-tinta/15 first:border-t-0"
-              >
+              <li key={atajo.etiqueta}>
+                {/* En el celular, el número abajo de su ícono, como en la app;
+                    en una pantalla ancha, en una fila: ícono, número y nombre,
+                    sin el aire que dejaba una celda alta para tres cifras. */}
                 <Link
-                  href={pendiente.href}
-                  className="group flex min-h-16 items-center gap-3 px-4 py-3 transition-colors hover:bg-tinta/[0.04] sm:px-5"
+                  href={atajo.href}
+                  aria-label={`${atajo.valor} ${atajo.etiqueta}`}
+                  className="group relative flex h-full min-h-32 flex-col justify-between gap-4 px-3 py-4 transition-colors hover:bg-tinta/[0.04] sm:px-5 lg:min-h-0 lg:flex-row lg:items-center lg:justify-start lg:gap-4 lg:py-5"
                 >
-                  <span
+                  <Icono
+                    aria-hidden="true"
                     className={cn(
-                      "flex size-10 shrink-0 items-center justify-center border",
-                      pendiente.urgente
-                        ? "border-senal text-senal"
-                        : "border-tinta/25"
+                      "size-5 shrink-0 lg:size-6",
+                      atajo.urgente ? "text-senal" : "opacity-60"
                     )}
-                  >
-                    <Icono aria-hidden="true" className="size-[18px]" />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block leading-snug font-semibold">
-                      {pendiente.texto}
-                    </span>
-                    {pendiente.detalle ? (
-                      <span className="mt-0.5 block text-sm leading-snug opacity-65">
-                        {pendiente.detalle}
-                      </span>
-                    ) : null}
-                  </span>
-                  <span className="flex shrink-0 items-center gap-1.5 text-sm font-semibold">
-                    <span className="hidden sm:inline">{pendiente.accion}</span>
-                    <ArrowRight
-                      aria-hidden="true"
-                      className="size-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transform-none"
+                  />
+                  <span className="lg:flex lg:min-w-0 lg:items-baseline lg:gap-3">
+                    <Contador
+                      valor={atajo.valor}
+                      className={cn(
+                        "block font-titular text-[clamp(2.25rem,7vw,3rem)] leading-none font-extrabold tracking-[-0.04em]",
+                        atajo.urgente && "text-senal"
+                      )}
                     />
+                    <span className="mt-1.5 block text-[13px] leading-tight font-semibold sm:text-sm lg:mt-0 lg:truncate lg:text-base">
+                      {atajo.etiqueta}
+                    </span>
                   </span>
+                  <ArrowRight
+                    aria-hidden="true"
+                    className="absolute top-4 right-3 size-4 -translate-x-1 opacity-0 transition-[opacity,transform] duration-200 group-hover:translate-x-0 group-hover:opacity-100 motion-reduce:transform-none sm:right-5 lg:static lg:ml-auto"
+                  />
                 </Link>
               </li>
             )
           })}
         </ul>
-      )}
+      ) : null}
     </Seccion>
   )
 }

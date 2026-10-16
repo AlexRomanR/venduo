@@ -206,10 +206,12 @@ components/
   panel/              Shell y piezas del panel. `piezas.tsx` son los
                       paneles, cifras y estados vacíos de toda pantalla;
                       `armazon.tsx` es la barra con su contenido y decide cuándo va;
-                      `funcion.tsx` apaga lo que Venduo desactivó y `visitas.tsx`
-                      es el panel de visitas, el mismo en `/admin`
-    tablero/          El Resumen: sus secciones, el gráfico de ventas, el sello de
-                      la tienda y compartirla
+                      `pestanas.tsx`, las pestañas de abajo en el celular;
+                      `funcion.tsx` apaga lo que Venduo desactivó, `visitas.tsx`
+                      es el panel de visitas, el mismo en `/admin`, y `contador.tsx`
+                      y `festejo.tsx` son los números que suben y el check al cobrar
+    tablero/          El Resumen: su cabecera, sus secciones, el gráfico de ventas y
+                      compartir la tienda
   admin/              El armazón de `/admin`, su navegación y los controles de
                       cada pantalla: funciones, plantillas, tiendas, ficha, registro
   landing/            Piezas de la portada
@@ -270,7 +272,9 @@ supabase/migrations/  SQL con marca de tiempo en el nombre
 
 public/marca/         Íconos del manifiesto y la tarjeta de compartir. Generados
 public/portada/       La foto y la captura de la tienda del primer bloque de la portada
-public/plantillas/    La miniatura de cada plantilla como imagen, para la app
+public/plantillas/    La miniatura de cada plantilla como imagen, para la app, y en
+                      `celular/` cada plantilla vista en un celular: la vista de una
+                      tienda sin captura
 
 scripts/marca.mjs     Genera todos los archivos del logo: `npm run marca`
 
@@ -336,7 +340,9 @@ con una cookie. **Cada ruta corre como esa persona**: RLS, `exigirFuncion` y
   ajustar stock— no pasa por acá: lo hace contra Supabase con su sesión.
 - Las miniaturas de `public/plantillas/` son capturas del componente `Miniatura`. Al
   cambiar la base de una plantilla o sumar una, se vuelven a capturar y se agrega su
-  clave en `lib/api/miniaturas.ts`.
+  clave en `lib/api/miniaturas.ts`. Las de `public/plantillas/celular/` son la portada
+  de cada plantilla a 390 × 780, con sus secciones y productos de ejemplo, como la
+  captura de una tienda real: una plantilla nueva lleva la suya.
 - **Los editores de la app no copian la lógica de la web: la usan.** La app abre
   `/editor/app` y `/editor/app/catalogo` en un WebView con su token —el middleware deja
   pasar el pedido con `x-venduo-app` y la página lo verifica como una cookie— y les

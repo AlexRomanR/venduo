@@ -8,10 +8,11 @@ import {
   BarraLateralEscritorio,
   BarraLateralMovil,
 } from "@/components/panel/barra-lateral"
+import { Pestanas } from "@/components/panel/pestanas"
 
 /**
- * El armazón del panel: la barra lateral en escritorio, el cajón en el
- * celular y el contenido al lado.
+ * El armazón del panel: la barra lateral en escritorio, y en el celular la
+ * barra de arriba, el cajón y las pestañas de abajo —los mismos de la app—.
  *
  * Una sola pieza para todas las pantallas que lo llevan, así la barra no
  * aparece en unas y falta en otras según en qué carpeta cayó la ruta. Cuáles
@@ -41,9 +42,12 @@ export async function ArmazonDelPanel({
           </p>
         ) : null}
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 lg:px-10">
+        {/* En el celular, abajo queda lugar para las pestañas. */}
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-4 pb-28 sm:px-5 lg:px-10 lg:py-10">
           {children}
         </main>
+
+        <Pestanas datos={barra} />
       </div>
     </div>
   )

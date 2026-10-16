@@ -275,4 +275,69 @@
       transform: translateX(-50%);
     }
   }
+
+  /*
+   * El panel se mueve poco y sin rebotes: cada parte del Resumen entra de a
+   * una, las barras del gráfico crecen desde la base y un número espera a
+   * contar en vez de mostrar el final y volver a cero. Con menos movimiento,
+   * todo aparece en su lugar.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .panel-entra {
+      animation: panel-entra 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-delay: calc(var(--orden, 0) * 45ms);
+    }
+    .barra-crece {
+      transform-box: fill-box;
+      transform-origin: bottom;
+      animation: barra-crece 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-delay: calc(var(--i, 0) * 9ms);
+    }
+  }
+  @keyframes panel-entra {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  @keyframes barra-crece {
+    from {
+      transform: scaleY(0);
+    }
+  }
+
+  /*
+   * Un contador antes de que corra el JavaScript: invisible, y visible solo si
+   * a los 900 ms no arrancó, para no esconder la cifra nunca.
+   */
+  .contador-espera {
+    opacity: 0;
+    animation: contador-aparece 1ms linear 900ms forwards;
+  }
+  @keyframes contador-aparece {
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* El check de un cobro: aparece, se queda un instante y se va. */
+  @media (prefers-reduced-motion: no-preference) {
+    .festejo {
+      animation: festejo 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+  }
+  @keyframes festejo {
+    0% {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+    22%,
+    70% {
+      opacity: 1;
+      transform: none;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
 }

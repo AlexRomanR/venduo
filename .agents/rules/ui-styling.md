@@ -22,9 +22,9 @@ tienda pública. Cómo funciona, y cómo se agrega una, está en `docs/store-tem
 **El panel de quien tiene tienda es de Venduo**, igual para todas. Antes tomaba la
 plantilla, y una letra o un color elegidos para vender —una condensada en mayúsculas, el
 azul de un botón de compra, una antigua fina para las cifras— terminaban en cada rótulo de
-una pantalla de trabajo. La tienda sigue reconocible donde se la nombra: su tarjeta en la
-barra lateral y su sello en el Resumen (`SelloDeTienda`), con su papel, su letra y su
-color de acción en un recuadro.
+una pantalla de trabajo. La tienda sigue reconocible donde se la nombra: su tarjeta en el
+menú lateral, con su papel, su letra y su color de acción en un recuadro, y la portada de
+la tienda en el Resumen, dentro de un celular chico.
 
 Tres reglas que se desprenden:
 
@@ -63,15 +63,49 @@ una portada y un panel no es la paleta ni la tipografía, es el ritmo:
 "Rojo" en esta regla quiere decir **la señal**: en Venduo es rojo, en Pasarela azul y en
 Esencia oro viejo. La regla de usarla poco no cambia con el color.
 
-### La app del emprendedor es otra cosa
+### El celular es uno solo
 
-La app (`venduo-app`) usa el mismo mundo —papel, tinta, la señal, Archivo y Geist,
-reglas de un píxel— pero **no la regla de "título y bajada"** de este panel: allá los
-paneles llevan solo su título, lo que espera algo es un número grande que se toca y los
-productos se muestran con su foto. Quien la abre la mira unos segundos desde el
-celular. Sus reglas están en el `AGENTS.md` de ese repositorio, "Se mira, no se lee".
-Lo que una pantalla de la app necesita de la web —la captura de la tienda, por
-ejemplo— sale de `/api/v1`.
+**El panel de la web abierto en un celular y la app (`venduo-app`) son la misma
+pantalla**: la misma barra de arriba (`BarraLateralMovil`, el cuadro de rayitas), el
+mismo menú lateral, las mismas pestañas de abajo (`Pestanas`), la misma cabecera, los
+mismos nombres y el mismo orden. Quien vende usa las dos y no tiene por qué aprender dos.
+
+- **Todo cambio a algo que existe en las dos se hace en los dos repositorios en la misma
+  tarea.** Una pantalla del panel que cambia en la web cambia en la app, y al revés.
+- **Se mira lado a lado antes de darlo por hecho**: el emulador y el navegador a 375 px.
+- **Lo único distinto es lo que es de una sola plataforma**: los avisos al teléfono y
+  "Venduo en la computadora" son de la app; la barra de escritorio, su riel plegado, los
+  atajos de teclado y el atajo "Nuevo producto" de la pantalla ancha son de la web.
+
+### El panel se mira, no se lee
+
+El panel de la web sigue la misma idea que la app (`venduo-app`, "Se mira, no se lee" en
+su `AGENTS.md`): quien vende lo abre entre dos mensajes y no va a leer un párrafo.
+
+- **Un panel lleva solo su título.** Nada de bajadas que expliquen para qué sirve: si
+  un panel necesita explicarse, se rediseña. `Seccion` todavía acepta `bajada` porque
+  hay pantallas por convertir; una pantalla nueva no la usa.
+- **Lo que espera algo es un número grande que se toca** y lleva a la lista ya
+  filtrada (`ParaHoy`). Los números suben al aparecer (`Contador`).
+- **Fotos antes que nombres**: un pedido por las fotos de lo que pidieron, un producto
+  por la suya, en carruseles que se deslizan en el celular.
+- **La tienda se muestra, no se nombra**, como la ve quien compra en esa pantalla: en el
+  celular, su portada en un celular chico al lado del nombre; en una pantalla ancha, su
+  portada en una ventana de computadora a la derecha. El Resumen es un resumen, no un
+  lugar para mirar la tienda: tocarla abre el editor, y para verla está "Ver tienda".
+  Sin captura todavía, va su plantilla: vista en un celular
+  (`public/plantillas/celular/`) o dibujada con sus colores (`Miniatura`).
+- **En una pantalla ancha nada queda a medio llenar**: la cabecera se alinea a dos bordes
+  con la computadora, "Para hoy" va en una fila y "Cómo te va" en dos zonas —cifras y
+  gráfico—. Los paneles se acomodan al lugar que les toca (`@container`), no al ancho de
+  la pantalla.
+- **Lo que no pide nada no ocupa lugar**: sin ventas no hay "lo más vendido"; sin
+  pendientes, "Estás al día" es una línea.
+- **Lo de todos los días se hace donde se ve**: cobrar un pedido y reponer stock desde
+  el Resumen, con el festejo de la app al cobrar (`useFestejo`).
+- **El movimiento es corto y sin rebotes**: los paneles entran de a uno, las barras
+  crecen, el período se desliza. Todo queda quieto con "Reducir movimiento"
+  (`globals.css`).
 
 ### Cuándo aparece la barra
 
@@ -99,21 +133,24 @@ Las pantallas del panel comparten una barra lateral fija desde `lg` y un cajón 
 cajón es el `Sheet` de shadcn con `showCloseButton={false}` y `shadow-none` —el suyo mide
 28 px y dice "Close"— y un cierre propio de 44 px.
 
-Lo que muestra sale de `lib/data/barra.ts`: la tienda con su enlace, "Tu negocio" con
-sus secciones, y la cuenta.
+Lo que muestra sale de `lib/data/barra.ts` y es el menú de la app: la persona arriba, la
+tarjeta de su tienda con su propia cara, y tres grupos —"Tu negocio" (Inicio, Pedidos,
+Productos, Catálogos, Compartir), "Tu tienda" (Estadísticas, Editar tu tienda, Datos de
+la tienda) y "Tu cuenta"—, con "Cerrar sesión" al final. La elegida va en tinta llena.
+En el celular, abajo, las pestañas de la app (`components/panel/pestanas.tsx`).
 
 Los contadores siguen la regla del rojo: **rojo solo si pide una acción** —un pedido que
-espera que confirmes su pago, un producto sin stock—; en tinta si solo informa. El atajo "Nuevo producto" va con trazo y no relleno rojo por lo mismo: vive en
-todas las pantallas y competiría con el botón principal de cada una. En el móvil, el botón
-del menú lleva un punto rojo si adentro hay algo urgente.
+espera que confirmes su pago, un producto sin stock, la tienda sin WhatsApp—; en tinta si
+solo informa. El atajo "Nuevo producto", solo en la barra de escritorio, va con trazo y
+no relleno rojo por lo mismo: competiría con el botón principal de cada pantalla. En el
+celular, el botón del menú lleva un punto rojo si adentro hay algo urgente.
 
 ### Las pantallas del panel
 
 **Toda pantalla del panel se arma igual que el Resumen**: cada cosa en su propio panel
-—regla estructural de un píxel, esquina viva, sin sombra— con un ícono, un título que
-dice **para qué sirve** ("Cómo van tus cobros", "Para hoy", "Se está
-acabando") y una bajada de una línea. El pie, si lo hay, es un enlace a todo el ancho
-hacia donde se sigue. Antes solo el Resumen se veía así, y en las demás pantallas las
+—regla estructural de un píxel, esquina viva, sin sombra— con un ícono y un título que
+dice **para qué sirve** ("Para hoy", "Se está acabando"). El pie, si lo hay, es un
+enlace a todo el ancho hacia donde se sigue. Antes solo el Resumen se veía así, y en las demás pantallas las
 cifras, los filtros y las listas quedaban sueltos bajo rótulos chicos: lo importante se
 perdía entre lo demás.
 

@@ -1,53 +1,55 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
-import { EyeOff, MessageCircle, PackageX, ShoppingBag } from "lucide-react"
+import { after } from "next/server"
+import { PackageMinus, PackageX, ShoppingBag } from "lucide-react"
 
+import { rutaDeVistaDePlantilla } from "@/lib/api/miniaturas"
 import { getBarraLateral, type Contadores } from "@/lib/data/barra"
 import { getMiTienda, getResumenPanel } from "@/lib/data/panel"
 import { getTablero } from "@/lib/data/tablero"
 import { visitasDeMiTienda } from "@/lib/data/visitas"
 import { RESUMEN_DEMO, tableroDeDemostracion } from "@/lib/demo-data"
 import { isSupabaseConfigured } from "@/lib/env"
-import { formatNumber } from "@/lib/format"
-import {
-  aparienciaDeTienda,
-  PLANTILLAS,
-  plantillaDeTienda,
-} from "@/lib/plantillas"
-import { pasosPendientes, type Tablero } from "@/lib/tablero"
+import { plantillaDeTienda } from "@/lib/plantillas"
+import type { Tablero } from "@/lib/tablero"
 import { urlDeTienda } from "@/lib/tienda"
+import { pedirVista } from "@/lib/vista"
 import type { ResumenDeVisitas } from "@/lib/visitas-resumen"
 import { AvisoSuscripcion } from "@/components/panel/aviso-suscripcion"
-import { CabeceraDeTienda } from "@/components/panel/tablero/cabecera"
+import {
+  CabeceraDeTienda,
+  type TiendaDelResumen,
+} from "@/components/panel/tablero/cabecera"
 import { ComoTeVa } from "@/components/panel/tablero/como-te-va"
 import { EsqueletoDelTablero } from "@/components/panel/tablero/esqueleto"
-import { ParaHoy, type Pendiente } from "@/components/panel/tablero/para-hoy"
+import {
+  ParaHoy,
+  type Alerta,
+  type Atajo,
+} from "@/components/panel/tablero/para-hoy"
 import { UltimosPedidos } from "@/components/panel/tablero/pedidos"
 import { PrimerosPasos } from "@/components/panel/tablero/primeros-pasos"
 import { MasVendidos, PorAcabarse } from "@/components/panel/tablero/productos"
 import { PanelDeVisitas } from "@/components/panel/visitas"
+import { cambiarEstado } from "./pedidos/acciones"
+import { ajustarStock } from "./productos/acciones"
 
 export const metadata = { title: "Resumen" }
 
 /**
  * Resumen del emprendedor: la pantalla de entrada del panel.
  *
- * Se lee de arriba abajo en el orden en que se usa: qué espera una respuesta,
- * qué le falta a la tienda si es nueva, cómo vienen las ventas, y después el
- * detalle —pedidos y productos—. Cada parte va en su propio panel, con
- * un título que dice para qué sirve.
+ * Se mira, no se lee, como el Inicio de la app: lo que espera algo en números
+ * grandes que se tocan, las ventas que suben al aparecer, y los pedidos y los
+ * productos por sus fotos. Lo que se hace todos los días se hace acá: cobrar
+ * un pedido y reponer stock.
  *
  * Quien todavía no eligió plantilla no tiene nada que resumir acá. La
  * comprobación es sobre `template_key` y no sobre la existencia de la tienda
  * porque es lo que marca que el alta terminó.
  */
 export default async function PanelPage() {
-  // El tablero arranca ya, sin esperar a la cabecera: antes empezaba recién
-  // cuando ella terminaba, y sus consultas se sumaban a las de arriba en vez
-  // de correr a la vez. Llega por el `Suspense` de abajo.
   const tablero = getTablero().catch(() => null)
-  // Las visitas, solo si Venduo se las activó: si no, llega `null` y no se
-  // dibuja nada. También arrancan ya.
   const visitas = visitasDeMiTienda().catch(() => null)
 
   const [tienda, resumen, barra] = await Promise.all([
@@ -56,15 +58,11 @@ export default async function PanelPage() {
     getBarraLateral(),
   ])
 
-  // Sin credenciales el modo demo tiene que seguir siendo navegable: no hay
-  // tienda que buscar ni alta que completar.
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
   const datos = resumen ?? RESUMEN_DEMO
   const clave = plantillaDeTienda(datos.tienda.templateKey)
 
-  // La barra trae la tienda tal como la muestra la barra: así la cabecera y la
-  // barra dicen lo mismo, también en modo demo.
-  const deLaTienda = {
+  const deLaTienda: TiendaDelResumen = {
     nombre: barra.tienda?.nombre ?? datos.tienda.name,
     slug: barra.tienda?.slug ?? datos.tienda.slug,
     url: barra.tienda?.url ?? urlDeTienda(datos.tienda.slug),
@@ -73,13 +71,35 @@ export default async function PanelPage() {
     pausada: barra.tienda?.pausada ?? false,
   }
 
+  // La captura de la portada, la misma de la app. Si quedó vieja se saca otra
+  // después de responder; mientras no haya, la miniatura de su plantilla.
+  if (
+    tienda &&
+    deLaTienda.publicada &&
+    !deLaTienda.pausada &&
+    (!tienda.vista_at ||
+      !tienda.vista_escritorio_url ||
+      new Date(tienda.vista_at) < new Date(tienda.vista_cambio_at))
+  ) {
+    const id = tienda.id
+    after(() => pedirVista(id))
+  }
+  const vista = tienda?.vista_url
+    ? { url: tienda.vista_url, real: true }
+    : { url: rutaDeVistaDePlantilla(clave), real: false }
+
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <CabeceraDeTienda
         persona={barra.persona.nombre}
         tienda={deLaTienda}
-        apariencia={barra.apariencia ?? aparienciaDeTienda(clave, {})}
-        plantilla={PLANTILLAS[clave].nombre}
+        suscripcion={datos.suscripcion}
+        vista={vista}
+        escritorio={{
+          url: tienda?.vista_escritorio_url ?? null,
+          clave,
+          apariencia: barra.apariencia,
+        }}
       />
 
       <AvisoSuscripcion suscripcion={datos.suscripcion} />
@@ -101,6 +121,7 @@ export default async function PanelPage() {
 /**
  * Lo que consulta la base, aparte de la cabecera: así la cabecera aparece al
  * instante y el resto llega en cuanto está, con su esqueleto mientras tanto.
+ * Cada parte entra de a una, apenas desfasada.
  */
 async function ContenidoDelTablero({
   tablero: lectura,
@@ -114,124 +135,127 @@ async function ContenidoDelTablero({
   visitas: Promise<ResumenDeVisitas | null>
   conEstadisticas: boolean
   contadores: Contadores
-  tienda: { nombre: string; slug: string; url: string; publicada: boolean }
+  tienda: TiendaDelResumen
   sinWhatsApp: boolean
 }) {
   const [leido, visitas] = await Promise.all([lectura, lecturaDeVisitas])
   const tablero = leido ?? tableroDeDemostracion()
-  const pendientes = armarPendientes(
+  const soloLectura = tablero.esDemo || !isSupabaseConfigured
+  const { alertas, atajos } = armarParaHoy(
     tablero,
     contadores,
     tienda.publicada,
     sinWhatsApp
   )
-  const faltanPasos = pasosPendientes(tablero.pasos) > 0
+
+  // Arriba, a todo el ancho, lo que pide algo y cómo vienen las ventas; abajo,
+  // en dos columnas en una pantalla ancha, los pedidos y los productos. En el
+  // celular, una sola columna en el mismo orden que el Inicio de la app.
+  const arriba = [
+    <ParaHoy key="para-hoy" alertas={alertas} atajos={atajos} />,
+    <PrimerosPasos key="pasos" pasos={tablero.pasos} tienda={tienda} />,
+    <ComoTeVa
+      key="ventas"
+      serie={tablero.serie}
+      hoy={tablero.hoy}
+      conEstadisticas={conEstadisticas}
+    />,
+  ]
+  const productos = tablero.pasos.producto
+    ? [
+        // Sin productos no hay qué rankear ni qué reponer: lo dicen los
+        // primeros pasos.
+        <MasVendidos key="mas-vendidos" productos={tablero.masVendidos} />,
+        <PorAcabarse
+          key="por-acabarse"
+          productos={tablero.porAcabarse}
+          ajustar={ajustarStock}
+          soloLectura={soloLectura}
+        />,
+      ]
+    : []
+
+  let orden = 0
+  const entra = (parte: React.ReactNode, clave: string) => (
+    <div
+      key={clave}
+      className="panel-entra min-w-0 empty:hidden"
+      style={{ "--orden": orden++ } as React.CSSProperties}
+    >
+      {parte}
+    </div>
+  )
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
-      {/* En una tienda nueva sin nada pendiente, "Estás al día" contradecía a
-          los primeros pasos que vienen justo debajo. */}
-      {pendientes.length > 0 || !faltanPasos ? (
-        <ParaHoy pendientes={pendientes} />
-      ) : null}
+      {arriba.map((parte, indice) => entra(parte, `arriba-${indice}`))}
 
-      <PrimerosPasos pasos={tablero.pasos} tienda={tienda} />
-
-      <ComoTeVa
-        serie={tablero.serie}
-        hoy={tablero.hoy}
-        conEstadisticas={conEstadisticas}
-      />
-
-      {visitas ? <PanelDeVisitas visitas={visitas} /> : null}
-
-      <div className="grid gap-6 md:gap-8 xl:grid-cols-2">
-        <UltimosPedidos pedidos={tablero.ultimosPedidos} />
-        {/* Sin productos no hay qué rankear ni qué reponer: lo dicen los
-            primeros pasos. */}
-        {tablero.pasos.producto ? (
-          <>
-            <MasVendidos productos={tablero.masVendidos} />
-            <PorAcabarse productos={tablero.porAcabarse} />
-          </>
+      <div className="grid items-start gap-6 md:gap-8 xl:grid-cols-2">
+        {entra(
+          <UltimosPedidos
+            pedidos={tablero.ultimosPedidos}
+            cobrar={cambiarEstado}
+            soloLectura={soloLectura}
+          />,
+          "pedidos"
+        )}
+        {productos.length > 0 ? (
+          <div className="flex min-w-0 flex-col gap-6 empty:hidden md:gap-8">
+            {productos.map((parte, indice) =>
+              entra(parte, `productos-${indice}`)
+            )}
+          </div>
         ) : null}
       </div>
+
+      {visitas ? entra(<PanelDeVisitas visitas={visitas} />, "visitas") : null}
     </div>
   )
 }
 
 /**
- * Lo que espera una respuesta, en orden: primero lo que impide vender,
- * después lo que lo frena, después lo que lo mejora.
+ * Lo que espera una respuesta: arriba lo que impide vender, dicho como lo que
+ * hay que hacer; abajo, lo que espera contado en números.
  *
  * Usa los contadores de la barra lateral y no los recalcula: los dos lugares
  * muestran los mismos números.
  */
-function armarPendientes(
+function armarParaHoy(
   tablero: Tablero,
   contadores: Contadores,
   publicada: boolean,
   sinWhatsApp: boolean
-): Pendiente[] {
-  const pendientes: Pendiente[] = []
-  const plural = (n: number, uno: string, varios: string) =>
-    `${formatNumber(n)} ${n === 1 ? uno : varios}`
-
+): { alertas: Alerta[]; atajos: Atajo[] } {
+  const alertas: Alerta[] = []
   // Sin número, el botón de compra de la tienda no le escribe a nadie: es lo
   // primero, antes incluso que publicarla.
-  if (sinWhatsApp) {
-    pendientes.push({
-      icono: MessageCircle,
-      texto: "Tu tienda no tiene WhatsApp",
-      detalle:
-        "Los pedidos llegan a ese número. Sin él, nadie puede comprarte.",
-      href: "/cuenta",
-      accion: "Agregarlo",
-      urgente: true,
-    })
-  }
+  if (sinWhatsApp)
+    alertas.push({ texto: "Agrega tu WhatsApp", href: "/cuenta" })
+  if (!publicada) alertas.push({ texto: "Publica tu tienda", href: "/cuenta" })
 
-  if (!publicada) {
-    pendientes.push({
-      icono: EyeOff,
-      texto: "Tu tienda está en borrador",
-      detalle: "Nadie puede comprarte hasta que la publiques.",
-      href: "/cuenta",
-      accion: "Publicar",
-      urgente: true,
-    })
-  }
-
-  const sinPagar = tablero.porGestionar.pendientes
-  if (sinPagar > 0) {
-    pendientes.push({
+  const atajos: Atajo[] = [
+    {
+      valor: tablero.porGestionar.pendientes,
+      etiqueta: "Por cobrar",
       icono: ShoppingBag,
-      texto: plural(
-        sinPagar,
-        "pedido espera tu respuesta",
-        "pedidos esperan tu respuesta"
-      ),
-      detalle: "Márcalos pagados cuando te paguen por WhatsApp.",
-      href: "/panel/pedidos",
-      accion: "Ver pedidos",
+      href: "/panel/pedidos?estado=pendiente",
       urgente: true,
-    })
-  }
-
-  if (contadores.productosSinStock > 0) {
-    pendientes.push({
+    },
+    {
+      valor: contadores.productosSinStock,
+      etiqueta: "Sin stock",
       icono: PackageX,
-      texto: plural(
-        contadores.productosSinStock,
-        "producto se quedó sin stock",
-        "productos se quedaron sin stock"
-      ),
-      detalle: "Nadie puede comprarlos hasta que los repongas.",
-      href: "/panel/productos",
-      accion: "Reponer",
+      href: "/panel/productos?estado=sin_stock",
       urgente: true,
-    })
-  }
+    },
+    {
+      valor: contadores.productosPocoStock,
+      etiqueta: "Queda poco",
+      icono: PackageMinus,
+      href: "/panel/productos?estado=poco_stock",
+      urgente: false,
+    },
+  ]
 
-  return pendientes
+  return { alertas, atajos }
 }

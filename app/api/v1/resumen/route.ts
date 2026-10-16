@@ -1,7 +1,8 @@
 import { after } from "next/server"
 
 import { esAdmin } from "@/lib/admin"
-import { miniaturaDePlantilla } from "@/lib/api/miniaturas"
+import { rutaDeVistaDePlantilla } from "@/lib/api/miniaturas"
+import { getSiteUrl } from "@/lib/env"
 import { exigirSesion, respuesta } from "@/lib/api/respuestas"
 import { getBarraLateral } from "@/lib/data/barra"
 import { getMiTienda, getResumenPanel } from "@/lib/data/panel"
@@ -67,7 +68,7 @@ export async function GET() {
             vista: {
               url:
                 terminada.vista_url ??
-                miniaturaDePlantilla(plantillaDeTienda(terminada.template_key)),
+                `${getSiteUrl()}${rutaDeVistaDePlantilla(terminada.template_key)}`,
               // Si es la captura de su portada o la miniatura de la plantilla.
               real: Boolean(terminada.vista_url),
             },

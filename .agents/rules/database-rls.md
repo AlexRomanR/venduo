@@ -257,7 +257,9 @@ Las políticas RLS van juntas en su propio archivo, para poder auditarlas de una
 
 ## La vista de la tienda
 
-`stores.vista_url` es una captura real de la portada, para el Inicio de la app. **Cuándo
+`stores.vista_url` es una captura real de la portada en el celular, para el Inicio de la
+app y el Resumen en el celular; `stores.vista_escritorio_url`, la misma portada en una
+computadora (1280 × 800), para el Resumen en una pantalla ancha. Se sacan juntas. **Cuándo
 quedó vieja lo decide la base**: `vista_cambio_at` lo mueven disparadores sobre `stores`,
 `store_blocks`, `store_pages` y `products` cada vez que cambia algo que se ve —el stock,
 solo al agotarse o volver—. Si es más nueva que `vista_at`, hace falta otra. La captura la

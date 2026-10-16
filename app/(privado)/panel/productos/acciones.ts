@@ -185,6 +185,8 @@ export async function ajustarStock(
   if (error) return { ok: false, error: "No pudimos guardar el stock." }
 
   revalidatePath(RUTA)
+  // También se repone desde el Resumen, en "Se está acabando".
+  revalidatePath("/panel")
   await actualizarVistaDespues()
   return { ok: true }
 }

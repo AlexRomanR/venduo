@@ -45,7 +45,7 @@ export async function getTablero(): Promise<Tablero | null> {
       supabase
         .from("orders")
         .select(
-          "id, order_number, buyer_name, buyer_phone, total_cents, status, created_at, order_items(quantity)"
+          "id, order_number, buyer_name, buyer_phone, total_cents, status, created_at, order_items(quantity, products(image_url))"
         )
         .eq("store_id", tienda.id)
         .order("created_at", { ascending: false })
@@ -135,6 +135,10 @@ export async function getTablero(): Promise<Tablero | null> {
       (total, item) => total + item.quantity,
       0
     ),
+    fotos: (pedido.order_items ?? [])
+      .map((item) => item.products?.image_url)
+      .filter((foto): foto is string => Boolean(foto))
+      .slice(0, 3),
   }))
 
   const personalizada =

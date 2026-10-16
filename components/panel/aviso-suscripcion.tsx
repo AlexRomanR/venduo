@@ -1,4 +1,4 @@
-import { AlertTriangle, Clock, Download, Lock } from "lucide-react"
+import { Download, Lock } from "lucide-react"
 
 import type { Suscripcion } from "@/lib/demo-data"
 
@@ -21,7 +21,7 @@ export function AvisoSuscripcion({
 }) {
   if (!suscripcion) return null
 
-  const { status, diasRestantes, porVencer } = suscripcion
+  const { status } = suscripcion
 
   if (status === "bloqueada" || status === "cancelada") {
     return (
@@ -48,37 +48,8 @@ export function AvisoSuscripcion({
     )
   }
 
-  if (status === "prueba" && porVencer) {
-    return (
-      <div className="border-t-2 border-tinta pt-4">
-        <p className="flex items-center gap-2 text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-          <AlertTriangle aria-hidden="true" className="size-4" />
-          {diasRestantes !== null && diasRestantes > 0
-            ? `Tu prueba vence en ${diasRestantes} ${diasRestantes === 1 ? "día" : "días"}`
-            : "Tu prueba vence hoy"}
-        </p>
-        <p className="mt-3 max-w-[60ch] text-sm leading-relaxed opacity-70">
-          Cuando venza, tu tienda pública deja de verse y el panel queda en solo
-          lectura. Nada se borra.
-        </p>
-      </div>
-    )
-  }
-
-  if (status === "prueba" && diasRestantes !== null) {
-    return (
-      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-tinta/15 pt-4 text-sm opacity-55">
-        <Clock aria-hidden="true" className="size-4 shrink-0" />
-        <span>
-          Período de prueba:{" "}
-          <span className="tabular font-semibold">
-            quedan {diasRestantes} días
-          </span>{" "}
-          con todo el panel disponible.
-        </span>
-      </p>
-    )
-  }
-
+  // La prueba se cuenta en la cabecera del Resumen, en una ficha que se pone
+  // roja cuando está por vencer: un párrafo acá repetía lo mismo con más
+  // palabras.
   return null
 }
