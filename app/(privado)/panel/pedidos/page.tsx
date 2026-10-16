@@ -1,206 +1,194 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { ShoppingBag, Wallet } from "lucide-react"
+import { Share2, ShoppingBag } from "lucide-react"
 
 import { getPedidos, type FiltroPedidos } from "@/lib/data/pedidos"
-import { DIAS_PARA_CONCRETAR, ESTADOS } from "@/lib/pedidos"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
-import { FICHA, FICHA_ELEGIDA, FICHA_LIBRE } from "@/lib/estilos"
-import { formatMoney, formatNumber } from "@/lib/format"
-import { cn } from "@/lib/utils"
+import { BOTON_SECUNDARIO } from "@/lib/estilos"
 import {
-  Cabecera,
-  Cifra,
-  Cifras,
-  Seccion,
-  SinDatos,
-} from "@/components/panel/piezas"
-import { FilaPedido } from "@/components/pedidos/fila"
+  DIAS_PARA_CONCRETAR,
+  grupoDeFecha,
+  pedidoEnFila,
+  tituloDePedido,
+  type GrupoDeFecha,
+} from "@/lib/pedidos"
+import { enlaceLegible, urlDeTienda } from "@/lib/tienda"
+import { cn } from "@/lib/utils"
+import { FranjaDeFichas } from "@/components/panel/fichas"
+import { FichasDeCobro } from "@/components/panel/fichas-grandes"
+import { Cabecera, Seccion, SinDatos } from "@/components/panel/piezas"
+import { CompartirTienda } from "@/components/panel/tablero/compartir"
+import { ListaDePedidos, type Renglon } from "@/components/pedidos/lista"
+import { cambiarEstado } from "./acciones"
 
 export const metadata = { title: "Pedidos" }
 
-/**
- * Las fichas de la lista. "No concretados" va al final y sin rojo: son los
- * pendientes que pasaron el plazo, y están para encontrarlos, no para que
- * esperen algo de la tienda.
- */
-const FILTROS: Array<{ valor: FiltroPedidos; etiqueta: string }> = [
-  ...ESTADOS,
-  { valor: "no_concretado", etiqueta: "No concretados" },
+const FILTROS: FiltroPedidos[] = [
+  "pendiente",
+  "pagado",
+  "cancelado",
+  "no_concretado",
 ]
 
+const BOTON = cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")
+
 /**
- * Los pedidos de la tienda.
+ * Los pedidos de la tienda, la misma pantalla de la app.
  *
  * Llegan por WhatsApp: el comprador manda su carrito con el número del pedido,
- * y acá queda registrado. Lo que manda el orden de la pantalla es qué pide una
- * acción: arriba, cuántos esperan que la tienda confirme el pago, que es lo
- * que descuenta el stock.
+ * y acá queda registrado. Arriba, la plata: lo que falta cobrar y lo que ya
+ * entró, que son también los dos filtros más usados. Debajo, los pedidos por
+ * día y con la foto de lo que pidieron, que es por lo que se los reconoce.
  */
 export default async function PedidosPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const tienda = await getMiTienda()
+  const [tienda, consulta] = await Promise.all([getMiTienda(), searchParams])
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
-  const consulta = await searchParams
-  const filtro = FILTROS.find((f) => f.valor === consulta.estado)?.valor
-
+  const filtro = FILTROS.find((f) => f === consulta.estado)
   const { pedidos, resumen, esDemo } = await getPedidos(filtro)
+
+  const href = (valor?: FiltroPedidos) =>
+    valor ? `/panel/pedidos?estado=${valor}` : "/panel/pedidos"
+  // Tocar la ficha elegida la suelta: vuelve a todos.
+  const alternar = (valor: FiltroPedidos) =>
+    href(filtro === valor ? undefined : valor)
+
+  const ahora = new Date()
+  const renglones: Renglon[] = []
+  let anterior: GrupoDeFecha | null = null
+  for (const pedido of pedidos) {
+    const grupo = grupoDeFecha(pedido.creado, ahora)
+    if (grupo !== anterior) renglones.push({ tipo: "grupo", grupo })
+    anterior = grupo
+    renglones.push({
+      tipo: "pedido",
+      pedido: pedidoEnFila(
+        {
+          ...pedido,
+          titulo: tituloDePedido(pedido),
+          articulos: pedido.items.reduce((t, item) => t + item.cantidad, 0),
+        },
+        ahora
+      ),
+    })
+  }
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
-      <Cabecera
-        titulo="Tus pedidos."
-        bajada="Cada pedido llega a tu WhatsApp con su número. Cuando te paguen, márcalo pagado: así baja del stock."
-        demo={
-          esDemo &&
-          "Estás en modo demo: los pedidos son de ejemplo y los cambios no se guardan."
-        }
+      {/* En el celular, el nombre de la pantalla va en la barra de arriba. */}
+      <div className="max-lg:sr-only">
+        <Cabecera titulo="Pedidos" />
+      </div>
+
+      <FichasDeCobro
+        cobros={[
+          {
+            etiqueta: "Por cobrar",
+            cents: resumen.porCobrarCents,
+            pedidos: resumen.pendientes,
+            urgente: true,
+            elegida: filtro === "pendiente",
+            href: alternar("pendiente"),
+          },
+          {
+            etiqueta: "Cobrado",
+            cents: resumen.cobradoCents,
+            pedidos: resumen.pagados,
+            elegida: filtro === "pagado",
+            href: alternar("pagado"),
+          },
+        ]}
       />
 
-      <Seccion
-        id="cobros"
-        icono={Wallet}
-        titulo="Cómo van tus cobros"
-        bajada="Lo que falta cobrar y lo que ya entró."
-      >
-        <Cifras>
-          <Cifra
-            etiqueta="Esperan pago"
-            valor={formatNumber(resumen.pendientes)}
-            detalle={
-              resumen.pendientes > 0
-                ? "Márcalos pagados cuando te paguen"
-                : "Ninguno espera respuesta"
+      <Seccion id="lista" icono={ShoppingBag} titulo="Tus pedidos">
+        <FranjaDeFichas
+          etiqueta="Filtrar por estado"
+          fichas={[
+            {
+              href: href(),
+              nombre: "Todos",
+              cuenta: resumen.total,
+              activa: !filtro,
+            },
+            {
+              href: href("pendiente"),
+              nombre: "Pendientes",
+              cuenta: resumen.pendientes,
+              urgente: true,
+              activa: filtro === "pendiente",
+            },
+            {
+              href: href("pagado"),
+              nombre: "Pagados",
+              cuenta: resumen.pagados,
+              activa: filtro === "pagado",
+            },
+            {
+              href: href("cancelado"),
+              nombre: "Cancelados",
+              cuenta: resumen.cancelados,
+              activa: filtro === "cancelado",
+            },
+            {
+              href: href("no_concretado"),
+              nombre: "No concretados",
+              cuenta: resumen.noConcretados,
+              activa: filtro === "no_concretado",
+            },
+          ]}
+        />
+
+        {renglones.length > 0 ? (
+          <ListaDePedidos
+            renglones={renglones}
+            cobrar={cambiarEstado}
+            soloLectura={esDemo}
+          />
+        ) : filtro ? (
+          <SinDatos
+            icono={ShoppingBag}
+            titulo={
+              filtro === "no_concretado"
+                ? "Ningún pedido quedó sin concretar"
+                : "No hay pedidos en ese estado"
             }
-            alerta={resumen.pendientes > 0}
-          />
-          <Cifra
-            etiqueta="Por cobrar"
-            valor={formatMoney(resumen.porCobrarCents)}
-            detalle={`De los últimos ${DIAS_PARA_CONCRETAR} días`}
-          />
-          <Cifra
-            etiqueta="Cobrado"
-            valor={formatMoney(resumen.cobradoCents)}
-            detalle={`${formatNumber(resumen.pagados)} ${resumen.pagados === 1 ? "pedido pagado" : "pedidos pagados"}`}
-          />
-          <Cifra
-            etiqueta="No concretados"
-            valor={formatNumber(resumen.noConcretados)}
-            detalle={`Pendientes de hace más de ${DIAS_PARA_CONCRETAR} días`}
-          />
-        </Cifras>
-      </Seccion>
-
-      <Seccion
-        id="lista"
-        icono={ShoppingBag}
-        titulo="Todos tus pedidos"
-        bajada="Filtra por estado y toca uno para ver el detalle y cambiar su estado."
-        extra={
-          pedidos.length > 0 ? (
-            <span className="tabular text-sm opacity-70">
-              {formatNumber(pedidos.length)}{" "}
-              {pedidos.length === 1 ? "pedido" : "pedidos"}
-            </span>
-          ) : null
-        }
-      >
-        <nav
-          aria-label="Filtrar por estado"
-          className="flex flex-wrap gap-2 border-b border-tinta/15 px-4 py-3 sm:px-5"
-        >
-          <Ficha href="/panel/pedidos" activa={!filtro}>
-            Todos
-            <span className="tabular ml-1.5 opacity-65">
-              {formatNumber(resumen.total)}
-            </span>
-          </Ficha>
-          {FILTROS.map((f) => (
-            <Ficha
-              key={f.valor}
-              href={`/panel/pedidos?estado=${f.valor}`}
-              activa={filtro === f.valor}
-            >
-              {f.etiqueta}
-              {f.valor === "no_concretado" && resumen.noConcretados > 0 ? (
-                <span className="tabular ml-1.5 opacity-65">
-                  {formatNumber(resumen.noConcretados)}
-                </span>
-              ) : null}
-            </Ficha>
-          ))}
-        </nav>
-
-        {pedidos.length === 0 ? (
-          filtro ? (
-            <SinDatos
-              icono={ShoppingBag}
-              titulo={
-                filtro === "no_concretado"
-                  ? "Ningún pedido quedó sin concretar"
-                  : "No hay pedidos en ese estado"
-              }
-              texto={
-                filtro === "no_concretado"
-                  ? `Aquí aparecen los pendientes que pasan ${DIAS_PARA_CONCRETAR} días sin concretarse: el cliente armó el carrito y no siguió. Se pueden marcar pagados igual si al final te pagan.`
-                  : "Prueba con otro filtro, o mira todos los pedidos de tu tienda."
-              }
-            >
-              <Link
-                href="/panel/pedidos"
-                className="inline-flex min-h-11 items-center text-sm font-semibold transition-colors hover:text-senal"
-              >
-                Ver todos
-              </Link>
-            </SinDatos>
-          ) : (
-            <SinDatos
-              icono={ShoppingBag}
-              titulo="Todavía no llegó ningún pedido"
-              texto="Cuando alguien te mande su carrito por WhatsApp, el pedido aparece aquí con el mismo número. Comparte el enlace de tu tienda para que empiecen a llegar."
-            >
-              <Link
-                href="/panel"
-                className="inline-flex min-h-11 items-center text-sm font-semibold transition-colors hover:text-senal"
-              >
-                Compartir mi tienda
-              </Link>
-            </SinDatos>
-          )
+            texto={
+              filtro === "no_concretado"
+                ? `Los pendientes de más de ${DIAS_PARA_CONCRETAR} días. Si al final te pagan, igual se marcan pagados.`
+                : "Prueba con otro filtro."
+            }
+          >
+            <Link href={href()} scroll={false} className={BOTON}>
+              Ver todos
+            </Link>
+          </SinDatos>
         ) : (
-          <ul>
-            {pedidos.map((pedido) => (
-              <FilaPedido key={pedido.id} pedido={pedido} />
-            ))}
-          </ul>
+          <SinDatos
+            icono={ShoppingBag}
+            titulo="Todavía no llegó ningún pedido"
+            texto="Comparte tu tienda: cada carrito que te manden por WhatsApp aparece aquí."
+          >
+            {tienda ? (
+              <CompartirTienda
+                nombre={tienda.name}
+                slug={tienda.slug}
+                url={urlDeTienda(tienda.slug)}
+                legible={enlaceLegible(urlDeTienda(tienda.slug))}
+              >
+                <button type="button" className={BOTON}>
+                  <Share2 aria-hidden="true" className="size-4" />
+                  Compartir mi tienda
+                </button>
+              </CompartirTienda>
+            ) : null}
+          </SinDatos>
         )}
       </Seccion>
     </div>
-  )
-}
-
-function Ficha({
-  href,
-  activa,
-  children,
-}: {
-  href: string
-  activa: boolean
-  children: React.ReactNode
-}) {
-  return (
-    <Link
-      href={href}
-      aria-current={activa ? "page" : undefined}
-      className={cn(FICHA, activa ? FICHA_ELEGIDA : FICHA_LIBRE)}
-    >
-      {children}
-    </Link>
   )
 }

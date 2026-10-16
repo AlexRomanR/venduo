@@ -72,7 +72,10 @@ export function Cabecera({
   )
 }
 
-/** La vuelta a la pantalla de la que sale una de detalle. */
+/**
+ * La vuelta a la pantalla de la que sale una de detalle. En el celular no se
+ * dibuja: la flecha va en la barra de arriba, como en la app.
+ */
 export function Volver({
   href,
   children,
@@ -83,7 +86,7 @@ export function Volver({
   return (
     <Link
       href={href}
-      className="group inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+      className="group inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold transition-colors hover:text-senal max-lg:hidden"
     >
       <ArrowLeft
         aria-hidden="true"

@@ -88,9 +88,26 @@ export function formatNumber(value: number, locale = LOCALE) {
 
 export function formatDate(value: string | Date, locale = LOCALE) {
   const date = typeof value === "string" ? new Date(value) : value
-  return new Intl.DateTimeFormat(locale, {
+  // Por partes: según el navegador, `es-BO` escribe "08-oct" o "08 oct.", y
+  // la app escribe "08 oct".
+  const partes = new Intl.DateTimeFormat(locale, {
+    timeZone: ZONA_HORARIA,
     day: "2-digit",
     month: "short",
+  }).formatToParts(date)
+  const parte = (tipo: string) =>
+    partes.find((p) => p.type === tipo)?.value.replace(".", "") ?? ""
+  return `${parte("day")} ${parte("month")}`
+}
+
+/** La hora en Bolivia, de 24: "22:55". */
+export function formatHora(value: string | Date, locale = LOCALE) {
+  const date = typeof value === "string" ? new Date(value) : value
+  return new Intl.DateTimeFormat(locale, {
+    timeZone: ZONA_HORARIA,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
   }).format(date)
 }
 
@@ -170,21 +187,18 @@ export function formatRelative(
   const date = typeof value === "string" ? new Date(value) : value
   const minutos = Math.round((ahora.getTime() - date.getTime()) / 60_000)
 
+  // Escrito a mano y no con `Intl.RelativeTimeFormat`: así dice lo mismo en
+  // todo navegador y lo mismo que la app —"hace 3 d" y no "hace 3 días"—.
   if (minutos < 1) return "recién"
-
-  const relativo = new Intl.RelativeTimeFormat(locale, {
-    numeric: "auto",
-    style: "short",
-  })
-  if (minutos < 60) return relativo.format(-minutos, "minute")
-  if (minutos < 60 * 24) {
-    return relativo.format(-Math.round(minutos / 60), "hour")
-  }
+  if (minutos < 60) return `hace ${minutos} min`
+  if (minutos < 60 * 24) return `hace ${Math.round(minutos / 60)} h`
 
   const dias =
     (Date.parse(diaEnBolivia(ahora)) - Date.parse(diaEnBolivia(date))) /
     86_400_000
-  if (dias < 7) return relativo.format(-dias, "day")
+  if (dias <= 1) return "ayer"
+  if (dias === 2) return "anteayer"
+  if (dias < 7) return `hace ${dias} d`
 
   return formatDia(diaEnBolivia(date), { conSemana: false }, locale)
 }

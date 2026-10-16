@@ -36,8 +36,10 @@ export interface PedidoReciente {
   estado: OrderStatus
   creado: string
   articulos: number
-  /** Las fotos de lo que se pidió, hasta tres: un pedido se reconoce por ellas. */
-  fotos: string[]
+  /** Quién compró o, si no se sabe, qué pidió (`tituloDePedido`). */
+  titulo: string
+  /** La foto de lo que pidió: un pedido se reconoce por ella. */
+  foto: string | null
 }
 
 export interface ProductoVendido {
