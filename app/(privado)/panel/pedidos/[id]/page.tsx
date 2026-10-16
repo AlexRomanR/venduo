@@ -80,7 +80,12 @@ export default async function PedidoPage({
         />
       </header>
 
-      <Seccion id="que-pidio" icono={ShoppingBag} titulo="Qué pidió">
+      <Seccion
+        id="que-pidio"
+        icono={ShoppingBag}
+        titulo="Qué pidió"
+        bajada="Con los precios del pedido, aunque después cambien en tu catálogo."
+      >
         <ul>
           {pedido.items.map((item, indice) => (
             <li
@@ -136,7 +141,12 @@ export default async function PedidoPage({
       {/* Solo los pedidos de antes de la compra por WhatsApp guardan quién
           compró: en los nuevos, esa persona está en el chat. */}
       {pedido.comprador || whatsapp ? (
-        <Seccion id="quien-compro" icono={UserRound} titulo="Quién compró">
+        <Seccion
+          id="quien-compro"
+          icono={UserRound}
+          titulo="Quién compró"
+          bajada="Los datos que dejó al comprar."
+        >
           <dl>
             {pedido.comprador ? (
               <Dato etiqueta="Nombre">

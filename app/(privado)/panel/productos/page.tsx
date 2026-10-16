@@ -87,20 +87,20 @@ export default async function ProductosPage({
 
   return (
     <div className="flex flex-col gap-6 max-lg:pb-16 md:gap-8">
-      {/* En el celular, el nombre va en la barra de arriba y "Nuevo producto"
-          flota sobre las pestañas, como en la app. */}
-      <h1 className="sr-only lg:hidden">Productos</h1>
-      <div className="max-lg:hidden">
-        <Cabecera titulo="Productos">
-          <Link
-            href="/panel/productos/nuevo"
-            className={cn(BOTON_PRIMARIO, "min-h-11 px-4 text-sm")}
-          >
-            <Plus aria-hidden="true" className="size-4" />
-            Nuevo producto
-          </Link>
-        </Cabecera>
-      </div>
+      {/* En el celular "Nuevo producto" flota sobre las pestañas, como en la app. */}
+      <Cabecera
+        titulo="Productos"
+        bajada="Lo que vendes, a qué precio y cuántas unidades te quedan. Es lo mismo que ve quien entra a tu tienda."
+        soloBajadaEnCelular
+      >
+        <Link
+          href="/panel/productos/nuevo"
+          className={cn(BOTON_PRIMARIO, "min-h-11 px-4 text-sm")}
+        >
+          <Plus aria-hidden="true" className="size-4" />
+          Nuevo producto
+        </Link>
+      </Cabecera>
 
       {resumen.total > 0 ? (
         <FichasGrandes
@@ -140,7 +140,7 @@ export default async function ProductosPage({
         bajada={
           hayFiltros
             ? `${formatNumber(productos.length)} de ${formatNumber(resumen.total)} ${resumen.total === 1 ? "producto" : "productos"}`
-            : undefined
+            : "Cambia el stock con más y menos; toca uno para editarlo."
         }
         extra={
           <Link

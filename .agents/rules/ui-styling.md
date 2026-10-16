@@ -88,9 +88,16 @@ mismos nombres y el mismo orden. Quien vende usa las dos y no tiene por qué apr
 El panel de la web sigue la misma idea que la app (`venduo-app`, "Se mira, no se lee" en
 su `AGENTS.md`): quien vende lo abre entre dos mensajes y no va a leer un párrafo.
 
-- **Un panel lleva solo su título.** Nada de bajadas que expliquen para qué sirve: si
-  un panel necesita explicarse, se rediseña. `Seccion` todavía acepta `bajada` porque
-  hay pantallas por convertir; una pantalla nueva no la usa.
+- **Cada pantalla lleva una descripción corta, y cada panel un subtítulo de una línea.**
+  La pantalla dice qué es y lo que hay que saber de ella en una o dos frases cortas
+  (`Cabecera`, `bajada`): "Catálogos en PDF con tus productos, para mandar por WhatsApp
+  o imprimir…". El panel, en una línea, qué se hace con él o qué conviene saber
+  (`Seccion`, `bajada`): "Ábrelos para cambiarlos o mándalos como están: siempre salen
+  con los precios de hoy." Es el modelo de Catálogos. Nunca un párrafo, nunca repetir
+  el título con otras palabras, y nada que explique cómo funciona la pantalla: si hace
+  falta eso, se rediseña. En el celular el nombre de la pantalla va en la barra de
+  arriba y la descripción queda arriba de todo (`soloBajadaEnCelular`), igual que en la
+  app, que lleva los mismos textos.
 - **Lo que espera algo es un número grande que se toca** y lleva a la lista ya
   filtrada (`ParaHoy`). Los números suben al aparecer (`Contador`).
 - **Fotos antes que nombres**: un pedido por las fotos de lo que pidieron, un producto

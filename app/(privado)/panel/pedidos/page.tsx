@@ -80,10 +80,11 @@ export default async function PedidosPage({
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
-      {/* En el celular, el nombre de la pantalla va en la barra de arriba. */}
-      <div className="max-lg:sr-only">
-        <Cabecera titulo="Pedidos" />
-      </div>
+      <Cabecera
+        titulo="Pedidos"
+        bajada="Cada pedido llega a tu WhatsApp con su número. Márcalo pagado cuando te paguen: así se descuenta del stock."
+        soloBajadaEnCelular
+      />
 
       <FichasDeCobro
         cobros={[
@@ -105,7 +106,12 @@ export default async function PedidosPage({
         ]}
       />
 
-      <Seccion id="lista" icono={ShoppingBag} titulo="Tus pedidos">
+      <Seccion
+        id="lista"
+        icono={ShoppingBag}
+        titulo="Tus pedidos"
+        bajada="Toca uno para ver qué pidió, o márcalo cobrado desde aquí."
+      >
         <FranjaDeFichas
           etiqueta="Filtrar por estado"
           fichas={[
