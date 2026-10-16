@@ -23,8 +23,8 @@ tienda pública. Cómo funciona, y cómo se agrega una, está en `docs/store-tem
 plantilla, y una letra o un color elegidos para vender —una condensada en mayúsculas, el
 azul de un botón de compra, una antigua fina para las cifras— terminaban en cada rótulo de
 una pantalla de trabajo. La tienda sigue reconocible donde se la nombra: su tarjeta en el
-menú lateral, con su papel, su letra y su color de acción en un recuadro, y la portada de
-la tienda en el Resumen, dentro de un celular chico.
+menú lateral, con su papel y su color de acción en un recuadro —el nombre en la letra de
+Venduo, como en la app—, y su portada en el Resumen.
 
 Tres reglas que se desprenden:
 

@@ -24,7 +24,6 @@ import {
   type LucideIcon,
 } from "lucide-react"
 
-import { estiloDelTitular } from "@/lib/plantillas/fuentes"
 import { COOKIE_BARRA } from "@/lib/preferencias"
 import { cn } from "@/lib/utils"
 import type { BarraLateral } from "@/lib/data/barra"
@@ -355,6 +354,7 @@ function Contenido({
                 pathname={pathname}
                 alNavegar={alNavegar}
                 plegada={plegada}
+                enCajon={enCajon}
               />
             ))}
           </Grupo>
@@ -454,12 +454,10 @@ function TarjetaDeTienda({
             className="size-7 object-contain"
           />
         ) : null}
-        <span
-          className="line-clamp-2 flex-1 text-xl leading-tight"
-          style={
-            apariencia ? estiloDelTitular(apariencia.tipografia) : undefined
-          }
-        >
+        {/* El nombre va en la letra de Venduo, como en la app: la de la
+            plantilla —una condensada en mayúsculas, una antigua fina— no se
+            leía con el resto del menú. La tienda se reconoce por sus colores. */}
+        <span className="line-clamp-2 flex-1 font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">
           {tienda.nombre}
         </span>
         <ArrowUpRight aria-hidden="true" className="size-[18px] shrink-0" />
@@ -589,12 +587,15 @@ function Entrada({
   pathname,
   alNavegar,
   plegada,
+  enCajon,
 }: {
   item: Item
   tienda: BarraLateral["tienda"]
   pathname: string
   alNavegar?: () => void
   plegada: boolean
+  /** En el cajón del celular, la fila es la de la app: Geist 600 a 16 px. */
+  enCajon: boolean
 }) {
   const activo = estaActivo(pathname, item)
   const Icono = item.icono
@@ -609,14 +610,23 @@ function Entrada({
       ? `${item.nombre} · ${item.estado}`
       : item.nombre
 
-  // Como en la app: la elegida va en tinta llena.
+  // Como en la app: la elegida va en tinta llena. En el cajón del celular,
+  // la fila de la app tal cual; en la barra de escritorio, más liviana —15 px
+  // y peso medio—, porque a la vista todo el día una columna entera en
+  // semibold competía con el contenido.
   const clases = plegada
     ? cn(
         "relative flex size-11 items-center justify-center transition-colors",
         activo ? "bg-tinta text-papel" : "hover:bg-tinta/[0.06]"
       )
     : cn(
-        "relative flex min-h-12 w-full items-center gap-3 px-3 text-left font-semibold transition-colors",
+        "relative flex w-full items-center gap-3 px-3 text-left transition-colors",
+        enCajon
+          ? "min-h-12 font-semibold"
+          : cn(
+              "min-h-11 text-[15px]",
+              activo ? "font-semibold" : "font-medium"
+            ),
         activo ? "bg-tinta text-papel" : "hover:bg-tinta/[0.06]"
       )
 

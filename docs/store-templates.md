@@ -469,7 +469,7 @@ antigua fina para las cifras— terminaban en cada rótulo de una herramienta de
 
 La tienda sigue reconocible donde se la nombra. `getBarraLateral()` calcula su apariencia
 con la misma función que la tienda pública, y la usa la tarjeta de la tienda en el menú
-lateral —su papel, su color de acción y el nombre con la letra de su plantilla—, que
+lateral —su papel y su color de acción, con el nombre en la letra de Venduo—, que
 dibuja con valores en línea dentro de un recuadro y no toca `:root`. El Resumen muestra
 la captura de su portada en un celular chico; sin captura, la plantilla vista en un
 celular (`public/plantillas/celular/`).
