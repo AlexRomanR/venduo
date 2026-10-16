@@ -35,6 +35,8 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/editor/app/catalogo/plantillas`         | Las plantillas de la lista de catálogos, para la app    | Token de la app |
 | `/panel`                                  | Resumen del emprendedor                                 | Requiere sesión |
 | `/panel/{seccion}`                        | Productos, pedidos, estadísticas, marketing             | Requiere sesión |
+| `/panel/marketing`                        | Publicar en redes: imagen y texto. `?producto=` elegido | Requiere sesión |
+| `/panel/marketing/imagen`                 | La imagen de un producto para redes, en PNG             | Requiere sesión |
 | `/panel/pedidos/{id}`                     | Un pedido: detalle y estados                            | Requiere sesión |
 | `/panel/productos/nuevo`                  | Alta de un producto                                     | Requiere sesión |
 | `/panel/productos/{id}`                   | Edición de un producto                                  | Requiere sesión |
@@ -183,6 +185,8 @@ components/
   cuenta/             Formularios de ajustes, foto de perfil y la conexión con Canva
   insights/           Cuaderno, tablero y gráficos SVG
   pedidos/            Lista, detalle y estados de un pedido
+  publicar/           Publicar en redes: la pantalla y el dibujo de la imagen, que
+                      `next/og` arma en el servidor con la letra de la tienda
   productos/          Catálogo: lista, filtros, formulario, fotos y categorías
   plantillas/         Un kit de componentes por plantilla, su registro y el tema
     clasica/          La base editorial. Los demás kits heredan de esta
@@ -257,6 +261,10 @@ lib/
   format.ts           Moneda, fechas, slugs
   pedidos.ts          Los estados de un pedido y el mensaje de WhatsApp, sin
                       dependencias de servidor
+  publicar.ts         Publicar en redes: diseños, formatos y cómo se completa el
+                      texto con el precio y el enlace, sin dependencias de servidor
+  fotos.ts            Las fotos convertidas a JPEG para dibujar en el servidor: el
+                      catálogo en PDF y la imagen para redes. Solo servidor
   qr.ts               Códigos QR
   admin.ts            La puerta de `/admin` y el registro de cambios. Solo servidor
   app-movil.ts        Lo que la web sabe de la app: su paquete, las rutas que abre

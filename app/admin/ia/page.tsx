@@ -18,6 +18,7 @@ const NOMBRES_DE_TIPO: Record<string, string> = {
   editor: "Editor de la tienda",
   estadisticas: "Preguntas a las estadísticas",
   catalogos: "Catálogos en PDF",
+  marketing: "Publicar en redes",
 }
 
 export default async function IaPage() {
@@ -111,7 +112,7 @@ export default async function IaPage() {
             <SinDatos
               icono={Bot}
               titulo="Todavía nadie la usó"
-              texto="Cada pedido a la IA desde el editor, las estadísticas o los catálogos se cuenta aquí."
+              texto="Cada pedido a la IA desde el editor, las estadísticas, los catálogos o las publicaciones se cuenta aquí."
             />
           ) : (
             <ul>

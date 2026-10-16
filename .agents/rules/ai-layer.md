@@ -36,14 +36,14 @@ Se obtiene con `getAIProvider()` de `lib/ai/index.ts`. `getAIStatus()` devuelve
 
 En `lib/ai/tasks.ts` hay **seis**, y todas siguen el mismo molde:
 
-| Tarea                    | Devuelve                         |
-| ------------------------ | -------------------------------- |
-| `generateStoreBlueprint` | `{ blueprint, provider, model }` |
-| `analyzeSales`           | `{ insight, provider, model }`   |
-| `generateCampaign`       | `{ campaign, provider, model }`  |
-| `buildInsightSql`        | `{ consulta, provider, model }`  |
-| `proponerEdicion`        | `{ propuesta, provider, model }` |
-| `proponerCatalogo`       | `{ propuesta, provider, model }` |
+| Tarea                    | Devuelve                             |
+| ------------------------ | ------------------------------------ |
+| `generateStoreBlueprint` | `{ blueprint, provider, model }`     |
+| `analyzeSales`           | `{ insight, provider, model }`       |
+| `escribirPublicaciones`  | `{ publicaciones, provider, model }` |
+| `buildInsightSql`        | `{ consulta, provider, model }`      |
+| `proponerEdicion`        | `{ propuesta, provider, model }`     |
+| `proponerCatalogo`       | `{ propuesta, provider, model }`     |
 
 Para agregar otra:
 

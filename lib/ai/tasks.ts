@@ -7,7 +7,7 @@ import { SECCIONES, type Campo } from "@/lib/plantillas/secciones"
 import { getAIProvider } from "./index"
 import {
   insightSqlSchema,
-  marketingCampaignSchema,
+  publicacionesSchema,
   propuestaDeCatalogoSchema,
   propuestaDeDisenoSchema,
   salesInsightSchema,
@@ -15,7 +15,7 @@ import {
   type GenerateStoreRequest,
   type InsightSql,
   type InsightsRequest,
-  type MarketingCampaign,
+  type Publicaciones,
   type PropuestaDeCatalogo,
   type PropuestaDeDiseno,
   type SalesInsight,
@@ -146,31 +146,68 @@ export async function buildInsightSql(input: {
 }
 
 /** Campaña de marketing multicanal para una tienda. */
-export async function generateCampaign(input: {
-  storeName: string
-  audience: string
-  objective: string
-}): Promise<{ campaign: MarketingCampaign; provider: string; model: string }> {
+/**
+ * Los textos para publicar un producto en redes: WhatsApp, Instagram y TikTok,
+ * Facebook y Marketplace.
+ *
+ * El modelo no escribe el precio ni el enlace: los suma quien llama, con los
+ * datos de la base. `vuelta` cambia en cada "Otra versión", para que no
+ * repita la anterior. El contexto viaja también entre marcas, como en el
+ * catálogo, para que el modo demo arme textos con el producto real.
+ */
+export async function escribirPublicaciones(input: {
+  tienda: string
+  producto: {
+    nombre: string
+    categoria: string | null
+    descripcion: string | null
+    rebaja: number | null
+    pocasUnidades: boolean
+  }
+  vuelta: number
+}): Promise<{ publicaciones: Publicaciones; provider: string; model: string }> {
   const ai = getAIProvider()
 
   const { object, provider, model } = await ai.generateObject({
-    schema: marketingCampaignSchema,
-    schemaName: "MarketingCampaign",
-    system: BASE_SYSTEM,
+    schema: publicacionesSchema,
+    schemaName: "Publicaciones",
+    system: [
+      BASE_SYSTEM,
+      "Escribes publicaciones para que la tienda venda un producto en sus redes.",
+      "Suenan a la tienda hablándole a su clienta o cliente, no a un aviso: cálido, directo, sin exagerar.",
+      "No escribas el precio ni ningún monto, ni enlaces: Venduo los agrega al final.",
+      "No inventes características que no estén en los datos: ni tallas, ni colores, ni materiales.",
+      "Como mucho dos emojis por texto. Sin hashtags dentro de los textos: van aparte.",
+      "Si hay rebaja, dilo. Si quedan pocas unidades, dilo sin alarmar.",
+    ].join("\n"),
     messages: [
       {
         role: "user",
         content: [
-          `Tienda: ${input.storeName}`,
-          `Público: ${input.audience}`,
-          `Objetivo: ${input.objective}`,
-          "Genera publicaciones listas para usar en distintos canales.",
-        ].join("\n"),
+          `Tienda: ${input.tienda}`,
+          `Producto: ${input.producto.nombre}`,
+          input.producto.categoria
+            ? `Categoría: ${input.producto.categoria}`
+            : null,
+          input.producto.descripcion
+            ? `Descripción: ${input.producto.descripcion}`
+            : null,
+          input.producto.rebaja
+            ? `Está con ${input.producto.rebaja}% de descuento.`
+            : null,
+          input.producto.pocasUnidades ? "Quedan pocas unidades." : null,
+          input.vuelta > 0
+            ? `Es la versión número ${input.vuelta + 1}: escribe algo distinto a lo de antes.`
+            : null,
+          `<<CONTEXTO>>${JSON.stringify(input)}<</CONTEXTO>>`,
+        ]
+          .filter(Boolean)
+          .join("\n"),
       },
     ],
   })
 
-  return { campaign: object, provider, model }
+  return { publicaciones: object, provider, model }
 }
 
 /* -------------------------------------------------------------------------

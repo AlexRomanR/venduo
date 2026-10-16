@@ -58,6 +58,12 @@ export const FUNCIONES = [
     descripcion: "Pedirle un catálogo en PDF a la IA.",
   },
   {
+    clave: "ia_marketing",
+    nombre: "IA en publicaciones",
+    grupo: "IA",
+    descripcion: "Que la IA escriba el texto para publicar un producto.",
+  },
+  {
     clave: "catalogos",
     nombre: "Catálogos en PDF",
     grupo: "Herramientas",
@@ -74,6 +80,12 @@ export const FUNCIONES = [
     nombre: "Enlace público de catálogo",
     grupo: "Herramientas",
     descripcion: "Mandar un catálogo como enlace que abre cualquiera.",
+  },
+  {
+    clave: "marketing",
+    nombre: "Publicar en redes",
+    grupo: "Herramientas",
+    descripcion: "La imagen y el texto de un producto para sus redes.",
   },
   {
     clave: "estadisticas",

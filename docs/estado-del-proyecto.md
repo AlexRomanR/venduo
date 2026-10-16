@@ -19,7 +19,7 @@ Actualizado el 9 de octubre de 2026.
 | 6   | Carrito que manda el pedido al WhatsApp de la tienda         | ✅     |
 | 7   | Panel de pedidos que descuenta stock al marcarse pagado      | ✅     |
 | 8   | Estadísticas en lenguaje natural                             | ✅     |
-| 9   | Copys de marketing y publicación en Facebook y WhatsApp      | ❌     |
+| 9   | Imagen y texto para publicar un producto en redes            | ✅     |
 | 10  | Catálogos en PDF editables, para descargar o compartir       | ✅     |
 
 > **6 de octubre:** se quitaron la red de vendedores, el cobro dentro de la plataforma
@@ -338,16 +338,19 @@ uno y otro, el código viejo falla contra la base nueva: conviene hacerlos segui
 Las tiendas de la demostración que no tengan WhatsApp no reciben pedidos hasta cargarlo
 en `/cuenta`.
 
-### 3. Marketing — prioridad media
+### 3. Publicar en redes en la app — a decidir
 
-`/panel/marketing` es un marcador "Pronto". La tarea `generateCampaign` existe en la capa
-de IA pero no se usa.
+**Publicar en redes** (`/panel/marketing`) está en la web y en la web en el celular, de
+prueba: elegir un producto, la imagen con los colores y la letra de la tienda —historia
+9:16 o cuadrada; foto grande, su color u oferta— y el texto para WhatsApp, Instagram y
+TikTok, y Facebook, que escribe la IA (`escribirPublicaciones`) o se arma sin ella. Se
+comparte imagen y texto juntos desde el celular, o se descarga y se copia. Desde cada
+producto, "Publicar en redes" llega con él elegido.
 
-Falta:
-
-- Generar copys para Facebook y WhatsApp desde un producto.
-- Publicar: plan A por API de Meta, plan B con enlaces de compartir y copiar. Se recomienda
-  ir directo al plan B por el tiempo de revisión de Meta.
+**Es la única diferencia a propósito entre el panel en el celular y la app**, mientras se
+prueba: la app no la tiene todavía. Si se queda, se lleva a la app con la imagen de la
+misma ruta y los textos de la misma acción. Publicar directo por la API de Meta no se
+hace: compartir desde el teléfono llega a las mismas redes sin la revisión de Meta.
 
 ### 4. Plantillas — prioridad baja
 

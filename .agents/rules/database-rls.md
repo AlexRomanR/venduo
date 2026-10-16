@@ -199,7 +199,7 @@ escritura deja su fila en `admin_audit_log` con `registrarCambio`.
 | ------------------------------------ | ---------------------------------------------------------- | ---------------- |
 | `is_platform_admin()`                | Si la sesión es de un administrador                        | Autenticados     |
 | `funcion_de_tienda(store, clave)`    | El estado de una función: la tienda manda sobre lo general | Solo servidor    |
-| `funciones_de_mi_tienda()`           | Las diez de la tienda de la sesión, en un jsonb            | Autenticados     |
+| `funciones_de_mi_tienda()`           | Todas las de la tienda de la sesión, en un jsonb           | Autenticados     |
 | `funcion_activa(clave)`              | Para políticas y vistas: si está activa en mi tienda       | Autenticados     |
 | `estado_del_registro()`              | Abierto, cerrado o con invitación                          | Anónimos también |
 | `registrar_visita(...)`              | Anota una visita y su resumen diario                       | Solo servidor    |

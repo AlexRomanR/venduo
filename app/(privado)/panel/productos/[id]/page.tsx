@@ -1,9 +1,15 @@
+import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
+import { Megaphone } from "lucide-react"
 
 import { getCatalogo, getProducto } from "@/lib/data/catalogo"
+import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
+import { BOTON_SECUNDARIO } from "@/lib/estilos"
 import { formatDate } from "@/lib/format"
+import { cn } from "@/lib/utils"
+import { ConFuncion } from "@/components/panel/funcion"
 import { Cabecera, Volver } from "@/components/panel/piezas"
 import { TituloDeLaBarra } from "@/components/panel/titulo-de-barra"
 import { FormularioProducto } from "@/components/productos/formulario"
@@ -20,10 +26,11 @@ export default async function EditarProductoPage({
   const { id } = await params
   // Las tres a la vez: el producto y las categorías esperan a la misma
   // tienda, que se lee una sola vez por pedido.
-  const [tienda, producto, { categorias }] = await Promise.all([
+  const [tienda, producto, { categorias }, funciones] = await Promise.all([
     getMiTienda(),
     getProducto(id),
     getCatalogo(),
+    funcionesDeMiTienda(),
   ])
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
@@ -48,7 +55,21 @@ export default async function EditarProductoPage({
               : ""}
           </>
         }
-      />
+      >
+        {/* Solo lo que se ve en la tienda se puede publicar: un producto
+            oculto llevaría a un enlace que no abre. */}
+        {producto.is_active && !producto.moderated_at ? (
+          <ConFuncion estado={funciones.marketing}>
+            <Link
+              href={`/panel/marketing?producto=${producto.id}`}
+              className={cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")}
+            >
+              <Megaphone aria-hidden="true" className="size-4" />
+              Publicar en redes
+            </Link>
+          </ConFuncion>
+        ) : null}
+      </Cabecera>
 
       <FormularioProducto
         tiendaId={tienda?.id ?? "demo"}
