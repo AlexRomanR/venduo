@@ -25,7 +25,7 @@ export function Cabecera({
   titulo,
   bajada,
   demo,
-  soloBajadaEnCelular = false,
+  accionesSoloEnPantallaAncha = false,
   children,
 }: {
   /** Lo que va arriba del titular, en versalita: "Pedido". */
@@ -34,11 +34,8 @@ export function Cabecera({
   bajada?: React.ReactNode
   /** El aviso de modo demo, si corresponde. Va en la bajada, resaltado. */
   demo?: string | false
-  /**
-   * En el celular el nombre de la pantalla va en la barra de arriba, como en la
-   * app: queda solo la bajada, y las acciones van donde las pone la pantalla.
-   */
-  soloBajadaEnCelular?: boolean
+  /** En el celular las acciones van donde las pone la pantalla, como un botón flotante. */
+  accionesSoloEnPantallaAncha?: boolean
   /** Las acciones de la pantalla. */
   children?: React.ReactNode
 }) {
@@ -53,19 +50,13 @@ export function Cabecera({
         <h1
           className={cn(
             "font-titular text-[clamp(1.75rem,5vw,2.5rem)] leading-[1.02] font-extrabold tracking-[-0.03em] text-balance",
-            etiqueta && "mt-1.5",
-            soloBajadaEnCelular && "max-lg:sr-only"
+            etiqueta && "mt-1.5"
           )}
         >
           {titulo}
         </h1>
         {bajada || demo ? (
-          <p
-            className={cn(
-              "mt-3 text-sm leading-relaxed opacity-70",
-              soloBajadaEnCelular && "max-lg:mt-0"
-            )}
-          >
+          <p className="mt-3 text-sm leading-relaxed opacity-70">
             {bajada}
             {demo ? (
               <>
@@ -81,7 +72,7 @@ export function Cabecera({
         <div
           className={cn(
             "flex flex-wrap items-center gap-2",
-            soloBajadaEnCelular && "max-lg:hidden"
+            accionesSoloEnPantallaAncha && "max-lg:hidden"
           )}
         >
           {children}

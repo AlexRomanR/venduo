@@ -81,9 +81,8 @@ export default async function PedidosPage({
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <Cabecera
-        titulo="Pedidos"
-        bajada="Cada pedido llega a tu WhatsApp con su número. Márcalo pagado cuando te paguen: así se descuenta del stock."
-        soloBajadaEnCelular
+        titulo="Tus pedidos."
+        bajada="Llegan a tu WhatsApp. Márcalos pagados y se descuentan del stock."
       />
 
       <FichasDeCobro
@@ -109,8 +108,8 @@ export default async function PedidosPage({
       <Seccion
         id="lista"
         icono={ShoppingBag}
-        titulo="Tus pedidos"
-        bajada="Toca uno para ver qué pidió, o márcalo cobrado desde aquí."
+        titulo="Los que llegaron"
+        bajada="Toca uno para ver qué pidió."
       >
         <FranjaDeFichas
           etiqueta="Filtrar por estado"

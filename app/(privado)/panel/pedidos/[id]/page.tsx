@@ -84,7 +84,7 @@ export default async function PedidoPage({
         id="que-pidio"
         icono={ShoppingBag}
         titulo="Qué pidió"
-        bajada="Con los precios del pedido, aunque después cambien en tu catálogo."
+        bajada="Con los precios del día del pedido."
       >
         <ul>
           {pedido.items.map((item, indice) => (
@@ -145,7 +145,7 @@ export default async function PedidoPage({
           id="quien-compro"
           icono={UserRound}
           titulo="Quién compró"
-          bajada="Los datos que dejó al comprar."
+          bajada="Lo que dejó al comprar."
         >
           <dl>
             {pedido.comprador ? (

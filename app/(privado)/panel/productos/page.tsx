@@ -89,9 +89,9 @@ export default async function ProductosPage({
     <div className="flex flex-col gap-6 max-lg:pb-16 md:gap-8">
       {/* En el celular "Nuevo producto" flota sobre las pestañas, como en la app. */}
       <Cabecera
-        titulo="Productos"
-        bajada="Lo que vendes, a qué precio y cuántas unidades te quedan. Es lo mismo que ve quien entra a tu tienda."
-        soloBajadaEnCelular
+        titulo="Tus productos."
+        bajada="Lo que vendes, su precio y cuántas unidades te quedan."
+        accionesSoloEnPantallaAncha
       >
         <Link
           href="/panel/productos/nuevo"
@@ -136,11 +136,11 @@ export default async function ProductosPage({
       <Seccion
         id="productos"
         icono={Boxes}
-        titulo="Tus productos"
+        titulo="Lo que vendes"
         bajada={
           hayFiltros
             ? `${formatNumber(productos.length)} de ${formatNumber(resumen.total)} ${resumen.total === 1 ? "producto" : "productos"}`
-            : "Cambia el stock con más y menos; toca uno para editarlo."
+            : "Cambia el stock con más y menos."
         }
         extra={
           <Link

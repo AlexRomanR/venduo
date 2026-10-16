@@ -73,7 +73,7 @@ export function PrimerosPasos({
       id="primeros-pasos"
       icono={Flag}
       titulo="Primeros pasos"
-      bajada="Lo que falta para que tu tienda empiece a vender."
+      bajada="Lo que falta para empezar a vender."
       extra={
         <div className="flex items-center gap-3">
           <span className="tabular text-sm font-semibold">
