@@ -14,7 +14,7 @@ import { Miniatura } from "@/components/panel/piezas"
  * Elegir qué productos van en el catálogo: buscar, filtrar y marcar.
  *
  * El orden en que se marcan es el orden del catálogo; después se cambia
- * arrastrando. "Elegir los que se ven" marca de una vez lo que dejan los
+ * arrastrando. "Seleccionar todos" marca de una vez lo que dejan los
  * filtros: todo lo rebajado, toda una categoría.
  */
 
@@ -141,8 +141,8 @@ export function SelectorDeProductos({
                 className="min-h-11 px-2 text-sm font-semibold underline-offset-4 hover:underline"
               >
                 {visibles.length === productos.length
-                  ? "Elegir todos"
-                  : `Elegir estos ${visiblesSinMarcar.length}`}
+                  ? "Seleccionar todos"
+                  : `Seleccionar todos (${visiblesSinMarcar.length})`}
               </button>
             ) : null}
             {visiblesMarcados.length > 0 ? (
@@ -154,7 +154,7 @@ export function SelectorDeProductos({
                 }}
                 className="min-h-11 px-2 text-sm font-semibold underline-offset-4 opacity-75 hover:underline hover:opacity-100"
               >
-                Quitar estos
+                Quitar todos
               </button>
             ) : null}
           </div>
@@ -251,8 +251,8 @@ function cumpleConFotos(
 /**
  * Elegir los productos de un catálogo nuevo por sus fotos, el mismo paso de
  * la app: un producto se reconoce por cómo se ve, no por su nombre. Se marcan
- * en orden —el número sobre la foto es su lugar en el catálogo— y "Elegir los
- * que se ven" marca de una vez lo que dejan el buscador y el filtro.
+ * en orden —el número sobre la foto es su lugar en el catálogo— y "Seleccionar
+ * todos" marca de una vez lo que dejan el buscador y el filtro.
  */
 export function SelectorConFotos({
   productos,
@@ -354,8 +354,8 @@ export function SelectorConFotos({
           className="min-h-11 w-fit text-left font-semibold underline underline-offset-4 transition-colors hover:text-senal"
         >
           {todosElegidos
-            ? "Quitar los que se ven"
-            : `Elegir los ${visibles.length} que se ven`}
+            ? "Quitar todos"
+            : `Seleccionar todos (${visibles.length})`}
         </button>
       ) : null}
 
