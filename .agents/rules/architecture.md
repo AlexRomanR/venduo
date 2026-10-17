@@ -35,6 +35,11 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/editor/app/catalogo/plantillas`         | Las plantillas de la lista de catálogos, para la app    | Token de la app |
 | `/panel`                                  | Resumen del emprendedor                                 | Requiere sesión |
 | `/panel/{seccion}`                        | Productos, pedidos, estadísticas, marketing             | Requiere sesión |
+| `/panel/marketing`                        | Publicar en redes: imagen y texto. `?producto=` elegido | Requiere sesión |
+| `/panel/marketing/imagen`                 | La imagen de un producto para redes, en PNG             | Requiere sesión |
+| `/panel/marketing/tiktok`                 | Publicar un producto en TikTok, o conectar la cuenta    | Requiere sesión |
+| `/panel/marketing/tiktok/conectar`        | Ir a TikTok a aprobar a Venduo                          | Requiere sesión |
+| `/panel/marketing/tiktok/vuelta`          | La vuelta de TikTok: guarda el permiso                  | Requiere sesión |
 | `/panel/pedidos/{id}`                     | Un pedido: detalle y estados                            | Requiere sesión |
 | `/panel/productos/nuevo`                  | Alta de un producto                                     | Requiere sesión |
 | `/panel/productos/{id}`                   | Edición de un producto                                  | Requiere sesión |
@@ -54,6 +59,7 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/auth/*`                                 | Callback y cierre de sesión                             | —               |
 | `/api/health`                             | Estado del servidor y sus capas                         | Público         |
 | `/api/visita`                             | Anota una visita a una tienda, sin identificar a nadie  | Público         |
+| `/api/tiktok/foto/…`                      | La foto que TikTok baja al publicar, y su verificación  | Público         |
 | `/api/v1/resumen`                         | La app: todo lo del Inicio, en un viaje                 | Token de la app |
 | `/api/v1/plantillas`                      | La app: las plantillas del alta, con su miniatura       | Token de la app |
 | `/api/v1/fuentes`                         | La app: las letras de las tiendas y sus archivos        | Público         |
@@ -72,6 +78,9 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/api/v1/catalogos/{id}`                  | La app: dar de baja un catálogo (`DELETE`)              | Token de la app |
 | `/api/v1/catalogos/{id}/canva`            | La app: llevar un catálogo a Canva                      | Token de la app |
 | `/api/v1/ia/catalogo/propuesta`           | La app: una propuesta de catálogo, sin guardarla        | Token de la app |
+| `/api/v1/publicar`                        | La app: los productos para Publicar en redes            | Token de la app |
+| `/api/v1/publicar/imagen`                 | La app: la imagen de un producto para redes, en PNG     | Token de la app |
+| `/api/v1/publicar/textos`                 | La app: los textos para redes, con la IA o sin ella     | Token de la app |
 | `/.well-known/assetlinks.json`            | Le confirma a Android que la app es de esta web         | Público         |
 | `/.well-known/apple-app-site-association` | Lo mismo, para iPhone                                   | Público         |
 | `/admin`                                  | Resumen de la plataforma: tiendas, embudo, salud        | Administrador   |
@@ -170,6 +179,7 @@ app/
   api/health/
   api/v1/             La API de la app móvil: entra con el token de la sesión
   api/visita/         Recibe las visitas de la tienda pública y las anota
+  api/tiktok/foto/    De donde TikTok baja la foto que se publica
   .well-known/        Lo que Android y iPhone le preguntan a la web antes de abrir
                       un enlace del panel dentro de la app
   admin/              La administración de Venduo: su armazón, sus pantallas y
@@ -183,6 +193,8 @@ components/
   cuenta/             Formularios de ajustes, foto de perfil y la conexión con Canva
   insights/           Cuaderno, tablero y gráficos SVG
   pedidos/            Lista, detalle y estados de un pedido
+  publicar/           Publicar en redes: la pantalla y el dibujo de la imagen, que
+                      `next/og` arma en el servidor con la letra de la tienda
   productos/          Catálogo: lista, filtros, formulario, fotos y categorías
   plantillas/         Un kit de componentes por plantilla, su registro y el tema
     clasica/          La base editorial. Los demás kits heredan de esta
@@ -246,6 +258,11 @@ lib/
   legal.ts            El correo de soporte y desde cuándo valen los textos legales
   canva.ts            Llevar un catálogo a Canva: el permiso con PKCE y la
                       importación del PDF. Solo servidor
+  tiktok.ts           Publicar en TikTok: el permiso, la cuenta, publicar y el
+                      estado. Solo servidor. Todo en `docs/tiktok.md`
+  tiktok-textos.ts    Las privacidades de TikTok y sus nombres, sin dependencias
+  cifrado.ts          AES-256-GCM para lo que se guarda de otras plataformas
+  publicar-imagen.tsx La imagen de Publicar en redes, en PNG o en JPEG. Solo servidor
   marca.ts            La geometría y los colores del logo: la fuente de todo archivo
   demo-data.ts        Datos de ejemplo del modo demo
   estilos.ts          Clases del vestido editorial de los controles
@@ -257,6 +274,10 @@ lib/
   format.ts           Moneda, fechas, slugs
   pedidos.ts          Los estados de un pedido y el mensaje de WhatsApp, sin
                       dependencias de servidor
+  publicar.ts         Publicar en redes: diseños, formatos y cómo se completa el
+                      texto con el precio y el enlace, sin dependencias de servidor
+  fotos.ts            Las fotos convertidas a JPEG para dibujar en el servidor: el
+                      catálogo en PDF y la imagen para redes. Solo servidor
   qr.ts               Códigos QR
   admin.ts            La puerta de `/admin` y el registro de cambios. Solo servidor
   app-movil.ts        Lo que la web sabe de la app: su paquete, las rutas que abre

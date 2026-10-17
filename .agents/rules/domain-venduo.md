@@ -148,8 +148,9 @@ devuelve nada aunque la pantalla las pidiera.
 
 ## Las funciones de cada tienda
 
-Cada función —la IA del editor, de estadísticas y de catálogos, los catálogos en PDF,
-Canva, el editor, cambiar de plantilla, las visitas— tiene tres estados: **activa**,
+Cada función —la IA del editor, de estadísticas, de catálogos y de publicaciones, los
+catálogos en PDF, Canva, publicar en redes, el editor, cambiar de plantilla, las
+visitas— tiene tres estados: **activa**,
 **desactivada** (se ve pero no responde, y al tocarla dice que no está disponible) y
 **desactivada y oculta**. Hay un estado general y uno por tienda; el de la tienda manda.
 **Apagado se comprueba en el servidor**, no solo en el botón. Y apagarle algo a una
@@ -157,7 +158,7 @@ tienda no le avisa nada.
 
 Las piezas, siempre las mismas:
 
-- **`funcionesDeMiTienda()`** (`lib/data/funciones.ts`) lee las diez de una vez, con
+- **`funcionesDeMiTienda()`** (`lib/data/funciones.ts`) lee todas de una vez, con
   memoria por pedido. La barra lateral ya las trae (`barra.funciones`).
 - **`ConFuncion`** (`components/panel/funcion.tsx`) es la cara: oculta no dibuja nada,
   desactivada atenúa y corta el clic con el único aviso, `AVISO_DE_NO_DISPONIBLE`.
@@ -165,7 +166,7 @@ Las piezas, siempre las mismas:
   Una página de una función apagada redirige sin explicar; una ruta de PDF responde 403.
 - La IA pide **`permisoDeIa(tipo)`** (`lib/data/uso-ia.ts`), que suma el tope diario, y
   anota cada pedido con `anotarUsoDeIa`. El interruptor general de la IA lo resuelve la
-  base: con `ia_apagada`, las tres funciones de IA llegan ocultas.
+  base: con `ia_apagada`, todas las funciones de IA (`ia_*`) llegan ocultas.
 
 Una función nueva se suma a `FUNCIONES` en `lib/funciones.ts` y a `feature_states` con
 una migración; sin la fila, la base la da por activa.
@@ -250,5 +251,5 @@ ofrece recuperarla dentro de los 90 días, se cambian también esos textos.
 
 **Los textos legales describen el sistema tal como es.** `/privacidad` nombra cada
 proveedor que recibe datos —Supabase, Vercel, Google por la IA, Expo y Firebase por los
-avisos, Canva si se conecta— y qué recibe. Un proveedor nuevo, o un dato de personas que
+avisos, Canva y TikTok si se conectan— y qué recibe. Un proveedor nuevo, o un dato de personas que
 se empiece a guardar, cambia ese texto y su fecha (`VIGENTE_DESDE` en `lib/legal.ts`).

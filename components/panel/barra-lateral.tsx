@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   ArrowUpRight,
   BookOpen,
+  Megaphone,
   ChartColumn,
   House,
   LogOut,
@@ -183,6 +184,12 @@ function Contenido({
               nombre: "Catálogos",
               icono: BookOpen,
               funcion: funciones.catalogos,
+            },
+            {
+              href: "/panel/marketing",
+              nombre: "Publicar en redes",
+              icono: Megaphone,
+              funcion: funciones.marketing,
             },
             { href: "", nombre: "Compartir", icono: Share2, compartir: true },
           ],
@@ -884,7 +891,11 @@ export function BarraLateralMovil({ datos }: { datos: BarraLateral }) {
   const deRuta = tituloDeRuta(pathname)
   // El que puso la página vale solo para la ruta que lo pide: al navegar, la
   // página nueva todavía no limpió el suyo.
-  const barra = propio && deRuta?.volver === propio.volver ? propio : deRuta
+  // Puede volver a la misma pantalla con algo más —el producto elegido—.
+  const barra =
+    propio && deRuta?.volver && propio.volver?.startsWith(deRuta.volver)
+      ? propio
+      : deRuta
 
   React.useEffect(() => {
     setAbierta(false)

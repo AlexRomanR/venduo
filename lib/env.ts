@@ -27,6 +27,15 @@ const envSchema = z.object({
   CANVA_CLIENT_ID: z.string().min(1).optional(),
   CANVA_CLIENT_SECRET: z.string().min(1).optional(),
 
+  // Publicar en TikTok: la app se crea en el portal de desarrolladores de
+  // TikTok, con Login Kit y Content Posting API. Sin esto, TikTok no aparece
+  // y se comparte desde la hoja del teléfono.
+  TIKTOK_CLIENT_KEY: z.string().min(1).optional(),
+  TIKTOK_CLIENT_SECRET: z.string().min(1).optional(),
+  // El archivo con que TikTok verifica que el dominio de las fotos es nuestro,
+  // como "tiktok123.txt=contenido". Lo sirve /api/tiktok/foto.
+  TIKTOK_VERIFICACION: z.string().optional(),
+
   // La app del emprendedor: con esto la web le confirma al teléfono que un
   // enlace del panel se puede abrir en la app. Su forma se comprueba en
   // `lib/app-movil.ts` y no acá: una variable inválida en este esquema tira
@@ -47,6 +56,9 @@ const parsed = envSchema.safeParse({
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || undefined,
   CANVA_CLIENT_ID: process.env.CANVA_CLIENT_ID || undefined,
   CANVA_CLIENT_SECRET: process.env.CANVA_CLIENT_SECRET || undefined,
+  TIKTOK_CLIENT_KEY: process.env.TIKTOK_CLIENT_KEY || undefined,
+  TIKTOK_CLIENT_SECRET: process.env.TIKTOK_CLIENT_SECRET || undefined,
+  TIKTOK_VERIFICACION: process.env.TIKTOK_VERIFICACION || undefined,
   APP_ANDROID_HUELLAS: process.env.APP_ANDROID_HUELLAS || undefined,
   APP_IOS_ID: process.env.APP_IOS_ID || undefined,
 })
@@ -66,6 +78,10 @@ export const isSupabaseConfigured = Boolean(
 
 export const isCanvaConfigured = Boolean(
   env.CANVA_CLIENT_ID && env.CANVA_CLIENT_SECRET
+)
+
+export const isTikTokConfigured = Boolean(
+  env.TIKTOK_CLIENT_KEY && env.TIKTOK_CLIENT_SECRET
 )
 
 export const isAIConfigured =

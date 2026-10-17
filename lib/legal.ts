@@ -8,4 +8,4 @@
 export const CORREO_DE_CONTACTO = "VenduoSupport@gmail.com"
 
 /** Desde cuándo valen los textos de `/privacidad` y `/terminos`. */
-export const VIGENTE_DESDE = "14 de octubre de 2026"
+export const VIGENTE_DESDE = "16 de octubre de 2026"

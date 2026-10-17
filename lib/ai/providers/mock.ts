@@ -1,6 +1,7 @@
 ﻿import { z } from "zod"
 
 import { catalogoDeDemostracion } from "./mock-catalogo"
+import { publicacionesDeDemostracion } from "./mock-publicaciones"
 import { propuestaDeDemostracion } from "./mock-propuesta"
 import {
   AIError,
@@ -262,6 +263,22 @@ export function createMockProvider(
           return {
             object: validado.data,
             raw: JSON.stringify(sugerido, null, 2),
+            provider: "mock",
+            model,
+          }
+        }
+      }
+
+      // Y para los textos de redes: con el producto real.
+      if (options.schemaName === "Publicaciones") {
+        const pedido = options.messages.at(-1)?.content ?? ""
+        const escritas = publicacionesDeDemostracion(pedido)
+        const validadas = options.schema.safeParse(escritas)
+
+        if (validadas.success) {
+          return {
+            object: validadas.data,
+            raw: JSON.stringify(escritas, null, 2),
             provider: "mock",
             model,
           }
