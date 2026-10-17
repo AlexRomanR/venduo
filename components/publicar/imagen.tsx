@@ -27,6 +27,12 @@ export interface DatosDeLaImagen {
   qr: string | null
   diseno: Diseno
   formato: Formato
+  /**
+   * Sin enlace ni QR: para TikTok, que no deja que una app agregue enlaces ni
+   * textos promocionales al contenido. Queda el nombre de la tienda, que es
+   * de quien publica.
+   */
+  sinEnlace?: boolean
 }
 
 /** El nombre más largo que entra con su letra grande; lo demás se corta. */
@@ -190,7 +196,7 @@ function Pie({
   color: string
   suave: string
 }) {
-  const { tienda, estilo, qr, formato } = datos
+  const { tienda, estilo, qr, formato, sinEnlace } = datos
   const historia = formato === "historia"
   return (
     <div
@@ -223,21 +229,23 @@ function Pie({
         >
           {tienda.nombre}
         </div>
-        <div
-          style={{
-            display: "flex",
-            fontFamily: estilo.cuerpo.fuente,
-            fontWeight: estilo.cuerpo.peso,
-            fontSize: historia ? 32 : 26,
-            lineHeight: 1.25,
-            color: suave,
-          }}
-        >
-          {/* Se parte después de una barra o un punto, nunca a media palabra. */}
-          {tienda.enlace.replace(/([/.])/g, "$1\u200b")}
-        </div>
+        {sinEnlace ? null : (
+          <div
+            style={{
+              display: "flex",
+              fontFamily: estilo.cuerpo.fuente,
+              fontWeight: estilo.cuerpo.peso,
+              fontSize: historia ? 32 : 26,
+              lineHeight: 1.25,
+              color: suave,
+            }}
+          >
+            {/* Se parte después de una barra o un punto, nunca a media palabra. */}
+            {tienda.enlace.replace(/([/.])/g, "$1\u200b")}
+          </div>
+        )}
       </div>
-      {historia && qr ? (
+      {historia && qr && !sinEnlace ? (
         // eslint-disable-next-line @next/next/no-img-element -- `next/og` dibuja con <img>.
         <img
           src={qr}

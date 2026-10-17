@@ -186,7 +186,8 @@ export function rutaDeImagen(
   productoId: string,
   diseno: Diseno,
   formato: Formato,
-  descargar = false
+  descargar = false,
+  para?: "tiktok"
 ): string {
   const consulta = new URLSearchParams({
     producto: productoId,
@@ -194,5 +195,6 @@ export function rutaDeImagen(
     formato,
   })
   if (descargar) consulta.set("descargar", "1")
+  if (para) consulta.set("para", para)
   return `/panel/marketing/imagen?${consulta.toString()}`
 }

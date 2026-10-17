@@ -285,6 +285,7 @@ de negocio está en `domain-venduo.md`.
 Lo mismo las tablas de la administración (arriba): se leen con la clave de servicio,
 detrás de `exigirAdmin()`.
 
-`social_connections` guarda los tokens de las conexiones de la tienda —Meta y Canva— y solo
-se accede con la clave de servicio. El de Canva llega además cifrado por la aplicación
-(`lib/canva.ts`): leer la fila no da acceso a la cuenta de nadie.
+`social_connections` guarda los tokens de las conexiones de la tienda —Meta, Canva y
+TikTok— y solo se accede con la clave de servicio. Los de Canva y TikTok llegan además
+cifrados por la aplicación (`lib/canva.ts`, `lib/cifrado.ts`): leer la fila no da acceso
+a la cuenta de nadie.

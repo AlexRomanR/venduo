@@ -251,5 +251,5 @@ ofrece recuperarla dentro de los 90 días, se cambian también esos textos.
 
 **Los textos legales describen el sistema tal como es.** `/privacidad` nombra cada
 proveedor que recibe datos —Supabase, Vercel, Google por la IA, Expo y Firebase por los
-avisos, Canva si se conecta— y qué recibe. Un proveedor nuevo, o un dato de personas que
+avisos, Canva y TikTok si se conectan— y qué recibe. Un proveedor nuevo, o un dato de personas que
 se empiece a guardar, cambia ese texto y su fecha (`VIGENTE_DESDE` en `lib/legal.ts`).

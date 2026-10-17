@@ -1786,7 +1786,7 @@ export type Database = {
       order_status: "pendiente" | "pagado" | "cancelado"
       page_status: "borrador" | "publicada"
       social_post_status: "borrador" | "publicado" | "compartido" | "fallido"
-      social_provider: "facebook" | "whatsapp" | "canva"
+      social_provider: "facebook" | "whatsapp" | "canva" | "tiktok"
       subscription_status: "prueba" | "activa" | "bloqueada" | "cancelada"
     }
     CompositeTypes: {
@@ -1927,7 +1927,7 @@ export const Constants = {
       order_status: ["pendiente", "pagado", "cancelado"],
       page_status: ["borrador", "publicada"],
       social_post_status: ["borrador", "publicado", "compartido", "fallido"],
-      social_provider: ["facebook", "whatsapp", "canva"],
+      social_provider: ["facebook", "whatsapp", "canva", "tiktok"],
       subscription_status: ["prueba", "activa", "bloqueada", "cancelada"],
     },
   },

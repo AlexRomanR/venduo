@@ -88,6 +88,13 @@ export const FUNCIONES = [
     descripcion: "La imagen y el texto de un producto para sus redes.",
   },
   {
+    clave: "tiktok",
+    nombre: "Publicar en TikTok",
+    grupo: "Herramientas",
+    descripcion:
+      "Conectar su cuenta de TikTok y publicar la foto de un producto.",
+  },
+  {
     clave: "estadisticas",
     nombre: "Estadísticas",
     grupo: "Herramientas",

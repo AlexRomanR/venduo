@@ -37,6 +37,9 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/panel/{seccion}`                        | Productos, pedidos, estadísticas, marketing             | Requiere sesión |
 | `/panel/marketing`                        | Publicar en redes: imagen y texto. `?producto=` elegido | Requiere sesión |
 | `/panel/marketing/imagen`                 | La imagen de un producto para redes, en PNG             | Requiere sesión |
+| `/panel/marketing/tiktok`                 | Publicar un producto en TikTok, o conectar la cuenta    | Requiere sesión |
+| `/panel/marketing/tiktok/conectar`        | Ir a TikTok a aprobar a Venduo                          | Requiere sesión |
+| `/panel/marketing/tiktok/vuelta`          | La vuelta de TikTok: guarda el permiso                  | Requiere sesión |
 | `/panel/pedidos/{id}`                     | Un pedido: detalle y estados                            | Requiere sesión |
 | `/panel/productos/nuevo`                  | Alta de un producto                                     | Requiere sesión |
 | `/panel/productos/{id}`                   | Edición de un producto                                  | Requiere sesión |
@@ -56,6 +59,7 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/auth/*`                                 | Callback y cierre de sesión                             | —               |
 | `/api/health`                             | Estado del servidor y sus capas                         | Público         |
 | `/api/visita`                             | Anota una visita a una tienda, sin identificar a nadie  | Público         |
+| `/api/tiktok/foto/…`                      | La foto que TikTok baja al publicar, y su verificación  | Público         |
 | `/api/v1/resumen`                         | La app: todo lo del Inicio, en un viaje                 | Token de la app |
 | `/api/v1/plantillas`                      | La app: las plantillas del alta, con su miniatura       | Token de la app |
 | `/api/v1/fuentes`                         | La app: las letras de las tiendas y sus archivos        | Público         |
@@ -172,6 +176,7 @@ app/
   api/health/
   api/v1/             La API de la app móvil: entra con el token de la sesión
   api/visita/         Recibe las visitas de la tienda pública y las anota
+  api/tiktok/foto/    De donde TikTok baja la foto que se publica
   .well-known/        Lo que Android y iPhone le preguntan a la web antes de abrir
                       un enlace del panel dentro de la app
   admin/              La administración de Venduo: su armazón, sus pantallas y
@@ -250,6 +255,11 @@ lib/
   legal.ts            El correo de soporte y desde cuándo valen los textos legales
   canva.ts            Llevar un catálogo a Canva: el permiso con PKCE y la
                       importación del PDF. Solo servidor
+  tiktok.ts           Publicar en TikTok: el permiso, la cuenta, publicar y el
+                      estado. Solo servidor. Todo en `docs/tiktok.md`
+  tiktok-textos.ts    Las privacidades de TikTok y sus nombres, sin dependencias
+  cifrado.ts          AES-256-GCM para lo que se guarda de otras plataformas
+  publicar-imagen.tsx La imagen de Publicar en redes, en PNG o en JPEG. Solo servidor
   marca.ts            La geometría y los colores del logo: la fuente de todo archivo
   demo-data.ts        Datos de ejemplo del modo demo
   estilos.ts          Clases del vestido editorial de los controles

@@ -68,6 +68,13 @@ export default function Privacidad() {
             <strong>Si conectas Canva:</strong> el permiso que Canva nos da para
             llevar tus catálogos a tu cuenta, guardado cifrado.
           </li>
+          <li>
+            <strong>Si conectas TikTok:</strong> el permiso que TikTok nos da
+            para publicar en tu cuenta, guardado cifrado. Para mostrarte con qué
+            cuenta vas a publicar leemos tu nombre, tu usuario y tu foto de
+            TikTok en el momento, sin guardarlos. No leemos tus videos, tus
+            mensajes ni tus seguidores.
+          </li>
         </ul>
       </Apartado>
 
@@ -147,6 +154,12 @@ export default function Privacidad() {
             <strong>Canva</strong>, solo si tú lo conectas y eliges llevar un
             catálogo: recibe ese catálogo en PDF.
           </li>
+          <li>
+            <strong>TikTok</strong>, solo si tú lo conectas y eliges publicar:
+            recibe la imagen de ese producto, el título, el texto y las opciones
+            que elegiste —quién puede verlo, comentarios, música, contenido
+            comercial—. Publicamos solo cuando tocas «Publicar en TikTok».
+          </li>
         </ul>
         <p>
           Además, lo que publicas en tu tienda —nombre, productos, precios,
@@ -199,6 +212,11 @@ export default function Privacidad() {
           <li>
             <strong>Desconectar Canva</strong> desde «Mi cuenta».
           </li>
+          <li>
+            <strong>Desconectar TikTok</strong> con «Cambiar de cuenta», en
+            «Publicar en TikTok», o desde los ajustes de tu cuenta de TikTok. Al
+            desconectarlo borramos el permiso.
+          </li>
         </ul>
         <p>
           Para lo que no puedas hacer tú desde tu cuenta, escríbenos a{" "}
@@ -210,10 +228,10 @@ export default function Privacidad() {
       <Apartado numero={9} titulo="Cómo los cuidamos">
         <p>
           Todo viaja cifrado. Cada tienda solo puede ver lo suyo: lo impone la
-          base de datos, no solo la pantalla. Los permisos de Canva se guardan
-          cifrados. Ninguna clave de nuestros servidores viaja a la app ni al
-          navegador. Ningún sistema es infalible: si alguna vez tus datos se
-          vieran expuestos, te avisaremos por correo.
+          base de datos, no solo la pantalla. Los permisos de Canva y de TikTok
+          se guardan cifrados. Ninguna clave de nuestros servidores viaja a la
+          app ni al navegador. Ningún sistema es infalible: si alguna vez tus
+          datos se vieran expuestos, te avisaremos por correo.
         </p>
       </Apartado>
 

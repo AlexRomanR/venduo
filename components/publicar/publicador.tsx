@@ -11,6 +11,7 @@ import {
   Package,
   RefreshCw,
   Search,
+  Send,
   Share2,
   Sparkles,
   Type,
@@ -60,6 +61,7 @@ export function Publicador({
   productos,
   tienda,
   ia,
+  tiktok,
   inicial,
   escribir,
 }: {
@@ -67,6 +69,8 @@ export function Publicador({
   tienda: { nombre: string; url: string }
   /** La IA de publicaciones en esta tienda: sin ella, el texto se arma solo. */
   ia: EstadoDeFuncion
+  /** Publicar directo en TikTok. `null` si la integración no está configurada. */
+  tiktok: EstadoDeFuncion | null
   inicial: string | null
   escribir: (productoId: string, vuelta: number) => Promise<ResultadoDeTextos>
 }) {
@@ -106,6 +110,7 @@ export function Publicador({
       producto={producto}
       tienda={tienda}
       ia={ia}
+      tiktok={tiktok}
       escribir={escribir}
       alCambiar={() => elegir(null)}
     />
@@ -246,12 +251,14 @@ function Publicacion({
   producto,
   tienda,
   ia,
+  tiktok,
   escribir,
   alCambiar,
 }: {
   producto: ProductoParaPublicar
   tienda: { nombre: string; url: string }
   ia: EstadoDeFuncion
+  tiktok: EstadoDeFuncion | null
   escribir: (productoId: string, vuelta: number) => Promise<ResultadoDeTextos>
   alCambiar: () => void
 }) {
@@ -476,6 +483,34 @@ function Publicacion({
               </p>
             ) : null}
           </div>
+
+          {tiktok && tiktok !== "oculta" ? (
+            <ConFuncion estado={tiktok} className="block">
+              <a
+                href={`/panel/marketing/tiktok?${new URLSearchParams({
+                  producto: producto.id,
+                  diseno,
+                  formato,
+                }).toString()}`}
+                onClick={() => {
+                  // El texto que se está escribiendo viaja a la pantalla de
+                  // TikTok, que le quita los enlaces.
+                  try {
+                    sessionStorage.setItem(
+                      "venduo:publicar:texto",
+                      textos.instagram
+                    )
+                  } catch {
+                    // Sin almacenamiento, allá se arma uno.
+                  }
+                }}
+                className="group flex min-h-12 items-center justify-between gap-3 border-t border-tinta/15 px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel sm:px-5"
+              >
+                Publicar directo en TikTok
+                <Send aria-hidden="true" className="size-4" />
+              </a>
+            </ConFuncion>
+          ) : null}
 
           <Compartir ruta={ruta} producto={producto} texto={texto} />
         </Seccion>

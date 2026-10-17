@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 import { getMaterialParaPublicar } from "@/lib/data/publicar"
-import { isSupabaseConfigured } from "@/lib/env"
+import { isSupabaseConfigured, isTikTokConfigured } from "@/lib/env"
 import { Cabecera } from "@/components/panel/piezas"
 import { Publicador } from "@/components/publicar/publicador"
 import { escribirTextos } from "./acciones"
@@ -45,6 +45,7 @@ export default async function PublicarPage({
         productos={material.productos}
         tienda={{ nombre: material.tienda.nombre, url: material.tienda.url }}
         ia={funciones.ia_marketing}
+        tiktok={isTikTokConfigured ? funciones.tiktok : null}
         inicial={inicial}
         escribir={escribirTextos}
       />

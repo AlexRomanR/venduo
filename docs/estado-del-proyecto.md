@@ -352,6 +352,12 @@ prueba: la app no la tiene todavía. Si se queda, se lleva a la app con la image
 misma ruta y los textos de la misma acción. Publicar directo por la API de Meta no se
 hace: compartir desde el teléfono llega a las mismas redes sin la revisión de Meta.
 
+**Publicar directo en TikTok** está hecho y apagado hasta configurarlo: con
+`TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET` y `TIKTOK_VERIFICACION` en Vercel aparece el
+botón en Publicar en redes. Falta crear la app en TikTok for Developers y pedir su
+revisión; hasta entonces todo lo publicado queda privado. Los pasos, el guion del video y
+el texto de la revisión están en `docs/tiktok.md`.
+
 ### 4. Plantillas — prioridad baja
 
 - Más plantillas para los rubros que quedaron en la base editorial (tecnología, hogar,
