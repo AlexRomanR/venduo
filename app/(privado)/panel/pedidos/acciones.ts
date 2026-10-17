@@ -114,6 +114,7 @@ export async function registrarVenta(
   const { data, error } = await supabase.rpc("registrar_venta", {
     p_items: validada.data.lineas.map((linea) => ({
       product_id: linea.productoId,
+      variant_id: linea.varianteId,
       quantity: linea.cantidad,
       precio_cents: Math.round(linea.precio * 100),
     })),
@@ -147,6 +148,13 @@ function mensajeDeVenta(crudo: string) {
   }
   if (/Producto no disponible/i.test(crudo)) {
     return "Uno de los productos ya no está en tu catálogo. Quítalo de la venta."
+  }
+  const sinOpcion = /Elige una opción de (.+)/.exec(crudo)
+  if (sinOpcion) {
+    return `${sinOpcion[1]} tiene opciones: quítalo y vuelve a elegir cuál vendiste.`
+  }
+  if (/Opción no disponible/i.test(crudo)) {
+    return "Una de las opciones ya no existe. Quítala de la venta y elige otra."
   }
   if (/No tienes una tienda/i.test(crudo)) {
     return "Todavía no tienes una tienda."

@@ -8,6 +8,7 @@ import {
   type Tablero,
 } from "@/lib/tablero"
 import { getMiTienda } from "@/lib/data/panel"
+import { cuantasVariantes, leerOpciones } from "@/lib/variantes"
 
 /** Hasta dónde se mira para lo más vendido. */
 const DIAS_DE_RANKING = 30
@@ -66,7 +67,7 @@ export async function getTablero(): Promise<Tablero | null> {
       // filtro de PostgREST no sabe hacer: un catálogo de MVP son decenas.
       supabase
         .from("products")
-        .select("id, name, image_url, stock, low_stock_threshold")
+        .select("id, name, image_url, stock, low_stock_threshold, opciones")
         .eq("store_id", tienda.id)
         .eq("is_active", true)
         .is("deleted_at", null),
@@ -134,6 +135,7 @@ export async function getTablero(): Promise<Tablero | null> {
       nombre: p.name,
       foto: p.image_url,
       stock: p.stock,
+      variantes: cuantasVariantes(leerOpciones(p.opciones)),
     }))
 
   const ultimosPedidos = (ultimos.data ?? []).map((pedido) => ({

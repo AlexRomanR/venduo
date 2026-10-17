@@ -13,6 +13,8 @@ export const ventaSchema = z.object({
     .array(
       z.object({
         productoId: z.string().min(1).max(64),
+        /** La opción que se vendió, si el producto las tiene. */
+        varianteId: z.string().min(1).max(64).nullable().default(null),
         cantidad: z
           .number()
           .int("Las unidades van enteras.")

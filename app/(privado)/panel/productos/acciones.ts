@@ -67,6 +67,18 @@ export async function guardarProducto(
   if (!tiendaId) return { ok: false, error: "Todavía no tienes una tienda." }
 
   const v = validado.data
+  const conVariantes = v.opciones.length > 0
+
+  // Sin opciones, las variantes que tuviera se dan de baja primero: recién
+  // entonces el producto vuelve a llevar su propio stock y se puede escribir.
+  if (id && !conVariantes) {
+    const { error } = await supabase.rpc("guardar_variantes", {
+      p_producto: id,
+      p_opciones: [],
+      p_variantes: [],
+    })
+    if (error) return { ok: false, error: mensajeDeVariantes(error.message) }
+  }
 
   // `image_url` y `category` no se escriben: los deriva el disparador de la
   // base desde `images` y `category_id`, que son la fuente.
@@ -77,7 +89,8 @@ export async function guardarProducto(
     price_cents: aCentavos(v.precio),
     compare_at_price_cents:
       v.precioAnterior === null ? null : aCentavos(v.precioAnterior),
-    stock: v.stock,
+    // Con variantes, el stock es la suma que lleva la base: no se escribe.
+    ...(id && conVariantes ? {} : { stock: v.stock }),
     low_stock_threshold: v.avisoStock,
     category_id: v.categoriaId,
     sku: v.sku || null,
@@ -117,6 +130,28 @@ export async function guardarProducto(
         ok: false,
         id: respuesta.data.id,
         error: "Guardamos el producto, pero no su costo. Vuelve a intentar.",
+      }
+    }
+  }
+
+  if (conVariantes) {
+    const { error } = await supabase.rpc("guardar_variantes", {
+      p_producto: respuesta.data.id,
+      p_opciones: v.opciones,
+      p_variantes: v.variantes.map((variante) => ({
+        valores: variante.valores,
+        stock: variante.stock,
+        price_cents:
+          variante.precio === null ? null : aCentavos(variante.precio),
+        image_url: variante.imagen,
+      })),
+    })
+    if (error) {
+      console.error("[productos] no se guardaron las variantes:", error)
+      return {
+        ok: false,
+        id: respuesta.data.id,
+        error: mensajeDeVariantes(error.message),
       }
     }
   }
@@ -165,7 +200,14 @@ export async function ajustarStock(
     .eq("id", id)
     .eq("store_id", tiendaId)
 
-  if (error) return { ok: false, error: "No pudimos guardar el stock." }
+  if (error) {
+    return {
+      ok: false,
+      error: /cada variante/i.test(error.message)
+        ? "Este producto tiene opciones: cambia el stock de cada una en el producto."
+        : "No pudimos guardar el stock.",
+    }
+  }
 
   revalidatePath(RUTA)
   // También se repone desde el Resumen, en "Se está acabando".
@@ -266,4 +308,21 @@ function mensajeDeError(crudo: string) {
     return "El precio anterior tiene que ser mayor que el actual."
   }
   return "No pudimos guardar. Revisa los datos e intenta de nuevo."
+}
+
+/** Lo que dijo `guardar_variantes`, en palabras de quien vende. */
+function mensajeDeVariantes(crudo: string): string {
+  if (/Combinación repetida/i.test(crudo)) {
+    return "Hay dos combinaciones iguales. Revisa los valores de cada opción."
+  }
+  if (/Valores repetidos|mismo nombre/i.test(crudo)) {
+    return "Hay un valor o una opción repetidos."
+  }
+  if (/Demasiadas variantes/i.test(crudo)) {
+    return "Son demasiadas combinaciones: hasta 60."
+  }
+  if (/Faltan las variantes|Opción no válida|Valor no válido/i.test(crudo)) {
+    return "Completa las opciones: cada una con su nombre y al menos un valor."
+  }
+  return "Guardamos el producto, pero no sus opciones. Vuelve a intentar."
 }

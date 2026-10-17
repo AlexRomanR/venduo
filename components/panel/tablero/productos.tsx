@@ -215,42 +215,55 @@ function FilaParaReponer({
         </span>
       </Link>
 
-      <div
-        role="group"
-        aria-label={`Unidades de ${producto.nombre}`}
-        className="flex shrink-0 items-center border border-tinta"
-      >
-        <button
-          type="button"
-          onClick={() => cambiar(stock - 1)}
-          disabled={stock === 0}
-          aria-label="Una menos"
-          className="flex size-11 items-center justify-center transition-colors hover:bg-tinta/[0.06] disabled:opacity-30 max-sm:w-9"
+      {producto.variantes ? (
+        // Con opciones no se sabe de cuál sumar: se repone en el producto.
+        <Link
+          href={`/panel/productos/${producto.id}#variantes`}
+          className="flex min-h-11 shrink-0 items-center gap-1.5 border border-tinta px-3 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
         >
-          <Minus aria-hidden="true" className="size-4" />
-        </button>
-        <span
-          aria-live="polite"
-          className={cn(
-            "tabular flex w-9 items-center justify-center font-titular text-lg font-extrabold sm:w-10",
-            agotado && "text-senal"
-          )}
+          <span className={cn("tabular", agotado && "text-senal")}>
+            {formatNumber(stock)}
+          </span>
+          en {producto.variantes} opciones
+        </Link>
+      ) : (
+        <div
+          role="group"
+          aria-label={`Unidades de ${producto.nombre}`}
+          className="flex shrink-0 items-center border border-tinta"
         >
-          {guardando ? (
-            <Loader2 aria-hidden="true" className="size-4 animate-spin" />
-          ) : (
-            formatNumber(stock)
-          )}
-        </span>
-        <button
-          type="button"
-          onClick={() => cambiar(stock + 1)}
-          aria-label="Una más"
-          className="flex size-11 items-center justify-center transition-colors hover:bg-tinta/[0.06] max-sm:w-9"
-        >
-          <Plus aria-hidden="true" className="size-4" />
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => cambiar(stock - 1)}
+            disabled={stock === 0}
+            aria-label="Una menos"
+            className="flex size-11 items-center justify-center transition-colors hover:bg-tinta/[0.06] disabled:opacity-30 max-sm:w-9"
+          >
+            <Minus aria-hidden="true" className="size-4" />
+          </button>
+          <span
+            aria-live="polite"
+            className={cn(
+              "tabular flex w-9 items-center justify-center font-titular text-lg font-extrabold sm:w-10",
+              agotado && "text-senal"
+            )}
+          >
+            {guardando ? (
+              <Loader2 aria-hidden="true" className="size-4 animate-spin" />
+            ) : (
+              formatNumber(stock)
+            )}
+          </span>
+          <button
+            type="button"
+            onClick={() => cambiar(stock + 1)}
+            aria-label="Una más"
+            className="flex size-11 items-center justify-center transition-colors hover:bg-tinta/[0.06] max-sm:w-9"
+          >
+            <Plus aria-hidden="true" className="size-4" />
+          </button>
+        </div>
+      )}
     </li>
   )
 }

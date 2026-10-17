@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 
 import { getCatalogo } from "@/lib/data/catalogo"
 import { getMiTienda } from "@/lib/data/panel"
+import { getVariantesDeMiTienda } from "@/lib/data/variantes"
 import { isSupabaseConfigured } from "@/lib/env"
 import { Cabecera, Volver } from "@/components/panel/piezas"
 import { TituloDeLaBarra } from "@/components/panel/titulo-de-barra"
@@ -22,9 +23,10 @@ export const metadata = { title: "Nueva venta" }
  * mostrador—, pero no los que Venduo ocultó.
  */
 export default async function NuevaVentaPage() {
-  const [tienda, { productos, esDemo }] = await Promise.all([
+  const [tienda, { productos, esDemo }, variantes] = await Promise.all([
     getMiTienda(),
     getCatalogo(),
+    getVariantesDeMiTienda(),
   ])
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
@@ -37,6 +39,12 @@ export default async function NuevaVentaPage() {
       precioCents: p.price_cents,
       stock: p.stock,
       categoria: p.category,
+      variantes: (variantes[p.id] ?? []).map((v) => ({
+        id: v.id,
+        nombre: v.nombre,
+        stock: v.stock,
+        precioCents: v.precioCents,
+      })),
     }))
     // Lo que tiene stock primero: es lo que se vende.
     .sort((a, b) => Number(b.stock > 0) - Number(a.stock > 0))

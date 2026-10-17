@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Banknote,
   Boxes,
+  Layers,
   Eye,
   FileText,
   Images,
@@ -25,6 +26,7 @@ import {
 import { CURRENCY_SYMBOL, formatMoney } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { productoSchema, type ProductoInput } from "@/lib/validation/producto"
+import type { Opcion, Variante } from "@/lib/variantes"
 import type { Product, ProductCategory } from "@/types"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -46,6 +48,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Seccion } from "@/components/panel/piezas"
+import { EditorDeVariantes } from "@/components/productos/variantes"
 import { Fotos } from "@/components/productos/fotos"
 
 /** Centavos a bolivianos, para que el campo muestre lo que la persona escribió. */
@@ -85,6 +88,8 @@ export function FormularioProducto({
   categorias,
   producto,
   costoCents = null,
+  opciones = [],
+  variantes = [],
   guardar,
 }: {
   tiendaId: string
@@ -92,6 +97,9 @@ export function FormularioProducto({
   producto?: Product
   /** Lo que le cuesta a la tienda: vive aparte del producto, solo para ella. */
   costoCents?: number | null
+  /** Talla, color, número: las opciones del producto y sus combinaciones. */
+  opciones?: Opcion[]
+  variantes?: Variante[]
   guardar: (
     entrada: ProductoInput,
     id?: string
@@ -107,6 +115,13 @@ export function FormularioProducto({
       precio: producto ? producto.price_cents / 100 : undefined,
       precioAnterior: aMonto(producto?.compare_at_price_cents ?? null),
       costo: aMonto(costoCents),
+      opciones,
+      variantes: variantes.map((v) => ({
+        valores: v.valores,
+        stock: v.stock,
+        precio: aMonto(v.precioCents),
+        imagen: v.imagen,
+      })),
       stock: producto?.stock ?? 0,
       avisoStock: producto?.low_stock_threshold ?? 3,
       categoriaId: producto?.category_id ?? null,
@@ -116,7 +131,13 @@ export function FormularioProducto({
       destacado: producto?.is_featured ?? false,
     },
   })
-  const [precio, costo] = form.watch(["precio", "costo"])
+  const [precio, costo, opcionesActuales, variantesActuales, fotosActuales] =
+    form.watch(["precio", "costo", "opciones", "variantes", "fotos"])
+  const conVariantes = (opcionesActuales ?? []).length > 0
+  const totalDeVariantes = (variantesActuales ?? []).reduce(
+    (suma, v) => suma + (v.stock || 0),
+    0
+  )
 
   const enCurso = form.formState.isSubmitting
 
@@ -384,38 +405,74 @@ export function FormularioProducto({
         </Bloque>
 
         <Bloque
+          id="variantes"
+          icono={Layers}
+          titulo="Tallas, colores…"
+          detalle="Cada opción con su stock, y su precio si es distinto."
+        >
+          <EditorDeVariantes
+            opciones={opcionesActuales ?? []}
+            variantes={variantesActuales ?? []}
+            fotos={fotosActuales ?? []}
+            precio={precio}
+            alCambiar={(nuevasOpciones, nuevasVariantes) => {
+              form.setValue("opciones", nuevasOpciones, { shouldDirty: true })
+              form.setValue("variantes", nuevasVariantes, {
+                shouldDirty: true,
+              })
+            }}
+            error={
+              form.formState.errors.opciones?.message ??
+              form.formState.errors.variantes?.message
+            }
+          />
+        </Bloque>
+
+        <Bloque
           id="stock"
           icono={Boxes}
           titulo="Cuántas tienes"
           detalle="Las unidades que puedes vender ahora mismo."
         >
           <div className="grid items-start gap-6 sm:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="stock"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className={ETIQUETA_CAMPO}>
-                    Unidades disponibles
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      inputMode="numeric"
-                      step="1"
-                      min="0"
-                      className={cn(CAMPO_LINEA, "tabular")}
-                      value={field.value ?? 0}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormDescription className={AYUDA_CAMPO}>
-                    Al llegar a cero deja de poder comprarse.
-                  </FormDescription>
-                  <FormMessage className="text-senal" />
-                </FormItem>
-              )}
-            />
+            {conVariantes ? (
+              <div className="flex flex-col gap-1">
+                <span className={ETIQUETA_CAMPO}>Unidades disponibles</span>
+                <span className="tabular flex h-12 items-center border-b border-tinta/25 text-base font-semibold">
+                  {totalDeVariantes}
+                </span>
+                <span className={AYUDA_CAMPO}>
+                  La suma de cada opción. Se cambia arriba, en cada una.
+                </span>
+              </div>
+            ) : (
+              <FormField
+                control={form.control}
+                name="stock"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className={ETIQUETA_CAMPO}>
+                      Unidades disponibles
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        step="1"
+                        min="0"
+                        className={cn(CAMPO_LINEA, "tabular")}
+                        value={field.value ?? 0}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormDescription className={AYUDA_CAMPO}>
+                      Al llegar a cero deja de poder comprarse.
+                    </FormDescription>
+                    <FormMessage className="text-senal" />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}
