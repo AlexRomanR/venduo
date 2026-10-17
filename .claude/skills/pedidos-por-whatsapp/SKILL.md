@@ -76,6 +76,22 @@ pagado. No hay columna ni tarea programada: todo lo que cuente pendientes que es
 lista usa `noSeConcreto`. Un conteo nuevo de pendientes que se olvide del plazo
 vuelve a llenar el panel de rojo con carritos que nunca se mandaron.
 
+## La venta directa
+
+Lo que se vendió en el chat o en persona se registra con **`registrar_venta(p_items)`**
+(`registrarVenta` en `app/(privado)/panel/pedidos/acciones.ts`, `useRegistrarVenta` en la
+app). Tampoco es una inserción: la función toma la tienda de la sesión, deja cada línea
+al precio que se cobró y pasa el pedido a pagado en la misma transacción, con
+`origen = 'directa'`. El stock lo descuenta el mismo disparador —una venta que no
+alcanza se rechaza entera— y copia el costo de cada línea para la ganancia.
+
+- **No duplicar la lógica en la pantalla.** La pantalla avisa si una línea pide más de lo
+  que hay ("Corregir el stock"), pero quien decide es la base.
+- **No sale el aviso de pedido nuevo**: `avisar_pedido_nuevo` solo avisa pendientes, y al
+  confirmarse la venta ya está pagada.
+- Todo lo que cuenta ventas la incluye sola: es un pedido pagado. Lo que tenga que
+  distinguirla mira `origen`.
+
 ## El WhatsApp de la tienda
 
 - Obligatorio en el alta: `crearTiendaSchema` y `create_store(…, p_whatsapp)`.

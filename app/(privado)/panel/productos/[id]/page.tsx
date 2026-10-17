@@ -1,13 +1,19 @@
 import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
-import { Megaphone } from "lucide-react"
+import { Megaphone, MessageCircle } from "lucide-react"
 
-import { getCatalogo, getProducto } from "@/lib/data/catalogo"
+import {
+  getCatalogo,
+  getCostoDeProducto,
+  getProducto,
+} from "@/lib/data/catalogo"
 import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
 import { BOTON_SECUNDARIO } from "@/lib/estilos"
 import { formatDate } from "@/lib/format"
+import { mensajeDeProducto } from "@/lib/publicar"
+import { urlDeProducto } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
 import { ConFuncion } from "@/components/panel/funcion"
 import { Cabecera, Volver } from "@/components/panel/piezas"
@@ -26,12 +32,14 @@ export default async function EditarProductoPage({
   const { id } = await params
   // Las tres a la vez: el producto y las categorías esperan a la misma
   // tienda, que se lee una sola vez por pedido.
-  const [tienda, producto, { categorias }, funciones] = await Promise.all([
-    getMiTienda(),
-    getProducto(id),
-    getCatalogo(),
-    funcionesDeMiTienda(),
-  ])
+  const [tienda, producto, { categorias }, funciones, costoCents] =
+    await Promise.all([
+      getMiTienda(),
+      getProducto(id),
+      getCatalogo(),
+      funcionesDeMiTienda(),
+      getCostoDeProducto(id),
+    ])
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
   // `getProducto` ya filtra por tienda, así que un identificador de otro
@@ -59,6 +67,26 @@ export default async function EditarProductoPage({
         {/* Solo lo que se ve en la tienda se puede publicar: un producto
             oculto llevaría a un enlace que no abre. */}
         {producto.is_active && !producto.moderated_at ? (
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(
+              mensajeDeProducto(
+                {
+                  nombre: producto.name,
+                  precioCents: producto.price_cents,
+                  precioAnteriorCents: producto.compare_at_price_cents,
+                },
+                urlDeProducto(tienda?.slug ?? "demo", producto.id)
+              )
+            )}`}
+            target="_blank"
+            rel="noreferrer noopener"
+            className={cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")}
+          >
+            <MessageCircle aria-hidden="true" className="size-4" />
+            Mandar por WhatsApp
+          </a>
+        ) : null}
+        {producto.is_active && !producto.moderated_at ? (
           <ConFuncion estado={funciones.marketing}>
             <Link
               href={`/panel/marketing?producto=${producto.id}`}
@@ -75,6 +103,7 @@ export default async function EditarProductoPage({
         tiendaId={tienda?.id ?? "demo"}
         categorias={categorias}
         producto={producto}
+        costoCents={costoCents}
         guardar={guardarProducto}
       />
 

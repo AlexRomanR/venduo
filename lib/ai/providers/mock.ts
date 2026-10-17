@@ -113,6 +113,18 @@ function sampleFromSchema(
 function sqlDeDemostracion(pedido: string) {
   const t = pedido.toLowerCase()
 
+  if (/gan[eé]|gananci|margen/.test(t)) {
+    return {
+      titulo: "Ganancia por día",
+      explicacion:
+        "Lo que ganaste cada día del último mes, en los productos con costo cargado.",
+      grafico: "columna",
+      formato: "dinero",
+      vistas: ["mis_items"],
+      sql: "select to_char(date_trunc('day', created_at), 'YYYY-MM-DD') as etiqueta, sum(ganancia_cents) as valor from mis_items where status = 'pagado' and ganancia_cents is not null and created_at >= now() - interval '30 days' group by 1 order by 1",
+    }
+  }
+
   if (/producto|art[ií]culo|m[aá]s vendid/.test(t)) {
     return {
       titulo: "Productos más vendidos",

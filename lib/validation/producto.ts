@@ -33,6 +33,13 @@ export const productoSchema = z
       .max(9_999_999)
       .nullable()
       .default(null),
+    /** Lo que le cuesta a la tienda. Solo lo ve ella: da la ganancia. */
+    costo: z
+      .number()
+      .nonnegative("El costo no puede ser negativo.")
+      .max(9_999_999, "Ese costo es demasiado alto.")
+      .nullable()
+      .default(null),
     stock: z
       .number({ error: "Pon cuántas unidades tienes." })
       .int("El stock va en unidades enteras.")

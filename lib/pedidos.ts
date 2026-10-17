@@ -169,6 +169,7 @@ export interface PedidoEnFila {
   foto: string | null
   relativo: string
   noConcretado: boolean
+  directa: boolean
 }
 
 export function pedidoEnFila(
@@ -182,6 +183,7 @@ export function pedidoEnFila(
     creado: string
     articulos: number
     foto: string | null
+    directa?: boolean
   },
   ahora: Date = new Date()
 ): PedidoEnFila {
@@ -196,5 +198,6 @@ export function pedidoEnFila(
     foto: pedido.foto,
     relativo: formatRelative(pedido.creado, ahora),
     noConcretado: noSeConcreto(pedido, ahora),
+    directa: pedido.directa ?? false,
   }
 }

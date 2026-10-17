@@ -45,21 +45,23 @@ export async function getTablero(): Promise<Tablero | null> {
       supabase
         .from("orders")
         .select(
-          "id, order_number, buyer_name, buyer_phone, total_cents, status, created_at, order_items(quantity, product_name, products(image_url))"
+          "id, order_number, buyer_name, buyer_phone, total_cents, status, created_at, origen, order_items(quantity, product_name, products(image_url))"
         )
         .eq("store_id", tienda.id)
         .order("created_at", { ascending: false })
         .limit(5),
+      // Las líneas de toda la serie: dan lo más vendido de los últimos días y
+      // la ganancia de cada día, con el costo que tenía al cobrarse.
       supabase
         .from("order_items")
         .select(
-          "product_id, product_name, quantity, unit_price_cents, products(image_url), orders!inner(status, created_at)"
+          "product_id, product_name, quantity, unit_price_cents, unit_cost_cents, products(image_url), orders!inner(status, created_at)"
         )
         .eq("store_id", tienda.id)
         .eq("orders.status", "pagado")
         // La fecha es la del pedido, como en la serie de ventas: la de la
         // línea puede ser otra, y entonces el ranking sumaba meses viejos.
-        .gte("orders.created_at", inicio(desdeRanking)),
+        .gte("orders.created_at", inicio(primerDia)),
       // Comparar stock con el umbral es comparar dos columnas, cosa que el
       // filtro de PostgREST no sabe hacer: un catálogo de MVP son decenas.
       supabase
@@ -93,9 +95,20 @@ export async function getTablero(): Promise<Tablero | null> {
     serie[indice].pedidos += 1
   }
 
+  // La ganancia de cada día: solo de lo que tenía costo.
+  for (const linea of lineas.data ?? []) {
+    if (linea.unit_cost_cents === null) continue
+    const indice = posicion.get(diaEnBolivia(linea.orders.created_at))
+    if (indice === undefined) continue
+    serie[indice].ventasConCostoCents += linea.quantity * linea.unit_price_cents
+    serie[indice].gananciaCents +=
+      linea.quantity * (linea.unit_price_cents - linea.unit_cost_cents)
+  }
+
   // Lo más vendido: por producto, o por nombre si el producto ya no existe.
   const porProducto = new Map<string, ProductoVendido>()
   for (const linea of lineas.data ?? []) {
+    if (diaEnBolivia(linea.orders.created_at) < desdeRanking) continue
     const clave = linea.product_id ?? `nombre:${linea.product_name}`
     const previo = porProducto.get(clave) ?? {
       id: linea.product_id,
@@ -145,6 +158,7 @@ export async function getTablero(): Promise<Tablero | null> {
     foto:
       (pedido.order_items ?? []).find((item) => item.products?.image_url)
         ?.products?.image_url ?? null,
+    directa: pedido.origen === "directa",
   }))
 
   const personalizada =

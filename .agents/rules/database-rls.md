@@ -96,6 +96,11 @@ compra y no descuenta stock**: eso pasa al marcarlo pagado. Lo que devuelve lleg
 no se toca desde la aplicación: lo mueve el disparador `handle_order_status_change` al
 cambiar de estado. Qué hace en cada caso está en `domain-venduo.md`.
 
+**La venta directa tampoco se inserta: es `registrar_venta(p_items)`**, solo para
+autenticados. Toma la tienda de `my_store_id()`, acepta un precio por línea —lo que se
+cobró de verdad— y deja el pedido pagado en la misma transacción, para que el stock lo
+mueva el disparador de siempre. Lleva `origen = 'directa'`.
+
 Las otras funciones del servidor son `apply_template(p_store_id, p_template_key)`,
 `change_store_template(p_template_key, p_keep_sections)`,
 `publicar_diseno(p_theme_overrides, p_logo_url, p_bloques)`, `restaurar_version(p_version_id)`,
@@ -135,6 +140,20 @@ El enlace compartido lo abre cualquiera, sin cuenta, por
 `catalogo_compartido(p_token)`: `security definer`, un catálogo por su token y
 solo si `store_is_live`. No se abre la tabla con una política para anónimos:
 expondría los catálogos de todas las tiendas.
+
+## El costo de los productos
+
+`product_costs` guarda lo que cada producto le cuesta a la tienda, **aparte de
+`products`**, porque `products` lo lee cualquiera que mire una tienda publicada: una
+columna de costo ahí se la mostraría a quien compra. Lee y escribe solo el dueño, con
+`store_id = my_store_id()`; la tienda de cada fila la pone el disparador
+`costo_de_producto` desde el producto, así nadie cuelga un costo de un producto ajeno.
+No tiene política de DELETE: quitar un costo es dejarlo en null.
+
+`handle_order_status_change` copia el costo a `order_items.unit_cost_cents` al pasar a
+pagado. Las vistas de la IA lo exponen —`cost_cents` en `mis_productos`,
+`unit_cost_cents` y `ganancia_cents` en `mis_items`—, y `product_costs` está en la lista
+de tablas que `run_insight_sql` no deja nombrar.
 
 ## Columnas derivadas: las mantiene la base
 

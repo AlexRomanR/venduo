@@ -30,6 +30,8 @@ export interface Pedido {
   items: LineaPedido[]
   /** La foto del primer producto que tenga una: con eso se reconoce el pedido. */
   foto: string | null
+  /** La registró la tienda: se vendió en el chat o en persona, no en la tienda. */
+  directa: boolean
 }
 
 export interface ResumenPedidos {
@@ -69,11 +71,12 @@ function pedidosDeDemostracion(filtro?: FiltroPedidos): Pedidos {
   const pedido = (
     datos: Omit<
       Pedido,
-      "comprador" | "telefono" | "pagado" | "foto" | "totalCents"
+      "comprador" | "telefono" | "pagado" | "foto" | "totalCents" | "directa"
     >
   ): Pedido => ({
     comprador: null,
     telefono: null,
+    directa: false,
     pagado: datos.estado === "pagado" ? datos.creado : null,
     ...datos,
     totalCents: datos.items.reduce((t, i) => t + i.totalCents, 0),
@@ -189,7 +192,7 @@ export async function getPedidos(filtro?: FiltroPedidos): Promise<Pedidos> {
     .from("orders")
     .select(
       `id, order_number, status, buyer_name, buyer_phone, total_cents,
-       created_at, paid_at,
+       created_at, paid_at, origen,
        order_items ( product_id, product_name, quantity, unit_price_cents,
                      products ( image_url ) )`
     )
@@ -216,6 +219,7 @@ export async function getPedidos(filtro?: FiltroPedidos): Promise<Pedidos> {
       pagado: fila.paid_at,
       items,
       foto: items.find((item) => item.foto)?.foto ?? null,
+      directa: fila.origen === "directa",
     }
   })
 

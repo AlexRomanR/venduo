@@ -83,8 +83,12 @@ export default async function PedidoPage({
       <Seccion
         id="que-pidio"
         icono={ShoppingBag}
-        titulo="Qué pidió"
-        bajada="Con los precios del día del pedido."
+        titulo={pedido.directa ? "Qué vendiste" : "Qué pidió"}
+        bajada={
+          pedido.directa
+            ? "Al precio que lo vendiste."
+            : "Con los precios del día del pedido."
+        }
       >
         <ul>
           {pedido.items.map((item, indice) => (
@@ -187,7 +191,7 @@ function LineaDeEstado({ pedido }: { pedido: Pedido }) {
   const pagado = pedido.estado === "pagado"
   const pasos = [
     {
-      titulo: "Llegó",
+      titulo: pedido.directa ? "Venta directa" : "Llegó",
       detalle: `${formatDate(pedido.creado)} · ${formatHora(pedido.creado)}`,
       hecho: true,
       rojo: false,

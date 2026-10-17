@@ -67,7 +67,9 @@ export interface ProductoParaPublicar {
 }
 
 /** Cuánto se rebajó, en un porcentaje entero. `null` si no tiene rebaja. */
-export function rebajaDe(producto: ProductoParaPublicar): number | null {
+export function rebajaDe(
+  producto: Pick<ProductoParaPublicar, "precioCents" | "precioAnteriorCents">
+): number | null {
   const antes = producto.precioAnteriorCents
   if (!antes || antes <= producto.precioCents) return null
   const rebaja = Math.round((1 - producto.precioCents / antes) * 100)
@@ -80,11 +82,32 @@ export function quedanPocas(producto: ProductoParaPublicar): boolean {
 }
 
 /** El precio dicho en una línea: "Antes Bs 520, ahora Bs 450". */
-export function lineaDePrecio(producto: ProductoParaPublicar): string {
+export function lineaDePrecio(
+  producto: Pick<ProductoParaPublicar, "precioCents" | "precioAnteriorCents">
+): string {
   const rebaja = rebajaDe(producto)
   return rebaja && producto.precioAnteriorCents
     ? `Antes ${formatMoney(producto.precioAnteriorCents)}, ahora ${formatMoney(producto.precioCents)}`
     : formatMoney(producto.precioCents)
+}
+
+/**
+ * El mensaje para contestar "¿precio?" con un producto: su nombre, el precio
+ * —con el anterior si está rebajado— y el enlace a su ficha, que WhatsApp
+ * muestra con la foto. Lo manda la tienda: es su voz, no la de Venduo.
+ */
+export function mensajeDeProducto(
+  producto: Pick<
+    ProductoParaPublicar,
+    "nombre" | "precioCents" | "precioAnteriorCents"
+  >,
+  enlace: string
+): string {
+  return [
+    producto.nombre,
+    lineaDePrecio(producto),
+    `Pídelo aquí: ${enlace}`,
+  ].join("\n")
 }
 
 /** Lo que escribe la IA, o el texto armado sin ella: sin precio ni enlace. */
