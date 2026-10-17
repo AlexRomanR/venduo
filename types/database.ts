@@ -481,6 +481,7 @@ export type Database = {
           product_name: string
           quantity: number
           store_id: string
+          unit_cost_cents: number | null
           unit_price_cents: number
         }
         Insert: {
@@ -491,6 +492,7 @@ export type Database = {
           product_name: string
           quantity: number
           store_id: string
+          unit_cost_cents?: number | null
           unit_price_cents: number
         }
         Update: {
@@ -501,6 +503,7 @@ export type Database = {
           product_name?: string
           quantity?: number
           store_id?: string
+          unit_cost_cents?: number | null
           unit_price_cents?: number
         }
         Relationships: [
@@ -549,6 +552,7 @@ export type Database = {
           created_at: string
           id: string
           order_number: number
+          origen: string
           paid_at: string | null
           status: Database["public"]["Enums"]["order_status"]
           store_id: string
@@ -563,6 +567,7 @@ export type Database = {
           created_at?: string
           id?: string
           order_number?: number
+          origen?: string
           paid_at?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           store_id: string
@@ -577,6 +582,7 @@ export type Database = {
           created_at?: string
           id?: string
           order_number?: number
+          origen?: string
           paid_at?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           store_id?: string
@@ -691,6 +697,52 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "product_categories_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_costs: {
+        Row: {
+          cost_cents: number | null
+          created_at: string
+          product_id: string
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          cost_cents?: number | null
+          created_at?: string
+          product_id: string
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          cost_cents?: number | null
+          created_at?: string
+          product_id?: string
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_costs_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "mis_productos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_costs_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_costs_store_id_fkey"
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
@@ -1546,12 +1598,15 @@ export type Database = {
       mis_items: {
         Row: {
           created_at: string | null
+          ganancia_cents: number | null
           id: string | null
           order_id: string | null
+          origen: string | null
           product_name: string | null
           quantity: number | null
           status: Database["public"]["Enums"]["order_status"] | null
           total_cents: number | null
+          unit_cost_cents: number | null
           unit_price_cents: number | null
         }
         Relationships: [
@@ -1575,6 +1630,7 @@ export type Database = {
         Row: {
           category: string | null
           compare_at_price_cents: number | null
+          cost_cents: number | null
           created_at: string | null
           id: string | null
           is_active: boolean | null
@@ -1585,32 +1641,6 @@ export type Database = {
           sku: string | null
           stock: number | null
         }
-        Insert: {
-          category?: string | null
-          compare_at_price_cents?: number | null
-          created_at?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          is_featured?: boolean | null
-          low_stock_threshold?: number | null
-          name?: string | null
-          price_cents?: number | null
-          sku?: string | null
-          stock?: number | null
-        }
-        Update: {
-          category?: string | null
-          compare_at_price_cents?: number | null
-          created_at?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          is_featured?: boolean | null
-          low_stock_threshold?: number | null
-          name?: string | null
-          price_cents?: number | null
-          sku?: string | null
-          stock?: number | null
-        }
         Relationships: []
       }
       mis_ventas: {
@@ -1618,6 +1648,7 @@ export type Database = {
           created_at: string | null
           id: string | null
           numero: number | null
+          origen: string | null
           status: Database["public"]["Enums"]["order_status"] | null
           total_cents: number | null
         }
@@ -1625,6 +1656,7 @@ export type Database = {
           created_at?: string | null
           id?: string | null
           numero?: number | null
+          origen?: string | null
           status?: Database["public"]["Enums"]["order_status"] | null
           total_cents?: number | null
         }
@@ -1632,6 +1664,7 @@ export type Database = {
           created_at?: string | null
           id?: string | null
           numero?: number | null
+          origen?: string | null
           status?: Database["public"]["Enums"]["order_status"] | null
           total_cents?: number | null
         }
@@ -1748,6 +1781,7 @@ export type Database = {
         Args: { p_device_name?: string; p_platform: string; p_token: string }
         Returns: undefined
       }
+      registrar_venta: { Args: { p_items: Json }; Returns: Json }
       registrar_visita: {
         Args: {
           p_device: string

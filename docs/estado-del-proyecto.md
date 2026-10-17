@@ -211,6 +211,17 @@ que se arregló:
   una descripción corta y cada panel un subtítulo de una línea, como Catálogos.
   Apariencia, Catálogos, Estadísticas, Cuenta y el formulario del producto son la
   fase 3.
+- **Nueva venta** (`/panel/pedidos/nueva` y la app): lo vendido en el chat o en persona
+  se registra como un pedido pagado con `origen = 'directa'`, descuenta el stock en el
+  acto y cuenta en las estadísticas. Se elige con fotos, cada línea lleva el precio al que
+  se vendió, y si el stock dice que no alcanza la línea lo avisa con "Corregir el stock".
+  En Pedidos va como botón flotante, y la fila dice "Venta directa".
+- **Costo y ganancia**: cada producto puede llevar lo que le cuesta a la tienda
+  (`product_costs`, solo del dueño), con la ganancia por unidad en vivo en el formulario.
+  "Cómo te va" muestra la ganancia del período —y avisa si falta el costo de algún
+  producto— y Estadísticas la contesta ("¿Cuánto gané este mes?").
+- **Mandar por WhatsApp** desde cada producto a la vista: su nombre, su precio y el
+  enlace a su ficha, para contestar "¿precio?" en un toque. Web y app.
 - Barra lateral con contadores de lo que pide atención; se puede plegar y recuerda cómo
   quedó. **En el celular el panel es la app**: la misma barra de arriba con el cuadro de
   rayitas, el mismo menú lateral —la persona, la tarjeta de la tienda y tres grupos—, las
@@ -359,19 +370,26 @@ Falta crear la app en TikTok for Developers y pedir su
 revisión; hasta entonces todo lo publicado queda privado. Los pasos, el guion del video y
 el texto de la revisión están en `docs/tiktok.md`.
 
-### 4. Plantillas — prioridad baja
+### 4. Variantes: talla, color, número — prioridad alta, con su plan
+
+La misma polera en S, M y L hoy son tres productos. Cada producto con variantes, cada
+una con su stock y opcionalmente su precio; quien compra elige en la tienda y viaja en el
+pedido y en el mensaje. Toca la base, `create_order`, `registrar_venta`, el carrito, la
+ficha de las ocho plantillas, los catálogos, las vistas de la IA y la app: se arma un
+plan antes de escribir código. Después: nota interna en el pedido, exportar pedidos y
+productos a planilla, pausa por vacaciones, y cargar productos desde una foto con la IA.
+
+### 5. Plantillas — prioridad baja
 
 - Más plantillas para los rubros que quedaron en la base editorial (tecnología, hogar,
   cosmética).
-- Atributos por rubro: talla y color en moda, mililitros o familia olfativa en
-  perfumería. Piden variantes en el carrito y en `create_order`.
 
-### 5. Suscripción — prioridad baja
+### 6. Suscripción — prioridad baja
 
 Se modela el estado, no el cobro. Falta el bloqueo real al vencer la prueba (panel en
 solo lectura con exportación a CSV) y la purga a los 90 días.
 
-### 6. Pendientes chicos
+### 7. Pendientes chicos
 
 - **Una vez, entrar a `/panel/apariencia` después de horas sin uso terminó en `/panel`**
   (revisión del 8 de octubre). El registro muestra pedidos a `/auth/destino` y `/crear`

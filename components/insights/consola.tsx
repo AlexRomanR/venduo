@@ -23,6 +23,7 @@ const SUGERENCIAS = [
   "Ventas por semana de los últimos 3 meses",
   "¿Cuántos pedidos tengo sin cobrar?",
   "¿Cuánto vale mi inventario?",
+  "¿Cuánto gané este mes?",
 ]
 
 interface Entrada {

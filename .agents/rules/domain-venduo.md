@@ -99,6 +99,34 @@ ya existe (`components/tienda/checkout.tsx`).
 **Una venta es un pedido pagado.** El panel, el tablero y las estadísticas cuentan solo
 `pagado`: un pendiente puede ser un carrito que nunca se mandó.
 
+### La venta directa
+
+**Lo vendido fuera de la tienda también se registra**, o el stock miente. "Nueva venta"
+(`/panel/pedidos/nueva` y la app) crea un pedido con `origen = 'directa'` por
+**`registrar_venta(p_items)`**: la tienda sale de la sesión, cada línea lleva el precio al
+que se vendió —puede ser una rebaja— y el pedido nace pendiente y pasa a pagado en la
+misma transacción. Así el stock lo descuenta `handle_order_status_change`, como siempre,
+y rechaza la venta entera si no alcanza. No pide datos de quien compra y no manda el
+aviso de pedido nuevo: ya está pagada al confirmarse. Se vende también un producto
+oculto —en persona se vende lo del mostrador—, pero no uno que Venduo ocultó.
+
+Cancelar una venta directa devuelve el stock, igual que cualquier pagado.
+
+### Costo y ganancia
+
+El costo de un producto vive en **`product_costs`**, no en `products`: la tienda pública
+lee `products` y le mostraría el costo a quien compra. Es opcional; sin costo, la fila
+queda en null. Al cobrar un pedido, el disparador copia el costo a cada línea
+(`unit_cost_cents`): la ganancia de lo vendido no cambia si el costo cambia después.
+**La ganancia solo cuenta las líneas con costo**, y cuando parte de lo vendido no lo
+tiene, la pantalla lo dice ("Falta el costo de algunos productos").
+
+### Mandar un producto por WhatsApp
+
+Desde un producto a la vista, "Mandar por WhatsApp" abre WhatsApp con su nombre, su
+precio y el enlace a su ficha (`mensajeDeProducto`, `lib/publicar.ts`), sin un número:
+la persona elige el chat. WhatsApp muestra la foto desde la ficha.
+
 `buyer_name` y `buyer_phone` siguen en `orders`, opcionales: los pedidos anteriores a la
 compra por WhatsApp los guardan, y para esos el panel ofrece abrir el chat. Los nuevos
 llegan vacíos.

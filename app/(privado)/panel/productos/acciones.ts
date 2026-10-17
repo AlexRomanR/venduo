@@ -103,6 +103,24 @@ export async function guardarProducto(
     return { ok: false, error: "No encontramos ese producto en tu catálogo." }
   }
 
+  // El costo va en su propia tabla, que solo lee la tienda: en `products` lo
+  // vería quien compra. Sin costo queda en null, no se borra la fila.
+  if (v.costo !== null || id) {
+    const { error } = await supabase.from("product_costs").upsert({
+      product_id: respuesta.data.id,
+      store_id: tiendaId,
+      cost_cents: v.costo === null ? null : aCentavos(v.costo),
+    })
+    if (error) {
+      console.error("[productos] no se pudo guardar el costo:", error)
+      return {
+        ok: false,
+        id: respuesta.data.id,
+        error: "Guardamos el producto, pero no su costo. Vuelve a intentar.",
+      }
+    }
+  }
+
   revalidatePath(RUTA)
   await actualizarVistaDespues()
   revalidatePath("/panel")

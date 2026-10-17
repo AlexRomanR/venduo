@@ -266,6 +266,23 @@ function filtrar(productos: Product[], filtros: FiltrosCatalogo): Product[] {
  * abriría el formulario con el producto de otro comercio. Guardar fallaría
  * después, pero para entonces ya se vio lo que no se debía.
  */
+/**
+ * Lo que le cuesta un producto a la tienda, en centavos, o `null` si no lo
+ * cargó. Vive aparte del producto porque solo lo lee el dueño.
+ */
+export async function getCostoDeProducto(id: string): Promise<number | null> {
+  const supabase = await createClient()
+  if (!supabase) return null
+
+  const { data } = await supabase
+    .from("product_costs")
+    .select("cost_cents")
+    .eq("product_id", id)
+    .maybeSingle()
+
+  return data?.cost_cents ?? null
+}
+
 export async function getProducto(id: string): Promise<Product | null> {
   const supabase = await createClient()
   if (!supabase) return null

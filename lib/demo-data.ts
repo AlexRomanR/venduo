@@ -359,7 +359,17 @@ export function tableroDeDemostracion(): Tablero {
     const subida = 1 + Math.max(indice - (todos.length - 30), 0) / 30
     const pedidos = Math.floor(azarFijo(numero) * 3.4 * finde * subida)
     const ticket = 9_000 + Math.round(azarFijo(numero * 7) * 30) * 1_000
-    return { ...dia, pedidos, ventasCents: pedidos * ticket }
+    const ventasCents = pedidos * ticket
+    // Casi todo con costo cargado y un margen de alrededor del 40%: la demo
+    // muestra la ganancia, y que falta el costo de algún producto.
+    const ventasConCostoCents = Math.round(ventasCents * 0.9)
+    return {
+      ...dia,
+      pedidos,
+      ventasCents,
+      ventasConCostoCents,
+      gananciaCents: Math.round(ventasConCostoCents * 0.4),
+    }
   })
 
   const hace = (minutos: number) =>

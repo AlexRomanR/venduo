@@ -15,6 +15,7 @@ mis_ventas — un pedido de mi tienda por fila
   created_at   timestamptz
   status       text: pendiente | pagado | cancelado
   total_cents  integer, centavos
+  origen       text: tienda (llegó por la tienda) | directa (vendida en el chat o en persona y registrada por la tienda)
 
 mis_items — una línea de pedido por fila (qué producto se vendió)
   order_id          uuid
@@ -24,6 +25,9 @@ mis_items — una línea de pedido por fila (qué producto se vendió)
   total_cents       integer, centavos (quantity * unit_price_cents)
   created_at        timestamptz, del pedido
   status            text, del pedido
+  unit_cost_cents   integer, centavos, lo que costaba el producto al cobrarse; nulo si no tenía costo
+  ganancia_cents    integer, centavos, quantity * (unit_price_cents - unit_cost_cents); nulo si no tenía costo
+  origen            text, del pedido: tienda | directa
 
 mis_productos — el catálogo de hoy, no depende de ventas
   name                    text
@@ -36,6 +40,7 @@ mis_productos — el catálogo de hoy, no depende de ventas
   is_active               boolean, si se ve en la tienda
   is_featured             boolean, si va destacado en la portada
   created_at              timestamptz
+  cost_cents              integer, centavos, lo que le cuesta a la tienda; puede ser nulo
 `.trim()
 
 /**
@@ -70,4 +75,7 @@ export const REGLAS_SQL = `
 - Ventas, lo más vendido, ingresos, ticket promedio y todo lo que diga
   "vendí" o "vendido" usan status = 'pagado'. Nunca status != 'cancelado':
   eso cuenta como vendido lo que todavía no se cobró.
+- Ganancia, margen y "cuánto gané" suman ganancia_cents de mis_items con
+  status = 'pagado' y ganancia_cents is not null: las líneas sin costo no
+  tienen ganancia que contar.
 `.trim()
