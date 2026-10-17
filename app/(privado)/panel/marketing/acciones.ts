@@ -25,10 +25,14 @@ export type ResultadoDeTextos =
  * La IA propone las palabras; el precio y el enlace los pone el sistema, con
  * los datos de la base. Nada se publica desde acá: la persona revisa, cambia
  * lo que quiera y comparte.
+ *
+ * `conIa: false` los arma sin ella: es el texto que la app muestra al instante,
+ * mientras la IA escribe o cuando no está. La pantalla de la web lo arma sola.
  */
 export async function escribirTextos(
   productoId: string,
-  vuelta = 0
+  vuelta = 0,
+  conIa = true
 ): Promise<ResultadoDeTextos> {
   const permiso = await exigirFuncion("marketing")
   if (!permiso.ok) return { ok: false, error: permiso.error }
@@ -46,7 +50,7 @@ export async function escribirTextos(
   }
   const enlace = enlaceDelProducto(material.tienda.url, producto.id)
 
-  if (funciones.ia_marketing !== "activa") {
+  if (!conIa || funciones.ia_marketing !== "activa") {
     return {
       ok: true,
       textos: armarTextos(

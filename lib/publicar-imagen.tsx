@@ -9,9 +9,16 @@ import {
   resolverEstilo,
   type EstiloResuelto,
 } from "@/lib/catalogos/estilo"
-import type { MaterialParaPublicar } from "@/lib/data/publicar"
+import { exigirFuncion } from "@/lib/data/funciones"
+import {
+  getMaterialParaPublicar,
+  type MaterialParaPublicar,
+} from "@/lib/data/publicar"
+import { slugify } from "@/lib/format"
 import { fotoEnBase64 } from "@/lib/fotos"
 import {
+  esDiseno,
+  esFormato,
   FORMATOS,
   rebajaDe,
   type Diseno,
@@ -23,8 +30,8 @@ import { ImagenDelProducto } from "@/components/publicar/imagen"
 
 /*
  * La imagen de un producto para redes, armada en el servidor. La usan la
- * pantalla —que la muestra y la deja descargar— y la publicación en TikTok,
- * que la pide sin enlace y en JPEG. Solo servidor.
+ * pantalla y la app —que la muestran y la dejan descargar o compartir— y la
+ * publicación en TikTok, que la pide sin enlace y en JPEG. Solo servidor.
  */
 
 type Fuente = {
@@ -142,4 +149,51 @@ export async function imagenEnJpeg(
     console.error("[publicar] no se pudo pasar la imagen a JPEG:", error)
     return null
   }
+}
+
+/**
+ * La respuesta de la imagen de un producto para redes, en PNG: la del panel
+ * (`/panel/marketing/imagen`) y la de la app (`/api/v1/publicar/imagen`), con
+ * los mismos parámetros —`producto`, `diseno`, `formato`— y la misma puerta.
+ *
+ * Corre como la persona: lee lo mismo que su panel, y si Venduo le apagó
+ * "Publicar en redes" responde 403. `?para=tiktok` la dibuja sin enlace ni
+ * QR, como sale a TikTok.
+ */
+export async function respuestaDeImagen(peticion: Request): Promise<Response> {
+  const permiso = await exigirFuncion("marketing")
+  if (!permiso.ok) return new Response(permiso.error, { status: 403 })
+
+  const consulta = new URL(peticion.url).searchParams
+  const diseno = consulta.get("diseno")
+  const formato = consulta.get("formato")
+  if (!esDiseno(diseno) || !esFormato(formato)) {
+    return new Response("Pedido incompleto.", { status: 400 })
+  }
+
+  const material = await getMaterialParaPublicar()
+  const producto = material.productos.find(
+    (p) => p.id === consulta.get("producto")
+  )
+  if (!producto) {
+    return new Response("Ese producto ya no está en tu tienda.", {
+      status: 404,
+    })
+  }
+
+  const nombre = `${slugify(producto.nombre) || "producto"}-${formato}.png`
+  return imagenDelProducto({
+    material,
+    producto,
+    diseno,
+    formato,
+    sinEnlace: consulta.get("para") === "tiktok",
+    cabeceras: {
+      // Privada: es de esta tienda, con sus precios de hoy.
+      "Cache-Control": "private, max-age=60",
+      ...(consulta.get("descargar")
+        ? { "Content-Disposition": `attachment; filename="${nombre}"` }
+        : {}),
+    },
+  })
 }

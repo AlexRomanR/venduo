@@ -185,8 +185,6 @@ function Contenido({
               icono: BookOpen,
               funcion: funciones.catalogos,
             },
-            // Por ahora solo en la web: se está probando antes de llevarla a
-            // la app (`docs/estado-del-proyecto.md`).
             {
               href: "/panel/marketing",
               nombre: "Publicar en redes",

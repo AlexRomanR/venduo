@@ -78,6 +78,9 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/api/v1/catalogos/{id}`                  | La app: dar de baja un catálogo (`DELETE`)              | Token de la app |
 | `/api/v1/catalogos/{id}/canva`            | La app: llevar un catálogo a Canva                      | Token de la app |
 | `/api/v1/ia/catalogo/propuesta`           | La app: una propuesta de catálogo, sin guardarla        | Token de la app |
+| `/api/v1/publicar`                        | La app: los productos para Publicar en redes            | Token de la app |
+| `/api/v1/publicar/imagen`                 | La app: la imagen de un producto para redes, en PNG     | Token de la app |
+| `/api/v1/publicar/textos`                 | La app: los textos para redes, con la IA o sin ella     | Token de la app |
 | `/.well-known/assetlinks.json`            | Le confirma a Android que la app es de esta web         | Público         |
 | `/.well-known/apple-app-site-association` | Lo mismo, para iPhone                                   | Público         |
 | `/admin`                                  | Resumen de la plataforma: tiendas, embudo, salud        | Administrador   |
