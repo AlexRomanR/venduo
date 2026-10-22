@@ -220,6 +220,12 @@ que se arregló:
   (`product_costs`, solo del dueño), con la ganancia por unidad en vivo en el formulario.
   "Cómo te va" muestra la ganancia del período —y avisa si falta el costo de algún
   producto— y Estadísticas la contesta ("¿Cuánto gané este mes?").
+- **Variantes de talla, color y número** (web y app): hasta dos opciones por producto,
+  con las combinaciones que se arman solas, el stock y el precio de cada una y una foto
+  por color. Quien compra elige en la ficha —lo agotado tachado, la foto del color—, la
+  variante viaja en el carrito, el pedido y el mensaje, y el stock lo lleva la base. La
+  venta directa pregunta cuál se vendió, "Se está acabando" avisa la talla agotada y el
+  catálogo en PDF puede decir las tallas.
 - **Mandar por WhatsApp** desde cada producto a la vista: su nombre, su precio y el
   enlace a su ficha, para contestar "¿precio?" en un toque. Web y app.
 - Barra lateral con contadores de lo que pide atención; se puede plegar y recuerda cómo
@@ -370,14 +376,10 @@ Falta crear la app en TikTok for Developers y pedir su
 revisión; hasta entonces todo lo publicado queda privado. Los pasos, el guion del video y
 el texto de la revisión están en `docs/tiktok.md`.
 
-### 4. Variantes: talla, color, número — prioridad alta, con su plan
+### 4. Lo que sigue del plan
 
-La misma polera en S, M y L hoy son tres productos. Cada producto con variantes, cada
-una con su stock y opcionalmente su precio; quien compra elige en la tienda y viaja en el
-pedido y en el mensaje. Toca la base, `create_order`, `registrar_venta`, el carrito, la
-ficha de las ocho plantillas, los catálogos, las vistas de la IA y la app: se arma un
-plan antes de escribir código. Después: nota interna en el pedido, exportar pedidos y
-productos a planilla, pausa por vacaciones, y cargar productos desde una foto con la IA.
+Nota interna en el pedido, exportar pedidos y productos a planilla, pausa por
+vacaciones, y cargar productos desde una foto con la IA.
 
 ### 5. Plantillas — prioridad baja
 

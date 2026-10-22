@@ -28,6 +28,8 @@ export interface ProductoDelCatalogo {
   categoriaId: string | null
   categoria: string | null
   codigo: string | null
+  /** Sus tallas, colores o números en una línea: "S, M, L · Negro, Blanco". */
+  opciones?: string | null
   /** La foto de portada: una URL en la vista previa, un JPEG en el PDF. */
   foto: string | null
   destacado: boolean

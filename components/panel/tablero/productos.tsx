@@ -125,7 +125,7 @@ export function PorAcabarse({
       <ul>
         {productos.map((producto) => (
           <FilaParaReponer
-            key={producto.id}
+            key={`${producto.id}:${producto.nombre}`}
             producto={producto}
             ajustar={ajustar}
             soloLectura={soloLectura}

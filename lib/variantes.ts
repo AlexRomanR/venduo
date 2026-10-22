@@ -167,6 +167,17 @@ export function opcionConFoto(
   )
 }
 
+/**
+ * Las opciones en una línea, para un catálogo: "S, M, L · Negro, Blanco".
+ * Comas dentro de cada opción, porque la línea de detalle ya separa con
+ * puntos. `null` si el producto no tiene opciones.
+ */
+export function resumenDeOpciones(opciones: Opcion[]): string | null {
+  return opciones.length
+    ? opciones.map((o) => o.valores.join(", ")).join(" · ")
+    : null
+}
+
 /** Cuántas variantes salen de unas opciones, sin armarlas. */
 export function cuantasVariantes(opciones: Opcion[]): number {
   return opciones.length === 0

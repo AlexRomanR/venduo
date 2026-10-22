@@ -208,8 +208,10 @@ components/
     bazar/            Bazar: de todo un poco
     comunes/          Portada, catálogo y ficha armados con las piezas de un kit
   tienda/             Lo compartido por todas las plantillas: carrito, el pedido
-                      por WhatsApp, agregar, barra de compra, filtros, buscador y
-                      `visita.tsx`, que anota las visitas
+                      por WhatsApp, agregar —con la elección de talla y color—,
+                      barra de compra, filtros, buscador, el precio "Desde"
+                      (`precio.tsx`), la foto del color elegido (`foto-elegida.ts`)
+                      y `visita.tsx`, que anota las visitas
   catalogos/          Catálogos en PDF. `primitivas.ts` es el contrato de dibujo,
                       `html.tsx` su versión para la pantalla y `documento.tsx`
                       las hojas; el PDF usa las mismas variantes
@@ -275,6 +277,8 @@ lib/
   format.ts           Moneda, fechas, slugs
   pedidos.ts          Los estados de un pedido y el mensaje de WhatsApp, sin
                       dependencias de servidor
+  variantes.ts        Las variantes: combinaciones, nombres, stock por valor, el precio
+                      "Desde" y la foto de cada color, sin dependencias de servidor
   publicar.ts         Publicar en redes: diseños, formatos y cómo se completa el
                       texto con el precio y el enlace, sin dependencias de servidor
   fotos.ts            Las fotos convertidas a JPEG para dibujar en el servidor: el

@@ -107,9 +107,17 @@ export const insightSqlSchema = z.object({
   formato: z.enum(["dinero", "cantidad"]),
   /** Paso 2: qué vistas hacen falta. Se pide explícito para poder auditarlo. */
   vistas: z
-    .array(z.enum(["mis_ventas", "mis_items", "mis_productos"]))
+    .array(
+      z.enum([
+        "mis_ventas",
+        "mis_items",
+        "mis_productos",
+        "mis_variantes",
+        "mis_visitas",
+      ])
+    )
     .min(1)
-    .max(3),
+    .max(5),
   /** Paso 3: la consulta. Devuelve `etiqueta` y `valor`, nada más. */
   sql: z.string().min(10).max(2000),
 })

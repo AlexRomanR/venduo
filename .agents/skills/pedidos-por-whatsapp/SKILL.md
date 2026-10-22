@@ -76,6 +76,16 @@ pagado. No hay columna ni tarea programada: todo lo que cuente pendientes que es
 lista usa `noSeConcreto`. Un conteo nuevo de pendientes que se olvide del plazo
 vuelve a llenar el panel de rojo con carritos que nunca se mandaron.
 
+## Las variantes en el pedido
+
+Un producto con opciones —talla, color— **se pide con su variante**: cada línea del
+carrito lleva `varianteId`, y `create_order` la exige ("Elige una opción de…"), toma su
+precio si tiene uno y comprueba su stock. La línea del pedido copia `variant_name`, y el
+mensaje la nombra: "1× Polera (M · Negro)". El carrito identifica cada línea con
+`claveDeLinea` —producto y variante—, así la M y la L son dos líneas, y los carritos
+guardados antes siguen valiendo. Al cobrar, el disparador descuenta de la variante; la
+suma del producto la lleva la base.
+
 ## La venta directa
 
 Lo que se vendió en el chat o en persona se registra con **`registrar_venta(p_items)`**

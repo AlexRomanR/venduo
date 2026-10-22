@@ -23,6 +23,7 @@ import { toDataURL } from "@/lib/qr"
 import { createClient } from "@/lib/supabase/server"
 import { enlaceLegible, urlDeTienda } from "@/lib/tienda"
 import { conOrigen } from "@/lib/visitas"
+import { leerOpciones, resumenDeOpciones } from "@/lib/variantes"
 import type { Product } from "@/types"
 
 /*
@@ -84,6 +85,7 @@ function aProducto(producto: Product): ProductoDelCatalogo {
       (producto.category ? `nombre:${producto.category}` : null),
     categoria: producto.category,
     codigo: producto.sku,
+    opciones: resumenDeOpciones(leerOpciones(producto.opciones)),
     foto: producto.image_url ?? producto.images[0] ?? null,
     destacado: producto.is_featured,
   }

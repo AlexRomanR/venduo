@@ -100,6 +100,23 @@ Esa eliminación a los 90 días es **el único caso en toda la plataforma donde 
 
 Gran parte de las ventas se cierran en el chat de Instagram o TikTok, o en persona, sin pasar por el carrito. Si no se registran, el stock miente: es justo lo que Venduo promete resolver ("vendí algo que ya no tenía"). Con **Nueva venta**, la tienda elige los productos y las unidades que vendió, ajusta el precio si hubo una rebaja, y la venta queda como un pedido **pagado**: descuenta el stock en el acto y cuenta en las estadísticas como cualquier otra. No pide datos de quien compra. Si el stock dice que no alcanza, no se registra: primero se corrige el stock.
 
+### Variantes: talla, color, número
+
+Quien vende ropa, zapatillas o perfumes tiene la misma polera en S, M y L, o el mismo
+perfume en 50 y 100 ml. Un producto puede tener **hasta dos opciones** —Talla y Color,
+Número y Color— y una **variante por cada combinación**, con su stock, su precio si es
+distinto y, si se quiere, la foto de su color. Es opcional: un producto sin opciones
+funciona como siempre.
+
+- **Quien compra elige en la ficha**, con botones; lo que no tiene stock se ve tachado y
+  el precio es el de la combinación. La tarjeta dice "Desde Bs 85" si los precios varían.
+- **La variante viaja en el carrito, en el pedido y en el mensaje de WhatsApp**: "2 ×
+  Polera básica (M · Negro)".
+- **El stock del producto es la suma de sus variantes**, y lo lleva la base: al cobrar
+  baja el de la variante. Con opciones, el stock se cambia en cada una, no en el total.
+- **En la venta directa** se elige cuál se vendió; **en el catálogo en PDF**, "Tallas y
+  colores" es un campo más.
+
 ### Costo y ganancia
 
 Cada producto puede llevar **lo que le cuesta a la tienda**. Es opcional y solo lo ve ella: nunca llega a la tienda pública. Con él, el panel dice cuánto ganó y no solo cuánto vendió. El costo de cada venta se fija al cobrarla: si después cambia, la ganancia de lo ya vendido no cambia.
@@ -304,6 +321,12 @@ No hay columna de moneda: es constante del sistema.
 Sin marca de borrado: un pedido se cancela, no se borra.
 
 **`order_items`** — líneas del pedido, con el nombre y el precio del producto copiados al momento de la compra, y su costo copiado al cobrarse (`unit_cost_cents`). Lleva también el identificador de la tienda por el principio de redundancia deliberada.
+
+**`product_variants`** — las variantes de un producto: su combinación (`valores`, como
+`{"Talla": "M", "Color": "Negro"}`), su nombre armado, su stock, su precio si es distinto,
+su código y su foto. Las opciones del producto van en `products.opciones`. El stock del
+producto es la suma de sus variantes, que mantiene la base. `order_items` copia la
+variante pedida (`variant_id` y `variant_name`).
 
 **`product_costs`** — lo que le cuesta cada producto a la tienda, una fila por producto. Va aparte de `products` porque los productos los lee cualquiera que mire la tienda, y el costo es solo del dueño.
 
