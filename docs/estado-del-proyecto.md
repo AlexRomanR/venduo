@@ -225,7 +225,9 @@ que se arregló:
   por color. Quien compra elige en la ficha —lo agotado tachado, la foto del color—, la
   variante viaja en el carrito, el pedido y el mensaje, y el stock lo lleva la base. La
   venta directa pregunta cuál se vendió, "Se está acabando" avisa la talla agotada y el
-  catálogo en PDF puede decir las tallas.
+  catálogo en PDF puede decir las tallas. En el formulario no se escribe: se elige el
+  tipo —talla, número, color, tamaño u otra— y se marcan sus valores, ya escritos
+  (`TIPOS_DE_OPCION` en `lib/variantes.ts`); cada color lleva su punto y su foto.
 - **Mandar por WhatsApp** desde cada producto a la vista: su nombre, su precio y el
   enlace a su ficha, para contestar "¿precio?" en un toque. Web y app.
 - Barra lateral con contadores de lo que pide atención; se puede plegar y recuerda cómo

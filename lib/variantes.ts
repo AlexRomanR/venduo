@@ -14,6 +14,100 @@ export const MAXIMO_DE_OPCIONES = 2
 export const MAXIMO_DE_VALORES = 20
 export const MAXIMO_DE_VARIANTES = 60
 
+/**
+ * Los tipos de opción que más se usan, con sus valores ya escritos: quien vende
+ * los marca en vez de tipearlos. "Otra" —sabor, modelo— se escribe a mano.
+ */
+export interface TipoDeOpcion {
+  /** El nombre que queda en la opción: "Talla". */
+  nombre: string
+  /** Para qué sirve, en dos o tres palabras. */
+  detalle: string
+  valores: string[]
+  /** Cómo se llama agregar uno que no está: "Otra talla". */
+  otro: string
+}
+
+export const TIPOS_DE_OPCION: TipoDeOpcion[] = [
+  {
+    nombre: "Talla",
+    detalle: "De ropa",
+    valores: ["XS", "S", "M", "L", "XL", "XXL"],
+    otro: "Otra talla",
+  },
+  {
+    nombre: "Número",
+    detalle: "De calzado",
+    valores: ["34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44"],
+    otro: "Otro número",
+  },
+  {
+    nombre: "Color",
+    detalle: "Con su foto",
+    valores: [
+      "Negro",
+      "Blanco",
+      "Gris",
+      "Beige",
+      "Café",
+      "Azul",
+      "Celeste",
+      "Verde",
+      "Rojo",
+      "Rosado",
+      "Morado",
+      "Amarillo",
+      "Naranja",
+    ],
+    otro: "Otro color",
+  },
+  {
+    nombre: "Tamaño",
+    detalle: "Ml, gramos, litros",
+    valores: ["30 ml", "50 ml", "100 ml", "200 ml", "500 ml", "1 litro"],
+    otro: "Otro tamaño",
+  },
+]
+
+/**
+ * El color de muestra de cada color de la lista, para dibujar su punto. No es
+ * un color de la interfaz: es el del producto, el mismo en cualquier tienda.
+ */
+export const MUESTRAS_DE_COLOR: Record<string, string> = {
+  Negro: "#1b1b1b",
+  Blanco: "#ffffff",
+  Gris: "#9a9a9a",
+  Beige: "#d9c7a7",
+  Café: "#6b4426",
+  Azul: "#1f4fbf",
+  Celeste: "#7cc4ef",
+  Verde: "#2f8a4a",
+  Rojo: "#d32626",
+  Rosado: "#f19bbd",
+  Morado: "#7b3fb0",
+  Amarillo: "#f2c81f",
+  Naranja: "#f07b1f",
+}
+
+/** El tipo de una opción, por su nombre. `null` si es una que se escribió a mano. */
+export function tipoDe(opcion: { nombre: string }): TipoDeOpcion | null {
+  const nombre = opcion.nombre.trim().toLowerCase()
+  return TIPOS_DE_OPCION.find((t) => t.nombre.toLowerCase() === nombre) ?? null
+}
+
+/**
+ * Los valores de una opción en un orden que se lee: los de la lista en su
+ * orden —S antes que M—, y los escritos a mano al final, como se agregaron.
+ */
+export function ordenarValores(
+  tipo: TipoDeOpcion | null,
+  valores: string[]
+): string[] {
+  if (!tipo) return valores
+  const propios = tipo.valores.filter((v) => valores.includes(v))
+  return [...propios, ...valores.filter((v) => !tipo.valores.includes(v))]
+}
+
 export interface Opcion {
   nombre: string
   valores: string[]
