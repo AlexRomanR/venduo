@@ -5,10 +5,11 @@ import Link from "next/link"
 import { Check, ShoppingBag } from "lucide-react"
 import { toast } from "sonner"
 
-import { formatMoney } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { Product } from "@/types"
+import type { VariantePublica } from "@/lib/variantes"
 import { ANCLA_DE_COMPRA } from "@/components/tienda/agregar"
+import { PrecioDeVitrina } from "@/components/tienda/precio"
 import { useCarrito } from "@/components/tienda/carrito"
 
 /**
@@ -27,9 +28,11 @@ export function BarraDeCompra({
   producto,
   slug,
 }: {
-  producto: Product
+  producto: Product & { variantes?: VariantePublica[] }
   slug: string
 }) {
+  // Con opciones, la barra no agrega: lleva a elegirlas, que es lo que falta.
+  const conOpciones = (producto.variantes ?? []).length > 0
   const { agregar, lineas, unidades, listo } = useCarrito()
   const [aLaVista, setALaVista] = React.useState(false)
   const [recien, setRecien] = React.useState(false)
@@ -55,6 +58,12 @@ export function BarraDeCompra({
   const disponible = Math.max(producto.stock - yaEnCarrito, 0)
 
   function alAgregar() {
+    if (conOpciones) {
+      document
+        .getElementById(ANCLA_DE_COMPRA)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" })
+      return
+    }
     if (disponible === 0) return
     agregar(
       {
@@ -86,7 +95,7 @@ export function BarraDeCompra({
             {producto.name}
           </p>
           <p className="tabular font-titular text-lg font-bold tracking-[-0.02em]">
-            {formatMoney(producto.price_cents)}
+            <PrecioDeVitrina producto={producto} />
           </p>
         </div>
 
@@ -106,7 +115,7 @@ export function BarraDeCompra({
         <button
           type="button"
           onClick={alAgregar}
-          disabled={disponible === 0}
+          disabled={!conOpciones && disponible === 0}
           className={cn(
             "flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-plantilla px-5 font-semibold transition-colors disabled:opacity-50",
             recien
@@ -116,6 +125,8 @@ export function BarraDeCompra({
         >
           {producto.stock === 0 ? (
             "Agotado"
+          ) : conOpciones ? (
+            "Elegir"
           ) : recien ? (
             <>
               <Check aria-hidden="true" className="size-4" />

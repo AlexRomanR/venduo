@@ -8,6 +8,7 @@ import {
 import type { Apariencia } from "@/lib/plantillas/apariencia"
 import { createClient } from "@/lib/supabase/server"
 import type { Json, Product } from "@/types"
+import { leerValores, type VariantePublica } from "@/lib/variantes"
 
 export interface BloquePublico {
   id: string
@@ -20,6 +21,14 @@ export interface CategoriaPublica {
   nombre: string
   productos: number
 }
+
+/**
+ * Un producto de la tienda pública, con sus variantes si las tiene. Los kits
+ * lo reciben como `Product`: las variantes viajan con él y las leen las piezas
+ * compartidas —el precio "Desde", el selector, la barra de compra—, nunca el
+ * kit.
+ */
+export type ProductoPublico = Product & { variantes?: VariantePublica[] }
 
 export interface TiendaPublica {
   id: string
@@ -34,7 +43,7 @@ export interface TiendaPublica {
   /** La base de la plantilla con la personalización de la tienda encima. */
   apariencia: Apariencia
   bloques: BloquePublico[]
-  productos: Product[]
+  productos: ProductoPublico[]
   categorias: CategoriaPublica[]
   esDemo: boolean
   /**
@@ -185,37 +194,49 @@ export async function completarTienda(
   // Las secciones viajan dentro de su página: pedirlas aparte obligaba a
   // esperar la página para recién preguntar por ellas, un viaje más en cada
   // visita a la tienda.
-  const [{ data: pagina }, { data: productos }, { data: categorias }] =
-    await Promise.all([
-      supabase
-        .from("store_pages")
-        .select("id, store_blocks(id, block_type_key, props)")
-        .eq("store_id", tienda.id)
-        .eq("is_home", true)
-        .is("deleted_at", null)
-        .eq("store_blocks.is_visible", true)
-        .is("store_blocks.deleted_at", null)
-        .order("position", { referencedTable: "store_blocks" })
-        .maybeSingle(),
-      supabase
-        .from("products")
-        .select("*")
-        .eq("store_id", tienda.id)
-        .eq("is_active", true)
-        // La política ya lo esconde al comprador; el dueño mirando su tienda
-        // entra por la suya, que no lo filtra.
-        .is("moderated_at", null)
-        .is("deleted_at", null)
-        .order("is_featured", { ascending: false })
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("product_categories")
-        .select("id, name")
-        .eq("store_id", tienda.id)
-        .is("deleted_at", null)
-        .order("position")
-        .order("name"),
-    ])
+  const [
+    { data: pagina },
+    { data: productos },
+    { data: categorias },
+    { data: variantes },
+  ] = await Promise.all([
+    supabase
+      .from("store_pages")
+      .select("id, store_blocks(id, block_type_key, props)")
+      .eq("store_id", tienda.id)
+      .eq("is_home", true)
+      .is("deleted_at", null)
+      .eq("store_blocks.is_visible", true)
+      .is("store_blocks.deleted_at", null)
+      .order("position", { referencedTable: "store_blocks" })
+      .maybeSingle(),
+    supabase
+      .from("products")
+      .select("*")
+      .eq("store_id", tienda.id)
+      .eq("is_active", true)
+      // La política ya lo esconde al comprador; el dueño mirando su tienda
+      // entra por la suya, que no lo filtra.
+      .is("moderated_at", null)
+      .is("deleted_at", null)
+      .order("is_featured", { ascending: false })
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("product_categories")
+      .select("id, name")
+      .eq("store_id", tienda.id)
+      .is("deleted_at", null)
+      .order("position")
+      .order("name"),
+    // Las variantes van en la misma tanda: son de la misma tienda y la
+    // política ya las acota a una que se sirve.
+    supabase
+      .from("product_variants")
+      .select("id, product_id, valores, nombre, price_cents, stock, image_url")
+      .eq("store_id", tienda.id)
+      .is("deleted_at", null)
+      .order("position"),
+  ])
 
   const bloques: BloquePublico[] = (pagina?.store_blocks ?? []).map(
     (bloque) => ({
@@ -225,7 +246,24 @@ export async function completarTienda(
     })
   )
 
-  const catalogo = productos ?? []
+  const porProducto = new Map<string, VariantePublica[]>()
+  for (const fila of variantes ?? []) {
+    const lista = porProducto.get(fila.product_id) ?? []
+    lista.push({
+      id: fila.id,
+      valores: leerValores(fila.valores),
+      nombre: fila.nombre,
+      precioCents: fila.price_cents,
+      stock: fila.stock,
+      imagen: fila.image_url,
+    })
+    porProducto.set(fila.product_id, lista)
+  }
+
+  const catalogo: ProductoPublico[] = (productos ?? []).map((producto) => {
+    const propias = porProducto.get(producto.id)
+    return propias ? { ...producto, variantes: propias } : producto
+  })
 
   return {
     id: tienda.id,
@@ -251,7 +289,7 @@ export async function completarTienda(
 export async function getProductoPublico(
   slug: string,
   productoId: string
-): Promise<{ tienda: TiendaPublica; producto: Product } | null> {
+): Promise<{ tienda: TiendaPublica; producto: ProductoPublico } | null> {
   const tienda = await getTiendaPublica(slug)
   if (!tienda) return null
 

@@ -23,7 +23,7 @@ import { enlaceDeWhatsApp, mensajeDePedido } from "@/lib/pedidos"
 import type { Apariencia } from "@/lib/plantillas/apariencia"
 import { cn } from "@/lib/utils"
 import type { PedidoInput, ResultadoPedido } from "@/app/t/[slug]/acciones"
-import { useCarrito } from "@/components/tienda/carrito"
+import { claveDeLinea, useCarrito } from "@/components/tienda/carrito"
 import { registrarEvento } from "@/components/tienda/visita"
 
 /** El último pedido mandado, para mostrarlo al volver de WhatsApp. */
@@ -45,10 +45,14 @@ const REUSAR_DURANTE_MS = 30 * 60 * 1000
 
 /** El carrito reducido a productos y cantidades, sin importar el orden. */
 function firmaDelCarrito(
-  lineas: Array<{ productoId: string; cantidad: number }>
+  lineas: Array<{
+    productoId: string
+    varianteId?: string | null
+    cantidad: number
+  }>
 ): string {
   return lineas
-    .map((l) => `${l.productoId}:${l.cantidad}`)
+    .map((l) => `${claveDeLinea(l)}:${l.cantidad}`)
     .sort()
     .join(",")
 }
@@ -136,6 +140,7 @@ export function Checkout({
     const resultado = await crear({
       items: lineas.map((l) => ({
         productoId: l.productoId,
+        varianteId: l.varianteId ?? null,
         cantidad: l.cantidad,
       })),
     })
@@ -322,7 +327,7 @@ function Lineas({
     <ul className="flex flex-col">
       {lineas.map((linea) => (
         <li
-          key={linea.productoId}
+          key={claveDeLinea(linea)}
           className={cn(
             "flex border-t first:border-t-0",
             compacta
@@ -367,6 +372,11 @@ function Lineas({
                 >
                   {linea.nombre}
                 </Link>
+                {linea.variante ? (
+                  <span className="block text-sm font-semibold">
+                    {linea.variante}
+                  </span>
+                ) : null}
               </h3>
               <p className="tabular font-titular font-bold">
                 {formatMoney(linea.precioCents * linea.cantidad)}
@@ -385,7 +395,7 @@ function Lineas({
             >
               <button
                 type="button"
-                onClick={() => cambiar(linea.productoId, linea.cantidad - 1)}
+                onClick={() => cambiar(claveDeLinea(linea), linea.cantidad - 1)}
                 aria-label={`Quitar una unidad de ${linea.nombre}`}
                 className="flex size-11 items-center justify-center rounded-plantilla border border-tinta/25 transition-colors hover:border-senal hover:text-senal"
               >
@@ -399,7 +409,7 @@ function Lineas({
               </span>
               <button
                 type="button"
-                onClick={() => cambiar(linea.productoId, linea.cantidad + 1)}
+                onClick={() => cambiar(claveDeLinea(linea), linea.cantidad + 1)}
                 disabled={linea.cantidad >= linea.stock}
                 aria-label={`Agregar una unidad de ${linea.nombre}`}
                 className="flex size-11 items-center justify-center rounded-plantilla border border-tinta/25 transition-colors hover:border-senal hover:text-senal disabled:opacity-30"
@@ -409,7 +419,7 @@ function Lineas({
 
               <button
                 type="button"
-                onClick={() => quitar(linea.productoId)}
+                onClick={() => quitar(claveDeLinea(linea))}
                 aria-label={`Quitar ${linea.nombre} del carrito`}
                 className="ml-auto flex size-11 items-center justify-center opacity-40 transition-colors hover:text-senal hover:opacity-100"
               >

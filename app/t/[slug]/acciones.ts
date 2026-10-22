@@ -18,6 +18,8 @@ const pedidoSchema = z.object({
     .array(
       z.object({
         productoId: z.uuid(),
+        /** La opción elegida, si el producto las tiene. */
+        varianteId: z.uuid().nullable().optional(),
         cantidad: z.number().int().min(1).max(99),
       })
     )
@@ -30,6 +32,7 @@ export type PedidoInput = z.input<typeof pedidoSchema>
 /** Una línea del pedido, con el precio que calculó el servidor. */
 export interface LineaPedida {
   nombre: string
+  variante: string | null
   cantidad: number
   totalCents: number
 }
@@ -53,6 +56,7 @@ const respuestaSchema = z.object({
   items: z.array(
     z.object({
       nombre: z.string(),
+      variante: z.string().nullable().optional(),
       cantidad: z.number().int(),
       total_cents: z.number().int(),
     })
@@ -95,6 +99,7 @@ export async function crearPedido(
     p_store_id: tienda.id,
     p_items: validado.data.items.map((i) => ({
       product_id: i.productoId,
+      variant_id: i.varianteId ?? null,
       quantity: i.cantidad,
     })),
   })
@@ -113,6 +118,7 @@ export async function crearPedido(
     totalCents: respuesta.data.total_cents,
     lineas: respuesta.data.items.map((item) => ({
       nombre: item.nombre,
+      variante: item.variante ?? null,
       cantidad: item.cantidad,
       totalCents: item.total_cents,
     })),
@@ -120,6 +126,13 @@ export async function crearPedido(
 }
 
 function mensajeDeError(crudo: string) {
+  const sinOpcion = /Elige una opción de (.+)/.exec(crudo)
+  if (sinOpcion) {
+    return `${sinOpcion[1]} ahora tiene opciones: quítalo de tu carrito y vuelve a agregarlo eligiendo la tuya.`
+  }
+  if (/Opción no disponible/i.test(crudo)) {
+    return "Una de las opciones de tu carrito ya no está. Quítala y elige otra."
+  }
   if (/stock/i.test(crudo)) {
     return "Se acabó el stock de algo de tu carrito. Revísalo y vuelve a intentar."
   }

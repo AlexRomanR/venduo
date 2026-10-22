@@ -5,6 +5,10 @@ import { registrarEvento } from "@/components/tienda/visita"
 
 export interface LineaCarrito {
   productoId: string
+  /** La opción elegida —talla, color—, si el producto las tiene. */
+  varianteId?: string | null
+  /** Su nombre, "M · Negro", para mostrarla en el carrito. */
+  variante?: string | null
   nombre: string
   precioCents: number
   imagen: string | null
@@ -19,12 +23,27 @@ interface EstadoCarrito {
   subtotalCents: number
   listo: boolean
   agregar: (linea: Omit<LineaCarrito, "cantidad">, cantidad: number) => void
-  cambiar: (productoId: string, cantidad: number) => void
-  quitar: (productoId: string) => void
+  /** `clave` es la de `claveDeLinea`: producto y opción. */
+  cambiar: (clave: string, cantidad: number) => void
+  quitar: (clave: string) => void
   vaciar: () => void
 }
 
 const Contexto = React.createContext<EstadoCarrito | null>(null)
+
+/**
+ * Una línea por producto, o una por opción si las tiene: la polera M y la L
+ * son dos líneas. Un carrito guardado antes de las variantes no trae opción y
+ * sigue valiendo.
+ */
+export function claveDeLinea(linea: {
+  productoId: string
+  varianteId?: string | null
+}): string {
+  return linea.varianteId
+    ? `${linea.productoId}:${linea.varianteId}`
+    : linea.productoId
+}
 
 /**
  * El carrito vive en el navegador, por tienda.
@@ -104,16 +123,15 @@ export function ProveedorCarrito({
       agregar(linea, cantidad) {
         if (tienda && !muestra)
           registrarEvento(tienda, "carrito", linea.productoId)
+        const clave = claveDeLinea(linea)
         setLineas((previas) => {
-          const existente = previas.find(
-            (l) => l.productoId === linea.productoId
-          )
+          const existente = previas.find((l) => claveDeLinea(l) === clave)
           if (!existente) return [...previas, { ...linea, cantidad }]
 
           // Nunca más de lo que hay: el tope real lo impone `create_order`,
           // pero avisar acá evita un pedido que va a fallar.
           return previas.map((l) =>
-            l.productoId === linea.productoId
+            claveDeLinea(l) === clave
               ? {
                   ...l,
                   cantidad: Math.min(l.cantidad + cantidad, linea.stock),
@@ -125,20 +143,18 @@ export function ProveedorCarrito({
         })
       },
 
-      cambiar(productoId, cantidad) {
+      cambiar(clave, cantidad) {
         setLineas((previas) =>
           previas.flatMap((l) => {
-            if (l.productoId !== productoId) return [l]
+            if (claveDeLinea(l) !== clave) return [l]
             const nueva = Math.min(Math.max(cantidad, 0), l.stock)
             return nueva === 0 ? [] : [{ ...l, cantidad: nueva }]
           })
         )
       },
 
-      quitar(productoId) {
-        setLineas((previas) =>
-          previas.filter((l) => l.productoId !== productoId)
-        )
+      quitar(clave) {
+        setLineas((previas) => previas.filter((l) => claveDeLinea(l) !== clave))
       },
 
       vaciar() {

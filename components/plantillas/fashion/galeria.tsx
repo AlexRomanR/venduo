@@ -5,6 +5,7 @@ import Image from "next/image"
 import { ImageOff } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { useFotoElegida } from "@/components/tienda/foto-elegida"
 
 /**
  * Las fotos de un producto en Pasarela.
@@ -30,7 +31,24 @@ export function Galeria({
   entera?: boolean
 }) {
   const [actual, setActual] = React.useState(0)
+  const [elegida, setElegida] = React.useState<string | null>(null)
   const carril = React.useRef<HTMLDivElement>(null)
+
+  // Elegir un color en la ficha muestra su foto: en el celular se desliza
+  // hasta ella; en la computadora pasa a ser la primera.
+  useFotoElegida((url) => {
+    const indice = imagenes.indexOf(url)
+    if (indice < 0) return
+    setElegida(url)
+    // Sin animación: elegir cambia el alto de la ficha, y el ajuste del
+    // carril cortaba a mitad un desplazamiento suave.
+    const el = carril.current
+    el?.scrollTo({ left: indice * el.clientWidth, behavior: "instant" })
+  })
+  const enOrden =
+    elegida && imagenes.includes(elegida)
+      ? [elegida, ...imagenes.filter((url) => url !== elegida)]
+      : imagenes
 
   const proporcion = retrato ? "aspect-[3/4]" : "aspect-square"
 
@@ -98,7 +116,7 @@ export function Galeria({
           imagenes.length > 1 ? "grid-cols-2" : "grid-cols-1"
         )}
       >
-        {imagenes.slice(0, 6).map((url, i) => (
+        {enOrden.slice(0, 6).map((url, i) => (
           <div
             key={url}
             className={cn(

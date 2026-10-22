@@ -4,6 +4,7 @@ import * as React from "react"
 import Image from "next/image"
 
 import { cn } from "@/lib/utils"
+import { useFotoElegida } from "@/components/tienda/foto-elegida"
 
 /**
  * Las fotos de un producto en Esencia.
@@ -21,6 +22,12 @@ export function Galeria({
 }) {
   const [actual, setActual] = React.useState(0)
   const principal = imagenes[actual] ?? imagenes[0]
+
+  // Elegir un color en la ficha muestra su foto.
+  useFotoElegida((url) => {
+    const indice = imagenes.indexOf(url)
+    if (indice >= 0) setActual(indice)
+  })
 
   return (
     <div>

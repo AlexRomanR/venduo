@@ -21,6 +21,7 @@ import type {
   PropsTarjeta,
   KitDeTienda,
 } from "@/components/plantillas/kit"
+import { PrecioDeVitrina } from "@/components/tienda/precio"
 
 /**
  * Los bloques de la base editorial.
@@ -154,7 +155,7 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
 
       <p className="mt-1 flex items-baseline gap-2">
         <span className="tabular font-titular text-lg font-bold tracking-[-0.02em]">
-          {formatMoney(producto.price_cents)}
+          <PrecioDeVitrina producto={producto} />
         </span>
         {producto.compare_at_price_cents ? (
           <span className="tabular text-sm line-through opacity-40">

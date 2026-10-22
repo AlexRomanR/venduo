@@ -78,6 +78,8 @@ export function numeroDeWhatsApp(telefono: string): string {
 
 export interface LineaDelMensaje {
   nombre: string
+  /** La opción —"M · Negro"—, si el producto las tiene. */
+  variante?: string | null
   cantidad: number
   totalCents: number
 }
@@ -98,7 +100,8 @@ export function mensajeDePedido(pedido: {
     `Hola ${pedido.tienda}, quiero hacer este pedido (#${pedido.numero}):`,
     "",
     ...pedido.lineas.map(
-      (l) => `· ${l.cantidad}× ${l.nombre} — ${formatMoney(l.totalCents)}`
+      (l) =>
+        `· ${l.cantidad}× ${l.nombre}${l.variante ? ` (${l.variante})` : ""} — ${formatMoney(l.totalCents)}`
     ),
     "",
     `Total: ${formatMoney(pedido.totalCents)}`,

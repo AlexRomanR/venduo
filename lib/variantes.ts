@@ -35,6 +35,9 @@ export interface Variante {
   imagen: string | null
 }
 
+/** Una variante como la ve quien compra: sin su código interno. */
+export type VariantePublica = Omit<Variante, "sku">
+
 /** Las opciones como las guarda la base, leídas sin confiar en su forma. */
 export function leerOpciones(crudo: unknown): Opcion[] {
   if (!Array.isArray(crudo)) return []

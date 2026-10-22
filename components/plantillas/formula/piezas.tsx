@@ -15,6 +15,7 @@ import type {
   PropsTarjeta,
   PropsVacio,
 } from "@/components/plantillas/kit"
+import { PrecioDeVitrina } from "@/components/tienda/precio"
 
 /**
  * Las piezas de Fórmula.
@@ -84,7 +85,9 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
           {producto.name}
         </h3>
         <p className="flex items-baseline gap-2 px-2.5 pt-1 pb-2.5 font-mono text-[13px]">
-          <span className="tabular">{formatMoney(producto.price_cents)}</span>
+          <span className="tabular">
+            <PrecioDeVitrina producto={producto} />
+          </span>
           {producto.compare_at_price_cents ? (
             <span className="tabular text-[11px] line-through opacity-55">
               {formatMoney(producto.compare_at_price_cents)}

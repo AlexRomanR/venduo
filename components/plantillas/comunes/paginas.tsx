@@ -7,6 +7,7 @@ import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
 import type { TiendaPublica } from "@/lib/data/tienda-publica"
+import { PrecioDeVitrina } from "@/components/tienda/precio"
 import { Bloques, ParteFija } from "@/components/plantillas/bloques"
 import { Galeria } from "@/components/plantillas/fashion/galeria"
 import type {
@@ -258,7 +259,7 @@ export function paginasDeKit(
               )}
             >
               <span className="tabular text-2xl font-semibold">
-                {formatMoney(producto.price_cents)}
+                <PrecioDeVitrina producto={producto} />
               </span>
               {producto.compare_at_price_cents ? (
                 <span className="tabular text-lg line-through opacity-55">
