@@ -48,7 +48,10 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Seccion } from "@/components/panel/piezas"
-import { EditorDeVariantes } from "@/components/productos/variantes"
+import {
+  EditorDeVariantes,
+  StockDeVariantes,
+} from "@/components/productos/variantes"
 import { Fotos } from "@/components/productos/fotos"
 
 /** Centavos a bolivianos, para que el campo muestre lo que la persona escribió. */
@@ -133,11 +136,9 @@ export function FormularioProducto({
   })
   const [precio, costo, opcionesActuales, variantesActuales, fotosActuales] =
     form.watch(["precio", "costo", "opciones", "variantes", "fotos"])
-  const conVariantes = (opcionesActuales ?? []).length > 0
-  const totalDeVariantes = (variantesActuales ?? []).reduce(
-    (suma, v) => suma + (v.stock || 0),
-    0
-  )
+  // Con tallas marcadas, las unidades se cargan en cada una; mientras no hay
+  // ninguna marcada, vale el total de siempre.
+  const conVariantes = (variantesActuales ?? []).length > 0
 
   const enCurso = form.formState.isSubmitting
 
@@ -407,24 +408,20 @@ export function FormularioProducto({
         <Bloque
           id="variantes"
           icono={Layers}
-          titulo="Tallas, colores…"
-          detalle="Cada opción con su stock, y su precio si es distinto."
+          titulo="Tallas y colores"
+          detalle="Si lo vendes en varias, cada una lleva su stock."
         >
           <EditorDeVariantes
             opciones={opcionesActuales ?? []}
             variantes={variantesActuales ?? []}
             fotos={fotosActuales ?? []}
-            precio={precio}
             alCambiar={(nuevasOpciones, nuevasVariantes) => {
               form.setValue("opciones", nuevasOpciones, { shouldDirty: true })
               form.setValue("variantes", nuevasVariantes, {
                 shouldDirty: true,
               })
             }}
-            error={
-              form.formState.errors.opciones?.message ??
-              form.formState.errors.variantes?.message
-            }
+            error={form.formState.errors.opciones?.message}
           />
         </Bloque>
 
@@ -434,18 +431,19 @@ export function FormularioProducto({
           titulo="Cuántas tienes"
           detalle="Las unidades que puedes vender ahora mismo."
         >
+          {conVariantes ? (
+            <StockDeVariantes
+              opciones={opcionesActuales ?? []}
+              variantes={variantesActuales ?? []}
+              precio={precio}
+              alCambiar={(nuevas) =>
+                form.setValue("variantes", nuevas, { shouldDirty: true })
+              }
+              error={form.formState.errors.variantes?.message}
+            />
+          ) : null}
           <div className="grid items-start gap-6 sm:grid-cols-2">
-            {conVariantes ? (
-              <div className="flex flex-col gap-1">
-                <span className={ETIQUETA_CAMPO}>Unidades disponibles</span>
-                <span className="tabular flex h-12 items-center border-b border-tinta/25 text-base font-semibold">
-                  {totalDeVariantes}
-                </span>
-                <span className={AYUDA_CAMPO}>
-                  La suma de cada opción. Se cambia arriba, en cada una.
-                </span>
-              </div>
-            ) : (
+            {conVariantes ? null : (
               <FormField
                 control={form.control}
                 name="stock"

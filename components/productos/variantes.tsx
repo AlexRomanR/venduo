@@ -13,11 +13,9 @@ import {
   Plus,
   Shirt,
   Trash2,
-  X,
   type LucideIcon,
 } from "lucide-react"
 
-import { ETIQUETA_CAMPO } from "@/lib/estilos"
 import { CURRENCY_SYMBOL, formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import {
@@ -51,22 +49,27 @@ const ICONOS: Record<string, LucideIcon> = {
   Tamaño: Droplet,
 }
 
+/** Las opciones que ya tienen nombre y valores: las que arman combinaciones. */
+function opcionesCompletas(opciones: Opcion[]): Opcion[] {
+  return opciones.filter((o) => o.nombre.trim() && o.valores.length)
+}
+
 /**
- * Las tallas, colores y números de un producto, eligiendo en vez de escribir.
+ * Las tallas, colores y números de un producto: solo elegirlos. El stock de
+ * cada uno va con las unidades (`StockDeVariantes`), donde se busca el stock.
  *
- * Primero el tipo —talla de ropa, número de calzado, color, tamaño, u otro que
- * se nombra a mano— y después sus valores, que ya están escritos y se marcan
- * con un toque. Lo que no está en la lista se agrega. Cada color lleva su
- * foto, si el producto tiene más de una.
+ * Primero el tipo —talla, número, color, tamaño u otro que se nombra a mano— y
+ * después sus valores, que ya están escritos y se marcan con un toque. Cada
+ * color lleva su foto, si el producto tiene más de una. El mismo editor de la
+ * app.
  *
- * Las combinaciones se arman solas, agrupadas por la primera opción, y una que
- * ya existía conserva su stock y su precio: sumar la XL no borra lo de la M.
+ * Las combinaciones se arman solas, y una que ya existía conserva su stock y
+ * su precio: sumar la XL no borra lo de la M.
  */
 export function EditorDeVariantes({
   opciones,
   variantes,
   fotos,
-  precio,
   alCambiar,
   error,
 }: {
@@ -74,8 +77,6 @@ export function EditorDeVariantes({
   variantes: VarianteEnFormulario[]
   /** Las fotos del producto: de ahí sale la foto de cada color. */
   fotos: string[]
-  /** El precio del producto, como se escribe: el de toda variante sin precio propio. */
-  precio: number | undefined
   alCambiar: (opciones: Opcion[], variantes: VarianteEnFormulario[]) => void
   error?: string
 }) {
@@ -94,9 +95,8 @@ export function EditorDeVariantes({
         ])
       ),
     }))
-    const completas = nuevas.filter((o) => o.nombre.trim() && o.valores.length)
     const color = nuevas.find((o) => tipoDe(o)?.nombre === "Color")?.nombre
-    return combinaciones(completas).map(
+    return combinaciones(opcionesCompletas(nuevas)).map(
       (valores) =>
         previas.find((p) => mismaCombinacion(p.valores, valores)) ?? {
           valores,
@@ -122,28 +122,14 @@ export function EditorDeVariantes({
     cambiarOpciones([...opciones, { nombre: tipo?.nombre ?? "", valores: [] }])
   }
 
-  function cambiarVariante(
-    indice: number,
-    cambio: Partial<VarianteEnFormulario>
-  ) {
-    alCambiar(
-      opciones,
-      variantes.map((v, i) => (i === indice ? { ...v, ...cambio } : v))
-    )
-  }
-
   const usados = opciones.map((o) => tipoDe(o)?.nombre).filter(Boolean)
-  const total = variantes.reduce((suma, v) => suma + (v.stock || 0), 0)
-  const cuantas = combinaciones(
-    opciones.filter((o) => o.nombre.trim() && o.valores.length)
-  ).length
+  const cuantas = combinaciones(opcionesCompletas(opciones)).length
 
   if (opciones.length === 0) {
     return (
-      <div className="flex flex-col gap-4">
-        <p className="text-sm leading-relaxed opacity-70">
-          ¿Lo vendes en varias tallas, colores o números? Elige cuál: cada
-          opción lleva su stock.
+      <div className="flex flex-col gap-3">
+        <p className="text-sm opacity-70">
+          ¿Lo vendes en varias tallas, colores o números? Elige cuál.
         </p>
         <ElegirTipo usados={[]} alElegir={agregarTipo} />
       </div>
@@ -151,12 +137,11 @@ export function EditorDeVariantes({
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-7">
       {opciones.map((opcion, indice) => (
         <EditorDeOpcion
           key={indice}
           opcion={opcion}
-          primera={indice === 0}
           fotos={opcion.nombre === conFoto ? fotos : []}
           fotoDe={(valor) => fotoDe(variantes, opcion.nombre, valor)}
           alElegirFoto={(valor, foto) =>
@@ -186,58 +171,42 @@ export function EditorDeVariantes({
       ))}
 
       {opciones.length < MAXIMO_DE_OPCIONES ? (
-        <div className="border-t border-tinta/15 py-4">
-          {agregando ? (
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-sm font-semibold">
-                  ¿Qué otra opción tiene?
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setAgregando(false)}
-                  aria-label="Cancelar"
-                  className="flex size-11 items-center justify-center transition-colors hover:bg-tinta/[0.06]"
-                >
-                  <X aria-hidden="true" className="size-5" />
-                </button>
-              </div>
-              <ElegirTipo usados={usados} alElegir={agregarTipo} />
-            </div>
-          ) : (
+        agregando ? (
+          <div className="flex flex-col gap-3">
+            <span className="text-sm font-semibold">
+              ¿Qué otra opción tiene?
+            </span>
+            <ElegirTipo usados={usados} alElegir={agregarTipo} />
             <button
               type="button"
-              onClick={() => setAgregando(true)}
-              className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold underline underline-offset-4 transition-colors hover:text-senal"
+              onClick={() => setAgregando(false)}
+              className="min-h-11 self-start text-sm font-semibold opacity-70 transition-opacity hover:opacity-100"
             >
-              <Plus aria-hidden="true" className="size-4" />
-              {usados.includes("Color")
-                ? "Agregar talla o número"
-                : "Agregar color u otra opción"}
+              Cancelar
             </button>
-          )}
-        </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setAgregando(true)}
+            className="flex min-h-11 items-center justify-center gap-2 border border-dashed border-tinta/35 text-sm font-semibold transition-colors hover:border-tinta active:bg-tinta/[0.06]"
+          >
+            <Plus aria-hidden="true" className="size-4" />
+            {usados.includes("Color")
+              ? "Agregar talla o número"
+              : "Agregar color"}
+          </button>
+        )
       ) : null}
 
       {cuantas > MAXIMO_DE_VARIANTES ? (
-        <p
-          role="alert"
-          className="border-t border-tinta/15 pt-4 text-sm font-semibold text-senal"
-        >
+        <p role="alert" className="text-sm font-semibold text-senal">
           Son {formatNumber(cuantas)} combinaciones: el máximo es{" "}
           {MAXIMO_DE_VARIANTES}. Desmarca algunas.
         </p>
-      ) : variantes.length > 0 ? (
-        <Combinaciones
-          opciones={opciones.filter((o) => o.nombre.trim() && o.valores.length)}
-          variantes={variantes}
-          total={total}
-          precio={precio}
-          alCambiar={cambiarVariante}
-        />
       ) : null}
 
-      {error ? <p className="pt-3 text-sm text-senal">{error}</p> : null}
+      {error ? <p className="text-sm text-senal">{error}</p> : null}
     </div>
   )
 }
@@ -246,7 +215,7 @@ export function EditorDeVariantes({
  * Elegir el tipo
  * ------------------------------------------------------------------------ */
 
-/** Las opciones que más se usan, cada una con su ejemplo, y "Otra". */
+/** Los tipos que más se usan y "Otra", como fichas: un toque y está elegido. */
 function ElegirTipo({
   usados,
   alElegir,
@@ -256,57 +225,68 @@ function ElegirTipo({
 }) {
   const disponibles = TIPOS_DE_OPCION.filter((t) => !usados.includes(t.nombre))
   return (
-    <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-      {disponibles.map((tipo) => {
-        const Icono = ICONOS[tipo.nombre] ?? Shirt
-        return (
-          <li key={tipo.nombre}>
-            <button
-              type="button"
-              onClick={() => alElegir(tipo)}
-              className="flex h-full min-h-[5.5rem] w-full flex-col items-start gap-1.5 border border-tinta/25 p-3 text-left transition-colors hover:border-tinta active:bg-tinta/[0.06]"
-            >
-              <Icono aria-hidden="true" className="size-5" />
-              <span className="leading-tight font-semibold">{tipo.nombre}</span>
-              <span className="text-xs leading-snug opacity-65">
-                {tipo.nombre === "Color" ? (
-                  <MuestrasEnFila />
-                ) : (
-                  `${tipo.detalle}: ${tipo.valores.slice(0, 3).join(", ")}…`
-                )}
-              </span>
-            </button>
-          </li>
-        )
-      })}
-      <li>
-        <button
-          type="button"
-          onClick={() => alElegir(null)}
-          className="flex h-full min-h-[5.5rem] w-full flex-col items-start gap-1.5 border border-dashed border-tinta/35 p-3 text-left transition-colors hover:border-tinta active:bg-tinta/[0.06]"
-        >
-          <PencilLine aria-hidden="true" className="size-5" />
-          <span className="leading-tight font-semibold">Otra</span>
-          <span className="text-xs leading-snug opacity-65">
-            Sabor, modelo, material…
-          </span>
-        </button>
-      </li>
-    </ul>
+    <div className="flex flex-wrap gap-2">
+      {disponibles.map((tipo) => (
+        <Ficha
+          key={tipo.nombre}
+          icono={ICONOS[tipo.nombre] ?? Shirt}
+          texto={tipo.nombre}
+          etiqueta={`${tipo.nombre}: ${tipo.detalle.toLowerCase()}`}
+          alTocar={() => alElegir(tipo)}
+        />
+      ))}
+      <Ficha
+        icono={PencilLine}
+        texto="Otra"
+        punteada
+        alTocar={() => alElegir(null)}
+      />
+    </div>
   )
 }
 
-/** Unos puntos de color, para que la ficha de "Color" se reconozca sin leer. */
-function MuestrasEnFila() {
+/** Una ficha que se toca: un tipo, un valor o agregar uno. */
+function Ficha({
+  icono: Icono,
+  texto,
+  etiqueta,
+  elegida,
+  punteada = false,
+  muestra,
+  alTocar,
+}: {
+  icono?: LucideIcon
+  texto: string
+  etiqueta?: string
+  /** Si se marca y desmarca: lleva su estado y su check. */
+  elegida?: boolean
+  punteada?: boolean
+  /** El color del valor, si es un color: lleva su punto. */
+  muestra?: string
+  alTocar: () => void
+}) {
   return (
-    <span
-      className="flex items-center gap-1 pt-0.5"
-      aria-label="Negro, blanco, azul, rojo y más"
+    <button
+      type="button"
+      aria-pressed={elegida}
+      aria-label={etiqueta}
+      onClick={alTocar}
+      className={cn(
+        "inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 border px-3 text-sm font-semibold transition-colors",
+        elegida
+          ? "border-tinta bg-tinta text-papel"
+          : punteada
+            ? "border-dashed border-tinta/35 hover:border-tinta"
+            : "border-tinta/25 hover:border-tinta"
+      )}
     >
-      {["Negro", "Blanco", "Azul", "Rojo", "Amarillo"].map((color) => (
-        <Muestra key={color} color={color} />
-      ))}
-    </span>
+      {Icono ? <Icono aria-hidden="true" className="size-4" /> : null}
+      {muestra ? <Muestra color={muestra} sobreTinta={elegida} /> : null}
+      {texto}
+      {elegida ? (
+        <Check aria-hidden="true" className="-mr-0.5 size-3.5" />
+      ) : null}
+    </button>
   )
 }
 
@@ -341,7 +321,6 @@ function Muestra({
 
 function EditorDeOpcion({
   opcion,
-  primera,
   fotos,
   fotoDe,
   alElegirFoto,
@@ -350,7 +329,6 @@ function EditorDeOpcion({
   alQuitar,
 }: {
   opcion: Opcion
-  primera: boolean
   /** Las fotos del producto, si esta opción lleva una por valor: el color. */
   fotos: string[]
   fotoDe: (valor: string) => string | null
@@ -363,22 +341,29 @@ function EditorDeOpcion({
   const [escribiendo, setEscribiendo] = React.useState(!tipo)
   const [nuevo, setNuevo] = React.useState("")
   const idNombre = React.useId()
-  const idNuevo = React.useId()
   const Icono = tipo ? (ICONOS[tipo.nombre] ?? Shirt) : PencilLine
+
+  // Una lista larga —trece colores, once números— ya elegida se cierra a lo
+  // elegido: la pared entera solo hace falta mientras se elige.
+  const larga = (tipo?.valores.length ?? 0) > 8
+  const [abierta, setAbierta] = React.useState(opcion.valores.length === 0)
+  const cerrada = larga && !abierta
 
   // Los de la lista, y los que se agregaron a mano, que también se marcan.
   const propios = opcion.valores.filter((v) => !tipo?.valores.includes(v))
-  const fichas = [...(tipo?.valores ?? []), ...propios]
+  const fichas = cerrada
+    ? opcion.valores
+    : [...(tipo?.valores ?? []), ...propios]
 
   function alternar(valor: string) {
-    const elegido = opcion.valores.includes(valor)
-    const siguientes = elegido
+    const siguientes = opcion.valores.includes(valor)
       ? opcion.valores.filter((v) => v !== valor)
       : [...opcion.valores, valor]
     alCambiarValores(ordenarValores(tipo, siguientes))
   }
 
   function agregar() {
+    // "Vainilla, Coco" de una vez: cada coma es un valor.
     const partes = nuevo
       .split(",")
       .map((p) => p.trim())
@@ -392,30 +377,21 @@ function EditorDeOpcion({
       alCambiarValores(ordenarValores(tipo, [...opcion.valores, ...sinRepetir]))
     }
     setNuevo("")
-    if (tipo) setEscribiendo(false)
+    if (tipo || opcion.valores.length + sinRepetir.length > 0) {
+      setEscribiendo(false)
+    }
   }
 
   return (
-    <section
-      className={cn(
-        "flex flex-col gap-3 py-4",
-        !primera && "border-t border-tinta/15",
-        primera && "pt-0"
-      )}
-    >
-      <div className="flex items-center gap-3">
+    <section className="flex flex-col gap-3">
+      <div className="flex items-center gap-2.5">
         <Icono aria-hidden="true" className="size-5 shrink-0" />
         {tipo ? (
           <h3 className="flex-1 font-titular text-lg leading-tight font-bold tracking-[-0.01em]">
             {tipo.nombre}
-            <span className="ml-2 text-sm font-normal opacity-65">
-              {opcion.valores.length
-                ? `${opcion.valores.length} ${opcion.valores.length === 1 ? "elegida" : "elegidas"}`
-                : "Toca las que tienes"}
-            </span>
           </h3>
         ) : (
-          <label htmlFor={idNombre} className="flex min-w-0 flex-1 flex-col">
+          <label htmlFor={idNombre} className="flex min-w-0 flex-1">
             <span className="sr-only">Nombre de la opción</span>
             <input
               id={idNombre}
@@ -432,212 +408,207 @@ function EditorDeOpcion({
           type="button"
           onClick={alQuitar}
           aria-label={`Quitar ${opcion.nombre || "esta opción"}`}
-          className="flex size-11 shrink-0 items-center justify-center transition-colors hover:bg-tinta/[0.06] hover:text-senal"
+          className="flex size-11 shrink-0 items-center justify-center opacity-65 transition hover:bg-tinta/[0.06] hover:text-senal hover:opacity-100"
         >
-          <Trash2 aria-hidden="true" className="size-5" />
+          <Trash2 aria-hidden="true" className="size-[18px]" />
         </button>
       </div>
 
-      {fichas.length ? (
+      {fichas.length || !escribiendo ? (
         <div
           role="group"
           aria-label={`${opcion.nombre || "Valores"}: toca los que tienes`}
           className="flex flex-wrap gap-2"
         >
-          {fichas.map((valor) => {
-            const elegido = opcion.valores.includes(valor)
-            return (
-              <button
-                key={valor}
-                type="button"
-                aria-pressed={elegido}
-                onClick={() => alternar(valor)}
-                className={cn(
-                  "inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 border px-3 text-sm font-semibold transition-colors",
-                  elegido
-                    ? "border-tinta bg-tinta text-papel"
-                    : "border-tinta/25 hover:border-tinta"
-                )}
-              >
-                {tipo?.nombre === "Color" ? (
-                  <Muestra color={valor} sobreTinta={elegido} />
-                ) : null}
-                {valor}
-                {elegido ? (
-                  <Check aria-hidden="true" className="-mr-0.5 size-3.5" />
-                ) : null}
-              </button>
-            )
-          })}
+          {fichas.map((valor) => (
+            <Ficha
+              key={valor}
+              texto={valor}
+              elegida={opcion.valores.includes(valor)}
+              muestra={tipo?.nombre === "Color" ? valor : undefined}
+              alTocar={() => alternar(valor)}
+            />
+          ))}
+          {cerrada ? (
+            <Ficha
+              icono={Plus}
+              texto="Ver todos"
+              punteada
+              alTocar={() => setAbierta(true)}
+            />
+          ) : escribiendo ? null : (
+            <Ficha
+              icono={Plus}
+              texto={tipo ? "Otra" : "Agregar"}
+              etiqueta={tipo?.otro ?? "Agregar un valor"}
+              punteada
+              alTocar={() => setEscribiendo(true)}
+            />
+          )}
         </div>
       ) : null}
 
       {escribiendo ? (
         <div className="flex items-end gap-2">
-          <label
-            htmlFor={idNuevo}
-            className="flex min-w-0 flex-1 flex-col gap-1"
-          >
-            <span className={ETIQUETA_CAMPO}>
-              {tipo ? tipo.otro : "Sus valores"}
-            </span>
-            <input
-              id={idNuevo}
-              value={nuevo}
-              onChange={(e) => setNuevo(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  agregar()
-                }
-              }}
-              placeholder={
-                tipo ? "Escríbelo" : "Separados por coma: Vainilla, Coco"
+          <input
+            aria-label={
+              tipo ? tipo.otro : `Valores de ${opcion.nombre || "la opción"}`
+            }
+            value={nuevo}
+            onChange={(e) => setNuevo(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                agregar()
               }
-              maxLength={120}
-              autoFocus={Boolean(tipo)}
-              className="h-11 w-full border-b border-tinta bg-transparent text-base outline-none placeholder:text-tinta/40 focus-visible:border-senal"
-            />
-          </label>
+            }}
+            placeholder={
+              tipo ? tipo.otro : "Sus valores, con coma: Vainilla, Coco"
+            }
+            maxLength={120}
+            autoFocus={Boolean(tipo)}
+            className="h-11 min-w-0 flex-1 border-b border-tinta bg-transparent text-base outline-none placeholder:text-tinta/40 focus-visible:border-senal"
+          />
           <button
             type="button"
             onClick={agregar}
             disabled={!nuevo.trim()}
-            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 border border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel disabled:opacity-35"
+            className="inline-flex min-h-11 shrink-0 items-center border border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel disabled:opacity-35"
           >
-            <Plus aria-hidden="true" className="size-4" />
             Agregar
           </button>
         </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setEscribiendo(true)}
-          className="inline-flex min-h-11 items-center gap-1.5 self-start text-sm font-semibold underline underline-offset-4 transition-colors hover:text-senal"
-        >
-          <Plus aria-hidden="true" className="size-4" />
-          {tipo?.otro ?? "Agregar"}
-        </button>
-      )}
+      ) : null}
 
       {fotos.length > 1 && opcion.valores.length ? (
-        <FotosPorColor
-          colores={opcion.valores}
-          fotos={fotos}
-          elegida={fotoDe}
-          alElegir={alElegirFoto}
-        />
+        <div className="flex flex-col gap-2 pt-1">
+          <span className="text-sm opacity-70">
+            La foto de cada color, la que se ve al elegirlo:
+          </span>
+          <ul className="flex flex-col gap-2">
+            {opcion.valores.map((color) => (
+              <FotoDeColor
+                key={color}
+                color={color}
+                fotos={fotos}
+                elegida={fotoDe(color)}
+                alElegir={(foto) => alElegirFoto(color, foto)}
+              />
+            ))}
+          </ul>
+        </div>
       ) : null}
     </section>
   )
 }
 
-/** La foto de cada color, elegida entre las del producto. */
-function FotosPorColor({
-  colores,
+/** La foto de un color, elegida entre las del producto. */
+function FotoDeColor({
+  color,
   fotos,
   elegida,
   alElegir,
 }: {
-  colores: string[]
+  color: string
   fotos: string[]
-  elegida: (color: string) => string | null
-  alElegir: (color: string, foto: string | null) => void
+  elegida: string | null
+  alElegir: (foto: string | null) => void
 }) {
   return (
-    <div className="mt-1 flex flex-col gap-3 bg-tinta/[0.03] p-3">
-      <span className="flex flex-col gap-0.5">
-        <span className="text-sm font-semibold">La foto de cada color</span>
-        <span className="text-xs opacity-65">
-          Es la que se ve cuando lo eligen en tu tienda.
-        </span>
+    <li className="flex items-center gap-3">
+      <span className="flex w-20 shrink-0 items-center gap-1.5 text-sm font-semibold">
+        <Muestra color={color} />
+        <span className="truncate">{color}</span>
       </span>
-      <ul className="flex flex-col gap-3">
-        {colores.map((color) => {
-          const actual = elegida(color)
-          return (
-            <li key={color} className="flex items-center gap-3">
-              <span className="flex w-20 shrink-0 items-center gap-1.5 text-sm font-semibold">
-                <Muestra color={color} />
-                <span className="truncate">{color}</span>
-              </span>
-              <div
-                role="radiogroup"
-                aria-label={`Foto de ${color}`}
-                className="flex min-w-0 [scrollbar-width:none] gap-1.5 overflow-x-auto"
-              >
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={actual === null}
-                  aria-label="Sin foto propia"
-                  onClick={() => alElegir(color, null)}
-                  className={cn(
-                    "flex size-12 shrink-0 items-center justify-center border bg-papel",
-                    actual === null
-                      ? "border-2 border-tinta"
-                      : "border-tinta/25"
-                  )}
-                >
-                  <ImageOff aria-hidden="true" className="size-4 opacity-55" />
-                </button>
-                {fotos.map((foto, indice) => (
-                  <button
-                    key={foto}
-                    type="button"
-                    role="radio"
-                    aria-checked={actual === foto}
-                    aria-label={`Foto ${indice + 1}`}
-                    onClick={() => alElegir(color, foto)}
-                    className={cn(
-                      "relative size-12 shrink-0 overflow-hidden border",
-                      actual === foto
-                        ? "border-2 border-tinta"
-                        : "border-tinta/25"
-                    )}
-                  >
-                    <Image
-                      src={foto}
-                      alt=""
-                      fill
-                      sizes="48px"
-                      className="object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            </li>
-          )
-        })}
-      </ul>
-    </div>
+      <div
+        role="radiogroup"
+        aria-label={`Foto de ${color}`}
+        className="flex min-w-0 [scrollbar-width:none] gap-1.5 overflow-x-auto"
+      >
+        <button
+          type="button"
+          role="radio"
+          aria-checked={elegida === null}
+          aria-label="Sin foto propia"
+          onClick={() => alElegir(null)}
+          className={cn(
+            "flex size-12 shrink-0 items-center justify-center border",
+            elegida === null ? "border-2 border-tinta" : "border-tinta/25"
+          )}
+        >
+          <ImageOff aria-hidden="true" className="size-4 opacity-55" />
+        </button>
+        {fotos.map((foto, indice) => (
+          <button
+            key={foto}
+            type="button"
+            role="radio"
+            aria-checked={elegida === foto}
+            aria-label={`Foto ${indice + 1}`}
+            onClick={() => alElegir(foto)}
+            className={cn(
+              "relative size-12 shrink-0 overflow-hidden border",
+              elegida === foto ? "border-2 border-tinta" : "border-tinta/25"
+            )}
+          >
+            <Image
+              src={foto}
+              alt=""
+              fill
+              sizes="48px"
+              className="object-cover"
+            />
+          </button>
+        ))}
+      </div>
+    </li>
   )
 }
 
 /* ---------------------------------------------------------------------------
- * Las combinaciones
+ * El stock de cada una
  * ------------------------------------------------------------------------ */
 
 /**
- * El stock y el precio de cada combinación. Con dos opciones van agrupadas por
- * la primera —la S, y debajo sus colores—: treinta filas sueltas no se leen.
+ * Las unidades de cada talla o color, en el lugar de las unidades del
+ * producto: una fila por cada una, con más y menos. Con dos opciones van
+ * agrupadas por la primera —la S, y debajo sus colores—.
+ *
+ * El precio de cada una casi nunca cambia, así que no se muestra hasta que se
+ * pide: "Alguna cuesta distinto" abre un precio por fila.
  */
-function Combinaciones({
+export function StockDeVariantes({
   opciones,
   variantes,
-  total,
   precio,
   alCambiar,
+  error,
 }: {
   opciones: Opcion[]
   variantes: VarianteEnFormulario[]
-  total: number
+  /** El precio del producto, como se escribe: el de toda variante sin precio propio. */
   precio: number | undefined
-  alCambiar: (indice: number, cambio: Partial<VarianteEnFormulario>) => void
+  alCambiar: (variantes: VarianteEnFormulario[]) => void
+  error?: string
 }) {
-  const [primera, segunda] = opciones
+  const [conPrecio, setConPrecio] = React.useState(() =>
+    variantes.some((v) => v.precio !== null)
+  )
+  const [primera, segunda] = opcionesCompletas(opciones)
+  if (!primera) return null
+
+  function cambiar(indice: number, cambio: Partial<VarianteEnFormulario>) {
+    alCambiar(variantes.map((v, i) => (i === indice ? { ...v, ...cambio } : v)))
+  }
+
+  function alternarPrecio() {
+    // Al cerrarlo, todas vuelven al precio del producto: lo escondido no cuenta.
+    if (conPrecio) alCambiar(variantes.map((v) => ({ ...v, precio: null })))
+    setConPrecio(!conPrecio)
+  }
+
   const filas = variantes.map((variante, indice) => ({ variante, indice }))
-  const grupos = segunda
+  const grupos: { titulo: string | null; filas: typeof filas }[] = segunda
     ? primera.valores.map((valor) => ({
         titulo: valor,
         filas: filas.filter(
@@ -645,59 +616,71 @@ function Combinaciones({
         ),
       }))
     : [{ titulo: null, filas }]
+  const ultima = segunda ?? primera
+  const esColor = tipoDe(ultima)?.nombre === "Color"
+  const total = variantes.reduce((suma, v) => suma + (v.stock || 0), 0)
 
   return (
-    <div className="flex flex-col border-t border-tinta pt-4">
-      <div className="flex items-baseline justify-between gap-3">
-        <span className="font-semibold">Stock de cada una</span>
-        <span className="tabular text-sm opacity-70">
-          {formatNumber(total)} {total === 1 ? "unidad" : "unidades"} en total
-        </span>
-      </div>
-      <p className="mt-1 text-xs opacity-65">
-        El precio, solo si alguna cuesta distinto.
-      </p>
-
+    // min-w-0: el panel es una grilla, y sin él la fila más ancha la estira.
+    <div className="flex min-w-0 flex-col gap-5">
       {grupos.map((grupo) => (
-        <div key={grupo.titulo ?? "todas"} className="mt-3">
+        <div key={grupo.titulo ?? "todas"} className="flex flex-col gap-2">
           {grupo.titulo ? (
-            <span className="flex items-center gap-1.5 text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
+            <span className="text-sm font-semibold">
               {primera.nombre} {grupo.titulo}
             </span>
           ) : null}
-          <ul>
+          <ul className="flex flex-col gap-2">
             {grupo.filas.map(({ variante, indice }) => {
-              const ultimo = segunda ?? primera
-              const valor = variante.valores[ultimo.nombre] ?? ""
+              const valor = variante.valores[ultima.nombre] ?? ""
               return (
                 <FilaDeVariante
                   key={indice}
                   etiqueta={valor}
-                  muestra={tipoDe(ultimo)?.nombre === "Color" ? valor : null}
+                  muestra={esColor ? valor : null}
                   completo={
                     segunda
                       ? `${variante.valores[primera.nombre]} · ${valor}`
                       : valor
                   }
                   variante={variante}
+                  conPrecio={conPrecio}
                   precio={precio}
-                  alCambiar={(cambio) => alCambiar(indice, cambio)}
+                  alCambiar={(cambio) => cambiar(indice, cambio)}
                 />
               )
             })}
           </ul>
         </div>
       ))}
+
+      <div className="flex items-center justify-between gap-3 border-t border-tinta/15 pt-2">
+        <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm font-semibold">
+          <input
+            type="checkbox"
+            checked={conPrecio}
+            onChange={alternarPrecio}
+            className="size-5 accent-tinta"
+          />
+          Alguna cuesta distinto
+        </label>
+        <span className="tabular text-sm opacity-70">
+          {formatNumber(total)} {total === 1 ? "unidad" : "unidades"}
+        </span>
+      </div>
+
+      {error ? <p className="text-sm text-senal">{error}</p> : null}
     </div>
   )
 }
 
-/** Una combinación: su nombre, el stock con más y menos, y su precio si cambia. */
+/** Una combinación: su nombre, su precio si se pidió, y sus unidades. */
 function FilaDeVariante({
   etiqueta,
   muestra,
   completo,
   variante,
+  conPrecio,
   precio,
   alCambiar,
 }: {
@@ -708,15 +691,22 @@ function FilaDeVariante({
   /** El nombre entero, para el lector de pantalla: "M · Negro". */
   completo: string
   variante: VarianteEnFormulario
+  conPrecio: boolean
   precio: number | undefined
   alCambiar: (cambio: Partial<VarianteEnFormulario>) => void
 }) {
-  const idPrecio = React.useId()
   return (
-    <li className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-tinta/15 py-2.5">
-      <span className="flex min-w-[6.5rem] flex-1 items-center gap-2 font-semibold">
+    <li className="flex items-center gap-2 sm:gap-3">
+      <span className="flex min-w-0 flex-1 items-center gap-2 text-sm font-semibold sm:text-base">
         {variante.imagen ? (
-          <span className="relative size-8 shrink-0 overflow-hidden border border-tinta/15">
+          // Con el precio abierto, en el celular la fila no da para la foto:
+          // el color ya se ve en su ficha, arriba.
+          <span
+            className={cn(
+              "relative size-6 shrink-0 overflow-hidden border border-tinta/15 sm:size-8",
+              conPrecio && "max-sm:hidden"
+            )}
+          >
             <Image
               src={variante.imagen}
               alt=""
@@ -728,57 +718,13 @@ function FilaDeVariante({
         ) : muestra ? (
           <Muestra color={muestra} grande />
         ) : null}
-        <span>{etiqueta}</span>
+        <span className="truncate">{etiqueta}</span>
       </span>
 
-      <div className="flex items-center gap-3">
-        <div
-          role="group"
-          aria-label={`Unidades de ${completo}`}
-          className="flex h-10 items-stretch border border-tinta"
-        >
-          <button
-            type="button"
-            onClick={() =>
-              alCambiar({ stock: Math.max((variante.stock || 0) - 1, 0) })
-            }
-            disabled={!variante.stock}
-            aria-label="Una menos"
-            className="flex w-10 items-center justify-center transition-colors hover:bg-tinta hover:text-papel disabled:opacity-35"
-          >
-            <Minus aria-hidden="true" className="size-4" />
-          </button>
-          <input
-            type="number"
-            inputMode="numeric"
-            min={0}
-            value={variante.stock}
-            onChange={(e) =>
-              alCambiar({
-                stock: Math.max(0, Math.trunc(Number(e.target.value) || 0)),
-              })
-            }
-            onFocus={(e) => e.target.select()}
-            aria-label={`Unidades de ${completo}`}
-            className={cn(
-              "tabular w-12 [appearance:textfield] border-x border-tinta bg-transparent text-center font-semibold outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
-              variante.stock === 0 && "text-tinta/55"
-            )}
-          />
-          <button
-            type="button"
-            onClick={() => alCambiar({ stock: (variante.stock || 0) + 1 })}
-            aria-label="Una más"
-            className="flex w-10 items-center justify-center transition-colors hover:bg-tinta hover:text-papel"
-          >
-            <Plus aria-hidden="true" className="size-4" />
-          </button>
-        </div>
-
-        <label htmlFor={idPrecio} className="flex items-baseline gap-1">
+      {conPrecio ? (
+        <label className="flex w-16 shrink-0 items-center gap-1 border-b border-tinta focus-within:border-senal sm:w-20">
           <span className="text-sm opacity-65">{CURRENCY_SYMBOL}</span>
           <input
-            id={idPrecio}
             type="number"
             inputMode="decimal"
             step="0.01"
@@ -789,11 +735,54 @@ function FilaDeVariante({
                 precio: e.target.value === "" ? null : Number(e.target.value),
               })
             }
-            placeholder={precio !== undefined ? String(precio) : "Precio"}
+            placeholder={precio !== undefined ? String(precio) : ""}
             aria-label={`Precio de ${completo}. Vacío: el del producto`}
-            className="tabular h-10 w-20 border-b border-tinta bg-transparent text-base outline-none placeholder:text-tinta/40 focus-visible:border-senal"
+            className="tabular h-11 w-full min-w-0 [appearance:textfield] bg-transparent text-base outline-none placeholder:text-tinta/40 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
         </label>
+      ) : null}
+
+      <div
+        role="group"
+        aria-label={`Unidades de ${completo}`}
+        className="flex h-11 shrink-0 items-stretch border border-tinta"
+      >
+        <button
+          type="button"
+          onClick={() =>
+            alCambiar({ stock: Math.max((variante.stock || 0) - 1, 0) })
+          }
+          disabled={!variante.stock}
+          aria-label="Una menos"
+          className="flex w-11 items-center justify-center transition-colors hover:bg-tinta hover:text-papel disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-tinta"
+        >
+          <Minus aria-hidden="true" className="size-4" />
+        </button>
+        <input
+          type="number"
+          inputMode="numeric"
+          min={0}
+          value={variante.stock}
+          onChange={(e) =>
+            alCambiar({
+              stock: Math.max(0, Math.trunc(Number(e.target.value) || 0)),
+            })
+          }
+          onFocus={(e) => e.target.select()}
+          aria-label={`Unidades de ${completo}`}
+          className={cn(
+            "tabular w-10 [appearance:textfield] border-x border-tinta bg-transparent text-center font-semibold outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+            variante.stock === 0 && "text-tinta/55"
+          )}
+        />
+        <button
+          type="button"
+          onClick={() => alCambiar({ stock: (variante.stock || 0) + 1 })}
+          aria-label="Una más"
+          className="flex w-11 items-center justify-center transition-colors hover:bg-tinta hover:text-papel"
+        >
+          <Plus aria-hidden="true" className="size-4" />
+        </button>
       </div>
     </li>
   )
