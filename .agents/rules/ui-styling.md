@@ -258,7 +258,9 @@ para nada en este producto.
   "fichas de largo muy distinto". **Sin excepciones**, hay dos formas y nada más:
   - **Columnas iguales**: `GRILLA_DE_FICHAS` (`lib/estilos.ts`), que pone tantas
     columnas iguales como entren, con cada ficha `w-full justify-center` y su texto
-    `truncate`. Es la de categorías, tallas, colores y tipos.
+    `truncate`. Es la de categorías, tallas, colores y tipos. Para fichas de dos o
+    tres palabras —"Unidades disponibles"—, `GRILLA_DE_FICHAS_LARGAS`, de columnas
+    más anchas y con el texto que baja a un segundo renglón en vez de cortarse.
   - **Una sola fila que se desliza**: la franja de filtros de una lista
     (`FranjaDeFichas`), donde la última asoma cortada a propósito.
 

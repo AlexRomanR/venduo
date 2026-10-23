@@ -54,3 +54,11 @@ export const FICHA_LIBRE = "border-tinta/25 hover:border-tinta"
  */
 export const GRILLA_DE_FICHAS =
   "grid grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] gap-1.5"
+
+/**
+ * La misma grilla para fichas de dos o tres palabras —"Unidades disponibles",
+ * "Lista con detalle"—: en columnas de 6.5rem quedaban cortadas. Su texto no
+ * va `truncate`: si no entra, baja a un segundo renglón dentro de su ficha.
+ */
+export const GRILLA_DE_FICHAS_LARGAS =
+  "grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-1.5"
