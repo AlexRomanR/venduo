@@ -89,6 +89,7 @@ aparte y su plan es `docs/plan-app-movil.md`.
 | `docs/plan-app-movil.md`      | La app nativa del emprendedor: decisiones, pantallas, fases  |
 | `docs/store-templates.md`     | El sistema de plantillas de tienda                           |
 | `docs/catalogos-pdf.md`       | Los catálogos en PDF: un dibujo, dos salidas, sus trampas    |
+| `docs/tiktok.md`              | Publicar en TikTok: cómo está hecho, configurarlo y revisión |
 
 ## Reglas
 

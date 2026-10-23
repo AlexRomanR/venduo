@@ -115,21 +115,46 @@ export const insightSqlSchema = z.object({
 })
 export type InsightSql = z.infer<typeof insightSqlSchema>
 
-export const marketingCampaignSchema = z.object({
-  objective: z.string().min(1).max(200),
-  posts: z
-    .array(
-      z.object({
-        channel: z.enum(["instagram", "whatsapp", "email", "tiktok"]),
-        hook: z.string().min(1).max(140),
-        body: z.string().min(1).max(800),
-        hashtags: z.array(z.string().min(1).max(40)).max(10),
-      })
-    )
+/**
+ * Los textos para publicar un producto en redes, uno por canal.
+ *
+ * Sin el precio ni el enlace: los agrega el sistema al final, con los datos
+ * de la base. Un precio escrito por el modelo puede salir mal, y en una
+ * publicación eso es una promesa a quien compra.
+ */
+export const publicacionesSchema = z.object({
+  whatsapp: z
+    .string()
     .min(1)
-    .max(4),
+    .max(320)
+    .describe(
+      "Para el estado o un mensaje de WhatsApp: dos o tres líneas, directo."
+    ),
+  instagram: z
+    .string()
+    .min(1)
+    .max(500)
+    .describe(
+      "Para Instagram y TikTok: la primera línea engancha; después, dos o tres frases cortas."
+    ),
+  facebook: z
+    .string()
+    .min(1)
+    .max(700)
+    .describe(
+      "Para Facebook y Marketplace: más descriptivo, con lo que alguien pregunta antes de comprar."
+    ),
+  hashtags: z
+    .array(
+      z
+        .string()
+        .regex(/^#?[\p{L}\p{N}_]{2,30}$/u)
+        .describe("Una palabra, sin espacios.")
+    )
+    .min(3)
+    .max(8),
 })
-export type MarketingCampaign = z.infer<typeof marketingCampaignSchema>
+export type Publicaciones = z.infer<typeof publicacionesSchema>
 
 /**
  * Lo que la IA propone para la tienda: operaciones, nunca el estado final.

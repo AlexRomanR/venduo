@@ -19,7 +19,7 @@ Actualizado el 9 de octubre de 2026.
 | 6   | Carrito que manda el pedido al WhatsApp de la tienda         | ✅     |
 | 7   | Panel de pedidos que descuenta stock al marcarse pagado      | ✅     |
 | 8   | Estadísticas en lenguaje natural                             | ✅     |
-| 9   | Copys de marketing y publicación en Facebook y WhatsApp      | ❌     |
+| 9   | Imagen y texto para publicar un producto en redes            | ✅     |
 | 10  | Catálogos en PDF editables, para descargar o compartir       | ✅     |
 
 > **6 de octubre:** se quitaron la red de vendedores, el cobro dentro de la plataforma
@@ -338,16 +338,26 @@ uno y otro, el código viejo falla contra la base nueva: conviene hacerlos segui
 Las tiendas de la demostración que no tengan WhatsApp no reciben pedidos hasta cargarlo
 en `/cuenta`.
 
-### 3. Marketing — prioridad media
+### 3. Publicar en redes — en prueba
 
-`/panel/marketing` es un marcador "Pronto". La tarea `generateCampaign` existe en la capa
-de IA pero no se usa.
+**Publicar en redes** (`/panel/marketing`, y en la app `mas/publicar`) está en la web y
+en la app, de prueba: elegir un producto, la imagen con los colores y la letra de la tienda —historia
+9:16 o cuadrada; foto grande, su color u oferta— y el texto para WhatsApp, Instagram y
+TikTok, y Facebook, que escribe la IA (`escribirPublicaciones`) o se arma sin ella. Se
+comparte imagen y texto juntos desde el celular, o se descarga y se copia. Desde cada
+producto, "Publicar en redes" llega con él elegido.
 
-Falta:
+**La app usa la misma imagen y la misma acción** (`/api/v1/publicar`, `…/imagen` y
+`…/textos`): la imagen la dibuja la web y la app la baja, la muestra, la guarda en la
+galería o la comparte con el texto copiado. Publicar directo por la API de Meta no se
+hace: compartir desde el teléfono llega a las mismas redes sin la revisión de Meta.
 
-- Generar copys para Facebook y WhatsApp desde un producto.
-- Publicar: plan A por API de Meta, plan B con enlaces de compartir y copiar. Se recomienda
-  ir directo al plan B por el tiempo de revisión de Meta.
+**Publicar directo en TikTok** está hecho y apagado hasta configurarlo: con
+`TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET` y `TIKTOK_VERIFICACION` en Vercel aparece el
+botón en Publicar en redes de la web; la app publica en TikTok desde la hoja de compartir.
+Falta crear la app en TikTok for Developers y pedir su
+revisión; hasta entonces todo lo publicado queda privado. Los pasos, el guion del video y
+el texto de la revisión están en `docs/tiktok.md`.
 
 ### 4. Plantillas — prioridad baja
 

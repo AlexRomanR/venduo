@@ -110,11 +110,25 @@ export default function Terminos() {
         </p>
       </Apartado>
 
-      <Apartado numero={7} titulo="Canva y otros servicios">
+      <Apartado numero={7} titulo="Canva, TikTok y otros servicios">
         <p>
           Si conectas tu cuenta de Canva, llevamos a Canva los catálogos que
           elijas. Lo que hagas en Canva se rige por sus propios términos. Puedes
           desconectarla cuando quieras desde «Mi cuenta».
+        </p>
+        <p>
+          Si conectas tu cuenta de TikTok, publicamos en ella solo lo que tú
+          revisas y confirmas, con las opciones que eliges. Lo que publicas en
+          TikTok se rige por sus{" "}
+          <a href="https://www.tiktok.com/legal/terms-of-service">
+            términos de servicio
+          </a>{" "}
+          y sus{" "}
+          <a href="https://www.tiktok.com/community-guidelines">
+            normas de la comunidad
+          </a>
+          , y eres responsable de que cumpla con ellas. Puedes desconectarla
+          cuando quieras.
         </p>
       </Apartado>
 

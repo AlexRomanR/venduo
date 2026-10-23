@@ -82,6 +82,8 @@ mismos nombres y el mismo orden. Quien vende usa las dos y no tiene por qué apr
 - **Lo único distinto es lo que es de una sola plataforma**: los avisos al teléfono y
   "Venduo en la computadora" son de la app; la barra de escritorio, su riel plegado, los
   atajos de teclado y el atajo "Nuevo producto" de la pantalla ancha son de la web.
+  Publicar directo en TikTok también es de la web por ahora: en la app se publica en
+  TikTok desde la hoja de compartir del teléfono.
 
 ### El panel se mira, no se lee
 
