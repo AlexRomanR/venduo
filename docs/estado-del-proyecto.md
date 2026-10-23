@@ -238,9 +238,10 @@ que se arregló:
   crear o editar algo.
 - **Nueva venta, por filas** (web y app; brief en
   `docs/briefs/2026-10-23-nueva-venta-por-filas.md`): arriba lo vendido —foto, nombre,
-  "1 × Bs 240" y más y menos—, "Agregar producto" abre la grilla en una hoja (con la
-  talla como segundo paso de la misma hoja), y tocar una línea abre su precio y
-  "Quitar de la venta". En la web, la venta a medio armar sobrevive a "Corregir el
+  "1 × Bs 240" y más y menos—, "Agregar producto" abre la grilla en una hoja, donde se
+  marcan varios productos y tallas (la talla es un segundo paso de la misma hoja) y se
+  suman con "Agregar N productos", y tocar una línea abre su precio y "Quitar de la
+  venta". En la web, la venta a medio armar sobrevive a "Corregir el
   stock" (`sessionStorage`); en la app la pantalla queda debajo y no se pierde, salvo
   que se salga de ella.
 - **`/idea`**: de una idea en palabras a un cambio probado, con entrevista, brief en
