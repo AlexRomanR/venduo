@@ -324,6 +324,16 @@ que se arregló:
 - La IA de estadísticas solo lee, en una transacción de solo lectura y contra vistas de la
   propia tienda.
 - Modo demo que funciona sin credenciales.
+- **Tests automatizados** (23 de octubre): Vitest para la lógica de `lib/` —dinero,
+  ofertas, variantes, WhatsApp, tablero, funciones— dentro de `npm run check`, y pgTAP
+  para la base sobre una copia local en Docker —`create_order`, el stock al pagar y
+  cancelar, `registrar_venta`, las variantes, RLS entre tiendas— con `npm run test:db` y
+  un job propio en el CI. Salieron dos errores, ya arreglados en
+  `20261023120000_devolver_stock_a_la_variante.sql`: cancelar un pedido con dos líneas
+  del mismo producto devolvía una sola, y una talla quitada y vuelta a crear no recibía
+  su unidad. Y las tallas de un producto oculto se podían leer desde afuera
+  (`20261023120100_variantes_de_productos_ocultos_rls.sql`). `aCentavos` quedó en `lib/format.ts`, en vez de tres copias. La app, cuando
+  se apruebe la web.
 
 ### Rendimiento
 
@@ -464,5 +474,6 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 
 No se construye, según `VENDUO.md` §7: multi-tienda por usuario, red de vendedores y
 comisiones, gestión de envíos, cobrar dentro de la plataforma, pedirle datos a quien
-compra, cobro de la suscripción, notificaciones por correo y tests automatizados. La
-app móvil nativa salió de esta lista el 10 de octubre de 2026 (arriba, "Lo que falta").
+compra, cobro de la suscripción y notificaciones por correo. La app móvil nativa salió
+de esta lista el 10 de octubre de 2026 (arriba, "Lo que falta"), y los tests
+automatizados el 23 de octubre.

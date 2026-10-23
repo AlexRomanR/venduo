@@ -143,8 +143,9 @@ expondría los catálogos de todas las tiendas.
 
 ## Las variantes
 
-`product_variants` tiene una sola política, de lectura: quien compra lee las de una
-tienda que se sirve y el dueño lee las suyas. **No tiene políticas de escritura**: se
+`product_variants` tiene una sola política, de lectura: quien compra lee las de un
+producto que también puede ver —activo, sin moderar, en una tienda que se sirve— y el
+dueño lee las suyas. **No tiene políticas de escritura**: se
 escriben con `guardar_variantes(p_producto, p_opciones, p_variantes)`, que valida cada
 combinación contra las opciones, arma su nombre, deja solo fotos que son del producto y
 hace todo en una transacción, y con `ajustar_stock_de_variante(p_variante, p_stock)`.
@@ -301,6 +302,29 @@ Escribir SQL **idempotente**: `create table if not exists`, `drop policy if exis
 de cada `create policy`. Así el archivo se puede volver a correr sin romper nada.
 
 Las políticas RLS van juntas en su propio archivo, para poder auditarlas de una lectura.
+
+## Probar una función o una política
+
+Con pgTAP, en `supabase/tests/*.test.sql`, sobre la base local que Docker arma desde las
+migraciones. Una función, un disparador o una política nueva o cambiada lleva su test
+(`code-quality.md`), y se corre antes de `db push`:
+
+```bash
+npm run test:db   # rearma la base local y corre los tests
+```
+
+- **Siempre `--local`, nunca `--linked`.** Esta máquina tiene el CLI enlazado a
+  producción: `supabase db reset --linked` la borraría entera. Los scripts llevan
+  `--local` escrito a propósito.
+- Cada archivo empieza con `begin;` y termina con `rollback;`: no deja nada.
+- Las tiendas se crean como las crea la aplicación: un usuario en `auth.users` y
+  `create_store` con su identidad. Para actuar como alguien:
+  `set local role authenticated;` y
+  `set local request.jwt.claims = '{"sub":"<uuid>","role":"authenticated"}';`. Quien
+  compra es `anon`; `reset role` vuelve a ver todo.
+- Una migración que cambia una función se prueba así: primero el test contra la función
+  vieja —tiene que fallar—, después `npx supabase migration up --local` y el test en
+  verde.
 
 ## La vista de la tienda
 

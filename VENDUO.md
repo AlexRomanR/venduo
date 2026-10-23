@@ -207,10 +207,11 @@ Tan importante como la lista de lo que sí:
 - **Cobrar dentro de la plataforma.** No hay pasarela, custodia, QR de pago ni comprobantes: el pago se acuerda por WhatsApp y la tienda lo marca en su panel.
 - **Cobro de la suscripción.** Se modela el estado de la suscripción, no el cobro.
 - **Notificaciones por email.**
-- **Tests automatizados.**
 
 La aplicación móvil nativa estuvo en esta lista durante la hackathon y salió de ella el
 10 de octubre de 2026: ahora es parte del producto (abajo, "La app del emprendedor").
+Los tests automatizados salieron el 23 de octubre de 2026: se escriben para la lógica que
+toca dinero, stock, pedidos o permisos (`code-quality.md`).
 
 ### La app del emprendedor
 

@@ -22,8 +22,9 @@ algo para probar, dilo en una línea al principio y prueba lo que se pueda.
 
 ## Lo que pruebas
 
-1. **`npm run check`** en la web (`F:\Venduo MVP`) y en la app (`F:\venduo-app`) si se
-   tocó. Los errores de lint en `.claude/skills/` de terceros sin versionar no cuentan.
+1. **`npm run check`** en la web (`F:\Venduo MVP`), que incluye los tests de la lógica, y
+   en la app (`F:\venduo-app`) si se tocó. Si el cambio tocó la base, también
+   **`npm run test:db`** (pide Docker; nunca contra producción). Los errores de lint en `.claude/skills/` de terceros sin versionar no cuentan.
 2. **La pantalla en el navegador** (Playwright, en `http://localhost:3000`; las capturas
    van a `.playwright-mcp/`):
    - a **375 px** y a **1280 px**: sin desplazamiento horizontal

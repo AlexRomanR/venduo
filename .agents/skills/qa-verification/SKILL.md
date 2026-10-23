@@ -17,9 +17,15 @@ Este skill describe la rutina obligatoria de aseguramiento de la calidad (QA), a
 Antes de solicitar revisión o hacer push a tu rama de trabajo, ejecuta el pipeline completo:
 
 ```bash
-# Verificación integral (TypeScript + ESLint + Prettier)
+# Verificación integral (TypeScript + ESLint + Prettier + tests de la lógica)
 npm run check
+
+# Si se tocó la base: rearma la base local (Docker) y corre los tests de pgTAP
+npm run test:db
 ```
+
+La lógica nueva o cambiada que toca dinero, stock, pedidos o permisos lleva su test
+(`code-quality.md`). Lo demás se verifica a mano, como sigue.
 
 Si deseas diagnosticar problemas específicos por separado:
 

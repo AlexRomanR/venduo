@@ -16,9 +16,8 @@ cuando el esquema no da lo que se supuso.
 ## Paso 0 — Antes de escribir nada
 
 1. **¿Está dentro de alcance?** `VENDUO.md` §7 tiene la lista de lo que no se construye:
-   multi-tienda por usuario, gestión de envíos, cobro de suscripción, notificaciones por
-   correo, app nativa y tests automatizados. Si la tarea pide algo de ahí, frenar y
-   preguntar.
+   multi-tienda por usuario, gestión de envíos, cobro de suscripción y notificaciones
+   por correo. Si la tarea pide algo de ahí, frenar y preguntar.
 2. **¿Ya existe?** Buscar en `lib/` antes de escribir. Formato de moneda, slugs, QR,
    clientes de Supabase y validación ya están resueltos.
 3. **¿Quién la usa?** El emprendedor en `/panel`, o quien compra en la tienda pública,

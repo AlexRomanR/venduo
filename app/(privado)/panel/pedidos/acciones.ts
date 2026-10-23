@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
+import { aCentavos } from "@/lib/format"
 import { createClient, getUsuario } from "@/lib/supabase/server"
 import { ESTADOS } from "@/lib/pedidos"
 import { ventaSchema, type VentaInput } from "@/lib/validation/venta"
@@ -116,7 +117,7 @@ export async function registrarVenta(
       product_id: linea.productoId,
       variant_id: linea.varianteId,
       quantity: linea.cantidad,
-      precio_cents: Math.round(linea.precio * 100),
+      precio_cents: aCentavos(linea.precio),
     })),
   })
 

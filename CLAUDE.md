@@ -15,15 +15,17 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
 
 ## Comandos
 
-| Comando                | Qué hace                                                         |
-| ---------------------- | ---------------------------------------------------------------- |
-| `npm run dev`          | Servidor de desarrollo                                           |
-| `npm run check`        | Tipos, lint y formato **en secuencia**. Lo mismo que corre el CI |
-| `npm run format`       | Arregla el formato                                               |
-| `npm run build`        | Build de producción                                              |
-| `npx supabase db push` | Aplica las migraciones pendientes                                |
-| `npm run db:types`     | Regenera `types/database.ts` desde el esquema real               |
-| `npm run sync:agents`  | Copia las skills de `.agents/` a `.claude/`                      |
+| Comando                | Qué hace                                                          |
+| ---------------------- | ----------------------------------------------------------------- |
+| `npm run dev`          | Servidor de desarrollo                                            |
+| `npm run check`        | Tipos, lint, formato y tests **en secuencia**. Lo que corre el CI |
+| `npm test`             | Los tests de la lógica de TypeScript                              |
+| `npm run test:db`      | Los tests de la base, sobre la base local (pide Docker)           |
+| `npm run format`       | Arregla el formato                                                |
+| `npm run build`        | Build de producción                                               |
+| `npx supabase db push` | Aplica las migraciones pendientes                                 |
+| `npm run db:types`     | Regenera `types/database.ts` desde el esquema real                |
+| `npm run sync:agents`  | Copia las skills de `.agents/` a `.claude/`                       |
 
 ## Lo que hay que saber antes de tocar nada
 
@@ -75,10 +77,10 @@ acá, frena y pregunta antes de escribir código:
 
 multi-tienda por usuario · red de vendedores, comisiones o referidos · gestión de envíos
 · cobrar dentro de la plataforma (el pago se acuerda por WhatsApp) · pedirle datos a
-quien compra · cobro de la suscripción · notificaciones por correo ·
-**tests automatizados**.
+quien compra · cobro de la suscripción · notificaciones por correo.
 
-La app móvil nativa ya no está en esta lista: era de la hackathon. Va en un repositorio
+Los tests automatizados salieron el 23 de octubre de 2026. La app móvil nativa
+tampoco está en esta lista: era de la hackathon. Va en un repositorio
 aparte y su plan es `docs/plan-app-movil.md`.
 
 ## Documentos
@@ -111,6 +113,7 @@ leyó no se cumple, y así se repitieron errores que la regla ya prohibía.
 | Tocar la IA                                                         | `ai-layer.md`                                           |
 | Cambiar lo que carga una pantalla, sus consultas o su esqueleto     | `performance.md`                                        |
 | Agregar una dependencia, escribir comentarios o preparar un commit  | `code-quality.md`                                       |
+| Escribir o cambiar lógica de dinero, stock, pedidos o permisos      | `code-quality.md` (tests)                               |
 | Tocar el logo o la marca                                            | `marca.md`                                              |
 
 Las skills del proyecto ya dicen qué regla leer en cada paso.
@@ -165,7 +168,7 @@ Instaladas para diseño y animación. **No se editan y el script de sincronizaci
 | `ponytail`                 | El cambio más chico que resuelve todo, sin lo no pedido                  | DietrichGebert/ponytail |
 | `caveman`                  | Respuestas cortas en el chat, con `/caveman`; se apaga con "normal mode" | JuliusBrussee/caveman   |
 
-`ponytail` pide dejar un test chico para la lógica nueva: en Venduo no, los tests
-automatizados están fuera de alcance (`VENDUO.md` §7). La verificación es la de siempre.
+`ponytail` pide un test para toda lógica nueva no trivial. En Venduo, solo para la que
+toca dinero, stock, pedidos o permisos; textos, pantallas y estilos no (`code-quality.md`).
 
 Sus binarios no se versionan: quien clone el repositorio corre `npx impeccable install` para bajar el de su plataforma.

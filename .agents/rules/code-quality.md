@@ -4,10 +4,12 @@
 
 ```bash
 npm run check
+npm run test:db   # además, si se tocó la base
 ```
 
-Corre tipos, lint y formato **en secuencia**: si los tipos fallan, el resto no se ejecuta.
-Es lo mismo que corre el CI en cada push y cada PR, así que si pasa acá pasa allá.
+`check` corre tipos, lint, formato y los tests de la lógica **en secuencia**: si los tipos
+fallan, el resto no se ejecuta. Es lo mismo que corre el CI en cada push y cada PR, así
+que si pasa acá pasa allá. `test:db` necesita Docker; el CI lo corre en su propio job.
 
 Para arreglar el formato: `npm run format`.
 
@@ -61,17 +63,41 @@ que el mensaje diga qué se rompía.
 
 No commitear si `npm run check` está en rojo.
 
-## Lo que no se hace
+## Tests
 
-**No se escriben tests automatizados.** Está fuera de alcance según `VENDUO.md` §7. La
-verificación es manual y está descrita en la skill `qa-verification`: correr el flujo,
-mirarlo en 375 px, probar el modo demo.
+Se escriben para **toda lógica nueva o cambiada que toque dinero, stock, pedidos o
+permisos**: una cuenta en centavos, un descuento, un estado de pedido, una función o una
+política de la base. Textos, pantallas y estilos no llevan: se prueban mirándolos, como
+dice la skill `qa-verification`.
+
+| Qué                                     | Dónde                                   | Cómo se corre                      |
+| --------------------------------------- | --------------------------------------- | ---------------------------------- |
+| Lógica de TypeScript                    | `*.test.ts` junto a su módulo de `lib/` | `npm test`, que entra en `check`   |
+| Funciones, disparadores y políticas SQL | `supabase/tests/*.test.sql`, con pgTAP  | `npm run test:db`, que pide Docker |
+
+- **Lo que no se puede importar no se puede probar.** Una cuenta escrita dentro de un
+  archivo `"use server"` o de un componente se mueve a un módulo neutral de `lib/`, como
+  `aCentavos` en `lib/format.ts`.
+- Un test de TypeScript no importa `lib/supabase/` ni `lib/data/`: lo que necesita la
+  base va en `supabase/tests/`.
+- **Los tests de la base corren solo en la base local**, la que Docker arma desde las
+  migraciones. Cada archivo va entre `begin;` y `rollback;`. Detalle en
+  `database-rls.md`.
+- Las fechas se pasan explícitas —el `ahora`— y los tests corren en UTC
+  (`vitest.config.mts`), como el servidor.
+- Un error que se arregla en esa lógica deja su test, y el test tiene que fallar antes
+  del arreglo: si pasa con el código viejo, no prueba nada.
+
+La skill `ponytail` pide un test para toda lógica nueva que no sea trivial; en Venduo
+manda esta regla.
+
+## Lo que no se hace
 
 No agregar dependencias sin necesidad. Todo lo que hace falta para el MVP ya está
 instalado; una biblioteca nueva es peso que alguien tiene que entender a las tres de la
 mañana.
 
-Se sumaron cuatro después del arranque. La primera es **`@react-pdf/renderer`**, para el informe
+Se sumaron cinco después del arranque. La primera es **`@react-pdf/renderer`**, para el informe
 del tablero: el PDF tiene que ser un archivo de verdad —que se abra en su pestaña, se
 guarde y se mande por WhatsApp— y eso no lo da imprimir la pantalla. Corre solo en el
 servidor y está declarada en `serverExternalPackages`. Arrastra un `postcss` con un aviso
@@ -94,6 +120,10 @@ que muestra la app: una captura real de la portada, que ningún dibujo reemplaza
 Chrome comprimido para funciones sin servidor y pesa unos 60 MB, así que **va solo en la
 ruta `/api/v1/vista`** (`outputFileTracingIncludes` en `next.config.ts`); el resto del
 servidor se la pide con `pedirVista`. Nunca importarla desde otra ruta.
+
+La quinta es **`vitest`**, solo de desarrollo, para los tests de TypeScript: lee el
+TypeScript y el alias `@/` sin compilar antes, que es lo que no hace el test de Node. Los
+de la base no suman nada: pgTAP viene con el CLI de Supabase.
 
 No construir para requisitos hipotéticos. Si algo está en la lista de lo que no entra, no
 se escribe el andamiaje "por si acaso".

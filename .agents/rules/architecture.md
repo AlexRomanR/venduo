@@ -298,6 +298,10 @@ types/
   index.ts            Alias escritos a mano
 
 supabase/migrations/  SQL con marca de tiempo en el nombre
+supabase/tests/       Tests de la base con pgTAP, uno por tema: `*.test.sql`
+
+vitest.config.mts     Los tests de TypeScript: `lib/**/*.test.ts`, junto a su
+                      módulo, en UTC
 
 public/marca/         Íconos del manifiesto y la tarjeta de compartir. Generados
 public/portada/       La foto y la captura de la tienda del primer bloque de la portada

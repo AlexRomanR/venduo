@@ -23,7 +23,7 @@ import {
   FICHA_LIBRE,
   GRILLA_DE_FICHAS,
 } from "@/lib/estilos"
-import { formatMoney, formatNumber } from "@/lib/format"
+import { aCentavos, formatMoney, formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { VentaInput } from "@/lib/validation/venta"
 import { CampoMonto, Cantidad, HojaDeAjuste } from "@/components/panel/ajustes"
@@ -198,7 +198,7 @@ export function NuevaVenta({
   function precioDe(linea: Linea) {
     return linea.precio === null
       ? datosDe(linea).precioCents
-      : Math.round(linea.precio * 100)
+      : aCentavos(linea.precio)
   }
 
   function cerrarLinea() {
@@ -522,8 +522,7 @@ function HojaDeLinea({
 }) {
   const { producto, variante, stock, precioCents: deLista } = datos
   if (!producto) return null
-  const precioCents =
-    linea.precio === null ? null : Math.round(linea.precio * 100)
+  const precioCents = linea.precio === null ? null : aCentavos(linea.precio)
   const sinStock = linea.cantidad > stock
 
   return (
