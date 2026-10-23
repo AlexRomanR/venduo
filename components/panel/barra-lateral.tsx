@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link, { useLinkStatus } from "next/link"
 import { usePathname } from "next/navigation"
 import {
+  ArrowLeft,
   ArrowUpRight,
   BookOpen,
   ChartColumn,
@@ -24,13 +25,16 @@ import {
   type LucideIcon,
 } from "lucide-react"
 
-import { estiloDelTitular } from "@/lib/plantillas/fuentes"
 import { COOKIE_BARRA } from "@/lib/preferencias"
 import { cn } from "@/lib/utils"
 import type { BarraLateral } from "@/lib/data/barra"
 import type { EstadoDeFuncion } from "@/lib/funciones"
 import { ConFuncion } from "@/components/panel/funcion"
 import { CompartirTienda } from "@/components/panel/tablero/compartir"
+import {
+  tituloDeRuta,
+  useTituloPropio,
+} from "@/components/panel/titulo-de-barra"
 import { Logo, Simbolo } from "@/components/marca/logo"
 import {
   Sheet,
@@ -355,6 +359,7 @@ function Contenido({
                 pathname={pathname}
                 alNavegar={alNavegar}
                 plegada={plegada}
+                enCajon={enCajon}
               />
             ))}
           </Grupo>
@@ -454,12 +459,10 @@ function TarjetaDeTienda({
             className="size-7 object-contain"
           />
         ) : null}
-        <span
-          className="line-clamp-2 flex-1 text-xl leading-tight"
-          style={
-            apariencia ? estiloDelTitular(apariencia.tipografia) : undefined
-          }
-        >
+        {/* El nombre va en la letra de Venduo, como en la app: la de la
+            plantilla —una condensada en mayúsculas, una antigua fina— no se
+            leía con el resto del menú. La tienda se reconoce por sus colores. */}
+        <span className="line-clamp-2 flex-1 font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">
           {tienda.nombre}
         </span>
         <ArrowUpRight aria-hidden="true" className="size-[18px] shrink-0" />
@@ -589,12 +592,15 @@ function Entrada({
   pathname,
   alNavegar,
   plegada,
+  enCajon,
 }: {
   item: Item
   tienda: BarraLateral["tienda"]
   pathname: string
   alNavegar?: () => void
   plegada: boolean
+  /** En el cajón del celular, la fila es la de la app: Geist 600 a 16 px. */
+  enCajon: boolean
 }) {
   const activo = estaActivo(pathname, item)
   const Icono = item.icono
@@ -609,14 +615,23 @@ function Entrada({
       ? `${item.nombre} · ${item.estado}`
       : item.nombre
 
-  // Como en la app: la elegida va en tinta llena.
+  // Como en la app: la elegida va en tinta llena. En el cajón del celular,
+  // la fila de la app tal cual; en la barra de escritorio, más liviana —15 px
+  // y peso medio—, porque a la vista todo el día una columna entera en
+  // semibold competía con el contenido.
   const clases = plegada
     ? cn(
         "relative flex size-11 items-center justify-center transition-colors",
         activo ? "bg-tinta text-papel" : "hover:bg-tinta/[0.06]"
       )
     : cn(
-        "relative flex min-h-12 w-full items-center gap-3 px-3 text-left font-semibold transition-colors",
+        "relative flex w-full items-center gap-3 px-3 text-left transition-colors",
+        enCajon
+          ? "min-h-12 font-semibold"
+          : cn(
+              "min-h-11 text-[15px]",
+              activo ? "font-semibold" : "font-medium"
+            ),
         activo ? "bg-tinta text-papel" : "hover:bg-tinta/[0.06]"
       )
 
@@ -865,21 +880,32 @@ export function BarraLateralMovil({ datos }: { datos: BarraLateral }) {
   const [abierta, setAbierta] = React.useState(false)
   const [desplazada, setDesplazada] = React.useState(false)
   const pathname = usePathname()
+  const propio = useTituloPropio()
+  const deRuta = tituloDeRuta(pathname)
+  // El que puso la página vale solo para la ruta que lo pide: al navegar, la
+  // página nueva todavía no limpió el suyo.
+  const barra = propio && deRuta?.volver === propio.volver ? propio : deRuta
 
   React.useEffect(() => {
     setAbierta(false)
   }, [pathname])
 
+  const conTitulo = Boolean(barra)
   React.useEffect(() => {
-    const medir = () => setDesplazada(window.scrollY > 120)
+    const medir = () => setDesplazada(window.scrollY > (conTitulo ? 4 : 120))
     medir()
     window.addEventListener("scroll", medir, { passive: true })
     return () => window.removeEventListener("scroll", medir)
-  }, [])
+  }, [conTitulo])
 
   const urgente =
     datos.contadores.pedidosPendientes > 0 ||
     datos.tienda?.conWhatsApp === false
+
+  // En el Resumen la barra no dice nada hasta que su cabecera se va de la
+  // pantalla; en las demás, el nombre de la pantalla va siempre, como en la app.
+  const titulo = barra?.titulo ?? datos.tienda?.nombre ?? "Venduo"
+  const visible = conTitulo || desplazada
 
   return (
     <header
@@ -889,37 +915,49 @@ export function BarraLateralMovil({ datos }: { datos: BarraLateral }) {
       )}
     >
       <div className="flex h-14 items-center gap-4 px-4">
-        <Sheet open={abierta} onOpenChange={setAbierta}>
-          <SheetTrigger
-            aria-label={
-              urgente ? "Abrir el menú. Hay algo que atender" : "Abrir el menú"
-            }
-            className="group"
+        {barra?.volver ? (
+          <Link
+            href={barra.volver}
+            aria-label="Volver"
+            className="-ml-1.5 flex size-11 shrink-0 items-center justify-center transition-opacity active:opacity-60"
           >
-            <BotonDeMenu abierto={abierta} urgente={urgente} />
-          </SheetTrigger>
+            <ArrowLeft aria-hidden="true" className="size-6" />
+          </Link>
+        ) : (
+          <Sheet open={abierta} onOpenChange={setAbierta}>
+            <SheetTrigger
+              aria-label={
+                urgente
+                  ? "Abrir el menú. Hay algo que atender"
+                  : "Abrir el menú"
+              }
+              className="group"
+            >
+              <BotonDeMenu abierto={abierta} urgente={urgente} />
+            </SheetTrigger>
 
-          <SheetContent
-            side="left"
-            showCloseButton={false}
-            className="w-[85vw] max-w-[20rem] gap-0 rounded-none border-r border-tinta/15 bg-papel p-0 text-tinta shadow-none"
-          >
-            <SheetTitle className="sr-only">Menú de Venduo</SheetTitle>
-            <SheetDescription className="sr-only">
-              Las secciones de tu panel y tu cuenta.
-            </SheetDescription>
-            <Contenido datos={datos} alNavegar={() => setAbierta(false)} />
-          </SheetContent>
-        </Sheet>
+            <SheetContent
+              side="left"
+              showCloseButton={false}
+              className="w-[85vw] max-w-[20rem] gap-0 rounded-none border-r border-tinta/15 bg-papel p-0 text-tinta shadow-none"
+            >
+              <SheetTitle className="sr-only">Menú de Venduo</SheetTitle>
+              <SheetDescription className="sr-only">
+                Las secciones de tu panel y tu cuenta.
+              </SheetDescription>
+              <Contenido datos={datos} alNavegar={() => setAbierta(false)} />
+            </SheetContent>
+          </Sheet>
+        )}
 
         <p
-          aria-hidden={!desplazada}
+          aria-hidden={!visible}
           className={cn(
-            "min-w-0 flex-1 truncate font-titular text-[19px] leading-6 font-extrabold tracking-[-0.02em] transition-[opacity,transform] duration-200 motion-reduce:transition-none",
-            desplazada ? "opacity-100" : "translate-y-2 opacity-0"
+            "tabular min-w-0 flex-1 truncate font-titular text-[19px] leading-6 font-extrabold tracking-[-0.02em] transition-[opacity,transform] duration-200 motion-reduce:transition-none",
+            visible ? "opacity-100" : "translate-y-2 opacity-0"
           )}
         >
-          {datos.tienda?.nombre ?? "Venduo"}
+          {titulo}
         </p>
       </div>
     </header>

@@ -9,6 +9,7 @@ import {
   BarraLateralMovil,
 } from "@/components/panel/barra-lateral"
 import { Pestanas } from "@/components/panel/pestanas"
+import { ProveedorDeTitulo } from "@/components/panel/titulo-de-barra"
 
 /**
  * El armazón del panel: la barra lateral en escritorio, y en el celular la
@@ -28,27 +29,29 @@ export async function ArmazonDelPanel({
   const plegada = galletas.get(COOKIE_BARRA)?.value === "plegada"
 
   return (
-    <div className="min-h-screen bg-papel text-tinta lg:flex">
-      <BarraLateralEscritorio datos={barra} plegadaInicial={plegada} />
+    <ProveedorDeTitulo>
+      <div className="min-h-screen bg-papel text-tinta lg:flex">
+        <BarraLateralEscritorio datos={barra} plegadaInicial={plegada} />
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <BarraLateralMovil datos={barra} />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <BarraLateralMovil datos={barra} />
 
-        {!isSupabaseConfigured || ai.demo ? (
-          <p className="border-b border-senal/30 bg-senal/5 px-5 py-2 text-center text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-            {!isSupabaseConfigured
-              ? "Modo demo · Supabase sin configurar"
-              : "IA en modo demo · las respuestas son simuladas"}
-          </p>
-        ) : null}
+          {!isSupabaseConfigured || ai.demo ? (
+            <p className="border-b border-senal/30 bg-senal/5 px-5 py-2 text-center text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+              {!isSupabaseConfigured
+                ? "Modo demo · Supabase sin configurar"
+                : "IA en modo demo · las respuestas son simuladas"}
+            </p>
+          ) : null}
 
-        {/* En el celular, abajo queda lugar para las pestañas. */}
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-4 pb-28 sm:px-5 lg:px-10 lg:py-10">
-          {children}
-        </main>
+          {/* En el celular, abajo queda lugar para las pestañas. */}
+          <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-4 pb-28 sm:px-5 lg:px-10 lg:py-10">
+            {children}
+          </main>
 
-        <Pestanas datos={barra} />
+          <Pestanas datos={barra} />
+        </div>
       </div>
-    </div>
+    </ProveedorDeTitulo>
   )
 }

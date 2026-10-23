@@ -23,8 +23,8 @@ tienda pública. Cómo funciona, y cómo se agrega una, está en `docs/store-tem
 plantilla, y una letra o un color elegidos para vender —una condensada en mayúsculas, el
 azul de un botón de compra, una antigua fina para las cifras— terminaban en cada rótulo de
 una pantalla de trabajo. La tienda sigue reconocible donde se la nombra: su tarjeta en el
-menú lateral, con su papel, su letra y su color de acción en un recuadro, y la portada de
-la tienda en el Resumen, dentro de un celular chico.
+menú lateral, con su papel y su color de acción en un recuadro —el nombre en la letra de
+Venduo, como en la app—, y su portada en el Resumen.
 
 Tres reglas que se desprenden:
 
@@ -73,6 +73,12 @@ mismos nombres y el mismo orden. Quien vende usa las dos y no tiene por qué apr
 - **Todo cambio a algo que existe en las dos se hace en los dos repositorios en la misma
   tarea.** Una pantalla del panel que cambia en la web cambia en la app, y al revés.
 - **Se mira lado a lado antes de darlo por hecho**: el emulador y el navegador a 375 px.
+- **La barra de arriba dice dónde estás**, como en la app: en una sección, su nombre con
+  el menú al lado; en un detalle, la flecha para volver y el nombre de lo que se mira
+  —"Pedido #291"—. Lo general sale de la ruta (`tituloDeRuta`, en
+  `components/panel/titulo-de-barra.tsx`); una página que sabe más lo dice con
+  `TituloDeLaBarra`. Por eso en el celular la pantalla no repite su titular ni su
+  "Volver": `Volver` se esconde solo, y la `Cabecera` va en `max-lg:sr-only`.
 - **Lo único distinto es lo que es de una sola plataforma**: los avisos al teléfono y
   "Venduo en la computadora" son de la app; la barra de escritorio, su riel plegado, los
   atajos de teclado y el atajo "Nuevo producto" de la pantalla ancha son de la web.
@@ -82,9 +88,15 @@ mismos nombres y el mismo orden. Quien vende usa las dos y no tiene por qué apr
 El panel de la web sigue la misma idea que la app (`venduo-app`, "Se mira, no se lee" en
 su `AGENTS.md`): quien vende lo abre entre dos mensajes y no va a leer un párrafo.
 
-- **Un panel lleva solo su título.** Nada de bajadas que expliquen para qué sirve: si
-  un panel necesita explicarse, se rediseña. `Seccion` todavía acepta `bajada` porque
-  hay pantallas por convertir; una pantalla nueva no la usa.
+- **Cada pantalla lleva su titular y una descripción corta, y cada panel un subtítulo
+  de una línea.** El titular nombra lo que es de la persona —"Tus pedidos.", "Tus
+  catálogos."— y se ve también en el celular, debajo de la barra. La descripción es
+  una sola frase corta (`Cabecera`, `bajada`): "Llegan a tu WhatsApp. Márcalos pagados
+  y se descuentan del stock." El panel, en pocas palabras, qué conviene saber de él
+  (`Seccion`, `bajada`): "Siempre salen con los precios de hoy." Un panel no repite el
+  titular de la pantalla —"Los que llegaron", no otra vez "Tus pedidos"—. Nunca dos
+  frases largas, nunca repetir el título con otras palabras, nada que explique cómo
+  funciona la pantalla. La app lleva los mismos textos.
 - **Lo que espera algo es un número grande que se toca** y lleva a la lista ya
   filtrada (`ParaHoy`). Los números suben al aparecer (`Contador`).
 - **Fotos antes que nombres**: un pedido por las fotos de lo que pidieron, un producto
@@ -165,6 +177,15 @@ perdía entre lo demás.
 | `SinDatos`         | El estado vacío dentro de un panel: qué va a aparecer y cómo      |
 | `Insignia`         | Un estado en versalita: un pedido, un producto oculto             |
 | `Miniatura`        | La foto chica de un producto en una fila                          |
+
+Y las de las listas, las mismas de la app:
+
+| Pieza                                      | Para qué                                                    |
+| ------------------------------------------ | ----------------------------------------------------------- |
+| `FichasDeCobro`, `FichasGrandes`           | Números grandes arriba de una lista que la filtran al tocar |
+| `FranjaDeFichas`                           | Los filtros de una lista: fichas que se deslizan, en la URL |
+| `ListaDePedidos` (`components/pedidos/`)   | Pedidos con foto y "Cobrado", en Pedidos y en el Resumen    |
+| `ListaProductos` (`components/productos/`) | Productos con foto, su marca encima y más y menos de stock  |
 
 Y el ritmo, el mismo en todas: la pantalla es una columna de paneles con `gap-6
 md:gap-8`. Dentro de un panel, las filas van de lado a lado con una regla arriba

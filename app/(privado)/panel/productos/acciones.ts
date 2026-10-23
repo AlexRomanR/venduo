@@ -10,7 +10,6 @@ import {
   type ProductoInput,
 } from "@/lib/validation/producto"
 import { actualizarVistaDespues } from "@/lib/vista"
-import type { ProductUpdate } from "@/types"
 
 export interface Resultado {
   ok: boolean
@@ -123,40 +122,6 @@ export async function borrarProducto(id: string): Promise<Resultado> {
     .eq("store_id", tiendaId)
 
   if (error) return { ok: false, error: "No pudimos borrar el producto." }
-
-  revalidatePath(RUTA)
-  await actualizarVistaDespues()
-  return { ok: true }
-}
-
-/**
- * Los interruptores de la lista: publicar y destacar.
- *
- * Van juntos y no en dos acciones porque los dos son lo mismo —un booleano
- * de una fila mía— y separarlos solo multiplica el código que resuelve la
- * tienda.
- */
-export async function alternarProducto(
-  id: string,
-  campo: "is_active" | "is_featured",
-  valor: boolean
-): Promise<Resultado> {
-  const { supabase, tiendaId } = await miTienda()
-  if (!supabase) return { ok: false, error: "Supabase sin configurar." }
-  if (!tiendaId) return { ok: false, error: "Todavía no tienes una tienda." }
-
-  // Escrito y no `{ [campo]: valor }`: con la clave calculada TypeScript pierde
-  // de vista qué columna se toca y deja de comprobar que exista.
-  const cambio: ProductUpdate =
-    campo === "is_active" ? { is_active: valor } : { is_featured: valor }
-
-  const { error } = await supabase
-    .from("products")
-    .update(cambio)
-    .eq("id", id)
-    .eq("store_id", tiendaId)
-
-  if (error) return { ok: false, error: "No pudimos guardar el cambio." }
 
   revalidatePath(RUTA)
   await actualizarVistaDespues()

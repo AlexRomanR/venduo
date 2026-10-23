@@ -331,7 +331,7 @@ export const DEMO_PRODUCTS: Product[] = [
  * El tablero del Resumen, en modo demo
  * ---------------------------------------------------------------------- */
 
-const fotoDemo = (id: string) =>
+export const fotoDemo = (id: string) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1200&q=85`
 
 /** Un número entre 0 y 1 que depende solo de la semilla: mismo día, mismo valor. */
@@ -378,7 +378,8 @@ export function tableroDeDemostracion(): Tablero {
         estado: "pendiente",
         creado: hace(26),
         articulos: 1,
-        fotos: ["1553062407-98eeb64c6a62"].map(fotoDemo),
+        titulo: "Mochila urbana",
+        foto: fotoDemo("1553062407-98eeb64c6a62"),
       },
       {
         id: "demo-pedido-2",
@@ -389,11 +390,8 @@ export function tableroDeDemostracion(): Tablero {
         estado: "pagado",
         creado: hace(134),
         articulos: 3,
-        fotos: [
-          "1521572163474-6864f9cf17ab",
-          "1588850561407-ed78c282e89b",
-          "1556905055-8f358a7a47b2",
-        ].map(fotoDemo),
+        titulo: "Polera básica y 2 más",
+        foto: fotoDemo("1521572163474-6864f9cf17ab"),
       },
       {
         id: "demo-pedido-3",
@@ -404,7 +402,8 @@ export function tableroDeDemostracion(): Tablero {
         estado: "pagado",
         creado: hace(60 * 27),
         articulos: 1,
-        fotos: ["1542291026-7eec264c27ff"].map(fotoDemo),
+        titulo: "Zapatillas running",
+        foto: fotoDemo("1542291026-7eec264c27ff"),
       },
       {
         id: "demo-pedido-4",
@@ -415,9 +414,8 @@ export function tableroDeDemostracion(): Tablero {
         estado: "pagado",
         creado: hace(60 * 24 * 3 + 95),
         articulos: 2,
-        fotos: ["1548883354-7622d03aca27", "1521572163474-6864f9cf17ab"].map(
-          fotoDemo
-        ),
+        titulo: "Campera rompeviento y 1 más",
+        foto: fotoDemo("1548883354-7622d03aca27"),
       },
       {
         id: "demo-pedido-5",
@@ -428,7 +426,8 @@ export function tableroDeDemostracion(): Tablero {
         estado: "cancelado",
         creado: hace(60 * 24 * 4 + 300),
         articulos: 1,
-        fotos: ["1588850561407-ed78c282e89b"].map(fotoDemo),
+        titulo: "Gorra deportiva",
+        foto: fotoDemo("1588850561407-ed78c282e89b"),
       },
     ],
     porGestionar: { pendientes: 1 },

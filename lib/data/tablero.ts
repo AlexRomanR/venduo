@@ -1,5 +1,5 @@
 import { diaEnBolivia, sumarDias } from "@/lib/format"
-import { limiteParaConcretar } from "@/lib/pedidos"
+import { limiteParaConcretar, tituloDePedido } from "@/lib/pedidos"
 import { createClient } from "@/lib/supabase/server"
 import {
   DIAS_DE_SERIE,
@@ -45,7 +45,7 @@ export async function getTablero(): Promise<Tablero | null> {
       supabase
         .from("orders")
         .select(
-          "id, order_number, buyer_name, buyer_phone, total_cents, status, created_at, order_items(quantity, products(image_url))"
+          "id, order_number, buyer_name, buyer_phone, total_cents, status, created_at, order_items(quantity, product_name, products(image_url))"
         )
         .eq("store_id", tienda.id)
         .order("created_at", { ascending: false })
@@ -135,10 +135,16 @@ export async function getTablero(): Promise<Tablero | null> {
       (total, item) => total + item.quantity,
       0
     ),
-    fotos: (pedido.order_items ?? [])
-      .map((item) => item.products?.image_url)
-      .filter((foto): foto is string => Boolean(foto))
-      .slice(0, 3),
+    titulo: tituloDePedido({
+      comprador: pedido.buyer_name,
+      items: (pedido.order_items ?? []).map((item) => ({
+        nombre: item.product_name,
+        cantidad: item.quantity,
+      })),
+    }),
+    foto:
+      (pedido.order_items ?? []).find((item) => item.products?.image_url)
+        ?.products?.image_url ?? null,
   }))
 
   const personalizada =

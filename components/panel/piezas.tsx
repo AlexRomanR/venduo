@@ -25,6 +25,7 @@ export function Cabecera({
   titulo,
   bajada,
   demo,
+  accionesSoloEnPantallaAncha = false,
   children,
 }: {
   /** Lo que va arriba del titular, en versalita: "Pedido". */
@@ -33,6 +34,8 @@ export function Cabecera({
   bajada?: React.ReactNode
   /** El aviso de modo demo, si corresponde. Va en la bajada, resaltado. */
   demo?: string | false
+  /** En el celular las acciones van donde las pone la pantalla, como un botón flotante. */
+  accionesSoloEnPantallaAncha?: boolean
   /** Las acciones de la pantalla. */
   children?: React.ReactNode
 }) {
@@ -66,13 +69,23 @@ export function Cabecera({
       </div>
 
       {children ? (
-        <div className="flex flex-wrap items-center gap-2">{children}</div>
+        <div
+          className={cn(
+            "flex flex-wrap items-center gap-2",
+            accionesSoloEnPantallaAncha && "max-lg:hidden"
+          )}
+        >
+          {children}
+        </div>
       ) : null}
     </header>
   )
 }
 
-/** La vuelta a la pantalla de la que sale una de detalle. */
+/**
+ * La vuelta a la pantalla de la que sale una de detalle. En el celular no se
+ * dibuja: la flecha va en la barra de arriba, como en la app.
+ */
 export function Volver({
   href,
   children,
@@ -83,7 +96,7 @@ export function Volver({
   return (
     <Link
       href={href}
-      className="group inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+      className="group inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold transition-colors hover:text-senal max-lg:hidden"
     >
       <ArrowLeft
         aria-hidden="true"
