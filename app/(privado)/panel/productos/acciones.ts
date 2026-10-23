@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 
+import { aCentavos } from "@/lib/format"
 import { createClient, getUsuario } from "@/lib/supabase/server"
 import {
   categoriaSchema,
@@ -42,11 +43,6 @@ async function miTienda() {
     .maybeSingle()
 
   return { supabase, tiendaId: data?.id ?? null }
-}
-
-/** Bolivianos a centavos enteros. Nunca punto flotante en la base. */
-function aCentavos(monto: number) {
-  return Math.round(monto * 100)
 }
 
 /* -------------------------------------------------------------------------

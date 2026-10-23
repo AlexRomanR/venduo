@@ -22,14 +22,18 @@ solo, no.
 ## Hay una sola base de datos, y es la de producción
 
 El proyecto de Supabase enlazado (`supabase link`) es **el mismo** que usa la página
-publicada en Vercel. Los scripts `db:start` y `db:stop` levantan una base local, pero el
-equipo no la usa: no hay una base de pruebas con los datos de la demostración.
+publicada en Vercel. La base local (`npx supabase db start`, con Docker) sirve solo para
+los tests de la base (`npm run test:db`): se arma desde las migraciones, sin los datos de
+la demostración. **Todo comando que la rearme lleva `--local`**: `db reset --linked`
+borraría producción.
 
 - **`npx supabase db push` cambia producción en el acto**, para todo el equipo. No hay
   vuelta atrás automática: deshacer es escribir otra migración.
 - **Antes de crear una migración, `git pull`.** Dos migraciones escritas en paralelo
   pueden chocar —dos `create or replace` de la misma función, la segunda pisa a la
   primera sin avisar— aunque tengan distinto nombre.
+- **`npm run test:db` antes de `db push`**: los tests corren sobre la base local con
+  la migración nueva (`database-rls.md`).
 - **Avisar al equipo antes de aplicar una migración**, y hacer commit de la migración y
   de `types/database.ts` regenerado en el mismo push.
 - **Una migración aplicada no se edita.** Los cambios van en una nueva

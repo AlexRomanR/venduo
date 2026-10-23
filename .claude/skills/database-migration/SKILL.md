@@ -76,6 +76,19 @@ Al crear una nueva tabla de negocio:
 
 ---
 
+## Probar antes de aplicar
+
+Toda función, disparador o política nueva o cambiada lleva su test en
+`supabase/tests/*.test.sql` (pgTAP; cómo se escribe, en `database-rls.md`). Primero el
+test contra la base local sin la migración —tiene que fallar si arregla algo—, después:
+
+```bash
+npx supabase migration up --local   # aplica la migración nueva solo en local
+npm run test:db                     # rearma la base local y corre todos los tests
+```
+
+**Siempre `--local`.** Con `--linked`, `db reset` borra producción.
+
 ## Despliegue y Regeneración de Tipos
 
 1. **Aplicar Migraciones Localmente / Remotamente:**

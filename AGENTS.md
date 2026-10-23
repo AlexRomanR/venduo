@@ -15,15 +15,17 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
 
 ## Comandos
 
-| Comando                | Qué hace                                                         |
-| ---------------------- | ---------------------------------------------------------------- |
-| `npm run dev`          | Servidor de desarrollo                                           |
-| `npm run check`        | Tipos, lint y formato **en secuencia**. Lo mismo que corre el CI |
-| `npm run format`       | Arregla el formato                                               |
-| `npm run build`        | Build de producción                                              |
-| `npx supabase db push` | Aplica las migraciones pendientes                                |
-| `npm run db:types`     | Regenera `types/database.ts` desde el esquema real               |
-| `npm run sync:agents`  | Copia las skills de `.agents/` a `.claude/`                      |
+| Comando                | Qué hace                                                          |
+| ---------------------- | ----------------------------------------------------------------- |
+| `npm run dev`          | Servidor de desarrollo                                            |
+| `npm run check`        | Tipos, lint, formato y tests **en secuencia**. Lo que corre el CI |
+| `npm test`             | Los tests de la lógica de TypeScript                              |
+| `npm run test:db`      | Los tests de la base, sobre la base local (pide Docker)           |
+| `npm run format`       | Arregla el formato                                                |
+| `npm run build`        | Build de producción                                               |
+| `npx supabase db push` | Aplica las migraciones pendientes                                 |
+| `npm run db:types`     | Regenera `types/database.ts` desde el esquema real                |
+| `npm run sync:agents`  | Copia las skills de `.agents/` a `.claude/`                       |
 
 ## Lo que hay que saber antes de tocar nada
 
@@ -51,8 +53,11 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
 - **Toda pantalla de la cuenta lleva la barra lateral** desde que la persona tiene panel.
   Se decide en `components/panel/armazon.tsx`, no en cada layout. Detalle en `ui-styling.md`.
 - **El celular es uno solo.** El panel de la web en un celular y la app son la misma
-  pantalla: todo cambio a algo que existe en las dos se hace en los dos repositorios en
-  la misma tarea. Detalle en `ui-styling.md`.
+  pantalla: todo cambio a algo que existe en las dos termina en los dos repositorios,
+  primero la web y, cuando la persona la aprueba, la app. Detalle en `ui-styling.md`.
+- **Ningún grupo de fichas baja de renglón a su ancho**: `GRILLA_DE_FICHAS` (columnas
+  iguales) o una franja que se desliza, sin excepciones. Pasó tres veces. Detalle en
+  `ui-styling.md`.
 - **Toda pantalla del panel se arma como el Resumen**: cada cosa en su panel con borde,
   con las piezas de `components/panel/piezas.tsx`. Detalle en `ui-styling.md`.
 - **Una tienda se ve con su plantilla, y ningún componente pregunta cuál es.** La base
@@ -72,8 +77,7 @@ acá, frena y pregunta antes de escribir código:
 
 multi-tienda por usuario · red de vendedores, comisiones o referidos · gestión de envíos
 · cobrar dentro de la plataforma (el pago se acuerda por WhatsApp) · pedirle datos a
-quien compra · cobro de la suscripción · notificaciones por correo ·
-**tests automatizados**.
+quien compra · cobro de la suscripción · notificaciones por correo.
 
 La app móvil nativa ya no está en esta lista: era de la hackathon. Va en un repositorio
 aparte y su plan es `docs/plan-app-movil.md`.
@@ -93,8 +97,9 @@ aparte y su plan es `docs/plan-app-movil.md`.
 
 ## Reglas
 
-En `.agents/rules/`, que Antigravity carga solo. Son la misma fuente que importa Claude
-Code desde `CLAUDE.md`, así que las dos herramientas aplican los mismos estándares.
+En `.agents/rules/`, que Antigravity carga solo. Son la misma fuente que lee Claude Code
+—que carga solo `workflow.md` y el resto antes de tocar lo suyo, para no gastar casi 40
+mil tokens por sesión—, así que las dos herramientas aplican los mismos estándares.
 
 | Archivo            | Cubre                                                            |
 | ------------------ | ---------------------------------------------------------------- |
@@ -103,7 +108,7 @@ Code desde `CLAUDE.md`, así que las dos herramientas aplican los mismos estánd
 | `domain-venduo.md` | Reglas de negocio, pedidos por WhatsApp, cuentas, alcance        |
 | `ui-styling.md`    | Móvil primero, Tailwind v4, shadcn/ui, textos                    |
 | `ai-layer.md`      | Interfaz del proveedor, esquemas zod, modo mock                  |
-| `code-quality.md`  | TypeScript estricto, secretos, commits                           |
+| `code-quality.md`  | TypeScript estricto, tests, secretos, commits                    |
 | `performance.md`   | Región, sesión sin viajes, consultas en paralelo, esqueletos     |
 | `workflow.md`      | Base compartida con producción, ramas, trampas del entorno       |
 | `marca.md`         | El logo: dónde vive, sus colores, cómo se regenera               |
@@ -145,12 +150,17 @@ que la persona apruebe antes de construir:
 
 Instaladas para diseño y animación, en el mismo directorio. **No se editan y el script de sincronización no las toca.** Las reglas de `ui-styling.md` mandan sobre ellas cuando se contradigan.
 
-| Skill                      | Para qué                                                | Origen               |
-| -------------------------- | ------------------------------------------------------- | -------------------- |
-| `impeccable`               | Auditar y pulir lo construido                           | pbakaus/impeccable   |
-| `design-taste-frontend-v1` | Jerarquía, espaciado y tipografía de una pantalla nueva | leonxlnx/taste-skill |
-| `animate`                  | Construir una animación                                 | emilkowalski/skills  |
-| `review-animations`        | Criticar una animación existente                        | emilkowalski/skills  |
-| `ask-sonner`               | Avisos con Sonner                                       | emilkowalski/skills  |
+| Skill                      | Para qué                                                                 | Origen                  |
+| -------------------------- | ------------------------------------------------------------------------ | ----------------------- |
+| `impeccable`               | Auditar y pulir lo construido                                            | pbakaus/impeccable      |
+| `design-taste-frontend-v1` | Jerarquía, espaciado y tipografía de una pantalla nueva                  | leonxlnx/taste-skill    |
+| `animate`                  | Construir una animación                                                  | emilkowalski/skills     |
+| `review-animations`        | Criticar una animación existente                                         | emilkowalski/skills     |
+| `ask-sonner`               | Avisos con Sonner                                                        | emilkowalski/skills     |
+| `ponytail`                 | El cambio más chico que resuelve todo, sin lo no pedido                  | DietrichGebert/ponytail |
+| `caveman`                  | Respuestas cortas en el chat, con `/caveman`; se apaga con "normal mode" | JuliusBrussee/caveman   |
+
+`ponytail` pide un test para toda lógica nueva no trivial. En Venduo, solo para la que
+toca dinero, stock, pedidos o permisos; textos, pantallas y estilos no (`code-quality.md`).
 
 Sus binarios no se versionan: quien clone el repositorio corre `npx impeccable install` para bajar el de su plataforma.

@@ -13,7 +13,7 @@
  * borrarlas en cada sincronización sería una trampa silenciosa.
  *
  * Las reglas no se copian: `.agents/rules/` las carga Antigravity sola, y
- * CLAUDE.md las trae con @-imports desde ese mismo lugar.
+ * CLAUDE.md importa `workflow.md` y manda a leer las demás desde ese mismo lugar.
  *
  *   node scripts/sync-agent-config.mjs            aplica
  *   node scripts/sync-agent-config.mjs --check    solo verifica (para el CI)

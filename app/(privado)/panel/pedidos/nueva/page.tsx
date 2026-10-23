@@ -50,7 +50,7 @@ export default async function NuevaVentaPage() {
     .sort((a, b) => Number(b.stock > 0) - Number(a.stock > 0))
 
   return (
-    <div className="flex flex-col gap-6 md:gap-8">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 md:gap-8">
       <TituloDeLaBarra titulo="Nueva venta" volver="/panel/pedidos" />
       <Volver href="/panel/pedidos">Pedidos</Volver>
       <Cabecera

@@ -38,6 +38,16 @@ export function formatMoney(
 }
 
 /**
+ * Bolivianos a centavos enteros. Nunca punto flotante en la base.
+ *
+ * Redondea porque la multiplicación arrastra el error del punto flotante:
+ * 19.99 × 100 da 1998.9999999999998.
+ */
+export function aCentavos(monto: number) {
+  return Math.round(monto * 100)
+}
+
+/**
  * Formatea una tasa guardada en puntos básicos.
  *
  * Vive acá por la misma razón que `formatMoney`: un porcentaje se guarda como

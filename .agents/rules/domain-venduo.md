@@ -81,6 +81,12 @@ cancelado reviva ni que un pagado vuelva a pendiente. **Nunca duplicarlo desde l
 aplicación**: ajustar `products.stock` a mano daría stock inventado el día que alguien
 cambie dos veces de estado.
 
+Al cancelar un pagado, cada unidad vuelve a **la variante viva con la misma
+combinación**: la suya o, si la tienda la quitó y la volvió a crear, la nueva. Si esa
+opción ya no existe, no se suma a nada: ya no se vende. Todo lo que hace el disparador
+está fijado en `supabase/tests/estado_y_stock.test.sql`; un cambio al disparador empieza
+por cambiar ese test.
+
 **Los pedidos que no se concretan no se cancelan solos.** Un pendiente con más de siete
 días (`DIAS_PARA_CONCRETAR` en `lib/pedidos.ts`) queda **no concretado**: sale de "Por
 cobrar" y de los contadores rojos, y se encuentra en su propio filtro. No se escribe
@@ -256,7 +262,9 @@ detenerse y preguntar antes de escribir código:
 - **Pedirle datos a quien compra** — van en el chat
 - **Cobro de la suscripción** — se modela el estado, no el cobro
 - **Notificaciones por email**
-- **Tests automatizados**
+
+**Los tests automatizados salieron de esta lista** el 23 de octubre de 2026
+(`code-quality.md`).
 
 **La app móvil nativa salió de esta lista**: era una exclusión de la hackathon. Es un
 producto aparte, en su propio repositorio, para el emprendedor; quien compra sigue en la

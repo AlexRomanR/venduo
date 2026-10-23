@@ -2,3 +2,7 @@
 node_modules
 package-lock.json
 components/ui
+
+# Skills de terceros: se copian tal cual, no se reformatean.
+**/skills/ponytail
+**/skills/caveman

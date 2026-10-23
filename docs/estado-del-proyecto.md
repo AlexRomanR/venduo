@@ -236,6 +236,14 @@ que se arregló:
   con su valor a la vista que abre una hoja. Las piezas (`components/panel/ajustes.tsx`)
   y la receta (`ui-styling.md`, skill `pantalla-por-filas`) son para toda pantalla de
   crear o editar algo.
+- **Nueva venta, por filas** (web y app; brief en
+  `docs/briefs/2026-10-23-nueva-venta-por-filas.md`): arriba lo vendido —foto, nombre,
+  "1 × Bs 240" y más y menos—, "Agregar producto" abre la grilla en una hoja, donde se
+  marcan varios productos y tallas (la talla es un segundo paso de la misma hoja) y se
+  suman con "Agregar N productos", y tocar una línea abre su precio y "Quitar de la
+  venta". En la web, la venta a medio armar sobrevive a "Corregir el
+  stock" (`sessionStorage`); en la app la pantalla queda debajo y no se pierde, salvo
+  que se salga de ella.
 - **`/idea`**: de una idea en palabras a un cambio probado, con entrevista, brief en
   `docs/briefs/` y los agentes `investigador-de-producto`, `analista-tecnico`,
   `disenador` y `verificador` (skill `de-idea-a-pantalla`).
@@ -317,6 +325,16 @@ que se arregló:
 - La IA de estadísticas solo lee, en una transacción de solo lectura y contra vistas de la
   propia tienda.
 - Modo demo que funciona sin credenciales.
+- **Tests automatizados** (23 de octubre): Vitest para la lógica de `lib/` —dinero,
+  ofertas, variantes, WhatsApp, tablero, funciones— dentro de `npm run check`, y pgTAP
+  para la base sobre una copia local en Docker —`create_order`, el stock al pagar y
+  cancelar, `registrar_venta`, las variantes, RLS entre tiendas— con `npm run test:db` y
+  un job propio en el CI. Salieron dos errores, ya arreglados en
+  `20261023120000_devolver_stock_a_la_variante.sql`: cancelar un pedido con dos líneas
+  del mismo producto devolvía una sola, y una talla quitada y vuelta a crear no recibía
+  su unidad. Y las tallas de un producto oculto se podían leer desde afuera
+  (`20261023120100_variantes_de_productos_ocultos_rls.sql`). `aCentavos` quedó en `lib/format.ts`, en vez de tres copias. La app, cuando
+  se apruebe la web.
 
 ### Rendimiento
 
@@ -406,6 +424,12 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 
 ### 7. Pendientes chicos
 
+- **Fichas que todavía bajan de renglón a su ancho** (`flex-wrap`), contra la regla de
+  `ui-styling.md`: pasarlas a `GRILLA_DE_FICHAS` o a una franja que se desliza. Quedan
+  los asistentes de catálogos y su editor, los filtros de la galería de plantillas del
+  alta, la cabecera del Resumen, el selector de talla de la tienda pública (lo ve quien
+  compra), varias pantallas de `/admin`, y en la app el editor de tallas y otras
+  pantallas, que se corrigen al pasar los cambios.
 - **Una vez, entrar a `/panel/apariencia` después de horas sin uso terminó en `/panel`**
   (revisión del 8 de octubre). El registro muestra pedidos a `/auth/destino` y `/crear`
   justo después, como si en ese instante la sesión no encontrara la tienda. No se pudo
@@ -451,5 +475,6 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 
 No se construye, según `VENDUO.md` §7: multi-tienda por usuario, red de vendedores y
 comisiones, gestión de envíos, cobrar dentro de la plataforma, pedirle datos a quien
-compra, cobro de la suscripción, notificaciones por correo y tests automatizados. La
-app móvil nativa salió de esta lista el 10 de octubre de 2026 (arriba, "Lo que falta").
+compra, cobro de la suscripción y notificaciones por correo. La app móvil nativa salió
+de esta lista el 10 de octubre de 2026 (arriba, "Lo que falta"), y los tests
+automatizados el 23 de octubre.
