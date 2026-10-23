@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ArrowLeft, ArrowRight, Check } from "lucide-react"
 
 import type { RubroConPlantillas } from "@/lib/demo-data"
+import { GRILLA_DE_FICHAS } from "@/lib/estilos"
 import { cn } from "@/lib/utils"
 import {
   Carousel,
@@ -59,9 +60,9 @@ export function GaleriaPlantillas({
 
   return (
     <div>
-      {/* El filtro envuelve en vez de desplazarse: a 375 px una fila que se va
-          de lado esconde la mitad de los rubros. */}
-      <div className="flex flex-wrap gap-2">
+      {/* En columnas iguales y no en una fila que se desliza: a 375 px esa
+          fila esconde la mitad de los rubros. */}
+      <div className={GRILLA_DE_FICHAS}>
         <Filtro
           activo={rubroActivo === null}
           onClick={() => setRubroActivo(null)}
@@ -313,13 +314,13 @@ function Filtro({
       onClick={onClick}
       aria-pressed={activo}
       className={cn(
-        "flex min-h-11 items-center border px-4 text-sm transition-colors duration-200",
+        "flex min-h-11 w-full min-w-0 items-center justify-center border px-2 text-sm transition-colors duration-200",
         activo
           ? "border-tinta bg-tinta text-papel"
           : "border-tinta/15 hover:border-tinta"
       )}
     >
-      {children}
+      <span className="truncate">{children}</span>
     </button>
   )
 }

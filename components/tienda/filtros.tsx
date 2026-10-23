@@ -49,7 +49,7 @@ export function FiltrosTienda({
   return (
     <div className="flex flex-col gap-4">
       <div className="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
-        <div className="flex w-max items-center gap-2 sm:w-auto sm:flex-wrap">
+        <div className="flex w-max items-center gap-2">
           <FichaDeFiltro
             redondeada={redondeadas}
             activa={!hayFiltro}

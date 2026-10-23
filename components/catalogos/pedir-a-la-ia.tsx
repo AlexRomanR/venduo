@@ -97,7 +97,7 @@ export function PedirCatalogoALaIa({
             }}
             className="flex flex-col gap-4 border-t border-tinta/15 px-4 py-4 sm:px-5"
           >
-            <div className="flex flex-wrap gap-1.5">
+            <div className="grid gap-1.5 sm:grid-cols-3">
               {IDEAS.map((idea) => (
                 <button
                   key={idea}

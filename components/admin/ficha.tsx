@@ -73,7 +73,7 @@ export function AccionesDeSuscripcion({
         </button>
       </form>
 
-      <div className="flex flex-wrap gap-2 border-t border-tinta/15 pt-4">
+      <div className="grid grid-cols-2 gap-2 border-t border-tinta/15 pt-4">
         {estado !== "activa" ? (
           <button
             type="button"

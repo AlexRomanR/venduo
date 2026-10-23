@@ -424,12 +424,11 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 
 ### 7. Pendientes chicos
 
-- **Fichas que todavía bajan de renglón a su ancho** (`flex-wrap`), contra la regla de
-  `ui-styling.md`: pasarlas a `GRILLA_DE_FICHAS` o a una franja que se desliza. Quedan
-  los asistentes de catálogos y su editor, los filtros de la galería de plantillas del
-  alta, la cabecera del Resumen, el selector de talla de la tienda pública (lo ve quien
-  compra), varias pantallas de `/admin`, y en la app el editor de tallas y otras
-  pantallas, que se corrigen al pasar los cambios.
+- **Fichas que todavía bajan de renglón a su ancho en la app** (`flexWrap`), contra la
+  regla de `ui-styling.md`: el editor de catálogos, pedirle un catálogo a la IA, la
+  cabecera del Inicio, el editor de la tienda y Publicar en redes. En la web ya no
+  queda ninguna (23 de octubre): catálogos, la galería de plantillas del alta, el
+  Resumen, la talla de la tienda pública, sus filtros y `/admin`.
 - **Una vez, entrar a `/panel/apariencia` después de horas sin uso terminó en `/panel`**
   (revisión del 8 de octubre). El registro muestra pedidos a `/auth/destino` y `/crear`
   justo después, como si en ese instante la sesión no encontrara la tienda. No se pudo

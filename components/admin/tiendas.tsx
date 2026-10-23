@@ -149,7 +149,7 @@ export function TablaDeTiendas({
           </label>
         </div>
         <div
-          className="flex flex-wrap gap-1.5"
+          className="-mx-4 flex gap-1.5 overflow-x-auto px-4 sm:mx-0 sm:px-0"
           role="group"
           aria-label="Filtrar"
         >
@@ -161,6 +161,7 @@ export function TablaDeTiendas({
               onClick={() => setFiltro(clave)}
               className={cn(
                 FICHA,
+                "shrink-0 whitespace-nowrap",
                 filtro === clave ? FICHA_ELEGIDA : FICHA_LIBRE
               )}
             >

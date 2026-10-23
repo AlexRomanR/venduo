@@ -49,7 +49,12 @@ function SelectorDeEstado({
     <div
       role="radiogroup"
       aria-label={nombre}
-      className="flex flex-wrap gap-1.5"
+      // Columnas iguales: de a dos en el celular si son cuatro, para que
+      // "Desactivada" no se corte; en una fila desde que entran.
+      className={cn(
+        "grid w-full gap-1.5 sm:w-auto",
+        opciones.length > 3 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-3"
+      )}
     >
       {opciones.map((opcion) => {
         const elegida = valor === opcion
@@ -63,7 +68,7 @@ function SelectorDeEstado({
             onClick={() => !elegida && alCambiar(opcion)}
             title={opcion ? NOMBRES_DE_ESTADO[opcion] : undefined}
             className={cn(
-              "flex min-h-11 items-center border px-3 text-xs font-semibold transition-colors disabled:opacity-50",
+              "flex min-h-11 min-w-0 items-center justify-center border px-2 text-xs font-semibold transition-colors disabled:opacity-50",
               elegida
                 ? opcion === "activa" ||
                   (opcion === null && general === "activa")

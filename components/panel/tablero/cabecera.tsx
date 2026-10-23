@@ -169,7 +169,7 @@ function Ficha({
  */
 function AccionesDeTienda({ tienda }: { tienda: TiendaDelResumen }) {
   return (
-    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+    <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
       <CompartirTienda
         nombre={tienda.nombre}
         slug={tienda.slug}
@@ -178,7 +178,10 @@ function AccionesDeTienda({ tienda }: { tienda: TiendaDelResumen }) {
       >
         <button
           type="button"
-          className={cn(BOTON_PRIMARIO, "col-span-2 min-h-11 text-sm")}
+          className={cn(
+            BOTON_PRIMARIO,
+            "col-span-2 min-h-11 text-sm xl:col-span-1"
+          )}
         >
           <Share2 aria-hidden="true" className="size-4" />
           Compartir tu tienda

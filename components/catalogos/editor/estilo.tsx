@@ -15,7 +15,7 @@ import {
   type EstiloSugerido,
 } from "@/lib/catalogos/plantillas"
 import { COMBINACIONES, PALETAS } from "@/lib/editor/sugerencias"
-import { BOTON_SECUNDARIO } from "@/lib/estilos"
+import { BOTON_SECUNDARIO, GRILLA_DE_FICHAS } from "@/lib/estilos"
 import {
   CLAVES_FUENTE,
   FUENTES,
@@ -277,7 +277,7 @@ export function PanelDeEstilo({
       </Grupo>
 
       <Grupo titulo="Letras">
-        <ul className="flex flex-wrap gap-2" aria-label="Parejas de letra">
+        <ul className={GRILLA_DE_FICHAS} aria-label="Parejas de letra">
           {COMBINACIONES.map((combinacion) => {
             const t = combinacion.tipografia
             const activa =
@@ -299,14 +299,14 @@ export function PanelDeEstilo({
                     })
                   }
                   className={cn(
-                    "flex min-h-11 items-center border px-3 text-sm transition-colors",
+                    "flex min-h-11 w-full min-w-0 items-center justify-center border px-2 text-sm transition-colors",
                     activa
                       ? "border-tinta bg-tinta text-papel"
                       : "border-tinta/25 hover:border-tinta"
                   )}
                   style={{ fontFamily: familiaDe(t.titular) }}
                 >
-                  {combinacion.nombre}
+                  <span className="truncate">{combinacion.nombre}</span>
                 </button>
               </li>
             )

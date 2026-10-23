@@ -30,13 +30,13 @@ function Interruptor({
       disabled={deshabilitado}
       onClick={alCambiar}
       className={cn(
-        "flex min-h-11 items-center border px-3 text-xs font-semibold transition-colors disabled:opacity-50",
+        "flex min-h-11 min-w-0 items-center justify-center border px-2 text-xs font-semibold transition-colors disabled:opacity-50 lg:px-3",
         activo
           ? "border-tinta bg-tinta text-papel"
           : "border-tinta/25 hover:border-tinta"
       )}
     >
-      {etiqueta}
+      <span className="truncate">{etiqueta}</span>
     </button>
   )
 }
@@ -154,7 +154,7 @@ export function PlantillasDeTiendaAdmin({
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-1.5 lg:shrink-0">
+          <div className="grid grid-cols-3 gap-1.5 lg:flex lg:shrink-0">
             <Interruptor
               activo={p.visible}
               etiqueta={p.visible ? "Se ofrece" : "Oculta"}

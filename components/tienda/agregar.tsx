@@ -153,7 +153,9 @@ export function AgregarAlCarrito({
                   </span>
                 ) : null}
               </legend>
-              <div className="mt-2 flex flex-wrap gap-2">
+              {/* Columnas iguales, más angostas que las del panel: una talla
+                  es una letra, y S, M y L entran en una fila del celular. */}
+              <div className="mt-2 grid grid-cols-[repeat(auto-fill,minmax(5rem,1fr))] gap-2">
                 {opcion.valores.map((valor) => {
                   const elegido = elegidos[opcion.nombre] === valor
                   const conStock = hayStockDe(
@@ -170,14 +172,14 @@ export function AgregarAlCarrito({
                       aria-label={`${opcion.nombre} ${valor}${conStock ? "" : ", sin stock"}`}
                       onClick={() => elegir(opcion.nombre, valor)}
                       className={cn(
-                        "min-h-11 min-w-11 rounded-plantilla border px-4 font-semibold transition-colors",
+                        "flex min-h-11 w-full min-w-0 items-center justify-center rounded-plantilla border px-2 font-semibold transition-colors",
                         elegido
                           ? "border-tinta bg-tinta text-papel"
                           : "border-tinta/30 hover:border-tinta",
                         !conStock && "line-through decoration-2 opacity-45"
                       )}
                     >
-                      {valor}
+                      <span className="truncate">{valor}</span>
                     </button>
                   )
                 })}
