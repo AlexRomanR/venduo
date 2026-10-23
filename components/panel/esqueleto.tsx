@@ -82,7 +82,7 @@ function Lista() {
       </Panel>
 
       <Panel>
-        <div className="flex flex-wrap gap-2 border-b border-tinta/15 px-4 py-3 sm:px-5">
+        <div className="flex gap-2 overflow-hidden border-b border-tinta/15 px-4 py-3 sm:px-5">
           {Array.from({ length: 4 }, (_, indice) => (
             <Skeleton
               key={indice}
@@ -122,7 +122,7 @@ function Detalle() {
   return (
     <>
       <Panel>
-        <div className="flex flex-wrap gap-3 px-4 py-5 sm:px-5">
+        <div className="flex gap-3 overflow-hidden px-4 py-5 sm:px-5">
           {Array.from({ length: 3 }, (_, indice) => (
             <Skeleton
               key={indice}

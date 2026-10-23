@@ -4,7 +4,12 @@ import * as React from "react"
 import { Copy, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
-import { FICHA, FICHA_ELEGIDA, FICHA_LIBRE } from "@/lib/estilos"
+import {
+  FICHA,
+  FICHA_ELEGIDA,
+  FICHA_LIBRE,
+  GRILLA_DE_FICHAS,
+} from "@/lib/estilos"
 import { formatDate } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import {
@@ -155,11 +160,7 @@ export function Invitaciones({
             className={CAMPO}
           />
         </label>
-        <div
-          className="flex flex-wrap gap-1.5"
-          role="group"
-          aria-label="Vence en"
-        >
+        <div className={GRILLA_DE_FICHAS} role="group" aria-label="Vence en">
           {VENCIMIENTOS.map((v) => (
             <button
               key={v.nombre}
@@ -168,10 +169,11 @@ export function Invitaciones({
               onClick={() => setDias(v.dias)}
               className={cn(
                 FICHA,
+                "w-full justify-center",
                 dias === v.dias ? FICHA_ELEGIDA : FICHA_LIBRE
               )}
             >
-              {v.nombre}
+              <span className="truncate">{v.nombre}</span>
             </button>
           ))}
         </div>

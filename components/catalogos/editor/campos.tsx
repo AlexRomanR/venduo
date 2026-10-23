@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Check, Minus, Plus, Sparkles } from "lucide-react"
 
 import type { ProductoDelCatalogo } from "@/lib/catalogos/datos"
+import { GRILLA_DE_FICHAS } from "@/lib/estilos"
 import { cn } from "@/lib/utils"
 
 /*
@@ -222,7 +223,7 @@ export function Fichas<T extends string>({
   return (
     <fieldset className="min-w-0">
       <legend className={ETIQUETA}>{etiqueta}</legend>
-      <div className="mt-2 flex flex-wrap gap-2">
+      <div className={cn(GRILLA_DE_FICHAS, "mt-2")}>
         {opciones.map((opcion) => {
           const activa = opcion.valor === valor
           return (
@@ -232,13 +233,13 @@ export function Fichas<T extends string>({
               aria-pressed={activa}
               onClick={() => alCambiar(opcion.valor)}
               className={cn(
-                "flex min-h-11 items-center border px-3 text-sm font-semibold transition-colors",
+                "flex min-h-11 w-full min-w-0 items-center justify-center border px-2 text-sm font-semibold transition-colors",
                 activa
                   ? "border-tinta bg-tinta text-papel"
                   : "border-tinta/25 hover:border-tinta"
               )}
             >
-              {opcion.etiqueta}
+              <span className="truncate">{opcion.etiqueta}</span>
             </button>
           )
         })}

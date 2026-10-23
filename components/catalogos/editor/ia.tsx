@@ -99,7 +99,8 @@ export function PedidoALaIa({
         </button>
       </form>
 
-      <div className="flex flex-wrap gap-2">
+      {/* Una por renglón: son frases, y el panel del editor es angosto. */}
+      <div className="grid gap-2">
         {ejemplos.map((ejemplo) => (
           <button
             key={ejemplo}
