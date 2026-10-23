@@ -119,6 +119,22 @@ se pierde en la próxima sincronización.
 | `visual-block-editor`  | Plantillas, tipos de bloque, propuestas de la IA            |
 | `ai-task-workflow`     | Agregar o cambiar una tarea de IA                           |
 | `qa-verification`      | Verificación antes de commitear                             |
+| `pantalla-por-filas`   | Una pantalla para crear o editar algo: lo esencial y filas  |
+| `de-idea-a-pantalla`   | De una idea en palabras a un cambio construido: `/idea`     |
+
+### De la idea a la pantalla: `/idea`
+
+Para algo nuevo o un cambio que no es trivial, **`/idea lo que quiero`** usa la skill
+`de-idea-a-pantalla`: mide el tamaño, hace una entrevista corta y deja el brief en
+`docs/briefs/`, y pasa por un equipo de agentes (`.claude/agents/`) con una pausa para
+que la persona apruebe antes de construir:
+
+| Agente                     | Qué hace                                                             |
+| -------------------------- | -------------------------------------------------------------------- |
+| `investigador-de-producto` | Cómo lo resuelven Shopify, Tiendanube, Mercado Libre, WhatsApp, Meta |
+| `analista-tecnico`         | Qué se reutiliza, qué se toca, la migración y sus riesgos            |
+| `disenador`                | Bocetos a 375 y 1280 px, los textos y los estados                    |
+| `verificador`              | Prueba de verdad lo construido y devuelve los defectos               |
 
 ### Skills de terceros
 

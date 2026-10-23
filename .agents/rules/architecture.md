@@ -309,6 +309,7 @@ scripts/marca.mjs     Genera todos los archivos del logo: `npm run marca`
 
 docs/
   store-templates.md  El sistema de plantillas: capas, base de datos, cómo agregar una
+  briefs/             Lo que se pidió con /idea, ya aclarado: uno por tarea
 ```
 
 ## Plantillas de tienda
