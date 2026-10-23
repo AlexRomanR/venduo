@@ -124,6 +124,11 @@ export default async function PedidoPage({
                   <span className="sr-only">{item.cantidad} de </span>
                   {item.nombre}
                 </span>
+                {item.variante ? (
+                  <span className="mt-0.5 block text-sm font-semibold">
+                    {item.variante}
+                  </span>
+                ) : null}
                 <span className="tabular mt-0.5 block text-sm opacity-65">
                   {item.cantidad} × {formatMoney(item.precioCents)}
                 </span>

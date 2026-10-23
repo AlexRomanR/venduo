@@ -7,35 +7,81 @@ import { toast } from "sonner"
 
 import { formatMoney } from "@/lib/format"
 import { cn } from "@/lib/utils"
+import {
+  fotoDe,
+  hayStockDe,
+  leerOpciones,
+  varianteDe,
+  type Valores,
+  type VariantePublica,
+} from "@/lib/variantes"
 import type { Product } from "@/types"
-import { useCarrito } from "@/components/tienda/carrito"
+import { claveDeLinea, useCarrito } from "@/components/tienda/carrito"
 
 /** Dónde está el botón de agregar: la barra de compra lo mira para no repetirlo. */
 export const ANCLA_DE_COMPRA = "agregar-al-carrito"
 
 /**
- * Cantidad y agregar al carrito.
+ * El evento con que el selector pide mostrar una foto —la del color elegido—.
+ * Lo escucha la galería de cada kit, sin saber quién lo manda.
+ */
+export const EVENTO_DE_FOTO = "venduo:foto"
+
+/**
+ * Cantidad y agregar al carrito, con la elección de talla y color si el
+ * producto las tiene.
  *
  * El botón confirma en su sitio en vez de mandar al carrito: quien compra
  * desde el celular suele querer seguir mirando, y sacarlo de la ficha después
  * de cada producto es lo que hace que abandone con un solo artículo.
+ *
+ * Con opciones, cada valor sin stock —dado lo que ya se eligió— se ve
+ * tachado, el precio es el de la combinación y elegir un color muestra su
+ * foto en la galería.
  */
 export function AgregarAlCarrito({
   producto,
   slug,
 }: {
-  producto: Product
+  producto: Product & { variantes?: VariantePublica[] }
   slug: string
 }) {
   const router = useRouter()
   const { agregar, lineas } = useCarrito()
+  const variantes = React.useMemo(
+    () => producto.variantes ?? [],
+    [producto.variantes]
+  )
+  const opciones = React.useMemo(
+    () => (variantes.length ? leerOpciones(producto.opciones) : []),
+    [variantes.length, producto.opciones]
+  )
   const [cantidad, setCantidad] = React.useState(1)
   const [recien, setRecien] = React.useState(false)
+  // Una opción con un solo valor ya viene elegida: no hay nada que decidir.
+  const [elegidos, setElegidos] = React.useState<Valores>(() =>
+    Object.fromEntries(
+      opciones
+        .filter((o) => o.valores.length === 1)
+        .map((o) => [o.nombre, o.valores[0]])
+    )
+  )
+
+  const conOpciones = opciones.length > 0
+  const faltan = opciones.filter((o) => !elegidos[o.nombre])
+  const variante =
+    conOpciones && faltan.length === 0 ? varianteDe(variantes, elegidos) : null
+  const precioCents = variante?.precioCents ?? producto.price_cents
+  const stock = conOpciones ? (variante?.stock ?? 0) : producto.stock
 
   const agotado = producto.stock === 0
   const yaEnCarrito =
-    lineas.find((l) => l.productoId === producto.id)?.cantidad ?? 0
-  const disponible = Math.max(producto.stock - yaEnCarrito, 0)
+    lineas.find(
+      (l) =>
+        claveDeLinea(l) ===
+        claveDeLinea({ productoId: producto.id, varianteId: variante?.id })
+    )?.cantidad ?? 0
+  const disponible = Math.max(stock - yaEnCarrito, 0)
   const tope = Math.max(disponible, 1)
 
   React.useEffect(() => {
@@ -44,23 +90,37 @@ export function AgregarAlCarrito({
     return () => window.clearTimeout(id)
   }, [recien])
 
+  function elegir(opcion: string, valor: string) {
+    setElegidos((antes) => ({ ...antes, [opcion]: valor }))
+    setCantidad(1)
+    const foto = fotoDe(variantes, opcion, valor)
+    if (foto) {
+      window.dispatchEvent(new CustomEvent(EVENTO_DE_FOTO, { detail: foto }))
+    }
+  }
+
   function alAgregar() {
     if (agotado || disponible === 0) return
+    if (conOpciones && !variante) return
 
     agregar(
       {
         productoId: producto.id,
+        varianteId: variante?.id ?? null,
+        variante: variante?.nombre ?? null,
         nombre: producto.name,
-        precioCents: producto.price_cents,
-        imagen: producto.image_url,
-        stock: producto.stock,
+        precioCents,
+        imagen: variante?.imagen ?? producto.image_url,
+        stock,
       },
       Math.min(cantidad, disponible)
     )
 
     setRecien(true)
     setCantidad(1)
-    toast.success(`${producto.name} está en tu carrito.`)
+    toast.success(
+      `${producto.name}${variante ? ` (${variante.nombre})` : ""} está en tu carrito.`
+    )
   }
 
   if (agotado) {
@@ -77,8 +137,61 @@ export function AgregarAlCarrito({
     )
   }
 
+  const elegidaSinStock = conOpciones && variante !== null && stock === 0
+
   return (
     <div id={ANCLA_DE_COMPRA} className="border-t-2 border-tinta pt-7">
+      {conOpciones ? (
+        <div className="mb-7 flex flex-col gap-5">
+          {opciones.map((opcion) => (
+            <fieldset key={opcion.nombre}>
+              <legend className="text-xs font-semibold tracking-[0.12em] uppercase opacity-60">
+                {opcion.nombre}
+                {elegidos[opcion.nombre] ? (
+                  <span className="ml-1.5 normal-case opacity-100">
+                    · {elegidos[opcion.nombre]}
+                  </span>
+                ) : null}
+              </legend>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {opcion.valores.map((valor) => {
+                  const elegido = elegidos[opcion.nombre] === valor
+                  const conStock = hayStockDe(
+                    variantes,
+                    opcion.nombre,
+                    valor,
+                    elegidos
+                  )
+                  return (
+                    <button
+                      key={valor}
+                      type="button"
+                      aria-pressed={elegido}
+                      aria-label={`${opcion.nombre} ${valor}${conStock ? "" : ", sin stock"}`}
+                      onClick={() => elegir(opcion.nombre, valor)}
+                      className={cn(
+                        "min-h-11 min-w-11 rounded-plantilla border px-4 font-semibold transition-colors",
+                        elegido
+                          ? "border-tinta bg-tinta text-papel"
+                          : "border-tinta/30 hover:border-tinta",
+                        !conStock && "line-through decoration-2 opacity-45"
+                      )}
+                    >
+                      {valor}
+                    </button>
+                  )
+                })}
+              </div>
+            </fieldset>
+          ))}
+          {elegidaSinStock ? (
+            <p className="text-sm font-semibold">
+              Esta opción se agotó. Elige otra o escríbele a la tienda.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
       <div className="flex flex-wrap items-end justify-between gap-5">
         <div>
           <span className="text-xs font-semibold tracking-[0.12em] uppercase opacity-45">
@@ -119,7 +232,7 @@ export function AgregarAlCarrito({
             Subtotal
           </span>
           <p className="tabular font-titular text-2xl font-extrabold tracking-[-0.03em]">
-            {formatMoney(producto.price_cents * cantidad)}
+            {formatMoney(precioCents * cantidad)}
           </p>
         </div>
       </div>
@@ -128,13 +241,13 @@ export function AgregarAlCarrito({
         <button
           type="button"
           onClick={alAgregar}
-          disabled={disponible === 0}
+          disabled={disponible === 0 || (conOpciones && !variante)}
           className={cn(
             "flex min-h-12 flex-1 items-center justify-center gap-2 rounded-plantilla px-5 font-semibold transition-colors",
             recien
               ? "bg-tinta text-papel"
               : "bg-senal text-white hover:bg-senal-alta",
-            disponible === 0 && "opacity-50"
+            (disponible === 0 || (conOpciones && !variante)) && "opacity-50"
           )}
         >
           {recien ? (
@@ -142,6 +255,8 @@ export function AgregarAlCarrito({
               <Check aria-hidden="true" className="size-4" />
               Agregado
             </>
+          ) : faltan.length > 0 ? (
+            `Elige ${faltan.map((o) => o.nombre.toLowerCase()).join(" y ")}`
           ) : (
             <>
               <ShoppingBag aria-hidden="true" className="size-4" />

@@ -28,6 +28,7 @@ mis_items — una línea de pedido por fila (qué producto se vendió)
   unit_cost_cents   integer, centavos, lo que costaba el producto al cobrarse; nulo si no tenía costo
   ganancia_cents    integer, centavos, quantity * (unit_price_cents - unit_cost_cents); nulo si no tenía costo
   origen            text, del pedido: tienda | directa
+  variante          text, la talla o el color que se vendió ("M · Negro"); nulo si el producto no tiene opciones
 
 mis_productos — el catálogo de hoy, no depende de ventas
   name                    text
@@ -41,6 +42,15 @@ mis_productos — el catálogo de hoy, no depende de ventas
   is_featured             boolean, si va destacado en la portada
   created_at              timestamptz
   cost_cents              integer, centavos, lo que le cuesta a la tienda; puede ser nulo
+
+mis_variantes — las tallas, colores o números de cada producto, hoy
+  producto     text, el nombre del producto
+  variante     text, "M · Negro": los valores en una línea
+  valores      jsonb, {"Talla": "M", "Color": "Negro"}; se lee con valores->>'Talla'
+  price_cents  integer, centavos, el precio de esa variante
+  stock        integer
+  category     text, del producto, puede ser nulo
+  is_active    boolean, si el producto se ve en la tienda
 `.trim()
 
 /**
@@ -75,6 +85,9 @@ export const REGLAS_SQL = `
 - Ventas, lo más vendido, ingresos, ticket promedio y todo lo que diga
   "vendí" o "vendido" usan status = 'pagado'. Nunca status != 'cancelado':
   eso cuenta como vendido lo que todavía no se cobró.
+- Para "qué talla" o "qué color se vende más", agrupa mis_items por variante
+  (status = 'pagado' y variante is not null). El stock por talla está en
+  mis_variantes.
 - Ganancia, margen y "cuánto gané" suman ganancia_cents de mis_items con
   status = 'pagado' y ganancia_cents is not null: las líneas sin costo no
   tienen ganancia que contar.

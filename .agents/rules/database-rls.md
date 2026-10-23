@@ -141,6 +141,30 @@ El enlace compartido lo abre cualquiera, sin cuenta, por
 solo si `store_is_live`. No se abre la tabla con una política para anónimos:
 expondría los catálogos de todas las tiendas.
 
+## Las variantes
+
+`product_variants` tiene una sola política, de lectura: quien compra lee las de una
+tienda que se sirve y el dueño lee las suyas. **No tiene políticas de escritura**: se
+escriben con `guardar_variantes(p_producto, p_opciones, p_variantes)`, que valida cada
+combinación contra las opciones, arma su nombre, deja solo fotos que son del producto y
+hace todo en una transacción, y con `ajustar_stock_de_variante(p_variante, p_stock)`.
+
+| Disparador                 | Qué hace                                                     |
+| -------------------------- | ------------------------------------------------------------ |
+| `variante_de_producto`     | Pone la tienda de la variante desde su producto              |
+| `sumar_stock_de_variantes` | Lleva `products.stock` a la suma de sus variantes vivas      |
+| `stock_de_producto`        | Rechaza cambiar a mano el stock de un producto con variantes |
+
+`sumar_stock_de_variantes` marca la transacción con `venduo.stock_de_variantes` para que
+`stock_de_producto` lo deje pasar. Sin variantes vivas, el producto vuelve a llevar su
+propio stock, el que sumaban.
+
+`create_order`, `registrar_venta` y `handle_order_status_change` saben de variantes: el
+pedido de un producto con variantes la exige, el precio es el suyo si tiene, y al cobrar
+o cancelar se mueve el stock de la variante. Las vistas de la IA suman `variante` a
+`mis_items` y una vista `mis_variantes`; `product_variants` está en la lista de tablas que
+`run_insight_sql` no deja nombrar.
+
 ## El costo de los productos
 
 `product_costs` guarda lo que cada producto le cuesta a la tienda, **aparte de
@@ -252,8 +276,12 @@ no puede hacer fallar la compra de nadie. Al tocar `create_order` o
 - **`push_tokens` no se escribe desde la app.** Registrar y olvidar un celular son
   `registrar_dispositivo` y `olvidar_dispositivo`: el mismo celular puede pasar de una
   cuenta a otra, y esa fila es de otra persona.
-- **El aviso de stock solo sale cuando lo movió una venta** (`pg_trigger_depth() >= 2`).
-  Si la persona cambió el número a mano, ya lo sabe.
+- **El aviso de stock solo sale cuando lo movió una venta.** Lo sabe por la marca
+  `venduo.por_venta`, que pone `handle_order_status_change` al cobrar: la profundidad de
+  disparadores ya no lo distingue, porque con variantes una corrección a mano también
+  llega anidada. Si la persona cambió el número a mano, ya lo sabe. Una variante que se
+  agota avisa sola ("Se agotó Polera · M"); el producto con variantes avisa cuando el
+  total cruza su umbral.
 - `notification_preferences` es una fila por persona. Sin fila, quiere todos los avisos.
 
 ## Migraciones

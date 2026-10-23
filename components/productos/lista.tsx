@@ -9,6 +9,7 @@ import { toast } from "sonner"
 
 import { formatMoney, formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
+import { cuantasVariantes, leerOpciones } from "@/lib/variantes"
 import type { Product } from "@/types"
 
 type Ajustar = (
@@ -117,6 +118,7 @@ function FilaDeProducto({
           ? { texto: "Queda poco", rojo: false }
           : null
   const href = `/panel/productos/${producto.id}`
+  const variantes = cuantasVariantes(leerOpciones(producto.opciones))
 
   return (
     <li className="flex gap-3 border-t border-tinta/15 py-3 pr-3 pl-4 first:border-t-0 sm:pr-4 sm:pl-5 @2xl:items-center @2xl:gap-4">
@@ -183,35 +185,54 @@ function FilaDeProducto({
           </span>
         </Link>
 
-        <div
-          role="group"
-          aria-label={`Unidades de ${producto.name}`}
-          className="flex items-center self-end @2xl:self-auto"
-        >
-          <Paso
-            etiqueta="Una unidad menos"
-            apagado={stock === 0}
-            alTocar={() => cambiar(stock - 1)}
+        {variantes > 0 ? (
+          // Con opciones no se sabe de cuál sumar: el stock se cambia en el
+          // producto, en cada una.
+          <Link
+            href={`${href}#variantes`}
+            className="flex min-h-10 items-center gap-1.5 self-end border border-tinta px-3 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel @2xl:self-auto"
           >
-            <Minus aria-hidden="true" className="size-5" />
-          </Paso>
-          <span
-            aria-live="polite"
-            className={cn(
-              "tabular flex h-10 min-w-12 items-center justify-center border-y border-tinta px-1 font-titular text-base font-bold",
-              agotado && "text-senal"
-            )}
+            <span
+              className={cn(
+                "tabular font-titular text-base font-bold",
+                agotado && "text-senal"
+              )}
+            >
+              {formatNumber(stock)}
+            </span>
+            en {variantes} opciones
+          </Link>
+        ) : (
+          <div
+            role="group"
+            aria-label={`Unidades de ${producto.name}`}
+            className="flex items-center self-end @2xl:self-auto"
           >
-            {guardando ? (
-              <span className="opacity-40">{formatNumber(stock)}</span>
-            ) : (
-              formatNumber(stock)
-            )}
-          </span>
-          <Paso etiqueta="Una unidad más" alTocar={() => cambiar(stock + 1)}>
-            <Plus aria-hidden="true" className="size-5" />
-          </Paso>
-        </div>
+            <Paso
+              etiqueta="Una unidad menos"
+              apagado={stock === 0}
+              alTocar={() => cambiar(stock - 1)}
+            >
+              <Minus aria-hidden="true" className="size-5" />
+            </Paso>
+            <span
+              aria-live="polite"
+              className={cn(
+                "tabular flex h-10 min-w-12 items-center justify-center border-y border-tinta px-1 font-titular text-base font-bold",
+                agotado && "text-senal"
+              )}
+            >
+              {guardando ? (
+                <span className="opacity-40">{formatNumber(stock)}</span>
+              ) : (
+                formatNumber(stock)
+              )}
+            </span>
+            <Paso etiqueta="Una unidad más" alTocar={() => cambiar(stock + 1)}>
+              <Plus aria-hidden="true" className="size-5" />
+            </Paso>
+          </div>
+        )}
       </div>
     </li>
   )

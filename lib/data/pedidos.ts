@@ -9,6 +9,8 @@ export interface LineaPedido {
   /** La foto del producto hoy; `null` si no tiene o ya no está. */
   foto: string | null
   nombre: string
+  /** La opción que se pidió —"M · Negro"—, copiada al pedir. */
+  variante: string | null
   cantidad: number
   precioCents: number
   totalCents: number
@@ -64,6 +66,7 @@ function pedidosDeDemostracion(filtro?: FiltroPedidos): Pedidos {
     productoId: null,
     foto: fotoDemo(foto),
     nombre,
+    variante: null,
     cantidad,
     precioCents,
     totalCents: cantidad * precioCents,
@@ -194,7 +197,7 @@ export async function getPedidos(filtro?: FiltroPedidos): Promise<Pedidos> {
       `id, order_number, status, buyer_name, buyer_phone, total_cents,
        created_at, paid_at, origen,
        order_items ( product_id, product_name, quantity, unit_price_cents,
-                     products ( image_url ) )`
+                     variant_name, products ( image_url ) )`
     )
     .eq("store_id", tienda.id)
     .order("created_at", { ascending: false })
@@ -204,6 +207,7 @@ export async function getPedidos(filtro?: FiltroPedidos): Promise<Pedidos> {
       productoId: item.product_id,
       foto: item.products?.image_url ?? null,
       nombre: item.product_name,
+      variante: item.variant_name,
       cantidad: item.quantity,
       precioCents: item.unit_price_cents,
       totalCents: item.quantity * item.unit_price_cents,

@@ -211,7 +211,7 @@ export function rebaja(producto: ProductoDelCatalogo): number | null {
   return porcentaje > 0 ? porcentaje : null
 }
 
-/** La línea de detalle de un producto: categoría, stock, código. */
+/** La línea de detalle de un producto: categoría, stock, código y sus tallas. */
 export function detalles(
   producto: ProductoDelCatalogo,
   campos: Campos
@@ -222,6 +222,7 @@ export function detalles(
     partes.push(producto.stock === 1 ? "Queda 1" : `Quedan ${producto.stock}`)
   }
   if (campos.codigo && producto.codigo) partes.push(`Cód. ${producto.codigo}`)
+  if (campos.opciones && producto.opciones) partes.push(producto.opciones)
   return partes.join(" · ")
 }
 

@@ -685,6 +685,21 @@ Dos trampas que salieron al hacerlas:
   `.font-titular:not(.tabular)`: en una plantilla en mayúsculas, "Bs 180" salía "BS 180".
   Todo monto lleva `.tabular`.
 
+### Lo que todo kit comparte: el precio y la foto del color
+
+Dos piezas que un kit usa y no reescribe, para que las variantes —talla, color— se vean
+igual en todas:
+
+- **El precio de un producto va con `PrecioDeVitrina`** (`components/tienda/precio.tsx`),
+  nunca con `formatMoney(producto.price_cents)`: dice "Desde Bs 180" cuando sus variantes
+  cuestan distinto. Las variantes viajan dentro de cada producto (`ProductoPublico`).
+- **La galería de la ficha escucha `useFotoElegida`** (`components/tienda/foto-elegida.ts`):
+  el selector de talla y color, que es uno solo (`AgregarAlCarrito`), avisa qué foto
+  mostrar y cada galería la muestra a su manera. La de Pasarela salta en el celular y la
+  pone primera en la computadora; la de Esencia la cambia; la Clásica cambia su foto
+  principal (`FotoPrincipal`). En el celular el salto va sin animación: elegir cambia el
+  alto de la ficha y cortaba a mitad un desplazamiento suave.
+
 ### La editorial (`clasica`) — respaldo
 
 No se ofrece. Es la base de todos los kits y la que dibuja las tiendas con plantillas
@@ -722,7 +737,8 @@ el peso más pesado. Sumar una pareja a `COMBINACIONES` (`lib/editor/sugerencias
 
 **4. El kit** — `components/plantillas/{clave}/`, empezando por `{ ...KIT_CLASICO }` y
 reemplazando lo que cambia —o con `paginasDeKit()` si sigue el esqueleto compartido—.
-Registrarlo en `KITS`: TypeScript avisa si falta. Agregar su dibujo a `DIBUJOS` en
+Registrarlo en `KITS`: TypeScript avisa si falta. Sus precios van con `PrecioDeVitrina`
+y su galería escucha `useFotoElegida` (sección 9, "Lo que todo kit comparte"). Agregar su dibujo a `DIBUJOS` en
 `miniatura.tsx` y sus productos de ejemplo a `EJEMPLOS` en `lib/editor/muestras.ts`, con
 fotos verificadas. Sumarla al espejo del modo demo (`RUBROS_DEMO`).
 

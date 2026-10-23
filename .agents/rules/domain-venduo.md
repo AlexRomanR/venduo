@@ -112,6 +112,27 @@ oculto —en persona se vende lo del mostrador—, pero no uno que Venduo ocult�
 
 Cancelar una venta directa devuelve el stock, igual que cualquier pagado.
 
+### Variantes: talla, color, número
+
+Un producto puede tener **hasta dos opciones** (`products.opciones`) y una variante por
+combinación (`product_variants`), con su stock, su precio si es distinto y su foto. Lo
+que no se puede olvidar:
+
+- **El stock del producto es la suma de sus variantes**: lo lleva un disparador, y la base
+  rechaza cambiar a mano el stock de un producto con variantes. En las listas, el más y
+  menos lleva al producto; una sola variante se ajusta con `ajustar_stock_de_variante`.
+- **Las variantes se guardan todas juntas con `guardar_variantes`**: crea, actualiza y
+  da de baja, y una combinación que ya existía conserva su id, que es lo que nombran los
+  pedidos. Agregar la talla XL no borra el stock cargado en la M.
+- **Un producto con variantes se pide con la variante.** `create_order` y
+  `registrar_venta` la exigen —"Elige una opción de…"—, toman su precio si tiene uno y
+  comprueban su stock. La línea del pedido copia su nombre.
+- **El selector de la ficha es uno solo** (`AgregarAlCarrito`, compartido por las ocho
+  plantillas). Elegir un color avisa con un evento de la página (`EVENTO_DE_FOTO`) y la
+  galería de cada kit muestra esa foto, sin que nadie pregunte de qué plantilla es.
+- **El precio "Desde"** de tarjetas y fichas sale de `PrecioDeVitrina`
+  (`components/tienda/precio.tsx`); un kit nuevo lo usa en vez de `formatMoney`.
+
 ### Costo y ganancia
 
 El costo de un producto vive en **`product_costs`**, no en `products`: la tienda pública

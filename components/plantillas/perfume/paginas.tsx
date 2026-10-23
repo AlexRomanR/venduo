@@ -6,6 +6,7 @@ import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
 import type { TiendaPublica } from "@/lib/data/tienda-publica"
+import { PrecioDeVitrina } from "@/components/tienda/precio"
 import { Bloques, ParteFija } from "@/components/plantillas/bloques"
 import type {
   PropsCatalogo,
@@ -258,7 +259,9 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
               !vitrina && "md:justify-start"
             )}
           >
-            <span className="tabular">{formatMoney(producto.price_cents)}</span>
+            <span className="tabular">
+              <PrecioDeVitrina producto={producto} />
+            </span>
             {producto.compare_at_price_cents ? (
               <span className="tabular text-base line-through opacity-45">
                 {formatMoney(producto.compare_at_price_cents)}

@@ -43,6 +43,10 @@ un PDF hecho a mano: un catálogo reenviado tres veces sigue diciendo lo de hoy.
 | Los productos, precio y stock | Se leen al dibujar: `getMaterialDelCatalogo()` (`lib/data/catalogos.ts`)     |
 | El enlace público             | `catalogs.share_token`, leído por `catalogo_compartido(p_token)`             |
 
+**Tallas y colores** es un campo más de lo que muestra cada producto (`campos.opciones`),
+apagado como la categoría y el código: encendido, la línea de detalle dice "S, M, L ·
+Negro, Blanco". Los catálogos guardados antes no lo traen y el esquema lo da por apagado.
+
 **Nunca se guardan precios ni stock**: solo ids. Un producto borrado de la tienda
 desaparece del catálogo sin aviso —mostrarlo sería vender algo que ya no existe— y uno
 sin stock sale con la etiqueta "Agotado".

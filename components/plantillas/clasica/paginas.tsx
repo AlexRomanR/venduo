@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, ImageOff, MessageCircle } from "lucide-react"
+import { ArrowLeft, MessageCircle } from "lucide-react"
 
 import { filtrarCatalogo } from "@/lib/catalogo"
 import { descuento, enlaceDeConsulta } from "@/lib/plantillas/bloques"
@@ -8,6 +8,8 @@ import { formatMoney } from "@/lib/format"
 import { rutaDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
 import type { TiendaPublica } from "@/lib/data/tienda-publica"
+import { PrecioDeVitrina } from "@/components/tienda/precio"
+import { FotoPrincipal } from "@/components/plantillas/clasica/foto-principal"
 import { Bloques, ParteFija } from "@/components/plantillas/bloques"
 import {
   BLOQUES_CLASICOS,
@@ -278,25 +280,16 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
       >
         <div className={cn(vitrina && "w-full max-w-[18rem] sm:max-w-sm")}>
           <div className="relative aspect-square w-full overflow-hidden border border-tinta/15 bg-tinta/5">
-            {producto.image_url ? (
-              <Image
-                src={producto.image_url}
-                alt={producto.name}
-                fill
-                unoptimized
-                priority
-                sizes={
-                  vitrina
-                    ? "(max-width: 640px) 288px, 384px"
-                    : "(max-width: 1024px) 100vw, 480px"
-                }
-                className="object-cover"
-              />
-            ) : (
-              <div className="flex size-full items-center justify-center">
-                <ImageOff aria-hidden="true" className="size-10 opacity-20" />
-              </div>
-            )}
+            <FotoPrincipal
+              inicial={producto.image_url}
+              imagenes={producto.images}
+              nombre={producto.name}
+              sizes={
+                vitrina
+                  ? "(max-width: 640px) 288px, 384px"
+                  : "(max-width: 1024px) 100vw, 480px"
+              }
+            />
           </div>
 
           {producto.images.length > 1 ? (
@@ -341,7 +334,7 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
             )}
           >
             <span className="tabular font-titular text-3xl font-extrabold tracking-[-0.03em]">
-              {formatMoney(producto.price_cents)}
+              <PrecioDeVitrina producto={producto} />
             </span>
             {producto.compare_at_price_cents ? (
               <span className="tabular text-lg line-through opacity-40">

@@ -272,6 +272,7 @@ const DEMO_PRODUCT_BASE = {
   compare_at_price_cents: null,
   image_url: null,
   moderated_at: null,
+  opciones: [],
   moderation_reason: null,
   images: [],
   category_id: null,

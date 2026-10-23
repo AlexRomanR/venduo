@@ -26,6 +26,13 @@ import {
 import { CURRENCY_SYMBOL, formatMoney, formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { VentaInput } from "@/lib/validation/venta"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { useFestejo } from "@/components/panel/festejo"
 import { Seccion, SinDatos } from "@/components/panel/piezas"
 import type { ResultadoDeVenta } from "@/app/(privado)/panel/pedidos/acciones"
@@ -38,10 +45,23 @@ export interface ProductoParaVender {
   precioCents: number
   stock: number
   categoria: string | null
+  /** Talla, color: con opciones, se elige cuál se vendió. */
+  variantes: OpcionParaVender[]
+}
+
+export interface OpcionParaVender {
+  id: string
+  nombre: string
+  stock: number
+  /** `null`: cuesta lo mismo que el producto. */
+  precioCents: number | null
 }
 
 interface Linea {
+  /** Una por producto, o una por opción si las tiene. */
+  clave: string
   productoId: string
+  varianteId: string | null
   cantidad: number
   /** Lo que se escribe en el campo, en bolivianos: puede quedar vacío un momento. */
   precio: string
@@ -72,18 +92,31 @@ export function NuevaVenta({
   const { festejo, festejar } = useFestejo()
   const [lineas, setLineas] = React.useState<Linea[]>([])
   const [registrando, setRegistrando] = React.useState(false)
+  const [eligiendo, setEligiendo] = React.useState<ProductoParaVender | null>(
+    null
+  )
 
   const porId = React.useMemo(
     () => new Map(productos.map((p) => [p.id, p])),
     [productos]
   )
 
-  function sumar(producto: ProductoParaVender) {
+  function tocar(producto: ProductoParaVender) {
+    // Con opciones, primero se elige cuál se vendió.
+    if (producto.variantes.length > 0) setEligiendo(producto)
+    else sumar(producto, null)
+  }
+
+  function sumar(
+    producto: ProductoParaVender,
+    variante: OpcionParaVender | null
+  ) {
+    const clave = variante ? `${producto.id}:${variante.id}` : producto.id
     setLineas((antes) => {
-      const ya = antes.find((l) => l.productoId === producto.id)
+      const ya = antes.find((l) => l.clave === clave)
       if (ya) {
         return antes.map((l) =>
-          l.productoId === producto.id
+          l.clave === clave
             ? { ...l, cantidad: Math.min(l.cantidad + 1, 999) }
             : l
         )
@@ -91,22 +124,38 @@ export function NuevaVenta({
       return [
         ...antes,
         {
+          clave,
           productoId: producto.id,
+          varianteId: variante?.id ?? null,
           cantidad: 1,
-          precio: String(producto.precioCents / 100),
+          precio: String((variante?.precioCents ?? producto.precioCents) / 100),
         },
       ]
     })
   }
 
-  function cambiar(productoId: string, cambio: Partial<Linea>) {
+  function cambiar(clave: string, cambio: Partial<Linea>) {
     setLineas((antes) =>
-      antes.map((l) => (l.productoId === productoId ? { ...l, ...cambio } : l))
+      antes.map((l) => (l.clave === clave ? { ...l, ...cambio } : l))
     )
   }
 
-  function quitar(productoId: string) {
-    setLineas((antes) => antes.filter((l) => l.productoId !== productoId))
+  function quitar(clave: string) {
+    setLineas((antes) => antes.filter((l) => l.clave !== clave))
+  }
+
+  /** El stock y el precio de una línea: los de su opción, si la tiene. */
+  function datosDe(linea: Linea) {
+    const producto = porId.get(linea.productoId)
+    const variante = linea.varianteId
+      ? producto?.variantes.find((v) => v.id === linea.varianteId)
+      : undefined
+    return {
+      producto,
+      variante,
+      stock: variante?.stock ?? producto?.stock ?? 0,
+      precioCents: variante?.precioCents ?? producto?.precioCents ?? 0,
+    }
   }
 
   const totalCents = lineas.reduce(
@@ -115,9 +164,7 @@ export function NuevaVenta({
     0
   )
   const unidades = lineas.reduce((total, l) => total + l.cantidad, 0)
-  const faltaStock = lineas.some(
-    (l) => l.cantidad > (porId.get(l.productoId)?.stock ?? 0)
-  )
+  const faltaStock = lineas.some((l) => l.cantidad > datosDe(l).stock)
   const faltaPrecio = lineas.some(
     (l) => l.precio.trim() === "" || Number.isNaN(Number(l.precio))
   )
@@ -133,6 +180,7 @@ export function NuevaVenta({
     const resultado = await registrar({
       lineas: lineas.map((l) => ({
         productoId: l.productoId,
+        varianteId: l.varianteId,
         cantidad: l.cantidad,
         precio: Number(l.precio),
       })),
@@ -193,8 +241,21 @@ export function NuevaVenta({
 
       <ElegirProductos
         productos={productos}
-        enLaVenta={new Map(lineas.map((l) => [l.productoId, l.cantidad]))}
-        alTocar={sumar}
+        enLaVenta={lineas.reduce(
+          (mapa, l) =>
+            mapa.set(l.productoId, (mapa.get(l.productoId) ?? 0) + l.cantidad),
+          new Map<string, number>()
+        )}
+        alTocar={tocar}
+      />
+
+      <ElegirOpcion
+        producto={eligiendo}
+        alCerrar={() => setEligiendo(null)}
+        alElegir={(variante) => {
+          if (eligiendo) sumar(eligiendo, variante)
+          setEligiendo(null)
+        }}
       />
 
       <Seccion
@@ -211,15 +272,18 @@ export function NuevaVenta({
         ) : (
           <ul>
             {lineas.map((linea) => {
-              const producto = porId.get(linea.productoId)
+              const { producto, variante, stock, precioCents } = datosDe(linea)
               if (!producto) return null
               return (
                 <LineaDeVenta
-                  key={linea.productoId}
+                  key={linea.clave}
                   linea={linea}
                   producto={producto}
-                  alCambiar={(cambio) => cambiar(linea.productoId, cambio)}
-                  alQuitar={() => quitar(linea.productoId)}
+                  variante={variante?.nombre ?? null}
+                  stock={stock}
+                  precioDeLista={precioCents}
+                  alCambiar={(cambio) => cambiar(linea.clave, cambio)}
+                  alQuitar={() => quitar(linea.clave)}
                 />
               )
             })}
@@ -412,19 +476,25 @@ function ElegirProductos({
 function LineaDeVenta({
   linea,
   producto,
+  variante,
+  stock,
+  precioDeLista,
   alCambiar,
   alQuitar,
 }: {
   linea: Linea
   producto: ProductoParaVender
+  /** La opción que se vendió, si el producto las tiene. */
+  variante: string | null
+  stock: number
+  precioDeLista: number
   alCambiar: (cambio: Partial<Linea>) => void
   alQuitar: () => void
 }) {
   const precioCents = Math.round((Number(linea.precio) || 0) * 100)
-  const rebaja =
-    precioCents < producto.precioCents && linea.precio.trim() !== ""
-  const sinStock = linea.cantidad > producto.stock
-  const idPrecio = `precio-${producto.id}`
+  const rebaja = precioCents < precioDeLista && linea.precio.trim() !== ""
+  const sinStock = linea.cantidad > stock
+  const idPrecio = `precio-${linea.clave}`
 
   return (
     <li className="flex flex-col gap-3 border-t border-tinta/15 px-4 py-4 first:border-t-0 sm:px-5">
@@ -446,6 +516,9 @@ function LineaDeVenta({
           <span className="line-clamp-2 leading-snug font-semibold">
             {producto.nombre}
           </span>
+          {variante ? (
+            <span className="block text-sm font-semibold">{variante}</span>
+          ) : null}
           <span className="tabular block text-sm opacity-65">
             {formatMoney(precioCents * linea.cantidad)}
           </span>
@@ -519,8 +592,7 @@ function LineaDeVenta({
 
       {rebaja ? (
         <p className="text-sm opacity-70">
-          Rebaja de {formatMoney(producto.precioCents - precioCents)} por
-          unidad.
+          Rebaja de {formatMoney(precioDeLista - precioCents)} por unidad.
         </p>
       ) : null}
 
@@ -531,11 +603,11 @@ function LineaDeVenta({
         >
           <CircleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
           <span>
-            {producto.stock === 0
+            {stock === 0
               ? "Tu stock dice que no te queda."
-              : `Tu stock dice que te quedan ${formatNumber(producto.stock)}.`}{" "}
+              : `Tu stock dice que te quedan ${formatNumber(stock)}.`}{" "}
             <Link
-              href={`/panel/productos/${producto.id}`}
+              href={`/panel/productos/${producto.id}${variante ? "#variantes" : ""}`}
               className="underline underline-offset-4"
             >
               Corregir el stock
@@ -544,5 +616,84 @@ function LineaDeVenta({
         </p>
       ) : null}
     </li>
+  )
+}
+
+/* ---------------------------------------------------------------------------
+ * Elegir la opción
+ * ------------------------------------------------------------------------ */
+
+/** Cuál se vendió de un producto con opciones: una fila por opción, con su stock. */
+function ElegirOpcion({
+  producto,
+  alCerrar,
+  alElegir,
+}: {
+  producto: ProductoParaVender | null
+  alCerrar: () => void
+  alElegir: (variante: OpcionParaVender) => void
+}) {
+  return (
+    <Dialog
+      open={producto !== null}
+      onOpenChange={(abierto) => {
+        if (!abierto) alCerrar()
+      }}
+    >
+      <DialogContent
+        showCloseButton={false}
+        className="max-h-[85dvh] gap-0 overflow-y-auto rounded-none border-2 border-tinta bg-papel p-0 text-tinta shadow-none sm:max-w-md"
+      >
+        <div className="flex items-start gap-4 border-b border-tinta/15 p-5">
+          <div className="min-w-0 flex-1">
+            <DialogTitle className="font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">
+              {producto?.nombre}
+            </DialogTitle>
+            <DialogDescription className="mt-1 text-sm text-tinta/70">
+              ¿Cuál vendiste?
+            </DialogDescription>
+          </div>
+          <DialogClose
+            aria-label="Cerrar"
+            className="-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center transition-colors hover:text-senal"
+          >
+            <X aria-hidden="true" className="size-5" />
+          </DialogClose>
+        </div>
+        <ul>
+          {producto?.variantes.map((variante) => (
+            <li
+              key={variante.id}
+              className="border-t border-tinta/15 first:border-t-0"
+            >
+              <button
+                type="button"
+                onClick={() => alElegir(variante)}
+                className="group flex min-h-14 w-full items-center gap-3 px-5 text-left transition-colors hover:bg-tinta hover:text-papel"
+              >
+                <span className="min-w-0 flex-1 font-semibold">
+                  {variante.nombre}
+                </span>
+                <span className="tabular text-sm opacity-70">
+                  {formatMoney(variante.precioCents ?? producto.precioCents)}
+                </span>
+                <span
+                  className={cn(
+                    "tabular w-20 text-right text-sm",
+                    variante.stock === 0
+                      ? "font-semibold text-senal group-hover:text-papel"
+                      : "opacity-70"
+                  )}
+                >
+                  {variante.stock === 0
+                    ? "Sin stock"
+                    : `Quedan ${formatNumber(variante.stock)}`}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </DialogContent>
+    </Dialog>
   )
 }

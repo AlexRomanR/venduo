@@ -15,6 +15,7 @@ import type {
   PropsTarjeta,
   PropsVacio,
 } from "@/components/plantillas/kit"
+import { PrecioDeVitrina } from "@/components/tienda/precio"
 
 /**
  * Las piezas de Bazar.
@@ -71,7 +72,7 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
                 : "border-2 border-tinta bg-papel"
           )}
         >
-          {agotado ? "Agotado" : formatMoney(producto.price_cents)}
+          {agotado ? "Agotado" : <PrecioDeVitrina producto={producto} />}
         </span>
       </div>
 

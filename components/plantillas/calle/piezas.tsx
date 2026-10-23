@@ -15,6 +15,7 @@ import type {
   PropsTarjeta,
   PropsVacio,
 } from "@/components/plantillas/kit"
+import { PrecioDeVitrina } from "@/components/tienda/precio"
 
 /**
  * Las piezas de Calle.
@@ -88,7 +89,7 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
               rebaja && "text-senal"
             )}
           >
-            {formatMoney(producto.price_cents)}
+            <PrecioDeVitrina producto={producto} />
           </span>
         </p>
       </div>

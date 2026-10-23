@@ -13,6 +13,7 @@ import type {
   PropsTarjeta,
   PropsVacio,
 } from "@/components/plantillas/kit"
+import { PrecioDeVitrina } from "@/components/tienda/precio"
 
 /**
  * Las piezas de Pasarela.
@@ -93,7 +94,7 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
         </h3>
         <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
           <span className="tabular font-semibold">
-            {formatMoney(producto.price_cents)}
+            <PrecioDeVitrina producto={producto} />
           </span>
           {producto.compare_at_price_cents ? (
             <span className="tabular line-through opacity-45">

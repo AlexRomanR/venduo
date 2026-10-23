@@ -137,6 +137,7 @@ export const CAMPOS = {
   categoria: "Categoría",
   stock: "Unidades disponibles",
   codigo: "Código",
+  opciones: "Tallas y colores",
 } as const
 
 export type Campo = keyof typeof CAMPOS
@@ -152,6 +153,7 @@ export const CAMPOS_POR_DEFECTO: Campos = {
   categoria: false,
   stock: false,
   codigo: false,
+  opciones: false,
 }
 
 /** Un id corto para un bloque o un pack nuevo. No tiene que ser secreto. */

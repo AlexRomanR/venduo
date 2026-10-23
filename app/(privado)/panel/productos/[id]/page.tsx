@@ -8,12 +8,14 @@ import {
   getProducto,
 } from "@/lib/data/catalogo"
 import { funcionesDeMiTienda } from "@/lib/data/funciones"
+import { getVariantesDeProducto } from "@/lib/data/variantes"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
 import { BOTON_SECUNDARIO } from "@/lib/estilos"
 import { formatDate } from "@/lib/format"
 import { mensajeDeProducto } from "@/lib/publicar"
 import { urlDeProducto } from "@/lib/tienda"
+import { leerOpciones } from "@/lib/variantes"
 import { cn } from "@/lib/utils"
 import { ConFuncion } from "@/components/panel/funcion"
 import { Cabecera, Volver } from "@/components/panel/piezas"
@@ -32,13 +34,14 @@ export default async function EditarProductoPage({
   const { id } = await params
   // Las tres a la vez: el producto y las categorías esperan a la misma
   // tienda, que se lee una sola vez por pedido.
-  const [tienda, producto, { categorias }, funciones, costoCents] =
+  const [tienda, producto, { categorias }, funciones, costoCents, variantes] =
     await Promise.all([
       getMiTienda(),
       getProducto(id),
       getCatalogo(),
       funcionesDeMiTienda(),
       getCostoDeProducto(id),
+      getVariantesDeProducto(id),
     ])
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
@@ -104,6 +107,8 @@ export default async function EditarProductoPage({
         categorias={categorias}
         producto={producto}
         costoCents={costoCents}
+        opciones={leerOpciones(producto.opciones)}
+        variantes={variantes}
         guardar={guardarProducto}
       />
 

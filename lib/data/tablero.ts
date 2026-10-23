@@ -8,6 +8,7 @@ import {
   type Tablero,
 } from "@/lib/tablero"
 import { getMiTienda } from "@/lib/data/panel"
+import { cuantasVariantes, leerOpciones } from "@/lib/variantes"
 
 /** Hasta dónde se mira para lo más vendido. */
 const DIAS_DE_RANKING = 30
@@ -32,7 +33,7 @@ export async function getTablero(): Promise<Tablero | null> {
   // Bolivia no cambia de hora en el año: el día empieza siempre a las −04:00.
   const inicio = (dia: string) => `${dia}T00:00:00-04:00`
 
-  const [ventas, ultimos, lineas, catalogo, cantidad, pendientes] =
+  const [ventas, ultimos, lineas, catalogo, cantidad, pendientes, agotadas] =
     await Promise.all([
       // Una venta es un pedido pagado, igual que en el resto del panel: un
       // pendiente puede ser un carrito que nunca se mandó por WhatsApp.
@@ -66,7 +67,7 @@ export async function getTablero(): Promise<Tablero | null> {
       // filtro de PostgREST no sabe hacer: un catálogo de MVP son decenas.
       supabase
         .from("products")
-        .select("id, name, image_url, stock, low_stock_threshold")
+        .select("id, name, image_url, stock, low_stock_threshold, opciones")
         .eq("store_id", tienda.id)
         .eq("is_active", true)
         .is("deleted_at", null),
@@ -83,6 +84,14 @@ export async function getTablero(): Promise<Tablero | null> {
         .eq("store_id", tienda.id)
         .eq("status", "pendiente")
         .gte("created_at", limiteParaConcretar()),
+      // Una talla agotada no baja el total de su producto a cero, pero frena
+      // la venta de esa talla: se avisa sola.
+      supabase
+        .from("product_variants")
+        .select("product_id, nombre")
+        .eq("store_id", tienda.id)
+        .eq("stock", 0)
+        .is("deleted_at", null),
     ])
 
   // La serie: cada pedido cae en su día de Bolivia.
@@ -125,16 +134,34 @@ export async function getTablero(): Promise<Tablero | null> {
     .sort((a, b) => b.unidades - a.unidades || b.montoCents - a.montoCents)
     .slice(0, 5)
 
-  const porAcabarse = (catalogo.data ?? [])
-    .filter((p) => p.stock <= p.low_stock_threshold)
-    .sort((a, b) => a.stock - b.stock || a.name.localeCompare(b.name))
+  const activos = new Map((catalogo.data ?? []).map((p) => [p.id, p]))
+  const porAcabarse = [
+    ...(catalogo.data ?? [])
+      .filter((p) => p.stock <= p.low_stock_threshold)
+      .map((p) => ({
+        id: p.id,
+        nombre: p.name,
+        foto: p.image_url,
+        stock: p.stock,
+        variantes: cuantasVariantes(leerOpciones(p.opciones)),
+      })),
+    // Las tallas agotadas de un producto que todavía tiene otras.
+    ...(agotadas.data ?? []).flatMap((v) => {
+      const producto = activos.get(v.product_id)
+      if (!producto || producto.stock === 0) return []
+      return [
+        {
+          id: producto.id,
+          nombre: `${producto.name} · ${v.nombre}`,
+          foto: producto.image_url,
+          stock: 0,
+          variantes: cuantasVariantes(leerOpciones(producto.opciones)),
+        },
+      ]
+    }),
+  ]
+    .sort((a, b) => a.stock - b.stock || a.nombre.localeCompare(b.nombre))
     .slice(0, 5)
-    .map((p) => ({
-      id: p.id,
-      nombre: p.name,
-      foto: p.image_url,
-      stock: p.stock,
-    }))
 
   const ultimosPedidos = (ultimos.data ?? []).map((pedido) => ({
     id: pedido.id,

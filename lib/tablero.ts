@@ -61,6 +61,8 @@ export interface ProductoPorAcabarse {
   nombre: string
   foto: string | null
   stock: number
+  /** Cuántas opciones tiene: con opciones, el stock se repone en cada una. */
+  variantes?: number
 }
 
 export interface Tablero {

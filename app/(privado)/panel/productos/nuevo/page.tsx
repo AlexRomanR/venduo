@@ -21,7 +21,7 @@ export default async function NuevoProductoPage() {
 
       <Cabecera
         titulo="Un producto nuevo."
-        bajada="Lo mínimo es el nombre, el precio y cuántas unidades tienes. Lo demás hace que se venda mejor, y lo puedes completar después."
+        bajada="Con foto, nombre y precio ya se puede vender."
       />
 
       <FormularioProducto

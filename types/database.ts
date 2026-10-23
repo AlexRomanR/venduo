@@ -483,6 +483,8 @@ export type Database = {
           store_id: string
           unit_cost_cents: number | null
           unit_price_cents: number
+          variant_id: string | null
+          variant_name: string | null
         }
         Insert: {
           created_at?: string
@@ -494,6 +496,8 @@ export type Database = {
           store_id: string
           unit_cost_cents?: number | null
           unit_price_cents: number
+          variant_id?: string | null
+          variant_name?: string | null
         }
         Update: {
           created_at?: string
@@ -505,6 +509,8 @@ export type Database = {
           store_id?: string
           unit_cost_cents?: number | null
           unit_price_cents?: number
+          variant_id?: string | null
+          variant_name?: string | null
         }
         Relationships: [
           {
@@ -540,6 +546,20 @@ export type Database = {
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "mis_variantes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
         ]
@@ -750,6 +770,76 @@ export type Database = {
           },
         ]
       }
+      product_variants: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: string
+          image_url: string | null
+          nombre: string
+          position: number
+          price_cents: number | null
+          product_id: string
+          sku: string | null
+          stock: number
+          store_id: string
+          updated_at: string
+          valores: Json
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          image_url?: string | null
+          nombre: string
+          position?: number
+          price_cents?: number | null
+          product_id: string
+          sku?: string | null
+          stock?: number
+          store_id: string
+          updated_at?: string
+          valores: Json
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          image_url?: string | null
+          nombre?: string
+          position?: number
+          price_cents?: number | null
+          product_id?: string
+          sku?: string | null
+          stock?: number
+          store_id?: string
+          updated_at?: string
+          valores?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "mis_productos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_variants_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category: string | null
@@ -767,6 +857,7 @@ export type Database = {
           moderated_at: string | null
           moderation_reason: string | null
           name: string
+          opciones: Json
           price_cents: number
           sku: string | null
           stock: number
@@ -789,6 +880,7 @@ export type Database = {
           moderated_at?: string | null
           moderation_reason?: string | null
           name: string
+          opciones?: Json
           price_cents: number
           sku?: string | null
           stock?: number
@@ -811,6 +903,7 @@ export type Database = {
           moderated_at?: string | null
           moderation_reason?: string | null
           name?: string
+          opciones?: Json
           price_cents?: number
           sku?: string | null
           stock?: number
@@ -1608,6 +1701,7 @@ export type Database = {
           total_cents: number | null
           unit_cost_cents: number | null
           unit_price_cents: number | null
+          variante: string | null
         }
         Relationships: [
           {
@@ -1640,6 +1734,19 @@ export type Database = {
           price_cents: number | null
           sku: string | null
           stock: number | null
+        }
+        Relationships: []
+      }
+      mis_variantes: {
+        Row: {
+          category: string | null
+          id: string | null
+          is_active: boolean | null
+          price_cents: number | null
+          producto: string | null
+          stock: number | null
+          valores: Json | null
+          variante: string | null
         }
         Relationships: []
       }
@@ -1706,6 +1813,10 @@ export type Database = {
           visitas_7d: number
         }[]
       }
+      ajustar_stock_de_variante: {
+        Args: { p_stock: number; p_variante: string }
+        Returns: number
+      }
       aplicar_bajas_de_cuenta: { Args: never; Returns: number }
       apply_template: {
         Args: { p_store_id: string; p_template_key: string }
@@ -1766,6 +1877,10 @@ export type Database = {
         Returns: string
       }
       funciones_de_mi_tienda: { Args: never; Returns: Json }
+      guardar_variantes: {
+        Args: { p_opciones: Json; p_producto: string; p_variantes: Json }
+        Returns: undefined
+      }
       is_platform_admin: { Args: never; Returns: boolean }
       marcar_vista_vieja: { Args: { p_store_id: string }; Returns: undefined }
       monto_en_texto: { Args: { p_cents: number }; Returns: string }

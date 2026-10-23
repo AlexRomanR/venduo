@@ -75,6 +75,8 @@ export const camposSchema = z.object({
   categoria: z.boolean(),
   stock: z.boolean(),
   codigo: z.boolean(),
+  // Los catálogos guardados antes de las variantes no lo traen.
+  opciones: z.boolean().default(false),
 })
 
 // El tipo es el de `constantes.ts`: este esquema lo valida, no lo define.

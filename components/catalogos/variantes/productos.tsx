@@ -124,7 +124,7 @@ function repartir(
 }
 
 function hayDetalle(campos: Campos): boolean {
-  return campos.categoria || campos.stock || campos.codigo
+  return campos.categoria || campos.stock || campos.codigo || campos.opciones
 }
 
 /** Lo que ocupa debajo de la foto una celda de grilla. */

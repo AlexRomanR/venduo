@@ -41,7 +41,9 @@ const soloVerificar = process.argv.includes("--check")
 const SKILLS_PROPIAS = [
   "ai-task-workflow",
   "database-migration",
+  "de-idea-a-pantalla",
   "implement-feature",
+  "pantalla-por-filas",
   "pedidos-por-whatsapp",
   "qa-verification",
   "visual-block-editor",

@@ -113,6 +113,18 @@ function sampleFromSchema(
 function sqlDeDemostracion(pedido: string) {
   const t = pedido.toLowerCase()
 
+  if (/talla|color|variante|n[uú]mero/.test(t)) {
+    return {
+      titulo: "Lo más vendido por talla y color",
+      explicacion:
+        "Unidades vendidas de cada variante, en los pedidos pagados.",
+      grafico: "barra",
+      formato: "cantidad",
+      vistas: ["mis_items"],
+      sql: "select product_name || ' · ' || variante as etiqueta, sum(quantity) as valor from mis_items where status = 'pagado' and variante is not null group by 1 order by 2 desc limit 15",
+    }
+  }
+
   if (/gan[eé]|gananci|margen/.test(t)) {
     return {
       titulo: "Ganancia por día",

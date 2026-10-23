@@ -204,6 +204,39 @@ baja de tinta al 65% (5,3:1 contra el papel): al 55% no llega al contraste AA.
 `lib/estilos.ts` en vez de reemplazarse: lo que aportan es el cableado de accesibilidad
 de los formularios, que no se regala por una cuestión de color.
 
+### Crear o editar algo: la pantalla por filas
+
+**Una pantalla para crear o editar algo no muestra todos sus campos abiertos.** Así era
+el formulario de producto: cinco paneles con título y subtítulo, cada campo con su
+rótulo y una frase de ayuda, todo para escribir. Se leía, no se miraba. Ahora es la
+pantalla por filas, y es la forma de toda pantalla nueva de este tipo —un producto, una
+venta, los datos de la tienda, un catálogo—:
+
+1. **Arriba, lo mínimo para que exista, escrito ahí mismo y grande.** En un producto:
+   fotos, nombre y precio. Se pregunta "¿sin qué no se puede guardar?", y eso y nada más.
+2. **Todo lo demás es una fila con su valor a la vista**: "Categoría · Ropa", "Oferta ·
+   No", "Tallas y colores · S, M, L". La pantalla se vuelve un resumen. Lo vacío
+   ("Ninguna", "Sin agregar") va en tinta al 55%; lo cargado, en negrita.
+3. **Tocar una fila abre una hoja con ese ajuste solo** (`HojaDeAjuste`): sale de abajo
+   en el celular y del costado en una pantalla ancha. La explicación va en la
+   descripción de la hoja, nunca como frase permanente bajo un campo.
+4. **Lo de todos los días se cambia en la fila**: una cantidad con más y menos
+   (`Cantidad`), un sí o no con su interruptor (`Palanca`). Solo se abre una hoja si hay
+   algo que elegir o escribir.
+5. **Las filas van en dos o tres paneles por para qué sirven**, no por tipo de campo: en
+   el producto, "lo de vender" (unidades, tallas, categoría, oferta, costo) y "cómo se
+   muestra" (visible, destacado, aviso, descripción).
+6. **Se sugiere en vez de preguntar**: la categoría "Ropa" abre las tallas ya en Talla.
+   Abrir algo y no completarlo no es un error: se guarda como si no se hubiera abierto.
+7. **La acción principal, fija sobre las pestañas en el celular**; con un error, la fila
+   que lo tiene se pinta de rojo con su mensaje y un aviso dice "Revisa lo que quedó en
+   rojo".
+
+Las piezas están en `components/panel/ajustes.tsx` (`Fila`, `Palanca`, `Cantidad`,
+`CampoMonto`, `HojaDeAjuste`) y el ejemplo completo es `components/productos/formulario.tsx`.
+El procedimiento para armar una —mirar, recortar, investigar, proponer con boceto,
+construir y verificar— es la skill `pantalla-por-filas`. La app lleva la misma pantalla.
+
 ## Móvil primero, en serio
 
 El usuario real de Venduo vende por TikTok desde el celular y compra desde el celular.
@@ -215,6 +248,13 @@ para nada en este producto.
 - Objetivos táctiles de **44 px** como mínimo. Los tamaños `sm` de shadcn ya lo cumplen.
 - Nada de tablas anchas sin `overflow-x-auto` alrededor.
 - Probar cada pantalla angosta antes de darla por hecha.
+- **Un grupo de botones que salta de renglón va en columnas iguales.** Botones del
+  ancho de su texto con `flex-wrap` dejan el segundo renglón desalineado del primero
+  —"Tamaño" y "Otra" debajo de "Talla", "Número" y "Color", cada uno con su borde en
+  otro lugar—, y se ve roto. Si son opciones del mismo peso, `grid` con columnas
+  iguales (`grid-cols-3 sm:grid-cols-5`) y cada botón `w-full`. El `flex-wrap` queda
+  para fichas de largo muy distinto —tallas, colores, categorías—, donde columnas fijas
+  dejarían huecos. Pasó en más de una pantalla: mirarlo en 375 px cada vez.
 
 ## Tailwind v4
 
