@@ -2,6 +2,23 @@
 
 Lo que no está en el código y se aprende rompiendo algo. Aplica a personas y a agentes.
 
+## Cada pedido se mide antes de empezar
+
+**Un agente decide solo si un pedido pasa por `/idea`**, sin esperar a que la persona lo
+escriba. Lo dice en una línea al empezar —"Es mediano: lo paso por `/idea`." o "Es chico:
+lo hago directo."— y sigue. Si la persona prefiere otro camino, manda ella.
+
+| Va por `/idea` (skill `de-idea-a-pantalla`)                       | Se hace directo                                       |
+| ----------------------------------------------------------------- | ----------------------------------------------------- |
+| Una función nueva, o una pantalla nueva                           | Un error con causa clara, un texto, una alineación    |
+| Rehacer una pantalla que "se ve rara", "confunde", "no me gusta"  | Repetir algo ya decidido: llevar a la app lo aprobado |
+| Algo que toca la base, o la web y la app a la vez por primera vez | Continuar una tarea que ya pasó por `/idea`           |
+| Un pedido vago, con varias formas razonables de resolverlo        | Una pregunta, una explicación, una investigación      |
+
+La pista más segura: **si para hacerlo bien habría que preguntarle algo a la persona o
+elegir entre dos diseños, va por `/idea`**. Si lo que hay que hacer está claro y es uno
+solo, no.
+
 ## Hay una sola base de datos, y es la de producción
 
 El proyecto de Supabase enlazado (`supabase link`) es **el mismo** que usa la página

@@ -1,11 +1,15 @@
 ---
 name: de-idea-a-pantalla
 description: >-
-  Use this skill when the person describes something they want built or changed
-  in Venduo in their own words (often with /idea) and it needs to go from a
-  rough idea to a finished, verified change: interview to sharpen the request
-  into a brief, research, technical plan, design, approval, implementation and
-  verification, with the right size of process for the task.
+  Use this skill proactively, without waiting for the person to type /idea,
+  whenever a request in Venduo is medium or large: a new feature or screen,
+  redoing a screen that "looks odd" or "confuses", something that touches the
+  database or both web and app for the first time, or a vague request with
+  several reasonable solutions. It takes the idea to a finished, verified
+  change: interview into a brief, research, technical plan, design, approval,
+  implementation and verification. Skip it for small or already-decided work
+  (a clear bug, a text, an alignment, porting an approved design, a question);
+  the sizing table is in workflow.md.
 ---
 
 # De la idea a la pantalla

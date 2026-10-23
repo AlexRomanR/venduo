@@ -124,6 +124,9 @@ se pierde en la próxima sincronización.
 
 ### De la idea a la pantalla: `/idea`
 
+**No hace falta escribirlo: cada pedido se mide antes de empezar** (`workflow.md`). Lo
+mediano o grande pasa por `/idea` solo, avisando en una línea; lo chico se hace directo.
+
 Para algo nuevo o un cambio que no es trivial, **`/idea lo que quiero`** usa la skill
 `de-idea-a-pantalla`: mide el tamaño, hace una entrevista corta y deja el brief en
 `docs/briefs/`, y pasa por un equipo de agentes (`.claude/agents/`) con una pausa para
