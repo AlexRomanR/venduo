@@ -70,8 +70,11 @@ pantalla**: la misma barra de arriba (`BarraLateralMovil`, el cuadro de rayitas)
 mismo menú lateral, las mismas pestañas de abajo (`Pestanas`), la misma cabecera, los
 mismos nombres y el mismo orden. Quien vende usa las dos y no tiene por qué aprender dos.
 
-- **Todo cambio a algo que existe en las dos se hace en los dos repositorios en la misma
-  tarea.** Una pantalla del panel que cambia en la web cambia en la app, y al revés.
+- **Todo cambio a algo que existe en las dos termina en los dos repositorios, en orden:
+  primero la web, después la app.** Se construye la web —y se mira en el celular—, la
+  persona la aprueba, y recién entonces se pasa a la app tal cual quedó. Así un ajuste
+  sobre lo que no convence se hace una vez y no dos. Mientras tanto la app queda como
+  estaba; lo que no se hace es dejarla atrás para siempre.
 - **Se mira lado a lado antes de darlo por hecho**: el emulador y el navegador a 375 px.
 - **La barra de arriba dice dónde estás**, como en la app: en una sección, su nombre con
   el menú al lado; en un detalle, la flecha para volver y el nombre de lo que se mira
@@ -248,13 +251,20 @@ para nada en este producto.
 - Objetivos táctiles de **44 px** como mínimo. Los tamaños `sm` de shadcn ya lo cumplen.
 - Nada de tablas anchas sin `overflow-x-auto` alrededor.
 - Probar cada pantalla angosta antes de darla por hecha.
-- **Un grupo de botones que salta de renglón va en columnas iguales.** Botones del
-  ancho de su texto con `flex-wrap` dejan el segundo renglón desalineado del primero
-  —"Tamaño" y "Otra" debajo de "Talla", "Número" y "Color", cada uno con su borde en
-  otro lugar—, y se ve roto. Si son opciones del mismo peso, `grid` con columnas
-  iguales (`grid-cols-3 sm:grid-cols-5`) y cada botón `w-full`. El `flex-wrap` queda
-  para fichas de largo muy distinto —tallas, colores, categorías—, donde columnas fijas
-  dejarían huecos. Pasó en más de una pantalla: mirarlo en 375 px cada vez.
+- **Un grupo de fichas o de botones nunca baja de renglón a su ancho.** Fichas del ancho
+  de su texto con `flex-wrap` dejan el segundo renglón con los bordes en otro lugar que
+  el primero, y se ve roto. Pasó tres veces —los tipos de talla, las tallas y las
+  categorías de Nueva venta—, la última por una excepción que esta regla tenía para
+  "fichas de largo muy distinto". **Sin excepciones**, hay dos formas y nada más:
+  - **Columnas iguales**: `GRILLA_DE_FICHAS` (`lib/estilos.ts`), que pone tantas
+    columnas iguales como entren, con cada ficha `w-full justify-center` y su texto
+    `truncate`. Es la de categorías, tallas, colores y tipos.
+  - **Una sola fila que se desliza**: la franja de filtros de una lista
+    (`FranjaDeFichas`), donde la última asoma cortada a propósito.
+
+  Antes de dar por hecha una pantalla con fichas, buscar `flex-wrap` en lo que se tocó.
+  `flex-wrap` sí vale para lo que no es un grupo de botones: textos sueltos, enlaces de
+  un pie, las fotos de un producto.
 
 ## Tailwind v4
 

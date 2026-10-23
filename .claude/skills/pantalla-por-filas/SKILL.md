@@ -84,8 +84,9 @@ Invocar `impeccable` con `polish`. Lo que más se escapa en estas pantallas:
 - Un rótulo de fila que se parte en dos renglones porque el valor ocupa lugar:
   acortarlo ("Aviso de stock", no "Avisarme si se acaba").
 - Dos lugares para cargar lo mismo a la vez (el total y las tallas abiertas).
-- Un grupo de botones del mismo peso que salta de renglón desalineado: columnas
-  iguales (`ui-styling.md`).
+- **Fichas que bajan de renglón a su ancho**: buscar `flex-wrap` en lo que se tocó. Todo
+  grupo de fichas va en `GRILLA_DE_FICHAS` o en una franja que se desliza, sin
+  excepciones (`ui-styling.md`). Pasó tres veces.
 - Objetivos de menos de 44 px, texto secundario por debajo de tinta al 65%.
 
 ## 7. Verificar de verdad
@@ -100,7 +101,10 @@ Invocar `impeccable` con `polish`. Lo que más se escapa en estas pantallas:
 
 ## Pantallas candidatas
 
-Las que hoy tienen campos abiertos y se beneficiarían: Nueva venta
-(`/panel/pedidos/nueva`), los datos de la tienda y la cuenta (`/cuenta`), Nuevo catálogo
-(`/panel/catalogos/nuevo`), los datos del negocio en el alta (`/crear/negocio`) y
-Categorías (`/panel/productos/categorias`).
+Ya son por filas: el producto (`components/productos/formulario.tsx`) y Nueva venta
+(`components/pedidos/nueva-venta.tsx`), que muestra la variante para listas: lo vendido
+como filas con más y menos al lado, y agregar en una hoja con un segundo paso.
+
+Las que hoy tienen campos abiertos y se beneficiarían: los datos de la tienda y la cuenta
+(`/cuenta`), Nuevo catálogo (`/panel/catalogos/nuevo`), los datos del negocio en el alta
+(`/crear/negocio`) y Categorías (`/panel/productos/categorias`).

@@ -25,8 +25,10 @@ y probado, con dos pausas para que decida. Cada etapa tiene su responsable:
 | 4   | Agente `disenador`                            | Bocetos a 375 y 1280 px y los textos |
 |     | Quien conversa                                | Que brief, plan y boceto cuadren     |
 | ⏸   | **La persona**                                | Aprueba brief, plan y boceto         |
-| 5   | Quien conversa, con las skills del proyecto   | El cambio, en la web y en la app     |
-| 6   | Agente `verificador`                          | Defectos ordenados, o "listo"        |
+| 5   | Quien conversa, con las skills del proyecto   | El cambio en la web, probado         |
+| ⏸   | **La persona**                                | Lo mira y lo aprueba                 |
+| 5b  | Quien conversa                                | Lo mismo en la app                   |
+| 6   | Agente `verificador`, solo en lo grande       | Lo que nadie probó todavía           |
 
 ---
 
@@ -35,11 +37,11 @@ y probado, con dos pausas para que decida. Cada etapa tiene su responsable:
 Antes de nada, decidir el tamaño y decirlo en una línea. No todo merece el recorrido
 completo, y cada agente cuesta tiempo:
 
-| Tamaño      | Ejemplo                                                         | Qué etapas                                           |
-| ----------- | --------------------------------------------------------------- | ---------------------------------------------------- |
-| **Chico**   | Alinear unos botones, cambiar un texto                          | Directo a construir (5) y verificar (6), sin agentes |
-| **Mediano** | Rehacer una pantalla que ya existe                              | Entrevista corta, analista y diseñador, pausa, 5 y 6 |
-| **Grande**  | Una función nueva, algo que toca la base o los dos repositorios | Todo                                                 |
+| Tamaño      | Ejemplo                                                         | Qué etapas                                       |
+| ----------- | --------------------------------------------------------------- | ------------------------------------------------ |
+| **Chico**   | Alinear unos botones, cambiar un texto                          | Directo a construir y probar, sin agentes        |
+| **Mediano** | Rehacer una pantalla que ya existe                              | Entrevista corta, analista y diseñador, pausa, 5 |
+| **Grande**  | Una función nueva, algo que toca la base o los dos repositorios | Todo, con el verificador acotado al final        |
 
 Si la persona pide otro tamaño, manda ella.
 
@@ -48,17 +50,23 @@ Si la persona pide otro tamaño, manda ella.
 **La hace quien conversa con la persona**, con `AskUserQuestion`: un agente en segundo
 plano no le puede preguntar nada. Entre **3 y 6 preguntas**, solo las que cambian lo que
 se construye, con opciones concretas y la recomendada primero. Lo que ya se sabe por el
-código, el pedido o el proyecto no se pregunta. Las de siempre, si no están claras:
+código, el pedido o el proyecto no se pregunta.
 
-- **Quién lo usa**: quien vende (el panel o la app) o quien compra (la tienda).
-- **Qué problema resuelve**, en su idioma: "vendí algo que ya no tenía", no "gestión de
-  inventario".
-- **Cómo se sabe que salió bien**: qué hace la persona en cuántos toques.
-- **Dónde**: la web, la app o las dos (en el celular son la misma pantalla: casi siempre
-  las dos).
-- **Qué no tiene que pasar**: lo que hoy funciona y no se puede romper.
+**Quien pide es el dueño del producto, no su cliente.** No se le pregunta "¿cómo vendes
+tú?" ni "¿qué tan seguido haces tal cosa?", como a quien usa Venduo: eso lo resuelve la
+investigación y el criterio. Se le pregunta **cómo quiere que quede y qué quedó ambiguo
+en lo que pidió**:
+
+- **Qué tiene que pasar** cuando hay dos lecturas posibles del pedido: "¿al tocar un
+  producto se suma y se cierra, o se marcan varios y se confirman con un botón?".
+- **Qué entra y qué no**: lo que el pedido no aclara —"¿también la nota interna?"—.
+- **Qué de lo de hoy se queda** y qué se puede cambiar.
+- **Hasta dónde llega**: si es solo esta pantalla o también las que se le parecen.
 - Si roza `VENDUO.md` §7 (cobrar dentro, envíos, pedirle datos a quien compra…),
   preguntar antes de seguir.
+
+Si el pedido ya es claro, no se inventan preguntas: se dice "está claro, sigo" y se
+escribe el brief.
 
 Con las respuestas, escribir el **brief** en `docs/briefs/AAAA-MM-DD-nombre-corto.md`:
 
@@ -124,15 +132,24 @@ Con las skills del proyecto que correspondan: `implement-feature`, `database-mig
   lista con casillas (`- [ ]`), y se marca cada una al terminarla y comprobarla. Así un
   trabajo largo se retoma donde quedó, aunque la conversación se corte o se resuma, y
   nada se da por hecho sin haberlo comprobado. Una tarea chica o mediana no lo necesita.
-- **La web primero si la persona quiere verlo antes**; si no, web y app en la misma
-  tarea.
+- **Primero la web, y su versión en el celular.** La app no se toca hasta que la
+  persona mira la web y lo aprueba (`ui-styling.md`, "El celular es uno solo"). Entonces
+  se pasa a la app tal cual quedó, como un paso aparte (5b), que ya no necesita boceto
+  ni entrevista.
+- **Quien construye prueba mientras construye**: 375 y 1280 px, cada estado, cada hoja,
+  guardar y mirar la base. Esa prueba es la verificación de lo chico y lo mediano, y se
+  cuenta con lo que se probó y lo que no.
 - Las migraciones con `npx supabase db push`, avisando antes: cambian producción.
 - Revisar con `impeccable` (`polish`) antes de darlo por hecho.
 
-## 6. Verificar
+## 6. Verificar, solo lo que falta
 
-Lanzar `verificador` con el brief, los archivos tocados y cómo debería comportarse.
-Corregir lo que traiga y, si fue algo serio, volver a verificar **una vez**. Después:
+**Solo en lo grande** —algo que toca la base, el dinero o el stock, o varias pantallas—,
+y **acotado**: quien construyó ya probó la pantalla, así que repetir todo es tiempo
+perdido. Se lanza `verificador` con la lista de **lo que ya se probó** y **lo que falta
+probar** —una escritura de punta a punta, un caso raro, la otra plataforma—, y prueba
+solo eso. Corregir lo que traiga, sin volver a verificar salvo que fuera algo serio.
+Después:
 
 - Actualizar `docs/estado-del-proyecto.md` y lo demás que pida `workflow.md`.
 - Contarle a la persona qué quedó, qué se probó y qué no, con la ruta para verlo.
