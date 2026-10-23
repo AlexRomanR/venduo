@@ -54,6 +54,6 @@ el CI; la app en esta vuelta; cubrir todo el código existente.
 - [x] pgTAP: `create_order`; `npm run test:db` en verde y en rojo con un precio cambiado.
 - [x] pgTAP: estado y stock, `registrar_venta`, stock de variantes, RLS entre tiendas.
 - [x] Migración: la unidad vuelve a la variante con la misma combinación; su test.
-- [ ] CI: `npm test` en `verify`, job `base`, Node 22; los dos en verde en la rama.
+- [x] CI: `npm test` en `verify`, job `base`, Node 22; los dos en verde en la rama.
 - [x] Reglas, skills y documentos; `sync:agents:check` en verde.
 - [x] Cierre: `npm run check` y `npm run build` con el servidor detenido.
