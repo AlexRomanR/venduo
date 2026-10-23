@@ -59,7 +59,7 @@ import {
   moverBloque,
   quitarBloque,
 } from "@/lib/catalogos/operaciones"
-import { GRILLA_DE_FICHAS } from "@/lib/estilos"
+import { GRILLA_DE_FICHAS_LARGAS } from "@/lib/estilos"
 import { cn } from "@/lib/utils"
 import { Aviso } from "@/components/editor/piezas"
 import {
@@ -907,7 +907,7 @@ function CamposDeProductos({
 
       <fieldset className="min-w-0">
         <legend className={ETIQUETA}>Qué se ve de cada producto</legend>
-        <div className={cn(GRILLA_DE_FICHAS, "mt-2")}>
+        <div className={cn(GRILLA_DE_FICHAS_LARGAS, "mt-2")}>
           {(Object.keys(CAMPOS) as Campo[]).map((campo) => {
             const activo = bloque.campos[campo]
             return (
@@ -922,13 +922,15 @@ function CamposDeProductos({
                   })
                 }
                 className={cn(
-                  "flex min-h-11 w-full min-w-0 items-center justify-center border px-2 text-sm font-semibold transition-colors",
+                  "flex min-h-11 w-full min-w-0 items-center justify-center border px-2 py-1.5 text-sm font-semibold transition-colors",
                   activo
                     ? "border-tinta bg-tinta text-papel"
                     : "border-tinta/25 hover:border-tinta"
                 )}
               >
-                <span className="truncate">{CAMPOS[campo]}</span>
+                <span className="text-center leading-tight">
+                  {CAMPOS[campo]}
+                </span>
               </button>
             )
           })}
