@@ -230,7 +230,7 @@ que se arregló:
   (`TIPOS_DE_OPCION` en `lib/variantes.ts`); cada color lleva su punto y su foto. La
   categoría sugiere el tipo (`tipoSugerido`: "Buzos" abre en Talla, "Botines" en
   Número), y el precio de cada una solo aparece con "Alguna cuesta distinto".
-- **El formulario de producto es una pantalla por filas** (web; la app, pendiente):
+- **El formulario de producto es una pantalla por filas** (web y app):
   arriba fotos, nombre y precio, grandes y escritos ahí mismo; lo demás —unidades,
   tallas, categoría, oferta, costo, visible, destacado, aviso, descripción— una fila
   con su valor a la vista que abre una hoja. Las piezas (`components/panel/ajustes.tsx`)
