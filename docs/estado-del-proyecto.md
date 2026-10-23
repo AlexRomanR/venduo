@@ -236,6 +236,13 @@ que se arregló:
   con su valor a la vista que abre una hoja. Las piezas (`components/panel/ajustes.tsx`)
   y la receta (`ui-styling.md`, skill `pantalla-por-filas`) son para toda pantalla de
   crear o editar algo.
+- **Nueva venta, por filas** (web y app; brief en
+  `docs/briefs/2026-10-23-nueva-venta-por-filas.md`): arriba lo vendido —foto, nombre,
+  "1 × Bs 240" y más y menos—, "Agregar producto" abre la grilla en una hoja (con la
+  talla como segundo paso de la misma hoja), y tocar una línea abre su precio y
+  "Quitar de la venta". En la web, la venta a medio armar sobrevive a "Corregir el
+  stock" (`sessionStorage`); en la app la pantalla queda debajo y no se pierde, salvo
+  que se salga de ella.
 - **`/idea`**: de una idea en palabras a un cambio probado, con entrevista, brief en
   `docs/briefs/` y los agentes `investigador-de-producto`, `analista-tecnico`,
   `disenador` y `verificador` (skill `de-idea-a-pantalla`).
@@ -406,6 +413,12 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 
 ### 7. Pendientes chicos
 
+- **Fichas que todavía bajan de renglón a su ancho** (`flex-wrap`), contra la regla de
+  `ui-styling.md`: pasarlas a `GRILLA_DE_FICHAS` o a una franja que se desliza. Quedan
+  los asistentes de catálogos y su editor, los filtros de la galería de plantillas del
+  alta, la cabecera del Resumen, el selector de talla de la tienda pública (lo ve quien
+  compra), varias pantallas de `/admin`, y en la app el editor de tallas y otras
+  pantallas, que se corrigen al pasar los cambios.
 - **Una vez, entrar a `/panel/apariencia` después de horas sin uso terminó en `/panel`**
   (revisión del 8 de octubre). El registro muestra pedidos a `/auth/destino` y `/crear`
   justo después, como si en ese instante la sesión no encontrara la tienda. No se pudo

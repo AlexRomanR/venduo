@@ -44,3 +44,13 @@ export const FICHA =
   "flex min-h-11 items-center border px-3 text-xs font-semibold transition-colors"
 export const FICHA_ELEGIDA = "border-tinta bg-tinta text-papel"
 export const FICHA_LIBRE = "border-tinta/25 hover:border-tinta"
+
+/**
+ * Un grupo de fichas que baja de renglón: columnas iguales, tantas como entren.
+ * Fichas del ancho de su texto con `flex-wrap` dejaban el segundo renglón con
+ * los bordes en otro lugar que el primero, y se veía roto —pasó tres veces—.
+ * Cada ficha adentro va `w-full justify-center`, con el texto `truncate`.
+ * Para una sola fila que se desliza, la franja de filtros de las listas.
+ */
+export const GRILLA_DE_FICHAS =
+  "grid grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] gap-1.5"

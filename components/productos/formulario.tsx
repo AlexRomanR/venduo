@@ -155,6 +155,15 @@ export function FormularioProducto({
     setHoja("tallas")
   }
 
+  // La lista, el Resumen y la venta llevan a #variantes: ahí las tallas son
+  // una hoja, así que se abre.
+  const conAncla = React.useRef(false)
+  React.useEffect(() => {
+    if (conAncla.current || window.location.hash !== "#variantes") return
+    conAncla.current = true
+    setHoja("tallas")
+  }, [])
+
   function cerrarHoja() {
     // Abrir las tallas y no marcar ninguna es no tenerlas: no es un error.
     const llenas = opcionesActuales.filter((o) => o.valores.length > 0)

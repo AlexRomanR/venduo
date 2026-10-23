@@ -139,21 +139,36 @@ export function Cantidad({
   etiqueta,
   valor,
   alCambiar,
+  minimo = 0,
+  maximo = 999_999,
+  error = false,
+  angosta = false,
 }: {
   etiqueta: string
   valor: number
   alCambiar: (valor: number) => void
+  /** Una línea de una venta no baja de 1: quitarla se hace en su hoja. */
+  minimo?: number
+  maximo?: number
+  error?: boolean
+  /** El número más estrecho, para una fila que también lleva foto y nombre. */
+  angosta?: boolean
 }) {
+  const acotar = (n: number) => Math.min(maximo, Math.max(minimo, n))
+  const borde = error ? "border-senal" : "border-tinta"
+  // Lo que se está escribiendo: puede quedar vacío un momento. Sin esto, con
+  // mínimo 1, borrar dejaba "1" y escribir "2" daba 12.
+  const [escrito, setEscrito] = React.useState<string | null>(null)
   return (
     <div
       role="group"
       aria-label={etiqueta}
-      className="flex h-11 shrink-0 items-stretch border border-tinta"
+      className={cn("flex h-11 shrink-0 items-stretch border", borde)}
     >
       <button
         type="button"
-        onClick={() => alCambiar(Math.max(valor - 1, 0))}
-        disabled={valor <= 0}
+        onClick={() => alCambiar(acotar(valor - 1))}
+        disabled={valor <= minimo}
         aria-label="Una menos"
         className="flex w-11 items-center justify-center transition-colors hover:bg-tinta hover:text-papel disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-tinta"
       >
@@ -162,20 +177,30 @@ export function Cantidad({
       <input
         type="number"
         inputMode="numeric"
-        min={0}
-        value={valor}
-        onChange={(e) =>
-          alCambiar(Math.max(0, Math.trunc(Number(e.target.value) || 0)))
-        }
+        min={minimo}
+        max={maximo}
+        value={escrito ?? valor}
+        onChange={(e) => {
+          const cifras = e.target.value.replace(/\D/g, "")
+          setEscrito(cifras)
+          if (cifras !== "") alCambiar(acotar(Number(cifras)))
+        }}
+        onBlur={() => setEscrito(null)}
         onFocus={(e) => e.target.select()}
         aria-label={etiqueta}
-        className="tabular w-14 [appearance:textfield] border-x border-tinta bg-transparent text-center font-semibold outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className={cn(
+          "tabular [appearance:textfield] border-x bg-transparent text-center font-semibold outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+          borde,
+          angosta ? "w-10" : "w-14",
+          error && "text-senal"
+        )}
       />
       <button
         type="button"
-        onClick={() => alCambiar(valor + 1)}
+        onClick={() => alCambiar(acotar(valor + 1))}
+        disabled={valor >= maximo}
         aria-label="Una más"
-        className="flex w-11 items-center justify-center transition-colors hover:bg-tinta hover:text-papel"
+        className="flex w-11 items-center justify-center transition-colors hover:bg-tinta hover:text-papel disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-tinta"
       >
         <Plus aria-hidden="true" className="size-4" />
       </button>
@@ -255,6 +280,7 @@ export function HojaDeAjuste({
   descripcion,
   alCerrar,
   sinListo = false,
+  pie,
   children,
 }: {
   abierta: boolean
@@ -263,6 +289,8 @@ export function HojaDeAjuste({
   alCerrar: () => void
   /** Para una hoja que se cierra sola al elegir, como la categoría. */
   sinListo?: boolean
+  /** Otra acción en lugar de "Listo": "Agregar 3 productos". */
+  pie?: React.ReactNode
   children: React.ReactNode
 }) {
   const ancha = usePantallaAncha()
@@ -294,7 +322,11 @@ export function HojaDeAjuste({
         <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 py-5">
           {children}
         </div>
-        {sinListo ? null : (
+        {sinListo ? null : pie ? (
+          <div className="border-t border-tinta/15 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+            {pie}
+          </div>
+        ) : (
           <div className="border-t border-tinta/15 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
             <button
               type="button"

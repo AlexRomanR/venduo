@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 
 import { useConfirmacion } from "@/components/panel/confirmar"
+import { GRILLA_DE_FICHAS } from "@/lib/estilos"
 import { CURRENCY_SYMBOL, formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import {
@@ -357,7 +358,7 @@ function Ficha({
       onClick={alTocar}
       className={cn(
         "inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 border px-3 text-sm font-semibold transition-colors",
-        ancha && "w-full px-2",
+        ancha && "w-full min-w-0 px-2",
         elegida
           ? "border-tinta bg-tinta text-papel"
           : punteada
@@ -367,9 +368,9 @@ function Ficha({
     >
       {Icono ? <Icono aria-hidden="true" className="size-4" /> : null}
       {muestra ? <Muestra color={muestra} sobreTinta={elegida} /> : null}
-      {texto}
+      <span className="truncate">{texto}</span>
       {elegida ? (
-        <Check aria-hidden="true" className="-mr-0.5 size-3.5" />
+        <Check aria-hidden="true" className="-mr-0.5 size-3.5 shrink-0" />
       ) : null}
     </button>
   )
@@ -515,7 +516,7 @@ function EditorDeOpcion({
         <div
           role="group"
           aria-label={`${opcion.nombre || "Valores"}: toca los que tienes`}
-          className="flex flex-wrap gap-2"
+          className={GRILLA_DE_FICHAS}
         >
           {fichas.map((valor) => (
             <Ficha
@@ -523,6 +524,7 @@ function EditorDeOpcion({
               texto={valor}
               elegida={opcion.valores.includes(valor)}
               muestra={tipo?.nombre === "Color" ? valor : undefined}
+              ancha
               alTocar={() => alternar(valor)}
             />
           ))}
@@ -531,6 +533,7 @@ function EditorDeOpcion({
               icono={Plus}
               texto="Ver todos"
               punteada
+              ancha
               alTocar={() => setAbierta(true)}
             />
           ) : escribiendo ? null : (
@@ -539,6 +542,7 @@ function EditorDeOpcion({
               texto={tipo ? "Otra" : "Agregar"}
               etiqueta={tipo?.otro ?? "Agregar un valor"}
               punteada
+              ancha
               alTocar={() => setEscribiendo(true)}
             />
           )}
