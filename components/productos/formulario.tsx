@@ -22,7 +22,7 @@ import {
   CAMPO_LINEA,
   ETIQUETA_CAMPO,
 } from "@/lib/estilos"
-import { CURRENCY_SYMBOL } from "@/lib/format"
+import { CURRENCY_SYMBOL, formatMoney } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { productoSchema, type ProductoInput } from "@/lib/validation/producto"
 import type { Product, ProductCategory } from "@/types"
@@ -84,11 +84,14 @@ export function FormularioProducto({
   tiendaId,
   categorias,
   producto,
+  costoCents = null,
   guardar,
 }: {
   tiendaId: string
   categorias: ProductCategory[]
   producto?: Product
+  /** Lo que le cuesta a la tienda: vive aparte del producto, solo para ella. */
+  costoCents?: number | null
   guardar: (
     entrada: ProductoInput,
     id?: string
@@ -103,6 +106,7 @@ export function FormularioProducto({
       descripcion: producto?.description ?? "",
       precio: producto ? producto.price_cents / 100 : undefined,
       precioAnterior: aMonto(producto?.compare_at_price_cents ?? null),
+      costo: aMonto(costoCents),
       stock: producto?.stock ?? 0,
       avisoStock: producto?.low_stock_threshold ?? 3,
       categoriaId: producto?.category_id ?? null,
@@ -112,6 +116,7 @@ export function FormularioProducto({
       destacado: producto?.is_featured ?? false,
     },
   })
+  const [precio, costo] = form.watch(["precio", "costo"])
 
   const enCurso = form.formState.isSubmitting
 
@@ -343,6 +348,38 @@ export function FormularioProducto({
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="costo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className={ETIQUETA_CAMPO}>
+                    Lo que te cuesta
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      inputMode="decimal"
+                      step="0.01"
+                      min="0"
+                      className={cn(CAMPO_LINEA, "tabular")}
+                      placeholder="Opcional"
+                      value={field.value ?? ""}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === "" ? null : Number(e.target.value)
+                        )
+                      }
+                    />
+                  </FormControl>
+                  <FormDescription className={AYUDA_CAMPO}>
+                    <Ganancia precio={precio} costo={costo} />
+                  </FormDescription>
+                  <FormMessage className="text-senal" />
+                </FormItem>
+              )}
+            />
           </div>
         </Bloque>
 
@@ -476,5 +513,36 @@ export function FormularioProducto({
         </div>
       </form>
     </Form>
+  )
+}
+
+/**
+ * Cuánto se gana por unidad, en vivo mientras se escribe el costo. Sin costo,
+ * dice para qué sirve cargarlo.
+ */
+function Ganancia({
+  precio,
+  costo,
+}: {
+  precio: number | undefined
+  costo: number | null | undefined
+}) {
+  if (costo === null || costo === undefined || precio === undefined) {
+    return <>Solo lo ves tú. Con él, tu panel te dice cuánto ganas.</>
+  }
+  const gananciaCents = Math.round((precio - costo) * 100)
+  if (gananciaCents < 0) {
+    return (
+      <span className="font-semibold text-senal">
+        Pierdes {formatMoney(-gananciaCents)} por unidad.
+      </span>
+    )
+  }
+  const margen =
+    precio > 0 ? Math.round((gananciaCents / (precio * 100)) * 100) : 0
+  return (
+    <span className="font-semibold text-tinta">
+      Ganas {formatMoney(gananciaCents)} por unidad ({margen}%).
+    </span>
   )
 }

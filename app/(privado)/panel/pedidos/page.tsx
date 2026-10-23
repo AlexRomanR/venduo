@@ -1,11 +1,11 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { Share2, ShoppingBag } from "lucide-react"
+import { Plus, Share2, ShoppingBag } from "lucide-react"
 
 import { getPedidos, type FiltroPedidos } from "@/lib/data/pedidos"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
-import { BOTON_SECUNDARIO } from "@/lib/estilos"
+import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
 import {
   DIAS_PARA_CONCRETAR,
   grupoDeFecha,
@@ -79,11 +79,20 @@ export default async function PedidosPage({
   }
 
   return (
-    <div className="flex flex-col gap-6 md:gap-8">
+    <div className="flex flex-col gap-6 max-lg:pb-16 md:gap-8">
       <Cabecera
         titulo="Tus pedidos."
         bajada="Llegan a tu WhatsApp. Márcalos pagados y se descuentan del stock."
-      />
+        accionesSoloEnPantallaAncha
+      >
+        <Link
+          href="/panel/pedidos/nueva"
+          className={cn(BOTON_PRIMARIO, "min-h-11 px-4 text-sm")}
+        >
+          <Plus aria-hidden="true" className="size-4" />
+          Nueva venta
+        </Link>
+      </Cabecera>
 
       <FichasDeCobro
         cobros={[
@@ -194,6 +203,19 @@ export default async function PedidosPage({
           </SinDatos>
         )}
       </Seccion>
+
+      {/* Lo vendido en el chat o en persona también baja el stock: el botón
+          flota sobre las pestañas, al alcance del pulgar. */}
+      <Link
+        href="/panel/pedidos/nueva"
+        className={cn(
+          BOTON_PRIMARIO,
+          "fixed right-4 bottom-[calc(4rem+env(safe-area-inset-bottom)+0.75rem)] z-20 min-h-12 px-5 lg:hidden"
+        )}
+      >
+        <Plus aria-hidden="true" className="size-5" />
+        Nueva venta
+      </Link>
     </div>
   )
 }

@@ -171,12 +171,12 @@ análisis es igual de grave.
 
 Por eso la IA escribe contra cuatro vistas ya acotadas a `my_store_id()`:
 
-| Vista           | Qué trae                       |
-| --------------- | ------------------------------ |
-| `mis_ventas`    | Pedidos, con su número         |
-| `mis_items`     | Líneas de pedido, por producto |
-| `mis_productos` | Catálogo y stock               |
-| `mis_visitas`   | Visitas por día y origen       |
+| Vista           | Qué trae                                        |
+| --------------- | ----------------------------------------------- |
+| `mis_ventas`    | Pedidos, con su número y si fue venta directa   |
+| `mis_items`     | Líneas de pedido, por producto, con su ganancia |
+| `mis_productos` | Catálogo, stock y costo                         |
+| `mis_visitas`   | Visitas por día y origen                        |
 
 `mis_visitas` solo devuelve filas si la tienda tiene la función de visitas activa, y el
 modelo solo la conoce en ese caso: `buildInsightSql` suma `ESQUEMA_DE_VISITAS` con

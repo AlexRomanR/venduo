@@ -40,6 +40,7 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/panel/marketing/tiktok`                 | Publicar un producto en TikTok, o conectar la cuenta    | Requiere sesión |
 | `/panel/marketing/tiktok/conectar`        | Ir a TikTok a aprobar a Venduo                          | Requiere sesión |
 | `/panel/marketing/tiktok/vuelta`          | La vuelta de TikTok: guarda el permiso                  | Requiere sesión |
+| `/panel/pedidos/nueva`                    | Registrar una venta hecha en el chat o en persona       | Requiere sesión |
 | `/panel/pedidos/{id}`                     | Un pedido: detalle y estados                            | Requiere sesión |
 | `/panel/productos/nuevo`                  | Alta de un producto                                     | Requiere sesión |
 | `/panel/productos/{id}`                   | Edición de un producto                                  | Requiere sesión |
@@ -192,7 +193,7 @@ components/
   editor/             El editor: pasos, vista previa, secciones, imágenes y la IA
   cuenta/             Formularios de ajustes, foto de perfil y la conexión con Canva
   insights/           Cuaderno, tablero y gráficos SVG
-  pedidos/            Lista, detalle y estados de un pedido
+  pedidos/            Lista, detalle y estados de un pedido, y la venta directa
   publicar/           Publicar en redes: la pantalla y el dibujo de la imagen, que
                       `next/og` arma en el servidor con la letra de la tienda
   productos/          Catálogo: lista, filtros, formulario, fotos y categorías

@@ -198,8 +198,10 @@ function FilaDePedido({
           </span>
           <span className="flex items-center gap-2">
             <span className="min-w-0 flex-1 truncate text-sm opacity-70">
-              {pedido.relativo} · {formatNumber(pedido.articulos)}{" "}
-              {pedido.articulos === 1 ? "artículo" : "artículos"}
+              {pedido.relativo} ·{" "}
+              {pedido.directa
+                ? "Venta directa"
+                : `${formatNumber(pedido.articulos)} ${pedido.articulos === 1 ? "artículo" : "artículos"}`}
             </span>
             {alCobrar && !pedido.noConcretado ? null : (
               <Estado

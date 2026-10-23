@@ -24,6 +24,10 @@ export interface DiaDeVentas {
   dia: string
   ventasCents: number
   pedidos: number
+  /** Lo ganado en las ventas de productos con costo cargado. */
+  gananciaCents: number
+  /** Cuánto de lo vendido tenía costo: si es menos que todo, la ganancia es parcial. */
+  ventasConCostoCents: number
 }
 
 export interface PedidoReciente {
@@ -40,6 +44,8 @@ export interface PedidoReciente {
   titulo: string
   /** La foto de lo que pidió: un pedido se reconoce por ella. */
   foto: string | null
+  /** La registró la tienda, vendida fuera de ella. */
+  directa?: boolean
 }
 
 export interface ProductoVendido {
@@ -85,6 +91,8 @@ export function diasVacios(
     dia: sumarDias(hoy, indice - (cantidad - 1)),
     ventasCents: 0,
     pedidos: 0,
+    gananciaCents: 0,
+    ventasConCostoCents: 0,
   }))
 }
 
@@ -94,6 +102,10 @@ export interface TotalesDelPeriodo {
   /** Ventas sobre pedidos; `null` sin pedidos, porque no hay promedio de nada. */
   ticketCents: number | null
   mejorDia: DiaDeVentas | null
+  /** `null` si nada de lo vendido tenía costo: no hay ganancia que decir. */
+  gananciaCents: number | null
+  /** Si hubo ventas de productos sin costo: la ganancia no las cuenta. */
+  gananciaParcial: boolean
 }
 
 export function totales(dias: DiaDeVentas[]): TotalesDelPeriodo {
@@ -107,11 +119,16 @@ export function totales(dias: DiaDeVentas[]): TotalesDelPeriodo {
     null
   )
 
+  const conCosto = dias.reduce((total, d) => total + d.ventasConCostoCents, 0)
+  const ganancia = dias.reduce((total, d) => total + d.gananciaCents, 0)
+
   return {
     ventasCents,
     pedidos,
     ticketCents: pedidos > 0 ? Math.round(ventasCents / pedidos) : null,
     mejorDia,
+    gananciaCents: conCosto > 0 ? ganancia : null,
+    gananciaParcial: conCosto > 0 && conCosto < ventasCents,
   }
 }
 

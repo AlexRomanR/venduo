@@ -96,6 +96,14 @@ Esa eliminación a los 90 días es **el único caso en toda la plataforma donde 
 
 **No hay envíos ni seguimiento.** Cómo llega el producto lo acuerdan la tienda y el comprador en el mismo chat; la plataforma no lo registra.
 
+### La venta directa
+
+Gran parte de las ventas se cierran en el chat de Instagram o TikTok, o en persona, sin pasar por el carrito. Si no se registran, el stock miente: es justo lo que Venduo promete resolver ("vendí algo que ya no tenía"). Con **Nueva venta**, la tienda elige los productos y las unidades que vendió, ajusta el precio si hubo una rebaja, y la venta queda como un pedido **pagado**: descuenta el stock en el acto y cuenta en las estadísticas como cualquier otra. No pide datos de quien compra. Si el stock dice que no alcanza, no se registra: primero se corrige el stock.
+
+### Costo y ganancia
+
+Cada producto puede llevar **lo que le cuesta a la tienda**. Es opcional y solo lo ve ella: nunca llega a la tienda pública. Con él, el panel dice cuánto ganó y no solo cuánto vendió. El costo de cada venta se fija al cobrarla: si después cambia, la ganancia de lo ya vendido no cambia.
+
 ---
 
 ## 6. Alcance del MVP
@@ -291,10 +299,13 @@ No hay columna de moneda: es constante del sistema.
 | `subtotal_cents`, `total_cents`            | Calculados en el servidor, desde el catálogo                                                                         |
 | `status`                                   | `pendiente`, `pagado`, `cancelado`                                                                                   |
 | `paid_at`                                  | Cuándo la tienda lo marcó pagado                                                                                     |
+| `origen`                                   | `tienda` si lo mandó quien compra; `directa` si la tienda registró una venta hecha fuera de ella                     |
 
 Sin marca de borrado: un pedido se cancela, no se borra.
 
-**`order_items`** — líneas del pedido, con el nombre y el precio del producto copiados al momento de la compra. Lleva también el identificador de la tienda por el principio de redundancia deliberada.
+**`order_items`** — líneas del pedido, con el nombre y el precio del producto copiados al momento de la compra, y su costo copiado al cobrarse (`unit_cost_cents`). Lleva también el identificador de la tienda por el principio de redundancia deliberada.
+
+**`product_costs`** — lo que le cuesta cada producto a la tienda, una fila por producto. Va aparte de `products` porque los productos los lee cualquiera que mire la tienda, y el costo es solo del dueño.
 
 #### Tienda visual
 

@@ -102,12 +102,33 @@ export function ComoTeVa({
               }
               periodo={periodo}
             />
-            <Cifra
-              etiqueta="Por pedido"
-              valor={ahora.ticketCents}
-              dinero
-              periodo={periodo}
-            />
+            {/* Con el costo cargado, lo que se ganó dice más que el promedio
+                por pedido: es lo que la persona quiere saber a fin de mes. */}
+            {ahora.gananciaCents !== null ? (
+              <Cifra
+                etiqueta="Ganancia"
+                valor={ahora.gananciaCents}
+                dinero
+                cambio={
+                  !ahora.gananciaParcial && antes.gananciaCents !== null
+                    ? variacion(ahora.gananciaCents, antes.gananciaCents)
+                    : undefined
+                }
+                detalle={
+                  ahora.gananciaParcial
+                    ? "Falta el costo de algunos productos"
+                    : undefined
+                }
+                periodo={periodo}
+              />
+            ) : (
+              <Cifra
+                etiqueta="Por pedido"
+                valor={ahora.ticketCents}
+                dinero
+                periodo={periodo}
+              />
+            )}
             <Cifra
               etiqueta="Tu mejor día"
               valor={ahora.mejorDia?.ventasCents ?? null}
