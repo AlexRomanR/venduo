@@ -16,6 +16,7 @@ import {
   type LucideIcon,
 } from "lucide-react"
 
+import { useConfirmacion } from "@/components/panel/confirmar"
 import { CURRENCY_SYMBOL, formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import {
@@ -55,13 +56,16 @@ function opcionesCompletas(opciones: Opcion[]): Opcion[] {
 }
 
 /**
- * Las tallas, colores y números de un producto: solo elegirlos. El stock de
- * cada uno va con las unidades (`StockDeVariantes`), donde se busca el stock.
+ * Las tallas, colores y números de un producto: solo elegirlos. Vive dentro de
+ * las unidades, porque para eso sirven: para contar el stock de cada una
+ * (`StockDeVariantes`).
  *
- * Primero el tipo —talla, número, color, tamaño u otro que se nombra a mano— y
- * después sus valores, que ya están escritos y se marcan con un toque. Cada
- * color lleva su foto, si el producto tiene más de una. El mismo editor de la
- * app.
+ * Cerrado es una línea —la mayoría de los productos no tiene tallas—, y lo que
+ * dice sale de la categoría: "Lo tengo en varias tallas" para unos buzos, "en
+ * varios números" para unos botines. Tocarla abre ese tipo con sus valores
+ * para marcar; "Cambiar" deja elegir otro. Sin sugerencia, ofrece los tipos.
+ * Los valores ya están escritos y se marcan con un toque, y cada color lleva
+ * su foto si el producto tiene más de una. El mismo editor de la app.
  *
  * Las combinaciones se arman solas, y una que ya existía conserva su stock y
  * su precio: sumar la XL no borra lo de la M.
@@ -70,6 +74,8 @@ export function EditorDeVariantes({
   opciones,
   variantes,
   fotos,
+  sugerido,
+  enHoja = false,
   alCambiar,
   error,
 }: {
@@ -77,10 +83,15 @@ export function EditorDeVariantes({
   variantes: VarianteEnFormulario[]
   /** Las fotos del producto: de ahí sale la foto de cada color. */
   fotos: string[]
+  /** El tipo que suele llevar su categoría (`tipoSugerido`): se ofrece primero. */
+  sugerido: TipoDeOpcion | null
+  /** Dentro de su propia hoja: sin nada elegido, muestra los tipos de entrada. */
+  enHoja?: boolean
   alCambiar: (opciones: Opcion[], variantes: VarianteEnFormulario[]) => void
   error?: string
 }) {
   const [agregando, setAgregando] = React.useState(false)
+  const { preguntar, dialogo } = useConfirmacion()
   // La opción con foto es la de color: cada color, la suya.
   const conFoto = opciones.find((o) => tipoDe(o)?.nombre === "Color")?.nombre
 
@@ -122,17 +133,53 @@ export function EditorDeVariantes({
     cambiarOpciones([...opciones, { nombre: tipo?.nombre ?? "", valores: [] }])
   }
 
+  async function quitar(indice: number) {
+    const tipo = tipoDe(opciones[indice])
+    // Quitar una opción borra las unidades que se cargaron en cada una.
+    if (variantes.some((v) => v.stock > 0)) {
+      const si = await preguntar({
+        titulo: tipo
+          ? `¿Ya no lo tienes en ${tipo.varios}?`
+          : "¿Quitar esta opción?",
+        texto: "Se borran las unidades que cargaste en cada una.",
+        confirmar: "Quitar",
+      })
+      if (!si) return
+    }
+    cambiarOpciones(opciones.filter((_, i) => i !== indice))
+  }
+
   const usados = opciones.map((o) => tipoDe(o)?.nombre).filter(Boolean)
   const cuantas = combinaciones(opcionesCompletas(opciones)).length
 
-  if (opciones.length === 0) {
+  if (opciones.length === 0 && enHoja) {
     return (
       <div className="flex flex-col gap-3">
-        <p className="text-sm opacity-70">
-          ¿Lo vendes en varias tallas, colores o números? Elige cuál.
-        </p>
+        <span className="text-sm font-semibold">¿En qué lo tienes?</span>
         <ElegirTipo usados={[]} alElegir={agregarTipo} />
       </div>
+    )
+  }
+
+  if (opciones.length === 0) {
+    return agregando ? (
+      <div className="flex flex-col gap-3">
+        <span className="text-sm font-semibold">¿En qué lo tienes?</span>
+        <ElegirTipo usados={[]} alElegir={agregarTipo} />
+        <button
+          type="button"
+          onClick={() => setAgregando(false)}
+          className="min-h-11 self-start text-sm font-semibold opacity-70 transition-opacity hover:opacity-100"
+        >
+          Cancelar
+        </button>
+      </div>
+    ) : (
+      <BotonPunteado
+        alTocar={() => (sugerido ? agregarTipo(sugerido) : setAgregando(true))}
+      >
+        Lo tengo en {sugerido?.varios ?? "varias tallas o colores"}
+      </BotonPunteado>
     )
   }
 
@@ -164,11 +211,25 @@ export function EditorDeVariantes({
               opciones.map((o, i) => (i === indice ? { ...o, valores } : o))
             )
           }
-          alQuitar={() =>
-            cambiarOpciones(opciones.filter((_, i) => i !== indice))
+          alCambiarTipo={
+            // Recién abierta por la sugerencia y sin nada marcado: si no era
+            // talla sino color, se cambia sin quitar y volver a abrir.
+            opciones.length === 1 && opcion.valores.length === 0
+              ? () => {
+                  cambiarOpciones([])
+                  setAgregando(true)
+                }
+              : undefined
           }
+          alQuitar={() => quitar(indice)}
         />
       ))}
+
+      {cuantas === 0 ? (
+        <p className="text-sm opacity-70">
+          Marca las que tienes y pon las unidades de cada una.
+        </p>
+      ) : null}
 
       {opciones.length < MAXIMO_DE_OPCIONES ? (
         agregando ? (
@@ -186,16 +247,11 @@ export function EditorDeVariantes({
             </button>
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={() => setAgregando(true)}
-            className="flex min-h-11 items-center justify-center gap-2 border border-dashed border-tinta/35 text-sm font-semibold transition-colors hover:border-tinta active:bg-tinta/[0.06]"
-          >
-            <Plus aria-hidden="true" className="size-4" />
+          <BotonPunteado alTocar={() => setAgregando(true)}>
             {usados.includes("Color")
               ? "Agregar talla o número"
               : "Agregar color"}
-          </button>
+          </BotonPunteado>
         )
       ) : null}
 
@@ -207,7 +263,28 @@ export function EditorDeVariantes({
       ) : null}
 
       {error ? <p className="text-sm text-senal">{error}</p> : null}
+      {dialogo}
     </div>
+  )
+}
+
+/** Abrir algo que no está a la vista: una línea punteada a todo el ancho. */
+function BotonPunteado({
+  alTocar,
+  children,
+}: {
+  alTocar: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onClick={alTocar}
+      className="flex min-h-11 w-full items-center justify-center gap-2 border border-dashed border-tinta/35 px-3 text-sm font-semibold transition-colors hover:border-tinta active:bg-tinta/[0.06] sm:w-fit sm:px-5"
+    >
+      <Plus aria-hidden="true" className="size-4" />
+      {children}
+    </button>
   )
 }
 
@@ -225,13 +302,16 @@ function ElegirTipo({
 }) {
   const disponibles = TIPOS_DE_OPCION.filter((t) => !usados.includes(t.nombre))
   return (
-    <div className="flex flex-wrap gap-2">
+    // Columnas iguales: fichas de ancho distinto que saltan de renglón dejan
+    // los bordes sin alinear.
+    <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
       {disponibles.map((tipo) => (
         <Ficha
           key={tipo.nombre}
           icono={ICONOS[tipo.nombre] ?? Shirt}
           texto={tipo.nombre}
           etiqueta={`${tipo.nombre}: ${tipo.detalle.toLowerCase()}`}
+          ancha
           alTocar={() => alElegir(tipo)}
         />
       ))}
@@ -239,6 +319,7 @@ function ElegirTipo({
         icono={PencilLine}
         texto="Otra"
         punteada
+        ancha
         alTocar={() => alElegir(null)}
       />
     </div>
@@ -253,6 +334,7 @@ function Ficha({
   elegida,
   punteada = false,
   muestra,
+  ancha = false,
   alTocar,
 }: {
   icono?: LucideIcon
@@ -263,6 +345,8 @@ function Ficha({
   punteada?: boolean
   /** El color del valor, si es un color: lleva su punto. */
   muestra?: string
+  /** Llena su columna, en una grilla de fichas iguales. */
+  ancha?: boolean
   alTocar: () => void
 }) {
   return (
@@ -273,6 +357,7 @@ function Ficha({
       onClick={alTocar}
       className={cn(
         "inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 border px-3 text-sm font-semibold transition-colors",
+        ancha && "w-full px-2",
         elegida
           ? "border-tinta bg-tinta text-papel"
           : punteada
@@ -326,6 +411,7 @@ function EditorDeOpcion({
   alElegirFoto,
   alCambiarNombre,
   alCambiarValores,
+  alCambiarTipo,
   alQuitar,
 }: {
   opcion: Opcion
@@ -335,6 +421,8 @@ function EditorDeOpcion({
   alElegirFoto: (valor: string, foto: string | null) => void
   alCambiarNombre: (nombre: string) => void
   alCambiarValores: (valores: string[]) => void
+  /** Elegir otro tipo en su lugar, mientras no tenga nada marcado. */
+  alCambiarTipo?: () => void
   alQuitar: () => void
 }) {
   const tipo = tipoDe(opcion)
@@ -404,6 +492,15 @@ function EditorDeOpcion({
             />
           </label>
         )}
+        {alCambiarTipo ? (
+          <button
+            type="button"
+            onClick={alCambiarTipo}
+            className="min-h-11 shrink-0 px-1 text-sm font-semibold underline underline-offset-4 transition-colors hover:text-senal"
+          >
+            Cambiar
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={alQuitar}
@@ -622,7 +719,10 @@ export function StockDeVariantes({
 
   return (
     // min-w-0: el panel es una grilla, y sin él la fila más ancha la estira.
-    <div className="flex min-w-0 flex-col gap-5">
+    <div className="flex min-w-0 flex-col gap-5 border-t border-tinta/15 pt-5">
+      <span className="text-xs font-semibold tracking-[0.12em] uppercase opacity-70">
+        Unidades de cada una
+      </span>
       {grupos.map((grupo) => (
         <div key={grupo.titulo ?? "todas"} className="flex flex-col gap-2">
           {grupo.titulo ? (

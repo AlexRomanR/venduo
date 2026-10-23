@@ -26,6 +26,8 @@ export interface TipoDeOpcion {
   valores: string[]
   /** Cómo se llama agregar uno que no está: "Otra talla". */
   otro: string
+  /** Para decir que hay más de uno: "varias tallas". */
+  varios: string
 }
 
 export const TIPOS_DE_OPCION: TipoDeOpcion[] = [
@@ -34,12 +36,14 @@ export const TIPOS_DE_OPCION: TipoDeOpcion[] = [
     detalle: "De ropa",
     valores: ["XS", "S", "M", "L", "XL", "XXL"],
     otro: "Otra talla",
+    varios: "varias tallas",
   },
   {
     nombre: "Número",
     detalle: "De calzado",
     valores: ["34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44"],
     otro: "Otro número",
+    varios: "varios números",
   },
   {
     nombre: "Color",
@@ -60,12 +64,14 @@ export const TIPOS_DE_OPCION: TipoDeOpcion[] = [
       "Naranja",
     ],
     otro: "Otro color",
+    varios: "varios colores",
   },
   {
     nombre: "Tamaño",
     detalle: "Ml, gramos, litros",
     valores: ["30 ml", "50 ml", "100 ml", "200 ml", "500 ml", "1 litro"],
     otro: "Otro tamaño",
+    varios: "varios tamaños",
   },
 ]
 
@@ -93,6 +99,73 @@ export const MUESTRAS_DE_COLOR: Record<string, string> = {
 export function tipoDe(opcion: { nombre: string }): TipoDeOpcion | null {
   const nombre = opcion.nombre.trim().toLowerCase()
   return TIPOS_DE_OPCION.find((t) => t.nombre.toLowerCase() === nombre) ?? null
+}
+
+/**
+ * Las palabras con que empieza el nombre de una categoría que suele venderse
+ * por tallas, números o tamaños. Se compara con el comienzo de cada palabra:
+ * "Tops" es ropa y "Laptops" no. Calzado va primero: "Zapatillas deportivas"
+ * se vende por número.
+ */
+const PALABRAS_DE_CADA_TIPO: [string, string[]][] = [
+  [
+    "Número",
+    ["zapat", "botin", "bota", "calzado", "sandalia", "tenis", "chinela"],
+  ],
+  [
+    "Talla",
+    [
+      "ropa",
+      "polera",
+      "buzo",
+      "calza",
+      "campera",
+      "chamarra",
+      "casaca",
+      "chompa",
+      "top",
+      "vestido",
+      "pantal",
+      "jean",
+      "short",
+      "falda",
+      "blusa",
+      "camisa",
+      "polo",
+      "abrigo",
+      "pijama",
+      "lencer",
+      "deportiv",
+      "uniforme",
+    ],
+  ],
+  [
+    "Tamaño",
+    ["perfum", "fragancia", "colonia", "crema", "locion", "shampoo", "aceite"],
+  ],
+]
+
+/**
+ * El tipo que suele llevar un producto de esa categoría, para ofrecerlo
+ * primero: "Buzos" sugiere Talla, "Botines" Número. Las categorías las nombra
+ * cada tienda, así que se sugiere y nunca se impone. `null` si no se reconoce.
+ */
+export function tipoSugerido(
+  categoria: string | null | undefined
+): TipoDeOpcion | null {
+  if (!categoria) return null
+  const palabras = categoria
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .split(/[^a-z]+/)
+    .filter(Boolean)
+  const encontrado = PALABRAS_DE_CADA_TIPO.find(([, raices]) =>
+    palabras.some((palabra) => raices.some((raiz) => palabra.startsWith(raiz)))
+  )
+  return encontrado
+    ? (TIPOS_DE_OPCION.find((t) => t.nombre === encontrado[0]) ?? null)
+    : null
 }
 
 /**

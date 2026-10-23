@@ -75,6 +75,43 @@ export function Fotos({
     alCambiar([url, ...valor.filter((f) => f !== url)])
   }
 
+  const archivo = (
+    <input
+      ref={entrada}
+      type="file"
+      accept="image/jpeg,image/png,image/webp,image/avif"
+      multiple
+      className="sr-only"
+      onChange={(e) => elegir(e.target.files)}
+    />
+  )
+
+  // Sin fotos, la zona entera es el botón: es lo primero que mira quien
+  // compra, y lo primero que tiene que ver quien carga el producto.
+  if (valor.length === 0) {
+    return (
+      <div>
+        <button
+          type="button"
+          onClick={() => entrada.current?.click()}
+          disabled={subiendo > 0}
+          className="flex aspect-[3/2] w-full flex-col items-center justify-center gap-2 border border-dashed border-tinta/40 transition-colors hover:border-tinta active:bg-tinta/[0.04] disabled:opacity-60 sm:aspect-[16/7]"
+        >
+          {subiendo > 0 ? (
+            <Loader2 aria-hidden="true" className="size-7 animate-spin" />
+          ) : (
+            <ImagePlus aria-hidden="true" className="size-7" />
+          )}
+          <span className="font-semibold">
+            {subiendo > 0 ? `Subiendo ${subiendo}…` : "Agregar fotos"}
+          </span>
+          <span className="text-xs text-tinta/65">Hasta {MAXIMO}</span>
+        </button>
+        {archivo}
+      </div>
+    )
+  }
+
   return (
     <div>
       <div className="flex flex-wrap gap-3">
@@ -138,18 +175,10 @@ export function Fotos({
         ) : null}
       </div>
 
-      <input
-        ref={entrada}
-        type="file"
-        accept="image/jpeg,image/png,image/webp,image/avif"
-        multiple
-        className="sr-only"
-        onChange={(e) => elegir(e.target.files)}
-      />
+      {archivo}
 
-      <p className="mt-3 text-xs leading-relaxed text-tinta/55">
-        Hasta {MAXIMO} fotos, 5 MB cada una. La primera es la portada: es la que
-        se ve en tu tienda y la que sale al compartir el producto.
+      <p className="mt-2 text-xs text-tinta/65">
+        La primera es la portada. Toca la estrella para cambiarla.
       </p>
     </div>
   )

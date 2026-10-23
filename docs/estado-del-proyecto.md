@@ -227,9 +227,18 @@ que se arregló:
   venta directa pregunta cuál se vendió, "Se está acabando" avisa la talla agotada y el
   catálogo en PDF puede decir las tallas. En el formulario no se escribe: se elige el
   tipo —talla, número, color, tamaño u otra— y se marcan sus valores, ya escritos
-  (`TIPOS_DE_OPCION` en `lib/variantes.ts`); cada color lleva su punto y su foto. El
-  stock de cada una va en "Cuántas tienes", una fila por talla, y el precio de cada
-  una solo aparece con "Alguna cuesta distinto".
+  (`TIPOS_DE_OPCION` en `lib/variantes.ts`); cada color lleva su punto y su foto. La
+  categoría sugiere el tipo (`tipoSugerido`: "Buzos" abre en Talla, "Botines" en
+  Número), y el precio de cada una solo aparece con "Alguna cuesta distinto".
+- **El formulario de producto es una pantalla por filas** (web; la app, pendiente):
+  arriba fotos, nombre y precio, grandes y escritos ahí mismo; lo demás —unidades,
+  tallas, categoría, oferta, costo, visible, destacado, aviso, descripción— una fila
+  con su valor a la vista que abre una hoja. Las piezas (`components/panel/ajustes.tsx`)
+  y la receta (`ui-styling.md`, skill `pantalla-por-filas`) son para toda pantalla de
+  crear o editar algo.
+- **`/idea`**: de una idea en palabras a un cambio probado, con entrevista, brief en
+  `docs/briefs/` y los agentes `investigador-de-producto`, `analista-tecnico`,
+  `disenador` y `verificador` (skill `de-idea-a-pantalla`).
 - **Mandar por WhatsApp** desde cada producto a la vista: su nombre, su precio y el
   enlace a su ficha, para contestar "¿precio?" en un toque. Web y app.
 - Barra lateral con contadores de lo que pide atención; se puede plegar y recuerda cómo
