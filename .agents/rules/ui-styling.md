@@ -277,6 +277,7 @@ extranjeras. Cada rótulo dice qué es o qué pasa, con la palabra de siempre:
 | "Bajada", "Llamado a la acción"   | "Subtítulo", "Cierre con botón"              |
 | "Acá", "se manda", "la señal"     | "Aquí", "se enviará", "la conexión"          |
 | "Soltar", "sacar" en un error     | Lo que la persona hacía: "borrar", "guardar" |
+| "Elegir los 14 que se ven"        | "Seleccionar todos", "Quitar todos"          |
 
 Un interruptor dice qué aparece y su estado en palabras llanas. Un error nombra lo que la
 persona estaba haciendo, no el paso interno que falló. Vale también para lo que la API
