@@ -244,6 +244,10 @@ que se arregló:
   venta". En la web, la venta a medio armar sobrevive a "Corregir el
   stock" (`sessionStorage`); en la app la pantalla queda debajo y no se pierde, salvo
   que se salga de ella.
+- **Ningún grupo de fichas baja de renglón a su ancho** (23 de octubre, web y app):
+  columnas iguales (`GRILLA_DE_FICHAS`, y `GRILLA_DE_FICHAS_LARGAS` para las de dos o
+  tres palabras) o una franja que se desliza, en catálogos, el alta, el Resumen, la
+  tienda pública y `/admin`.
 - **`/idea`**: de una idea en palabras a un cambio probado, con entrevista, brief en
   `docs/briefs/` y los agentes `investigador-de-producto`, `analista-tecnico`,
   `disenador` y `verificador` (skill `de-idea-a-pantalla`).
@@ -424,11 +428,6 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 
 ### 7. Pendientes chicos
 
-- **Fichas que todavía bajan de renglón a su ancho en la app** (`flexWrap`), contra la
-  regla de `ui-styling.md`: el editor de catálogos, pedirle un catálogo a la IA, la
-  cabecera del Inicio, el editor de la tienda y Publicar en redes. En la web ya no
-  queda ninguna (23 de octubre): catálogos, la galería de plantillas del alta, el
-  Resumen, la talla de la tienda pública, sus filtros y `/admin`.
 - **Una vez, entrar a `/panel/apariencia` después de horas sin uso terminó en `/panel`**
   (revisión del 8 de octubre). El registro muestra pedidos a `/auth/destino` y `/crear`
   justo después, como si en ese instante la sesión no encontrara la tienda. No se pudo
