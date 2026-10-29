@@ -76,7 +76,7 @@ El vencimiento **bloquea la plataforma**, no la borra:
 
 1. La tienda pública deja de servirse.
 2. El panel queda en solo lectura, con un aviso de que debe suscribirse.
-3. Se habilita una única acción: **exportar los datos** en CSV — catálogo de productos y pedidos con sus líneas. CSV porque es lo que el emprendedor puede abrir sin instalar nada.
+3. Se habilita una única acción: **descargar los datos** en planilla de Excel — productos, y pedidos con sus líneas—. La misma descarga existe siempre en Pedidos y en Productos; Excel y no CSV porque un CSV se abre en una sola columna en un Excel en español.
 4. Se le informa que **sus datos se eliminarán a los 90 días** del bloqueo si no se suscribe. Es tiempo suficiente para volver de un mal mes, sin que la plataforma cargue datos muertos indefinidamente.
 
 Esa eliminación a los 90 días es **el único caso en toda la plataforma donde se borran datos físicamente** (ver sección 8).
@@ -116,6 +116,27 @@ funciona como siempre.
   baja el de la variante. Con opciones, el stock se cambia en cada una, no en el total.
 - **En la venta directa** se elige cuál se vendió; **en el catálogo en PDF**, "Tallas y
   colores" es un campo más.
+
+### La nota del pedido
+
+Cada pedido y cada venta directa puede llevar una **nota interna**, de hasta 500
+caracteres: "entrega el sábado", "pagó la mitad". La escribe la tienda y solo la ve
+ella: nunca llega a quien compra ni al mensaje de WhatsApp. No es para guardar datos de
+quien compra.
+
+### De vacaciones
+
+La tienda puede ponerse **de vacaciones**: se sigue viendo —el enlace y el QR siguen
+andando—, con un aviso arriba, pero no recibe pedidos; la base los rechaza. La fecha de
+vuelta es opcional, y ese día vuelve a recibir pedidos sola. La venta directa sigue. No
+es la pausa del administrador, que la saca del público.
+
+### Cargar varios productos
+
+Además del formulario de uno, la tienda puede **cargar varios a la vez** desde lo que ya
+tiene: fotos de sus productos, una planilla con sus propias columnas o una lista escrita
+—la foto del cuaderno, o el texto pegado o dictado—. La IA arma borradores; la persona
+los revisa y los crea. Nada se crea sin confirmar, y un borrador sin precio no se crea.
 
 ### Costo y ganancia
 
@@ -424,6 +445,14 @@ Una venta es un pedido **pagado**: un pendiente puede ser un carrito que se mand
 ### Catálogos en PDF
 
 Recibe una frase —«las zapatillas en oferta», «lista de precios para revendedores»— y los productos de la tienda con su precio, su descuento y su stock. Devuelve qué productos van, en qué orden, con qué plantilla, un nombre y una bajada para la portada, y en una línea por qué. El sistema descarta los productos que no son de esa tienda antes de armar nada, y el emprendedor ve la propuesta y decide si la usa. Con un catálogo abierto, la misma tarea elige y ordena solo entre sus productos.
+
+### Cargar productos
+
+Recibe fotos de productos, la foto de una lista escrita o su texto, y devuelve
+borradores: nombre, precio si se lee, categoría, descripción. Nunca inventa un precio.
+De una planilla recibe solo el principio y dice qué columna es qué: el sistema lee todas
+las filas con ese mapeo, así no reescribe ni inventa cientos de productos. Sin IA, las
+columnas se adivinan por los encabezados y la persona las corrige.
 
 ### Marketing
 

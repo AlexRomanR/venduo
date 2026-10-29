@@ -888,3 +888,12 @@ A propósito, **no existe**:
   perfumería—. Pedirían variantes en el carrito y en `create_order`, y eso es otro trabajo.
 - **El rojo de la base editorial está a 4,35:1 contra el papel**, un poco por debajo de lo
   que dice `DESIGN.md`. No se tocó porque es la marca de Venduo; queda anotado.
+
+## Lo que va encima de cualquier plantilla
+
+La banda de vacaciones (`components/tienda/aviso-de-vacaciones.tsx`) la dibuja
+`app/t/[slug]/layout.tsx` encima de la tienda, sin preguntar qué plantilla es: solo usa
+sus colores (`bg-tinta`, `text-papel`). Lo demás de las vacaciones —la ficha sin
+"Agregar", la barra de compra que no aparece, el carrito sin el botón de enviar— lo
+resuelven las piezas compartidas leyendo `vacaciones` del contexto del carrito. Ningún
+kit tiene que saberlo.

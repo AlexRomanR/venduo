@@ -4,6 +4,7 @@ import {
   ArrowUpRight,
   Paintbrush,
   Store,
+  TreePalm,
   UserRound,
   UserRoundX,
 } from "lucide-react"
@@ -12,11 +13,14 @@ import { estaConectado, isCanvaConfigured } from "@/lib/canva"
 import { getCuenta } from "@/lib/data/cuenta"
 import { isSupabaseConfigured } from "@/lib/env"
 import { getMiTienda } from "@/lib/data/panel"
+import { deVacaciones } from "@/lib/vacaciones"
 import { DarDeBaja } from "@/components/cuenta/baja"
 import { ConexionCanva } from "@/components/cuenta/canva"
 import { FormPersona, FormTienda } from "@/components/cuenta/formularios"
 import { Foto } from "@/components/cuenta/foto"
+import { Vacaciones } from "@/components/cuenta/vacaciones"
 import { Cabecera, Seccion, SinDatos } from "@/components/panel/piezas"
+import { guardarVacaciones } from "./acciones"
 
 export const metadata = { title: "Mi cuenta" }
 
@@ -38,8 +42,10 @@ function Ver({ href, children }: { href: string; children: string }) {
  * panel se guarda por su lado.
  */
 export default async function CuentaPage() {
-  const [cuenta, conCanva] = await Promise.all([
+  // `getMiTienda` está en memoria por pedido: llamarla dos veces es un viaje.
+  const [cuenta, tienda, conCanva] = await Promise.all([
     getCuenta(),
+    getMiTienda(),
     getMiTienda().then((tienda) => (tienda ? estaConectado(tienda.id) : false)),
   ])
 
@@ -102,6 +108,26 @@ export default async function CuentaPage() {
           relleno
         >
           <FormTienda cuenta={cuenta} />
+        </Seccion>
+      ) : null}
+
+      {/* Con la tienda pausada por Venduo, manda esa pausa: las vacaciones no
+          cambiarían nada. */}
+      {tienda && !tienda.suspended_at ? (
+        <Seccion
+          id="vacaciones"
+          icono={TreePalm}
+          titulo="Vacaciones"
+          bajada="Tu tienda se sigue viendo, sin recibir pedidos."
+        >
+          <Vacaciones
+            activa={deVacaciones({
+              desde: tienda.vacaciones_desde,
+              hasta: tienda.vacaciones_hasta,
+            })}
+            hasta={tienda.vacaciones_hasta}
+            guardar={guardarVacaciones}
+          />
         </Seccion>
       ) : null}
 

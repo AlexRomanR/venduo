@@ -38,6 +38,10 @@ const SECCIONES: Array<[RegExp, TituloDeBarra]> = [
     { titulo: "Categorías", volver: "/panel/productos" },
   ],
   [
+    /^\/panel\/productos\/cargar$/,
+    { titulo: "Cargar varios", volver: "/panel/productos" },
+  ],
+  [
     /^\/panel\/productos\/[^/]+$/,
     { titulo: "Producto", volver: "/panel/productos" },
   ],

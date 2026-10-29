@@ -3,9 +3,19 @@ import type { ZodType } from "zod"
 export type AIProviderName =
   "anthropic" | "openai-compatible" | "google" | "mock"
 
+export interface ImagenParaIA {
+  tipo: "image/jpeg" | "image/png" | "image/webp"
+  base64: string
+}
+
 export interface AIMessage {
   role: "user" | "assistant"
   content: string
+  /**
+   * Fotos que acompañan al texto: un producto, la página de un cuaderno. Cada
+   * adaptador las pone en el formato de su proveedor; el mock las ignora.
+   */
+  imagenes?: ImagenParaIA[]
 }
 
 export interface GenerateTextOptions {

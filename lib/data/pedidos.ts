@@ -1,6 +1,8 @@
 import { fotoDemo } from "@/lib/demo-data"
 import { getMiTienda } from "@/lib/data/panel"
 import { createClient } from "@/lib/supabase/server"
+import { limitesDe, PERIODOS, type Periodo } from "@/lib/exportar"
+import { inicioDelDia } from "@/lib/format"
 import { noSeConcreto } from "@/lib/pedidos"
 import type { OrderStatus } from "@/types"
 
@@ -34,6 +36,8 @@ export interface Pedido {
   foto: string | null
   /** La registró la tienda: se vendió en el chat o en persona, no en la tienda. */
   directa: boolean
+  /** La nota interna de la tienda. Nunca la ve quien compra. */
+  nota: string | null
 }
 
 export interface ResumenPedidos {
@@ -51,7 +55,26 @@ export interface ResumenPedidos {
 export interface Pedidos {
   pedidos: Pedido[]
   resumen: ResumenPedidos
+  /** Cuántos hay en cada período de la descarga, sobre todos y no lo filtrado. */
+  porPeriodo: Record<Periodo, number>
   esDemo: boolean
+}
+
+function contarPorPeriodo(pedidos: Pedido[]): Record<Periodo, number> {
+  const ahora = new Date()
+  return Object.fromEntries(
+    PERIODOS.map(({ valor }) => {
+      const { desde, hasta } = limitesDe(valor, ahora)
+      return [
+        valor,
+        pedidos.filter(
+          (p) =>
+            (!desde || p.creado >= inicioDelDia(desde)) &&
+            (!hasta || p.creado < inicioDelDia(hasta))
+        ).length,
+      ]
+    })
+  ) as Record<Periodo, number>
 }
 
 function pedidosDeDemostracion(filtro?: FiltroPedidos): Pedidos {
@@ -74,12 +97,19 @@ function pedidosDeDemostracion(filtro?: FiltroPedidos): Pedidos {
   const pedido = (
     datos: Omit<
       Pedido,
-      "comprador" | "telefono" | "pagado" | "foto" | "totalCents" | "directa"
-    >
+      | "comprador"
+      | "telefono"
+      | "pagado"
+      | "foto"
+      | "totalCents"
+      | "directa"
+      | "nota"
+    > & { nota?: string }
   ): Pedido => ({
     comprador: null,
     telefono: null,
     directa: false,
+    nota: null,
     pagado: datos.estado === "pagado" ? datos.creado : null,
     ...datos,
     totalCents: datos.items.reduce((t, i) => t + i.totalCents, 0),
@@ -92,6 +122,7 @@ function pedidosDeDemostracion(filtro?: FiltroPedidos): Pedidos {
       numero: 148,
       estado: "pendiente",
       creado: hace(26),
+      nota: "Lo recoge el sábado en la tienda. Paga al recoger.",
       items: [linea("Mochila urbana", 1, 52_000, "1553062407-98eeb64c6a62")],
     }),
     pedido({
@@ -143,6 +174,7 @@ function pedidosDeDemostracion(filtro?: FiltroPedidos): Pedidos {
   return {
     pedidos: filtro ? pedidos.filter((p) => enFiltro(p, filtro)) : pedidos,
     resumen: resumir(pedidos),
+    porPeriodo: contarPorPeriodo(pedidos),
     esDemo: true,
   }
 }
@@ -195,7 +227,7 @@ export async function getPedidos(filtro?: FiltroPedidos): Promise<Pedidos> {
     .from("orders")
     .select(
       `id, order_number, status, buyer_name, buyer_phone, total_cents,
-       created_at, paid_at, origen,
+       created_at, paid_at, origen, nota,
        order_items ( product_id, product_name, quantity, unit_price_cents,
                      variant_name, products ( image_url ) )`
     )
@@ -224,6 +256,7 @@ export async function getPedidos(filtro?: FiltroPedidos): Promise<Pedidos> {
       items,
       foto: items.find((item) => item.foto)?.foto ?? null,
       directa: fila.origen === "directa",
+      nota: fila.nota,
     }
   })
 
@@ -232,6 +265,7 @@ export async function getPedidos(filtro?: FiltroPedidos): Promise<Pedidos> {
     // negocio y no el pie de la tabla.
     pedidos: filtro ? pedidos.filter((p) => enFiltro(p, filtro)) : pedidos,
     resumen: resumir(pedidos),
+    porPeriodo: contarPorPeriodo(pedidos),
     esDemo: false,
   }
 }

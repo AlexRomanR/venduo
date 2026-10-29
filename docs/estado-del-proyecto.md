@@ -248,6 +248,21 @@ que se arregló:
   columnas iguales (`GRILLA_DE_FICHAS`, y `GRILLA_DE_FICHAS_LARGAS` para las de dos o
   tres palabras) o una franja que se desliza, en catálogos, el alta, el Resumen, la
   tienda pública y `/admin`.
+- **Nota interna del pedido** (23 de octubre): en el detalle, en Nueva venta y una
+  línea en la lista. Solo la ve la tienda.
+- **Descargar en Excel** (23 de octubre): pedidos (dos hojas, por período) y productos
+  (una fila por talla), escritos sin dependencias (`lib/planilla.ts`). También desde el
+  aviso de tienda bloqueada.
+- **De vacaciones** (23 de octubre): panel en `/cuenta`, franja en el Resumen, banda en
+  la tienda, sin pedidos —lo rechaza la base— y vuelta sola el día de la fecha.
+- **Cargar varios productos** (23 de octubre, `/panel/productos/cargar`): fotos, una
+  planilla con sus columnas o una lista escrita; la IA arma borradores, la persona los
+  revisa y los crea juntos. La planilla anda sin IA. Función `ia_productos`. La capa de
+  IA ya manda fotos. Antes de armar los productos se ve "Así leímos tu planilla": la
+  tabla con lo que es cada columna, lo dudoso preguntado de a una y una casilla por
+  fila. Web y app.
+- **La suspensión del administrador se impone en la base** (23 de octubre): el dueño ya
+  no puede quitársela por la API.
 - **`/idea`**: de una idea en palabras a un cambio probado, con entrevista, brief en
   `docs/briefs/` y los agentes `investigador-de-producto`, `analista-tecnico`,
   `disenador` y `verificador` (skill `de-idea-a-pantalla`).
@@ -413,8 +428,13 @@ el texto de la revisión están en `docs/tiktok.md`.
 
 ### 4. Lo que sigue del plan
 
-Nota interna en el pedido, exportar pedidos y productos a planilla, pausa por
-vacaciones, y cargar productos desde una foto con la IA.
+Hecho en la web el 23 de octubre (brief `docs/briefs/2026-10-23-lo-que-falta-del-plan.md`):
+la nota interna, descargar en Excel, de vacaciones y cargar varios productos con la IA.
+El 24 de octubre se llevó a la app (rama `lo-que-falta` de `venduo-app`), con las rutas
+`/api/v1/carga/…` y `/api/v1/exportar/…`; la app suma `expo-document-picker` para elegir
+la planilla. La carga además lee una tabla pegada como lista, deja quitar filas, recorre
+cada columna la primera vez y pregunta lo dudoso desde la barra de abajo. Para otra
+vuelta: "Foto y precio" en serie desde la cámara y duplicar un producto.
 
 ### 5. Plantillas — prioridad baja
 
@@ -428,6 +448,12 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 
 ### 7. Pendientes chicos
 
+- **De vacaciones, las plantillas siguen diciendo cómo comprar**: la franja "Arma tu
+  pedido y mándalo por WhatsApp" y el bloque "Cómo comprar" de la ficha. La banda de
+  vacaciones lo aclara, pero se contradicen. Taparlos pide marcarlos en cada plantilla.
+- **Las fotos de una carga que no se crea quedan en Storage** (`product-images/{tienda}/`):
+  se suben al procesarlas. Cuestan centavos; si molestan, subirlas a una carpeta propia y
+  limpiarla.
 - **Una vez, entrar a `/panel/apariencia` después de horas sin uso terminó en `/panel`**
   (revisión del 8 de octubre). El registro muestra pedidos a `/auth/destino` y `/crear`
   justo después, como si en ese instante la sesión no encontrara la tienda. No se pudo

@@ -1,6 +1,14 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { Boxes, PackageMinus, PackageX, Plus, Tags, Wallet } from "lucide-react"
+import {
+  Boxes,
+  ImagePlus,
+  PackageMinus,
+  PackageX,
+  Plus,
+  Tags,
+  Wallet,
+} from "lucide-react"
 
 import { getCatalogo, type FiltrosCatalogo } from "@/lib/data/catalogo"
 import { getMiTienda } from "@/lib/data/panel"
@@ -12,8 +20,10 @@ import { cn } from "@/lib/utils"
 import { FranjaDeFichas } from "@/components/panel/fichas"
 import { FichasGrandes } from "@/components/panel/fichas-grandes"
 import { Cabecera, Seccion, SinDatos } from "@/components/panel/piezas"
+import { DescargarProductos } from "@/components/panel/descargar"
 import { BuscadorDeProductos } from "@/components/productos/buscador"
 import { ListaProductos } from "@/components/productos/lista"
+import { PrimerosProductos } from "@/components/productos/primeros"
 import { ajustarStock } from "./acciones"
 
 export const metadata = { title: "Productos" }
@@ -94,6 +104,13 @@ export default async function ProductosPage({
         accionesSoloEnPantallaAncha
       >
         <Link
+          href="/panel/productos/cargar"
+          className={cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")}
+        >
+          <ImagePlus aria-hidden="true" className="size-4" />
+          Cargar varios
+        </Link>
+        <Link
           href="/panel/productos/nuevo"
           className={cn(BOTON_PRIMARIO, "min-h-11 px-4 text-sm")}
         >
@@ -137,21 +154,33 @@ export default async function ProductosPage({
         id="productos"
         icono={Boxes}
         titulo="Lo que vendes"
+        accion={
+          resumen.total > 0
+            ? {
+                href: "/panel/productos/cargar",
+                texto: "Cargar varios a la vez",
+              }
+            : undefined
+        }
         bajada={
           hayFiltros
             ? `${formatNumber(productos.length)} de ${formatNumber(resumen.total)} ${resumen.total === 1 ? "producto" : "productos"}`
             : "Cambia el stock con más y menos."
         }
         extra={
-          <Link
-            href="/panel/productos/categorias"
-            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold underline underline-offset-4 transition-colors hover:text-senal"
-          >
-            <Tags aria-hidden="true" className="size-4" />
-            {categorias.length === 0
-              ? "Crear categorías"
-              : `${formatNumber(categorias.length)} ${categorias.length === 1 ? "categoría" : "categorías"}`}
-          </Link>
+          // Los dos en una fila: entran en los 311 px de un celular.
+          <span className="flex items-center gap-5">
+            <Link
+              href="/panel/productos/categorias"
+              className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold underline underline-offset-4 transition-colors hover:text-senal"
+            >
+              <Tags aria-hidden="true" className="size-4" />
+              {categorias.length === 0
+                ? "Crear categorías"
+                : `${formatNumber(categorias.length)} ${categorias.length === 1 ? "categoría" : "categorías"}`}
+            </Link>
+            {resumen.total > 0 ? <DescargarProductos esDemo={esDemo} /> : null}
+          </span>
         }
       >
         {resumen.total > 0 ? (
@@ -257,19 +286,9 @@ export default async function ProductosPage({
             </Link>
           </SinDatos>
         ) : (
-          <SinDatos
-            icono={Boxes}
-            titulo="Todavía no cargaste ningún producto"
-            texto="Con su foto, su precio y cuántas unidades tienes."
-          >
-            <Link
-              href="/panel/productos/nuevo"
-              className={cn(BOTON_PRIMARIO, "min-h-11 px-4 text-sm")}
-            >
-              <Plus aria-hidden="true" className="size-4" />
-              Cargar el primero
-            </Link>
-          </SinDatos>
+          // Es donde más se abandona: en vez de un solo botón, las formas de
+          // cargar lo que ya se tiene.
+          <PrimerosProductos />
         )}
       </Seccion>
 

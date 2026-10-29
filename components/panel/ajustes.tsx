@@ -47,6 +47,8 @@ export function Fila({
   apagado = false,
   peligro = false,
   error,
+  detalle,
+  soloLectura = false,
   alTocar,
 }: {
   icono: LucideIcon
@@ -55,39 +57,73 @@ export function Fila({
   apagado?: boolean
   peligro?: boolean
   error?: string
+  /** Un texto entero bajo el título, sin cortar: una nota se lee completa. */
+  detalle?: string
+  /** Se ve pero no se toca: en el modo demo o con el panel bloqueado. */
+  soloLectura?: boolean
   alTocar: () => void
 }) {
-  return (
-    <li className="border-t border-tinta/15 first:border-t-0">
-      <button
-        type="button"
-        onClick={alTocar}
-        className="flex min-h-16 w-full items-center gap-3 px-4 py-2 text-left transition-colors hover:bg-tinta/[0.04] active:bg-tinta/[0.07]"
-      >
-        <Icono
-          aria-hidden="true"
-          className={cn("size-5 shrink-0", error && "text-senal")}
-        />
-        <span className="flex min-w-0 flex-1 flex-col">
-          <span className={cn("font-semibold", error && "text-senal")}>
-            {titulo}
+  const contenido = (
+    <>
+      <Icono
+        aria-hidden="true"
+        className={cn(
+          "size-5 shrink-0",
+          error && "text-senal",
+          detalle && "mt-0.5 self-start"
+        )}
+      />
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span className={cn("font-semibold", error && "text-senal")}>
+          {titulo}
+        </span>
+        {error ? <span className="text-sm text-senal">{error}</span> : null}
+        {detalle ? (
+          <span className="mt-1 text-sm break-words whitespace-pre-line">
+            {detalle}
           </span>
-          {error ? <span className="text-sm text-senal">{error}</span> : null}
-        </span>
-        <span
-          className={cn(
-            "max-w-[45%] truncate text-right",
-            apagado ? "text-tinta/55" : "font-semibold",
-            peligro && "text-senal"
-          )}
-        >
-          {valor}
-        </span>
+        ) : null}
+      </span>
+      <span
+        className={cn(
+          "max-w-[45%] truncate text-right",
+          apagado ? "text-tinta/55" : "font-semibold",
+          peligro && "text-senal",
+          detalle && "self-start pt-0.5"
+        )}
+      >
+        {valor}
+      </span>
+      {soloLectura ? null : (
         <ChevronRight
           aria-hidden="true"
-          className="size-4 shrink-0 opacity-55"
+          className={cn(
+            "size-4 shrink-0 opacity-55",
+            detalle && "mt-1.5 self-start"
+          )}
         />
-      </button>
+      )}
+    </>
+  )
+  const clases = "flex min-h-16 w-full items-center gap-3 px-4 py-2 text-left"
+
+  return (
+    <li className="border-t border-tinta/15 first:border-t-0">
+      {soloLectura ? (
+        <div className={cn(clases, detalle && "py-3")}>{contenido}</div>
+      ) : (
+        <button
+          type="button"
+          onClick={alTocar}
+          className={cn(
+            clases,
+            "transition-colors hover:bg-tinta/[0.04] active:bg-tinta/[0.07]",
+            detalle && "py-3"
+          )}
+        >
+          {contenido}
+        </button>
+      )}
     </li>
   )
 }

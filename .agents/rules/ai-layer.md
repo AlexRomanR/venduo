@@ -26,7 +26,10 @@ interface AIProvider {
 }
 ```
 
-Son esos dos métodos y no otros. `generateObject` recibe `{ schema, schemaName, system,
+Son esos dos métodos y no otros. Un mensaje puede llevar **fotos** (`imagenes`, en
+base64): cada adaptador las pone en el formato de su proveedor y el mock las ignora. Las
+fotos se bajan en el servidor desde la carpeta de la tienda en Storage, nunca desde una
+dirección que mande el navegador (`esFotoDeMiTienda`). `generateObject` recibe `{ schema, schemaName, system,
 messages }` y devuelve `{ object, raw, provider, model, usage }`.
 
 Se obtiene con `getAIProvider()` de `lib/ai/index.ts`. `getAIStatus()` devuelve
@@ -34,7 +37,7 @@ Se obtiene con `getAIProvider()` de `lib/ai/index.ts`. `getAIStatus()` devuelve
 
 ## Las tareas que existen
 
-En `lib/ai/tasks.ts` hay **seis**, y todas siguen el mismo molde:
+En `lib/ai/tasks.ts` hay **ocho**, y todas siguen el mismo molde:
 
 | Tarea                    | Devuelve                             |
 | ------------------------ | ------------------------------------ |
@@ -44,6 +47,8 @@ En `lib/ai/tasks.ts` hay **seis**, y todas siguen el mismo molde:
 | `buildInsightSql`        | `{ consulta, provider, model }`      |
 | `proponerEdicion`        | `{ propuesta, provider, model }`     |
 | `proponerCatalogo`       | `{ propuesta, provider, model }`     |
+| `leerProductos`          | `{ lectura, provider, model }`       |
+| `mapearPlanilla`         | `{ mapeo, provider, model }`         |
 
 Para agregar otra:
 
@@ -116,7 +121,7 @@ son `user_id`, `kind`, `provider`, `model`, `prompt` y `output`:
 await supabase.from("ai_generations").insert({
   user_id: user.id,
   store_id: storeId,
-  kind: "marketing", // tienda | bloques | analisis | marketing
+  kind: "marketing", // tienda | bloques | analisis | marketing | productos
   provider,
   model,
   prompt: promptDelUsuario,

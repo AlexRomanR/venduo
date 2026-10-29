@@ -200,7 +200,7 @@ function FilaDeProducto({
             >
               {formatNumber(stock)}
             </span>
-            en {variantes} opciones
+            en {variantes === 1 ? "una opción" : `${variantes} opciones`}
           </Link>
         ) : (
           <div

@@ -235,3 +235,67 @@ export const propuestaDeCatalogoSchema = z.object({
   explicacion: z.string().min(1).max(280),
 })
 export type PropuestaDeCatalogo = z.infer<typeof propuestaDeCatalogoSchema>
+
+/* -------------------------------------------------------------------------
+ * Cargar productos de una vez
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Los productos que la IA lee de fotos o de una lista escrita. Nunca inventa
+ * un precio: si no se lee, va `null` y la persona lo completa. La pantalla
+ * vuelve a validar cada uno contra el esquema del producto al crearlo.
+ */
+export const borradoresDeProductosSchema = z.object({
+  borradores: z
+    .array(
+      z.object({
+        /** Vacío si no se pudo leer: la persona lo escribe. */
+        nombre: z.string().max(120),
+        /** En bolivianos, tal como estaba escrito. `null` si no se ve. */
+        precio: z.number().nonnegative().max(9_999_999).nullable(),
+        stock: z.number().int().min(0).max(999_999).nullable(),
+        categoria: z.string().max(60).nullable(),
+        descripcion: z.string().max(300),
+        /** Con fotos de productos: el número de la foto, desde 0. */
+        foto: z.number().int().min(0).max(39).nullable(),
+        /** Lo que no se pudo leer, en pocas palabras: "no se ve el precio". */
+        duda: z.string().max(120).nullable(),
+      })
+    )
+    .max(60),
+  aviso: z.string().max(200).nullable(),
+})
+export type BorradoresDeProductos = z.infer<typeof borradoresDeProductosSchema>
+
+/**
+ * Qué es cada columna de una planilla, deducido por su encabezado y por lo
+ * que contienen sus celdas, y si la lectura está segura. Lo dudoso se le
+ * pregunta a la persona. El sistema lee todas las filas con esto: la IA no
+ * reescribe —ni inventa— cientos de productos.
+ */
+export const lecturaDePlanillaSchema = z.object({
+  filaDeEncabezado: z.number().int().min(0).max(20).nullable(),
+  columnas: z
+    .array(
+      z.object({
+        columna: z.number().int().min(0).max(49),
+        campo: z
+          .enum([
+            "nombre",
+            "precio",
+            "stock",
+            "categoria",
+            "talla",
+            "color",
+            "descripcion",
+            "codigo",
+            "costo",
+          ])
+          .nullable(),
+        seguro: z.boolean(),
+      })
+    )
+    .max(50),
+  aviso: z.string().max(200).nullable(),
+})
+export type LecturaDePlanilla = z.infer<typeof lecturaDePlanillaSchema>

@@ -4,7 +4,13 @@ import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Check, Loader2, MessageCircle, ShoppingBag } from "lucide-react"
+import {
+  Check,
+  Loader2,
+  MessageCircle,
+  ShoppingBag,
+  StickyNote,
+} from "lucide-react"
 import { toast } from "sonner"
 
 import { formatMoney, formatNumber } from "@/lib/format"
@@ -210,6 +216,13 @@ function FilaDePedido({
               />
             )}
           </span>
+          {pedido.nota ? (
+            <span className="flex min-w-0 items-center gap-1.5 text-sm text-tinta/65">
+              <StickyNote aria-hidden="true" className="size-3.5 shrink-0" />
+              <span className="sr-only">Nota:</span>
+              <span className="truncate">{pedido.nota.split("\n")[0]}</span>
+            </span>
+          ) : null}
         </span>
       </Link>
 

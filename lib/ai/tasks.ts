@@ -5,14 +5,19 @@ import type { TipoDeBloque } from "@/lib/plantillas/bloques"
 import { FUENTES } from "@/lib/plantillas/fuentes"
 import { SECCIONES, type Campo } from "@/lib/plantillas/secciones"
 import { getAIProvider } from "./index"
+import type { ImagenParaIA } from "./types"
 import {
+  borradoresDeProductosSchema,
+  lecturaDePlanillaSchema,
   insightSqlSchema,
   publicacionesSchema,
   propuestaDeCatalogoSchema,
   propuestaDeDisenoSchema,
   salesInsightSchema,
   storeBlueprintSchema,
+  type BorradoresDeProductos,
   type GenerateStoreRequest,
+  type LecturaDePlanilla,
   type InsightSql,
   type InsightsRequest,
   type Publicaciones,
@@ -445,4 +450,118 @@ export async function proponerCatalogo(input: {
   })
 
   return { propuesta: object, provider, model }
+}
+
+const REGLAS_DE_CARGA =
+  "Lees productos para cargarlos en la tienda. Nunca inventas un precio, un " +
+  "stock ni una talla: si no se lee, va null y lo dices en `duda`. El precio " +
+  'va en bolivianos tal como está escrito ("85,50" es 85.5; "1.250" es ' +
+  '1250). El nombre es corto y claro, como se vería en una tienda: "Polera ' +
+  'Nike negra", sin precios ni medidas de más. La categoría, si se puede, es ' +
+  'una de las que la tienda ya tiene; si no, una palabra en plural: "Poleras". ' +
+  "La descripción, una frase o vacía. No repitas un producto. No pongas " +
+  "marcas que no estén escritas o a la vista. El stock, si no se lee, va " +
+  "null sin mencionarlo: la tienda lo pone en 1 y lo cambia si hace falta."
+
+/**
+ * Productos desde fotos: una foto por producto, o páginas de un cuaderno con
+ * la lista escrita. O desde el texto de una lista pegada o dictada. La IA
+ * propone borradores; la persona los revisa antes de crear nada.
+ */
+export async function leerProductos(input: {
+  modo: "fotos" | "lista"
+  imagenes: ImagenParaIA[]
+  texto: string | null
+  categorias: string[]
+}): Promise<{
+  lectura: BorradoresDeProductos
+  provider: string
+  model: string
+}> {
+  const ai = getAIProvider()
+  const pedido =
+    input.modo === "fotos"
+      ? `Hay ${input.imagenes.length} fotos, una por producto, numeradas desde 0 en orden. Devuelve un borrador por foto, con su número en \`foto\`. Lee el nombre de lo que se ve; el precio, solo si aparece escrito.`
+      : input.imagenes.length
+        ? `Son ${input.imagenes.length} páginas de una lista escrita a mano o impresa. Devuelve un borrador por renglón con producto. \`foto\` va null.`
+        : "Es una lista escrita por la persona. Devuelve un borrador por renglón con producto. `foto` va null."
+
+  const { object, provider, model } = await ai.generateObject({
+    schema: borradoresDeProductosSchema,
+    schemaName: "BorradoresDeProductos",
+    system: `${BASE_SYSTEM} ${REGLAS_DE_CARGA}`,
+    maxTokens: 8192,
+    temperature: 0.2,
+    limiteMs: 45_000,
+    messages: [
+      {
+        role: "user",
+        imagenes: input.imagenes,
+        content: [
+          pedido,
+          "",
+          "<<CONTEXTO>>",
+          JSON.stringify({
+            modo: input.modo,
+            fotos: input.imagenes.length,
+            categorias: input.categorias,
+            texto: input.texto,
+          }),
+          "<</CONTEXTO>>",
+        ].join("\n"),
+      },
+    ],
+  })
+
+  return { lectura: object, provider, model }
+}
+
+/**
+ * Qué es cada columna de una planilla. Recibe el principio, no la planilla
+ * entera: el sistema aplica la lectura a todas las filas.
+ */
+export async function leerPlanilla(input: {
+  filas: string[][]
+}): Promise<{ lectura: LecturaDePlanilla; provider: string; model: string }> {
+  const ai = getAIProvider()
+  const tabla = input.filas
+    .map(
+      (fila, indice) =>
+        `Fila ${indice}: ${fila.map((celda, columna) => `[${columna}] ${celda}`).join(" | ")}`
+    )
+    .join("\n")
+
+  const { object, provider, model } = await ai.generateObject({
+    schema: lecturaDePlanillaSchema,
+    schemaName: "LecturaDePlanilla",
+    system:
+      `${BASE_SYSTEM} Recibes el principio de una planilla de productos y ` +
+      "dices qué es cada columna (su número entre corchetes), una entrada por " +
+      "columna con datos. Decide por el encabezado y, sobre todo, por lo que " +
+      "contienen las celdas: textos casi todos distintos son el nombre; textos " +
+      "que se repiten (Poleras, Gorras) son la categoría; números con " +
+      "decimales o Bs son el precio; enteros chicos son el stock; S, M, L, XL " +
+      "o 38, 39, 40 son la talla; negro, rojo, azul son el color; códigos como " +
+      "A12 son el código; textos largos son la descripción. El costo es lo que " +
+      "paga la tienda; el precio, lo que cobra. Cada campo va en una sola " +
+      "columna. `seguro` es true solo si no hay duda razonable; si dudas —por " +
+      "ejemplo, una columna de números que puede ser stock o precio—, false: " +
+      "se le pregunta a la persona. Una columna que no sirve va con campo null. " +
+      "`filaDeEncabezado` es la fila de los títulos, o null si no hay.",
+    temperature: 0,
+    messages: [
+      {
+        role: "user",
+        content: [
+          "<<CONTEXTO>>",
+          JSON.stringify({ filas: input.filas }),
+          "<</CONTEXTO>>",
+          "",
+          tabla,
+        ].join("\n"),
+      },
+    ],
+  })
+
+  return { lectura: object, provider, model }
 }

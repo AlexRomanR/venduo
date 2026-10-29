@@ -64,6 +64,13 @@ export const FUNCIONES = [
     descripcion: "Que la IA escriba el texto para publicar un producto.",
   },
   {
+    clave: "ia_productos",
+    nombre: "IA para cargar productos",
+    grupo: "IA",
+    descripcion:
+      "Que la IA arme productos desde fotos, una planilla o una lista.",
+  },
+  {
     clave: "catalogos",
     nombre: "Catálogos en PDF",
     grupo: "Herramientas",

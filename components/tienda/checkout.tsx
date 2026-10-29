@@ -3,6 +3,7 @@
 import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   ArrowLeft,
   Check,
@@ -22,6 +23,7 @@ import { formatMoney } from "@/lib/format"
 import { enlaceDeWhatsApp, mensajeDePedido } from "@/lib/pedidos"
 import type { Apariencia } from "@/lib/plantillas/apariencia"
 import { cn } from "@/lib/utils"
+import { textoDeVuelta } from "@/lib/vacaciones"
 import type { PedidoInput, ResultadoPedido } from "@/app/t/[slug]/acciones"
 import { claveDeLinea, useCarrito } from "@/components/tienda/carrito"
 import { registrarEvento } from "@/components/tienda/visita"
@@ -99,7 +101,9 @@ export function Checkout({
   /** Otros productos de la tienda, por si los ofrece para sumar al pedido. */
   sugeridos?: ProductoSugerido[]
 }) {
-  const { lineas, subtotalCents, unidades, listo, vaciar } = useCarrito()
+  const { lineas, subtotalCents, unidades, listo, vaciar, vacaciones } =
+    useCarrito()
+  const router = useRouter()
   const [enCurso, setEnCurso] = React.useState(false)
   const [enviado, setEnviado] = React.useState<Enviado | null>(null)
   const clave = `venduo:enviado:${slug}`
@@ -149,6 +153,9 @@ export function Checkout({
       pestana?.close()
       setEnCurso(false)
       toast.error(resultado.error)
+      // Si entró de vacaciones con el carrito abierto, la página vuelve a
+      // leerse y muestra el aviso en lugar del botón.
+      if (/vacaciones/i.test(resultado.error)) router.refresh()
       return
     }
 
@@ -198,11 +205,12 @@ export function Checkout({
       <div className="border-t-2 border-tinta py-14">
         <ShoppingBag aria-hidden="true" className="size-8 opacity-25" />
         <h2 className="mt-5 font-titular text-2xl font-extrabold tracking-[-0.03em]">
-          Tu carrito está vacío.
+          {vacaciones ? "Estamos de vacaciones." : "Tu carrito está vacío."}
         </h2>
         <p className="mt-3 max-w-[46ch] leading-relaxed opacity-70">
-          Mira el catálogo de {nombreTienda} y agrega lo que te guste. Cuando
-          estés listo, mandas tu pedido por WhatsApp.
+          {vacaciones
+            ? `${textoDeVuelta(vacaciones.hasta)} Mientras tanto, puedes mirar el catálogo de ${nombreTienda}.`
+            : `Mira el catálogo de ${nombreTienda} y agrega lo que te guste. Cuando estés listo, mandas tu pedido por WhatsApp.`}
         </p>
         <Link
           href={`/t/${slug}`}
@@ -216,13 +224,15 @@ export function Checkout({
   }
 
   const articulos = `${unidades} ${unidades === 1 ? "artículo" : "artículos"}`
-  const sugerencias = opciones.sugerencias ? (
-    <Sugerencias sugeridos={sugeridos} />
-  ) : null
+  const sugerencias =
+    opciones.sugerencias && !vacaciones ? (
+      <Sugerencias sugeridos={sugeridos} />
+    ) : null
   const boton = (
     <EnviarPorWhatsApp
       enCurso={enCurso}
       disponible={demo || Boolean(whatsapp)}
+      vacaciones={vacaciones}
       alEnviar={enviar}
     />
   )
@@ -547,12 +557,25 @@ function Total({
 function EnviarPorWhatsApp({
   enCurso,
   disponible,
+  vacaciones,
   alEnviar,
 }: {
   enCurso: boolean
   disponible: boolean
+  vacaciones: { hasta: string | null } | null
   alEnviar: () => void
 }) {
+  // Con la misma forma que "no recibe pedidos": es el mismo caso, por otra razón.
+  if (vacaciones) {
+    return (
+      <p className="mt-7 border-l-2 border-senal pl-4 text-sm leading-relaxed">
+        Estamos de vacaciones:{" "}
+        {textoDeVuelta(vacaciones.hasta).replace(/^V/, "v")} Tu carrito queda
+        guardado para entonces.
+      </p>
+    )
+  }
+
   if (!disponible) {
     return (
       <p className="mt-7 border-l-2 border-senal pl-4 text-sm leading-relaxed">

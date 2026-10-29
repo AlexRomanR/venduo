@@ -13,11 +13,13 @@ import {
   tituloDePedido,
   type GrupoDeFecha,
 } from "@/lib/pedidos"
+import { PERIODOS, textoDePeriodo, type Periodo } from "@/lib/exportar"
 import { enlaceLegible, urlDeTienda } from "@/lib/tienda"
 import { cn } from "@/lib/utils"
 import { FranjaDeFichas } from "@/components/panel/fichas"
 import { FichasDeCobro } from "@/components/panel/fichas-grandes"
 import { Cabecera, Seccion, SinDatos } from "@/components/panel/piezas"
+import { DescargarPedidos } from "@/components/panel/descargar"
 import { CompartirTienda } from "@/components/panel/tablero/compartir"
 import { ListaDePedidos, type Renglon } from "@/components/pedidos/lista"
 import { cambiarEstado } from "./acciones"
@@ -50,7 +52,7 @@ export default async function PedidosPage({
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
   const filtro = FILTROS.find((f) => f === consulta.estado)
-  const { pedidos, resumen, esDemo } = await getPedidos(filtro)
+  const { pedidos, resumen, porPeriodo, esDemo } = await getPedidos(filtro)
 
   const href = (valor?: FiltroPedidos) =>
     valor ? `/panel/pedidos?estado=${valor}` : "/panel/pedidos"
@@ -119,6 +121,19 @@ export default async function PedidosPage({
         icono={ShoppingBag}
         titulo="Los que llegaron"
         bajada="Toca uno para ver qué pidió."
+        extra={
+          resumen.total > 0 ? (
+            <DescargarPedidos
+              cuentas={porPeriodo}
+              textos={
+                Object.fromEntries(
+                  PERIODOS.map(({ valor }) => [valor, textoDePeriodo(valor)])
+                ) as Record<Periodo, string>
+              }
+              esDemo={esDemo}
+            />
+          ) : null
+        }
       >
         <FranjaDeFichas
           etiqueta="Filtrar por estado"

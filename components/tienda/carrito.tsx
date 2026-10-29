@@ -27,6 +27,12 @@ interface EstadoCarrito {
   cambiar: (clave: string, cantidad: number) => void
   quitar: (clave: string) => void
   vaciar: () => void
+  /**
+   * La tienda está de vacaciones: se mira, pero no se agrega ni se pide. Va
+   * acá para que las piezas compartidas —agregar, la barra de compra, el
+   * carrito— lo sepan sin que ninguna plantilla tenga que pasarlo.
+   */
+  vacaciones: { hasta: string | null } | null
 }
 
 const Contexto = React.createContext<EstadoCarrito | null>(null)
@@ -61,6 +67,7 @@ export function ProveedorCarrito({
   slug,
   tienda,
   muestra,
+  vacaciones = null,
   children,
 }: {
   slug: string
@@ -72,6 +79,7 @@ export function ProveedorCarrito({
    * su tienda y no tiene que encontrarse después su propio carrito tocado.
    */
   muestra?: LineaCarrito[]
+  vacaciones?: { hasta: string | null } | null
   children: React.ReactNode
 }) {
   const clave = `venduo:carrito:${slug}`
@@ -119,6 +127,7 @@ export function ProveedorCarrito({
       unidades,
       subtotalCents,
       listo,
+      vacaciones,
 
       agregar(linea, cantidad) {
         if (tienda && !muestra)
@@ -164,7 +173,7 @@ export function ProveedorCarrito({
         setLineas((previas) => (previas.length === 0 ? previas : []))
       },
     }
-  }, [lineas, listo])
+  }, [lineas, listo, vacaciones])
 
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>
 }

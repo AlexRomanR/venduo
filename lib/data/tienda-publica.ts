@@ -8,6 +8,7 @@ import {
 import type { Apariencia } from "@/lib/plantillas/apariencia"
 import { createClient } from "@/lib/supabase/server"
 import type { Json, Product } from "@/types"
+import { deVacaciones } from "@/lib/vacaciones"
 import { leerValores, type VariantePublica } from "@/lib/variantes"
 
 export interface BloquePublico {
@@ -38,6 +39,11 @@ export interface TiendaPublica {
   logoUrl: string | null
   /** A donde llega cada pedido. Sin él, la tienda no puede vender. */
   whatsapp: string | null
+  /**
+   * De vacaciones: se ve, pero no recibe pedidos. `hasta` es el día que
+   * vuelve. `null`: atiende.
+   */
+  vacaciones: { hasta: string | null } | null
   /** Con qué kit se dibuja. Una clave retirada ya llega resuelta a la base. */
   plantilla: ClavePlantilla
   /** La base de la plantilla con la personalización de la tienda encima. */
@@ -137,6 +143,7 @@ export const getTiendaPublica = cache(async function getTiendaPublica(
       descripcion: "Ropa deportiva en Santa Cruz.",
       logoUrl: null,
       whatsapp: null,
+      vacaciones: null,
       plantilla: "fashion",
       apariencia: aparienciaDeTienda("fashion", {}),
       bloques: bloquesDeDemostracion(),
@@ -167,7 +174,7 @@ type Cliente = NonNullable<Awaited<ReturnType<typeof createClient>>>
 
 /** Lo que se lee de `stores` para armar una tienda. */
 export const COLUMNAS_DE_TIENDA =
-  "id, slug, name, description, logo_url, whatsapp, is_published, template_key, theme_overrides"
+  "id, slug, name, description, logo_url, whatsapp, is_published, template_key, theme_overrides, vacaciones_desde, vacaciones_hasta"
 
 type FilaDeTienda = {
   id: string
@@ -178,6 +185,8 @@ type FilaDeTienda = {
   whatsapp: string | null
   template_key: string | null
   theme_overrides: Json
+  vacaciones_desde?: string | null
+  vacaciones_hasta?: string | null
 }
 
 /**
@@ -272,6 +281,12 @@ export async function completarTienda(
     descripcion: tienda.description,
     logoUrl: tienda.logo_url,
     whatsapp: tienda.whatsapp,
+    vacaciones: deVacaciones({
+      desde: tienda.vacaciones_desde ?? null,
+      hasta: tienda.vacaciones_hasta ?? null,
+    })
+      ? { hasta: tienda.vacaciones_hasta ?? null }
+      : null,
     plantilla: plantillaDeTienda(tienda.template_key),
     apariencia: aparienciaDeTienda(tienda.template_key, tienda.theme_overrides),
     bloques,

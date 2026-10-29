@@ -144,7 +144,8 @@ export default function Privacidad() {
             <strong>Google (Gemini)</strong> responde lo que le pides a la
             inteligencia artificial: recibe tu pedido y los datos de tu tienda
             que hacen falta para responderlo —por ejemplo, tus ventas por
-            producto—. Nunca datos de quien compra.
+            producto—. Si cargas productos con la IA, también las fotos, la
+            planilla o la lista que subes para eso. Nunca datos de quien compra.
           </li>
           <li>
             <strong>Expo y Firebase Cloud Messaging</strong> entregan los avisos

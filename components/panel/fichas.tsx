@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import { Deslizable } from "@/components/panel/deslizable"
 import { formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 
@@ -30,8 +31,8 @@ export function FranjaDeFichas({
   etiqueta: string
 }) {
   return (
-    <nav
-      aria-label={etiqueta}
+    <Deslizable
+      etiqueta={etiqueta}
       className="flex [scrollbar-width:none] gap-1.5 overflow-x-auto overscroll-x-contain border-b border-tinta/15 px-4 py-3 sm:px-5 [&::-webkit-scrollbar]:hidden"
     >
       {fichas.map((ficha) => (
@@ -64,6 +65,6 @@ export function FranjaDeFichas({
           ) : null}
         </Link>
       ))}
-    </nav>
+    </Deslizable>
   )
 }

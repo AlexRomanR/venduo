@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest"
 import {
   enlaceDeWhatsApp,
   grupoDeFecha,
+  LARGO_DE_NOTA,
+  limpiarNota,
   mensajeDePedido,
   noSeConcreto,
   numeroDeWhatsApp,
@@ -139,5 +141,19 @@ describe("tituloDePedido", () => {
       "Pedido por WhatsApp"
     )
     expect(tituloDePedido({ comprador: "Ana", items: [] })).toBe("Ana")
+  })
+})
+
+describe("limpiarNota", () => {
+  it("quita espacios de más y vacía es null", () => {
+    expect(limpiarNota("  Entrega el sábado  ")).toBe("Entrega el sábado")
+    expect(limpiarNota("   ")).toBeNull()
+    expect(limpiarNota(null)).toBeNull()
+  })
+
+  it("corta en el largo máximo", () => {
+    expect(limpiarNota("a".repeat(LARGO_DE_NOTA + 20))).toHaveLength(
+      LARGO_DE_NOTA
+    )
   })
 })

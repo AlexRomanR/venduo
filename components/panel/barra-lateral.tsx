@@ -485,9 +485,11 @@ function TarjetaDeTienda({
         <span className="truncate">
           {tienda.pausada
             ? "Pausada"
-            : tienda.publicada
-              ? "Publicada"
-              : "Borrador"}{" "}
+            : !tienda.publicada
+              ? "Borrador"
+              : tienda.deVacaciones
+                ? "De vacaciones"
+                : "Publicada"}{" "}
           · {legible(tienda.url)}
         </span>
       </span>
