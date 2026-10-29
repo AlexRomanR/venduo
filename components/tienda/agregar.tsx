@@ -7,6 +7,7 @@ import { toast } from "sonner"
 
 import { formatMoney } from "@/lib/format"
 import { cn } from "@/lib/utils"
+import { textoDeVuelta } from "@/lib/vacaciones"
 import {
   fotoDe,
   hayStockDe,
@@ -47,7 +48,7 @@ export function AgregarAlCarrito({
   slug: string
 }) {
   const router = useRouter()
-  const { agregar, lineas } = useCarrito()
+  const { agregar, lineas, vacaciones } = useCarrito()
   const variantes = React.useMemo(
     () => producto.variantes ?? [],
     [producto.variantes]
@@ -120,6 +121,20 @@ export function AgregarAlCarrito({
     setCantidad(1)
     toast.success(
       `${producto.name}${variante ? ` (${variante.nombre})` : ""} está en tu carrito.`
+    )
+  }
+
+  // De vacaciones no se agrega: se mira. Con la forma de "Sin stock".
+  if (vacaciones) {
+    return (
+      <div id={ANCLA_DE_COMPRA} className="border-t-2 border-tinta pt-7">
+        <p className="font-titular text-lg font-bold tracking-[-0.02em]">
+          {textoDeVuelta(vacaciones.hasta).replace(/\.$/, "")}
+        </p>
+        <p className="mt-2 max-w-[48ch] leading-relaxed opacity-70">
+          Puedes mirar todo; los pedidos se reciben a la vuelta.
+        </p>
+      </div>
     )
   }
 

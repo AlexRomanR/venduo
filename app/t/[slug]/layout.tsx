@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next"
 import { getTiendaPublica } from "@/lib/data/tienda-publica"
 import { urlDeTienda } from "@/lib/tienda"
 import { EstiloDePlantilla } from "@/components/plantillas/estilo"
+import { AvisoDeVacaciones } from "@/components/tienda/aviso-de-vacaciones"
 import { ProveedorCarrito } from "@/components/tienda/carrito"
 
 /**
@@ -66,6 +67,7 @@ export default async function TiendaLayout({
     <ProveedorCarrito
       slug={slug}
       tienda={tienda && !tienda.esDemo ? tienda.id : undefined}
+      vacaciones={tienda?.vacaciones ?? null}
     >
       {/* El tema se pinta en el servidor, junto con el HTML: si esperara al
           navegador, la tienda aparecería un instante con los colores de
@@ -75,6 +77,11 @@ export default async function TiendaLayout({
         data-plantilla={tienda?.plantilla}
         className="flex min-h-screen flex-col bg-papel text-tinta"
       >
+        {/* Encima de cualquier plantilla, sin preguntar cuál es: solo usa los
+            colores de la tienda. */}
+        {tienda?.vacaciones ? (
+          <AvisoDeVacaciones hasta={tienda.vacaciones.hasta} />
+        ) : null}
         {children}
       </div>
     </ProveedorCarrito>

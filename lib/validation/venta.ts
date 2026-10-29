@@ -1,5 +1,14 @@
 import { z } from "zod"
 
+import { LARGO_DE_NOTA, limpiarNota } from "@/lib/pedidos"
+
+/** La nota interna de un pedido: vacía se guarda como `null`. */
+export const notaSchema = z
+  .string()
+  .max(LARGO_DE_NOTA, `La nota va hasta ${LARGO_DE_NOTA} caracteres.`)
+  .nullable()
+  .transform(limpiarNota)
+
 /**
  * Una venta directa: lo que se vendió fuera de la tienda —en el chat o en
  * persona— y la tienda registra para que el stock y las estadísticas digan la
@@ -28,6 +37,7 @@ export const ventaSchema = z.object({
     )
     .min(1, "Elige al menos un producto.")
     .max(50, "Son demasiados productos para una venta."),
+  nota: notaSchema.optional(),
 })
 
 export type VentaInput = z.input<typeof ventaSchema>

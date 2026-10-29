@@ -88,7 +88,12 @@ export function createGoogleProvider(config: {
               : {}),
             contents: options.messages.map((m) => ({
               role: m.role === "assistant" ? "model" : "user",
-              parts: [{ text: m.content }],
+              parts: [
+                ...(m.imagenes ?? []).map((imagen) => ({
+                  inlineData: { mimeType: imagen.tipo, data: imagen.base64 },
+                })),
+                { text: m.content },
+              ],
             })),
             generationConfig: {
               maxOutputTokens: options.maxTokens ?? 4096,

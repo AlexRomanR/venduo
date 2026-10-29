@@ -35,7 +35,19 @@ export function createAnthropicProvider(config: {
           ...(options.system ? { system: options.system } : {}),
           messages: options.messages.map((m) => ({
             role: m.role,
-            content: m.content,
+            content: m.imagenes?.length
+              ? [
+                  ...m.imagenes.map((imagen) => ({
+                    type: "image" as const,
+                    source: {
+                      type: "base64" as const,
+                      media_type: imagen.tipo,
+                      data: imagen.base64,
+                    },
+                  })),
+                  { type: "text" as const, text: m.content },
+                ]
+              : m.content,
           })),
         },
         { timeout: options.limiteMs ?? LIMITE_POR_DEFECTO_MS }

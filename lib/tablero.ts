@@ -46,6 +46,8 @@ export interface PedidoReciente {
   foto: string | null
   /** La registró la tienda, vendida fuera de ella. */
   directa?: boolean
+  /** La nota interna de la tienda. */
+  nota?: string | null
 }
 
 export interface ProductoVendido {

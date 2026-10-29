@@ -1,5 +1,6 @@
 ﻿import { z } from "zod"
 
+import { borradoresDeDemostracion, lecturaDeDemostracion } from "./mock-carga"
 import { catalogoDeDemostracion } from "./mock-catalogo"
 import { publicacionesDeDemostracion } from "./mock-publicaciones"
 import { propuestaDeDemostracion } from "./mock-propuesta"
@@ -287,6 +288,29 @@ export function createMockProvider(
           return {
             object: validado.data,
             raw: JSON.stringify(sugerido, null, 2),
+            provider: "mock",
+            model,
+          }
+        }
+      }
+
+      // Y para cargar productos: borradores desde fotos o una lista, o qué
+      // columna de una planilla es qué.
+      if (
+        options.schemaName === "BorradoresDeProductos" ||
+        options.schemaName === "LecturaDePlanilla"
+      ) {
+        const pedido = options.messages.at(-1)?.content ?? ""
+        const leido =
+          options.schemaName === "LecturaDePlanilla"
+            ? lecturaDeDemostracion(pedido)
+            : borradoresDeDemostracion(pedido)
+        const validado = options.schema.safeParse(leido)
+
+        if (validado.success) {
+          return {
+            object: validado.data,
+            raw: JSON.stringify(leido, null, 2),
             provider: "mock",
             model,
           }

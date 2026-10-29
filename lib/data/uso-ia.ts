@@ -17,13 +17,15 @@ import { createAdminClient } from "@/lib/supabase/server"
  * demora la respuesta.
  */
 
-export type TipoDeIa = "editor" | "estadisticas" | "catalogos" | "marketing"
+export type TipoDeIa =
+  "editor" | "estadisticas" | "catalogos" | "marketing" | "productos"
 
 const FUNCION: Record<TipoDeIa, ClaveFuncion> = {
   editor: "ia_editor",
   estadisticas: "ia_estadisticas",
   catalogos: "ia_catalogos",
   marketing: "ia_marketing",
+  productos: "ia_productos",
 }
 
 export const AVISO_DE_TOPE =

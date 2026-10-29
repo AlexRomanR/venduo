@@ -2,6 +2,7 @@ import { cache } from "react"
 
 import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
+import { deVacaciones } from "@/lib/vacaciones"
 import { isSupabaseConfigured } from "@/lib/env"
 import { TODAS_ACTIVAS, type FuncionesDeTienda } from "@/lib/funciones"
 import { limiteParaConcretar } from "@/lib/pedidos"
@@ -31,6 +32,8 @@ export interface BarraLateral {
     publicada: boolean
     /** Si Venduo la pausó: no se ve aunque esté publicada. */
     pausada: boolean
+    /** De vacaciones: se ve, pero no recibe pedidos. */
+    deVacaciones: boolean
     url: string
     /** Sin WhatsApp no recibe pedidos: el menú lo marca en rojo. */
     conWhatsApp: boolean
@@ -62,6 +65,7 @@ function barraDeDemostracion(): BarraLateral {
       logoUrl: null,
       publicada: true,
       pausada: false,
+      deVacaciones: false,
       url: urlDeTienda("rosa-deportes"),
       conWhatsApp: true,
     },
@@ -160,6 +164,10 @@ export const getBarraLateral = cache(
             logoUrl: tiendaFila.logo_url,
             publicada: tiendaFila.is_published,
             pausada: Boolean(tiendaFila.suspended_at),
+            deVacaciones: deVacaciones({
+              desde: tiendaFila.vacaciones_desde,
+              hasta: tiendaFila.vacaciones_hasta,
+            }),
             url: urlDeTienda(tiendaFila.slug),
             conWhatsApp: Boolean(tiendaFila.whatsapp),
           }

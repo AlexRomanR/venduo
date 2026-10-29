@@ -33,7 +33,7 @@ export function BarraDeCompra({
 }) {
   // Con opciones, la barra no agrega: lleva a elegirlas, que es lo que falta.
   const conOpciones = (producto.variantes ?? []).length > 0
-  const { agregar, lineas, unidades, listo } = useCarrito()
+  const { agregar, lineas, unidades, listo, vacaciones } = useCarrito()
   const [aLaVista, setALaVista] = React.useState(false)
   const [recien, setRecien] = React.useState(false)
 
@@ -78,6 +78,9 @@ export function BarraDeCompra({
     setRecien(true)
     toast.success(`${producto.name} está en tu carrito.`)
   }
+
+  // De vacaciones no hay compra: la ficha ya dice cuándo vuelve.
+  if (vacaciones) return null
 
   return (
     <div

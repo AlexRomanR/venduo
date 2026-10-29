@@ -155,6 +155,11 @@ export function formatFechaLarga(
   }).format(date)
 }
 
+/** El instante en que empieza un día en Bolivia, que no cambia de hora: UTC−4. */
+export function inicioDelDia(dia: string): string {
+  return `${dia}T04:00:00.000Z`
+}
+
 /** `AAAA-MM-DD` corrido `dias` días, sin que la zona horaria lo mueva. */
 export function sumarDias(dia: string, dias: number): string {
   const [anio, mes, numero] = dia.split("-").map(Number)

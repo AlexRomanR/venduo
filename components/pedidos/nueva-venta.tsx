@@ -29,6 +29,7 @@ import type { VentaInput } from "@/lib/validation/venta"
 import { CampoMonto, Cantidad, HojaDeAjuste } from "@/components/panel/ajustes"
 import { useFestejo } from "@/components/panel/festejo"
 import { Miniatura, Seccion, SinDatos } from "@/components/panel/piezas"
+import { FilaDeNota } from "@/components/pedidos/nota"
 import type { ResultadoDeVenta } from "@/app/(privado)/panel/pedidos/acciones"
 
 /** Lo que hace falta de un producto para venderlo. */
@@ -86,6 +87,7 @@ export function NuevaVenta({
   const router = useRouter()
   const { festejo, festejar } = useFestejo()
   const [lineas, setLineas] = React.useState<Linea[]>([])
+  const [nota, setNota] = React.useState<string | null>(null)
   const [registrando, setRegistrando] = React.useState(false)
   const [agregando, setAgregando] = React.useState(false)
   // Cada vez que se abre, la hoja se monta de nuevo: empieza sin nada marcado,
@@ -108,10 +110,17 @@ export function NuevaVenta({
     try {
       const guardado = sessionStorage.getItem(BORRADOR)
       if (guardado) {
-        const leidas = (JSON.parse(guardado) as Linea[]).filter((l) =>
-          porId.has(l.productoId)
-        )
-        if (leidas.length) setLineas(leidas)
+        // Antes de la nota, el borrador era solo la lista de líneas.
+        const crudo = JSON.parse(guardado) as
+          Linea[] | { lineas: Linea[]; nota: string | null }
+        const borrador = Array.isArray(crudo)
+          ? { lineas: crudo, nota: null }
+          : crudo
+        const leidas = borrador.lineas.filter((l) => porId.has(l.productoId))
+        if (leidas.length) {
+          setLineas(leidas)
+          setNota(borrador.nota)
+        }
       }
     } catch {
       // Sin almacenamiento, la venta empieza vacía: no es un error.
@@ -123,12 +132,12 @@ export function NuevaVenta({
     if (!restaurado) return
     try {
       if (lineas.length)
-        sessionStorage.setItem(BORRADOR, JSON.stringify(lineas))
+        sessionStorage.setItem(BORRADOR, JSON.stringify({ lineas, nota }))
       else sessionStorage.removeItem(BORRADOR)
     } catch {
       // Igual que arriba: sin almacenamiento, no se guarda.
     }
-  }, [lineas, restaurado])
+  }, [lineas, nota, restaurado])
 
   React.useEffect(() => {
     if (!recien) return
@@ -235,6 +244,7 @@ export function NuevaVenta({
         cantidad: l.cantidad,
         precio: precioDe(l) / 100,
       })),
+      nota,
     }).catch((): ResultadoDeVenta => ({
       ok: false,
       error: "No pudimos registrar la venta. Revisa tu conexión.",
@@ -259,7 +269,13 @@ export function NuevaVenta({
         },
       }
     )
+    if (resultado.sinNota) {
+      toast.warning(
+        "Guardamos la venta, pero no la nota. Agrégala en el pedido."
+      )
+    }
     setLineas([])
+    setNota(null)
     // El stock de cada producto cambió: la grilla lo vuelve a leer.
     router.refresh()
   }
@@ -351,6 +367,14 @@ export function NuevaVenta({
             <Plus aria-hidden="true" className="size-5" />
             Agregar producto
           </button>
+          <ul className="border-t border-tinta/15">
+            <FilaDeNota
+              nota={nota}
+              titulo="Nota de la venta"
+              soloLectura={registrando}
+              alCambiar={setNota}
+            />
+          </ul>
 
           {/* En el celular, el total y el botón van fijos sobre las pestañas:
               es lo que se vino a hacer. En una pantalla ancha, al pie de la

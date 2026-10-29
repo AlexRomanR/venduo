@@ -50,8 +50,10 @@ export default async function EditarProductoPage({
   // quien lo pide, y no confirma que ese producto exista en algún lado.
   if (!producto) notFound()
 
+  // Abajo, el lugar de la barra fija de "Guardar cambios": sin él, tapaba
+  // "Borrar del catálogo" en el celular.
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 md:gap-8">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 max-lg:pb-24 md:gap-8">
       <TituloDeLaBarra titulo={producto.name} volver="/panel/productos" />
       <Volver href="/panel/productos">Productos</Volver>
 

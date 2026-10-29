@@ -303,6 +303,24 @@ de cada `create policy`. Así el archivo se puede volver a correr sin romper nad
 
 Las políticas RLS van juntas en su propio archivo, para poder auditarlas de una lectura.
 
+## Lo que solo cambia el administrador
+
+`stores.suspended_at`, `stores.closed_at` y `products.moderated_at` los escribe Venduo
+—con la clave de servicio o desde una función `security definer`—. Las políticas del
+dueño dejan escribir la fila entera, así que el disparador
+`proteger_marcas_del_administrador` rechaza esos cambios cuando quien llama es
+`authenticated` o `anon`. Una columna nueva de ese tipo se suma ahí.
+
+## La nota y las vacaciones
+
+- `orders.nota`: texto de la tienda, hasta 500 caracteres o null —nunca vacío—. No
+  necesita política: la de actualizar del dueño ya alcanza. Ninguna lectura de quien
+  compra la nombra.
+- `stores.vacaciones_desde` y `vacaciones_hasta`: `tienda_de_vacaciones(p_store_id)`
+  decide y el disparador `pedido_de_vacaciones` rechaza el insert de un pedido de
+  origen `tienda`. Entran en `vista_cambio_tienda`; la vuelta sola la detecta
+  `lib/vista.ts`.
+
 ## Probar una función o una política
 
 Con pgTAP, en `supabase/tests/*.test.sql`, sobre la base local que Docker arma desde las

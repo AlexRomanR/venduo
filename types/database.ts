@@ -571,6 +571,7 @@ export type Database = {
           buyer_phone: string | null
           created_at: string
           id: string
+          nota: string | null
           order_number: number
           origen: string
           paid_at: string | null
@@ -586,6 +587,7 @@ export type Database = {
           buyer_phone?: string | null
           created_at?: string
           id?: string
+          nota?: string | null
           order_number?: number
           origen?: string
           paid_at?: string | null
@@ -601,6 +603,7 @@ export type Database = {
           buyer_phone?: string | null
           created_at?: string
           id?: string
+          nota?: string | null
           order_number?: number
           origen?: string
           paid_at?: string | null
@@ -1473,6 +1476,8 @@ export type Database = {
           template_key: string | null
           theme_overrides: Json
           updated_at: string
+          vacaciones_desde: string | null
+          vacaciones_hasta: string | null
           vista_at: string | null
           vista_cambio_at: string
           vista_escritorio_url: string | null
@@ -1497,6 +1502,8 @@ export type Database = {
           template_key?: string | null
           theme_overrides?: Json
           updated_at?: string
+          vacaciones_desde?: string | null
+          vacaciones_hasta?: string | null
           vista_at?: string | null
           vista_cambio_at?: string
           vista_escritorio_url?: string | null
@@ -1521,6 +1528,8 @@ export type Database = {
           template_key?: string | null
           theme_overrides?: Json
           updated_at?: string
+          vacaciones_desde?: string | null
+          vacaciones_hasta?: string | null
           vista_at?: string | null
           vista_cambio_at?: string
           vista_escritorio_url?: string | null
@@ -1922,9 +1931,11 @@ export type Database = {
         Returns: undefined
       }
       store_is_live: { Args: { p_store_id: string }; Returns: boolean }
+      tienda_de_vacaciones: { Args: { p_store_id: string }; Returns: boolean }
     }
     Enums: {
-      ai_generation_kind: "tienda" | "bloques" | "analisis" | "marketing"
+      ai_generation_kind:
+        "tienda" | "bloques" | "analisis" | "marketing" | "productos"
       block_proposal_status: "propuesta" | "aplicada" | "rechazada" | "invalida"
       design_origin:
         | "inicial"
@@ -2064,7 +2075,13 @@ export const Constants = {
   },
   public: {
     Enums: {
-      ai_generation_kind: ["tienda", "bloques", "analisis", "marketing"],
+      ai_generation_kind: [
+        "tienda",
+        "bloques",
+        "analisis",
+        "marketing",
+        "productos",
+      ],
       block_proposal_status: ["propuesta", "aplicada", "rechazada", "invalida"],
       design_origin: [
         "inicial",

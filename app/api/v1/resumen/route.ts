@@ -62,6 +62,11 @@ export async function GET() {
             logoUrl: barra.tienda.logoUrl,
             publicada: barra.tienda.publicada,
             pausada: barra.tienda.pausada,
+            // Se ve, pero no recibe pedidos. `hasta`: el día que vuelve.
+            vacaciones: {
+              activa: barra.tienda.deVacaciones,
+              hasta: terminada.vacaciones_hasta,
+            },
             whatsapp: terminada.whatsapp,
             plantilla:
               PLANTILLAS[plantillaDeTienda(terminada.template_key)].nombre,

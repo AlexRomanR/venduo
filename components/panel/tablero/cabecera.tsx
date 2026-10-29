@@ -20,6 +20,8 @@ export interface TiendaDelResumen {
   logoUrl: string | null
   publicada: boolean
   pausada?: boolean
+  /** De vacaciones: se ve, pero no recibe pedidos. La eligió la persona. */
+  deVacaciones?: boolean
 }
 
 /**
@@ -129,9 +131,11 @@ function EstadoDeTienda({
         />
         {tienda.pausada
           ? "Pausada"
-          : tienda.publicada
-            ? "Publicada"
-            : "Borrador"}
+          : !tienda.publicada
+            ? "Borrador"
+            : tienda.deVacaciones
+              ? "De vacaciones"
+              : "Publicada"}
       </Ficha>
       {prueba && prueba.diasRestantes !== null ? (
         <FichaDePrueba

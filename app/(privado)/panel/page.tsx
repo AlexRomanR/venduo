@@ -13,7 +13,8 @@ import { isSupabaseConfigured } from "@/lib/env"
 import { plantillaDeTienda } from "@/lib/plantillas"
 import type { Tablero } from "@/lib/tablero"
 import { urlDeTienda } from "@/lib/tienda"
-import { pedirVista } from "@/lib/vista"
+import { deVacaciones } from "@/lib/vacaciones"
+import { pedirVista, volvioDespuesDeLaCaptura } from "@/lib/vista"
 import type { ResumenDeVisitas } from "@/lib/visitas-resumen"
 import { AvisoSuscripcion } from "@/components/panel/aviso-suscripcion"
 import {
@@ -30,7 +31,9 @@ import {
 import { UltimosPedidos } from "@/components/panel/tablero/pedidos"
 import { PrimerosPasos } from "@/components/panel/tablero/primeros-pasos"
 import { MasVendidos, PorAcabarse } from "@/components/panel/tablero/productos"
+import { FranjaDeVacaciones } from "@/components/panel/tablero/vacaciones"
 import { PanelDeVisitas } from "@/components/panel/visitas"
+import { guardarVacaciones } from "../cuenta/acciones"
 import { cambiarEstado } from "./pedidos/acciones"
 import { ajustarStock } from "./productos/acciones"
 
@@ -69,6 +72,7 @@ export default async function PanelPage() {
     logoUrl: barra.tienda?.logoUrl ?? null,
     publicada: barra.tienda?.publicada ?? datos.tienda.isPublished,
     pausada: barra.tienda?.pausada ?? false,
+    deVacaciones: barra.tienda?.deVacaciones ?? false,
   }
 
   // La captura de la portada, la misma de la app. Si quedó vieja se saca otra
@@ -79,7 +83,12 @@ export default async function PanelPage() {
     !deLaTienda.pausada &&
     (!tienda.vista_at ||
       !tienda.vista_escritorio_url ||
-      new Date(tienda.vista_at) < new Date(tienda.vista_cambio_at))
+      new Date(tienda.vista_at) < new Date(tienda.vista_cambio_at) ||
+      volvioDespuesDeLaCaptura(
+        tienda.vista_at,
+        tienda.vacaciones_hasta,
+        new Date()
+      ))
   ) {
     const id = tienda.id
     after(() => pedirVista(id))
@@ -101,6 +110,18 @@ export default async function PanelPage() {
           apariencia: barra.apariencia,
         }}
       />
+
+      {tienda &&
+      !deLaTienda.pausada &&
+      deVacaciones({
+        desde: tienda.vacaciones_desde,
+        hasta: tienda.vacaciones_hasta,
+      }) ? (
+        <FranjaDeVacaciones
+          hasta={tienda.vacaciones_hasta}
+          reactivar={guardarVacaciones}
+        />
+      ) : null}
 
       <AvisoSuscripcion suscripcion={datos.suscripcion} />
 

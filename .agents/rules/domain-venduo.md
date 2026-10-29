@@ -226,6 +226,19 @@ Las piezas, siempre las mismas:
 Una función nueva se suma a `FUNCIONES` en `lib/funciones.ts` y a `feature_states` con
 una migración; sin la fila, la base la da por activa.
 
+## De vacaciones
+
+La persona puede poner su tienda **de vacaciones** desde `/cuenta`: se sigue sirviendo
+(`store_is_live` no cambia) con una banda arriba, común a las plantillas, pero no recibe
+pedidos. La regla vive en la base —`tienda_de_vacaciones()` y el disparador
+`pedido_de_vacaciones` sobre `orders`— y en `lib/vacaciones.ts`, la misma: está de
+vacaciones si `vacaciones_desde` no es null y todavía no llegó `vacaciones_hasta`, el
+día que vuelve, contado en Bolivia. **Nadie escribe para reactivarla**: el día de la
+vuelta la condición deja de cumplirse. La venta directa sigue. Las piezas compartidas
+de la tienda —agregar, la barra de compra, el carrito— lo leen del contexto del carrito,
+no de la plantilla. Se dice "De vacaciones", nunca "pausada": eso es lo del
+administrador.
+
 ## Pausa y moderación
 
 Dos herramientas del administrador que no pasan por la suscripción:
@@ -238,6 +251,10 @@ Dos herramientas del administrador que no pasan por la suscripción:
   catálogos y de `create_order`. El dueño lo ve en Productos como "Oculto por Venduo".
   Toda lectura pública de productos filtra `moderated_at is null`: la política lo hace
   para el comprador, pero el dueño mirando su tienda entra por la suya.
+
+El dueño no puede desmarcar nada de esto escribiendo en la base: el disparador
+`proteger_marcas_del_administrador` rechaza que cambie `suspended_at`, `closed_at` o
+`moderated_at` desde la API con sesión.
 
 ## Las ofertas
 

@@ -39,7 +39,22 @@ export function createOpenAICompatibleProvider(config: {
       ...(options.system
         ? [{ role: "system" as const, content: options.system }]
         : []),
-      ...options.messages,
+      ...options.messages.map((m) =>
+        m.imagenes?.length
+          ? {
+              role: m.role,
+              content: [
+                { type: "text" as const, text: m.content },
+                ...m.imagenes.map((imagen) => ({
+                  type: "image_url" as const,
+                  image_url: {
+                    url: `data:${imagen.tipo};base64,${imagen.base64}`,
+                  },
+                })),
+              ],
+            }
+          : { role: m.role, content: m.content }
+      ),
     ]
 
     let response: Response

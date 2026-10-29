@@ -34,16 +34,27 @@ export function AvisoSuscripcion({
           Tu tienda dejó de verse y el panel quedó en solo lectura.
         </h2>
         <p className="mt-3 max-w-[54ch] text-sm leading-relaxed text-white/75">
-          Puedes exportar todo —catálogo y pedidos— en CSV. Tus datos se
+          Puedes descargar tus pedidos y tus productos en planilla. Tus datos se
           conservan 90 días desde el bloqueo.
         </p>
-        {/* La exportación en CSV es la única acción que queda habilitada con la
-            tienda bloqueada, pero todavía no está construida: se enuncia sin
-            enlace en vez de llevar a una ruta que no existe. */}
-        <p className="mt-6 inline-flex items-center gap-2 border-2 border-white/40 px-5 py-3 text-sm font-semibold text-white/70">
-          <Download aria-hidden="true" className="size-4" />
-          La exportación en CSV llega con la sección de datos
-        </p>
+        {/* Descargar es lo único que sigue andando con la tienda bloqueada:
+            es la forma de llevarse los datos. */}
+        <div className="mt-6 grid gap-2 sm:max-w-md sm:grid-cols-2">
+          {[
+            ["/panel/exportar/pedidos?periodo=todo", "Descargar pedidos"],
+            ["/panel/exportar/productos", "Descargar productos"],
+          ].map(([href, texto]) => (
+            <a
+              key={href}
+              href={href}
+              download
+              className="inline-flex min-h-12 items-center justify-center gap-2 border-2 border-white px-5 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-senal"
+            >
+              <Download aria-hidden="true" className="size-4" />
+              {texto}
+            </a>
+          ))}
+        </div>
       </div>
     )
   }

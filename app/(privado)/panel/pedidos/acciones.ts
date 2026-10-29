@@ -6,7 +6,11 @@ import { z } from "zod"
 import { aCentavos } from "@/lib/format"
 import { createClient, getUsuario } from "@/lib/supabase/server"
 import { ESTADOS } from "@/lib/pedidos"
-import { ventaSchema, type VentaInput } from "@/lib/validation/venta"
+import {
+  notaSchema,
+  ventaSchema,
+  type VentaInput,
+} from "@/lib/validation/venta"
 import type { OrderStatus } from "@/types"
 
 const RUTA = "/panel/pedidos"
@@ -64,6 +68,61 @@ export async function cambiarEstado(
   return { ok: true }
 }
 
+/**
+ * Guarda la nota interna de un pedido. Vacía, la borra. Solo la tienda la lee:
+ * `create_order` y el mensaje de WhatsApp no la nombran.
+ */
+export async function guardarNota(
+  id: string,
+  nota: string | null
+): Promise<Resultado> {
+  const validada = notaSchema.safeParse(nota)
+  if (!validada.success) {
+    return {
+      ok: false,
+      error: validada.error.issues[0]?.message ?? "Revisa la nota.",
+    }
+  }
+
+  const supabase = await createClient()
+  if (!supabase) {
+    return {
+      ok: false,
+      error: "Estás en modo demo: los cambios no se guardan.",
+    }
+  }
+
+  const user = await getUsuario()
+  if (!user) return { ok: false, error: "Necesitas iniciar sesión." }
+
+  const { data: tienda } = await supabase
+    .from("stores")
+    .select("id")
+    .eq("owner_id", user.id)
+    .is("deleted_at", null)
+    .maybeSingle()
+  if (!tienda) return { ok: false, error: "Todavía no tienes una tienda." }
+
+  const { error } = await supabase
+    .from("orders")
+    .update({ nota: validada.data, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("store_id", tienda.id)
+
+  if (error) {
+    return {
+      ok: false,
+      error:
+        "No pudimos guardar la nota. Revisa tu conexión y vuelve a intentarlo.",
+    }
+  }
+
+  revalidatePath(RUTA)
+  revalidatePath(`${RUTA}/${id}`)
+  revalidatePath("/panel")
+  return { ok: true }
+}
+
 function mensajeDeError(crudo: string) {
   const sinStock = /Stock insuficiente de (.+): quedan (\d+)/.exec(crudo)
   if (sinStock) {
@@ -79,7 +138,14 @@ function mensajeDeError(crudo: string) {
 }
 
 export type ResultadoDeVenta =
-  | { ok: true; id: string; numero: number; totalCents: number }
+  | {
+      ok: true
+      id: string
+      numero: number
+      totalCents: number
+      /** La venta quedó, pero la nota no se pudo guardar. */
+      sinNota?: boolean
+    }
   | { ok: false; error: string }
 
 const ventaRegistradaSchema = z.object({
@@ -131,6 +197,18 @@ export async function registrarVenta(
     }
   }
 
+  // La nota va aparte y no dentro de `registrar_venta`: cambiarle la firma
+  // dejaría a PostgREST con dos funciones del mismo nombre, también para la
+  // app publicada. Si falla, la venta igual quedó.
+  let sinNota = false
+  if (validada.data.nota) {
+    const { error: errorDeNota } = await supabase
+      .from("orders")
+      .update({ nota: validada.data.nota })
+      .eq("id", venta.data.id)
+    sinNota = Boolean(errorDeNota)
+  }
+
   revalidatePath(RUTA)
   revalidatePath("/panel")
   revalidatePath("/panel/productos")
@@ -139,6 +217,7 @@ export async function registrarVenta(
     id: venta.data.id,
     numero: venta.data.numero,
     totalCents: venta.data.total_cents,
+    sinNota,
   }
 }
 

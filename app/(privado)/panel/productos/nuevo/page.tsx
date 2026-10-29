@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { redirect } from "next/navigation"
 
 import { getCatalogo } from "@/lib/data/catalogo"
@@ -23,6 +24,12 @@ export default async function NuevoProductoPage() {
         titulo="Un producto nuevo."
         bajada="Con foto, nombre y precio ya se puede vender."
       />
+      <Link
+        href="/panel/productos/cargar"
+        className="-mt-3 inline-flex min-h-11 items-center gap-1.5 self-start text-sm font-semibold underline underline-offset-4 transition-colors hover:text-senal md:-mt-5"
+      >
+        ¿Son varios? Cárgalos de una vez
+      </Link>
 
       <FormularioProducto
         tiendaId={tienda?.id ?? "demo"}

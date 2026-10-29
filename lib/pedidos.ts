@@ -31,6 +31,18 @@ export const SIGUIENTES: Record<OrderStatus, OrderStatus[]> = {
 }
 
 /**
+ * El largo máximo de la nota interna de un pedido. La base lo impone igual
+ * (`orders_nota_largo`); esto es para cortar en la pantalla y en la validación.
+ */
+export const LARGO_DE_NOTA = 500
+
+/** La nota como se guarda: sin espacios de más, y `null` si quedó vacía. */
+export function limpiarNota(nota: string | null | undefined): string | null {
+  const limpia = nota?.trim() ?? ""
+  return limpia ? limpia.slice(0, LARGO_DE_NOTA) : null
+}
+
+/**
  * Los días que un pedido pendiente espera antes de quedar "no concretado".
  *
  * Cada toque al botón del carrito crea un pedido, y muchos no se concretan:
@@ -173,6 +185,8 @@ export interface PedidoEnFila {
   relativo: string
   noConcretado: boolean
   directa: boolean
+  /** La nota interna de la tienda, para una línea en la lista. */
+  nota: string | null
 }
 
 export function pedidoEnFila(
@@ -187,6 +201,7 @@ export function pedidoEnFila(
     articulos: number
     foto: string | null
     directa?: boolean
+    nota?: string | null
   },
   ahora: Date = new Date()
 ): PedidoEnFila {
@@ -202,5 +217,6 @@ export function pedidoEnFila(
     relativo: formatRelative(pedido.creado, ahora),
     noConcretado: noSeConcreto(pedido, ahora),
     directa: pedido.directa ?? false,
+    nota: pedido.nota ?? null,
   }
 }

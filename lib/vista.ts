@@ -5,6 +5,7 @@ import { after } from "next/server"
 
 import { getMiTienda } from "@/lib/data/panel"
 import { env, getSiteUrl } from "@/lib/env"
+import { inicioDelDia } from "@/lib/format"
 import { createAdminClient } from "@/lib/supabase/server"
 import { urlDeTienda } from "@/lib/tienda"
 
@@ -178,7 +179,7 @@ export async function capturarVista(tiendaId: string): Promise<string | null> {
     .eq("id", tiendaId)
     .or(`vista_pedida_at.is.null,vista_pedida_at.lt.${vencido}`)
     .select(
-      "id, slug, vista_url, vista_escritorio_url, vista_at, vista_cambio_at"
+      "id, slug, vista_url, vista_escritorio_url, vista_at, vista_cambio_at, vacaciones_hasta"
     )
     .maybeSingle()
 
@@ -202,7 +203,8 @@ export async function capturarVista(tiendaId: string): Promise<string | null> {
     const alDia =
       tienda.vista_at &&
       tienda.vista_escritorio_url &&
-      new Date(tienda.vista_at) >= new Date(tienda.vista_cambio_at)
+      new Date(tienda.vista_at) >= new Date(tienda.vista_cambio_at) &&
+      !volvioDespuesDeLaCaptura(tienda.vista_at, tienda.vacaciones_hasta, ahora)
     const { data: enElAire } = await admin.rpc("store_is_live", {
       p_store_id: tiendaId,
     })
@@ -247,4 +249,19 @@ export async function capturarVista(tiendaId: string): Promise<string | null> {
     await soltar()
     return tienda.vista_url
   }
+}
+
+/**
+ * La vuelta de vacaciones no la escribe nadie —se decide al leer—, así que la
+ * base no marca la captura vieja ese día. Si el día de la vuelta empezó
+ * después de la captura, la captura todavía muestra la banda: hace falta otra.
+ */
+export function volvioDespuesDeLaCaptura(
+  vistaAt: string,
+  hasta: string | null,
+  ahora: Date
+) {
+  if (!hasta) return false
+  const vuelta = new Date(inicioDelDia(hasta))
+  return vuelta > new Date(vistaAt) && vuelta <= ahora
 }

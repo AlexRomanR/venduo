@@ -126,6 +126,10 @@ export async function crearPedido(
 }
 
 function mensajeDeError(crudo: string) {
+  // Primero: el carrito pudo quedar abierto de antes de las vacaciones.
+  if (/vacaciones/i.test(crudo)) {
+    return "La tienda está de vacaciones y no recibe pedidos por ahora."
+  }
   const sinOpcion = /Elige una opción de (.+)/.exec(crudo)
   if (sinOpcion) {
     return `${sinOpcion[1]} ahora tiene opciones: quítalo de tu carrito y vuelve a agregarlo eligiendo la tuya.`

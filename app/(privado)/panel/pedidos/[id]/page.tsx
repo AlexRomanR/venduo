@@ -19,7 +19,8 @@ import {
   CobrarPedido,
   Estado,
 } from "@/components/pedidos/piezas"
-import { cambiarEstado } from "../acciones"
+import { NotaDelPedido } from "@/components/pedidos/nota"
+import { cambiarEstado, guardarNota } from "../acciones"
 
 export const metadata = { title: "Pedido" }
 
@@ -79,6 +80,14 @@ export default async function PedidoPage({
           soloLectura={soloLectura}
         />
       </header>
+
+      <NotaDelPedido
+        id={pedido.id}
+        numero={pedido.numero}
+        nota={pedido.nota}
+        soloLectura={soloLectura}
+        guardar={guardarNota}
+      />
 
       <Seccion
         id="que-pidio"
