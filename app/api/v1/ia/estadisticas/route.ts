@@ -38,7 +38,7 @@ export async function POST(peticion: Request) {
   )
   if (!resultado.ok || !resultado.consulta || !resultado.filas) {
     return fallo(
-      resultado.error ?? "No pudimos calcular ese gráfico. Prueba de nuevo.",
+      resultado.error ?? "No pudimos calcular ese gráfico. Inténtalo de nuevo.",
       422
     )
   }

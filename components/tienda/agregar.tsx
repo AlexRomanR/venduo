@@ -132,7 +132,7 @@ export function AgregarAlCarrito({
           {textoDeVuelta(vacaciones.hasta).replace(/\.$/, "")}
         </p>
         <p className="mt-2 max-w-[48ch] leading-relaxed opacity-70">
-          Puedes mirar todo; los pedidos se reciben a la vuelta.
+          Puedes ver todo el catálogo; recibimos tu pedido cuando regresemos.
         </p>
       </div>
     )
@@ -145,8 +145,7 @@ export function AgregarAlCarrito({
           Sin stock por ahora
         </p>
         <p className="mt-2 max-w-[48ch] leading-relaxed opacity-70">
-          Este producto se agotó. Escríbele a la tienda para saber cuándo
-          vuelve.
+          Este producto se agotó. Escríbenos para saber cuándo vuelve.
         </p>
       </div>
     )
@@ -203,7 +202,7 @@ export function AgregarAlCarrito({
           ))}
           {elegidaSinStock ? (
             <p className="text-sm font-semibold">
-              Esta opción se agotó. Elige otra o escríbele a la tienda.
+              Esta opción se agotó. Elige otra o escríbenos.
             </p>
           ) : null}
         </div>

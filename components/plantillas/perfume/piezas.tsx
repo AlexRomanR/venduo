@@ -285,7 +285,7 @@ export function Pie({ marco }: PropsPie) {
         </nav>
 
         <p className="mx-auto mt-6 max-w-[40ch] text-sm leading-relaxed opacity-55">
-          Los pedidos y el pago se acuerdan con la tienda por WhatsApp.
+          Los pedidos y el pago los acordamos por WhatsApp.
         </p>
 
         <Link

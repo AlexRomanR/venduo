@@ -46,12 +46,12 @@ export default async function BorrarCuenta({
       <Apartado numero={1} titulo="Cómo hacerlo">
         <ul>
           <li>
-            <strong>En la app:</strong> Más → Tus datos → «Dar de baja mi
+            <strong>En la app:</strong> el menú → Tus datos → «Dar de baja mi
             cuenta».
           </li>
           <li>
             <strong>En la web:</strong> entra a{" "}
-            <Link href="/cuenta">Mi cuenta</Link> y, al final, «Dar de baja mi
+            <Link href="/cuenta">Tus datos</Link> y, al final, «Dar de baja mi
             cuenta».
           </li>
           <li>
@@ -89,7 +89,7 @@ export default async function BorrarCuenta({
       <Apartado numero={4} titulo="Si solo quieres dejar de vender un tiempo">
         <p>
           No hace falta borrar nada: despublica tu tienda desde{" "}
-          <Link href="/cuenta">Mi cuenta</Link> y vuelve a publicarla cuando
+          <Link href="/cuenta">Tus datos</Link> y vuelve a publicarla cuando
           quieras, con todo como lo dejaste.
         </p>
       </Apartado>

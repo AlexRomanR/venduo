@@ -188,7 +188,7 @@ export default async function PedidosPage({
             }
             texto={
               filtro === "no_concretado"
-                ? `Los pendientes de más de ${DIAS_PARA_CONCRETAR} días. Si al final te pagan, igual se marcan pagados.`
+                ? `Los pendientes de más de ${DIAS_PARA_CONCRETAR} días. Si al final te pagan, puedes marcarlos como pagados.`
                 : "Prueba con otro filtro."
             }
           >

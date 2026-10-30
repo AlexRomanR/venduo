@@ -70,7 +70,7 @@ export function Inicio({ tienda, filtros }: PropsInicio) {
       <ParteFija
         tienda={tienda}
         nombre="Sobre la tienda"
-        ayuda="Tu descripción, cuántos productos tienes y cómo se hacen los pedidos. La descripción se cambia en Cuenta, desde tu panel."
+        ayuda="Tu descripción, cuántos productos tienes y cómo se hacen los pedidos. La descripción se cambia en Datos de la tienda, desde tu panel."
       >
         <DatosDeLaTienda
           tienda={tienda}
@@ -125,8 +125,8 @@ function GrillaDelCatalogo({
     return (
       <p className="mt-12 max-w-[48ch] leading-relaxed opacity-55">
         {tienda.productos.length === 0
-          ? "Esta tienda todavía no cargó sus productos. Vuelve en un rato."
-          : "Nada coincide con ese filtro. Prueba con otro, o mira todo el catálogo."}
+          ? "Todavía estamos cargando nuestros productos. Vuelve pronto."
+          : "Nada coincide con ese filtro. Prueba con otro o ve todo el catálogo."}
       </p>
     )
   }
@@ -201,7 +201,7 @@ function DatosDeLaTienda({
                 Pedidos
               </dt>
               <dd className="mt-1 text-sm leading-snug">
-                Por WhatsApp, directo con la tienda
+                Por WhatsApp, directo con nosotros
               </dd>
             </div>
           </dl>

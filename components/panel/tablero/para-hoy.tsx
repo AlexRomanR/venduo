@@ -58,7 +58,7 @@ export function ParaHoy({
       id="para-hoy"
       icono={CircleAlert}
       titulo="Para hoy"
-      bajada="Lo que espera algo de ti."
+      bajada="Lo que necesita tu atención."
     >
       {alertas.map((alerta) => (
         <Link

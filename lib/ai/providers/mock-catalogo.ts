@@ -186,7 +186,7 @@ export function catalogoDeDemostracion(mensaje: string): PropuestaDeCatalogo {
     productos: lista.slice(0, 60).map((producto) => producto.id),
     bajada: intencion?.bajada ?? "Escríbenos por WhatsApp y te lo separamos.",
     explicacion:
-      `Elegí ${cantidad}${criterios.length ? ` ${criterios.join(" y ")}` : ""}, ` +
+      `Elegimos ${cantidad}${criterios.length ? ` ${criterios.join(" y ")}` : ""}, ` +
       `lo destacado primero, y la plantilla ${definicion.nombre}: ` +
       `${definicion.detalle.charAt(0).toLowerCase()}${definicion.detalle.slice(1)}`,
   }

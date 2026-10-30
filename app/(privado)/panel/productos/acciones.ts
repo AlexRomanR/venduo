@@ -125,7 +125,7 @@ export async function guardarProducto(
       return {
         ok: false,
         id: respuesta.data.id,
-        error: "Guardamos el producto, pero no su costo. Vuelve a intentar.",
+        error: "Guardamos el producto, pero no su costo. Inténtalo de nuevo.",
       }
     }
   }
@@ -303,7 +303,7 @@ function mensajeDeError(crudo: string) {
   if (crudo.includes("compare_at_price_cents")) {
     return "El precio anterior tiene que ser mayor que el actual."
   }
-  return "No pudimos guardar. Revisa los datos e intenta de nuevo."
+  return "No pudimos guardar. Revisa los datos e inténtalo de nuevo."
 }
 
 /** Lo que dijo `guardar_variantes`, en palabras de quien vende. */
@@ -320,5 +320,5 @@ function mensajeDeVariantes(crudo: string): string {
   if (/Faltan las variantes|Opción no válida|Valor no válido/i.test(crudo)) {
     return "Completa las opciones: cada una con su nombre y al menos un valor."
   }
-  return "Guardamos el producto, pero no sus opciones. Vuelve a intentar."
+  return "Guardamos el producto, pero no sus opciones. Inténtalo de nuevo."
 }

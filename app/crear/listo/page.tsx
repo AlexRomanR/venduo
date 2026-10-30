@@ -40,7 +40,7 @@ export default async function ListoPage() {
           <p className="mt-5 max-w-[50ch] text-lg leading-relaxed opacity-70">
             Tu logo, tus colores, tu letra y los textos de tu portada. Tu tienda
             ya está en línea con tu plantilla; lo que cambies lo ves al instante
-            y tus clientes lo ven recién cuando lo publiques.
+            y tus clientes lo ven solo cuando lo publiques.
           </p>
 
           <ul className="mt-8 max-w-[46ch] border-t border-tinta/15 text-sm">
@@ -72,7 +72,8 @@ export default async function ListoPage() {
             </Link>
           </div>
           <p className="mt-5 text-sm opacity-55">
-            Lo encuentras cuando quieras en Apariencia, dentro de tu panel.
+            Lo encuentras cuando quieras en Editar tu tienda, dentro de tu
+            panel.
           </p>
         </div>
 

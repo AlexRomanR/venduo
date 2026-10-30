@@ -102,29 +102,29 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
   if (quiere("oscur", "negr", "dark")) {
     colores(
       "Blanco y negro",
-      "uso blanco y negro, porque con un fondo oscuro la letra blanca de los botones no se leería"
+      "usamos blanco y negro, porque con un fondo oscuro la letra blanca de los botones no se leería"
     )
   } else if (quiere("cálid", "calid", "terracota", "tierra", "naranja")) {
-    colores("Terracota", "paso a una paleta terracota, más cálida")
+    colores("Terracota", "pasamos a una paleta terracota, más cálida")
   } else if (quiere("verde", "natural", "bosque", "planta")) {
-    colores("Bosque", "paso a verdes de bosque")
+    colores("Bosque", "pasamos a verdes de bosque")
   } else if (quiere("azul", "océano", "oceano", "fresc")) {
-    colores("Océano", "paso a azules de océano, más frescos")
+    colores("Océano", "pasamos a azules de océano, más frescos")
   } else if (quiere("rosa", "femenin")) {
-    colores("Rosa", "paso a una paleta rosa")
+    colores("Rosa", "pasamos a una paleta rosa")
   } else if (quiere("lavanda", "morad", "lila", "violeta")) {
-    colores("Lavanda", "paso a una paleta lavanda")
+    colores("Lavanda", "pasamos a una paleta lavanda")
   } else if (quiere("alegre", "colorid", "amarill", "mostaza")) {
-    colores("Mostaza", "paso a una paleta mostaza, más alegre")
+    colores("Mostaza", "pasamos a una paleta mostaza, más alegre")
   }
 
   // Letra
   if (quiere("elegant", "lujo", "premium", "sofistic", "fino", "fina")) {
-    if (!conColores) colores("Vino", "uso tonos vino")
-    letra("Elegante", "uso una letra antigua y elegante para los títulos")
+    if (!conColores) colores("Vino", "usamos tonos vino")
+    letra("Elegante", "usamos una letra antigua y elegante para los títulos")
   } else if (quiere("modern", "minimal", "limpi", "sobri")) {
-    if (!conColores) colores("Blanco y negro", "uso blanco y negro")
-    letra("Moderna", "uso una letra moderna y firme")
+    if (!conColores) colores("Blanco y negro", "usamos blanco y negro")
+    letra("Moderna", "usamos una letra moderna y firme")
   }
   if (quiere("mayúscula", "mayuscula")) {
     operaciones.push({
@@ -132,7 +132,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
       ruta: "tipografia.mayusculas",
       valor: true,
     })
-    partes.push("pongo los títulos en mayúsculas")
+    partes.push("ponemos los títulos en mayúsculas")
   }
   if (quiere("redond")) {
     operaciones.push({
@@ -150,7 +150,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
       ruta: "disposicion.tarjeta",
       valor: "cuadrada",
     })
-    partes.push("muestro las fotos de los productos cuadradas")
+    partes.push("mostramos las fotos de los productos cuadradas")
   }
   if (quiere("vertical", "retrato")) {
     operaciones.push({
@@ -158,7 +158,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
       ruta: "disposicion.tarjeta",
       valor: "retrato",
     })
-    partes.push("muestro las fotos de los productos en vertical")
+    partes.push("mostramos las fotos de los productos en vertical")
   }
   const columnas = pedido.match(/([234])\s*columna/)?.[1]
   if (columnas) {
@@ -167,14 +167,16 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
       ruta: "disposicion.columnas",
       valor: Number(columnas),
     })
-    partes.push(`ordeno el catálogo en ${columnas} columnas`)
+    partes.push(`ordenamos el catálogo en ${columnas} columnas`)
   } else if (quiere("más grande", "mas grande", "grandes")) {
     operaciones.push({
       op: "apariencia",
       ruta: "disposicion.columnas",
       valor: 2,
     })
-    partes.push("dejo dos columnas para que los productos se vean más grandes")
+    partes.push(
+      "dejamos dos columnas para que los productos se vean más grandes"
+    )
   }
 
   // Ficha de producto
@@ -185,14 +187,14 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
       ruta: "ficha.diseno",
       valor: "vitrina",
     })
-    partes.push("centro la ficha de producto, como una vitrina")
+    partes.push("centramos la ficha de producto, como una vitrina")
   } else if (quiere("dividida", "al costado", "al lado")) {
     operaciones.push({
       op: "apariencia",
       ruta: "ficha.diseno",
       valor: "dividida",
     })
-    partes.push("pongo la foto al lado del texto en la ficha")
+    partes.push("ponemos la foto al lado del texto en la ficha")
   }
   if (quiere("siempre a la vista", "siempre a mano", "barra", "botón fijo")) {
     operaciones.push({
@@ -200,7 +202,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
       ruta: "ficha.barraFija",
       valor: true,
     })
-    partes.push("dejo el botón de compra siempre a la vista en el celular")
+    partes.push("dejamos el botón de compra siempre a la vista en el celular")
   }
   if (quiere("parecid", "relacionad", "similar")) {
     operaciones.push({
@@ -210,8 +212,8 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
     })
     partes.push(
       sin
-        ? "quito los productos similares de la ficha"
-        : "muestro productos similares debajo del producto"
+        ? "quitamos los productos similares de la ficha"
+        : "mostramos productos similares debajo del producto"
     )
   }
   if (quiere("whatsapp") && !quiere("contacto")) {
@@ -221,10 +223,10 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
         ruta: "ficha.consulta",
         valor: true,
       })
-      partes.push("agrego un enlace para que te pregunten por WhatsApp")
+      partes.push("agregamos un enlace para que te pregunten por WhatsApp")
     } else {
       nota =
-        "Para que te pregunten por WhatsApp, primero agrega el número de tu tienda en Cuenta."
+        "Para que te pregunten por WhatsApp, primero agrega el número de tu tienda en Datos de la tienda."
     }
   }
 
@@ -235,21 +237,21 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
       ruta: "carrito.diseno",
       valor: "boleta",
     })
-    partes.push("armo el carrito como una boleta")
+    partes.push("armamos el carrito como una boleta")
   } else if (quiere("por pasos", "paso a paso")) {
     operaciones.push({
       op: "apariencia",
       ruta: "carrito.diseno",
       valor: "pasos",
     })
-    partes.push("ordeno el carrito en tres pasos numerados")
+    partes.push("ordenamos el carrito en tres pasos numerados")
   } else if (quiere("carrito") && quiere("columna")) {
     operaciones.push({
       op: "apariencia",
       ruta: "carrito.diseno",
       valor: "columnas",
     })
-    partes.push("pongo el carrito en dos columnas")
+    partes.push("ponemos el carrito en dos columnas")
   }
   if (quiere("sugier", "sugerenc", "otros productos")) {
     operaciones.push({
@@ -257,7 +259,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
       ruta: "carrito.sugerencias",
       valor: true,
     })
-    partes.push("sugiero otros productos en el carrito")
+    partes.push("sugerimos otros productos en el carrito")
   }
 
   // Secciones
@@ -265,10 +267,12 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
     const faq = seccion("faq")
     if (faq) {
       operaciones.push({ op: "mover", seccion: faq.id, posicion: 1 })
-      partes.push("subo las preguntas frecuentes, justo después de la portada")
+      partes.push(
+        "subimos las preguntas frecuentes, justo después de la portada"
+      )
     } else {
       operaciones.push({ op: "agregar", tipo: "faq", posicion: 1, props: {} })
-      partes.push("agrego preguntas frecuentes después de la portada")
+      partes.push("agregamos preguntas frecuentes después de la portada")
     }
   }
   if (quiere("testimonio", "opinion", "opinión", "reseña", "resena")) {
@@ -279,7 +283,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
         posicion: contexto.secciones.length,
         props: {},
       })
-      partes.push("agrego una sección de testimonios")
+      partes.push("agregamos una sección de testimonios")
     }
   }
   if (quiere("contacto", "horario", "dirección", "direccion")) {
@@ -290,7 +294,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
         posicion: contexto.secciones.length,
         props: {},
       })
-      partes.push("agrego tus datos de contacto al final")
+      partes.push("agregamos tus datos de contacto al final")
     }
   }
 
@@ -304,22 +308,22 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
       props: {
         title: "Para mamá, lo mejor",
         subtitle:
-          "Regalos que se quedan en el recuerdo. Pide hoy y lo cerramos contigo por WhatsApp.",
+          "Regalos que se quedan en el recuerdo. Pide hoy y lo coordinamos contigo por WhatsApp.",
         ctaLabel: "Ver regalos",
       },
     })
-    partes.push("preparo la portada para el Día de la Madre")
+    partes.push("preparamos la portada para el Día de la Madre")
   } else if (portada && quiere("navidad")) {
     operaciones.push({
       op: "editar",
       seccion: portada.id,
       props: {
         title: "Regalos para esta Navidad",
-        subtitle: "Elige con tiempo: te ayudamos a elegir por WhatsApp.",
+        subtitle: "Elige con tiempo: te ayudamos por WhatsApp.",
         ctaLabel: "Ver regalos",
       },
     })
-    partes.push("preparo la portada para Navidad")
+    partes.push("preparamos la portada para Navidad")
   } else if (portada && quiere("oferta", "descuento", "rebaja", "liquidaci")) {
     operaciones.push({
       op: "editar",
@@ -331,7 +335,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
         ctaLabel: "Ver ofertas",
       },
     })
-    partes.push("pongo la portada en modo ofertas")
+    partes.push("ponemos la portada en modo ofertas")
   } else if (
     portada &&
     descripcion &&
@@ -354,7 +358,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
       })
     }
     partes.push(
-      "escribo los textos de tu portada con lo que contaste de tu negocio"
+      "escribimos los textos de tu portada con lo que contaste de tu negocio"
     )
   }
 
@@ -362,7 +366,7 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
     return {
       resumen:
         nota ??
-        "No encontré qué cambiar en tu pedido. Prueba con algo como «colores más cálidos», «hazla más elegante» o «sube las preguntas frecuentes».",
+        "No encontramos qué cambiar en tu pedido. Prueba con algo como «colores más cálidos», «hazla más elegante» o «sube las preguntas frecuentes».",
       operaciones: [],
     }
   }

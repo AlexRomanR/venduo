@@ -510,7 +510,7 @@ export function FormularioProducto({
       <HojaDeAjuste
         abierta={hoja === "costo"}
         titulo="Lo que te cuesta"
-        descripcion="Solo lo ves tú. Con él, tu panel te dice cuánto ganas."
+        descripcion="Solo lo ves tú. Con él calculamos cuánto ganas."
         alCerrar={cerrarHoja}
       >
         <CampoMonto

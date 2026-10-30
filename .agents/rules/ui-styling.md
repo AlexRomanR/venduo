@@ -320,24 +320,71 @@ un boliviano con acento extranjero, y un jurado local lo nota.
 de pasillo: frases que en una conversación se entienden y en una pantalla suenan raras o
 extranjeras. Cada rótulo dice qué es o qué pasa, con la palabra de siempre:
 
-| No                                | Sí                                           |
-| --------------------------------- | -------------------------------------------- |
-| "Se nota en la computadora"       | "Solo cambia en computadora"                 |
-| "Ahí se nota", "Mírala arriba"    | "Cambiamos a la vista…", "Puedes verla…"     |
-| "Tirar los cambios"               | "Descartar los cambios"                      |
-| "Sale del catálogo"               | "Se quita del catálogo"                      |
-| "Dale tu estilo"                  | "Personaliza tu tienda"                      |
-| "Al pie de la ficha", "Parecidos" | "Debajo del producto", "Similares"           |
-| "Bajada", "Llamado a la acción"   | "Subtítulo", "Cierre con botón"              |
-| "Acá", "se manda", "la señal"     | "Aquí", "se enviará", "la conexión"          |
-| "Soltar", "sacar" en un error     | Lo que la persona hacía: "borrar", "guardar" |
-| "Elegir los 14 que se ven"        | "Seleccionar todos", "Quitar todos"          |
+| No                                       | Sí                                                    |
+| ---------------------------------------- | ----------------------------------------------------- |
+| "Se nota en la computadora"              | "Solo cambia en computadora"                          |
+| "Ahí se nota", "Mírala arriba"           | "Cambiamos a la vista…", "Puedes verla…"              |
+| "Tirar los cambios"                      | "Descartar los cambios"                               |
+| "Sale del catálogo"                      | "Se quita del catálogo"                               |
+| "Dale tu estilo"                         | "Personaliza tu tienda"                               |
+| "Al pie de la ficha", "Parecidos"        | "Debajo del producto", "Similares"                    |
+| "Bajada", "Llamado a la acción"          | "Subtítulo", "Cierre con botón"                       |
+| "Acá", "se manda", "la señal"            | "Aquí", "se enviará", "la conexión"                   |
+| "Soltar", "sacar" en un error            | Lo que la persona hacía: "borrar", "guardar"          |
+| "Elegir los 14 que se ven"               | "Seleccionar todos", "Quitar todos"                   |
+| "Te respondemos al toque"                | "Te respondemos enseguida"                            |
+| "Márcalo igual", "Cerrar sesión igual"   | "Márcalo como pagado", "Cerrar sesión de todos modos" |
+| "Todo cae en un grupo"                   | "Todo queda en un grupo"                              |
+| "Renombrar una arrastra a sus productos" | "Si le cambias el nombre, cambia en sus productos"    |
+| "Con un toque", "si algo no te sale"     | "Y si necesitas ayuda…"                               |
+| "Lo achicamos", "mira todo"              | "Ajustamos el tamaño por ti", "ve todo el catálogo"   |
 
 Un interruptor dice qué aparece y su estado en palabras llanas. Un error nombra lo que la
 persona estaba haciendo, no el paso interno que falló. Vale también para lo que la API
 le manda a la app —los nombres y las ayudas de los ajustes y de las secciones—, que la
-app muestra tal cual. Lo que lee el comprador en la tienda puede ser más cercano: es la
+app muestra tal cual. Lo que lee quien compra en la tienda puede ser más cercano: es la
 voz de la tienda, no la de Venduo.
+
+### Quién habla en cada texto
+
+Antes de escribir un texto se decide quién lo dice. Hay una voz por texto:
+
+- **Venduo habla en primera persona del plural**: "No pudimos guardar", "Te avisamos",
+  "Elegimos 4 productos". Nunca "no pude", "encontré", "armé". Vale para la IA: la
+  instrucción de sistema de `lib/ai/tasks.ts` lo pide, y el modo demo lo cumple.
+- **La tienda le habla a quien compra como dueña de su negocio**, también en plural:
+  "Envíanos tu pedido", "Ahí coordinamos el pago", "Estamos de vacaciones". Nunca en
+  tercera persona —"coordinas el pago con la tienda", "la tienda no recibe pedidos"—:
+  suena a que la tienda es de otro. Solo Venduo habla de la tienda desde afuera, cuando
+  no está disponible: "Esta tienda ya no está disponible".
+- **Las cosas no hablan, y no se les habla.** El stock, el panel o la plataforma no
+  "dicen", "avisan" ni "saludan": "Según tu stock, quedan 3", "Te avisamos antes de que
+  algo se acabe". Y un botón no le pide a la persona que le hable a sus datos: "Ver
+  estadísticas", no "Pregúntales más a tus estadísticas".
+- **Las personas, sin género fijo**: "quien te compra", "quienes te compran", "Te damos
+  la bienvenida". No "un cliente", "tus compradores", "el dueño", "bienvenido",
+  "como vendedor".
+
+### Cada pantalla, con su nombre de hoy
+
+Un texto que manda a otro lugar usa el nombre exacto de la barra lateral de la web y del
+menú de la app: Inicio, Pedidos, Productos, Categorías, Catálogos, Publicar en redes,
+Compartir, Estadísticas, Editar tu tienda, Datos de la tienda, Tus datos, Avisos. Un botón
+citado entre «» se copia del botón real, letra por letra.
+
+**Al renombrar una pantalla o un botón, se buscan sus menciones en la web y en la app**
+(`grep -rn "Apariencia"` en los dos repositorios). Pasó dos veces: "Apariencia" y
+"Cuenta" cambiaron de nombre y siguieron citadas en textos que mandaban a una pantalla
+que ya no existía.
+
+### Lo que se repite, de una sola forma
+
+- **Reintentar**: "Inténtalo de nuevo." Después de otro verbo, con "e": "Revisa tu
+  conexión e inténtalo de nuevo." No "Vuelve a intentar", "Prueba de nuevo", "Intenta de
+  nuevo".
+- **Un número lleva su singular**: "1 cambio", "1 producto". Ningún `${n} cambios` sin
+  mirar si `n` es 1.
+- **Las citas van entre «»**, no entre comillas rectas ni curvas.
 
 Preferir **"correo"** sobre "email", que es la palabra que usa la gente.
 

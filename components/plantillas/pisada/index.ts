@@ -38,7 +38,7 @@ export const KIT_PISADA: KitDeTienda = {
       consulta: "¿No sabes tu talla? Pregúntanos",
       estado: "Estado del par",
       sinResultados:
-        "Ningún modelo coincide con lo que elegiste. Prueba con otro estilo o mira todo.",
+        "Ningún modelo coincide con lo que elegiste. Prueba con otro estilo o ve todo el catálogo.",
     },
   }),
 }

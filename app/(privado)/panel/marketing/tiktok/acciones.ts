@@ -127,7 +127,7 @@ export async function publicarEnTiktok(
   if (!jpeg || !admin) {
     return {
       ok: false,
-      error: "No pudimos preparar la imagen. Vuelve a intentar.",
+      error: "No pudimos preparar la imagen. Inténtalo de nuevo.",
     }
   }
 
@@ -142,7 +142,7 @@ export async function publicarEnTiktok(
     console.error("[tiktok] no se pudo subir la imagen:", subida)
     return {
       ok: false,
-      error: "No pudimos preparar la imagen. Vuelve a intentar.",
+      error: "No pudimos preparar la imagen. Inténtalo de nuevo.",
     }
   }
 

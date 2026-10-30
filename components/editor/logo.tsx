@@ -102,7 +102,7 @@ export function Logo() {
         <p className="mt-0.5 text-xs leading-relaxed opacity-55">
           {encima
             ? "Suéltalo para usarlo."
-            : "Arrástralo aquí o elígelo. JPG, PNG o WebP: lo achicamos por ti."}
+            : "Arrástralo aquí o elígelo. JPG, PNG o WebP: ajustamos el tamaño por ti."}
         </p>
         <div className="mt-1 flex flex-wrap gap-x-5">
           <button

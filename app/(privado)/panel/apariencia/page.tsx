@@ -149,7 +149,7 @@ export default async function AparienciaPage() {
           id="otras"
           icono={Shapes}
           titulo="Cambia de plantilla"
-          bajada="Cambia la cara, no el negocio: antes de cambiar guardamos cómo estaba."
+          bajada="Cambia cómo se ve, no tu negocio: antes de cambiar guardamos cómo estaba."
         >
           {disponibles.length === 0 ? (
             <SinDatos

@@ -136,7 +136,7 @@ export function PublicarEnTiktok({
       contenidoPagado: comercial && pagado,
     }).catch((): ResultadoDePublicar => ({
       ok: false,
-      error: "No pudimos hablar con TikTok. Vuelve a intentar.",
+      error: "No pudimos conectarnos con TikTok. Inténtalo de nuevo.",
     }))
     if (!resultado.ok) {
       if (resultado.reconectar) {

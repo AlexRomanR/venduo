@@ -237,8 +237,8 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
 
         <div className="self-end border-2 border-tinta">
           <p className="border-b-2 border-tinta p-4 text-sm font-semibold">
-            Arma tu pedido, mándalo por WhatsApp y lo cerramos en el chat:
-            talla, pago y entrega.
+            Arma tu pedido y envíanoslo por WhatsApp: ahí coordinamos la talla,
+            el pago y la entrega.
           </p>
           {tienda.whatsapp ? (
             <a
@@ -295,7 +295,7 @@ export function Pie({ marco }: PropsPie) {
           </nav>
 
           <p className="text-sm leading-relaxed opacity-70">
-            Los pedidos y el pago se acuerdan con la tienda por WhatsApp.
+            Los pedidos y el pago los acordamos por WhatsApp.
           </p>
 
           <Link

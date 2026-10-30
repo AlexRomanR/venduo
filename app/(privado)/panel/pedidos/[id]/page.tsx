@@ -69,8 +69,8 @@ export default async function PedidoPage({
         <LineaDeEstado pedido={pedido} />
         {noConcretado ? (
           <p className="text-sm opacity-70">
-            Pasaron más de {DIAS_PARA_CONCRETAR} días sin pagarse. Si te pagan,
-            márcalo igual.
+            Pasaron más de {DIAS_PARA_CONCRETAR} días sin pagarse. Si ya te
+            pagaron, márcalo como pagado.
           </p>
         ) : null}
         <CobrarPedido

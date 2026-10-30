@@ -418,7 +418,7 @@ export async function crearProductos(entrada: {
     return {
       ok: false,
       error:
-        "No pudimos crear los productos. Revisa tu conexión y vuelve a intentarlo.",
+        "No pudimos crear los productos. Revisa tu conexión e inténtalo de nuevo.",
     }
   }
 

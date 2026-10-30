@@ -139,7 +139,7 @@ export function Categorias({
         id="tus-categorias"
         icono={Tags}
         titulo="Tus categorías"
-        bajada="Renombrar una arrastra a sus productos; borrarla no borra ninguno."
+        bajada="Si le cambias el nombre, cambia en sus productos. Si la borras, los productos se quedan."
         extra={
           categorias.length > 0 ? (
             <span className="tabular text-sm opacity-70">

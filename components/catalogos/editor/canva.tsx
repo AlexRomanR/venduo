@@ -226,7 +226,7 @@ export function BotonDeCanva({
                       ? "Tu catálogo se está bajando en PDF."
                       : descarga === "lista"
                         ? "Tu catálogo ya está en Descargas, en PDF."
-                        : "No se pudo bajar el PDF. Ciérralo y vuelve a intentarlo."}
+                        : "No se pudo bajar el PDF. Ciérralo e inténtalo de nuevo."}
                   </span>
                 </span>
               </li>

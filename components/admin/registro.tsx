@@ -155,7 +155,7 @@ export function Invitaciones({
           <input
             value={nota}
             onChange={(evento) => setNota(evento.target.value)}
-            placeholder="Opcional: “Rosa, la de las zapatillas”"
+            placeholder="Opcional: «Rosa, la de las zapatillas»"
             maxLength={120}
             className={CAMPO}
           />

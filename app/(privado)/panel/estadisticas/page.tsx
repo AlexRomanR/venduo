@@ -40,7 +40,7 @@ export default async function EstadisticasPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <Cabecera
-        titulo="Pregúntale a tus números."
+        titulo="Tus estadísticas."
         bajada="Solo se consultan los datos de tu tienda, y solo se leen."
         demo={
           ai.demo &&

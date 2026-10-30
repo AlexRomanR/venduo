@@ -62,7 +62,7 @@ export default function Terminos() {
           <li>Tus precios, tu stock y cumplir lo que prometes.</li>
           <li>Los cobros, las entregas, los cambios y las devoluciones.</li>
           <li>
-            Cumplir las leyes que te toquen como vendedor, incluidas las
+            Cumplir las leyes que te toquen por vender, incluidas las
             tributarias.
           </li>
         </ul>
@@ -114,7 +114,7 @@ export default function Terminos() {
         <p>
           Si conectas tu cuenta de Canva, llevamos a Canva los catálogos que
           elijas. Lo que hagas en Canva se rige por sus propios términos. Puedes
-          desconectarla cuando quieras desde «Mi cuenta».
+          desconectarla cuando quieras desde «Tus datos».
         </p>
         <p>
           Si conectas tu cuenta de TikTok, publicamos en ella solo lo que tú
@@ -155,8 +155,8 @@ export default function Terminos() {
 
       <Apartado numero={10} titulo="Dar de baja tu cuenta">
         <p>
-          Puedes irte cuando quieras, desde tu cuenta en la web o en la app. Qué
-          pasa con tus datos está en{" "}
+          Puedes dar de baja tu cuenta cuando quieras, desde en la web o en la
+          app. Qué pasa con tus datos está en{" "}
           <Link href="/borrar-cuenta">cómo borrar tu cuenta</Link>.
         </p>
       </Apartado>

@@ -107,7 +107,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
       },
     ],
     inicial: {
-      title: "Bienvenido",
+      title: "Te damos la bienvenida",
       subtitle: "Cuéntale a tu cliente qué vendes y por qué comprarte a ti.",
       ctaLabel: "Ver la colección",
     },

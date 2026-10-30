@@ -72,7 +72,7 @@ export function ComoTeVa({
         conEstadisticas
           ? {
               href: "/panel/estadisticas",
-              texto: "Pregúntale más a tus estadísticas",
+              texto: "Ver estadísticas",
             }
           : undefined
       }

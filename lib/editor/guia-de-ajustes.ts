@@ -62,7 +62,8 @@ export const GUIA_DE_AJUSTES: Partial<Record<RutaDeAjuste, GuiaDeAjuste>> = {
     pantalla: "ambas",
     ayuda:
       "Un botón para que tu cliente te escriba por WhatsApp sobre ese producto, con el mensaje ya escrito.",
-    sinSenal: "Necesita el WhatsApp de tu tienda. Agrégalo en tu cuenta.",
+    sinSenal:
+      "Necesita el WhatsApp de tu tienda. Agrégalo en Datos de la tienda.",
   },
   "ficha.relacionados": {
     pantalla: "ambas",

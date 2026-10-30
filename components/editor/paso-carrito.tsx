@@ -28,8 +28,7 @@ const DISENOS: Record<Carrito["diseno"], { nombre: string; texto: string }> = {
   },
   pasos: {
     nombre: "Por pasos",
-    texto:
-      "Revisar el pedido y mandarlo por WhatsApp, numerados. Nadie se pierde en el camino.",
+    texto: "Revisar el pedido y enviarlo por WhatsApp, en pasos numerados.",
   },
 }
 
@@ -162,7 +161,7 @@ export function PasoCarrito() {
         ) : null}
         <Aviso>
           Es una vista previa: aquí no se crean pedidos aunque toques «Enviar
-          por WhatsApp».
+          pedido por WhatsApp».
         </Aviso>
       </div>
 

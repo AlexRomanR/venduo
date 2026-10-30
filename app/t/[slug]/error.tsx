@@ -33,7 +33,7 @@ export default function ErrorDeTienda({
         Algo no cargó
       </h1>
       <p className="mt-4 max-w-[42ch] leading-relaxed opacity-70">
-        Puede ser la conexión. Vuelve a intentarlo; tu carrito sigue guardado en
+        Puede ser la conexión. Inténtalo de nuevo; tu carrito sigue guardado en
         este teléfono.
       </p>
 

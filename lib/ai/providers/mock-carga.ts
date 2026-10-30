@@ -71,12 +71,12 @@ export function borradoresDeDemostracion(
         categoria: categorias[0] ?? null,
         descripcion: "",
         foto: null,
-        duda: precio === null ? "No encontré el precio." : null,
+        duda: precio === null ? "No encontramos el precio." : null,
       }
     }),
     aviso: texto.trim()
       ? null
-      : "En el modo demo, sin una lista escrita, armé unos de ejemplo.",
+      : "En el modo demo, sin una lista escrita, armamos unos de ejemplo.",
   }
 }
 

@@ -49,7 +49,7 @@ export const FUNCIONES = [
     clave: "ia_estadisticas",
     nombre: "IA en estadísticas",
     grupo: "IA",
-    descripcion: "Preguntarle a sus números en palabras.",
+    descripcion: "Hacer preguntas sobre sus ventas en palabras.",
   },
   {
     clave: "ia_catalogos",
@@ -117,7 +117,7 @@ export const FUNCIONES = [
     clave: "cambiar_plantilla",
     nombre: "Cambiar de plantilla",
     grupo: "Tienda",
-    descripcion: "Pasar a otra plantilla desde Apariencia.",
+    descripcion: "Pasar a otra plantilla desde Editar tu tienda.",
   },
   {
     clave: "visitas",

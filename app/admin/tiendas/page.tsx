@@ -23,7 +23,7 @@ export default async function TiendasPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <Cabecera
         titulo="Tiendas."
-        bajada="Todas las tiendas de Venduo. Las trabadas llevan más de tres días sin productos o sin publicar: son las que conviene llamar."
+        bajada="Todas las tiendas de Venduo. Las detenidas llevan más de tres días sin productos o sin publicar: son las que conviene llamar."
       >
         <a
           href="/admin/tiendas/exportar"

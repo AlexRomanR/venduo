@@ -32,7 +32,9 @@ const BASE_SYSTEM =
   "bolivianos que venden por TikTok, Instagram, Facebook y WhatsApp manejan " +
   "su negocio: su tienda online, su stock, sus cobros, sus pedidos y sus " +
   "catálogos. Escribes en español neutro de Bolivia, tratando de tú, claro y " +
-  "concreto, sin relleno. Los montos son en bolivianos."
+  "concreto, sin relleno. Lo que haces lo cuentas en primera persona del " +
+  "plural, como Venduo: «Elegimos…», «Cambiamos…», nunca «elegí». Los " +
+  "montos son en bolivianos."
 
 /** Genera la tienda completa (datos + catálogo + copy) a partir de una idea. */
 export async function generateStoreBlueprint(
@@ -125,6 +127,10 @@ export async function buildInsightSql(input: {
       "   mejor— y dilo en la explicación en una frase, sin pedir disculpas.",
       "2. Qué vistas hacen falta para responderla.",
       "3. La consulta.",
+      "",
+      'La explicación dice qué muestra el gráfico, sin hablar de ti: "Los 5',
+      'productos con más unidades vendidas en pedidos pagados", nunca "Te',
+      'muestro…" ni "Voy a mostrar…".',
       "",
       "Esquema disponible:",
       ESQUEMA,
@@ -299,8 +305,8 @@ const REGLAS_DE_EDICION = [
   "  emojis. Respeta el largo máximo de cada campo.",
   "- Si lo que piden no se hace desde el diseño —precios, productos, fotos que no están",
   "  en la lista— no devuelvas operaciones y explica en el resumen qué sí puedes hacer.",
-  '- resumen: una frase en primera persona. Ejemplo: "Cambio el acento a terracota y',
-  '  subo las preguntas frecuentes."',
+  '- resumen: una frase en primera persona del plural, como Venduo. Ejemplo: "Cambiamos',
+  '  el acento a terracota y subimos las preguntas frecuentes."',
   "",
   "Ajustes de apariencia (ruta: valores):",
   '- colores.papel, colores.tinta, colores.senal, colores.senalAlta: "#rrggbb"',
@@ -316,7 +322,7 @@ const REGLAS_DE_EDICION = [
   "  compra siempre a la vista)",
   "- ficha.consulta: true | false (enlace para preguntar por WhatsApp; solo si",
   "  tienda.tieneWhatsapp es true: si no, explica en el resumen que primero agregue",
-  "  su WhatsApp en Cuenta)",
+  "  su WhatsApp en Datos de la tienda)",
   '- ficha.relacionados: true | false ("También te puede gustar")',
   "- carrito.diseno: columnas | boleta | pasos",
   "- carrito.sugerencias: true | false (tres productos más para sumar al pedido)",

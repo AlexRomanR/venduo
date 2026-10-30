@@ -111,7 +111,7 @@ function bloquesDeDemostracion(): BloquePublico[] {
       tipo: "about",
       props: {
         title: "Sobre nosotros",
-        body: "Vendemos ropa para entrenar y para el día a día. Haz tu pedido y lo cerramos contigo por WhatsApp.",
+        body: "Vendemos ropa para entrenar y para el día a día. Haz tu pedido y lo coordinamos contigo por WhatsApp.",
       },
     },
   ]

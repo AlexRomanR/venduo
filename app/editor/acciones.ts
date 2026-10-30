@@ -358,7 +358,7 @@ export async function proponerCambios(entrada: {
       }
       resultado = segundo
       aviso =
-        "Dejé los colores como estaban: la combinación que pensé no se iba a leer bien."
+        "Dejamos los colores como estaban: la combinación propuesta no se leía bien."
     } else {
       await registrarPropuesta(diseno, {
         pedido: pedido.data,
@@ -396,7 +396,7 @@ export async function proponerCambios(entrada: {
       ...intento,
       propuesta: { ...intento.propuesta, operaciones: efectivas },
     }
-    aviso ??= "Dejé afuera lo que tu tienda ya tenía así."
+    aviso ??= "Dejamos fuera lo que tu tienda ya tenía así."
   }
 
   const id = await registrarPropuesta(diseno, {

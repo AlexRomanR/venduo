@@ -22,8 +22,8 @@ const SAMPLE_TEXT: Record<string, string> = {
   description:
     "Contenido de ejemplo generado en modo demo. Configura AI_PROVIDER y AI_API_KEY para usar un modelo real.",
   summary: "Resumen de ejemplo del período analizado.",
-  headline: "Vende más, con menos vueltas",
-  tagline: "Tu tienda online, con stock y cobros incluidos",
+  headline: "Vende más, sin complicarte",
+  tagline: "Tu tienda online, con stock y pedidos por WhatsApp",
   categor: "Calzado",
   hashtag: "venduo",
   currency: "BOB",

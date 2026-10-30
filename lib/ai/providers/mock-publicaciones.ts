@@ -96,7 +96,7 @@ export function publicacionesDeDemostracion(
       `${gancho} En ${tienda} lo tenemos listo para ti.`,
       rebaja,
       pocas,
-      "Mira todos los detalles en el enlace y haz tu pedido por WhatsApp: te respondemos al toque.",
+      "Mira todos los detalles en el enlace y haz tu pedido por WhatsApp: te respondemos enseguida.",
     ]
       .filter(Boolean)
       .join("\n\n"),

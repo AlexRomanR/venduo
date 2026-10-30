@@ -75,7 +75,9 @@ export function paginasDeKit(
         <div className="mx-auto w-full max-w-7xl px-5 py-12">
           <Vacio
             titulo={textos.sinProductos}
-            texto={`${tienda.nombre} todavía no cargó sus productos. Vuelve en un rato.`}
+            texto={
+              "Todavía estamos cargando nuestros productos. Vuelve pronto."
+            }
           />
         </div>
       )
@@ -109,7 +111,7 @@ export function paginasDeKit(
         <ParteFija
           tienda={tienda}
           nombre="Sobre la tienda"
-          ayuda="Muestra el nombre, la descripción y el WhatsApp de tu tienda, y lleva a tu catálogo. Se cambian en Cuenta, desde tu panel."
+          ayuda="Muestra el nombre, la descripción y el WhatsApp de tu tienda, y lleva a tu catálogo. Se cambian en Datos de la tienda, desde tu panel."
         >
           <Cierre tienda={tienda} />
         </ParteFija>
@@ -156,7 +158,7 @@ export function paginasDeKit(
               texto={
                 hayFiltro
                   ? textos.sinResultados
-                  : `${tienda.nombre} todavía no cargó sus productos. Vuelve en un rato.`
+                  : "Todavía estamos cargando nuestros productos. Vuelve pronto."
               }
               accion={
                 hayFiltro
@@ -322,8 +324,8 @@ export function paginasDeKit(
               ) : null}
               <Detalle titulo="Cómo comprar" Rotulo={Rotulo}>
                 <p className="leading-relaxed opacity-80">
-                  Agrégalo al carrito y manda tu pedido por WhatsApp: la tienda
-                  te responde ahí.
+                  Agrégalo al carrito y envíanos tu pedido por WhatsApp. Ahí
+                  coordinamos el pago y la entrega.
                 </p>
               </Detalle>
               {producto.sku ? (

@@ -196,8 +196,8 @@ export default function Privacidad() {
         <p>Puedes, en cualquier momento:</p>
         <ul>
           <li>
-            <strong>Ver y corregir</strong> tus datos desde tu cuenta, en «Mi
-            cuenta».
+            <strong>Ver y corregir</strong> tus datos desde tu cuenta, en «Tus
+            datos».
           </li>
           <li>
             <strong>Llevártelos:</strong> pídenos una copia de tu tienda, tus
@@ -211,7 +211,7 @@ export default function Privacidad() {
             la app.
           </li>
           <li>
-            <strong>Desconectar Canva</strong> desde «Mi cuenta».
+            <strong>Desconectar Canva</strong> desde «Tus datos».
           </li>
           <li>
             <strong>Desconectar TikTok</strong> con «Cambiar de cuenta», en

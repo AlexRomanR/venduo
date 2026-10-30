@@ -457,7 +457,7 @@ export function CargaDeProductos({
       .catch(() => ({
         ok: false as const,
         error:
-          "No pudimos crear los productos. Revisa tu conexión y vuelve a intentarlo.",
+          "No pudimos crear los productos. Revisa tu conexión e inténtalo de nuevo.",
       }))
     setCreando(false)
     if (!resultado.ok) {
@@ -1240,7 +1240,7 @@ function FilaDeBorrador({
         )}
         {repetido && !omitido ? (
           <p className="text-xs text-tinta/65">
-            Ya tienes uno con este nombre: se creará igual.
+            Ya tienes uno con este nombre: se creará de todos modos.
           </p>
         ) : null}
       </div>

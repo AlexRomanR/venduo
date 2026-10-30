@@ -39,7 +39,7 @@ export default async function PlantillasPage() {
         id="tienda"
         icono={LayoutTemplate}
         titulo="Plantillas de tienda"
-        bajada="La galería del alta y el cambio de plantilla en Apariencia."
+        bajada="La galería del alta y el cambio de plantilla en Editar tu tienda."
       >
         <PlantillasDeTiendaAdmin
           plantillas={deTienda.map((p) => ({

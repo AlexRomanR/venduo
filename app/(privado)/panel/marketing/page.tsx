@@ -39,7 +39,7 @@ export default async function PublicarPage({
     <div className="flex flex-col gap-6 md:gap-8">
       <Cabecera
         titulo="Publica tus productos."
-        bajada="Elige uno: te armamos la imagen y el texto para tus redes."
+        bajada="Elige un producto y preparamos la imagen y el texto para tus redes."
       />
       <Publicador
         productos={material.productos}

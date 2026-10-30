@@ -196,7 +196,7 @@ function Ideas({
         ))}
       </ul>
       <p className="px-4 py-2 text-xs leading-relaxed opacity-55">
-        O escríbele con tus palabras lo que quieres.
+        O escribe con tus palabras lo que quieres.
         {ia.demo ? " IA en modo demo: las respuestas son simuladas." : ""}
       </p>
     </div>
