@@ -30,7 +30,7 @@ export interface FilaDeTienda {
 
 const FILTROS = {
   todas: "Todas",
-  trabadas: "Trabadas",
+  trabadas: "Detenidas",
   sin_publicar: "Sin publicar",
   prueba: "En prueba",
   bloqueadas: "Bloqueadas",

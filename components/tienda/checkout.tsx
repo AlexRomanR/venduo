@@ -209,8 +209,8 @@ export function Checkout({
         </h2>
         <p className="mt-3 max-w-[46ch] leading-relaxed opacity-70">
           {vacaciones
-            ? `${textoDeVuelta(vacaciones.hasta)} Mientras tanto, puedes mirar el catálogo de ${nombreTienda}.`
-            : `Mira el catálogo de ${nombreTienda} y agrega lo que te guste. Cuando estés listo, mandas tu pedido por WhatsApp.`}
+            ? `${textoDeVuelta(vacaciones.hasta)} Mientras tanto, puedes ver nuestro catálogo.`
+            : `Revisa nuestro catálogo y agrega lo que te guste. Luego envíanos tu pedido por WhatsApp.`}
         </p>
         <Link
           href={`/t/${slug}`}
@@ -579,8 +579,7 @@ function EnviarPorWhatsApp({
   if (!disponible) {
     return (
       <p className="mt-7 border-l-2 border-senal pl-4 text-sm leading-relaxed">
-        Esta tienda todavía no recibe pedidos por WhatsApp. Vuelve a intentarlo
-        más tarde.
+        Todavía no recibimos pedidos por WhatsApp. Inténtalo de nuevo más tarde.
       </p>
     )
   }
@@ -602,8 +601,8 @@ function EnviarPorWhatsApp({
       </button>
 
       <p className="mt-4 text-xs leading-relaxed opacity-60">
-        Se abre WhatsApp con tu pedido ya escrito para la tienda. Ahí te
-        responden y acuerdan el pago.
+        Se abre WhatsApp con tu pedido ya escrito. Ahí te respondemos y
+        acordamos el pago.
       </p>
     </>
   )

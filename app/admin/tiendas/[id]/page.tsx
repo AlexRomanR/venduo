@@ -232,13 +232,13 @@ export default async function TiendaAdminPage({
         id="productos"
         icono={Package}
         titulo="Sus productos"
-        bajada="Ocultar uno lo saca de la tienda pública. El dueño lo ve marcado en su panel."
+        bajada="Ocultar uno lo saca de la tienda pública. La tienda lo ve marcado en su panel."
       >
         {productos.length === 0 ? (
           <SinDatos
             icono={Package}
             titulo="Todavía sin productos"
-            texto="Si lleva días así, es una tienda trabada: vale la pena escribirle."
+            texto="Si lleva días así, es una tienda detenida: vale la pena escribirle."
           />
         ) : (
           <ModeracionDeProductos tienda={tienda.id} productos={productos} />

@@ -564,8 +564,8 @@ function HojaDeLinea({
               className="mt-0.5 size-4 shrink-0"
             />
             {stock === 0
-              ? "Tu stock dice que no te queda."
-              : `Tu stock dice que te quedan ${formatNumber(stock)}.`}
+              ? "No te queda stock."
+              : `Solo te quedan ${formatNumber(stock)}.`}
           </p>
           <Link
             href={`/panel/productos/${producto.id}${variante ? "#variantes" : ""}`}

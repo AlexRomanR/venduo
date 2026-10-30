@@ -73,7 +73,7 @@ function Portada({ bloque }: PropsBloque) {
       >
         <div>
           <h1 className="max-w-[16ch] font-titular text-[clamp(2.5rem,9vw,5rem)] leading-[0.98] font-extrabold tracking-[-0.04em]">
-            {texto(bloque, "title") ?? "Bienvenido"}
+            {texto(bloque, "title") ?? "Te damos la bienvenida"}
           </h1>
           {bajada ? (
             <p className="mt-6 max-w-[52ch] text-lg leading-relaxed opacity-70">

@@ -60,6 +60,9 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
   `ui-styling.md`.
 - **Toda pantalla del panel se arma como el Resumen**: cada cosa en su panel con borde,
   con las piezas de `components/panel/piezas.tsx`. Detalle en `ui-styling.md`.
+- **Cada texto tiene una voz.** Venduo y la tienda hablan en plural ("no pudimos",
+  "coordinamos"), las cosas no hablan, nadie tiene género fijo y toda pantalla citada
+  lleva su nombre de hoy. Detalle en `ui-styling.md`.
 - **Una tienda se ve con su plantilla, y ningún componente pregunta cuál es.** La base
   vive en código, la personalización en `stores.theme_overrides` y lo que se dibuja se
   calcula. Todo en `docs/store-templates.md`.

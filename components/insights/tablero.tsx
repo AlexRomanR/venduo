@@ -54,7 +54,7 @@ export function Tablero({
       return
     }
 
-    toast.success(`"${grafico.titulo}" salió de tu tablero.`)
+    toast.success(`Se quitó «${grafico.titulo}» del tablero.`)
   }
 
   return (

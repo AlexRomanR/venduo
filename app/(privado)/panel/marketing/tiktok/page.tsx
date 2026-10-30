@@ -32,7 +32,7 @@ export const metadata = { title: "Publicar en TikTok" }
 export const maxDuration = 60
 
 const AVISOS: Record<string, string> = {
-  error: "No pudimos conectar tu cuenta de TikTok. Vuelve a intentar.",
+  error: "No pudimos conectar tu cuenta de TikTok. Inténtalo de nuevo.",
   no: "No conectaste tu cuenta de TikTok.",
 }
 

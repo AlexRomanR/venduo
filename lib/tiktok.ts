@@ -446,17 +446,17 @@ export function mensajeDeTiktok(codigo: string): string {
     case "auth_removed":
       return "Vuelve a conectar tu cuenta de TikTok."
     case "rate_limit_exceeded":
-      return "Espera un minuto y vuelve a intentar."
+      return "Espera un minuto e inténtalo de nuevo."
     case "photo_pull_failed":
     case "picture_size_check_failed":
     case "file_format_check_failed":
-      return "TikTok no pudo leer la imagen. Vuelve a intentar."
+      return "TikTok no pudo leer la imagen. Inténtalo de nuevo."
     case "spam_risk_text":
     case "spam_risk":
-      return "TikTok no aceptó la publicación. Revisa el texto y prueba de nuevo."
+      return "TikTok no aceptó la publicación. Revisa el texto e inténtalo de nuevo."
     case "publish_cancelled":
       return "La publicación se canceló."
     default:
-      return "TikTok no pudo publicarla. Vuelve a intentar en un momento."
+      return "TikTok no pudo publicarla. Inténtalo de nuevo en un momento."
   }
 }

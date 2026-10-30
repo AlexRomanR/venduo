@@ -29,7 +29,7 @@ export default async function FuncionesPage() {
       <Seccion
         id="ia"
         icono={Bot}
-        titulo="La IA, de un golpe"
+        titulo="Toda la IA a la vez"
         bajada="Por encima de lo que diga cada función de IA."
         relleno
       >

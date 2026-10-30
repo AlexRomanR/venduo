@@ -93,7 +93,7 @@ export async function preguntar(
     return {
       ok: false,
       error: detalle.includes("vistas")
-        ? "Esa pregunta necesita datos que todavía no puedo consultar."
+        ? "Esa pregunta necesita datos que todavía no se pueden consultar."
         : "No pudimos calcular ese gráfico. Prueba con otra pregunta.",
     }
   }

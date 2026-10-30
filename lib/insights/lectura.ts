@@ -30,7 +30,7 @@ export function leerGrafico(
     // respuesta: "5" no contesta "¿en qué estado están mis pedidos?".
     return esEtiquetaDeTotal(fila.etiqueta)
       ? `${fmt(fila.valor)} en total.`
-      : `Todo cae en un solo grupo: ${fechaLegible(fila.etiqueta)}, con ${fmt(fila.valor)}.`
+      : `Todo queda en un solo grupo: ${fechaLegible(fila.etiqueta)}, con ${fmt(fila.valor)}.`
   }
 
   return esSerieDeTiempo(filas)

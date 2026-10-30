@@ -32,11 +32,11 @@ export const KIT_CALLE: KitDeTienda = {
     grilla,
     Cierre,
     textos: {
-      sinProductos: "Se viene la primera tanda",
+      sinProductos: "Pronto, los primeros productos",
       consulta: "¿Dudas con la talla? Pregúntanos",
       estado: "Estado de la prenda",
       sinResultados:
-        "Nada coincide con lo que elegiste. Prueba con otra sección o mira todo.",
+        "Nada coincide con lo que elegiste. Prueba con otra sección o ve todo el catálogo.",
     },
   }),
 }

@@ -131,7 +131,7 @@ export function PasoProducto() {
             ayuda={
               tienda.whatsapp
                 ? GUIA["ficha.consulta"]?.ayuda
-                : "Necesita el WhatsApp de tu tienda. Agrégalo en Cuenta y vuelve."
+                : "Necesita el WhatsApp de tu tienda. Agrégalo en Datos de la tienda y vuelve."
             }
             activo={ficha.consulta && Boolean(tienda.whatsapp)}
             deshabilitado={!tienda.whatsapp}

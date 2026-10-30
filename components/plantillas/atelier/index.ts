@@ -39,7 +39,7 @@ export const KIT_ATELIER: KitDeTienda = {
       consulta: "¿Quieres más fotos o las medidas? Pregúntanos",
       estado: "Estado de la pieza",
       sinResultados:
-        "Ninguna pieza coincide con lo que elegiste. Prueba con otra línea o mira toda la colección.",
+        "Ninguna pieza coincide con lo que elegiste. Prueba con otra línea o ve toda la colección.",
     },
   }),
 }

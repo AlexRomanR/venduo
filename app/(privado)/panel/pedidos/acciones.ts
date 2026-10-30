@@ -113,7 +113,7 @@ export async function guardarNota(
     return {
       ok: false,
       error:
-        "No pudimos guardar la nota. Revisa tu conexión y vuelve a intentarlo.",
+        "No pudimos guardar la nota. Revisa tu conexión e inténtalo de nuevo.",
     }
   }
 
@@ -224,7 +224,7 @@ export async function registrarVenta(
 function mensajeDeVenta(crudo: string) {
   const sinStock = /Stock insuficiente de (.+): quedan (\d+)/.exec(crudo)
   if (sinStock) {
-    return `Tu stock dice que quedan ${sinStock[2]} de ${sinStock[1]}. Corrígelo y vuelve a registrar la venta.`
+    return `Según tu stock, quedan ${sinStock[2]} de ${sinStock[1]}. Corrígelo y vuelve a registrar la venta.`
   }
   if (/Producto no disponible/i.test(crudo)) {
     return "Uno de los productos ya no está en tu catálogo. Quítalo de la venta."
@@ -239,5 +239,5 @@ function mensajeDeVenta(crudo: string) {
   if (/No tienes una tienda/i.test(crudo)) {
     return "Todavía no tienes una tienda."
   }
-  return "No pudimos registrar la venta. Vuelve a intentar."
+  return "No pudimos registrar la venta. Inténtalo de nuevo."
 }

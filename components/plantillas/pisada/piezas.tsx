@@ -248,8 +248,8 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
         </div>
         <ul className="flex flex-col gap-2 self-end">
           <li className={cn("px-5 py-4 text-sm font-semibold", PLACA)}>
-            Arma tu pedido y mándalo por WhatsApp: ahí se cierra el pago y la
-            entrega.
+            Arma tu pedido y envíanoslo por WhatsApp: ahí coordinamos el pago y
+            la entrega.
           </li>
           {tienda.whatsapp ? (
             <li>
@@ -308,7 +308,7 @@ export function Pie({ marco }: PropsPie) {
           </nav>
 
           <p className="text-sm leading-relaxed opacity-70">
-            Los pedidos y el pago se acuerdan con la tienda por WhatsApp.
+            Los pedidos y el pago los acordamos por WhatsApp.
           </p>
 
           <Link

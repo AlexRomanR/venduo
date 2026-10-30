@@ -709,7 +709,7 @@ function CamposDeHoja({
               detalle={
                 datos.tienda.whatsapp
                   ? datos.tienda.whatsapp
-                  : "Carga tu número en Cuenta para mostrarlo."
+                  : "Carga tu número en Datos de la tienda para mostrarlo."
               }
               activo={bloque.whatsapp && Boolean(datos.tienda.whatsapp)}
               deshabilitado={!datos.tienda.whatsapp}
@@ -717,7 +717,7 @@ function CamposDeHoja({
             />
             <Interruptor
               etiqueta="El QR de tu tienda online"
-              detalle="Lo escanean y caen en tu tienda, con el stock al día."
+              detalle="Lo escanean y llegan a tu tienda, con el stock al día."
               activo={bloque.qr}
               alCambiar={(qr) => cambiar({ ...bloque, qr })}
             />

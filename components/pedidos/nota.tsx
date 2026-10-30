@@ -133,7 +133,7 @@ export function NotaDelPedido({
     const resultado = await guardar(id, nueva).catch(() => ({
       ok: false,
       error:
-        "No pudimos guardar la nota. Revisa tu conexión y vuelve a intentarlo.",
+        "No pudimos guardar la nota. Revisa tu conexión e inténtalo de nuevo.",
     }))
     if (!resultado.ok) {
       setActual(antes)

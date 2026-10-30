@@ -84,7 +84,7 @@ const COMPARACION = [
     tema: "El stock",
     comun: "Lo llevas aparte, en un cuaderno o en tu cabeza.",
     venduo:
-      "Marcas el pedido pagado y se descuenta con un toque. Te avisa antes de que se acabe.",
+      "Marcas el pedido como pagado y el stock se descuenta solo, y te avisamos antes de que algo se acabe.",
   },
   {
     tema: "Los pedidos",
@@ -135,7 +135,7 @@ const INCLUYE = [
   {
     titulo: "Control de stock",
     detalle:
-      "Marcas un pedido pagado y se descuenta del inventario con un toque. Te avisa lo que se está acabando y nadie compra lo que ya no tienes.",
+      "Cuando marcas un pedido como pagado, se descuenta del inventario. Te avisamos de lo que se está acabando y nadie compra lo que ya no tienes.",
   },
   {
     titulo: "Pedidos por WhatsApp",
@@ -193,7 +193,7 @@ const PREGUNTAS = [
   },
   {
     p: "¿Necesito saber de computación?",
-    r: "No. Si sabes subir una foto a TikTok, sabes usar Venduo. Y si algo no te sale, se lo pides a la IA en tus palabras.",
+    r: "No. Si sabes subir una foto a TikTok, sabes usar Venduo. Y si necesitas ayuda, se la pides a la IA con tus palabras.",
   },
   {
     p: "¿Cuánto cuesta?",
@@ -301,10 +301,10 @@ export default async function Inicio() {
         <section className="border-t border-tinta/15">
           <div className="mx-auto max-w-6xl px-5 py-20">
             <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-              ¿Te suena?
+              ¿Te pasa esto?
             </p>
             <h2 className="mt-5 max-w-[18ch] font-titular text-[clamp(1.9rem,5vw,2.75rem)] leading-[1.04] font-extrabold tracking-[-0.03em]">
-              Vender por redes funciona. Manejarlo, no tanto.
+              Vender por redes funciona. Organizarlo es lo difícil.
             </h2>
 
             <ul className="mt-12 grid gap-x-10 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -510,8 +510,8 @@ export default async function Inicio() {
             <p className="mt-8 max-w-[52ch] text-lg leading-relaxed text-white/90">
               Sin formularios ni cuentas: quien compra elige, ve el total y toca
               un botón. Te escribe con la lista de productos y el número del
-              pedido, y lo cierran en el mismo chat donde ya le vendías. El
-              pedido queda en tu panel, y cuando te paga, el stock baja solo.
+              pedido, y acuerdan el pago en el mismo chat donde ya le vendías.
+              El pedido queda en tu panel, y cuando te paga, el stock baja solo.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link

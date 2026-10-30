@@ -128,7 +128,7 @@ export async function crearPedido(
 function mensajeDeError(crudo: string) {
   // Primero: el carrito pudo quedar abierto de antes de las vacaciones.
   if (/vacaciones/i.test(crudo)) {
-    return "La tienda está de vacaciones y no recibe pedidos por ahora."
+    return "Estamos de vacaciones y por ahora no recibimos pedidos."
   }
   const sinOpcion = /Elige una opción de (.+)/.exec(crudo)
   if (sinOpcion) {
@@ -138,13 +138,13 @@ function mensajeDeError(crudo: string) {
     return "Una de las opciones de tu carrito ya no está. Quítala y elige otra."
   }
   if (/stock/i.test(crudo)) {
-    return "Se acabó el stock de algo de tu carrito. Revísalo y vuelve a intentar."
+    return "Se acabó el stock de algo de tu carrito. Revísalo e inténtalo de nuevo."
   }
   if (/product/i.test(crudo)) {
     return "Uno de los productos ya no está disponible."
   }
   if (/whatsapp/i.test(crudo)) {
-    return "Esta tienda todavía no recibe pedidos por WhatsApp."
+    return "Todavía no recibimos pedidos por WhatsApp."
   }
-  return "No pudimos armar tu pedido. Intenta de nuevo en un momento."
+  return "No pudimos armar tu pedido. Inténtalo de nuevo en un momento."
 }

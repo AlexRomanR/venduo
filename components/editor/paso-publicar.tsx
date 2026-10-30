@@ -306,8 +306,8 @@ function Publicado({ alSeguir }: { alSeguir: () => void }) {
         Tu tienda ya se ve así.
       </h2>
       <p className="mt-3 max-w-[40ch] text-sm leading-relaxed opacity-70">
-        Cada cliente que abra tu enlace ve los cambios desde ahora. Lo que
-        tenías antes quedó guardado en el historial de Apariencia.
+        Quien abra tu enlace ve los cambios desde ahora. Lo que tenías antes
+        quedó guardado: puedes volver a esa versión desde Editar tu tienda.
       </p>
 
       <div className="mt-7 flex flex-col gap-3">

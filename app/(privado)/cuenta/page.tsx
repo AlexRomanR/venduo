@@ -22,7 +22,7 @@ import { Vacaciones } from "@/components/cuenta/vacaciones"
 import { Cabecera, Seccion, SinDatos } from "@/components/panel/piezas"
 import { guardarVacaciones } from "./acciones"
 
-export const metadata = { title: "Mi cuenta" }
+export const metadata = { title: "Tus datos" }
 
 /** El enlace que va a la derecha del título de un panel. */
 function Ver({ href, children }: { href: string; children: string }) {
@@ -55,12 +55,12 @@ export default async function CuentaPage() {
 
     return (
       <div className="flex flex-col gap-6 md:gap-8">
-        <Cabecera titulo="Mi cuenta" />
+        <Cabecera titulo="Tus datos." />
         <Seccion
           id="persona"
           icono={UserRound}
           titulo="Quién eres en Venduo"
-          bajada="Tus datos y los de tu tienda."
+          bajada="Los tuyos y los de tu tienda."
         >
           <SinDatos
             icono={UserRound}
@@ -77,15 +77,15 @@ export default async function CuentaPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <Cabecera
-        titulo="Mi cuenta"
-        bajada="Tus datos y los de tu tienda. Cada panel se guarda por separado."
+        titulo="Tus datos."
+        bajada="Los tuyos y los de tu tienda. Cada panel se guarda por separado."
       />
 
       <Seccion
         id="persona"
         icono={UserRound}
         titulo="Quién eres en Venduo"
-        bajada="Tu foto se ve en el panel; con tu nombre te saluda la plataforma."
+        bajada="Tu foto y tu nombre se ven en tu panel."
         relleno
       >
         <div className="grid items-start gap-8 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-12">
@@ -103,7 +103,7 @@ export default async function CuentaPage() {
           id="tienda"
           icono={Store}
           titulo={cuenta.tienda.name}
-          bajada="Cómo te ven tus compradores y a qué WhatsApp te llegan los pedidos."
+          bajada="Cómo te ven quienes te compran y a qué WhatsApp te llegan los pedidos."
           extra={<Ver href={`/t/${cuenta.tienda.slug}`}>Ver mi tienda</Ver>}
           relleno
         >

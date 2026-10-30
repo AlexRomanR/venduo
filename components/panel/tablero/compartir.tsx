@@ -68,7 +68,8 @@ export function CompartirTienda({
         if (vigente) setQr(imagen)
       })
       .catch(() => {
-        if (vigente) toast.error("No pudimos dibujar el QR. Prueba de nuevo.")
+        if (vigente)
+          toast.error("No pudimos dibujar el QR. Inténtalo de nuevo.")
       })
     return () => {
       vigente = false

@@ -140,7 +140,7 @@ export function Consola({
             : null,
         error: respuesta.ok
           ? undefined
-          : (respuesta.error ?? "No pude responder eso."),
+          : (respuesta.error ?? "No pudimos responder eso."),
         guardado: false,
       },
       ...previas,

@@ -36,13 +36,13 @@ export async function POST(peticion: Request) {
       descarga = typeof marca === "string" ? marca : "1"
     }
   } catch {
-    return aviso("No llegó el catálogo. Vuelve a intentarlo.", 400)
+    return aviso("No llegó el catálogo. Inténtalo de nuevo.", 400)
   }
 
   const catalogo = catalogoSchema.safeParse(cuerpo)
   if (!catalogo.success) {
     return aviso(
-      "El catálogo tiene algo que no se puede dibujar. Revisa los textos y vuelve a intentarlo.",
+      "El catálogo tiene algo que no se puede dibujar. Revisa los textos e inténtalo de nuevo.",
       400
     )
   }

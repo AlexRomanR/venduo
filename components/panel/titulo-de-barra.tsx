@@ -58,7 +58,7 @@ const SECCIONES: Array<[RegExp, TituloDeBarra]> = [
     { titulo: "Publicar en TikTok", volver: "/panel/marketing" },
   ],
   [/^\/panel\/marketing/, { titulo: "Publicar en redes" }],
-  [/^\/cuenta/, { titulo: "Tu cuenta" }],
+  [/^\/cuenta/, { titulo: "Tus datos" }],
 ]
 
 /** El título de una ruta. `null` en el Resumen: ahí manda su cabecera. */

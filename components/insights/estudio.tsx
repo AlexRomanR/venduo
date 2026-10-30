@@ -69,7 +69,7 @@ export function Estudio({
           id="preguntar"
           icono={MessageSquareText}
           titulo="Haz una pregunta"
-          bajada="Con tus palabras: te armo el gráfico con los datos de tu tienda."
+          bajada="Escríbela con tus palabras y armamos el gráfico con los datos de tu tienda."
         >
           <ConFuncion estado={ia}>
             <Consola
@@ -104,7 +104,7 @@ export function Estudio({
           <SinDatos
             icono={LayoutDashboard}
             titulo="Todavía no guardaste ningún gráfico"
-            texto="Cuando una respuesta te sirva, dale a Guardar y queda aquí. Se vuelve a calcular con los datos de cada día, así que no envejece."
+            texto="Cuando una respuesta te sirva, toca Guardar y quedará aquí. Se vuelve a calcular con los datos de cada día, así que no envejece."
           />
         ) : (
           <>

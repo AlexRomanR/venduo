@@ -279,7 +279,7 @@ export function Pie({ marco }: PropsPie) {
           </nav>
 
           <p className="text-sm leading-relaxed opacity-70">
-            Los pedidos y el pago se acuerdan con la tienda por WhatsApp.
+            Los pedidos y el pago los acordamos por WhatsApp.
           </p>
 
           <Link

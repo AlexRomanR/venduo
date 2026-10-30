@@ -63,7 +63,7 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
       toast.error(
         error.message.includes("Ya tienes una tienda")
           ? "Ya tienes una tienda creada."
-          : "No pudimos crear tu tienda. Intenta de nuevo."
+          : "No pudimos crear tu tienda. Inténtalo de nuevo."
       )
       return
     }
@@ -123,7 +123,7 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
                 />
               </FormControl>
               <FormDescription className="text-xs text-tinta/55">
-                Escríbelo como se lo contarías a un cliente. Con esto la IA
+                Escríbelo como se lo contarías a quien te compra. Con esto la IA
                 escribe los textos de tu portada.
               </FormDescription>
               <FormMessage className="text-sm text-senal" />

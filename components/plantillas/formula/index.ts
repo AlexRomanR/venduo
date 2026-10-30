@@ -36,7 +36,7 @@ export const KIT_FORMULA: KitDeTienda = {
       consulta: "¿No sabes cuál elegir? Te asesoramos",
       estado: "Estado del frasco",
       sinResultados:
-        "Ningún frasco coincide con lo que elegiste. Prueba con otra familia o mira todo.",
+        "Ningún frasco coincide con lo que elegiste. Prueba con otra familia o ve todo el catálogo.",
     },
   }),
 }

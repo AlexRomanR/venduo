@@ -41,7 +41,7 @@ export function Inicio({ tienda }: PropsInicio) {
       <div className="mx-auto w-full max-w-7xl px-5 py-12">
         <Vacio
           titulo="La colección está en camino"
-          texto={`${tienda.nombre} todavía no cargó sus productos. Vuelve en un rato.`}
+          texto={"Todavía estamos cargando nuestros productos. Vuelve pronto."}
         />
       </div>
     )
@@ -101,7 +101,7 @@ export function Inicio({ tienda }: PropsInicio) {
       <ParteFija
         tienda={tienda}
         nombre="Sobre la tienda"
-        ayuda="Muestra el nombre, la descripción y el WhatsApp de tu tienda. Se cambian en Cuenta, desde tu panel."
+        ayuda="Muestra el nombre, la descripción y el WhatsApp de tu tienda. Se cambian en Datos de la tienda, desde tu panel."
       >
         <SobreLaTienda tienda={tienda} />
       </ParteFija>
@@ -129,7 +129,7 @@ function SobreLaTienda({ tienda }: { tienda: TiendaPublica }) {
 
       <ul className="self-end border-t-2 border-tinta">
         <Servicio icono={<ShoppingBag aria-hidden="true" className="size-5" />}>
-          Tu pedido llega a nuestro WhatsApp y lo cerramos ahí
+          Tu pedido llega a nuestro WhatsApp y ahí coordinamos todo
         </Servicio>
         {tienda.whatsapp ? (
           <Servicio
@@ -214,8 +214,8 @@ export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
             titulo={hayFiltro ? "Nada por aquí" : "Todavía sin productos"}
             texto={
               hayFiltro
-                ? "Ninguna prenda coincide con lo que elegiste. Prueba con otro filtro o mira todo."
-                : `${tienda.nombre} todavía no cargó sus productos. Vuelve en un rato.`
+                ? "Ninguna prenda coincide con lo que elegiste. Prueba con otro filtro o ve todo el catálogo."
+                : "Todavía estamos cargando nuestros productos. Vuelve pronto."
             }
             accion={
               hayFiltro
@@ -386,8 +386,8 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
             ) : null}
             <Detalle titulo="Cómo comprar">
               <p className="leading-relaxed opacity-80">
-                Agrégala al carrito y manda tu pedido por WhatsApp: la tienda te
-                responde ahí.
+                Agrégala al carrito y envíanos tu pedido por WhatsApp. Ahí
+                coordinamos el pago y la entrega.
               </p>
             </Detalle>
             {producto.sku ? (

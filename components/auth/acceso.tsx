@@ -33,9 +33,9 @@ const REGISTRO = {
     "Elige una plantilla y tu tienda queda armada. Subes tus productos desde el celular o computadora, los pedidos te llegan por WhatsApp y un panel te muestra lo que vendes cada día.",
   puntos: [
     {
-      titulo: "Tu inventario, con un toque",
+      titulo: "Tu inventario, siempre al día",
       detalle:
-        "Cuando te pagan, marcas el pedido y se descuenta del stock. Te avisa lo que se está acabando.",
+        "Cuando te pagan, marcas el pedido y se descuenta del stock. Te avisamos de lo que se está acabando.",
     },
     {
       titulo: "Pedidos por WhatsApp",
@@ -202,7 +202,7 @@ export function Acceso({
             : // Una cuenta dada de baja queda bloqueada en Auth.
               error.code === "user_banned" || /banned/i.test(error.message)
               ? `Esta cuenta fue dada de baja. Si crees que es un error, escríbenos a ${CORREO_DE_CONTACTO}.`
-              : "No pudimos hacerte entrar. Inténtalo de nuevo en un rato."
+              : "No pudimos iniciar tu sesión. Inténtalo de nuevo en un rato."
         )
         return
       }

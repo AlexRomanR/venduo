@@ -60,7 +60,7 @@ export function Bienvenida({ alEmpezar }: { alEmpezar: () => void }) {
         {tienda.nombre} ya existe
       </p>
       <p className="mt-2 font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">
-        Ahora, dale tu estilo.
+        Ahora, personaliza tu tienda.
       </p>
       <ul className="mt-3 flex flex-col gap-1.5 text-sm leading-relaxed opacity-80">
         <li>Lo que cambies lo ves al instante, en tu tienda real.</li>

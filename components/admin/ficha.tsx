@@ -169,8 +169,9 @@ export function PausaDeTienda({
     >
       <label className="flex flex-col gap-1">
         <span className="text-sm opacity-70">
-          La tienda deja de verse al público, sin tocar su suscripción. El dueño
-          sigue entrando a su panel. El motivo queda anotado, solo para ti.
+          La tienda deja de verse al público, sin tocar su suscripción. Quien la
+          administra sigue entrando a su panel. El motivo queda anotado, solo
+          para ti.
         </span>
         <input
           value={texto}

@@ -37,7 +37,7 @@ export function Inicio({ tienda }: PropsInicio) {
     return (
       <Vacio
         titulo="Pronto, la colección"
-        texto={`${tienda.nombre} todavía no cargó sus productos. Vuelve en un rato.`}
+        texto={"Todavía estamos cargando nuestros productos. Vuelve pronto."}
       />
     )
   }
@@ -66,7 +66,7 @@ export function Inicio({ tienda }: PropsInicio) {
       <ParteFija
         tienda={tienda}
         nombre="La casa"
-        ayuda="Muestra el nombre, la descripción y el WhatsApp de tu tienda. Se cambian en Cuenta, desde tu panel."
+        ayuda="Muestra el nombre, la descripción y el WhatsApp de tu tienda. Se cambian en Datos de la tienda, desde tu panel."
       >
         <LaCasa tienda={tienda} />
       </ParteFija>
@@ -86,7 +86,8 @@ function LaCasa({ tienda }: { tienda: TiendaPublica }) {
     {
       icono: MessageCircle,
       titulo: "Tu pedido",
-      texto: "Llega a nuestro WhatsApp y lo cerramos contigo ahí mismo.",
+      texto:
+        "Llega a nuestro WhatsApp y ahí coordinamos contigo el pago y la entrega.",
     },
   ].filter((servicio) => servicio !== null)
 
@@ -180,8 +181,8 @@ export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
           titulo={hayFiltro ? "Nada con ese filtro" : "Pronto, la colección"}
           texto={
             hayFiltro
-              ? "No encontramos nada con lo que elegiste. Prueba con otra búsqueda o mira toda la colección."
-              : `${tienda.nombre} todavía no cargó sus productos. Vuelve en un rato.`
+              ? "No encontramos nada con lo que elegiste. Prueba con otra búsqueda o ve toda la colección."
+              : "Todavía estamos cargando nuestros productos. Vuelve pronto."
           }
           accion={
             hayFiltro

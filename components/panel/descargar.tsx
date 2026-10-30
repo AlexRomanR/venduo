@@ -48,7 +48,7 @@ async function descargar(url: string): Promise<boolean> {
 
 function avisar(bien: boolean, esDemo: boolean) {
   if (!bien) {
-    toast.error("No pudimos preparar la planilla. Vuelve a intentarlo.")
+    toast.error("No pudimos preparar la planilla. Inténtalo de nuevo.")
   } else if (esDemo) {
     toast.info("Estás en modo demo: la planilla sale con datos de ejemplo.")
   } else {
