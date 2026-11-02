@@ -64,7 +64,11 @@ export interface DefinicionDeSeccion {
    */
   vacia: string
   campos: Campo[]
-  /** Con qué nace al agregarla: un ejemplo que se entiende, no un vacío. */
+  /**
+   * Con qué nace al agregarla. Nada que quien compra pueda tomar por dicho
+   * por la tienda —un testimonio, un horario, su historia—: eso va en el
+   * `ejemplo` del campo, que el editor muestra como pista gris.
+   */
   inicial: Record<string, unknown>
 }
 
@@ -91,6 +95,8 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
         tipo: "parrafo",
         max: 240,
         ayuda: "Una o dos líneas que cuenten qué vendes.",
+        ejemplo:
+          "Ropa deportiva elegida una por una. Pide aquí y coordinamos la entrega.",
       },
       {
         clave: "ctaLabel",
@@ -108,7 +114,6 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
     ],
     inicial: {
       title: "Te damos la bienvenida",
-      subtitle: "Cuéntale a tu cliente qué vendes y por qué comprarte a ti.",
       ctaLabel: "Ver la colección",
     },
   },
@@ -191,12 +196,14 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
         tipo: "parrafo",
         max: 1200,
         requerido: true,
+        ejemplo:
+          "Cómo empezó tu negocio, qué cuidas al elegir cada producto y por qué te eligen.",
       },
       { clave: "imageUrl", etiqueta: "Foto", tipo: "imagen" },
     ],
     inicial: {
       title: "Quiénes somos",
-      body: "Cuenta cómo empezó tu negocio, qué te importa al elegir cada producto y por qué tus clientes vuelven.",
+      body: "",
     },
   },
 
@@ -222,6 +229,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
             tipo: "parrafo",
             max: 400,
             requerido: true,
+            ejemplo: "Llegó rápido y tal cual la foto.",
           },
           {
             clave: "author",
@@ -229,18 +237,14 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
             tipo: "texto",
             max: 80,
             requerido: true,
+            ejemplo: "Carla, Cochabamba",
           },
         ],
       },
     ],
     inicial: {
       title: "Lo que dicen",
-      items: [
-        {
-          quote: "Llegó rápido y tal cual la foto. Ya hice mi segundo pedido.",
-          author: "Carla, Cochabamba",
-        },
-      ],
+      items: [],
     },
   },
 
@@ -283,10 +287,22 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
         max: 30,
         ejemplo: "+591 70000000",
       },
-      { clave: "address", etiqueta: "Dirección", tipo: "texto", max: 200 },
-      { clave: "hours", etiqueta: "Horario", tipo: "texto", max: 200 },
+      {
+        clave: "address",
+        etiqueta: "Dirección",
+        tipo: "texto",
+        max: 200,
+        ejemplo: "Av. Busch 1234, Santa Cruz",
+      },
+      {
+        clave: "hours",
+        etiqueta: "Horario",
+        tipo: "texto",
+        max: 200,
+        ejemplo: "Lunes a sábado, de 9:00 a 19:00",
+      },
     ],
-    inicial: { title: "Contacto", hours: "Lunes a sábado, de 9:00 a 19:00" },
+    inicial: { title: "Contacto" },
   },
 
   faq: {

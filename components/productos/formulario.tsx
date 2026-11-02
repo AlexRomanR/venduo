@@ -189,7 +189,7 @@ export function FormularioProducto({
     if (llenas.length < opcionesActuales.length)
       form.setValue("opciones", llenas)
     return form.handleSubmit(alEnviar, () =>
-      toast.error("Revisa lo que quedó en rojo.")
+      toast.error("Revisa lo que quedó marcado.")
     )(evento)
   }
 
@@ -228,7 +228,7 @@ export function FormularioProducto({
               autoComplete="off"
               aria-invalid={Boolean(errores.nombre)}
               className={cn(
-                "w-full border-b-2 border-tinta bg-transparent py-2 font-titular text-[1.75rem] leading-tight font-extrabold tracking-[-0.03em] outline-none placeholder:text-tinta/30 focus-visible:border-senal",
+                "w-full border-b-2 border-tinta bg-transparent py-2 font-titular text-[1.75rem] leading-tight font-extrabold tracking-[-0.03em] outline-none placeholder:text-tinta/30 focus-visible:border-tinta focus-visible:bg-tinta/[0.04]",
                 errores.nombre && "border-senal"
               )}
             />
@@ -238,7 +238,7 @@ export function FormularioProducto({
           <div className="flex flex-col gap-1">
             <div
               className={cn(
-                "flex items-baseline gap-2 border-b-2 border-tinta focus-within:border-senal",
+                "flex items-baseline gap-2 border-b-2 border-tinta focus-within:border-tinta focus-within:bg-tinta/[0.04]",
                 errores.precio && "border-senal"
               )}
             >
@@ -565,7 +565,7 @@ export function FormularioProducto({
             {...form.register("descripcion")}
             rows={4}
             placeholder="De qué es, qué tallas hay, para qué sirve."
-            className="resize-none border-b border-tinta bg-transparent py-2 text-base outline-none placeholder:text-tinta/35 focus-visible:border-senal"
+            className="resize-none border-b border-tinta bg-transparent py-2 text-base outline-none placeholder:text-tinta/35 focus-visible:border-tinta focus-visible:bg-tinta/[0.04]"
           />
           <ErrorDeAjuste texto={errores.descripcion?.message} />
         </label>

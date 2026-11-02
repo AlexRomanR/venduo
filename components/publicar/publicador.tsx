@@ -224,7 +224,7 @@ function ElegirProducto({
                       />
                     )}
                     {rebaja ? (
-                      <span className="tabular absolute top-1.5 left-1.5 bg-senal px-1.5 py-0.5 text-xs font-bold text-white">
+                      <span className="tabular absolute top-1.5 left-1.5 bg-tinta px-1.5 py-0.5 text-xs font-bold text-white">
                         −{rebaja}%
                       </span>
                     ) : null}

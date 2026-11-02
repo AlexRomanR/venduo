@@ -264,7 +264,7 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
             </Link>
           ) : null}
           <p className="pt-2 text-sm opacity-70">
-            Los pedidos y el pago se acuerdan por WhatsApp.
+            Los pedidos y el pago los acordamos por WhatsApp.
           </p>
         </div>
       </div>

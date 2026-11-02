@@ -23,6 +23,7 @@ import type {
 } from "@/components/plantillas/kit"
 import { AgregarAlCarrito } from "@/components/tienda/agregar"
 import { BuscarYOrdenar } from "@/components/tienda/buscar"
+import { SiRecibePedidos } from "@/components/tienda/carrito"
 import { FiltrosTienda } from "@/components/tienda/filtros"
 
 /**
@@ -384,12 +385,14 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
                 </p>
               </Detalle>
             ) : null}
-            <Detalle titulo="Cómo comprar">
-              <p className="leading-relaxed opacity-80">
-                Agrégala al carrito y envíanos tu pedido por WhatsApp. Ahí
-                coordinamos el pago y la entrega.
-              </p>
-            </Detalle>
+            <SiRecibePedidos>
+              <Detalle titulo="Cómo comprar">
+                <p className="leading-relaxed opacity-80">
+                  Agrégala al carrito y envíanos tu pedido por WhatsApp. Ahí
+                  coordinamos el pago y la entrega.
+                </p>
+              </Detalle>
+            </SiRecibePedidos>
             {producto.sku ? (
               <Detalle titulo="Código">
                 <p className="tabular opacity-80">{producto.sku}</p>

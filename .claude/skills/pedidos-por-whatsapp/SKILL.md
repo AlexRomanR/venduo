@@ -74,7 +74,7 @@ días deja de contar como algo que espera a la tienda, pero se puede seguir marc
 pagado. No hay columna ni tarea programada: todo lo que cuente pendientes que esperan
 —la barra, el Resumen, "Por cobrar"— filtra `created_at >= limiteParaConcretar()`, y la
 lista usa `noSeConcreto`. Un conteo nuevo de pendientes que se olvide del plazo
-vuelve a llenar el panel de rojo con carritos que nunca se mandaron.
+vuelve a llenar el panel de avisos con carritos que nunca se mandaron.
 
 ## Las variantes en el pedido
 

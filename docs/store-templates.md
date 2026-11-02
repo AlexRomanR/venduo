@@ -238,7 +238,7 @@ lib/plantillas/
   bloques.ts        Qué significa cada bloque, sin decir cómo se ve
   index.ts          El registro: PLANTILLAS, ClavePlantilla, plantillaDeTienda()
 
-lib/fuentes.ts      Las fuentes compiladas con next/font. Van todas en <html>
+lib/fuentes/        Las fuentes compiladas con next/font/local. Van todas en <html>
 lib/catalogo.ts     Filtrar y ordenar el catálogo público (sin dependencias de servidor)
 lib/data/apariencia.ts  La plantilla de mi tienda, las elegibles y el historial
 
@@ -434,7 +434,7 @@ una miniatura de perfumería no salga en mayúsculas dentro de un panel de moda.
 
 ### Las fuentes
 
-`lib/fuentes.ts` declara todas con `next/font` y cada una expone una variable `--fuente-*`.
+`lib/fuentes` declara todas con `next/font/local` y cada una expone una variable `--fuente-*`.
 Ninguna se aplica sola: `globals.css` asigna `--font-titular` y `--font-cuerpo`, y una
 plantilla las reasigna. Asignarlas en un paso aparte es lo que evita la referencia circular
 que habría si la plantilla redefiniera la variable de la propia fuente.
@@ -446,7 +446,7 @@ Las de plantilla van con `preload: false`. Declararlas en `<html>` suma unas lí
 de la variable, el nombre de la familia en Google Fonts y sus grosores. Con eso
 `/api/v1/fuentes` le dice a la app dónde está el archivo TTF de cada grosor, y la app
 escribe cada opción de letra con la letra misma. Una letra nueva se suma en `FUENTES`
-y en `lib/fuentes.ts`, y aparece sola en los editores de la app.
+y en `lib/fuentes`, y aparece sola en los editores de la app.
 
 ### Estados
 
@@ -727,7 +727,8 @@ contra señal ≥ 4,5:1. `contraste()` de `apariencia.ts` sirve.
 
 **2. Registrarla** en `PLANTILLAS` (`lib/plantillas/index.ts`).
 
-**3. Las fuentes**, si son nuevas: declararlas en `lib/fuentes.ts` con `preload: false` y
+**3. Las fuentes**, si son nuevas: bajar su woff2 latino de Google Fonts a `lib/fuentes/`,
+declararlas en `lib/fuentes/index.ts` con `preload: false` y
 sumarlas a `FUENTES` en `lib/plantillas/fuentes.ts` con **la misma variable**. El catálogo
 en PDF también las usa: un TTF estático por peso en `public/fuentes/{clave}-{peso}.ttf`
 (la API de Google Fonts los da con un agente de usuario sin soporte de woff2), y sus

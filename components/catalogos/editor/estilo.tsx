@@ -383,7 +383,7 @@ function CampoDeColor({
       >
         {etiqueta}
       </label>
-      <div className="mt-1 flex items-center gap-2 border-b border-tinta/40 focus-within:border-senal">
+      <div className="mt-1 flex items-center gap-2 border-b border-tinta/40 focus-within:border-tinta focus-within:bg-tinta/[0.04]">
         <input
           type="color"
           aria-label={`${etiqueta}: elegir en la paleta`}
@@ -430,7 +430,7 @@ function SelectorDeLetra({
         id={id}
         value={valor}
         onChange={(evento) => alCambiar(evento.target.value as ClaveFuente)}
-        className="mt-1 h-11 w-full cursor-pointer border-0 border-b border-tinta/40 bg-transparent text-base focus-visible:border-senal focus-visible:outline-none"
+        className="mt-1 h-11 w-full cursor-pointer border-0 border-b border-tinta/40 bg-transparent text-base focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:outline-none"
         style={{ fontFamily: familiaDe(valor) }}
       >
         {CLAVES_FUENTE.map((clave) => (

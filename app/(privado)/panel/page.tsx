@@ -1,7 +1,6 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { after } from "next/server"
-import { PackageMinus, PackageX, ShoppingBag } from "lucide-react"
 
 import { rutaDeVistaDePlantilla } from "@/lib/api/miniaturas"
 import { getBarraLateral, type Contadores } from "@/lib/data/barra"
@@ -10,29 +9,34 @@ import { getTablero } from "@/lib/data/tablero"
 import { visitasDeMiTienda } from "@/lib/data/visitas"
 import { RESUMEN_DEMO, tableroDeDemostracion } from "@/lib/demo-data"
 import { isSupabaseConfigured } from "@/lib/env"
+import { formatMoney, formatNumber } from "@/lib/format"
+import { pedidoEnFila } from "@/lib/pedidos"
 import { plantillaDeTienda } from "@/lib/plantillas"
-import type { Tablero } from "@/lib/tablero"
-import { urlDeTienda } from "@/lib/tienda"
+import { totales, type Tablero } from "@/lib/tablero"
+import { enlaceLegible, urlDeTienda } from "@/lib/tienda"
 import { deVacaciones } from "@/lib/vacaciones"
 import { pedirVista, volvioDespuesDeLaCaptura } from "@/lib/vista"
 import type { ResumenDeVisitas } from "@/lib/visitas-resumen"
 import { AvisoSuscripcion } from "@/components/panel/aviso-suscripcion"
-import {
-  CabeceraDeTienda,
-  type TiendaDelResumen,
-} from "@/components/panel/tablero/cabecera"
-import { ComoTeVa } from "@/components/panel/tablero/como-te-va"
 import { EsqueletoDelTablero } from "@/components/panel/tablero/esqueleto"
+import { FranjaDeVacaciones } from "@/components/panel/tablero/vacaciones"
+import { Cierre } from "@/components/panel/resumen/cierre"
+import {
+  Entrada,
+  type TiendaDeLaEntrada,
+} from "@/components/panel/resumen/entrada"
 import {
   ParaHoy,
-  type Alerta,
-  type Atajo,
-} from "@/components/panel/tablero/para-hoy"
-import { UltimosPedidos } from "@/components/panel/tablero/pedidos"
-import { PrimerosPasos } from "@/components/panel/tablero/primeros-pasos"
-import { MasVendidos, PorAcabarse } from "@/components/panel/tablero/productos"
-import { FranjaDeVacaciones } from "@/components/panel/tablero/vacaciones"
-import { PanelDeVisitas } from "@/components/panel/visitas"
+  type Espera,
+  type Pendiente,
+} from "@/components/panel/resumen/para-hoy"
+import { PrimerosPasos } from "@/components/panel/resumen/pasos"
+import { Pedidos } from "@/components/panel/resumen/pedidos"
+import { MasVendidos, PorAcabarse } from "@/components/panel/resumen/productos"
+import { Resumen } from "@/components/panel/resumen/resumen"
+import { Ventas } from "@/components/panel/resumen/ventas"
+import { Visitas } from "@/components/panel/resumen/visitas"
+import portada from "@/components/portada/portada.module.css"
 import { guardarVacaciones } from "../cuenta/acciones"
 import { cambiarEstado } from "./pedidos/acciones"
 import { ajustarStock } from "./productos/acciones"
@@ -42,10 +46,11 @@ export const metadata = { title: "Resumen" }
 /**
  * Resumen del emprendedor: la pantalla de entrada del panel.
  *
- * Se mira, no se lee, como el Inicio de la app: lo que espera algo en números
- * grandes que se tocan, las ventas que suben al aparecer, y los pedidos y los
- * productos por sus fotos. Lo que se hace todos los días se hace acá: cobrar
- * un pedido y reponer stock.
+ * Es el cuaderno de ventas del día, contado en escenas como la portada: la
+ * tienda en un celular, lo que espera en notas pegadas, las ventas que crecen
+ * en la escena oscura, los pedidos como tickets con su sello y lo que más se
+ * vende como polaroids. Lo que se hace todos los días se hace acá: cobrar un
+ * pedido y reponer stock.
  *
  * Quien todavía no eligió plantilla no tiene nada que resumir acá. La
  * comprobación es sobre `template_key` y no sobre la existencia de la tienda
@@ -65,10 +70,12 @@ export default async function PanelPage() {
   const datos = resumen ?? RESUMEN_DEMO
   const clave = plantillaDeTienda(datos.tienda.templateKey)
 
-  const deLaTienda: TiendaDelResumen = {
+  const url = barra.tienda?.url ?? urlDeTienda(datos.tienda.slug)
+  const deLaTienda: TiendaDeLaEntrada = {
     nombre: barra.tienda?.nombre ?? datos.tienda.name,
     slug: barra.tienda?.slug ?? datos.tienda.slug,
-    url: barra.tienda?.url ?? urlDeTienda(datos.tienda.slug),
+    url,
+    legible: enlaceLegible(url),
     logoUrl: barra.tienda?.logoUrl ?? null,
     publicada: barra.tienda?.publicada ?? datos.tienda.isPublished,
     pausada: barra.tienda?.pausada ?? false,
@@ -98,17 +105,17 @@ export default async function PanelPage() {
     : { url: rutaDeVistaDePlantilla(clave), real: false }
 
   return (
-    <div className="flex flex-col gap-6 md:gap-8">
-      <CabeceraDeTienda
+    <Resumen>
+      <Entrada
         persona={barra.persona.nombre}
         tienda={deLaTienda}
         suscripcion={datos.suscripcion}
         vista={vista}
-        escritorio={{
-          url: tienda?.vista_escritorio_url ?? null,
-          clave,
-          apariencia: barra.apariencia,
-        }}
+        frase={
+          <Suspense fallback={<span className="opacity-0">…</span>}>
+            <FraseDelDia tablero={tablero} />
+          </Suspense>
+        }
       />
 
       {tienda &&
@@ -135,14 +142,51 @@ export default async function PanelPage() {
           sinWhatsApp={isSupabaseConfigured && !tienda?.whatsapp}
         />
       </Suspense>
-    </div>
+    </Resumen>
   )
 }
 
 /**
- * Lo que consulta la base, aparte de la cabecera: así la cabecera aparece al
- * instante y el resto llega en cuanto está, con su esqueleto mientras tanto.
- * Cada parte entra de a una, apenas desfasada.
+ * Lo que pasó hoy, en una frase, debajo del nombre de la tienda: lo vendido y,
+ * resaltado, lo que espera el cobro. Llega cuando la base respondió.
+ */
+async function FraseDelDia({
+  tablero: lectura,
+}: {
+  tablero: Promise<Tablero | null>
+}) {
+  const tablero = (await lectura) ?? tableroDeDemostracion()
+  const hoy = tablero.serie.at(-1)
+  const semana = totales(tablero.serie.slice(-7))
+  const pendientes = tablero.porGestionar.pendientes
+  const pedidos = (n: number) =>
+    `${formatNumber(n)} ${n === 1 ? "pedido" : "pedidos"}`
+
+  const vendido =
+    hoy && hoy.pedidos > 0
+      ? `Hoy llevas ${formatMoney(hoy.ventasCents)} en ${pedidos(hoy.pedidos)}.`
+      : semana.pedidos > 0
+        ? `En la semana vendiste ${formatMoney(semana.ventasCents)} en ${pedidos(semana.pedidos)}.`
+        : "Tu tienda está lista para recibir pedidos."
+
+  return (
+    <>
+      {vendido}{" "}
+      {pendientes > 0 ? (
+        <span className={portada.resaltado}>
+          {pendientes === 1
+            ? "Un pedido espera tu cobro."
+            : `${formatNumber(pendientes)} pedidos esperan tu cobro.`}
+        </span>
+      ) : null}
+    </>
+  )
+}
+
+/**
+ * Lo que consulta la base, aparte de la entrada: así la tienda aparece al
+ * instante y las escenas llegan en cuanto están, con su esqueleto mientras
+ * tanto.
  */
 async function ContenidoDelTablero({
   tablero: lectura,
@@ -156,81 +200,58 @@ async function ContenidoDelTablero({
   visitas: Promise<ResumenDeVisitas | null>
   conEstadisticas: boolean
   contadores: Contadores
-  tienda: TiendaDelResumen
+  tienda: TiendaDeLaEntrada
   sinWhatsApp: boolean
 }) {
   const [leido, visitas] = await Promise.all([lectura, lecturaDeVisitas])
   const tablero = leido ?? tableroDeDemostracion()
   const soloLectura = tablero.esDemo || !isSupabaseConfigured
-  const { alertas, atajos } = armarParaHoy(
+  const { pendientes, esperas } = armarParaHoy(
     tablero,
     contadores,
     tienda.publicada,
     sinWhatsApp
   )
-
-  // Arriba, a todo el ancho, lo que pide algo y cómo vienen las ventas; abajo,
-  // en dos columnas en una pantalla ancha, los pedidos y los productos. En el
-  // celular, una sola columna en el mismo orden que el Inicio de la app.
-  const arriba = [
-    <ParaHoy key="para-hoy" alertas={alertas} atajos={atajos} />,
-    <PrimerosPasos key="pasos" pasos={tablero.pasos} tienda={tienda} />,
-    <ComoTeVa
-      key="ventas"
-      serie={tablero.serie}
-      hoy={tablero.hoy}
-      conEstadisticas={conEstadisticas}
-    />,
-  ]
-  const productos = tablero.pasos.producto
-    ? [
-        // Sin productos no hay qué rankear ni qué reponer: lo dicen los
-        // primeros pasos.
-        <MasVendidos key="mas-vendidos" productos={tablero.masVendidos} />,
-        <PorAcabarse
-          key="por-acabarse"
-          productos={tablero.porAcabarse}
-          ajustar={ajustarStock}
-          soloLectura={soloLectura}
-        />,
-      ]
-    : []
-
-  let orden = 0
-  const entra = (parte: React.ReactNode, clave: string) => (
-    <div
-      key={clave}
-      className="panel-entra min-w-0 empty:hidden"
-      style={{ "--orden": orden++ } as React.CSSProperties}
-    >
-      {parte}
-    </div>
-  )
+  const ahora = new Date()
+  const deLaTienda = {
+    nombre: tienda.nombre,
+    slug: tienda.slug,
+    url: tienda.url,
+    legible: tienda.legible,
+  }
 
   return (
-    <div className="flex flex-col gap-6 md:gap-8">
-      {arriba.map((parte, indice) => entra(parte, `arriba-${indice}`))}
-
-      <div className="grid items-start gap-6 md:gap-8 xl:grid-cols-2">
-        {entra(
-          <UltimosPedidos
-            pedidos={tablero.ultimosPedidos}
-            cobrar={cambiarEstado}
-            soloLectura={soloLectura}
-          />,
-          "pedidos"
+    <>
+      <ParaHoy pendientes={pendientes} esperas={esperas} />
+      <PrimerosPasos pasos={tablero.pasos} tienda={deLaTienda} />
+      <Ventas
+        serie={tablero.serie}
+        hoy={tablero.hoy}
+        conEstadisticas={conEstadisticas}
+      />
+      <Pedidos
+        pedidos={tablero.ultimosPedidos.map((pedido) =>
+          pedidoEnFila(pedido, ahora)
         )}
-        {productos.length > 0 ? (
-          <div className="flex min-w-0 flex-col gap-6 empty:hidden md:gap-8">
-            {productos.map((parte, indice) =>
-              entra(parte, `productos-${indice}`)
-            )}
-          </div>
-        ) : null}
-      </div>
-
-      {visitas ? entra(<PanelDeVisitas visitas={visitas} />, "visitas") : null}
-    </div>
+        cobrar={cambiarEstado}
+        soloLectura={soloLectura}
+        tienda={deLaTienda}
+      />
+      {/* Sin productos no hay qué rankear ni qué reponer: lo dicen los
+          primeros pasos. */}
+      {tablero.pasos.producto ? (
+        <>
+          <MasVendidos productos={tablero.masVendidos} />
+          <PorAcabarse
+            productos={tablero.porAcabarse}
+            ajustar={ajustarStock}
+            soloLectura={soloLectura}
+          />
+        </>
+      ) : null}
+      {visitas ? <Visitas visitas={visitas} /> : null}
+      <Cierre tienda={deLaTienda} />
+    </>
   )
 }
 
@@ -246,37 +267,38 @@ function armarParaHoy(
   contadores: Contadores,
   publicada: boolean,
   sinWhatsApp: boolean
-): { alertas: Alerta[]; atajos: Atajo[] } {
-  const alertas: Alerta[] = []
+): { pendientes: Pendiente[]; esperas: Espera[] } {
+  const pendientes: Pendiente[] = []
   // Sin número, el botón de compra de la tienda no le escribe a nadie: es lo
   // primero, antes incluso que publicarla.
   if (sinWhatsApp)
-    alertas.push({ texto: "Agrega tu WhatsApp", href: "/cuenta" })
-  if (!publicada) alertas.push({ texto: "Publica tu tienda", href: "/cuenta" })
+    pendientes.push({ texto: "Agrega tu WhatsApp", href: "/cuenta" })
+  if (!publicada)
+    pendientes.push({ texto: "Publica tu tienda", href: "/cuenta" })
 
-  const atajos: Atajo[] = [
+  const esperas: Espera[] = [
     {
+      clave: "cobrar",
       valor: tablero.porGestionar.pendientes,
       etiqueta: "Por cobrar",
-      icono: ShoppingBag,
       href: "/panel/pedidos?estado=pendiente",
       urgente: true,
     },
     {
+      clave: "agotado",
       valor: contadores.productosSinStock,
       etiqueta: "Sin stock",
-      icono: PackageX,
       href: "/panel/productos?estado=sin_stock",
       urgente: true,
     },
     {
+      clave: "poco",
       valor: contadores.productosPocoStock,
       etiqueta: "Queda poco",
-      icono: PackageMinus,
       href: "/panel/productos?estado=poco_stock",
       urgente: false,
     },
   ]
 
-  return { alertas, atajos }
+  return { pendientes, esperas }
 }

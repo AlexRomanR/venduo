@@ -195,7 +195,7 @@ export function BotonDeCanva({
             </DialogTitle>
             <DialogClose
               aria-label="Cerrar"
-              className="-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center transition-colors hover:text-senal"
+              className="-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center transition-colors hover:bg-tinta/[0.06]"
             >
               <X aria-hidden="true" className="size-5" />
             </DialogClose>

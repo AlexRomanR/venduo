@@ -1,67 +1,67 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-13T00:00:00.000Z",
+  "generatedAt": "2026-10-31T12:00:00.000Z",
   "title": "Design System: Venduo",
   "extensions": {
     "colorMeta": {
       "papel": {
         "role": "neutral",
-        "displayName": "Papel Frío",
-        "canonical": "#f1f0ee",
+        "displayName": "Papel Cálido",
+        "canonical": "#f7f5f0",
         "tonalRamp": [
-          "#232220",
-          "#3a3835",
-          "#55524e",
-          "#757169",
-          "#9b9790",
-          "#c2beb8",
-          "#e0ddd8",
-          "#f7f6f4"
+          "#3e3d3c",
+          "#6f6e6c",
+          "#a8a7a3",
+          "#d9d8d3",
+          "#f7f5f0",
+          "#f9f8f4",
+          "#fcfbf9",
+          "#fefefd"
         ]
       },
       "tinta": {
         "role": "neutral",
         "displayName": "Tinta",
-        "canonical": "#16171a",
+        "canonical": "#1d1c1a",
         "tonalRamp": [
-          "#0b0c0e",
-          "#16171a",
-          "#2a2c31",
-          "#42454c",
-          "#5f636b",
-          "#8b8f97",
-          "#bcc0c6",
-          "#eceef1"
+          "#070706",
+          "#0d0d0c",
+          "#141312",
+          "#1a1917",
+          "#1d1c1a",
+          "#61605f",
+          "#a5a4a3",
+          "#dddddd"
         ]
       },
       "senal": {
         "role": "primary",
-        "displayName": "Rojo de Señal",
-        "canonical": "#d62d12",
+        "displayName": "Frambuesa de Señal",
+        "canonical": "#d0216a",
         "tonalRamp": [
-          "#2e0800",
-          "#4d1003",
-          "#731a06",
-          "#9c230b",
-          "#d62d12",
-          "#ee3a1c",
-          "#f5836a",
-          "#fbc9bf"
+          "#34081a",
+          "#5e0f30",
+          "#8d1648",
+          "#b71d5d",
+          "#d0216a",
+          "#de6497",
+          "#eca6c3",
+          "#f8dee9"
         ]
       },
       "senal-alta": {
         "role": "primary",
-        "displayName": "Rojo Encendido",
-        "canonical": "#ee3a1c",
+        "displayName": "Frambuesa Encendida",
+        "canonical": "#b01a59",
         "tonalRamp": [
-          "#330a02",
-          "#551105",
-          "#7d1a08",
-          "#ab240d",
-          "#d62d12",
-          "#ee3a1c",
-          "#f78c76",
-          "#fcd0c7"
+          "#2c0616",
+          "#4f0c28",
+          "#78123d",
+          "#9b174e",
+          "#b01a59",
+          "#c85f8b",
+          "#dfa3bd",
+          "#f3dde6"
         ]
       },
       "plata": {
@@ -81,7 +81,7 @@
       },
       "blanco": {
         "role": "neutral",
-        "displayName": "Blanco sobre Rojo",
+        "displayName": "Blanco sobre Frambuesa",
         "canonical": "#ffffff",
         "tonalRamp": [
           "#1a1a1a",
@@ -93,6 +93,51 @@
           "#e6e6e6",
           "#ffffff"
         ]
+      },
+      "toldo": {
+        "role": "primary",
+        "displayName": "Toldo",
+        "canonical": "#d0216a",
+        "tonalRamp": [
+          "#34081a",
+          "#5e0f30",
+          "#8d1648",
+          "#b71d5d",
+          "#d0216a",
+          "#de6497",
+          "#eca6c3",
+          "#f8dee9"
+        ]
+      },
+      "accion": {
+        "role": "primary",
+        "displayName": "Acción",
+        "canonical": "#1d1c1a",
+        "tonalRamp": [
+          "#070706",
+          "#0d0d0c",
+          "#141312",
+          "#1a1917",
+          "#1d1c1a",
+          "#61605f",
+          "#a5a4a3",
+          "#dddddd"
+        ]
+      },
+      "resaltador": {
+        "role": "accent",
+        "displayName": "Resaltador",
+        "canonical": "#fff1a6",
+        "tonalRamp": [
+          "#403c2a",
+          "#736c4b",
+          "#ada471",
+          "#e0d492",
+          "#fff1a6",
+          "#fff5c1",
+          "#fff9db",
+          "#fffdf2"
+        ]
       }
     },
     "typographyMeta": {
@@ -102,11 +147,11 @@
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Titular de sección, medida 16-18ch. Crece a clamp(2rem,6vw,3.5rem) sobre el bloque rojo."
+        "purpose": "Titular de sección, medida 16-18ch. Crece a clamp(2rem,6vw,3.5rem) sobre el bloque de frambuesa."
       },
       "numeral": {
         "displayName": "Cifra",
-        "purpose": "Cifras destacadas en rojo, siempre tabulares y siempre con un detalle en versalita debajo."
+        "purpose": "Cifras destacadas en frambuesa, siempre tabulares y siempre con un detalle en versalita debajo."
       },
       "title": {
         "displayName": "Title",
@@ -122,7 +167,7 @@
       },
       "label": {
         "displayName": "Label de sección",
-        "purpose": "Nombre de la sección en versalita roja. Es el mismo texto que el ancla de navegación; no repite el titular."
+        "purpose": "Nombre de la sección en versalita en frambuesa. Es el mismo texto que el ancla de navegación; no repite el titular."
       }
     },
     "shadows": [],
@@ -154,11 +199,26 @@
       }
     ],
     "breakpoints": [
-      { "name": "base", "value": "375px" },
-      { "name": "sm", "value": "640px" },
-      { "name": "md", "value": "768px" },
-      { "name": "lg", "value": "1024px" },
-      { "name": "container", "value": "1152px" }
+      {
+        "name": "base",
+        "value": "375px"
+      },
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "container",
+        "value": "1152px"
+      }
     ]
   },
   "components": [
@@ -168,7 +228,7 @@
       "refersTo": "button-primary",
       "description": "La acción de conversión. Una sola por bloque.",
       "html": "<a class=\"ds-btn-primary\" href=\"#\">Crear mi tienda</a>",
-      "css": ".ds-btn-primary { display: inline-block; background: var(--senal, #d62d12); color: #fff; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 1rem; font-weight: 600; padding: 12px 20px; border: none; border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-primary:hover { background: var(--senal-alta, #ee3a1c); } .ds-btn-primary:focus-visible { outline: 3px solid var(--tinta, #16171a); outline-offset: 3px; }"
+      "css": ".ds-btn-primary { display: inline-block; background: var(--senal, #d0216a); color: #fff; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 1rem; font-weight: 600; padding: 12px 20px; border: none; border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-primary:hover { background: var(--senal-alta, #b01a59); } .ds-btn-primary:focus-visible { outline: 3px solid var(--tinta, #1d1c1a); outline-offset: 3px; }"
     },
     {
       "name": "Botón secundario",
@@ -176,46 +236,46 @@
       "refersTo": "button-outline",
       "description": "Trazo de 2 px sobre papel; en hover se invierte a campo tinta.",
       "html": "<a class=\"ds-btn-outline\" href=\"#\">Quiero vender</a>",
-      "css": ".ds-btn-outline { display: inline-block; background: transparent; color: var(--tinta, #16171a); font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 1rem; font-weight: 600; padding: 12px 20px; border: 2px solid var(--tinta, #16171a); border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-outline:hover { background: var(--tinta, #16171a); color: #fff; } .ds-btn-outline:focus-visible { outline: 3px solid var(--senal, #d62d12); outline-offset: 3px; }"
+      "css": ".ds-btn-outline { display: inline-block; background: transparent; color: var(--tinta, #1d1c1a); font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 1rem; font-weight: 600; padding: 12px 20px; border: 2px solid var(--tinta, #1d1c1a); border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-outline:hover { background: var(--tinta, #1d1c1a); color: #fff; } .ds-btn-outline:focus-visible { outline: 3px solid var(--senal, #d0216a); outline-offset: 3px; }"
     },
     {
-      "name": "Botón sobre el bloque rojo",
+      "name": "Botón sobre el bloque de frambuesa",
       "kind": "button",
       "refersTo": "button-outline-sobre-senal",
-      "description": "Variante del secundario dentro del campo rojo; el foco es un contorno blanco porque un anillo de color no se vería.",
+      "description": "Variante del secundario dentro del campo de frambuesa; el foco es un contorno blanco porque un anillo de color no se vería.",
       "html": "<div class=\"ds-campo-senal\"><a class=\"ds-btn-sobre-senal\" href=\"#\">Abrir mi tienda</a></div>",
-      "css": ".ds-campo-senal { background: var(--senal, #d62d12); padding: 32px; } .ds-btn-sobre-senal { display: inline-block; background: transparent; color: #fff; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 1rem; font-weight: 600; padding: 12px 20px; border: 2px solid #fff; border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-sobre-senal:hover { background: #fff; color: var(--senal, #d62d12); } .ds-campo-senal :focus-visible { outline: 3px solid #fff; outline-offset: 3px; }"
+      "css": ".ds-campo-senal { background: var(--senal, #d0216a); padding: 32px; } .ds-btn-sobre-senal { display: inline-block; background: transparent; color: #fff; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 1rem; font-weight: 600; padding: 12px 20px; border: 2px solid #fff; border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-sobre-senal:hover { background: #fff; color: var(--senal, #d0216a); } .ds-campo-senal :focus-visible { outline: 3px solid #fff; outline-offset: 3px; }"
     },
     {
       "name": "Cabecera de sección",
       "kind": "custom",
       "refersTo": "section-label",
-      "description": "Label rojo en versalita que nombra la sección —el mismo texto del ancla de navegación— y debajo el titular en Archivo extrabold.",
+      "description": "Label en frambuesa en versalita que nombra la sección —el mismo texto del ancla de navegación— y debajo el titular en Archivo extrabold.",
       "html": "<header class=\"ds-section-header\"><p class=\"ds-section-label\">Qué viene adentro</p><h2 class=\"ds-section-title\">Todo lo que antes hacías en cinco apps distintas.</h2></header>",
-      "css": ".ds-section-header { color: var(--tinta, #16171a); } .ds-section-label { margin: 0; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--senal, #d62d12); } .ds-section-title { margin: 20px 0 0; max-width: 18ch; font-family: var(--font-titular, system-ui), sans-serif; font-size: clamp(1.9rem, 5vw, 2.75rem); font-weight: 800; line-height: 1.04; letter-spacing: -0.03em; }"
+      "css": ".ds-section-header { color: var(--tinta, #1d1c1a); } .ds-section-label { margin: 0; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--senal, #d0216a); } .ds-section-title { margin: 20px 0 0; max-width: 18ch; font-family: var(--font-titular, system-ui), sans-serif; font-size: clamp(1.9rem, 5vw, 2.75rem); font-weight: 800; line-height: 1.04; letter-spacing: -0.03em; }"
     },
     {
       "name": "Ítem de lista con regla",
       "kind": "card",
       "refersTo": "panel",
-      "description": "El patrón que reemplaza a la tarjeta: regla superior de 1 px, sin sombra y sin radio; en hover la regla y el título pasan a rojo.",
+      "description": "El patrón que reemplaza a la tarjeta: regla superior de 1 px, sin sombra y sin radio; en hover la regla y el título pasan a frambuesa.",
       "html": "<article class=\"ds-item-regla\"><h3 class=\"ds-item-titulo\">Editor con IA</h3><p class=\"ds-item-detalle\">Le hablas y la tienda cambia: precios, textos, categorías, portada.</p></article>",
-      "css": ".ds-item-regla { border-top: 1px solid rgba(22, 23, 26, 0.15); padding: 24px 0; color: var(--tinta, #16171a); transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-item-regla:hover { border-top-color: var(--senal, #d62d12); } .ds-item-titulo { margin: 0; font-family: var(--font-titular, system-ui), sans-serif; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.02em; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-item-regla:hover .ds-item-titulo { color: var(--senal, #d62d12); } .ds-item-detalle { margin: 8px 0 0; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; line-height: 1.625; opacity: 0.7; }"
+      "css": ".ds-item-regla { border-top: 1px solid rgba(22, 23, 26, 0.15); padding: 24px 0; color: var(--tinta, #1d1c1a); transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-item-regla:hover { border-top-color: var(--senal, #d0216a); } .ds-item-titulo { margin: 0; font-family: var(--font-titular, system-ui), sans-serif; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.02em; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-item-regla:hover .ds-item-titulo { color: var(--senal, #d0216a); } .ds-item-detalle { margin: 8px 0 0; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; line-height: 1.625; opacity: 0.7; }"
     },
     {
       "name": "Cifra",
       "kind": "custom",
       "refersTo": "typography.numeral",
-      "description": "Numeral rojo tabular con su detalle en versalita apagada. Cuenta hasta su valor al entrar, partiendo del valor final ya renderizado.",
+      "description": "Numeral en frambuesa tabular con su detalle en versalita apagada. Cuenta hasta su valor al entrar, partiendo del valor final ya renderizado.",
       "html": "<div class=\"ds-cifra\"><p class=\"ds-cifra-valor\">4.100</p><p class=\"ds-cifra-detalle\">Pedidos por WhatsApp este mes</p></div>",
-      "css": ".ds-cifra-valor { margin: 0; font-family: var(--font-titular, system-ui), sans-serif; font-size: clamp(2.5rem, 7vw, 3.25rem); font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: var(--senal, #d62d12); font-variant-numeric: tabular-nums; font-feature-settings: \"tnum\"; } .ds-cifra-detalle { margin: 12px 0 0; max-width: 24ch; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; line-height: 1.625; letter-spacing: 0.025em; text-transform: uppercase; color: var(--tinta, #16171a); opacity: 0.6; }"
+      "css": ".ds-cifra-valor { margin: 0; font-family: var(--font-titular, system-ui), sans-serif; font-size: clamp(2.5rem, 7vw, 3.25rem); font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: var(--senal, #d0216a); font-variant-numeric: tabular-nums; font-feature-settings: \"tnum\"; } .ds-cifra-detalle { margin: 12px 0 0; max-width: 24ch; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; line-height: 1.625; letter-spacing: 0.025em; text-transform: uppercase; color: var(--tinta, #1d1c1a); opacity: 0.6; }"
     },
     {
       "name": "Barra de navegación",
       "kind": "nav",
-      "description": "Encabezado adherido en papel translúcido con desenfoque y regla inferior; la acción roja sobrevive al colapso móvil.",
+      "description": "Encabezado adherido en papel translúcido con desenfoque y regla inferior; la acción en frambuesa sobrevive al colapso móvil.",
       "html": "<header class=\"ds-nav\"><span class=\"ds-nav-marca\">Venduo</span><nav class=\"ds-nav-enlaces\"><a href=\"#\">Cómo funciona</a><a href=\"#\">Módulos</a><a href=\"#\">Preguntas</a></nav><a class=\"ds-nav-accion\" href=\"#\">Crear mi tienda</a></header>",
-      "css": ".ds-nav { display: flex; align-items: center; gap: 24px; padding: 14px 20px; background: color-mix(in srgb, var(--papel, #f1f0ee) 90%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(22, 23, 26, 0.15); color: var(--tinta, #16171a); } .ds-nav-marca { flex: 1; font-family: var(--font-titular, system-ui), sans-serif; font-size: 1.125rem; font-weight: 800; letter-spacing: -0.02em; } .ds-nav-enlaces { display: flex; gap: 24px; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; } .ds-nav-enlaces a { color: inherit; text-decoration: none; opacity: 0.7; transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-enlaces a:hover { opacity: 1; } .ds-nav-accion { background: var(--senal, #d62d12); color: #fff; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; font-weight: 600; padding: 10px 16px; border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-accion:hover { background: var(--senal-alta, #ee3a1c); }"
+      "css": ".ds-nav { display: flex; align-items: center; gap: 24px; padding: 14px 20px; background: color-mix(in srgb, var(--papel, #f7f5f0) 90%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(22, 23, 26, 0.15); color: var(--tinta, #1d1c1a); } .ds-nav-marca { flex: 1; font-family: var(--font-titular, system-ui), sans-serif; font-size: 1.125rem; font-weight: 800; letter-spacing: -0.02em; } .ds-nav-enlaces { display: flex; gap: 24px; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; } .ds-nav-enlaces a { color: inherit; text-decoration: none; opacity: 0.7; transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-enlaces a:hover { opacity: 1; } .ds-nav-accion { background: var(--senal, #d0216a); color: #fff; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; font-weight: 600; padding: 10px 16px; border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-accion:hover { background: var(--senal-alta, #b01a59); }"
     },
     {
       "name": "Chip de estado",
@@ -223,29 +283,29 @@
       "refersTo": "chip-estado",
       "description": "Única forma redondeada del sistema: una etiqueta de estado corta dentro de una cabecera de tienda.",
       "html": "<span class=\"ds-chip-estado\">Abierta</span>",
-      "css": ".ds-chip-estado { display: inline-block; background: transparent; color: var(--senal, #d62d12); font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.7rem; font-weight: 500; padding: 2px 8px; border: 1px solid color-mix(in srgb, var(--senal, #d62d12) 40%, transparent); border-radius: 9999px; }"
+      "css": ".ds-chip-estado { display: inline-block; background: transparent; color: var(--senal, #d0216a); font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.7rem; font-weight: 500; padding: 2px 8px; border: 1px solid color-mix(in srgb, var(--senal, #d0216a) 40%, transparent); border-radius: 9999px; }"
     },
     {
       "name": "Fotografía editorial",
       "kind": "custom",
       "description": "Blanco y negro que recupera color y escala 1.02 al pasar el cursor, con pie que describe la escena sin nombrar a nadie.",
       "html": "<figure class=\"ds-foto\"><div class=\"ds-foto-marco\"><img src=\"https://images.unsplash.com/photo-1687422808248-f807f4ea2a2e?w=800&q=85&auto=format&fit=crop\" alt=\"Comerciante revisando pedidos en su teléfono\" /></div><figcaption>El negocio que ya existe, con el celular como mostrador.</figcaption></figure>",
-      "css": ".ds-foto { margin: 0; color: var(--tinta, #16171a); } .ds-foto-marco { position: relative; overflow: hidden; aspect-ratio: 4 / 5; background: rgba(22, 23, 26, 0.1); } .ds-foto-marco img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); transition: filter 500ms cubic-bezier(0, 0, 0.2, 1), transform 500ms cubic-bezier(0, 0, 0.2, 1); } .ds-foto-marco img:hover { filter: grayscale(0); transform: scale(1.02); } .ds-foto figcaption { margin-top: 12px; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.75rem; line-height: 1.625; opacity: 0.55; }"
+      "css": ".ds-foto { margin: 0; color: var(--tinta, #1d1c1a); } .ds-foto-marco { position: relative; overflow: hidden; aspect-ratio: 4 / 5; background: rgba(22, 23, 26, 0.1); } .ds-foto-marco img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); transition: filter 500ms cubic-bezier(0, 0, 0.2, 1), transform 500ms cubic-bezier(0, 0, 0.2, 1); } .ds-foto-marco img:hover { filter: grayscale(0); transform: scale(1.02); } .ds-foto figcaption { margin-top: 12px; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.75rem; line-height: 1.625; opacity: 0.55; }"
     },
     {
       "name": "Acordeón de preguntas",
       "kind": "custom",
-      "description": "<details> nativo, accesible y sin JavaScript; el título pasa a rojo en hover.",
+      "description": "<details> nativo, accesible y sin JavaScript; el título pasa a frambuesa en hover.",
       "html": "<details class=\"ds-acordeon\"><summary><span class=\"ds-acordeon-p\">¿Cuánto cuesta?</span><svg class=\"ds-acordeon-mas\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M8 2v12M2 8h12\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg></summary><p class=\"ds-acordeon-r\">Crear la tienda y publicarla no cuesta nada.</p></details>",
-      "css": ".ds-acordeon { border-top: 1px solid rgba(22, 23, 26, 0.15); color: var(--tinta, #16171a); } .ds-acordeon summary { display: flex; align-items: flex-start; gap: 16px; padding: 24px 0; cursor: pointer; list-style: none; } .ds-acordeon summary::-webkit-details-marker { display: none; } .ds-acordeon-p { flex: 1; font-family: var(--font-titular, system-ui), sans-serif; font-weight: 700; letter-spacing: -0.01em; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-acordeon:hover .ds-acordeon-p { color: var(--senal, #d62d12); } .ds-acordeon-mas { flex-shrink: 0; margin-top: 4px; color: var(--senal, #d62d12); transition: transform 300ms cubic-bezier(0, 0, 0.2, 1); } .ds-acordeon[open] .ds-acordeon-mas { transform: rotate(45deg); } .ds-acordeon-r { margin: 0; padding-bottom: 28px; max-width: 68ch; font-family: var(--font-geist-sans, system-ui), sans-serif; line-height: 1.625; opacity: 0.7; }"
+      "css": ".ds-acordeon { border-top: 1px solid rgba(22, 23, 26, 0.15); color: var(--tinta, #1d1c1a); } .ds-acordeon summary { display: flex; align-items: flex-start; gap: 16px; padding: 24px 0; cursor: pointer; list-style: none; } .ds-acordeon summary::-webkit-details-marker { display: none; } .ds-acordeon-p { flex: 1; font-family: var(--font-titular, system-ui), sans-serif; font-weight: 700; letter-spacing: -0.01em; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-acordeon:hover .ds-acordeon-p { color: var(--senal, #d0216a); } .ds-acordeon-mas { flex-shrink: 0; margin-top: 4px; color: var(--senal, #d0216a); transition: transform 300ms cubic-bezier(0, 0, 0.2, 1); } .ds-acordeon[open] .ds-acordeon-mas { transform: rotate(45deg); } .ds-acordeon-r { margin: 0; padding-bottom: 28px; max-width: 68ch; font-family: var(--font-geist-sans, system-ui), sans-serif; line-height: 1.625; opacity: 0.7; }"
     }
   ],
   "narrative": {
     "northStar": "El diario del mercado",
-    "overview": "Venduo se ve como una página impresa: papel claro, tinta casi negra, reglas de un píxel que separan las secciones y un solo rojo de señal que aparece poco y manda cuando aparece. No hay degradados, ni tarjetas flotando, ni un teléfono en ángulo. Lo que estructura la página es la retícula y la línea, no la caja.\n\nLa densidad es alta arriba y respira abajo: bloques de texto acotados en medida (ch), titulares grandes con tracking cerrado, y cuerpos de texto a opacidad reducida para que el titular mande sin necesidad de un segundo color. El sistema está hecho para un Android de gama baja con datos móviles, así que el peso visual lo cargan la tipografía y el espacio, no los efectos.\n\nEste mundo rige las superficies públicas: la portada, la tienda /t/{slug}. El panel privado (/panel) sigue con los tokens por defecto de shadcn, que conviven en app/globals.css a propósito.",
+    "overview": "Venduo se ve como una página impresa: papel cálido, tinta casi negra, reglas de un píxel que separan las secciones y un solo frambuesa de señal que aparece poco y manda cuando aparece. No hay degradados, ni tarjetas flotando, ni un teléfono en ángulo. Lo que estructura la página es la retícula y la línea, no la caja.\n\nLa densidad es alta arriba y respira abajo: bloques de texto acotados en medida (ch), titulares grandes con tracking cerrado, y cuerpos de texto a opacidad reducida para que el titular mande sin necesidad de un segundo color. El sistema está hecho para un Android de gama baja con datos móviles, así que el peso visual lo cargan la tipografía y el espacio, no los efectos.\n\nEste mundo rige las superficies públicas: la portada, la tienda /t/{slug}. El panel privado (/panel) sigue con los tokens por defecto de shadcn, que conviven en app/globals.css a propósito.",
     "keyCharacteristics": [
-      "Campo de papel #f1f0ee, nunca blanco puro, en toda superficie pública.",
-      "Un solo acento: el rojo de señal. Sin paleta secundaria.",
+      "Campo de papel #f7f5f0, nunca blanco puro, en toda superficie pública.",
+      "Un solo acento: el frambuesa de señal. Sin paleta secundaria.",
       "Separación por regla de un píxel; cero tarjetas y cero sombras.",
       "Archivo extrabold con tracking negativo para titulares y cifras; Geist para leer.",
       "Fotografía en blanco y negro que recupera color al pasar el cursor.",
@@ -254,12 +314,12 @@
     "rules": [
       {
         "name": "La regla de la voz única",
-        "body": "El rojo ocupa menos del 10% de cualquier pantalla. Si aparece en más de dos lugares en un viewport, uno de ellos no era importante.",
+        "body": "El frambuesa ocupa menos del 10% de cualquier pantalla. Si aparece en más de dos lugares en un viewport, uno de ellos no era importante.",
         "section": "colors"
       },
       {
         "name": "La regla del papel",
-        "body": "Ninguna superficie pública usa #fff como fondo. El blanco es un color de texto sobre rojo, no un campo.",
+        "body": "Ninguna superficie pública usa #fff como fondo. El blanco es un color de texto sobre frambuesa, no un campo.",
         "section": "colors"
       },
       {
@@ -324,8 +384,8 @@
       }
     ],
     "dos": [
-      "Do usar papel #f1f0ee como campo de toda superficie pública y tinta #16171a para el texto.",
-      "Do reservar el rojo para la acción principal, las cifras, el label de sección y, como campo, un solo bloque por página.",
+      "Do usar papel #f7f5f0 como campo de toda superficie pública y tinta #1d1c1a para el texto.",
+      "Do reservar el frambuesa para la acción principal, las cifras, el label de sección y, como campo, un solo bloque por página.",
       "Do separar con reglas de 1 px a tinta 15%, y usar el trazo de 2 px solo para coronar un bloque de apertura o trazar el botón secundario.",
       "Do construir la jerarquía de texto bajando opacidad sobre tinta.",
       "Do poner todo monto por formatMoney y con .tabular.",
@@ -341,7 +401,7 @@
       "Don't redondear un contenedor. El radio es para lo que se toca.",
       "Don't introducir un segundo acento de color, ni un degradado, ni un gris que no sea tinta con opacidad o la plata ya declarada.",
       "Don't usar blanco puro como fondo de una superficie pública.",
-      "Don't publicar una foto a color junto al rojo: le compite al único acento.",
+      "Don't publicar una foto a color junto al frambuesa: le compite al único acento.",
       "Don't mezclar los tokens de este mundo con los tokens de shadcn en una misma pantalla.",
       "Don't animar en el primer viewport, ni mover, escalar o ensombrecer un botón al pasar el cursor: el hover es cambio de color.",
       "Don't mostrar una cifra ilustrativa sin su descargo al pie.",

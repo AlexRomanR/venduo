@@ -74,7 +74,10 @@ La especificación funcional completa vive en `VENDUO.md` y es la fuente de verd
   extranjero a nadie.
   - _Pendiente:_ el código y las reglas escritas hasta ahora usan voseo rioplatense
     ("Ingresá", "Escribí"), heredado del andamiaje inicial. Hay que corregirlo.
-- **Sin identidad visual definida.** No hay logo, paleta ni tipografía comprometidas.
+- **Identidad visual: el cuaderno de ventas pasado en limpio.** Papel cálido, tinta y un
+  frambuesa de señal; Archivo para titulares y cifras, Geist para leer. El logo es la
+  feria en el celular, con el toldo en frambuesa (`.agents/rules/marca.md`). El sistema completo,
+  con el registro del panel y el de la portada, está en `DESIGN.md`.
 
 ## Evidence on Hand
 

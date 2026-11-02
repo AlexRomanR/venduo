@@ -191,7 +191,7 @@ export function Consola({
             type="submit"
             disabled={enCurso || texto.trim().length === 0}
             aria-label="Preguntar"
-            className="flex size-12 shrink-0 items-center justify-center rounded-plantilla bg-senal text-white transition-colors hover:bg-senal-alta disabled:opacity-40"
+            className="flex size-12 shrink-0 items-center justify-center rounded-plantilla bg-accion text-white transition-colors hover:bg-accion-alta disabled:opacity-40"
           >
             {enCurso ? (
               <Loader2 aria-hidden="true" className="size-4 animate-spin" />
@@ -205,7 +205,7 @@ export function Consola({
       {enCurso ? (
         <p
           aria-live="polite"
-          className="mx-4 mb-5 flex items-center gap-3 border-l-2 border-senal pl-4 text-sm leading-relaxed opacity-70 sm:mx-5"
+          className="mx-4 mb-5 flex items-center gap-3 border-l-2 border-tinta pl-4 text-sm leading-relaxed opacity-70 sm:mx-5"
         >
           <Loader2
             aria-hidden="true"
@@ -266,13 +266,13 @@ export function Consola({
           ) : null}
 
           {entrada.error ? (
-            <p className="mt-5 max-w-[58ch] border-l-2 border-senal pl-4 text-sm leading-relaxed">
+            <p className="mt-5 max-w-[58ch] border-l-2 border-tinta pl-4 text-sm leading-relaxed">
               {entrada.error}
             </p>
           ) : entrada.consulta ? (
             <>
               <div className="mt-5 flex flex-wrap items-start gap-x-8 gap-y-4">
-                <p className="max-w-[58ch] min-w-[min(100%,18rem)] flex-1 border-l-2 border-senal pl-4 leading-relaxed">
+                <p className="max-w-[58ch] min-w-[min(100%,18rem)] flex-1 border-l-2 border-tinta pl-4 leading-relaxed">
                   {entrada.lectura ??
                     "La consulta salió bien pero no devolvió ningún dato todavía."}
                 </p>

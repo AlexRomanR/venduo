@@ -97,7 +97,7 @@ No agregar dependencias sin necesidad. Todo lo que hace falta para el MVP ya est
 instalado; una biblioteca nueva es peso que alguien tiene que entender a las tres de la
 mañana.
 
-Se sumaron cinco después del arranque. La primera es **`@react-pdf/renderer`**, para el informe
+Se sumaron seis después del arranque. La primera es **`@react-pdf/renderer`**, para el informe
 del tablero: el PDF tiene que ser un archivo de verdad —que se abra en su pestaña, se
 guarde y se mande por WhatsApp— y eso no lo da imprimir la pantalla. Corre solo en el
 servidor y está declarada en `serverExternalPackages`. Arrastra un `postcss` con un aviso
@@ -124,6 +124,11 @@ servidor se la pide con `pedirVista`. Nunca importarla desde otra ruta.
 La quinta es **`vitest`**, solo de desarrollo, para los tests de TypeScript: lee el
 TypeScript y el alias `@/` sin compilar antes, que es lo que no hace el test de Node. Los
 de la base no suman nada: pgTAP viene con el CLI de Supabase.
+
+La sexta es **`gsap`** (con `@gsap/react`) **y `lenis`**, para la portada: las escenas que
+se arman con el scroll, la entrada fija y el scroll suave no se sostienen con transiciones
+de CSS. **Solo las importa `components/portada/`**, a través de `components/portada/gsap.ts`;
+ninguna pantalla del panel las carga, y en el panel el movimiento sigue siendo de CSS.
 
 No construir para requisitos hipotéticos. Si algo está en la lista de lo que no entra, no
 se escribe el andamiaje "por si acaso".

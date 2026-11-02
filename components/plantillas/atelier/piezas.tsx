@@ -16,6 +16,7 @@ import type {
   PropsVacio,
 } from "@/components/plantillas/kit"
 import { PrecioDeVitrina } from "@/components/tienda/precio"
+import { SiRecibePedidos } from "@/components/tienda/carrito"
 
 /**
  * Las piezas de Atelier.
@@ -210,10 +211,12 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
         </div>
 
         <dl className="self-end">
-          <Dato titulo="Cómo comprar">
-            Elige tus piezas y manda el pedido por WhatsApp. Ahí acordamos el
-            pago y la entrega.
-          </Dato>
+          <SiRecibePedidos>
+            <Dato titulo="Cómo comprar">
+              Elige tus piezas y manda el pedido por WhatsApp. Ahí acordamos el
+              pago y la entrega.
+            </Dato>
+          </SiRecibePedidos>
           {tienda.whatsapp ? (
             <Dato titulo="De cerca">
               <a

@@ -147,7 +147,7 @@ Cada una rompió un PDF antes de tener su arreglo.
    `.next/server/app/c/[token]/route.js.nft.json` siga nombrando el `.wasm`.
 
 6. **Las letras salen del disco**, de `public/fuentes`, con los mismos pesos que
-   `lib/fuentes.ts` (`PESOS`). Un peso que no está lo inventaría el lector. La única
+   `lib/fuentes` (`PESOS`). Un peso que no está lo inventaría el lector. La única
    cursiva es la de Cormorant: la cita usa cursiva solo con esa letra.
 7. **Emojis**: las letras no los traen y saldrían como cuadros vacíos. `limpiarTexto()`
    los quita en las dos salidas.
@@ -202,8 +202,27 @@ y dejan las hojas como están.
 | Pantalla                 | Qué hace                                                                  |
 | ------------------------ | ------------------------------------------------------------------------- |
 | `/panel/catalogos`       | La IA plegada, los guardados y las plantillas dibujadas con tus productos |
-| `/panel/catalogos/nuevo` | Productos → estilo → editar. `?plantilla=` o `?estilo=` salta el estilo   |
+| `/panel/catalogos/nuevo` | Productos → plantilla → editar. `?plantilla=` o `?estilo=` salta el paso  |
 | `/panel/catalogos/{id}`  | Uno guardado, con los productos de hoy                                    |
+
+**La pantalla responde (31/10/2026).** En la web:
+
+- **Elegir productos**: el catálogo se arma al lado mientras se eligen ("Así va
+  quedando", `editor/asi-va-quedando.tsx`), con la plantilla que se tocó en la lista o,
+  si no, la primera de la tienda. Cada foto elegida vuela hasta él
+  (`editor/vuelo.ts`). En el celular, la última hoja va chica en la barra de abajo y se
+  abre en una hoja.
+- **Elegir la plantilla**: el probador (`editor/probador.tsx`) muestra tu catálogo en
+  grande y las plantillas en miniatura; tocar una la prueba y «Usar esta plantilla» la
+  confirma. La galería de antes (`editor/galeria.tsx`) sigue para la app.
+- **Editar**: `VistaPrevia` con `vivo` marca con el resaltador la hoja que cambió (si
+  cambian más de tres, ninguna) y hace entrar las nuevas; con `armando`, una luz recorre
+  las hojas mientras sale el PDF. "Enlace" y "Verlo" guardan solos antes de abrir.
+- **La lista**: mandar por WhatsApp a la vista, «N agotados» en la señal, lo recién
+  editado con el resaltador, y un error de lectura se dice en vez de mostrar la lista
+  vacía.
+
+La app sigue con la galería y sin `vivo` hasta que se apruebe la web.
 
 **La lista y el editor son los mismos en la web y en la app**, como todo el panel en el
 celular (`ui-styling.md`, "El celular es uno solo"):

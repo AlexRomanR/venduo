@@ -4,79 +4,54 @@ import { Skeleton } from "@/components/ui/skeleton"
 /** El gris de todo esqueleto del panel: tinta muy diluida y esquina viva. */
 export const BLOQUE_ESQUELETO = "rounded-none bg-tinta/[0.07]"
 
-/** Un panel con su cabecera y algunas filas, mientras llegan los datos. */
-function Panel({ filas, alto = "h-12" }: { filas: number; alto?: string }) {
-  return (
-    <div className="border border-tinta/25">
-      <div className="flex items-center gap-3 border-b border-tinta/15 px-4 py-4 sm:px-5">
-        <Skeleton className={cn(BLOQUE_ESQUELETO, "size-5")} />
-        <Skeleton className={cn(BLOQUE_ESQUELETO, "h-5 w-36")} />
-      </div>
-      <div className="flex flex-col gap-3 px-4 py-4 sm:px-5">
-        {Array.from({ length: filas }, (_, indice) => (
-          <Skeleton
-            key={indice}
-            className={cn(BLOQUE_ESQUELETO, alto, "w-full")}
-          />
-        ))}
-      </div>
-    </div>
-  )
-}
+const REDONDO = "rounded-[14px] bg-tinta/[0.07]"
 
 /**
- * La forma del tablero mientras se consulta la base.
- *
- * Con la forma de lo que viene —los paneles, las cuatro cifras, el gráfico—
- * y no una rueda girando: así la pantalla no salta cuando llega el contenido.
+ * La forma de las escenas del Resumen mientras se consulta la base: las notas
+ * de "Para hoy" y la escena oscura de las ventas, con sus medidas. Así la
+ * pantalla no salta cuando llega el contenido.
  */
 export function EsqueletoDelTablero() {
   return (
-    <div
-      aria-busy="true"
-      aria-label="Cargando tu resumen"
-      className="flex flex-col gap-6 md:gap-8"
-    >
-      {/* Para hoy: tres números grandes. */}
-      <div className="border border-tinta/25">
-        <div className="flex items-center gap-3 border-b border-tinta/15 px-4 py-4 sm:px-5">
-          <Skeleton className={cn(BLOQUE_ESQUELETO, "size-5")} />
-          <Skeleton className={cn(BLOQUE_ESQUELETO, "h-5 w-28")} />
+    <div aria-busy="true" aria-label="Cargando tu resumen">
+      <div className="grid gap-10 py-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-center lg:gap-12 lg:py-20">
+        <div>
+          <Skeleton className={cn(BLOQUE_ESQUELETO, "h-3 w-20")} />
+          <Skeleton className={cn(REDONDO, "mt-4 h-10 w-full max-w-[16rem]")} />
+          <Skeleton className={cn(REDONDO, "mt-2 h-10 w-40")} />
+          <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-6 h-4 w-64")} />
         </div>
-        <div className="grid grid-cols-3 divide-x divide-tinta/10">
+        <div className="grid grid-cols-3 gap-3 sm:gap-5">
           {Array.from({ length: 3 }, (_, indice) => (
-            <div
+            <Skeleton
               key={indice}
-              className="flex h-32 flex-col justify-end gap-2 px-4 py-4 sm:px-5"
-            >
-              <Skeleton className={cn(BLOQUE_ESQUELETO, "h-10 w-12")} />
-              <Skeleton className={cn(BLOQUE_ESQUELETO, "h-3.5 w-20")} />
-            </div>
+              className={cn(REDONDO, "h-[9.5rem] rounded-[18px] sm:h-[11rem]")}
+            />
           ))}
         </div>
       </div>
 
-      <div className="border border-tinta/25">
-        <div className="flex items-center gap-3 border-b border-tinta/15 px-4 py-4 sm:px-5">
-          <Skeleton className={cn(BLOQUE_ESQUELETO, "size-5")} />
-          <Skeleton className={cn(BLOQUE_ESQUELETO, "h-5 w-32")} />
+      <div className="-mx-4 my-6 bg-tinta px-5 py-12 sm:-mx-5 sm:px-8 lg:mx-0 lg:my-10 lg:rounded-[28px] lg:px-12 lg:py-16">
+        <Skeleton className="h-3 w-24 rounded-none bg-papel/15" />
+        <Skeleton className="mt-4 h-8 w-64 max-w-full rounded-[10px] bg-papel/15" />
+        <div className="mt-10 grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+          <div>
+            <Skeleton className="h-4 w-36 rounded-none bg-papel/15" />
+            <Skeleton className="mt-3 h-[clamp(3rem,8vw,5rem)] w-full max-w-[22rem] rounded-[14px] bg-papel/15" />
+            <Skeleton className="mt-8 h-16 w-full rounded-[10px] bg-papel/10" />
+          </div>
+          <div className="flex h-[200px] items-end gap-[3px] lg:h-[240px]">
+            {[38, 52, 30, 64, 45, 72, 50, 84, 40, 58, 66, 48].map(
+              (alto, indice) => (
+                <Skeleton
+                  key={indice}
+                  className="flex-1 rounded-t-[3px] rounded-b-none bg-papel/15"
+                  style={{ height: `${alto}%` }}
+                />
+              )
+            )}
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-px bg-tinta/10">
-          {Array.from({ length: 4 }, (_, indice) => (
-            <div key={indice} className="bg-papel px-4 py-4 sm:px-5">
-              <Skeleton className={cn(BLOQUE_ESQUELETO, "h-3 w-16")} />
-              <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-3 h-7 w-24")} />
-            </div>
-          ))}
-        </div>
-        <div className="px-4 py-5 sm:px-5">
-          <Skeleton className={cn(BLOQUE_ESQUELETO, "h-48 w-full")} />
-        </div>
-      </div>
-
-      <div className="grid items-start gap-6 md:gap-8 xl:grid-cols-2">
-        <Panel filas={4} alto="h-14" />
-        <Panel filas={3} alto="h-14" />
       </div>
     </div>
   )

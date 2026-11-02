@@ -16,6 +16,7 @@ import type {
   PropsVacio,
 } from "@/components/plantillas/kit"
 import { PrecioDeVitrina } from "@/components/tienda/precio"
+import { SiRecibePedidos } from "@/components/tienda/carrito"
 
 /**
  * Las piezas de Calle.
@@ -236,10 +237,12 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
         </div>
 
         <div className="self-end border-2 border-tinta">
-          <p className="border-b-2 border-tinta p-4 text-sm font-semibold">
-            Arma tu pedido y envíanoslo por WhatsApp: ahí coordinamos la talla,
-            el pago y la entrega.
-          </p>
+          <SiRecibePedidos>
+            <p className="border-b-2 border-tinta p-4 text-sm font-semibold">
+              Arma tu pedido y envíanoslo por WhatsApp: ahí coordinamos la
+              talla, el pago y la entrega.
+            </p>
+          </SiRecibePedidos>
           {tienda.whatsapp ? (
             <a
               href={`https://wa.me/${numeroDeWhatsApp(tienda.whatsapp)}`}

@@ -13,13 +13,15 @@ cómo se usa. No escribes código ni editas archivos.
 
 ## Lo que lees primero
 
-- `DESIGN.md`: el mundo visual (papel, tinta y un rojo de señal; reglas de un píxel,
-  esquina viva, sin sombras; Archivo para titulares, Geist para el cuerpo).
+- `DESIGN.md`: el mundo visual (papel cálido, tinta para botones y lo elegido, frambuesa
+  de señal para lo que pide algo, resaltador para lo que acaba de cambiar; en el panel,
+  reglas de un píxel, esquina viva, sin sombras; Archivo para titulares, Geist para el
+  cuerpo). La portada tiene su registro propio, en "La portada": no se copia al panel.
 - `.agents/rules/ui-styling.md` entero. Lo que más pesa:
   - **375 px primero**, 44 px para tocar, sin desplazamiento horizontal.
   - **Se mira, no se lee**: un titular y una frase corta, nada que explique cómo
     funciona la pantalla.
-  - **El rojo solo para lo que pide una acción.**
+  - **La señal (la frambuesa) solo para lo que pide algo; botones y lo elegido en tinta.**
   - **Crear o editar algo es una pantalla por filas** (y la skill
     `.agents/skills/pantalla-por-filas/SKILL.md`).
   - **Botones del mismo peso que saltan de renglón, en columnas iguales.**

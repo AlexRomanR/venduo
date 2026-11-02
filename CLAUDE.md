@@ -58,8 +58,16 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
 - **Ningún grupo de fichas baja de renglón a su ancho**: `GRILLA_DE_FICHAS` (columnas
   iguales) o una franja que se desliza, sin excepciones. Pasó tres veces. Detalle en
   `ui-styling.md`.
-- **Toda pantalla del panel se arma como el Resumen**: cada cosa en su panel con borde,
-  con las piezas de `components/panel/piezas.tsx`. Detalle en `ui-styling.md`.
+- **Toda pantalla del panel se arma en paneles**: cada cosa en su panel con borde, con
+  las piezas de `components/panel/piezas.tsx`. **La excepción es el Resumen**, que se
+  cuenta en escenas como la portada (`components/panel/resumen/`). Detalle en
+  `ui-styling.md` y `DESIGN.md`.
+- **La tinta trabaja, la frambuesa avisa.** Papel cálido; botones y lo elegido en tinta
+  (`BOTON_PRIMARIO`, `bg-accion`, que en una tienda vale el color de su plantilla); la
+  frambuesa (`senal`) solo para lo que pide algo, los errores y el logo; el resaltador
+  para lo que acaba de cambiar. El panel es el diario —reglas, sin sombras— y responde a
+  lo que se toca; la portada (`components/portada/`) tiene escenas y celulares propios.
+  Detalle en `DESIGN.md`.
 - **Cada texto tiene una voz.** Venduo y la tienda hablan en plural ("no pudimos",
   "coordinamos"), las cosas no hablan, nadie tiene género fijo y toda pantalla citada
   lleva su nombre de hoy. Detalle en `ui-styling.md`.
@@ -91,7 +99,7 @@ aparte y su plan es `docs/plan-app-movil.md`.
 | Archivo                       | Qué es                                                       |
 | ----------------------------- | ------------------------------------------------------------ |
 | `VENDUO.md`                   | La especificación del producto. Fuente de verdad             |
-| `DESIGN.md`                   | El mundo visual de Venduo y la base editorial                |
+| `DESIGN.md`                   | El mundo visual: el panel, la portada y la base editorial    |
 | `docs/estado-del-proyecto.md` | Qué está hecho y qué falta. **Leerlo antes de elegir tarea** |
 | `docs/plan-administracion.md` | El panel `/admin` y las visitas: qué se hizo y por qué       |
 | `docs/plan-app-movil.md`      | La app nativa del emprendedor: decisiones, pantallas, fases  |

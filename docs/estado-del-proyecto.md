@@ -44,9 +44,15 @@ Actualizado el 9 de octubre de 2026.
 - Venduo se presenta como **tienda online, inventario y ventas en uno, listo en un
   minuto**, con lo que viene además: plantillas editables, pedidos que llegan por
   WhatsApp, catálogos en PDF y estadísticas.
-- La portada (`/`) está ordenada en ese sentido: titular, el problema, por qué no es
-  solo una tienda online, cómo funciona en tres pasos, lo que incluye, para quién es,
-  cómo llegan los pedidos por WhatsApp, preguntas frecuentes y llamado final.
+- La portada (`/`, en `components/portada/`) se rehizo el 30 de octubre: "el cuaderno de
+  ventas pasado en limpio". Va en este orden: titular con el celular en 3D (en
+  escritorio, los productos caen al celular con el scroll), el problema, cómo funciona en
+  tres pasos con su escena, el pedido por WhatsApp de punta a punta, por qué no es solo
+  una tienda online (las plantillas vistiendo la tienda, el catálogo, la publicación y
+  las estadísticas), para quién es (rubro y plantilla), lo que incluye, preguntas y
+  llamado final. Cada escena tiene su versión para el celular, legible a 360 px. Se
+  revisó dos veces con `/impeccable critique` (25/36 y 26/36) y se corrigió lo que
+  marcaron. Los prototipos `/noche`, `/diario` y `/libreta` se borraron.
 - Los ejemplos son de quien vende por redes —ropa, zapatillas, belleza, tecnología,
   segunda mano—, no de comida casera. Cómo se le habla al cliente está en
   `ui-styling.md`.
@@ -58,6 +64,31 @@ Actualizado el 9 de octubre de 2026.
   —plegada, el símbolo solo—, y es el favicon, el ícono del celular y la tarjeta al
   compartir la portada. Se regenera con `npm run marca`. Todo en
   `.agents/rules/marca.md`.
+- **Desde el 31 de octubre: la tinta trabaja, la frambuesa avisa.** El papel pasó al
+  cálido `#f7f5f0` y la tinta a `#1d1c1a`. Los botones y lo elegido van en tinta (token
+  `accion`, que en una tienda vale el color de su plantilla), y la señal es frambuesa
+  `#d0216a`: solo lo que pide algo, los errores y el logo. El vino del 30/10 se probó y no
+  encajó en el panel (contra la tinta daba 1,35:1); la frambuesa se eligió comparando
+  cuatro tonos en el panel de verdad. Los gráficos van en tinta con la señal en el punto
+  activo, el foco de los campos en tinta, y el resaltador `#fff1a6` es un color del
+  sistema para lo que acaba de cambiar. Íconos y tarjeta regenerados. Brief:
+  `docs/briefs/2026-10-31-productos-vivo-y-color.md`.
+- **El Resumen, en escenas (31 de octubre).** `/panel` se rehízo con la filosofía de la
+  portada: la tienda en un celular en 3D que sigue al puntero, lo que espera en notas
+  pegadas, las ventas en una escena oscura con la cifra que cuenta y el gráfico que
+  crece, los pedidos como tickets con sello al cobrarlos, lo más vendido como polaroids,
+  las visitas en un embudo y el enlace para copiar al final. GSAP y Lenis; cada escena
+  se arma al aparecer y vuelve a empezar al salir. Mismos datos y acciones que antes
+  (cobrar, reponer, vacaciones, compartir). En `components/panel/resumen/`; las piezas
+  viejas del tablero se borraron. La app todavía tiene el Inicio de antes.
+- **Catálogos responde (31 de octubre).** Al elegir los productos, el catálogo se arma al
+  lado ("Así va quedando") y cada foto elegida vuela hasta él. La plantilla se elige en un
+  probador: tu catálogo en grande y las plantillas en miniatura, que se prueban tocándolas.
+  En el editor, la hoja que cambió se marca con el resaltador, las cifras cuentan, una luz
+  recorre las hojas mientras sale el PDF y "Enlace" y "Verlo" guardan solos. En la lista,
+  mandar por WhatsApp está a la vista, «N agotados» avisa y lo recién editado se marca; si
+  la lectura falla, se dice. Todo con CSS y la API de animaciones del navegador. La app
+  todavía usa la galería de antes (`galeria.tsx`) y la vista previa sin `vivo`.
 
 ### Catálogos en PDF (`/panel/catalogos`)
 
@@ -127,6 +158,17 @@ que se arregló:
 - Botones del catálogo en una grilla pareja en el celular, botones de cantidad con la
   forma de la plantilla y textos corregidos.
 
+### Textos y letras (29 y 30 de octubre)
+
+Una revisión de los unos 5.300 textos de la web y la app: cada uno con su voz —Venduo
+y la tienda en plural, las cosas no hablan, sin género fijo, cada pantalla con su
+nombre de hoy—, escrita como regla en `ui-styling.md`. Las semillas de las plantillas
+perdieron su texto de relleno ("Cuenta aquí…", "Escribe acá…") y su tercera persona,
+en la base y en las tiendas que los habían copiado, y las secciones nuevas del editor
+nacen vacías, con pistas grises en vez de un testimonio o un horario inventados. De vacaciones, la franja y el
+"Cómo comprar" de cada plantilla se ocultan con `SiRecibePedidos`. Las letras se
+sirven desde `lib/fuentes/` con `next/font/local`: el build ya no las baja de Google.
+
 ### Editor de la tienda (`/editor`)
 
 - Pantalla completa, en seis pasos: **Tu marca**, **Portada**, **Catálogo**, **Producto**,
@@ -184,15 +226,14 @@ que se arregló:
 
 ### Panel del emprendedor (`/panel`)
 
-- **Resumen que se mira, no se lee**, como el Inicio de la app. Al lado del nombre, la
-  portada de la tienda como la ve quien compra en esa pantalla —en un celular chico, o en
-  una computadora en una pantalla ancha—, que abre el editor. **Para hoy** en números grandes que llevan a la
-  lista filtrada, **Cómo te va** con cifras que suben y barras que crecen,
-  **Últimos pedidos** con las fotos de lo que pidieron y el botón **Cobrado** ahí
-  mismo, **Lo más vendido** en fotos y **Se está acabando** con más y menos para
-  reponer sin salir. Lo que no pide nada no aparece. Si la tienda no tiene WhatsApp, es
-  lo primero que pide. Compartir la tienda abre el enlace, el QR y un mensaje listo
-  para WhatsApp.
+- **Resumen en escenas**, como la portada. La tienda en un celular en 3D que abre el
+  editor, con una frase de lo vendido hoy y lo que espera el cobro. **Para hoy** en notas
+  pegadas que llevan a la lista filtrada, **Primeros pasos** que se tachan solos, **Cómo
+  te va** en la escena oscura con la cifra que cuenta y el gráfico que crece, **Últimos
+  pedidos** como tickets con el botón **Marcar pagado** ahí mismo, **Lo más vendido**
+  como polaroids, **Se está acabando** con más y menos para reponer sin salir, las
+  visitas si están activas y el enlace para copiar al final. Lo que no pide nada no
+  aparece. Si la tienda no tiene WhatsApp, es lo primero que pide.
 - **Productos**: alta y edición con fotos, stock, umbral de aviso, precio
   anterior, código y destacado. Categorías propias.
 - **Pedidos**: lista y detalle con el mismo número que llegó por WhatsApp. Tres estados:
@@ -203,7 +244,7 @@ que se arregló:
 - **Apariencia**: la puerta al editor, la plantilla, cambiarla y el historial, con
   **Restaurar** en cada versión. El resumen también lleva al editor, y pide darle estilo
   mientras la tienda luzca igual a la plantilla.
-- Todas las pantallas se arman como el Resumen: cada cosa en su panel con borde, un
+- Todas las pantallas —menos el Resumen, en escenas— se arman en paneles: cada cosa en su panel con borde, un
   título que dice para qué sirve y su estado vacío dentro. **Pedidos y Productos son
   las pantallas de la app**: números grandes que filtran, fichas que se deslizan, los
   pedidos por día con su foto y "Cobrado", el detalle con "Marcar pagado" fijo abajo, y
@@ -378,6 +419,15 @@ borrar la cuenta están publicados. Falta lo que es de quien publica: las cuenta
 Firebase y Play Console, y probarla en un teléfono de verdad. La lista está en
 **`docs/plan-app-movil.md`**, "Lo que falta". iPhone viene después.
 
+### 1.b. Llevar el color y Catálogos a la app — cuando se apruebe la web
+
+Falta la app (`venduo-app`): copiar los tokens nuevos de `app/globals.css` (tinta para
+botones, frambuesa para lo que pide algo) a su tema y el ícono nuevo de `public/marca/`, y
+llevar el Catálogos nuevo —"Así va quedando", el probador, `vivo` en
+`editor-de-la-app.tsx`—, como pide "web primero, app después". También quedan de la portada nueva: reemplazar la captura de la plantilla
+Fórmula, que muestra un frasco de una marca real, y la de Calle, que dice "lo cerramos
+por WhatsApp".
+
 ### 2. Funciones por plan — cuando se decida
 
 Hoy hay un solo plan. Las funciones ya se resuelven por tienda en la base
@@ -448,9 +498,6 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 
 ### 7. Pendientes chicos
 
-- **De vacaciones, las plantillas siguen diciendo cómo comprar**: la franja "Arma tu
-  pedido y mándalo por WhatsApp" y el bloque "Cómo comprar" de la ficha. La banda de
-  vacaciones lo aclara, pero se contradicen. Taparlos pide marcarlos en cada plantilla.
 - **Las fotos de una carga que no se crea quedan en Storage** (`product-images/{tienda}/`):
   se suben al procesarlas. Cuestan centavos; si molestan, subirlas a una carpeta propia y
   limpiarla.
@@ -470,9 +517,6 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
 
 - **Fotos en los datos de ejemplo.** Casi ningún producto tiene foto, y las plantillas se
   lucen con ellas. Importante antes de la demostración.
-- **Textos de ejemplo visibles** en tiendas con plantillas retiradas (p. ej. "Cuenta aquí
-  de dónde salen tus piezas" en Casa Illimani). Reemplazarlos o pasar esas tiendas a una
-  plantilla nueva.
 - **Tiendas de comida sembradas en producción** (Panadería Doña Elsa y otras de la
   demostración): contradicen el mensaje nuevo, pero cambiarlas toca datos compartidos
   y se acuerda antes.

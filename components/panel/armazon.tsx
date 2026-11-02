@@ -37,7 +37,7 @@ export async function ArmazonDelPanel({
           <BarraLateralMovil datos={barra} />
 
           {!isSupabaseConfigured || ai.demo ? (
-            <p className="border-b border-senal/30 bg-senal/5 px-5 py-2 text-center text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+            <p className="border-b border-tinta/15 bg-tinta/[0.04] px-5 py-2 text-center text-xs font-semibold tracking-[0.12em] text-tinta/70 uppercase">
               {!isSupabaseConfigured
                 ? "Modo demo · Supabase sin configurar"
                 : "IA en modo demo · las respuestas son simuladas"}

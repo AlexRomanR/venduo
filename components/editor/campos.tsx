@@ -12,7 +12,7 @@ import { Opciones } from "@/components/editor/piezas"
 const ETIQUETA = "text-xs font-semibold tracking-[0.12em] uppercase opacity-55"
 
 const CAJA =
-  "w-full border-0 border-b border-tinta/40 bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-senal focus-visible:outline-none"
+  "w-full border-0 border-b border-tinta/40 bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:outline-none"
 
 /**
  * Los campos de una sección, armados desde su definición en `secciones.ts`.

@@ -201,7 +201,7 @@ function EditorDePack({
           type="button"
           aria-label="Quitar este pack"
           onClick={quitar}
-          className="flex size-11 items-center justify-center opacity-70 transition-opacity hover:text-senal hover:opacity-100"
+          className="flex size-11 items-center justify-center opacity-70 transition-opacity hover:opacity-100"
         >
           <Trash2 aria-hidden="true" className="size-4" />
         </button>
@@ -258,7 +258,7 @@ function EditorDePack({
           <label htmlFor={`${pack.id}-precio`} className={ETIQUETA}>
             Precio del pack
           </label>
-          <div className="mt-1 flex items-center gap-2 border-b border-tinta/40 focus-within:border-senal">
+          <div className="mt-1 flex items-center gap-2 border-b border-tinta/40 focus-within:border-tinta focus-within:bg-tinta/[0.04]">
             <span className="text-base opacity-65">{CURRENCY_SYMBOL}</span>
             <input
               id={`${pack.id}-precio`}

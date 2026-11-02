@@ -28,7 +28,7 @@ import { borrarCatalogo } from "@/app/(privado)/panel/catalogos/acciones"
 import { useConfirmacion } from "@/components/panel/confirmar"
 
 const ICONO =
-  "flex size-11 items-center justify-center opacity-65 transition-colors hover:text-senal hover:opacity-100"
+  "flex size-11 items-center justify-center opacity-65 transition-opacity hover:opacity-100"
 
 /**
  * Lo que se hace con un catálogo guardado sin abrirlo: verlo en PDF,
@@ -72,6 +72,39 @@ export function AccionesDeCatalogo({
       >
         <Pencil aria-hidden="true" className="size-4" />
       </Link>
+      {compartir === "oculta" ? null : esDemo ? (
+        <a
+          href={`/panel/catalogos/${id}/pdf?descargar=1`}
+          download
+          aria-label={`Descargar el PDF de «${nombre}»`}
+          className={cn(ICONO, "opacity-100")}
+        >
+          <Download aria-hidden="true" className="size-4" />
+        </a>
+      ) : (
+        <button
+          type="button"
+          aria-label={`Mandar «${nombre}» por WhatsApp`}
+          className={cn(
+            ICONO,
+            "opacity-100",
+            compartir === "desactivada" && "opacity-55"
+          )}
+          onClick={() => {
+            if (compartir !== "activa") {
+              toast.info(AVISO_DE_NO_DISPONIBLE)
+              return
+            }
+            window.open(
+              enlaceDeWhatsApp(`${nombre} · ${tienda}\n${enlace}`),
+              "_blank",
+              "noopener"
+            )
+          }}
+        >
+          <Send aria-hidden="true" className="size-4" />
+        </button>
+      )}
       <DropdownMenu>
         <DropdownMenuTrigger
           aria-label={`Más acciones para ${nombre}`}
@@ -110,24 +143,6 @@ export function AccionesDeCatalogo({
           </DropdownMenuItem>
           {compartir !== "oculta" ? (
             <>
-              <DropdownMenuItem
-                disabled={esDemo}
-                className={cn(compartir === "desactivada" && "opacity-55")}
-                onSelect={() => {
-                  if (compartir !== "activa") {
-                    toast.info(AVISO_DE_NO_DISPONIBLE)
-                    return
-                  }
-                  window.open(
-                    enlaceDeWhatsApp(`${nombre} · ${tienda}\n${enlace}`),
-                    "_blank",
-                    "noopener"
-                  )
-                }}
-              >
-                <Send aria-hidden="true" className="size-4" />
-                Mandar por WhatsApp
-              </DropdownMenuItem>
               <DropdownMenuItem
                 disabled={esDemo}
                 className={cn(compartir === "desactivada" && "opacity-55")}

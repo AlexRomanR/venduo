@@ -489,7 +489,7 @@ function EditorDeOpcion({
               placeholder="¿Cómo se llama? Sabor, modelo…"
               maxLength={30}
               autoFocus={!opcion.nombre}
-              className="h-11 w-full border-b border-tinta bg-transparent font-titular text-lg font-bold outline-none placeholder:font-sans placeholder:text-base placeholder:font-normal placeholder:text-tinta/40 focus-visible:border-senal"
+              className="h-11 w-full border-b border-tinta bg-transparent font-titular text-lg font-bold outline-none placeholder:font-sans placeholder:text-base placeholder:font-normal placeholder:text-tinta/40 focus-visible:border-tinta focus-visible:bg-tinta/[0.04]"
             />
           </label>
         )}
@@ -568,7 +568,7 @@ function EditorDeOpcion({
             }
             maxLength={120}
             autoFocus={Boolean(tipo)}
-            className="h-11 min-w-0 flex-1 border-b border-tinta bg-transparent text-base outline-none placeholder:text-tinta/40 focus-visible:border-senal"
+            className="h-11 min-w-0 flex-1 border-b border-tinta bg-transparent text-base outline-none placeholder:text-tinta/40 focus-visible:border-tinta focus-visible:bg-tinta/[0.04]"
           />
           <button
             type="button"
@@ -826,7 +826,7 @@ function FilaDeVariante({
       </span>
 
       {conPrecio ? (
-        <label className="flex w-16 shrink-0 items-center gap-1 border-b border-tinta focus-within:border-senal sm:w-20">
+        <label className="flex w-16 shrink-0 items-center gap-1 border-b border-tinta focus-within:border-tinta focus-within:bg-tinta/[0.04] sm:w-20">
           <span className="text-sm opacity-65">{CURRENCY_SYMBOL}</span>
           <input
             type="number"

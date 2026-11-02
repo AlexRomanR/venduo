@@ -311,7 +311,7 @@ function CampoHex({
       }}
       maxLength={7}
       spellCheck={false}
-      className="tabular h-11 w-[5.5rem] shrink-0 border-0 border-b border-tinta/30 bg-transparent px-0 font-mono text-sm uppercase transition-colors focus-visible:border-senal focus-visible:outline-none"
+      className="tabular h-11 w-[5.5rem] shrink-0 border-0 border-b border-tinta/30 bg-transparent px-0 font-mono text-sm uppercase transition-colors focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:outline-none"
     />
   )
 }

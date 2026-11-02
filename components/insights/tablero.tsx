@@ -112,7 +112,7 @@ export function Tablero({
 
             {/* La lectura se recalcula con los datos de hoy, igual que el trazo. */}
             {lectura ? (
-              <p className="mt-4 border-l-2 border-senal pl-4 text-sm leading-relaxed">
+              <p className="mt-4 border-l-2 border-tinta pl-4 text-sm leading-relaxed">
                 {lectura}
               </p>
             ) : null}

@@ -16,6 +16,7 @@ import type {
   PropsVacio,
 } from "@/components/plantillas/kit"
 import { PrecioDeVitrina } from "@/components/tienda/precio"
+import { SiRecibePedidos } from "@/components/tienda/carrito"
 
 /**
  * Las piezas de Pisada.
@@ -247,10 +248,12 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
           ) : null}
         </div>
         <ul className="flex flex-col gap-2 self-end">
-          <li className={cn("px-5 py-4 text-sm font-semibold", PLACA)}>
-            Arma tu pedido y envíanoslo por WhatsApp: ahí coordinamos el pago y
-            la entrega.
-          </li>
+          <SiRecibePedidos>
+            <li className={cn("px-5 py-4 text-sm font-semibold", PLACA)}>
+              Arma tu pedido y envíanoslo por WhatsApp: ahí coordinamos el pago
+              y la entrega.
+            </li>
+          </SiRecibePedidos>
           {tienda.whatsapp ? (
             <li>
               <a

@@ -12,9 +12,10 @@
 
 /** Los colores de la marca. Son los de `DESIGN.md` y no cambian con la plantilla. */
 export const COLORES_DE_MARCA = {
-  tinta: "#16171a",
-  senal: "#d62d12",
-  papel: "#f1f0ee",
+  tinta: "#1d1c1a",
+  /** El toldo: la frambuesa de la señal. */
+  senal: "#d0216a",
+  papel: "#f7f5f0",
 } as const
 
 /** La caja de dibujo de todas las piezas. */

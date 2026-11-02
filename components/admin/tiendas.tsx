@@ -130,7 +130,7 @@ export function TablaDeTiendas({
               value={busqueda}
               onChange={(evento) => setBusqueda(evento.target.value)}
               placeholder="Nombre, enlace o correo del dueño"
-              className="h-11 w-full border-b border-tinta bg-transparent pl-7 text-base outline-none placeholder:text-tinta/40 focus-visible:border-senal"
+              className="h-11 w-full border-b border-tinta bg-transparent pl-7 text-base outline-none placeholder:text-tinta/40 focus-visible:border-tinta focus-visible:bg-tinta/[0.04]"
             />
           </label>
           <label className="flex items-center gap-2 text-sm">
@@ -138,7 +138,7 @@ export function TablaDeTiendas({
             <select
               value={orden}
               onChange={(evento) => setOrden(evento.target.value as Orden)}
-              className="h-11 border-b border-tinta bg-transparent pr-2 font-semibold outline-none focus-visible:border-senal"
+              className="h-11 border-b border-tinta bg-transparent pr-2 font-semibold outline-none focus-visible:border-tinta focus-visible:bg-tinta/[0.04]"
             >
               {Object.entries(ORDENES).map(([clave, nombre]) => (
                 <option key={clave} value={clave}>
