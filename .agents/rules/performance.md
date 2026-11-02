@@ -80,6 +80,15 @@ que usaba la barra. Lo que el cliente necesita vive en un módulo sin zod
 
 Lo que solo se usa al tocar algo —el QR de compartir— se carga con `import()`.
 
+**La portada y el Resumen son las únicas pantallas con GSAP y Lenis**
+(`components/portada/gsap.ts`). La portada es además la más pesada en imágenes: unas 77,
+la mayoría productos recortados y capturas de las plantillas. Que se queden ahí: un
+componente de otra pantalla del panel que importe algo de `components/portada/` se lleva
+GSAP entero. En el Resumen, la entrada no espera a la base: la frase de lo vendido y las
+escenas llegan por `Suspense`. En la portada, lo que no está a la vista no se
+mueve —las escenas arrancan al verse y paran al salir— y las imágenes de fuera del primer
+viewport no llevan `priority`.
+
 ## Medir
 
 **`npm run dev` no sirve para cronometrar.** Compila cada pantalla la primera vez, no

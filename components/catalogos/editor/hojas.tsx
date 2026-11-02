@@ -461,7 +461,7 @@ function EditorDeHoja({
             type="button"
             aria-label="Quitar esta hoja"
             onClick={quitar}
-            className="flex size-11 items-center justify-center opacity-70 transition-opacity hover:text-senal hover:opacity-100"
+            className="flex size-11 items-center justify-center opacity-70 transition-opacity hover:opacity-100"
           >
             <Trash2 aria-hidden="true" className="size-4" />
           </button>

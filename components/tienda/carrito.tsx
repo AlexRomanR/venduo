@@ -185,3 +185,13 @@ export function useCarrito() {
   }
   return valor
 }
+
+/**
+ * Lo que le dice a quien compra cómo hacer el pedido: una franja, el "Cómo
+ * comprar" de la ficha. De vacaciones se oculta, porque la banda de arriba ya
+ * dice que no recibimos pedidos. Fuera del carrito se muestra siempre.
+ */
+export function SiRecibePedidos({ children }: { children: React.ReactNode }) {
+  const vacaciones = React.useContext(Contexto)?.vacaciones
+  return vacaciones ? null : <>{children}</>
+}

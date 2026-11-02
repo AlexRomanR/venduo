@@ -144,7 +144,7 @@ function Numero({
 }) {
   return (
     <div className="border-t-2 border-tinta pt-6">
-      <p className="tabular font-titular text-[clamp(2.5rem,9vw,4.5rem)] leading-none font-extrabold tracking-[-0.04em] text-senal">
+      <p className="tabular font-titular text-[clamp(2.5rem,9vw,4.5rem)] leading-none font-extrabold tracking-[-0.04em]">
         {formato(fila.valor)}
       </p>
       <p className="mt-4 text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
@@ -260,19 +260,19 @@ function Serie({
                   width={anchoColumna}
                   height={Math.max(MARGEN.arriba + altoUtil - p.y, 1)}
                   rx={Math.min(4, anchoColumna / 2)}
-                  className="fill-senal"
+                  className={activo === i ? "fill-senal" : "fill-tinta"}
                   fillOpacity={activo === null || activo === i ? 1 : 0.35}
                 />
               ))
             ) : (
               <>
                 {spec.grafico === "area" ? (
-                  <path d={area} className="fill-senal" fillOpacity={0.12} />
+                  <path d={area} className="fill-tinta" fillOpacity={0.08} />
                 ) : null}
                 <path
                   d={linea}
                   fill="none"
-                  className="stroke-senal"
+                  className="stroke-tinta"
                   strokeWidth={2}
                   strokeLinejoin="round"
                   strokeLinecap="round"
@@ -405,7 +405,7 @@ function Barras({
               aria-label={`${fila.etiqueta}: ${formatoCompleto(fila.valor)}`}
             >
               <div
-                className="h-full rounded-r-[4px] bg-senal transition-[width] duration-500 ease-out"
+                className="h-full rounded-r-[4px] bg-tinta transition-[width] duration-500 ease-out"
                 style={{
                   width: `${Math.max((fila.valor / maximo) * 100, 1.5)}%`,
                 }}

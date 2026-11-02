@@ -89,7 +89,7 @@ export function GaleriaPlantillas({
         className="mt-10"
       >
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-tinta/15 pb-4">
-          <p className="flex-1 text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+          <p className="flex-1 text-xs font-semibold tracking-[0.12em] uppercase">
             {visibles.length}{" "}
             {visibles.length === 1 ? "plantilla" : "plantillas"}
           </p>
@@ -122,7 +122,7 @@ export function GaleriaPlantillas({
                     // contra las de dos líneas.
                     "group flex h-full w-full flex-col border-t-2 pt-5 text-left transition-colors duration-300",
                     seleccionada
-                      ? "border-senal"
+                      ? "border-tinta"
                       : "border-tinta/15 hover:border-tinta"
                   )}
                 >
@@ -131,7 +131,7 @@ export function GaleriaPlantillas({
                   <div
                     className={cn(
                       "overflow-hidden border transition-colors",
-                      seleccionada ? "border-senal" : "border-tinta"
+                      seleccionada ? "border-2 border-tinta" : "border-tinta"
                     )}
                   >
                     <div className="transition-transform duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transform-none">
@@ -143,7 +143,7 @@ export function GaleriaPlantillas({
                     <h3
                       className={cn(
                         "flex-1 font-titular text-lg font-bold tracking-[-0.02em] transition-colors",
-                        seleccionada ? "text-senal" : "group-hover:text-senal"
+                        seleccionada ? "text-tinta" : "group-hover:underline"
                       )}
                     >
                       {plantilla.name}
@@ -152,7 +152,7 @@ export function GaleriaPlantillas({
                       className={cn(
                         "flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold tracking-[0.12em] uppercase transition-all duration-300",
                         seleccionada
-                          ? "border-senal text-senal opacity-100"
+                          ? "border-tinta bg-tinta text-papel opacity-100"
                           : "border-transparent opacity-0"
                       )}
                     >
@@ -208,7 +208,7 @@ export function GaleriaPlantillas({
             </p>
             <Link
               href={`/crear/negocio?plantilla=${plantillaElegida.key}`}
-              className="flex min-h-12 items-center gap-2 rounded-sm bg-senal px-5 font-semibold text-white transition-colors hover:bg-senal-alta"
+              className="flex min-h-12 items-center gap-2 rounded-sm bg-accion px-5 font-semibold text-white transition-colors hover:bg-accion-alta"
             >
               Continuar
               <ArrowRight aria-hidden="true" className="size-4" />

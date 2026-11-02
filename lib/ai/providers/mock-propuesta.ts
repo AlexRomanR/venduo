@@ -283,7 +283,9 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
         posicion: contexto.secciones.length,
         props: {},
       })
-      partes.push("agregamos una sección de testimonios")
+      partes.push(
+        "agregamos una sección de testimonios: escribe ahí lo que te dijeron quienes te compraron"
+      )
     }
   }
   if (quiere("contacto", "horario", "dirección", "direccion")) {
@@ -294,7 +296,9 @@ export function propuestaDeDemostracion(mensaje: string): PropuestaDeDiseno {
         posicion: contexto.secciones.length,
         props: {},
       })
-      partes.push("agregamos tus datos de contacto al final")
+      partes.push(
+        "agregamos la sección de contacto al final, para tu horario y tu dirección"
+      )
     }
   }
 

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { toast } from "sonner"
 import Image from "next/image"
 import { Check, Package, Search } from "lucide-react"
 
@@ -98,7 +99,7 @@ export function SelectorDeProductos({
             value={buscar}
             onChange={(evento) => setBuscar(evento.target.value)}
             placeholder="Busca por nombre o código"
-            className="h-11 w-full border-0 border-b border-tinta/40 bg-transparent pl-6 text-base placeholder:text-tinta/40 focus-visible:border-senal focus-visible:outline-none"
+            className="h-11 w-full border-0 border-b border-tinta/40 bg-transparent pl-6 text-base placeholder:text-tinta/40 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:outline-none"
           />
         </label>
         <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
@@ -259,12 +260,15 @@ export function SelectorConFotos({
   categorias,
   elegidos,
   alCambiar,
+  alMarcar,
   tope = 200,
 }: {
   productos: ProductoDelCatalogo[]
   categorias: { id: string; nombre: string }[]
   elegidos: string[]
   alCambiar: (ids: string[]) => void
+  /** Al marcar uno, con su foto: para que vuele hasta el catálogo. */
+  alMarcar?: (foto: HTMLElement) => void
   tope?: number
 }) {
   const [buscar, setBuscar] = React.useState("")
@@ -295,9 +299,16 @@ export function SelectorConFotos({
   const todosElegidos =
     visibles.length > 0 && visibles.every((p) => marcados.has(p.id))
 
-  function alternar(id: string) {
-    if (marcados.has(id)) alCambiar(elegidos.filter((otro) => otro !== id))
-    else if (elegidos.length < tope) alCambiar([...elegidos, id])
+  function alternar(id: string, boton: HTMLElement) {
+    if (marcados.has(id)) {
+      alCambiar(elegidos.filter((otro) => otro !== id))
+    } else if (elegidos.length < tope) {
+      alCambiar([...elegidos, id])
+      const foto = boton.querySelector<HTMLElement>("[data-foto]")
+      if (foto) alMarcar?.(foto)
+    } else {
+      toast.info(`Hasta ${tope} productos por catálogo.`)
+    }
   }
 
   return (
@@ -351,7 +362,7 @@ export function SelectorConFotos({
               )
             }
           }}
-          className="min-h-11 w-fit text-left font-semibold underline underline-offset-4 transition-colors hover:text-senal"
+          className="min-h-11 w-fit text-left font-semibold underline underline-offset-4 transition-[text-decoration-thickness] hover:decoration-2"
         >
           {todosElegidos
             ? "Quitar todos"
@@ -380,14 +391,17 @@ export function SelectorConFotos({
                   role="checkbox"
                   aria-checked={marcado}
                   aria-label={producto.nombre}
-                  onClick={() => alternar(producto.id)}
+                  onClick={(evento) =>
+                    alternar(producto.id, evento.currentTarget)
+                  }
                   className="group flex w-full flex-col gap-1 text-left"
                 >
                   <span
+                    data-foto
                     className={cn(
                       "relative flex aspect-square w-full items-center justify-center overflow-hidden border bg-tinta/[0.05] transition-colors",
                       marcado
-                        ? "border-2 border-senal"
+                        ? "border-2 border-tinta"
                         : "border-tinta/15 group-hover:border-tinta"
                     )}
                   >
@@ -408,7 +422,7 @@ export function SelectorConFotos({
                     {marcado ? (
                       <span
                         aria-hidden="true"
-                        className="tabular absolute top-1.5 right-1.5 flex size-7 items-center justify-center rounded-full bg-senal text-sm font-bold text-white"
+                        className="tabular numero-entra absolute top-1.5 right-1.5 flex size-7 items-center justify-center rounded-full bg-tinta text-sm font-bold text-white"
                       >
                         {posicion <= 99 ? (
                           posicion

@@ -176,7 +176,7 @@ export function Barras({
           </div>
           <div className="mt-1 h-1.5 bg-tinta/[0.08]">
             <div
-              className="h-full bg-senal"
+              className="h-full bg-tinta"
               style={{ width: `${(fila.valor / maximo) * 100}%` }}
             />
           </div>
@@ -232,7 +232,7 @@ function GraficoDeVisitas({
               width={barra}
               height={h}
               rx="2"
-              className="fill-senal"
+              className="fill-tinta"
             >
               <title>{`${corto(d.dia)}: ${d.visitas} visitas`}</title>
             </rect>

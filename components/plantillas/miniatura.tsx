@@ -403,7 +403,7 @@ function DibujoBazar() {
   return (
     <div className="flex h-full flex-col">
       <div className="bg-senal py-[3px] text-center text-[length:1.406cqw] font-semibold text-white">
-        Arma tu pedido y mándalo por WhatsApp
+        Arma tu pedido y envíanoslo por WhatsApp
       </div>
       <div className="flex items-center gap-2 border-b-2 border-tinta/10 px-2.5 py-1.5">
         <span className="font-titular text-[length:3.75cqw] leading-none font-extrabold tracking-[-0.03em]">

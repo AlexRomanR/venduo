@@ -61,6 +61,10 @@
    */
   --color-senal: var(--senal);
   --color-senal-alta: var(--senal-alta);
+  --color-toldo: var(--toldo);
+  --color-resaltador: var(--resaltador);
+  --color-accion: var(--accion);
+  --color-accion-alta: var(--accion-alta);
   --color-tinta: var(--tinta);
   --color-papel: var(--papel);
   --font-titular: var(--font-titular);
@@ -102,19 +106,35 @@
   --sidebar-ring: oklch(0.708 0 0);
 
   /*
-   * Mundo de la portada pública.
+   * El mundo de Venduo: la portada, el panel, la cuenta y /admin.
    *
-   * Papel claro como campo, tinta casi negra, y un rojo de señal que aparece
-   * poco y manda cuando aparece: la acción principal, las cifras, el bloque
-   * de cierre. El color no baña la pantalla; marca.
+   * Papel cálido como campo, tinta casi negra para todo lo que se lee y se
+   * toca, y la señal en frambuesa, que aparece poco y manda cuando aparece: lo
+   * que pide algo —un pedido por cobrar, un producto agotado, un error— y la
+   * marca. El color no baña la pantalla; marca.
    *
-   * El rojo pasa 4,5:1 contra el papel, así que sirve para texto y no solo
-   * para fondos.
+   * La frambuesa pasa 4,7:1 contra el papel y 3,3:1 contra la tinta: sirve
+   * para texto y se distingue de un vistazo de la tinta. `senal-alta` es su
+   * estado al pasar el puntero. `toldo` son las rayas del logo.
+   *
+   * El resaltador marca lo que espera o acaba de cambiar, siempre detrás de un
+   * texto en tinta (la frambuesa sobre el amarillo no pasa 4,5:1).
    */
-  --papel: #f1f0ee;
-  --tinta: #16171a;
-  --senal: #d62d12;
-  --senal-alta: #ee3a1c;
+  --papel: #f7f5f0;
+  --tinta: #1d1c1a;
+  --senal: #d0216a;
+  --senal-alta: #b01a59;
+  --toldo: #d0216a;
+  --resaltador: #fff1a6;
+
+  /*
+   * El botón principal y lo elegido. En Venduo van en tinta: la señal queda
+   * para lo que pide algo. Una plantilla lo vuelve a su color de acción
+   * (`cssDeApariencia`), así los botones de compra de una tienda no salen
+   * negros.
+   */
+  --accion: #1d1c1a;
+  --accion-alta: #3b3936;
 
   /*
    * Qué fuente es el titular y cuál el cuerpo. Las fuentes declaran solo su
@@ -187,8 +207,9 @@
 
   :root {
     caret-color: var(--senal);
-    accent-color: var(--senal);
-    scrollbar-color: var(--senal) transparent;
+    accent-color: var(--accion);
+    scrollbar-color: color-mix(in oklab, var(--tinta) 35%, transparent)
+      transparent;
   }
 
   /*
@@ -203,7 +224,7 @@
       "lnum" 1;
   }
 
-  /* Sobre el bloque rojo, el anillo de foco tiene que verse sobre rojo. */
+  /* Sobre el bloque de señal, el anillo de foco tiene que verse sobre la frambuesa. */
   .campo-senal :focus-visible {
     outline: 3px solid #fff;
     outline-offset: 3px;
@@ -338,6 +359,143 @@
     }
     100% {
       opacity: 0;
+    }
+  }
+
+  /*
+   * El panel responde a lo que se toca (DESIGN.md, "El movimiento del
+   * panel"). Todo arranca por un toque, nunca solo al cargar; con "Reducir
+   * movimiento" se ve el estado final en el acto.
+   */
+
+  /* Lo que acaba de cambiar: un trazo de resaltador detrás del texto, que
+     entra de izquierda a derecha y después se retira hacia abajo. */
+  .texto-recien {
+    background-image: linear-gradient(var(--resaltador), var(--resaltador));
+    background-repeat: no-repeat;
+    background-position: 0 88%;
+    background-size: 100% 0.62em;
+    box-decoration-break: clone;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .texto-recien {
+      animation: texto-recien 1.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  }
+  @keyframes texto-recien {
+    0% {
+      background-size: 0% 0.62em;
+    }
+    22%,
+    70% {
+      background-size: 100% 0.62em;
+    }
+    100% {
+      background-size: 100% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Una hoja que llega: sube, se enfoca y se endereza. */
+    .hoja-entra {
+      animation: hoja-entra 0.62s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-delay: calc(var(--orden, 0) * 70ms);
+    }
+
+    /* El velo de resaltador sobre una hoja que cambió: barre y se va. */
+    .marca-recien {
+      animation: marca-recien 1.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Un número que aparece sobre una foto elegida. */
+    .numero-entra {
+      animation: numero-entra 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    /* Lo que reemplaza a lo de antes en el mismo lugar: la plantilla nueva en
+       el probador, la hoja chica de "Así va quedando". */
+    .cambio-entra {
+      animation: cambio-entra 0.52s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    /* Mientras se arma el PDF, una luz recorre cada hoja, una tras otra. */
+    .armando-barrido {
+      background: linear-gradient(
+        180deg,
+        transparent 0%,
+        color-mix(in oklab, var(--resaltador) 85%, transparent) 50%,
+        transparent 100%
+      );
+      background-size: 100% 45%;
+      background-repeat: no-repeat;
+      mix-blend-mode: multiply;
+      animation: armando-barrido 1.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+      animation-delay: calc(var(--i, 0) * 160ms);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marca-recien,
+    .armando-barrido {
+      display: none;
+    }
+  }
+  @keyframes hoja-entra {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.965) rotate(-0.6deg);
+      filter: blur(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+  @keyframes marca-recien {
+    0% {
+      opacity: 0;
+      clip-path: inset(0 100% 0 0);
+    }
+    18% {
+      opacity: 0.6;
+      clip-path: inset(0 0 0 0);
+    }
+    55% {
+      opacity: 0.6;
+    }
+    100% {
+      opacity: 0;
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes numero-entra {
+    from {
+      opacity: 0;
+      transform: scale(0.3) rotate(-25deg);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes cambio-entra {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.985);
+      filter: blur(5px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+  @keyframes armando-barrido {
+    from {
+      background-position: 0 -60%;
+    }
+    to {
+      background-position: 0 160%;
     }
   }
 }

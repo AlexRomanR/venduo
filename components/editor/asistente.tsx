@@ -89,7 +89,7 @@ export function Asistente() {
           ) : ia.error ? (
             <p
               role="alert"
-              className="mx-4 my-3 border-l-2 border-senal py-1 pl-3 text-sm leading-relaxed"
+              className="mx-4 my-3 border-l-2 border-tinta py-1 pl-3 text-sm leading-relaxed"
             >
               {ia.error}
             </p>

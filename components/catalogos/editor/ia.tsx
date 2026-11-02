@@ -82,7 +82,7 @@ export function PedidoALaIa({
           maxLength={300}
           onChange={(evento) => setFrase(evento.target.value)}
           placeholder={ejemplos[0]}
-          className="h-11 min-w-0 flex-[1_1_14rem] border-0 border-b border-tinta/40 bg-transparent text-base placeholder:text-tinta/40 focus-visible:border-senal focus-visible:outline-none"
+          className="h-11 min-w-0 flex-[1_1_14rem] border-0 border-b border-tinta/40 bg-transparent text-base placeholder:text-tinta/40 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:outline-none"
         />
         <button
           type="submit"

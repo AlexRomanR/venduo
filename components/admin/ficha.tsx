@@ -22,7 +22,7 @@ const BOTON =
 const BOTON_ALERTA =
   "flex min-h-11 items-center justify-center gap-2 border-2 border-senal px-4 text-sm font-semibold text-senal transition-colors hover:bg-senal hover:text-white disabled:opacity-50"
 const CAMPO =
-  "w-full border-b border-tinta bg-transparent py-2 text-base outline-none placeholder:text-tinta/40 focus-visible:border-senal"
+  "w-full border-b border-tinta bg-transparent py-2 text-base outline-none placeholder:text-tinta/40 focus-visible:border-tinta focus-visible:bg-tinta/[0.04]"
 
 /* ---------------------------------------------------------------- suscripción */
 

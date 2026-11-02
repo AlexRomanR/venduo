@@ -184,30 +184,26 @@ export function EsqueletoDePantalla({
   )
 }
 
-/** El Resumen mientras carga: la cabecera con su sello y después el tablero. */
+/**
+ * El Resumen mientras carga: la entrada —el nombre de la tienda al lado del
+ * celular— y después las escenas.
+ */
 export function EsqueletoDelResumen() {
   return (
-    <div
-      aria-busy="true"
-      aria-label="Cargando tu resumen"
-      className="flex flex-col gap-6 md:gap-8"
-    >
-      <div className="flex items-center gap-4 lg:gap-6">
-        <Skeleton
-          className={cn(
-            BLOQUE_ESQUELETO,
-            "aspect-[1/2] w-[88px] shrink-0 rounded-[14px] lg:w-[104px]"
-          )}
-        />
-        <div className="min-w-0 flex-1">
+    <div aria-busy="true" aria-label="Cargando tu resumen">
+      <div className="grid items-center gap-8 pt-2 pb-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-6 lg:pt-4 lg:pb-16">
+        <div>
           <Skeleton className={cn(BLOQUE_ESQUELETO, "h-3 w-20")} />
+          <Skeleton className="mt-4 h-[clamp(2.6rem,7vw,5rem)] w-full max-w-[22rem] rounded-[14px] bg-tinta/[0.07]" />
+          <Skeleton className="mt-2 h-[clamp(2.6rem,7vw,5rem)] w-2/3 max-w-[18rem] rounded-[14px] bg-tinta/[0.07]" />
+          <Skeleton className="mt-5 h-9 w-56 rounded-full bg-tinta/[0.07]" />
           <Skeleton
-            className={cn(
-              BLOQUE_ESQUELETO,
-              "mt-2 h-[clamp(1.9rem,6vw,3rem)] w-full max-w-xs"
-            )}
+            className={cn(BLOQUE_ESQUELETO, "mt-6 h-5 w-72 max-w-full")}
           />
-          <Skeleton className={cn(BLOQUE_ESQUELETO, "mt-3 h-8 w-40")} />
+          <Skeleton className="mt-8 h-[3.25rem] w-full rounded-full bg-tinta/[0.07] sm:w-56" />
+        </div>
+        <div className="flex h-[400px] items-center justify-center lg:h-[540px]">
+          <Skeleton className="aspect-[9/19.2] h-[340px] rounded-[30px] bg-tinta/[0.07] lg:h-[470px]" />
         </div>
       </div>
 

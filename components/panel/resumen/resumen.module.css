@@ -1,0 +1,140 @@
+/*
+ * El Resumen: el cuaderno de ventas del día, con el mismo bolígrafo que la
+ * portada. Las clases de letra, resaltador y trazos son las de
+ * `components/portada/portada.module.css`; acá se declaran sus variables y lo
+ * que usa solo el Resumen.
+ */
+
+.resumen {
+  --hoja: #fdfcf9;
+  --boli: var(--senal);
+  --boli-suave: #fce4ee;
+  --boli-claro: #ff7aa8;
+  --regla: rgb(29 28 26 / 0.12);
+
+  position: relative;
+  font-family: var(--fuente-geist), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.resumen ::selection {
+  background: var(--resaltador);
+  color: var(--tinta);
+}
+
+/* Una tarjeta que flota sobre el papel: la nota, el ticket, la polaroid. */
+.nota {
+  border: 1px solid var(--regla);
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgb(29 28 26 / 0.05),
+    0 22px 44px -26px rgb(29 28 26 / 0.38);
+}
+
+/* El papel rayado del cuaderno, para la lista de lo que espera. */
+.renglones {
+  --renglon: 2.25rem;
+  background-color: var(--hoja);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--renglon) - 1px),
+    rgb(29 28 26 / 0.07) calc(var(--renglon) - 1px),
+    rgb(29 28 26 / 0.07) var(--renglon)
+  );
+}
+
+/* El sello de un pedido: se estampa torcido, como uno de goma. */
+.sello {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  border: 2.5px solid currentColor;
+  border-radius: 6px;
+  padding: 0.18em 0.55em 0.12em;
+  font-family: var(--fuente-ancha), var(--fuente-archivo), sans-serif;
+  font-stretch: 112%;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  rotate: -8deg;
+  mix-blend-mode: multiply;
+}
+
+.selloRecien {
+  animation: sello-entra 0.55s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+@keyframes sello-entra {
+  0% {
+    opacity: 0;
+    transform: scale(2.4);
+    filter: blur(2px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.92);
+    filter: blur(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* La línea punteada que separa el talón del ticket; en el celular el talón
+   va abajo, con su borde. */
+@media (min-width: 640px) {
+  .picado {
+    background-image: linear-gradient(
+      to bottom,
+      rgb(29 28 26 / 0.25) 50%,
+      transparent 50%
+    );
+    background-size: 1px 8px;
+    background-repeat: repeat-y;
+  }
+}
+
+/* Lo que espera respira, despacio. */
+.late {
+  animation: late 1.8s ease-in-out infinite;
+}
+
+@keyframes late {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--boli) 45%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--boli) 0%, transparent);
+  }
+}
+
+/* Una franja que se desliza: se esfuma en los bordes para avisarlo. */
+.franja {
+  scrollbar-width: none;
+}
+
+@media (max-width: 639px) {
+  .franja {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 12px,
+      black calc(100% - 40px),
+      transparent
+    );
+  }
+}
+
+.franja::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selloRecien,
+  .late {
+    animation: none;
+  }
+}

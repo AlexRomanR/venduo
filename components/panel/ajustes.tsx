@@ -267,7 +267,7 @@ export function CampoMonto({
       </label>
       <div
         className={cn(
-          "flex items-baseline gap-2 border-b-2 border-tinta focus-within:border-senal",
+          "flex items-baseline gap-2 border-b-2 border-tinta focus-within:border-tinta focus-within:bg-tinta/[0.04]",
           error && "border-senal"
         )}
       >

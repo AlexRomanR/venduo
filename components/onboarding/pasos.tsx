@@ -22,7 +22,7 @@ export const PASOS_CREAR: Paso[] = [
 export function Pasos({ pasos, actual }: { pasos: Paso[]; actual: number }) {
   return (
     <div>
-      <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+      <p className="text-xs font-semibold tracking-[0.12em] uppercase">
         Paso {actual} de {pasos.length}
       </p>
 

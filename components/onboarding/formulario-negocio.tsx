@@ -28,7 +28,7 @@ const ETIQUETA_CAMPO =
   "text-xs font-semibold tracking-[0.12em] uppercase opacity-55 data-[error=true]:text-senal data-[error=true]:opacity-100"
 
 const CAMPO =
-  "rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-senal focus-visible:ring-0 aria-invalid:border-senal aria-invalid:ring-0 md:text-base"
+  "rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:ring-0 aria-invalid:border-senal aria-invalid:ring-0 md:text-base"
 
 export function FormularioNegocio({ plantilla }: { plantilla: string }) {
   const router = useRouter()
@@ -161,7 +161,7 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
         <button
           type="submit"
           disabled={form.formState.isSubmitting}
-          className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-sm bg-senal px-5 font-semibold text-white transition-colors hover:bg-senal-alta disabled:opacity-60 sm:w-auto sm:self-start sm:px-8"
+          className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-sm bg-accion px-5 font-semibold text-white transition-colors hover:bg-accion-alta disabled:opacity-60 sm:w-auto sm:self-start sm:px-8"
         >
           {form.formState.isSubmitting ? (
             <Loader2 aria-hidden="true" className="size-4 animate-spin" />

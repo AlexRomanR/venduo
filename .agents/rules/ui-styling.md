@@ -4,7 +4,7 @@
 
 **`DESIGN.md` en la raíz es la fuente del mundo visual**: paleta con sus valores, escala
 tipográfica, ritmo de espaciado, pesos de regla, patrones de componente y gramática de
-movimiento. Se derivó de la portada ya construida, no de intenciones, y es lo que hereda
+movimiento. Se derivó de las pantallas ya construidas, no de intenciones, y es lo que hereda
 cada superficie nueva.
 
 Leerlo antes de diseñar una pantalla. Esta regla cubre lo que no se negocia; `DESIGN.md`
@@ -12,8 +12,22 @@ cubre cómo se ve.
 
 ### El mundo de Venduo y el de cada tienda
 
-**Venduo usa el mundo editorial de `DESIGN.md`**: papel, tinta y un rojo de señal. Portada,
-ingreso, el alta de la tienda y el panel.
+**Venduo usa el mundo editorial de `DESIGN.md`**: papel cálido, tinta para todo lo que se
+lee y se toca, y una frambuesa de señal para lo que pide algo.
+El ingreso, el alta de la tienda, el panel, la cuenta y `/admin` van en su registro de
+diario. **La portada comparte la paleta, las letras y el logo, y tiene un registro propio**
+—el celular en 3D, las escenas, la letra a mano, las sombras y el movimiento con el
+scroll—, medido en `DESIGN.md`, "La portada". **La única pantalla del panel con ese
+registro es el Resumen** (`components/panel/resumen/`, desde el 31/10/2026): se cuenta en
+escenas como la portada, con los datos reales de la tienda, y ahí no rigen los paneles
+con borde ni "sin sombras" (`DESIGN.md`, "El Resumen"). **En las demás pantallas del
+panel pasa solo la idea de que la pantalla responde**: lo que se toca se ve en el
+momento, con el resaltador para lo que acaba de cambiar y el movimiento de `DESIGN.md`,
+"El panel responde a lo que se toca". Sin celulares flotando ni escenas.
+
+**El botón principal y lo elegido van en tinta** (`BOTON_PRIMARIO`, `bg-accion`); la
+frambuesa queda para lo que pide algo y para los errores. En una tienda, `--accion` vale
+el color de acción de su plantilla: un botón de compra no sale negro.
 
 **Una tienda usa el de su plantilla.** La plantilla redefine los mismos tokens —`papel`,
 `tinta`, `senal`, `font-titular`, el radio— y trae su propio kit de componentes para la
@@ -32,7 +46,7 @@ Tres reglas que se desprenden:
   clases por clave. Lo que cambia entre plantillas vive en su kit
   (`components/plantillas/{clave}`) o en sus tokens (`lib/plantillas/{clave}.ts`).
 - **Lo compartido se escribe con tokens y queda bien en todas**: carrito, checkout, pago y
-  filtros. Un `#16171a` o un `rounded-sm` fijos ya no responden a la plantilla: usar
+  filtros. Un `#1d1c1a` o un `rounded-sm` fijos ya no responden a la plantilla: usar
   `text-tinta` y `rounded-plantilla`.
 - **Nada en `app/(privado)` pinta la plantilla.** Ni `EstiloDePlantilla` en el layout ni
   variables de la tienda en `:root`: lo que muestra su identidad lo hace dentro de un
@@ -60,8 +74,10 @@ una portada y un panel no es la paleta ni la tipografía, es el ritmo:
 | Señal         | La acción de conversión   | Solo lo que pide una acción: un pendiente  |
 | Barra         | Anclas de navegación      | Navegación persistente, siempre a la vista |
 
-"Rojo" en esta regla quiere decir **la señal**: en Venduo es rojo, en Pasarela azul y en
-Esencia oro viejo. La regla de usarla poco no cambia con el color.
+"Rojo" en esta regla —se escribió cuando la señal de Venduo era roja— quiere decir **la
+señal**: en Venduo hoy es frambuesa, en Pasarela azul y en Esencia oro viejo. La regla de usarla
+poco no cambia con el color. Los errores también van en la señal, siempre con su mensaje
+escrito: un error nunca es solo color.
 
 ### El celular es uno solo
 
@@ -103,25 +119,24 @@ su `AGENTS.md`): quien vende lo abre entre dos mensajes y no va a leer un párra
   frases largas, nunca repetir el título con otras palabras, nada que explique cómo
   funciona la pantalla. La app lleva los mismos textos.
 - **Lo que espera algo es un número grande que se toca** y lleva a la lista ya
-  filtrada (`ParaHoy`). Los números suben al aparecer (`Contador`).
+  filtrada (las notas de `ParaHoy` en el Resumen). Los números suben al aparecer.
 - **Fotos antes que nombres**: un pedido por las fotos de lo que pidieron, un producto
   por la suya, en carruseles que se deslizan en el celular.
-- **La tienda se muestra, no se nombra**, como la ve quien compra en esa pantalla: en el
-  celular, su portada en un celular chico al lado del nombre; en una pantalla ancha, su
-  portada en una ventana de computadora a la derecha. El Resumen es un resumen, no un
-  lugar para mirar la tienda: tocarla abre el editor, y para verla está "Ver tienda".
-  Sin captura todavía, va su plantilla: vista en un celular
-  (`public/plantillas/celular/`) o dibujada con sus colores (`Miniatura`).
-- **En una pantalla ancha nada queda a medio llenar**: la cabecera se alinea a dos bordes
-  con la computadora, "Para hoy" va en una fila y "Cómo te va" en dos zonas —cifras y
-  gráfico—. Los paneles se acomodan al lugar que les toca (`@container`), no al ancho de
-  la pantalla.
+- **La tienda se muestra, no se nombra**: en el Resumen, su portada en un celular en 3D
+  al lado del nombre. Tocarla abre el editor, y para verla está "Ver tienda". Sin
+  captura todavía, va su plantilla vista en un celular (`public/plantillas/celular/`), y
+  lo dice.
+- **En una pantalla ancha nada queda a medio llenar**: cada escena del Resumen va en dos
+  columnas —el titular a la izquierda, lo suyo a la derecha— y en una sola en el
+  celular. Los paneles de las demás pantallas se acomodan al lugar que les toca
+  (`@container`), no al ancho de la pantalla.
 - **Lo que no pide nada no ocupa lugar**: sin ventas no hay "lo más vendido"; sin
-  pendientes, "Estás al día" es una línea.
+  pendientes, "Para hoy" dice "Estás al día" con un visto a mano.
 - **Lo de todos los días se hace donde se ve**: cobrar un pedido y reponer stock desde
   el Resumen, con el festejo de la app al cobrar (`useFestejo`).
-- **El movimiento es corto y sin rebotes**: los paneles entran de a uno, las barras
-  crecen, el período se desliza. Todo queda quieto con "Reducir movimiento"
+- **El movimiento del Resumen es el de la portada** (`components/panel/resumen/escena.ts`):
+  cada escena se arma al aparecer y vuelve a empezar al salir. En las demás pantallas,
+  corto y con un porqué (`DESIGN.md`, "El panel responde a lo que se toca"). Todo queda quieto con "Reducir movimiento"
   (`globals.css`).
 
 ### Cuándo aparece la barra
@@ -164,12 +179,12 @@ celular, el botón del menú lleva un punto rojo si adentro hay algo urgente.
 
 ### Las pantallas del panel
 
-**Toda pantalla del panel se arma igual que el Resumen**: cada cosa en su propio panel
-—regla estructural de un píxel, esquina viva, sin sombra— con un ícono y un título que
-dice **para qué sirve** ("Para hoy", "Se está acabando"). El pie, si lo hay, es un
-enlace a todo el ancho hacia donde se sigue. Antes solo el Resumen se veía así, y en las demás pantallas las
-cifras, los filtros y las listas quedaban sueltos bajo rótulos chicos: lo importante se
-perdía entre lo demás.
+**Toda pantalla del panel —menos el Resumen, que va en escenas— se arma en paneles**:
+cada cosa en su propio panel —regla estructural de un píxel, esquina viva, sin sombra—
+con un ícono y un título que dice **para qué sirve** ("Tus pedidos", "Se está
+acabando"). El pie, si lo hay, es un enlace a todo el ancho hacia donde se sigue. Antes
+las cifras, los filtros y las listas quedaban sueltos bajo rótulos chicos: lo importante
+se perdía entre lo demás.
 
 **Nadie arma esto a mano.** Las piezas están en `components/panel/piezas.tsx`:
 
@@ -232,8 +247,8 @@ venta, los datos de la tienda, un catálogo—:
 6. **Se sugiere en vez de preguntar**: la categoría "Ropa" abre las tallas ya en Talla.
    Abrir algo y no completarlo no es un error: se guarda como si no se hubiera abierto.
 7. **La acción principal, fija sobre las pestañas en el celular**; con un error, la fila
-   que lo tiene se pinta de rojo con su mensaje y un aviso dice "Revisa lo que quedó en
-   rojo".
+   que lo tiene se pinta en la señal con su mensaje y un aviso dice "Revisa lo que quedó
+   marcado".
 
 Las piezas están en `components/panel/ajustes.tsx` (`Fila`, `Palanca`, `Cantidad`,
 `CampoMonto`, `HojaDeAjuste`) y el ejemplo completo es `components/productos/formulario.tsx`.
@@ -272,7 +287,7 @@ para nada en este producto.
 
 La configuración vive en `app/globals.css`, no en un `tailwind.config`. Los colores se
 usan **siempre por su token** —`bg-papel`, `text-tinta`, `text-senal`, `border-tinta/15`—
-y nunca con un valor fijo: un `#16171a` escrito a mano es un color que ya no responde a
+y nunca con un valor fijo: un `#1d1c1a` escrito a mano es un color que ya no responde a
 `DESIGN.md`.
 
 Las jerarquías intermedias son **tinta con opacidad**, no grises nuevos: `opacity-70`
@@ -364,6 +379,11 @@ Antes de escribir un texto se decide quién lo dice. Hay una voz por texto:
 - **Las personas, sin género fijo**: "quien te compra", "quienes te compran", "Te damos
   la bienvenida". No "un cliente", "tus compradores", "el dueño", "bienvenido",
   "como vendedor".
+- **Ningún texto de relleno llega a quien compra.** Lo que nace con una sección, una
+  semilla de `template_pages` o una plantilla se publica como si lo hubiera escrito la
+  tienda: nunca "Escribe acá…", "Cuenta aquí…", un testimonio, un horario o una
+  historia inventados. Eso va como pista gris del campo (`ejemplo` en
+  `lib/plantillas/secciones.ts`), y la sección nace vacía.
 
 ### Cada pantalla, con su nombre de hoy
 
@@ -513,7 +533,8 @@ Se dibujan **a mano en SVG**, sin biblioteca: el público está en datos móvile
 mundo no tiene sombras, ni contenedores redondeados, ni una segunda paleta que una
 biblioteca de gráficos da por supuesta.
 
-**Toda serie va en el rojo de señal, una sola por gráfico.** No es solo por la regla del
+**Toda serie va en tinta, una sola por gráfico; la señal, solo en la barra o el punto que se
+está mirando.** No es solo por la regla del
 acento único: el validador de la skill `dataviz` mostró que un ramp de un solo tono no
 separa categorías ni con visión normal —ΔE 7,0 entre adyacentes—, así que la identidad
 **nunca** puede venir del color.

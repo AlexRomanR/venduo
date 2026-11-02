@@ -4,10 +4,9 @@ import { cn } from "@/lib/utils"
 /**
  * El símbolo de Venduo: la feria en el celular.
  *
- * El cuerpo va en `currentColor` y las rayas rojas en la señal, así que sobre
- * un fondo oscuro basta con poner el texto en papel. Solo en el mundo de
- * Venduo: dentro de una tienda la señal es la de su plantilla, y el toldo
- * saldría azul u oro. Las reglas están en `.agents/rules/marca.md`.
+ * El cuerpo va en `currentColor` y las rayas del toldo en vino claro
+ * (`toldo`), así que sobre un fondo oscuro basta con poner el texto en papel.
+ * Solo en el mundo de Venduo. Las reglas están en `.agents/rules/marca.md`.
  */
 export function Simbolo({
   className,
@@ -30,7 +29,7 @@ export function Simbolo({
         <path
           key={raya.d}
           d={raya.d}
-          className={raya.senal ? "fill-senal" : undefined}
+          className={raya.senal ? "fill-toldo" : undefined}
           fill={raya.senal ? undefined : "currentColor"}
         />
       ))}

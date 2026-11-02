@@ -640,7 +640,7 @@ export function CargaDeProductos({
         <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 flex items-center gap-3 border-t border-tinta bg-papel px-4 py-3 lg:sticky lg:bottom-0 lg:border lg:px-5">
           <div className="min-w-0 flex-1">
             {sinPrecio + sinNombre > 0 ? (
-              <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+              <p className="text-xs font-semibold tracking-[0.12em] uppercase">
                 {sinNombre > 0
                   ? `Faltan ${sinNombre} ${sinNombre === 1 ? "nombre" : "nombres"}`
                   : `Faltan ${sinPrecio} ${sinPrecio === 1 ? "precio" : "precios"}`}
@@ -1723,8 +1723,8 @@ function LecturaDePlanilla({
   const enmarcada = (numero: number, ultima = false) =>
     activa === numero &&
     cn(
-      "border-x-2 border-x-senal bg-senal/[0.06]",
-      ultima && "border-b-2 border-b-senal"
+      "border-x-2 border-x-tinta bg-tinta/[0.04]",
+      ultima && "border-b-2 border-b-tinta"
     )
 
   return (
@@ -1830,7 +1830,7 @@ function LecturaDePlanilla({
                         className={cn(
                           "sticky top-0 z-10 border-b border-tinta/15 bg-papel p-0 text-left align-top font-normal",
                           activa === c.columna &&
-                            "border-x-2 border-t-2 border-senal"
+                            "border-x-2 border-t-2 border-tinta"
                         )}
                       >
                         <button
@@ -1841,7 +1841,7 @@ function LecturaDePlanilla({
                           className={cn(
                             "group flex w-full min-w-28 cursor-pointer flex-col items-start gap-1.5 px-3 py-2.5 transition-colors",
                             activa === c.columna
-                              ? "bg-senal/[0.06]"
+                              ? "bg-tinta/[0.04]"
                               : "hover:bg-tinta/[0.05]"
                           )}
                         >

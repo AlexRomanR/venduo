@@ -68,7 +68,7 @@ termina rehecho.
   campos de las hojas escriben con `setValue` (`poner` en el formulario de producto):
   el portal de la hoja queda fuera del `<form>`, el contexto no.
 - Cada fila muestra el **valor actual en palabras** ("Ropa", "S, M, L", "Al quedar 3").
-  Lo vacío, en tinta al 55%. Una fila con error se pinta de rojo con su mensaje.
+  Lo vacío, en tinta al 55%. Una fila con error se pinta en la señal (la frambuesa) con su mensaje.
 - Abrir algo y no completarlo no es un error: al cerrar la hoja y al guardar, lo que
   quedó vacío se descarta (como las opciones sin valores en el producto).
 - La acción principal, fija sobre las pestañas en el celular
@@ -94,7 +94,7 @@ Invocar `impeccable` con `polish`. Lo que más se escapa en estas pantallas:
 - **375 y 1280 px**, sin desplazamiento horizontal. Abrir cada hoja.
 - **Guardar uno existente sin cambios** y mirar en la base que quedó igual
   (`npx supabase db query --linked "select …"`).
-- **Intentar guardar uno vacío**: los errores en rojo, en su fila.
+- **Intentar guardar uno vacío**: los errores marcados en la señal, en su fila.
 - `npm run check`, y la consola sin errores con la página ya compilada (un aviso de
   hidratación recién recompilado desaparece al recargar; si no, es real).
 - En la app, lo mismo en el emulador, y las dos lado a lado.

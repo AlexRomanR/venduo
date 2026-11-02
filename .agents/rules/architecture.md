@@ -228,7 +228,9 @@ components/
     variantes/        Cómo se dibuja cada bloque: portada, productos, separador,
                       pack, oferta, contraportada y texto
     editor/           El constructor: productos, plantillas, hojas, packs,
-                      estilo, vista previa, IA, exportar y Canva
+                      estilo, vista previa, IA, exportar y Canva; "Así va
+                      quedando" (`asi-va-quedando.tsx`), el probador de plantillas
+                      (`probador.tsx`) y la foto que vuela al elegir (`vuelo.ts`)
   panel/              Shell y piezas del panel. `piezas.tsx` son los
                       paneles, cifras y estados vacíos de toda pantalla;
                       `armazon.tsx` es la barra con su contenido y decide cuándo va;
@@ -237,12 +239,21 @@ components/
                       `fichas.tsx` y `fichas-grandes.tsx`, los filtros de una lista;
                       `funcion.tsx` apaga lo que Venduo desactivó, `visitas.tsx`
                       es el panel de visitas, el mismo en `/admin`, y `contador.tsx`
-                      y `festejo.tsx` son los números que suben y el check al cobrar
-    tablero/          El Resumen: su cabecera, sus secciones, el gráfico de ventas y
-                      compartir la tienda
+                      y `festejo.tsx` son los números que suben y el check al cobrar;
+                      `recien.tsx` marca con el resaltador lo que acaba de cambiar y
+                      `reintentar.tsx` vuelve a pedir una pantalla que falló
+    resumen/          El Resumen, en escenas como la portada: la entrada con el
+                      celular, Para hoy, primeros pasos, ventas, pedidos, productos,
+                      visitas y el cierre; `escena.ts` es su movimiento (GSAP) y
+                      `resumen.tsx` el contenedor con Lenis y las letras
+    tablero/          Lo que el Resumen comparte con otras pantallas: compartir la
+                      tienda, la franja de vacaciones y el esqueleto de carga
   admin/              El armazón de `/admin`, su navegación y los controles de
                       cada pantalla: funciones, plantillas, tiendas, ficha, registro
-  landing/            Piezas de la portada
+  portada/            La portada pública: sus secciones, escenas y celulares de
+                      muestra, sus letras (Archivo con ancho y Kalam), GSAP y Lenis
+                      (`gsap.ts`) y los productos de Rosa Deportes (`productos.ts`).
+                      Del panel, solo `panel/resumen/` importa de acá
   legal/              El armazón de las páginas de texto: privacidad, términos y baja
   marca/              `Logo` y `Simbolo`: la marca de Venduo, desde `lib/marca.ts`
   config-status.tsx   Checklist de capas configuradas
@@ -283,7 +294,8 @@ lib/
   catalogo.ts         Filtrar y ordenar el catálogo público, sin dependencias de servidor
   tablero.ts          El tablero del Resumen: sus tipos y las cuentas de los períodos,
                       sin dependencias de servidor
-  fuentes.ts          Todas las tipografías, con next/font
+  fuentes/            Todas las tipografías, con next/font/local, y sus woff2: no se
+                      piden a Google en cada build
   format.ts           Moneda, fechas, slugs
   pedidos.ts          Los estados de un pedido y el mensaje de WhatsApp, sin
                       dependencias de servidor
@@ -314,7 +326,7 @@ vitest.config.mts     Los tests de TypeScript: `lib/**/*.test.ts`, junto a su
                       módulo, en UTC
 
 public/marca/         Íconos del manifiesto y la tarjeta de compartir. Generados
-public/portada/       La foto y la captura de la tienda del primer bloque de la portada
+public/portada/       Los productos recortados sin fondo de la portada (Pexels)
 public/plantillas/    La miniatura de cada plantilla como imagen, para la app, y en
                       `celular/` cada plantilla vista en un celular: la vista de una
                       tienda sin captura

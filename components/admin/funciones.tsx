@@ -239,7 +239,7 @@ export function AjustesDeIa({
               setValor(evento.target.value.replace(/\D/g, ""))
             }
             placeholder="Sin tope"
-            className="mt-1 h-11 w-40 border-b border-tinta bg-transparent text-base outline-none focus-visible:border-senal"
+            className="mt-1 h-11 w-40 border-b border-tinta bg-transparent text-base outline-none focus-visible:border-tinta focus-visible:bg-tinta/[0.04]"
           />
         </label>
         <button

@@ -98,7 +98,7 @@ const ETIQUETA_CAMPO =
 // Campo sin caja: una regla abajo que se pone roja al enfocar. El mundo
 // editorial estructura con la línea, no con el recuadro.
 const CAMPO =
-  "h-12 rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-senal focus-visible:ring-0 aria-invalid:border-senal aria-invalid:ring-0 md:text-base"
+  "h-12 rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:ring-0 aria-invalid:border-senal aria-invalid:ring-0 md:text-base"
 
 export function Acceso({
   next,
@@ -222,7 +222,7 @@ export function Acceso({
   return (
     <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-12 lg:grid-cols-[1fr_0.95fr] lg:grid-rows-[auto_1fr] lg:gap-y-0 lg:py-20">
       <div className="lg:col-start-1 lg:row-start-1 lg:pr-14">
-        <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+        <p className="text-xs font-semibold tracking-[0.12em] uppercase">
           {esRegistro ? REGISTRO.etiqueta : VUELTA.etiqueta}
         </p>
         <h1 className="mt-5 max-w-[13ch] font-titular text-[clamp(2.25rem,7vw,3.75rem)] leading-[0.98] font-extrabold tracking-[-0.035em] text-balance">
@@ -388,7 +388,7 @@ export function Acceso({
               <button
                 type="submit"
                 disabled={form.formState.isSubmitting}
-                className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-sm bg-senal px-5 font-semibold text-white transition-colors hover:bg-senal-alta disabled:opacity-60"
+                className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-sm bg-accion px-5 font-semibold text-white transition-colors hover:bg-accion-alta disabled:opacity-60"
               >
                 {form.formState.isSubmitting ? (
                   <Loader2 aria-hidden="true" className="size-4 animate-spin" />

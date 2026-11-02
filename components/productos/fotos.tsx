@@ -120,7 +120,7 @@ export function Fotos({
             key={url}
             className={cn(
               "group relative size-24 overflow-hidden border bg-tinta/5",
-              i === 0 ? "border-senal" : "border-tinta/25"
+              i === 0 ? "border-tinta" : "border-tinta/25"
             )}
           >
             <Image
@@ -133,7 +133,7 @@ export function Fotos({
             />
 
             {i === 0 ? (
-              <figcaption className="absolute inset-x-0 bottom-0 bg-senal px-1 py-0.5 text-center text-[10px] font-semibold tracking-[0.1em] text-white uppercase">
+              <figcaption className="absolute inset-x-0 bottom-0 bg-tinta px-1 py-0.5 text-center text-[10px] font-semibold tracking-[0.1em] text-white uppercase">
                 Portada
               </figcaption>
             ) : (

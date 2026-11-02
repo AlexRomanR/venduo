@@ -7,7 +7,7 @@ import { Search } from "lucide-react"
 import { rutaDeTienda } from "@/lib/tienda"
 import { BotonDelCarrito } from "@/components/plantillas/clasica/marco"
 import type { PropsCabecera } from "@/components/plantillas/kit"
-import { useCarrito } from "@/components/tienda/carrito"
+import { SiRecibePedidos, useCarrito } from "@/components/tienda/carrito"
 
 /**
  * La cabecera de Bazar.
@@ -21,9 +21,11 @@ export function Cabecera({ marco, enlaceDelCarrito = true }: PropsCabecera) {
 
   return (
     <header className="sticky top-0 z-30 bg-papel">
-      <p className="bg-senal px-5 py-1.5 text-center text-xs font-semibold text-white">
-        Arma tu pedido y mándalo por WhatsApp
-      </p>
+      <SiRecibePedidos>
+        <p className="bg-senal px-5 py-1.5 text-center text-xs font-semibold text-white">
+          Arma tu pedido y envíanoslo por WhatsApp
+        </p>
+      </SiRecibePedidos>
 
       <div className="border-b-2 border-tinta/10">
         <div className="mx-auto flex w-full max-w-7xl items-center gap-3 px-5 py-2">

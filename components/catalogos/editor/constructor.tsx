@@ -57,7 +57,9 @@ import { AVISO_DE_NO_DISPONIBLE, type EstadoDeFuncion } from "@/lib/funciones"
 import { cn } from "@/lib/utils"
 import { useConfirmacion } from "@/components/panel/confirmar"
 import { ConFuncion } from "@/components/panel/funcion"
-import { Cabecera, Seccion } from "@/components/panel/piezas"
+import { Contador } from "@/components/panel/contador"
+import { Cabecera } from "@/components/panel/piezas"
+import { Recien } from "@/components/panel/recien"
 import { TituloDeLaBarra } from "@/components/panel/titulo-de-barra"
 import { Aviso } from "@/components/editor/piezas"
 import {
@@ -80,9 +82,9 @@ import {
   puedeCompartirArchivos,
 } from "@/components/catalogos/editor/exportar"
 import {
-  GaleriaDeEstilos,
-  GaleriaDePlantillas,
-} from "@/components/catalogos/editor/galeria"
+  AsiVaQuedando,
+  AsiVaQuedandoEnLaBarra,
+} from "@/components/catalogos/editor/asi-va-quedando"
 import { PanelDeHojas } from "@/components/catalogos/editor/hojas"
 import { PanelDePacks } from "@/components/catalogos/editor/packs"
 import {
@@ -93,8 +95,10 @@ import {
   PanelDeIa,
   PanelDeProductos,
 } from "@/components/catalogos/editor/productos"
+import { Probador } from "@/components/catalogos/editor/probador"
 import { SelectorConFotos } from "@/components/catalogos/editor/selector"
 import { VistaPrevia } from "@/components/catalogos/editor/vista-previa"
+import { volarAlCatalogo } from "@/components/catalogos/editor/vuelo"
 import {
   borrarCatalogo,
   guardarCatalogo,
@@ -272,6 +276,45 @@ export function Constructor({
 
   const elegida = empezarCon ? nombreDeEleccion(empezarCon, sugeridos) : null
 
+  // Mientras se eligen los productos, el catálogo se arma con la plantilla que
+  // se tocó en la lista o, si no se tocó ninguna, con la primera de la tienda.
+  // Es provisoria: en el paso siguiente se prueba y se elige.
+  const provisoria = React.useMemo<EleccionDePlantilla | null>(() => {
+    if (empezarCon) return empezarCon
+    if (sugeridos[0]) return { tipo: "estilo", clave: sugeridos[0].clave }
+    return plantillas[0] ? { tipo: "plantilla", clave: plantillas[0] } : null
+  }, [empezarCon, sugeridos, plantillas])
+  const nombreProvisorio = provisoria
+    ? nombreDeEleccion(provisoria, sugeridos)
+    : null
+  const seleccionDiferida = React.useDeferredValue(seleccion)
+  const borrador = React.useMemo(
+    () =>
+      provisoria && seleccionDiferida.length > 0
+        ? armarConEleccion(
+            provisoria,
+            {
+              nombre: nombreDelMes(),
+              productos: productosDe(seleccionDiferida),
+              tienda: {
+                nombre: datos.tienda.nombre,
+                whatsapp: datos.tienda.whatsapp,
+              },
+              estilo: estiloDeTienda,
+            },
+            sugeridos
+          )
+        : null,
+    [
+      provisoria,
+      seleccionDiferida,
+      productosDe,
+      datos,
+      estiloDeTienda,
+      sugeridos,
+    ]
+  )
+
   /** Con los productos elegidos: directo a editar si ya hay plantilla. */
   function seguir() {
     const armado = empezarCon
@@ -299,7 +342,7 @@ export function Constructor({
 
   if (fase === "contenido") {
     return (
-      <div className="flex flex-col gap-6 max-lg:pb-24 md:gap-8">
+      <div className="flex flex-col gap-6 max-lg:pb-28 md:gap-8">
         {/* En el celular es el paso de la app: "Tus productos" arriba, con
             la X para salir, y el botón fijo abajo. */}
         <TituloDeLaBarra
@@ -314,29 +357,56 @@ export function Constructor({
             titulo="Nuevo catálogo."
             bajada={
               elegida
-                ? `Con la plantilla ${elegida}. Elige los productos y en qué orden.`
-                : "Elige los productos y en qué orden; después, el estilo."
+                ? `Con la plantilla ${elegida}. Elige los productos en el orden en que van.`
+                : "Elige los productos en el orden en que van."
             }
           />
         </div>
-        <SelectorConFotos
-          productos={Object.values(datos.productos)}
-          categorias={datos.categorias}
-          elegidos={seleccion}
-          alCambiar={setSeleccion}
-        />
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+          <SelectorConFotos
+            productos={Object.values(datos.productos)}
+            categorias={datos.categorias}
+            elegidos={seleccion}
+            alCambiar={setSeleccion}
+            alMarcar={volarAlCatalogo}
+          />
+          <div className="max-lg:hidden">
+            <AsiVaQuedando
+              borrador={borrador}
+              datos={datos}
+              plantilla={nombreProvisorio}
+            />
+          </div>
+        </div>
         <div className="fixed inset-x-0 bottom-0 z-20 border-t border-tinta bg-papel px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:sticky lg:-mx-10 lg:px-10">
-          <button
-            type="button"
-            disabled={seleccion.length === 0}
-            onClick={seguir}
-            className={cn(BOTON_PRIMARIO, "w-full lg:mx-auto lg:max-w-md")}
-          >
-            <LayoutTemplate aria-hidden="true" className="size-5" />
-            {seleccion.length === 0
-              ? "Elige los productos"
-              : `${elegida ? "Armar el catálogo" : "Elegir el estilo"} · ${seleccion.length}`}
-          </button>
+          <div className="flex items-center gap-3 lg:justify-center">
+            <div className="lg:hidden">
+              <AsiVaQuedandoEnLaBarra
+                borrador={borrador}
+                datos={datos}
+                plantilla={nombreProvisorio}
+              />
+            </div>
+            <button
+              type="button"
+              disabled={seleccion.length === 0}
+              onClick={seguir}
+              className={cn(
+                BOTON_PRIMARIO,
+                "min-w-0 flex-1 lg:w-full lg:max-w-md lg:flex-none"
+              )}
+            >
+              <LayoutTemplate aria-hidden="true" className="size-5 shrink-0" />
+              {seleccion.length === 0 ? (
+                "Elige los productos"
+              ) : (
+                <span className="truncate">
+                  {elegida ? "Armar el catálogo" : "Elegir la plantilla"} ·{" "}
+                  <Contador valor={seleccion.length} />
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -346,71 +416,47 @@ export function Constructor({
     const productos = catalogo
       ? elegidos(catalogo, datos)
       : productosDe(seleccion)
+    const volver = () => setFase(catalogo ? "editar" : "contenido")
     return (
       <div className="flex flex-col gap-6 md:gap-8">
         <TituloDeLaBarra
-          titulo="Elige el estilo"
+          titulo="Elige la plantilla"
           volver="/panel/catalogos"
-          alVolver={() => setFase(catalogo ? "editar" : "contenido")}
+          alVolver={volver}
         />
         <div className="flex flex-col gap-6 max-lg:hidden md:gap-8">
           <button
             type="button"
-            onClick={() => setFase(catalogo ? "editar" : "contenido")}
-            className="group inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+            onClick={volver}
+            className="group inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline"
           >
             <ArrowLeft aria-hidden="true" className="size-4" />
             {catalogo ? "Volver al catálogo" : "Volver a los productos"}
           </button>
           <Cabecera
-            titulo="Elige una plantilla."
+            titulo="Elige la plantilla."
             bajada={
               catalogo
-                ? "Las hojas se arman de nuevo con la que elijas; tus productos, packs y colores se quedan."
-                : "Cada una armada con tus productos y los colores de tu tienda."
+                ? "Las hojas se arman de nuevo; tus productos, packs y colores se quedan."
+                : `Con tus ${productos.length} ${productos.length === 1 ? "producto" : "productos"} y los colores de tu tienda.`
             }
           />
         </div>
-        {sugeridos.length > 0 ? (
-          <Seccion
-            id="con-tu-estilo"
-            icono={Palette}
-            titulo="Con el estilo de tu tienda"
-            bajada="Tus colores, a toda hoja o en oscuro."
-          >
-            <GaleriaDeEstilos
-              sugeridos={sugeridos}
-              productos={productos}
-              datos={datos}
-              nombre={catalogo?.nombre ?? nombreDelMes()}
-              packs={catalogo?.packs}
-              alElegir={(nuevo) => {
-                cambiar(nuevo)
-                setFase("editar")
-              }}
-            />
-          </Seccion>
-        ) : null}
-        <Seccion
-          id="plantillas"
-          icono={LayoutTemplate}
-          titulo="Todas las plantillas"
-          bajada={`Con tus ${productos.length} ${productos.length === 1 ? "producto" : "productos"}.`}
-        >
-          <GaleriaDePlantillas
-            productos={productos}
-            datos={datos}
-            estilo={catalogo?.estilo ?? estiloDeTienda}
-            nombre={catalogo?.nombre ?? nombreDelMes()}
-            packs={catalogo?.packs}
-            actual={catalogo?.plantilla}
-            claves={plantillas}
-            alElegir={(nuevo) => {
-              cambiar(nuevo)
-              setFase("editar")
-            }}
-          />
-        </Seccion>
+        <Probador
+          sugeridos={sugeridos}
+          claves={plantillas}
+          productos={productos}
+          datos={datos}
+          estilo={catalogo?.estilo ?? estiloDeTienda}
+          nombre={catalogo?.nombre ?? nombreDelMes()}
+          packs={catalogo?.packs}
+          actual={catalogo?.plantilla}
+          alUsar={(nuevo) => {
+            cambiar(nuevo)
+            setFase("editar")
+          }}
+          alVolver={() => setFase("editar")}
+        />
       </div>
     )
   }
@@ -447,7 +493,7 @@ function Volver() {
   return (
     <Link
       href="/panel/catalogos"
-      className="group inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+      className="group inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline"
     >
       <ArrowLeft
         aria-hidden="true"
@@ -539,13 +585,13 @@ function Editor({
   ]
   const bloqueado = problemas.length > 0 || hojas === 0
 
-  async function guardar() {
+  async function guardar(): Promise<{ id: string; enlace: string } | null> {
     setOcupado("guardar")
     const resultado = await guardarCatalogo(guardado?.id ?? null, catalogo)
     setOcupado(null)
     if (!resultado.ok) {
       toast.error(resultado.error)
-      return
+      return null
     }
     alGuardar({ id: resultado.id, enlace: resultado.enlace })
     toast.success("Catálogo guardado.")
@@ -557,6 +603,23 @@ function Editor({
       // título que pone la página de un catálogo guardado.
       document.title = "Editar catálogo · Venduo"
     }
+    return { id: resultado.id, enlace: resultado.enlace }
+  }
+
+  /**
+   * Abre algo del catálogo guardado; si hay cambios, guarda primero. La
+   * pestaña se abre antes de esperar, como Canva: si no, el navegador la
+   * bloquea por no venir de un toque.
+   */
+  async function abrirGuardado(destino: (enlace: string) => string) {
+    if (guardado && !sinGuardar) {
+      window.open(destino(guardado.enlace), "_blank", "noopener")
+      return
+    }
+    const pestana = window.open("about:blank", "_blank")
+    const resultado = await guardar()
+    if (resultado && pestana) pestana.location.href = destino(resultado.enlace)
+    else pestana?.close()
   }
 
   async function bajarPdf() {
@@ -664,7 +727,7 @@ function Editor({
         className={cn(
           "ml-1 flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition-opacity active:opacity-70",
           sinGuardar || !guardado
-            ? "bg-senal text-white"
+            ? "bg-accion text-white"
             : "border border-tinta/25"
         )}
       >
@@ -706,13 +769,13 @@ function Editor({
               onChange={(evento) =>
                 alCambiar({ ...catalogo, nombre: evento.target.value })
               }
-              className="mt-1 w-full border-0 border-b border-transparent bg-transparent font-titular text-[clamp(1.6rem,5vw,2.25rem)] leading-tight font-extrabold tracking-[-0.03em] hover:border-tinta/30 focus-visible:border-senal focus-visible:outline-none"
+              className="mt-1 w-full border-0 border-b border-transparent bg-transparent font-titular text-[clamp(1.6rem,5vw,2.25rem)] leading-tight font-extrabold tracking-[-0.03em] hover:border-tinta/30 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:outline-none"
             />
             <p className="mt-1 flex items-center gap-1.5 text-sm opacity-70">
               {!sinGuardar && guardado && !esDemo ? (
                 <Check aria-hidden="true" className="size-4" />
               ) : null}
-              {estado} · {hojas} {hojas === 1 ? "hoja" : "hojas"} ·{" "}
+              <Recien valor={estado}>{estado}</Recien> ·{" "}
               {HOJAS[catalogo.hoja].nombre}
             </p>
           </div>
@@ -981,6 +1044,8 @@ function Editor({
                 }
                 alCambiarNombre={(nombre) => alCambiar({ ...catalogo, nombre })}
                 alGuardar={guardar}
+                alAbrirGuardado={abrirGuardado}
+                hojas={hojas}
                 alCompartirPdf={compartible ? compartirPdf : bajarPdf}
                 alBorrar={borrar}
               />
@@ -996,7 +1061,11 @@ function Editor({
             <h2 className="font-titular text-lg leading-tight font-bold tracking-[-0.02em]">
               Vista previa
             </h2>
-            <p className="text-xs opacity-65">Toca una hoja para editarla</p>
+            <p className="text-sm font-semibold whitespace-nowrap">
+              <Recien valor={hojas}>
+                <Contador valor={hojas} /> {hojas === 1 ? "hoja" : "hojas"}
+              </Recien>
+            </p>
           </header>
           <VistaPrevia
             catalogo={catalogo}
@@ -1004,6 +1073,8 @@ function Editor({
             elegido={elegido}
             pedido={pedidoDeVista}
             alElegir={elegirHoja}
+            vivo
+            armando={ocupado === "descargar" || ocupado === "compartir"}
             className="bg-tinta/[0.04] px-4 py-6 sm:px-6 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto"
           />
         </section>
@@ -1055,6 +1126,8 @@ function PanelListo({
   canva,
   alCambiarNombre,
   alGuardar,
+  alAbrirGuardado,
+  hojas,
   alCompartirPdf,
   alBorrar,
 }: {
@@ -1071,6 +1144,9 @@ function PanelListo({
   canva: React.ReactNode
   alCambiarNombre: (nombre: string) => void
   alGuardar: () => void
+  /** Abre el enlace guardado; si hay cambios, guarda primero. */
+  alAbrirGuardado: (destino: (enlace: string) => string) => void
+  hojas: number
   alCompartirPdf: () => void
   alBorrar: () => void
 }) {
@@ -1088,6 +1164,23 @@ function PanelListo({
           className={CAMPO_LINEA}
         />
       </label>
+
+      <p className="-mt-3 text-sm opacity-75">
+        <Recien
+          valor={
+            esDemo ? "demo" : sinGuardar ? "cambios" : guardado ? "ok" : "no"
+          }
+        >
+          {esDemo
+            ? "Modo demo: no se guarda"
+            : sinGuardar
+              ? "Cambios sin guardar"
+              : guardado
+                ? "Guardado"
+                : "Sin guardar"}
+        </Recien>{" "}
+        · <Contador valor={hojas} /> {hojas === 1 ? "hoja" : "hojas"}
+      </p>
 
       {problemas.length > 0 ? (
         <div className="flex flex-col gap-1.5">
@@ -1137,15 +1230,10 @@ function PanelListo({
               titulo="Enlace"
               nota="Por WhatsApp"
               icono={Send}
-              apagado={!listo}
+              apagado={esDemo || bloqueado || ocupado !== null}
               alTocar={() =>
-                guardado &&
-                window.open(
-                  enlaceDeWhatsApp(
-                    `${catalogo.nombre} · ${tienda}\n${guardado.enlace}`
-                  ),
-                  "_blank",
-                  "noopener"
+                alAbrirGuardado((enlace) =>
+                  enlaceDeWhatsApp(`${catalogo.nombre} · ${tienda}\n${enlace}`)
                 )
               }
             />
@@ -1158,7 +1246,7 @@ function PanelListo({
             }
             nota={compartible ? "Con precios de hoy" : "Se descarga"}
             icono={compartible ? Share2 : FileDown}
-            apagado={(!listo && !esDemo) || bloqueado || ocupado !== null}
+            apagado={bloqueado || ocupado !== null}
             alTocar={alCompartirPdf}
           />
           {conEnlace ? (
@@ -1166,24 +1254,19 @@ function PanelListo({
               titulo="Verlo"
               nota="Como lo ven"
               icono={Eye}
-              apagado={!listo}
-              alTocar={() =>
-                guardado && window.open(guardado.enlace, "_blank", "noopener")
-              }
+              apagado={esDemo || bloqueado || ocupado !== null}
+              alTocar={() => alAbrirGuardado((enlace) => enlace)}
             />
           ) : null}
         </div>
         {funciones.canva !== "oculta" ? canva : null}
-        {!listo && !esDemo ? (
-          <p className="text-sm opacity-70">Guárdalo para mandarlo.</p>
-        ) : null}
       </div>
 
       {guardado ? (
         <button
           type="button"
           onClick={alBorrar}
-          className="mx-auto flex min-h-11 items-center gap-2 text-sm font-semibold text-senal"
+          className="mx-auto flex min-h-11 items-center gap-2 text-sm font-semibold opacity-70 transition-opacity hover:opacity-100"
         >
           <Trash2 aria-hidden="true" className="size-4" />
           Borrar el catálogo

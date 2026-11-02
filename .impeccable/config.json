@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "${familia}",
+        "createdAt": "2026-10-15T16:45:57.663Z",
+        "reason": "Agent: falso positivo, es la URL de la hoja de Google Fonts que lee la API, no una letra usada en la interfaz"
+      }
+    ]
+  }
+}

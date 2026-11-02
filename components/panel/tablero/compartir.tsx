@@ -61,7 +61,7 @@ export function CompartirTienda({
         toDataURL(conOrigen(url, "qr"), {
           size: 1024,
           margin: 2,
-          dark: "#16171a",
+          dark: "#1d1c1a",
         })
       )
       .then((imagen) => {

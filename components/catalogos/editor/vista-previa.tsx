@@ -84,14 +84,28 @@ export function VistaPrevia({
   pedido = 0,
   alElegir,
   className,
+  vivo = false,
+  soloVer = false,
+  armando = false,
+  anchoMaximo = 620,
 }: {
   catalogo: Catalogo
   datos: DatosDelCatalogo
   elegido: string | null
   /** Sube cada vez que hay que volver a mostrar lo elegido: al abrir la vista. */
   pedido?: number
-  alElegir: (bloque: string) => void
+  alElegir?: (bloque: string) => void
   className?: string
+  /**
+   * Las hojas entran al aparecer. Solo en el panel de la web: la app lo prende
+   * cuando se apruebe ("web primero, app después").
+   */
+  vivo?: boolean
+  /** Las hojas no se tocan: es para mirar cómo va quedando. */
+  soloVer?: boolean
+  /** Mientras se arma el PDF, una luz recorre las hojas. */
+  armando?: boolean
+  anchoMaximo?: number
 }) {
   const diferido = React.useDeferredValue(catalogo)
   const hojas = React.useMemo(
@@ -100,7 +114,13 @@ export function VistaPrevia({
   )
   const desplazable = React.useRef<HTMLDivElement>(null)
   const [ref, ancho] = useAncho<HTMLDivElement>()
-  const anchoDeHoja = Math.min(ancho, 620)
+  const anchoDeHoja = Math.min(ancho, anchoMaximo)
+
+  // Solo la primera tanda de hojas entra en fila; lo que llega después, en el acto.
+  const primeraVez = React.useRef(true)
+  React.useEffect(() => {
+    primeraVez.current = false
+  }, [])
 
   // Lo que falta mostrar. Se anota cuando cambia lo elegido y se cumple apenas
   // su hoja existe y se ve: un bloque recién agregado llega un render después,
@@ -168,29 +188,59 @@ export function VistaPrevia({
               const primeraDelBloque =
                 indice === 0 ||
                 hojas[indice - 1].hoja.bloque.id !== hoja.bloque.id
+              const dibujo = (
+                <>
+                  <HojaEscalada hoja={hoja} ctx={ctx} ancho={anchoDeHoja} />
+                  {armando ? (
+                    <span
+                      aria-hidden="true"
+                      className="armando-barrido pointer-events-none absolute inset-0"
+                      style={{ "--i": indice } as React.CSSProperties}
+                    />
+                  ) : null}
+                </>
+              )
+              const marco = cn(
+                "relative block overflow-hidden outline-offset-4 transition-shadow",
+                activa
+                  ? "ring-2 ring-tinta ring-offset-4 ring-offset-papel"
+                  : "ring-1 ring-tinta/15",
+                !soloVer && !activa && "hover:ring-tinta/50"
+              )
               return (
                 <figure
                   key={ctx.numero}
                   data-bloque={primeraDelBloque ? hoja.bloque.id : undefined}
-                  className="flex scroll-mt-24 flex-col gap-1.5"
+                  className={cn(
+                    "flex scroll-mt-24 flex-col gap-1.5",
+                    vivo && "hoja-entra"
+                  )}
+                  style={
+                    vivo
+                      ? ({
+                          "--orden": primeraVez.current
+                            ? Math.min(indice, 8)
+                            : 0,
+                        } as React.CSSProperties)
+                      : undefined
+                  }
                 >
-                  <button
-                    type="button"
-                    onClick={() => {
-                      tocada.current = hoja.bloque.id
-                      alElegir(hoja.bloque.id)
-                    }}
-                    aria-label={`Editar la hoja ${ctx.numero}`}
-                    aria-pressed={activa}
-                    className={cn(
-                      "block outline-offset-4 transition-shadow",
-                      activa
-                        ? "ring-2 ring-tinta ring-offset-4 ring-offset-papel"
-                        : "ring-1 ring-tinta/15 hover:ring-tinta/50"
-                    )}
-                  >
-                    <HojaEscalada hoja={hoja} ctx={ctx} ancho={anchoDeHoja} />
-                  </button>
+                  {soloVer ? (
+                    <div className={marco}>{dibujo}</div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        tocada.current = hoja.bloque.id
+                        alElegir?.(hoja.bloque.id)
+                      }}
+                      aria-label={`Editar la hoja ${ctx.numero}`}
+                      aria-pressed={activa}
+                      className={marco}
+                    >
+                      {dibujo}
+                    </button>
+                  )}
                   <figcaption className="tabular text-xs opacity-65">
                     Hoja {ctx.numero} de {ctx.total}
                   </figcaption>

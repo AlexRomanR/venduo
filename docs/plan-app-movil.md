@@ -224,7 +224,9 @@ Lo que sigue igual que en la web:
 
 - **El mismo mundo de Venduo** (`DESIGN.md`): papel, tinta y la señal; Archivo y Geist.
   Los tokens se copian de `app/globals.css` a un archivo de tema de la app; si la paleta
-  cambia acá, cambia allá.
+  cambia acá, cambia allá. **El 31 de octubre cambió**: botones y lo elegido en tinta,
+  la señal en frambuesa `#d0216a` (también el toldo del ícono), el papel a `#f7f5f0` y la
+  tinta a `#1d1c1a`. Falta llevarlo a la app.
 - **Material 3 manda en estructura y navegación en Android**; la identidad de Venduo
   entra por el tema: colores, tipografía, forma y movimiento. En iPhone se respetan sus
   garantías: márgenes seguros, volver deslizando desde el borde y "Reducir movimiento".

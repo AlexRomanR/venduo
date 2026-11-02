@@ -293,6 +293,8 @@ const REGLAS_DE_EDICION = [
   '- En "editar" manda solo los campos que cambian, con sus claves exactas.',
   "- Respeta el máximo de cada tipo: si ya está, muévela o edítala en vez de agregar otra.",
   "- Imágenes: solo URLs de la lista de imágenes. Nunca inventes una URL.",
+  "- Nunca inventes testimonios, horarios, direcciones ni la historia del negocio: si",
+  "  piden esa sección, agrégala sin ese texto y di en el resumen que lo complete.",
   "- Categorías: solo nombres de la lista de categorías.",
   "- Colores en #rrggbb, y tienen que leerse: colores.tinta contra colores.papel con",
   "  contraste de 7:1 o más; colores.senal contra colores.papel con 4,5:1 o más, y la",

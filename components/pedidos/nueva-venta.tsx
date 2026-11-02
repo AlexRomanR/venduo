@@ -229,7 +229,7 @@ export function NuevaVenta({
   async function enviar() {
     if (lineas.length === 0 || registrando) return
     if (faltaStock) {
-      toast.error("Revisa lo que quedó en rojo.")
+      toast.error("Revisa lo que quedó marcado.")
       return
     }
     if (soloLectura) {

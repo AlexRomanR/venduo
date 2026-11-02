@@ -54,7 +54,7 @@ export interface CombinacionDeLetra {
 /**
  * Parejas de titular y cuerpo que funcionan juntas.
  *
- * Los pesos son los que cada fuente trae compilados en `lib/fuentes.ts`: pedir
+ * Los pesos son los que cada fuente trae compilados en `lib/fuentes`: pedir
  * un peso que no está hace que el navegador lo invente, y se nota.
  */
 export const COMBINACIONES: CombinacionDeLetra[] = [

@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { BookOpen, Plus } from "lucide-react"
+import { BookOpen, CloudOff, Plus } from "lucide-react"
 
 import { HOJAS } from "@/lib/catalogos/constantes"
 import { elegidos } from "@/lib/catalogos/datos"
@@ -17,11 +17,17 @@ import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 import { isSupabaseConfigured } from "@/lib/env"
 import { BOTON_PRIMARIO } from "@/lib/estilos"
-import { formatRelative } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { ConFuncion } from "@/components/panel/funcion"
-import { Cabecera, Seccion } from "@/components/panel/piezas"
+import {
+  Cabecera,
+  Insignia,
+  Seccion,
+  SinDatos,
+} from "@/components/panel/piezas"
+import { Reintentar } from "@/components/panel/reintentar"
 import { AccionesDeCatalogo } from "@/components/catalogos/acciones-de-lista"
+import { EditadoHace } from "@/components/catalogos/editado-hace"
 import { MiniaturaDeCatalogo } from "@/components/catalogos/miniatura"
 import { PedirCatalogoALaIa } from "@/components/catalogos/pedir-a-la-ia"
 import { PlantillasDeLaLista } from "@/components/catalogos/plantillas-de-la-lista"
@@ -39,14 +45,19 @@ export const metadata = { title: "Catálogos" }
  * celular, como "Nuevo producto".
  */
 export default async function CatalogosPage() {
-  const [tienda, { catalogos, esDemo }, material, funciones, plantillas] =
-    await Promise.all([
-      getMiTienda(),
-      getCatalogos(),
-      getMaterialDelCatalogo(),
-      funcionesDeMiTienda(),
-      plantillasDeCatalogoVisibles(),
-    ])
+  const [
+    tienda,
+    { catalogos, esDemo, error },
+    material,
+    funciones,
+    plantillas,
+  ] = await Promise.all([
+    getMiTienda(),
+    getCatalogos(),
+    getMaterialDelCatalogo(),
+    funcionesDeMiTienda(),
+    plantillasDeCatalogoVisibles(),
+  ])
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
   if (funciones.catalogos !== "activa") redirect("/panel")
   const { datos, estiloDeTienda, plantillaDeLaTienda } = material
@@ -75,6 +86,23 @@ export default async function CatalogosPage() {
         <PedirCatalogoALaIa armar={armarCatalogoConLaIa} />
       </ConFuncion>
 
+      {error ? (
+        <Seccion
+          id="guardados"
+          icono={BookOpen}
+          titulo="Los que ya armaste"
+          bajada="Siempre salen con los precios de hoy."
+        >
+          <SinDatos
+            icono={CloudOff}
+            titulo="No pudimos cargar tus catálogos"
+            texto="Revisa tu conexión e inténtalo de nuevo."
+          >
+            <Reintentar />
+          </SinDatos>
+        </Seccion>
+      ) : null}
+
       {/* Sin catálogos no hay nada que mostrar aquí: las plantillas de abajo
           son las que invitan a armar el primero. */}
       {catalogos.length > 0 ? (
@@ -86,7 +114,9 @@ export default async function CatalogosPage() {
         >
           <ul>
             {catalogos.map((guardado) => {
-              const cuantos = elegidos(guardado.catalogo, datos).length
+              const productos = elegidos(guardado.catalogo, datos)
+              const cuantos = productos.length
+              const agotados = productos.filter((p) => p.stock <= 0).length
               return (
                 <li
                   key={guardado.id}
@@ -116,10 +146,15 @@ export default async function CatalogosPage() {
                       {cuantos} {cuantos === 1 ? "producto" : "productos"} ·{" "}
                       {HOJAS[guardado.hoja].nombre}
                     </p>
-                    {esDemo ? null : (
-                      <p className="mt-0.5 text-xs opacity-65">
-                        Editado {formatRelative(guardado.actualizado)}
+                    {agotados > 0 ? (
+                      <p className="mt-1.5">
+                        <Insignia tono="senal">
+                          {agotados} {agotados === 1 ? "agotado" : "agotados"}
+                        </Insignia>
                       </p>
+                    ) : null}
+                    {esDemo ? null : (
+                      <EditadoHace fecha={guardado.actualizado} />
                     )}
                   </div>
                   <AccionesDeCatalogo

@@ -242,6 +242,8 @@ export const getMaterialDelCatalogo = cache(
 export async function getCatalogos(): Promise<{
   catalogos: CatalogoGuardado[]
   esDemo: boolean
+  /** La lectura falló: no es lo mismo que no tener catálogos. */
+  error?: boolean
 }> {
   const supabase = await createClient()
   const tienda = supabase ? await getMiTienda() : null
@@ -254,12 +256,14 @@ export async function getCatalogos(): Promise<{
     }
   }
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("catalogs")
     .select("id, config, share_token, updated_at")
     .eq("store_id", tienda.id)
     .is("deleted_at", null)
     .order("updated_at", { ascending: false })
+
+  if (error) return { catalogos: [], esDemo: false, error: true }
 
   return {
     catalogos: (data ?? []).flatMap((fila) => {

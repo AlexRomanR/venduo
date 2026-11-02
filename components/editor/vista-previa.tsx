@@ -34,10 +34,10 @@ import { Checkout } from "@/components/tienda/checkout"
 
 type Estado = Extract<MensajeAlaVistaPrevia, { tipo: "estado" }>
 
-/** El color con el que el editor marca lo que se toca: el rojo de Venduo. */
-const MARCA = "#d62d12"
-/** Lo que no se edita desde acá se marca en tinta, no en rojo. */
-const NEUTRO = "#16171a"
+/** El color con el que el editor marca lo que se toca: la frambuesa de Venduo. */
+const MARCA = "#d0216a"
+/** Lo que no se edita desde acá se marca en tinta, no en frambuesa. */
+const NEUTRO = "#1d1c1a"
 
 const SIN_FILTROS = leerFiltros({})
 

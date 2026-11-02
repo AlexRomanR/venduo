@@ -17,14 +17,17 @@ export const ETIQUETA_CAMPO =
 
 /** Campo sin caja: una regla abajo que se pone roja al enfocar o al fallar. */
 export const CAMPO =
-  "rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-senal focus-visible:ring-0 aria-invalid:border-senal aria-invalid:ring-0 md:text-base"
+  "rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:ring-0 aria-invalid:border-senal aria-invalid:ring-0 md:text-base"
 
 /** El alto mínimo de un campo de una línea: 48 px, por encima del táctil. */
 export const CAMPO_LINEA = `h-12 ${CAMPO}`
 
-/** Botón primario: el rojo de señal, uno por bloque. */
+/**
+ * Botón primario, uno por bloque: en tinta en Venduo, y en el color de acción
+ * de la plantilla dentro de una tienda (`--accion`).
+ */
 export const BOTON_PRIMARIO =
-  "flex min-h-12 items-center justify-center gap-2 rounded-plantilla bg-senal px-5 font-semibold text-white transition-colors hover:bg-senal-alta disabled:opacity-60"
+  "flex min-h-12 items-center justify-center gap-2 rounded-plantilla bg-accion px-5 font-semibold text-white transition-colors hover:bg-accion-alta disabled:opacity-60"
 
 /** Botón secundario: trazo de 2 px que se invierte al pasar el cursor. */
 export const BOTON_SECUNDARIO =

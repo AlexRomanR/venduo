@@ -1,62 +1,68 @@
 ---
-version: 1
+version: 2
 slug: "app-page-tsx"
 primary_target: "app/page.tsx"
-related_targets: []
+related_targets: ["components/portada"]
 ---
 
 Superficie: `/` — la portada pública. Modo Persuade.
 
-Llega alguien que no conoce Venduo, desde un enlace de WhatsApp o de sus redes, casi siempre
-en un Android de gama baja con datos móviles. Ya vende por TikTok, Instagram o WhatsApp y
-no siente que le falte una página web: le falta orden. Tiene que entender que Venduo es
-más que una tienda online —la tienda y el sistema que la maneja— y querer registrarse.
-Una sola audiencia: quien vende por redes y no da abasto. Lo que la convence es ver que el
-pedido le sigue llegando por WhatsApp, donde ya vende, pero ordenado.
+Llega alguien que no conoce Venduo, desde un enlace de TikTok, WhatsApp o sus redes,
+casi siempre en un Android de gama media con datos móviles. Ya vende por redes y no
+siente que le falte una página web: le falta orden. Tiene que entender que Venduo es más
+que una tienda online —la tienda y el sistema que la maneja— y querer registrarse. Lo que
+la convence es ver que el pedido le sigue llegando por WhatsApp, donde ya vende, pero
+ordenado.
 
-Prueba: el mecanismo funcionando en el primer viewport. Las cifras y los ejemplos son
-ilustrativos de la demostración y lo declaran al pie.
-
-Decisión abierta que nadie debe inventar: el slug de la tienda de ejemplo todavía no
-existe; hasta entonces queda como constante nula con su pendiente escrito.
+Prueba: el mecanismo funcionando en pantalla, en escenas que cuentan un pedido real de
+punta a punta. Los productos, precios, stock y pedidos son de Rosa Deportes, la tienda de
+ejemplo, y la portada lo declara al pie.
 
 ## Direction contract
 
 THESIS: La portada nombra las tres cosas que la persona se lleva —la tienda online, el
-inventario y las ventas—, promete que se arman en minutos y nombra lo que viene además:
-la plantilla editable, los pedidos por WhatsApp, los catálogos y las estadísticas. A la
-derecha lo muestra con algo real y no con un esquema: quien vende, su tienda funcionando
-y lo que Venduo le avisa.
-Rechaza la portada SaaS con degradado, teléfono flotando en ángulo y tres tarjetas de
-características, y rechaza también el color bañado que satura la vista.
+inventario y las ventas—, promete que se arman en minutos y lo muestra con su propio
+celular: las cosas con las que hoy vende (sus productos, sus dudas, su WhatsApp) caen al
+celular y se ordenan. Cada sección es una escena que se puede tocar, no una lista de
+características.
 
-OWN-WORLD: Editorial impreso. Papel claro `#f1f0ee` como campo, tinta `#16171a`, y un
-rojo de señal `#d62d12` que aparece poco y manda cuando aparece: la acción principal, las
-cifras, las etiquetas de sección y el bloque de cierre. Reglas de un píxel separan las
-secciones; no hay tarjetas como andamiaje ni sombras difusas. Titulares y cifras en
-Archivo extrabold con tracking cerrado; texto en Geist. Fotografía en blanco y negro que
-recupera color al pasar el cursor, porque el rojo es el único acento y una foto a color le
-competiría.
+OWN-WORLD: El cuaderno de ventas pasado en limpio. Papel cálido `#f7f5f0`, tinta
+`#1d1c1a`, una frambuesa `#d0216a` para lo que pide algo y un resaltador amarillo
+`#fff1a6` bajo una frase de cada titular. Titulares en Archivo con eje de ancho, texto en
+Geist y notas a mano en Kalam. Productos a color recortados sin fondo, un celular en 3D y
+tarjetas que flotan con sombra teñida de tinta. Sin naranja: la marca es la frambuesa,
+también en el toldo del logo. El sistema compartido y sus excepciones están en `DESIGN.md`, "La
+portada".
 
-STORY: Se reconoce en los problemas de vender por redes, entiende que una tienda sola no
-los arregla y que lo que hay detrás sí. Cree porque lo ve ocurrir en pantalla, no porque se
-lo digan. Elige el camino que lo describe: ordenar su negocio o salir a vender.
+STORY: Se reconoce en los problemas de vender por redes ("¿Te pasa esto?"), ve cómo arma
+su tienda en tres pasos, ve un pedido llegar a su WhatsApp y el stock bajar solo, descubre
+que todo lo que Venduo arma lleva su estilo, encuentra su rubro y repasa lo que incluye.
+Cierra con las preguntas de siempre y una sola acción: crear su tienda gratis.
 
-FIRST VIEWPORT: Barra fija con las anclas y la acción roja. A la izquierda, el titular a
-escala grande —"Tu tienda online, tu inventario y tus ventas. Lista en minutos."—, una
-bajada, los cuatro agregados con su ícono y la acción. A la derecha (`Vitrina`), tres
-capas: una foto en blanco y negro de una joven con su celular y una bolsa con un pedido; un
-celular recto con la captura real de Rosa Deportes; y dos tarjetas de papel con regla,
-el aviso de Venduo de un pedido nuevo y el stock que se está acabando en rojo. Sin
-scroll para llegar a la acción en la computadora.
+ORDER: Portada → ¿Te pasa esto? → Cómo funciona → Pedidos por WhatsApp → Por qué no es
+solo una tienda online → Para quién es → Qué incluye → Preguntas → Cierre. El pedido va
+después de "Cómo funciona" porque asume que la tienda ya existe.
 
-La foto es de Pexels (8788781, licencia libre) y la captura sale de la tienda publicada,
-a 390 px y doble densidad, desde la sección "Lo nuevo", con el primer producto (un
-mouse gamer) cambiado por una zapatilla de running (Pexels 2529148) antes de sacarla. Las dos viven en
-`public/portada/`: si la tienda de Rosa cambia, la captura se vuelve a sacar.
+FIRST VIEWPORT: Barra fija con las anclas y "Crear mi tienda gratis". A la izquierda, el
+titular —"Tu tienda online, tu inventario y tus ventas. Lista en minutos."—, la bajada,
+los cuatro agregados y la acción. A la derecha, el celular en 3D con la tienda de Rosa,
+rodeado de productos y de las dudas de quien vende. En escritorio, una entrada fija y
+corta: los productos caen al celular y se agrega uno al carrito. En el celular, el texto
+primero y el celular debajo, sin entrada fija.
 
-FORM: Editorial impreso, dirección fijada por el usuario sobre una referencia propia que
-reemplazó la asignación del dado. Seed key 0c40d65d.
+MOBILE: Cada escena tiene su versión en columna, legible a 360 px. Las franjas que se
+deslizan lo avisan con bordes que se esfuman, puntos y "Desliza →"; los carruseles se
+manejan con el dedo. "Pedidos" muestra un solo celular grande que pasa del carrito al
+WhatsApp.
 
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review,
-the verdict, DESIGN.md, and every shipping raster carrying its provenance
+TRUTH: Lo que muestra un celular existe en Venduo hoy y se llama igual: el mensaje del
+pedido es el de `mensajeDePedido`, los estados son "Pendiente" y "Pagado", Venduo no sabe
+el nombre de quien compra, y las notificaciones del celular no se dibujan porque todavía
+no existen.
+
+PENDING: La captura de la plantilla Fórmula muestra un frasco de una marca real y hay que
+reemplazarla; la de Calle dice "lo cerramos por WhatsApp". "Celulares y tecnología" usa la
+misma plantilla que "Regalos" porque no hay una de tecnología.
+
+FINISH: Revisado con `/impeccable critique` el 30/10/2026: 26/36 en la última pasada,
+con sus problemas corregidos después.

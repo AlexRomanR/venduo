@@ -24,7 +24,7 @@ export default function RootLayout({
     // aplica `font-sans` sobre <html>, y una variable declarada en <body> no
     // es visible para su propio padre. Con ellas abajo, --font-sans resolvía
     // vacío y todo el texto de párrafo caía al serif del navegador. Están
-    // todas, las de cada plantilla incluidas: ver `lib/fuentes.ts`.
+    // todas, las de cada plantilla incluidas: ver `lib/fuentes`.
     <html lang="es" suppressHydrationWarning className={VARIABLES_DE_FUENTES}>
       <body className="antialiased">
         <ThemeProvider

@@ -23,9 +23,9 @@ import {
 import { leerGrafico } from "@/lib/insights/lectura"
 
 /** Los mismos valores de `globals.css`. Si cambian allá, cambian acá. */
-const PAPEL = "#f1f0ee"
-const TINTA = "#16171a"
-const SENAL = "#d62d12"
+const PAPEL = "#f7f5f0"
+const TINTA = "#1d1c1a"
+const SENAL = "#d0216a"
 const FILETE = "#d6d4d0"
 const APAGADO = "#6f7076"
 
