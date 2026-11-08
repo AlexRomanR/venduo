@@ -1,5 +1,12 @@
 import { EsqueletoDePantalla } from "@/components/panel/esqueleto"
 
 export default function Cargando() {
-  return <EsqueletoDePantalla forma="formulario" />
+  return (
+    <EsqueletoDePantalla
+      bajada="Los tuyos y los de tu tienda. Cada panel se guarda por separado."
+      titulo="Tus datos."
+      resaltar="datos"
+      forma="formulario"
+    />
+  )
 }

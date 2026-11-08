@@ -120,7 +120,7 @@ export function PanelDeHojas(props: Props) {
           type="button"
           onClick={() => setAgregando(true)}
           disabled={catalogo.bloques.length >= TOPE_DE_BLOQUES}
-          className="flex min-h-12 w-full items-center justify-center gap-2 border-2 border-dashed border-tinta/40 font-semibold transition-colors hover:border-tinta hover:bg-tinta/[0.03] disabled:opacity-50"
+          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-plantilla border-2 border-dashed border-tinta/40 font-semibold transition-colors hover:border-tinta hover:bg-tinta/[0.03] disabled:opacity-50"
         >
           <Plus aria-hidden="true" className="size-5" />
           Agregar una hoja
@@ -283,7 +283,7 @@ function FilaDeHoja({
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
-        "relative flex items-center border-t border-tinta/15 bg-papel first:border-t-0",
+        "relative flex items-center border-t border-tinta/15 bg-hoja first:border-t-0",
         isDragging && "z-10 border-2 border-tinta bg-tinta/[0.06]"
       )}
     >
@@ -378,7 +378,7 @@ function AgregarHoja({
         {(Object.keys(TIPOS_DE_BLOQUE) as TipoDeBloque[]).map((tipo) => {
           const Icono = ICONOS_DE_HOJA[tipo]
           return (
-            <li key={tipo} className="bg-papel">
+            <li key={tipo} className="bg-hoja">
               <button
                 type="button"
                 onClick={() => agregar(tipo)}

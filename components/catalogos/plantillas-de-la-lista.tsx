@@ -136,7 +136,7 @@ export function PlantillasDeLaLista({
 
 function Rejilla({ children }: { children: React.ReactNode }) {
   return (
-    <ul className="grid grid-cols-2 gap-px bg-tinta/15 sm:grid-cols-3 xl:grid-cols-4">
+    <ul className="grid grid-cols-2 overflow-hidden sm:grid-cols-3 xl:grid-cols-4">
       {children}
     </ul>
   )
@@ -158,7 +158,7 @@ function Tarjeta({
   detalle: string
 }) {
   return (
-    <li className="bg-papel">
+    <li className="pieza-celda -mr-px -mb-px border-r border-b border-tinta/10">
       <Link
         href={`${ruta}?${consultaDeEleccion(eleccion)}`}
         data-eleccion={JSON.stringify(eleccion)}

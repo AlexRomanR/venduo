@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-31T12:00:00.000Z",
+  "generatedAt": "2026-11-07T12:00:00.000Z",
   "title": "Design System: Venduo",
   "extensions": {
     "colorMeta": {
@@ -170,32 +170,58 @@
         "purpose": "Nombre de la sección en versalita en frambuesa. Es el mismo texto que el ancla de navegación; no repite el titular."
       }
     },
-    "shadows": [],
+    "shadows": [
+      {
+        "name": "cuaderno",
+        "value": "0 1px 2px rgb(29 28 26 / 0.05), 0 22px 44px -26px rgb(29 28 26 / 0.38)",
+        "purpose": "La única sombra del cuaderno: tarjetas, notas, tickets y polaroids apoyadas sobre el papel. El diario no tiene sombras."
+      },
+      {
+        "name": "celular",
+        "value": "0 40px 100px -30px rgb(29 28 26 / 0.45)",
+        "purpose": "El celular de muestra de la portada y del Resumen."
+      }
+    ],
     "motion": [
       {
         "name": "entra",
         "value": "opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "El único gesto del sistema: el elemento sube 14px y aparece al entrar al viewport. Solo debajo del pliegue."
+        "purpose": "El gesto del diario y la entrada corta de una pantalla de trabajo: el elemento sube 14px y aparece."
       },
       {
-        "name": "escalonado",
-        "value": "70ms a 90ms entre hermanos",
-        "purpose": "Demora acumulada entre elementos hermanos que entran juntos, con tope práctico de tres pasos."
+        "name": "escena",
+        "value": "GSAP + ScrollTrigger (web) o Reanimated (app), una línea de tiempo por sección",
+        "purpose": "El cuaderno en escenas: cada sección se arma al aparecer y vuelve a empezar al salir de la pantalla."
       },
       {
-        "name": "estado",
-        "value": "cubic-bezier(0, 0, 0.2, 1) 500ms",
-        "purpose": "Recuperación de color y escala 1.02 de la fotografía, y llenado de la demostración de tienda (escalón de 130ms por producto)."
+        "name": "nota",
+        "value": "caída de 70px, giro de 14° que se endereza, salida elástica, ~0.9s",
+        "purpose": "Las notas pegadas y las polaroids que caen sobre la mesa."
+      },
+      {
+        "name": "sello",
+        "value": "escala 2.4 → 0.92 → 1 en 0.5s, cubic-bezier(0.2, 1.6, 0.4, 1)",
+        "purpose": "El sello de goma que se estampa cuando la base confirma el pago."
+      },
+      {
+        "name": "trazo",
+        "value": "stroke-dashoffset de su largo a 0, 0.6–0.8s, power2.out",
+        "purpose": "Los trazos a mano —subrayado, círculo, flecha, visto, tachón— que se dibujan al entrar."
       },
       {
         "name": "cuenta",
-        "value": "900ms, salida cúbica (1 - (1-t)^3)",
-        "purpose": "La cifra que cuenta hasta su valor al entrar en pantalla."
+        "value": "900ms a 1.5s, salida cúbica (1 - (1-t)^3)",
+        "purpose": "La cifra que cuenta hasta su valor; en tinta, en la señal solo si pide algo."
       },
       {
-        "name": "marcador",
-        "value": "transform 300ms cubic-bezier(0, 0, 0.2, 1)",
-        "purpose": "Giro del marcador del acordeón al abrir."
+        "name": "salta",
+        "value": "0.38s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "purpose": "El número que salta al cambiar: el stock al sumar o restar, el lugar de un producto elegido."
+      },
+      {
+        "name": "vuelo",
+        "value": "arco de 0.62s con Web Animations (web) o Reanimated (app)",
+        "purpose": "La foto del producto elegido que vuela hasta el catálogo; el destino late al recibirla."
       }
     ],
     "breakpoints": [
@@ -226,9 +252,9 @@
       "name": "Botón primario",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "La acción de conversión. Una sola por bloque.",
+      "description": "La acción principal, en tinta (token accion; en una tienda, el color de su plantilla). Una sola por bloque.",
       "html": "<a class=\"ds-btn-primary\" href=\"#\">Crear mi tienda</a>",
-      "css": ".ds-btn-primary { display: inline-block; background: var(--senal, #d0216a); color: #fff; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 1rem; font-weight: 600; padding: 12px 20px; border: none; border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-primary:hover { background: var(--senal-alta, #b01a59); } .ds-btn-primary:focus-visible { outline: 3px solid var(--tinta, #1d1c1a); outline-offset: 3px; }"
+      "css": ".ds-btn-primary { display: inline-block; background: var(--accion, #1d1c1a); color: #fff; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 1rem; font-weight: 600; padding: 12px 20px; border: none; border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-primary:hover { background: var(--accion-alta, #3b3936); } .ds-btn-primary:focus-visible { outline: 3px solid var(--tinta, #1d1c1a); outline-offset: 3px; }"
     },
     {
       "name": "Botón secundario",
@@ -258,7 +284,7 @@
       "name": "Ítem de lista con regla",
       "kind": "card",
       "refersTo": "panel",
-      "description": "El patrón que reemplaza a la tarjeta: regla superior de 1 px, sin sombra y sin radio; en hover la regla y el título pasan a frambuesa.",
+      "description": "El patrón del diario que reemplaza a la tarjeta: regla superior de 1 px, sin sombra y sin radio. En el cuaderno, las mismas filas van dentro de una tarjeta.",
       "html": "<article class=\"ds-item-regla\"><h3 class=\"ds-item-titulo\">Editor con IA</h3><p class=\"ds-item-detalle\">Le hablas y la tienda cambia: precios, textos, categorías, portada.</p></article>",
       "css": ".ds-item-regla { border-top: 1px solid rgba(22, 23, 26, 0.15); padding: 24px 0; color: var(--tinta, #1d1c1a); transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-item-regla:hover { border-top-color: var(--senal, #d0216a); } .ds-item-titulo { margin: 0; font-family: var(--font-titular, system-ui), sans-serif; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.02em; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-item-regla:hover .ds-item-titulo { color: var(--senal, #d0216a); } .ds-item-detalle { margin: 8px 0 0; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; line-height: 1.625; opacity: 0.7; }"
     },
@@ -266,16 +292,16 @@
       "name": "Cifra",
       "kind": "custom",
       "refersTo": "typography.numeral",
-      "description": "Numeral en frambuesa tabular con su detalle en versalita apagada. Cuenta hasta su valor al entrar, partiendo del valor final ya renderizado.",
+      "description": "Numeral tabular en tinta —en la señal si pide algo— con su detalle en versalita apagada. Cuenta hasta su valor al entrar en pantalla.",
       "html": "<div class=\"ds-cifra\"><p class=\"ds-cifra-valor\">4.100</p><p class=\"ds-cifra-detalle\">Pedidos por WhatsApp este mes</p></div>",
       "css": ".ds-cifra-valor { margin: 0; font-family: var(--font-titular, system-ui), sans-serif; font-size: clamp(2.5rem, 7vw, 3.25rem); font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: var(--senal, #d0216a); font-variant-numeric: tabular-nums; font-feature-settings: \"tnum\"; } .ds-cifra-detalle { margin: 12px 0 0; max-width: 24ch; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; line-height: 1.625; letter-spacing: 0.025em; text-transform: uppercase; color: var(--tinta, #1d1c1a); opacity: 0.6; }"
     },
     {
       "name": "Barra de navegación",
       "kind": "nav",
-      "description": "Encabezado adherido en papel translúcido con desenfoque y regla inferior; la acción en frambuesa sobrevive al colapso móvil.",
+      "description": "Encabezado adherido en papel translúcido con desenfoque y regla inferior; la acción principal, en tinta, cierra la barra.",
       "html": "<header class=\"ds-nav\"><span class=\"ds-nav-marca\">Venduo</span><nav class=\"ds-nav-enlaces\"><a href=\"#\">Cómo funciona</a><a href=\"#\">Módulos</a><a href=\"#\">Preguntas</a></nav><a class=\"ds-nav-accion\" href=\"#\">Crear mi tienda</a></header>",
-      "css": ".ds-nav { display: flex; align-items: center; gap: 24px; padding: 14px 20px; background: color-mix(in srgb, var(--papel, #f7f5f0) 90%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(22, 23, 26, 0.15); color: var(--tinta, #1d1c1a); } .ds-nav-marca { flex: 1; font-family: var(--font-titular, system-ui), sans-serif; font-size: 1.125rem; font-weight: 800; letter-spacing: -0.02em; } .ds-nav-enlaces { display: flex; gap: 24px; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; } .ds-nav-enlaces a { color: inherit; text-decoration: none; opacity: 0.7; transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-enlaces a:hover { opacity: 1; } .ds-nav-accion { background: var(--senal, #d0216a); color: #fff; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; font-weight: 600; padding: 10px 16px; border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-accion:hover { background: var(--senal-alta, #b01a59); }"
+      "css": ".ds-nav { display: flex; align-items: center; gap: 24px; padding: 14px 20px; background: color-mix(in srgb, var(--papel, #f7f5f0) 90%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(22, 23, 26, 0.15); color: var(--tinta, #1d1c1a); } .ds-nav-marca { flex: 1; font-family: var(--font-titular, system-ui), sans-serif; font-size: 1.125rem; font-weight: 800; letter-spacing: -0.02em; } .ds-nav-enlaces { display: flex; gap: 24px; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; } .ds-nav-enlaces a { color: inherit; text-decoration: none; opacity: 0.7; transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-enlaces a:hover { opacity: 1; } .ds-nav-accion { background: var(--accion, #1d1c1a); color: #fff; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.875rem; font-weight: 600; padding: 10px 16px; border-radius: 0.375rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-accion:hover { background: var(--accion-alta, #3b3936); }"
     },
     {
       "name": "Chip de estado",
@@ -288,7 +314,7 @@
     {
       "name": "Fotografía editorial",
       "kind": "custom",
-      "description": "Blanco y negro que recupera color y escala 1.02 al pasar el cursor, con pie que describe la escena sin nombrar a nadie.",
+      "description": "Los productos a color, como los subió quien vende. En el cuaderno, con radio y dentro de una tarjeta o una polaroid; en el diario, sin radio.",
       "html": "<figure class=\"ds-foto\"><div class=\"ds-foto-marco\"><img src=\"https://images.unsplash.com/photo-1687422808248-f807f4ea2a2e?w=800&q=85&auto=format&fit=crop\" alt=\"Comerciante revisando pedidos en su teléfono\" /></div><figcaption>El negocio que ya existe, con el celular como mostrador.</figcaption></figure>",
       "css": ".ds-foto { margin: 0; color: var(--tinta, #1d1c1a); } .ds-foto-marco { position: relative; overflow: hidden; aspect-ratio: 4 / 5; background: rgba(22, 23, 26, 0.1); } .ds-foto-marco img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); transition: filter 500ms cubic-bezier(0, 0, 0.2, 1), transform 500ms cubic-bezier(0, 0, 0.2, 1); } .ds-foto-marco img:hover { filter: grayscale(0); transform: scale(1.02); } .ds-foto figcaption { margin-top: 12px; font-family: var(--font-geist-sans, system-ui), sans-serif; font-size: 0.75rem; line-height: 1.625; opacity: 0.55; }"
     },
@@ -298,28 +324,68 @@
       "description": "<details> nativo, accesible y sin JavaScript; el título pasa a frambuesa en hover.",
       "html": "<details class=\"ds-acordeon\"><summary><span class=\"ds-acordeon-p\">¿Cuánto cuesta?</span><svg class=\"ds-acordeon-mas\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M8 2v12M2 8h12\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg></summary><p class=\"ds-acordeon-r\">Crear la tienda y publicarla no cuesta nada.</p></details>",
       "css": ".ds-acordeon { border-top: 1px solid rgba(22, 23, 26, 0.15); color: var(--tinta, #1d1c1a); } .ds-acordeon summary { display: flex; align-items: flex-start; gap: 16px; padding: 24px 0; cursor: pointer; list-style: none; } .ds-acordeon summary::-webkit-details-marker { display: none; } .ds-acordeon-p { flex: 1; font-family: var(--font-titular, system-ui), sans-serif; font-weight: 700; letter-spacing: -0.01em; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-acordeon:hover .ds-acordeon-p { color: var(--senal, #d0216a); } .ds-acordeon-mas { flex-shrink: 0; margin-top: 4px; color: var(--senal, #d0216a); transition: transform 300ms cubic-bezier(0, 0, 0.2, 1); } .ds-acordeon[open] .ds-acordeon-mas { transform: rotate(45deg); } .ds-acordeon-r { margin: 0; padding-bottom: 28px; max-width: 68ch; font-family: var(--font-geist-sans, system-ui), sans-serif; line-height: 1.625; opacity: 0.7; }"
+    },
+    {
+      "name": "Tarjeta del cuaderno",
+      "kind": "container",
+      "refersTo": "nota",
+      "description": "El panel del cuaderno: blanca, borde de tinta al 12%, radio 16–20 px y la sombra del cuaderno.",
+      "html": "<div class=\"ds-tarjeta\"><b>Los que llegaron</b><p>Toca uno para ver qué pidió.</p></div>",
+      "css": ".ds-tarjeta { background: #ffffff; border: 1px solid rgba(29, 28, 26, 0.12); box-shadow: 0 1px 2px rgb(29 28 26 / 0.05), 0 22px 44px -26px rgb(29 28 26 / 0.38); border-radius: 20px; padding: 18px 20px; color: var(--tinta, #1d1c1a); font-family: var(--font-geist-sans, system-ui), sans-serif; } .ds-tarjeta b { font-family: var(--font-titular, system-ui), sans-serif; font-weight: 800; letter-spacing: -0.02em; }"
+    },
+    {
+      "name": "Nota pegada",
+      "kind": "card",
+      "refersTo": "nota-pegada",
+      "description": "Lo que espera, contado: un número grande y dos palabras en una tarjeta chica torcida 1–3°. Lo urgente en la señal, encerrado a mano.",
+      "html": "<a class=\"ds-nota\" href=\"#\"><span class=\"ds-nota-num\">1</span><span>Por cobrar</span></a>",
+      "css": ".ds-nota { display: inline-grid; gap: 4px; background: #ffffff; border: 1px solid rgba(29, 28, 26, 0.12); box-shadow: 0 1px 2px rgb(29 28 26 / 0.05), 0 22px 44px -26px rgb(29 28 26 / 0.38); border-radius: 18px; padding: 14px 16px; rotate: -2.5deg; color: var(--tinta, #1d1c1a); text-decoration: none; font: 600 14px var(--font-geist-sans, system-ui), sans-serif; transition: rotate 300ms ease, translate 300ms ease; } .ds-nota:hover { rotate: 0deg; translate: 0 -6px; } .ds-nota-num { font: 800 46px/1 var(--font-titular, system-ui), sans-serif; letter-spacing: -0.05em; color: var(--senal, #d0216a); }"
+    },
+    {
+      "name": "Ticket con sello",
+      "kind": "card",
+      "refersTo": "ticket",
+      "description": "Un pedido: foto, número y qué pidió; el talón punteado con el total y su estado como sello de goma.",
+      "html": "<div class=\"ds-ticket\"><div class=\"ds-ticket-arriba\">#147 · hace 2 h<br><b>Polera básica y 2 más</b></div><div class=\"ds-ticket-talon\"><b>Bs 245</b><span class=\"ds-sello\">Pagado</span></div></div>",
+      "css": ".ds-ticket { background: #ffffff; border: 1px solid rgba(29, 28, 26, 0.12); box-shadow: 0 1px 2px rgb(29 28 26 / 0.05), 0 22px 44px -26px rgb(29 28 26 / 0.38); border-radius: 16px; overflow: hidden; font: 14px var(--font-geist-sans, system-ui), sans-serif; color: var(--tinta, #1d1c1a); } .ds-ticket-arriba { padding: 14px 16px; } .ds-ticket-talon { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-top: 1px dashed rgba(29, 28, 26, 0.2); background: #fdfcf9; } .ds-sello { font: 800 12px var(--font-titular, system-ui), sans-serif; letter-spacing: 0.08em; text-transform: uppercase; border: 2.5px solid currentColor; border-radius: 6px; padding: 2px 8px; rotate: -8deg; }"
+    },
+    {
+      "name": "Polaroid",
+      "kind": "card",
+      "refersTo": "polaroid",
+      "description": "Lo más vendido: la foto con marco blanco, el nombre a mano debajo y su lugar en un círculo; el primero en la señal.",
+      "html": "<figure class=\"ds-polaroid\"><div class=\"ds-polaroid-foto\"></div><figcaption>Polera básica</figcaption></figure>",
+      "css": ".ds-polaroid { margin: 0; width: 160px; background: #ffffff; border: 1px solid rgba(29, 28, 26, 0.12); box-shadow: 0 1px 2px rgb(29 28 26 / 0.05), 0 22px 44px -26px rgb(29 28 26 / 0.38); border-radius: 4px; padding: 9px 9px 12px; rotate: -4deg; } .ds-polaroid-foto { aspect-ratio: 1; background: #e9e5dc; } .ds-polaroid figcaption { margin-top: 8px; font: 17px var(--fuente-mano, 'Kalam', cursive); color: var(--tinta, #1d1c1a); }"
+    },
+    {
+      "name": "Trazo a mano",
+      "kind": "decoration",
+      "refersTo": "trazo",
+      "description": "Subrayado, círculo, flecha, visto y tachón en la señal (components/portada/trazos.tsx). Se dibujan al entrar; nunca llevan información que no esté dicha en otro lado.",
+      "html": "<span class=\"ds-subrayado\">tu enlace.</span>",
+      "css": ".ds-subrayado { font: 800 28px var(--font-titular, system-ui), sans-serif; background: linear-gradient(transparent 70%, var(--resaltador, #fff1a6) 70%, var(--resaltador, #fff1a6) 92%, transparent 92%); }"
     }
   ],
   "narrative": {
-    "northStar": "El diario del mercado",
-    "overview": "Venduo se ve como una página impresa: papel cálido, tinta casi negra, reglas de un píxel que separan las secciones y un solo frambuesa de señal que aparece poco y manda cuando aparece. No hay degradados, ni tarjetas flotando, ni un teléfono en ángulo. Lo que estructura la página es la retícula y la línea, no la caja.\n\nLa densidad es alta arriba y respira abajo: bloques de texto acotados en medida (ch), titulares grandes con tracking cerrado, y cuerpos de texto a opacidad reducida para que el titular mande sin necesidad de un segundo color. El sistema está hecho para un Android de gama baja con datos móviles, así que el peso visual lo cargan la tipografía y el espacio, no los efectos.\n\nEste mundo rige las superficies públicas: la portada, la tienda /t/{slug}. El panel privado (/panel) sigue con los tokens por defecto de shadcn, que conviven en app/globals.css a propósito.",
+    "northStar": "El cuaderno de ventas pasado en limpio",
+    "overview": "Venduo se ve como el cuaderno de quien vende, pasado en limpio sobre papel impreso: papel cálido, tinta casi negra, titulares de imprenta y un solo bolígrafo de color —la frambuesa— que aparece poco y manda cuando aparece. Sobre el papel van las cosas de un mostrador: el ticket con su sello, la nota pegada, la polaroid del producto, el resaltador sobre lo que importa y la letra a mano de quien anota rápido.\n\nUn solo mundo en tres registros, según lo que la persona vino a hacer (decisión del 7 de noviembre de 2026). El cuaderno en escenas —la portada, el Resumen del panel y el Inicio de la app— se mira: cada sección se arma con el scroll y vuelve a empezar al salir. El cuaderno de trabajo —Pedidos, Productos, Catálogos, Estadísticas y las demás pantallas del panel y de la app— usa las mismas piezas, quietas al deslizar: lo mueve lo que se toca. El diario —el ingreso, el alta y /admin— es sobrio: reglas de un píxel, esquina viva, sin sombras.\n\nSe diseña para el celular y los datos móviles, a 375 px primero, pero no para un Android de gama baja: el movimiento puede ser rico, nunca requisito para entender, y con «Reducir movimiento» todo queda quieto.",
     "keyCharacteristics": [
-      "Campo de papel #f7f5f0, nunca blanco puro, en toda superficie pública.",
-      "Un solo acento: el frambuesa de señal. Sin paleta secundaria.",
-      "Separación por regla de un píxel; cero tarjetas y cero sombras.",
-      "Archivo extrabold con tracking negativo para titulares y cifras; Geist para leer.",
-      "Fotografía en blanco y negro que recupera color al pasar el cursor.",
-      "Un solo gesto de movimiento: entrar al viewport."
+      "Campo de papel cálido #f7f5f0, nunca blanco puro como fondo de página.",
+      "Un solo acento: la frambuesa de señal, para lo que pide algo. Botones y lo elegido en tinta; el resaltador #fff1a6 detrás de una frase del titular.",
+      "Archivo extrabold con tracking negativo para titulares y cifras; Geist para leer; Kalam a mano para notas, pistas y vacíos.",
+      "En el cuaderno, tarjetas blancas con radio de 16–20 px y una sola sombra teñida de tinta. En el diario, regla de un píxel y cero sombras.",
+      "Las piezas del mostrador: la nota pegada con su número, el ticket con su sello de goma, la polaroid, los trazos a mano.",
+      "Movimiento con un porqué: con el scroll en las escenas, al tocar en las pantallas de trabajo, entrar en el diario."
     ],
     "rules": [
       {
         "name": "La regla de la voz única",
-        "body": "El frambuesa ocupa menos del 10% de cualquier pantalla. Si aparece en más de dos lugares en un viewport, uno de ellos no era importante.",
+        "body": "La frambuesa ocupa menos del 10% de cualquier pantalla. Si aparece en más de dos lugares en un viewport, uno de ellos no pedía nada.",
         "section": "colors"
       },
       {
         "name": "La regla del papel",
-        "body": "Ninguna superficie pública usa #fff como fondo. El blanco es un color de texto sobre frambuesa, no un campo.",
+        "body": "Ninguna superficie de Venduo usa #fff como fondo de página. El blanco es el campo de una tarjeta del cuaderno o un color de texto sobre la señal.",
         "section": "colors"
       },
       {
@@ -343,18 +409,17 @@
         "section": "typography"
       },
       {
-        "name": "La regla de los dos mundos",
-        "body": "Las superficies públicas —portada, /t/{slug}, /v/{slug}— usan los tokens de este documento. Los paneles privados usan los tokens semánticos de shadcn tal como vienen. No se mezclan en una misma pantalla y no se migra uno al otro sin decisión explícita.",
-        "section": "layout"
+        "name": "La regla de los tres registros",
+        "body": "Un solo mundo —papel, tinta, frambuesa, resaltador, Archivo, Geist, Kalam— en tres registros: en escenas (portada, Resumen, Inicio de la app), el cuaderno de trabajo (las demás pantallas del panel y de la app, y toda pantalla nueva) y el diario (ingreso, alta, /admin). Una tienda /t/{slug} usa el mundo de su plantilla."
       },
       {
         "name": "La regla del contenedor único",
-        "body": "Todo alinea a max-w-6xl. Si algo necesita romper esa línea, lo que sale a sangre es el fondo, nunca el texto.",
+        "body": "En el panel todo alinea a max-w-6xl; la portada usa max-w-[1280px]. Si algo necesita romper esa línea, lo que sale a sangre es el fondo, nunca el texto.",
         "section": "layout"
       },
       {
         "name": "La regla sin sombra",
-        "body": "Ningún elemento de una superficie pública lleva box-shadow. Si algo necesita separarse del fondo, se le pone una regla o se le cambia el campo.",
+        "body": "Ningún elemento del diario lleva box-shadow. En el cuaderno hay una sola sombra, teñida de tinta: 0 1px 2px rgb(29 28 26 / 0.05), 0 22px 44px -26px rgb(29 28 26 / 0.38).",
         "section": "elevation"
       },
       {
@@ -364,12 +429,12 @@
       },
       {
         "name": "La regla de la esquina viva",
-        "body": "Un contenedor no se redondea. El redondeo se reserva para lo que se toca.",
+        "body": "En el diario, un contenedor no se redondea. En el cuaderno, el radio dice qué se puede levantar de la mesa: tarjetas 16–20 px, botones en píldora, la polaroid casi recta.",
         "section": "shapes"
       },
       {
         "name": "La regla de la lista sobre la tarjeta",
-        "body": "Una colección se rinde como lista o retícula de ítems separados por regla superior, no como tarjetas. La caja no es andamiaje.",
+        "body": "En el diario, una colección se rinde como lista o retícula separada por regla superior. En el cuaderno, cada grupo va en una tarjeta y sus filas se separan por regla adentro.",
         "section": "shapes"
       },
       {
@@ -379,31 +444,47 @@
       },
       {
         "name": "La regla del pliegue",
-        "body": "Lo que se ve sin desplazar se rinde quieto. El revelado se usa solo debajo del pliegue, para que en un equipo lento la primera pantalla se lea de inmediato.",
+        "body": "En el diario, lo que se ve sin desplazar se rinde quieto. La portada y el Resumen sí se arman al cargar; una pantalla de trabajo, nunca con el scroll.",
         "section": "components"
+      },
+      {
+        "name": "La regla de la nota que sobra",
+        "body": "Lo que dice una nota a mano también está dicho en otro lado, o no hace falta. Si se borra la nota, la pantalla se sigue entendiendo."
+      },
+      {
+        "name": "La regla del sello verdadero",
+        "body": "El sello se estampa cuando la base confirmó, no al tocar. Sin conexión, el pedido queda esperando y se dice."
+      },
+      {
+        "name": "La regla de lo quieto al deslizar",
+        "body": "En una pantalla de trabajo nada se arma con el scroll. El movimiento lo dispara lo que se toca."
+      },
+      {
+        "name": "La regla de la escena entera",
+        "body": "Una escena se arma o no se arma: nunca queda una pieza a medio camino. Vuelve a empezar cuando sale entera de la pantalla."
       }
     ],
     "dos": [
-      "Do usar papel #f7f5f0 como campo de toda superficie pública y tinta #1d1c1a para el texto.",
-      "Do reservar el frambuesa para la acción principal, las cifras, el label de sección y, como campo, un solo bloque por página.",
-      "Do separar con reglas de 1 px a tinta 15%, y usar el trazo de 2 px solo para coronar un bloque de apertura o trazar el botón secundario.",
+      "Do usar papel #f7f5f0 como campo de toda superficie de Venduo y tinta #1d1c1a para el texto.",
+      "Do reservar la frambuesa para lo que pide algo —un pendiente, un agotado, un error— y el logo; los botones y lo elegido van en tinta.",
+      "Do elegir el registro por lo que la persona vino a hacer: mirar (escenas), trabajar (el cuaderno quieto) o completar un trámite (el diario).",
+      "Do dejar quieta una pantalla de trabajo mientras se desliza, y mover solo lo que responde a un toque.",
       "Do construir la jerarquía de texto bajando opacidad sobre tinta.",
       "Do poner todo monto por formatMoney y con .tabular.",
-      "Do rendir la fotografía en blanco y negro, devolviendo el color en hover.",
+      "Do mostrar los productos a color, como los subió quien vende.",
       "Do resolver a 375 px primero, con objetivos táctiles de 44 px, y recién después dejar crecer hasta 1280 px.",
       "Do escribir en español neutro boliviano tratando de «tú», también en los textos que genera la IA.",
-      "Do dejar el estado final legible sin JavaScript y con movimiento reducido.",
-      "Do componer sobre shadcn/ui envolviendo o con asChild."
+      "Do dejar el estado final legible sin JavaScript y con movimiento reducido."
     ],
     "donts": [
-      "Don't usar sombras. Ninguna, de ningún tipo, en superficies públicas.",
-      "Don't rendir una colección como tarjetas: va como lista o retícula separada por reglas.",
-      "Don't redondear un contenedor. El radio es para lo que se toca.",
+      "Don't usar sombras en el diario. En el cuaderno hay una sola, teñida de tinta, para lo que está apoyado sobre el papel.",
+      "Don't atar al scroll una pantalla de trabajo: quien busca un pedido entre ochenta no espera a que aparezca.",
+      "Don't redondear un contenedor ni rendir una colección como tarjetas en el diario.",
       "Don't introducir un segundo acento de color, ni un degradado, ni un gris que no sea tinta con opacidad o la plata ya declarada.",
-      "Don't usar blanco puro como fondo de una superficie pública.",
-      "Don't publicar una foto a color junto al frambuesa: le compite al único acento.",
+      "Don't poner en la señal un botón, una pestaña elegida o un rótulo de pantalla de trabajo.",
+      "Don't escribir con la letra a mano algo que haga falta para entender: un titular, un botón, un texto corrido.",
+      "Don't estampar un sello antes de que la base confirme.",
       "Don't mezclar los tokens de este mundo con los tokens de shadcn en una misma pantalla.",
-      "Don't animar en el primer viewport, ni mover, escalar o ensombrecer un botón al pasar el cursor: el hover es cambio de color.",
       "Don't mostrar una cifra ilustrativa sin su descargo al pie.",
       "Don't concatenar clases a mano: las condicionales van por cn()."
     ]

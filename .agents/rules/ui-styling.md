@@ -12,18 +12,21 @@ cubre cómo se ve.
 
 ### El mundo de Venduo y el de cada tienda
 
-**Venduo usa el mundo editorial de `DESIGN.md`**: papel cálido, tinta para todo lo que se
-lee y se toca, y una frambuesa de señal para lo que pide algo.
-El ingreso, el alta de la tienda, el panel, la cuenta y `/admin` van en su registro de
-diario. **La portada comparte la paleta, las letras y el logo, y tiene un registro propio**
-—el celular en 3D, las escenas, la letra a mano, las sombras y el movimiento con el
-scroll—, medido en `DESIGN.md`, "La portada". **La única pantalla del panel con ese
-registro es el Resumen** (`components/panel/resumen/`, desde el 31/10/2026): se cuenta en
-escenas como la portada, con los datos reales de la tienda, y ahí no rigen los paneles
-con borde ni "sin sombras" (`DESIGN.md`, "El Resumen"). **En las demás pantallas del
-panel pasa solo la idea de que la pantalla responde**: lo que se toca se ve en el
-momento, con el resaltador para lo que acaba de cambiar y el movimiento de `DESIGN.md`,
-"El panel responde a lo que se toca". Sin celulares flotando ni escenas.
+**Venduo es el cuaderno de ventas de `DESIGN.md`**: papel cálido, tinta para todo lo que
+se lee y se toca, una frambuesa de señal para lo que pide algo, el resaltador y la letra a
+mano. Un solo mundo en **tres registros**, que se eligen por lo que la persona vino a
+hacer (decisión del 7 de noviembre de 2026, `DESIGN.md`, "Overview"):
+
+| Registro                   | Pantallas                                                                                                                                    | Regla                                                                                                                                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **El cuaderno en escenas** | La portada, el Resumen (`components/panel/resumen/`) y el Inicio de la app                                                                   | Escenas que se arman con el scroll y vuelven a empezar al salir.                                                                                                                                                                   |
+| **El cuaderno de trabajo** | Pedidos, Productos, Catálogos, Estadísticas, Publicar en redes, Apariencia, Compartir, Datos de la tienda y Tus datos, en la web y en la app | Las mismas piezas —tarjetas con radio y sombra teñida, notas, tickets con sello, titulares con resaltador, letra a mano en las pistas—, **quietas al deslizar**: lo mueve lo que se toca. `DESIGN.md`, "Las pantallas de trabajo". |
+| **El diario**              | El ingreso, el alta de la tienda y `/admin`                                                                                                  | Reglas de un píxel, esquina viva, sin sombras.                                                                                                                                                                                     |
+
+**Una pantalla nueva del panel va en el cuaderno de trabajo.** Nunca en escenas: quien
+busca un pedido entre ochenta no espera a que aparezca. Las que todavía van en paneles con
+borde se pasan **enteras**, cuando se tocan, primero en la web y después en la app; la
+lista de lo que falta está en `docs/estado-del-proyecto.md`.
 
 **El botón principal y lo elegido van en tinta** (`BOTON_PRIMARIO`, `bg-accion`); la
 frambuesa queda para lo que pide algo y para los errores. En una tienda, `--accion` vale
@@ -74,10 +77,10 @@ una portada y un panel no es la paleta ni la tipografía, es el ritmo:
 | Señal         | La acción de conversión   | Solo lo que pide una acción: un pendiente  |
 | Barra         | Anclas de navegación      | Navegación persistente, siempre a la vista |
 
-"Rojo" en esta regla —se escribió cuando la señal de Venduo era roja— quiere decir **la
-señal**: en Venduo hoy es frambuesa, en Pasarela azul y en Esencia oro viejo. La regla de usarla
-poco no cambia con el color. Los errores también van en la señal, siempre con su mensaje
-escrito: un error nunca es solo color.
+**La señal** es la frambuesa en Venduo; en una tienda, el color de su plantilla —azul en
+Pasarela, oro viejo en Esencia—. La regla de usarla poco no cambia con el color. Los
+errores también van en la señal, siempre con su mensaje escrito: un error nunca es solo
+color.
 
 ### El celular es uno solo
 
@@ -135,9 +138,11 @@ su `AGENTS.md`): quien vende lo abre entre dos mensajes y no va a leer un párra
 - **Lo de todos los días se hace donde se ve**: cobrar un pedido y reponer stock desde
   el Resumen, con el festejo de la app al cobrar (`useFestejo`).
 - **El movimiento del Resumen es el de la portada** (`components/panel/resumen/escena.ts`):
-  cada escena se arma al aparecer y vuelve a empezar al salir. En las demás pantallas,
-  corto y con un porqué (`DESIGN.md`, "El panel responde a lo que se toca"). Todo queda quieto con "Reducir movimiento"
-  (`globals.css`).
+  cada escena se arma al aparecer y vuelve a empezar al salir. En las pantallas de
+  trabajo, nada se arma con el scroll y lo que se toca responde con todo: el sello que se
+  estampa, el número que salta, la foto que vuela (`DESIGN.md`, "El panel responde a lo
+  que se toca"). Sin límite por equipos lentos; todo queda quieto con "Reducir
+  movimiento" (`globals.css`).
 
 ### Cuándo aparece la barra
 
@@ -171,32 +176,66 @@ Productos, Catálogos, Compartir), "Tu tienda" (Estadísticas, Editar tu tienda,
 la tienda) y "Tu cuenta"—, con "Cerrar sesión" al final. La elegida va en tinta llena.
 En el celular, abajo, las pestañas de la app (`components/panel/pestanas.tsx`).
 
-Los contadores siguen la regla del rojo: **rojo solo si pide una acción** —un pedido que
-espera que confirmes su pago, un producto sin stock, la tienda sin WhatsApp—; en tinta si
-solo informa. El atajo "Nuevo producto", solo en la barra de escritorio, va con trazo y
-no relleno rojo por lo mismo: competiría con el botón principal de cada pantalla. En el
-celular, el botón del menú lleva un punto rojo si adentro hay algo urgente.
+Los contadores siguen la regla de la señal: **en la señal solo si pide una acción** —un
+pedido que espera que confirmes su pago, un producto sin stock, la tienda sin WhatsApp—;
+en tinta si solo informa. El atajo "Nuevo producto", solo en la barra de escritorio, va
+con trazo y sin relleno por lo mismo: competiría con el botón principal de cada pantalla.
+En el celular, el botón del menú lleva un punto en la señal si adentro hay algo urgente.
 
 ### Las pantallas del panel
 
-**Toda pantalla del panel —menos el Resumen, que va en escenas— se arma en paneles**:
-cada cosa en su propio panel —regla estructural de un píxel, esquina viva, sin sombra—
-con un ícono y un título que dice **para qué sirve** ("Tus pedidos", "Se está
-acabando"). El pie, si lo hay, es un enlace a todo el ancho hacia donde se sigue. Antes
-las cifras, los filtros y las listas quedaban sueltos bajo rótulos chicos: lo importante
-se perdía entre lo demás.
+**Toda pantalla de trabajo se arma con las piezas del cuaderno** (`DESIGN.md`, "Las
+pantallas de trabajo"): la cabecera con su titular y una frase resaltada, lo que filtra
+como notas pegadas con su número, cada cosa en su tarjeta —de hoja (`bg-hoja`, `#fdfcf9`),
+radio de `16–20px`, la sombra del cuaderno— con un título que dice **para qué sirve** ("Los
+que llegaron", "Se está acabando"), los pedidos como tickets con su sello, los vacíos con
+una nota a mano y una sola acción, y los botones en píldora. Quieta al deslizar; responde
+al tocar.
+
+**Todo lo apoyado sobre el papel es de hoja, nunca blanco.** El blanco puro al lado del
+papel lo hacía ver amarillento, y una cabecera blanca sobre un cuerpo de papel partía la
+tarjeta en dos. Una fila, una celda o una cabecera pegajosa adentro de una tarjeta va en
+`bg-hoja` (o sin fondo), no en `bg-papel` ni en `bg-white`.
+
+**Lo que hay que saber de cada pieza del cuaderno:**
+
+- **El titular resalta lo que elige la pantalla**: `Cabecera` con `resaltar="pedidos"`, la
+  frase tal cual está en el titular. Sin `resaltar` no se resalta nada: una pantalla de
+  detalle, que nombra una cosa, no lleva.
+- **El sello del pedido pendiente se toca**: "Por cobrar" es el botón que marca pagado, con
+  su pregunta antes. Solo late el pendiente más viejo, y el sello "Pagado" se estampa
+  recién cuando la base confirmó.
+- **Lo fijo abajo en el celular es una bandeja** (`pieza-bandeja`): flota con margen, radio
+  y sombra sobre la lista, nunca una regla de tinta de lado a lado. Desde 1024 px cada
+  barra vuelve a sus utilidades. La que va pegada al borde, sin pestañas abajo, suma
+  `bandeja-al-borde`.
+- **Las rejillas de celdas no tienen hueco**: cada celda lleva `pieza-celda -mr-px -mb-px
+border-r border-b border-tinta/10` y la tarjeta recorta las reglas del borde. El hueco
+  de un píxel sobre un fondo de tinta dejaba un bloque gris donde faltaba una celda.
+- **Mientras carga, la forma de verdad**: `EsqueletoDePantalla` con el titular de la
+  pantalla —se sabe antes de que llegue nada— y su `forma` (`pedidos`, `productos`,
+  `catalogos`, `publicar`, `rejilla`, `estadisticas`, `formulario`, `detalle`, `lista`);
+  los datos que faltan son
+  `Hueso`, una píldora de tinta al 7% que late y se queda quieta con Reducir movimiento.
+- **Ninguna letra baja de 12 px**, ni la de una marca sobre una foto, ni un contador.
+
+**Las piezas de abajo se visten solas.** Son las mismas en el panel y en `/admin`: adentro
+del armazón del panel (`data-registro="cuaderno"`) salen como el cuaderno y afuera, como
+el diario. Una caja propia con borde lleva `pieza-tarjeta`, y un buscador o un control
+con forma, `pieza-ficha`; sin la clase, queda cuadrada. Cómo está hecho, en `DESIGN.md`,
+"Las pantallas de trabajo".
 
 **Nadie arma esto a mano.** Las piezas están en `components/panel/piezas.tsx`:
 
-| Pieza              | Para qué                                                          |
-| ------------------ | ----------------------------------------------------------------- |
-| `Cabecera`         | El titular de la pantalla, su bajada, el aviso de demo y acciones |
-| `Volver`           | La vuelta desde una pantalla de detalle                           |
-| `Seccion`          | El panel. `extra` a la derecha del título, `accion` en el pie     |
-| `Cifras` y `Cifra` | Cifras en celdas separadas por una regla, de a dos o de a cuatro  |
-| `SinDatos`         | El estado vacío dentro de un panel: qué va a aparecer y cómo      |
-| `Insignia`         | Un estado en versalita: un pedido, un producto oculto             |
-| `Miniatura`        | La foto chica de un producto en una fila                          |
+| Pieza              | Para qué                                                                                                                                               |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Cabecera`         | El titular de la pantalla, su bajada, el aviso de demo y acciones                                                                                      |
+| `Volver`           | La vuelta desde una pantalla de detalle                                                                                                                |
+| `Seccion`          | El panel. `extra` a la derecha del título, `accion` en el pie. Con `extraEnLinea`, los botones de ícono se quedan en la línea del título en el celular |
+| `Cifras` y `Cifra` | Cifras en celdas separadas por una regla, de a dos o de a cuatro                                                                                       |
+| `SinDatos`         | El estado vacío dentro de un panel: qué va a aparecer y cómo                                                                                           |
+| `Insignia`         | Un estado en versalita: un pedido, un producto oculto                                                                                                  |
+| `Miniatura`        | La foto chica de un producto en una fila                                                                                                               |
 
 Y las de las listas, las mismas de la app:
 
@@ -204,18 +243,20 @@ Y las de las listas, las mismas de la app:
 | ------------------------------------------ | ----------------------------------------------------------- |
 | `FichasDeCobro`, `FichasGrandes`           | Números grandes arriba de una lista que la filtran al tocar |
 | `FranjaDeFichas`                           | Los filtros de una lista: fichas que se deslizan, en la URL |
-| `ListaDePedidos` (`components/pedidos/`)   | Pedidos con foto y "Cobrado", en Pedidos y en el Resumen    |
+| `ListaDePedidos` (`components/pedidos/`)   | Pedidos como tickets; el sello "Por cobrar" marca pagado    |
 | `ListaProductos` (`components/productos/`) | Productos con foto, su marca encima y más y menos de stock  |
 
-Y el ritmo, el mismo en todas: la pantalla es una columna de paneles con `gap-6
+Y el ritmo, el mismo en todas —en el cuaderno, con tarjetas en vez de paneles—: la
+pantalla es una columna de paneles con `gap-6
 md:gap-8`. Dentro de un panel, las filas van de lado a lado con una regla arriba
 (`border-t border-tinta/15 first:border-t-0`) y su propio margen interior; un
 formulario o un texto usan `relleno`. Los filtros son una franja con regla abajo,
 dentro del panel que filtran, con las fichas de `lib/estilos.ts`: la elegida en tinta
-llena, nunca en rojo.
+llena, nunca en la señal.
 
-Los rótulos van en tinta, nunca en rojo: en el panel el rojo es para lo que pide una
-acción, y un rótulo en cada sección lo gastaba en nombrar cosas. El texto secundario no
+Los rótulos de una pantalla de trabajo van en tinta, nunca en la señal: ahí la señal es
+para lo que pide una acción, y un rótulo en cada sección la gastaba en nombrar cosas. En
+las escenas, el rótulo de cada una sí va en la señal, como en la portada. El texto secundario no
 baja de tinta al 65% (5,3:1 contra el papel): al 55% no llega al contraste AA.
 
 **Los componentes de `components/ui/` se siguen usando.** Se visten con las clases de
@@ -234,7 +275,7 @@ venta, los datos de la tienda, un catálogo—:
    fotos, nombre y precio. Se pregunta "¿sin qué no se puede guardar?", y eso y nada más.
 2. **Todo lo demás es una fila con su valor a la vista**: "Categoría · Ropa", "Oferta ·
    No", "Tallas y colores · S, M, L". La pantalla se vuelve un resumen. Lo vacío
-   ("Ninguna", "Sin agregar") va en tinta al 55%; lo cargado, en negrita.
+   ("Ninguna", "Sin agregar") va en tinta al 65%; lo cargado, en negrita.
 3. **Tocar una fila abre una hoja con ese ajuste solo** (`HojaDeAjuste`): sale de abajo
    en el celular y del costado en una pantalla ancha. La explicación va en la
    descripción de la hoja, nunca como frase permanente bajo un campo.

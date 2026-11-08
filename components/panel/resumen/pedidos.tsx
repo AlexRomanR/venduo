@@ -4,7 +4,7 @@ import { useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowUpRight, Loader2, ShoppingBag } from "lucide-react"
+import { ArrowUpRight, ShoppingBag } from "lucide-react"
 import { toast } from "sonner"
 
 import { formatMoney } from "@/lib/format"
@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils"
 import type { OrderStatus } from "@/types"
 import { useConfirmacion } from "@/components/panel/confirmar"
 import { useFestejo } from "@/components/panel/festejo"
+import { Estado } from "@/components/pedidos/piezas"
 import { CompartirTienda } from "@/components/panel/tablero/compartir"
 import { Flecha } from "@/components/portada/trazos"
 import portada from "@/components/portada/portada.module.css"
@@ -54,6 +55,8 @@ export function Pedidos({
   const { festejo, festejar } = useFestejo()
   const [cobrando, setCobrando] = useState<string | null>(null)
   const [cobrados, setCobrados] = useState<Set<string>>(() => new Set())
+  // Mientras se pregunta o se guarda, el sello no late.
+  const [preguntando, setPreguntando] = useState(false)
 
   useEscena(raiz, (tl, piezas) => {
     entra(
@@ -88,30 +91,48 @@ export function Pedidos({
       toast.info("Estás en modo demo: los cambios no se guardan.")
       return
     }
+    setPreguntando(true)
     const si = await preguntar({
       titulo: `¿Marcar pagado el pedido #${pedido.numero}?`,
       texto:
         "Se descuenta de tu stock. Un pedido pagado no vuelve a pendiente.",
       confirmar: "Marcar pagado",
     })
+    setPreguntando(false)
     if (!si) return
+    if (!navigator.onLine) {
+      toast.error("Sin conexión. El pedido sigue por cobrar.")
+      return
+    }
 
     setCobrando(pedido.id)
     const resultado = await cobrar(pedido.id, "pagado")
     setCobrando(null)
     if (!resultado.ok) {
-      toast.error(resultado.error ?? "No pudimos marcar el pedido pagado.")
+      toast.error(
+        resultado.error ??
+          "No pudimos marcar el pedido pagado. Inténtalo de nuevo."
+      )
       return
     }
     setCobrados((antes) => new Set(antes).add(pedido.id))
     festejar()
     toast.success("Pago confirmado. Ya se descontó del stock.")
-    router.refresh()
+    // Se refresca después de que se vio el golpe del sello.
+    window.setTimeout(() => router.refresh(), 900)
   }
 
-  const primerPendiente = pedidos.findIndex(
-    (pedido) => pedido.estado === "pendiente" && !cobrados.has(pedido.id)
-  )
+  // El pendiente más viejo: los pedidos llegan de lo más nuevo a lo más viejo.
+  let masViejo = -1
+  pedidos.forEach((pedido, indice) => {
+    if (
+      pedido.estado === "pendiente" &&
+      !pedido.noConcretado &&
+      !cobrados.has(pedido.id)
+    ) {
+      masViejo = indice
+    }
+  })
 
   return (
     <section
@@ -178,7 +199,7 @@ export function Pedidos({
                   indice >= EN_CELULAR && "max-sm:hidden"
                 )}
               >
-                {indice === primerPendiente ? (
+                {indice === masViejo ? (
                   <span
                     aria-hidden="true"
                     className="pointer-events-none absolute -top-9 right-6 z-10 hidden items-end gap-1 sm:flex"
@@ -192,6 +213,10 @@ export function Pedidos({
                   estado={estado}
                   recien={cobrados.has(pedido.id)}
                   cobrando={cobrando === pedido.id}
+                  ocupado={cobrando !== null}
+                  late={
+                    indice === masViejo && !preguntando && cobrando === null
+                  }
                   alCobrar={() => void marcarPagado(pedido)}
                 />
               </li>
@@ -208,23 +233,27 @@ function Ticket({
   estado,
   recien,
   cobrando,
+  ocupado,
+  late,
   alCobrar,
 }: {
   pedido: PedidoEnFila
   estado: OrderStatus
   recien: boolean
   cobrando: boolean
+  ocupado: boolean
+  /** Es el pendiente más viejo: su sello late. */
+  late: boolean
   alCobrar: () => void
 }) {
-  const pendiente = estado === "pendiente"
-  const cancelado = estado === "cancelado"
+  const pendiente = estado === "pendiente" && !pedido.noConcretado
 
   return (
     <div
       className={cn(
         estilos.nota,
         "grid overflow-hidden rounded-[16px] transition-transform duration-300 hover:-translate-y-0.5 sm:grid-cols-[1fr_auto]",
-        cancelado && "opacity-60"
+        estado === "cancelado" && "opacity-60"
       )}
     >
       <Link
@@ -238,7 +267,7 @@ function Ticket({
               alt=""
               fill
               sizes="64px"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transform-none"
             />
           ) : (
             <ShoppingBag
@@ -248,11 +277,11 @@ function Ticket({
           )}
         </span>
         <span className="min-w-0">
-          <span className="block text-[12.5px] font-semibold text-[var(--tinta)]/50 tabular-nums">
+          <span className="block text-[12.5px] font-semibold text-[var(--tinta)]/65 tabular-nums">
             #{pedido.numero} · {pedido.relativo}
             {pedido.directa ? " · Venta directa" : ""}
           </span>
-          <span className="mt-0.5 line-clamp-2 block text-[16.5px] leading-snug font-semibold group-hover:underline group-hover:decoration-[var(--boli)] group-hover:underline-offset-4 sm:truncate">
+          <span className="mt-0.5 line-clamp-2 block text-[16.5px] leading-snug font-semibold decoration-[var(--tinta)]/40 underline-offset-4 group-hover:underline sm:truncate">
             {pedido.titulo}
           </span>
           {pedido.nota ? (
@@ -266,7 +295,7 @@ function Ticket({
       <div
         className={cn(
           estilos.picado,
-          "flex items-center justify-between gap-2 border-t border-dashed border-[var(--regla)] bg-[var(--hoja)] bg-[position:left_top] px-3.5 py-2.5 max-sm:bg-none sm:min-w-[9rem] sm:flex-col sm:items-end sm:justify-center sm:border-t-0 sm:py-3 sm:pr-4 sm:pl-5"
+          "flex items-center justify-between gap-2 border-t border-dashed border-[var(--tinta)]/25 px-3.5 py-2.5 max-sm:bg-none sm:min-w-[10rem] sm:flex-col sm:items-end sm:justify-center sm:gap-1.5 sm:border-t-0 sm:py-3 sm:pr-4 sm:pl-5"
         )}
       >
         <span
@@ -274,36 +303,35 @@ function Ticket({
             portada.titular,
             portada.cifras,
             "text-[clamp(1.2rem,2.4vw,1.5rem)] leading-none",
-            cancelado && "line-through"
+            estado === "cancelado" && "line-through",
+            recien && "texto-recien"
           )}
         >
           {formatMoney(pedido.totalCents)}
         </span>
         {pendiente ? (
+          // El sello "Por cobrar" se toca: pregunta y, con la base, se estampa.
           <button
             type="button"
             onClick={alCobrar}
-            disabled={cobrando}
-            className={cn(
-              estilos.late,
-              "inline-flex min-h-9 items-center gap-1.5 rounded-full bg-[var(--tinta)] px-3.5 text-[13px] font-semibold text-white transition-colors hover:bg-[var(--boli)] disabled:opacity-60"
-            )}
+            disabled={ocupado}
+            aria-busy={cobrando || undefined}
+            aria-label={`Marcar pagado el pedido #${pedido.numero}`}
+            className="group/sello relative -my-1 -mr-1 inline-flex min-h-11 min-w-11 items-center justify-end rounded-[10px] p-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--tinta)] disabled:opacity-50"
           >
-            {cobrando ? (
-              <Loader2 aria-hidden="true" className="size-3.5 animate-spin" />
-            ) : null}
-            Marcar pagado
+            <Estado
+              estado="pendiente"
+              late={late}
+              className="transition-[rotate,scale,color] duration-200 ease-out group-hover/sello:scale-105 group-hover/sello:[rotate:0deg] group-hover/sello:text-[var(--senal-alta)] group-active/sello:scale-95 motion-reduce:transition-none"
+            />
           </button>
         ) : (
-          <span
-            className={cn(
-              estilos.sello,
-              recien ? estilos.selloRecien : "js-sello",
-              cancelado ? "text-[var(--tinta)]/45" : "text-[var(--tinta)]"
-            )}
-          >
-            {cancelado ? "Cancelado" : "Pagado"}
-          </span>
+          <Estado
+            estado={estado}
+            noConcretado={pedido.noConcretado && !recien}
+            recien={recien}
+            className={recien ? undefined : "js-sello"}
+          />
         )}
       </div>
     </div>

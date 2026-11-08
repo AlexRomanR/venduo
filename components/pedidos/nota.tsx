@@ -144,7 +144,7 @@ export function NotaDelPedido({
   }
 
   return (
-    <ul className="border border-tinta">
+    <ul className="pieza-tarjeta border border-tinta">
       <FilaDeNota
         nota={actual}
         titulo={`Nota del pedido #${numero}`}

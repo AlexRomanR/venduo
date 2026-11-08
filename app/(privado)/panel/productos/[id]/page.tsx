@@ -57,9 +57,10 @@ export default async function EditarProductoPage({
       <TituloDeLaBarra titulo={producto.name} volver="/panel/productos" />
       <Volver href="/panel/productos">Productos</Volver>
 
+      {/* El nombre ya está en su campo, grande, justo abajo, y en la barra del
+          celular: en el titular se repetía. */}
       <Cabecera
-        etiqueta="Editar producto"
-        titulo={producto.name}
+        titulo="Editar producto."
         bajada={
           <>
             Cargado el {formatDate(producto.created_at)}
@@ -72,35 +73,38 @@ export default async function EditarProductoPage({
         {/* Solo lo que se ve en la tienda se puede publicar: un producto
             oculto llevaría a un enlace que no abre. */}
         {producto.is_active && !producto.moderated_at ? (
-          <a
-            href={`https://wa.me/?text=${encodeURIComponent(
-              mensajeDeProducto(
-                {
-                  nombre: producto.name,
-                  precioCents: producto.price_cents,
-                  precioAnteriorCents: producto.compare_at_price_cents,
-                },
-                urlDeProducto(tienda?.slug ?? "demo", producto.id)
-              )
-            )}`}
-            target="_blank"
-            rel="noreferrer noopener"
-            className={cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")}
-          >
-            <MessageCircle aria-hidden="true" className="size-4" />
-            Mandar por WhatsApp
-          </a>
-        ) : null}
-        {producto.is_active && !producto.moderated_at ? (
-          <ConFuncion estado={funciones.marketing}>
-            <Link
-              href={`/panel/marketing?producto=${producto.id}`}
+          // Dos columnas iguales: a su ancho, el segundo bajaba de renglón.
+          <div className="grid w-full grid-cols-2 gap-2 sm:w-auto">
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(
+                mensajeDeProducto(
+                  {
+                    nombre: producto.name,
+                    precioCents: producto.price_cents,
+                    precioAnteriorCents: producto.compare_at_price_cents,
+                  },
+                  urlDeProducto(tienda?.slug ?? "demo", producto.id)
+                )
+              )}`}
+              target="_blank"
+              rel="noreferrer noopener"
               className={cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")}
             >
-              <Megaphone aria-hidden="true" className="size-4" />
-              Publicar en redes
-            </Link>
-          </ConFuncion>
+              <MessageCircle aria-hidden="true" className="size-4" />
+              <span className="sm:hidden">WhatsApp</span>
+              <span className="max-sm:hidden">Mandar por WhatsApp</span>
+            </a>
+            <ConFuncion estado={funciones.marketing}>
+              <Link
+                href={`/panel/marketing?producto=${producto.id}`}
+                className={cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")}
+              >
+                <Megaphone aria-hidden="true" className="size-4" />
+                <span className="sm:hidden">Publicar</span>
+                <span className="max-sm:hidden">Publicar en redes</span>
+              </Link>
+            </ConFuncion>
+          </div>
         ) : null}
       </Cabecera>
 

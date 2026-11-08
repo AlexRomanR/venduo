@@ -89,7 +89,7 @@ por cambiar ese test.
 
 **Los pedidos que no se concretan no se cancelan solos.** Un pendiente con más de siete
 días (`DIAS_PARA_CONCRETAR` en `lib/pedidos.ts`) queda **no concretado**: sale de "Por
-cobrar" y de los contadores rojos, y se encuentra en su propio filtro. No se escribe
+cobrar" y de los contadores en la señal, y se encuentra en su propio filtro. No se escribe
 nada en la base: se decide al leer, con `noSeConcreto` en la lista y
 `limiteParaConcretar` en los conteos. Y se puede marcar pagado igual, porque cancelarlo
 lo dejaría bloqueado para el comprador que paga el día ocho.

@@ -1,5 +1,16 @@
-import { CURRENCY, diaEnBolivia } from "@/lib/format"
-import { diasVacios, type Tablero } from "@/lib/tablero"
+import { CURRENCY, diaEnBolivia, sumarDias } from "@/lib/format"
+import {
+  porDiaDeLaSemana,
+  type Estadisticas,
+  type ProductoQueDeja,
+} from "@/lib/estadisticas"
+import {
+  cortarPeriodo,
+  diasVacios,
+  totales,
+  type Periodo,
+  type Tablero,
+} from "@/lib/tablero"
 import type { ProductoDelCatalogo } from "@/lib/catalogos/datos"
 import type { Product, SubscriptionStatus } from "@/types"
 
@@ -703,3 +714,144 @@ export const PRODUCTOS_DE_CATALOGO_DEMO: ProductoDelCatalogo[] = [
     }
   ),
 ]
+
+/* -------------------------------------------------------------------------
+ * Estadísticas, en modo demo
+ * ---------------------------------------------------------------------- */
+
+/**
+ * El tablero fijo de Estadísticas de Rosa Deportes sin base de datos.
+ *
+ * La serie es la misma del Resumen (`tableroDeDemostracion`), así las cifras
+ * de las dos pantallas coinciden; lo que no está en la serie —los productos,
+ * los cobros— crece con el período para que cambiarlo se note.
+ */
+export function estadisticasDeDemostracion(dias: Periodo): Estadisticas {
+  const { hoy, serie } = tableroDeDemostracion()
+  const { actual, anterior } = cortarPeriodo(serie, dias)
+  const totalesActuales = totales(actual)
+  const escala = dias / 30
+
+  const producto = (
+    id: string,
+    nombre: string,
+    foto: string | null,
+    unidades: number,
+    precioCents: number,
+    margen: number
+  ): ProductoQueDeja => {
+    const cantidad = Math.max(1, Math.round(unidades * escala))
+    const montoCents = cantidad * precioCents
+    return {
+      id,
+      nombre,
+      foto,
+      unidades: cantidad,
+      montoCents,
+      gananciaCents: Math.round(montoCents * margen),
+    }
+  }
+
+  const masDeja = [
+    producto(
+      "demo-zapatilla",
+      "Zapatilla running",
+      fotoDemo("1542291026-7eec264c27ff"),
+      14,
+      52_000,
+      0.42
+    ),
+    producto(
+      "demo-campera",
+      "Campera rompeviento",
+      fotoDemo("1548883354-7622d03aca27"),
+      6,
+      38_000,
+      0.45
+    ),
+    producto(
+      "demo-buzo",
+      "Buzo oversize",
+      fotoDemo("1556905055-8f358a7a47b2"),
+      9,
+      18_000,
+      0.5
+    ),
+    producto(
+      "demo-polera",
+      "Polera básica",
+      fotoDemo("1521572163474-6864f9cf17ab"),
+      23,
+      6_500,
+      0.55
+    ),
+    producto(
+      "demo-gorra",
+      "Gorra deportiva",
+      fotoDemo("1588850561407-ed78c282e89b"),
+      11,
+      5_500,
+      0.5
+    ),
+  ].sort((a, b) => (b.gananciaCents ?? 0) - (a.gananciaCents ?? 0))
+
+  const quietos = [
+    {
+      id: "demo-short",
+      nombre: "Short Dry-Fit",
+      foto: null,
+      stock: 7,
+      valorCents: 7 * 6_000,
+    },
+    {
+      id: "demo-medias",
+      nombre: "Medias deportivas, pack de 3",
+      foto: null,
+      stock: 18,
+      valorCents: 18 * 1_800,
+    },
+    {
+      id: "demo-termo",
+      nombre: "Termo 750 ml",
+      foto: null,
+      stock: 4,
+      valorCents: 4 * 4_500,
+    },
+  ].slice(0, dias === 7 ? 3 : dias === 30 ? 2 : 1)
+
+  const llegaron = totalesActuales.pedidos + Math.round(6 * escala) + 2
+  const porCobrar = 2
+  const cancelados = Math.max(1, Math.round(2 * escala))
+
+  return {
+    hoy,
+    periodo: {
+      dias,
+      desde: sumarDias(hoy, -(dias - 1)),
+      hasta: hoy,
+      actual: totalesActuales,
+      anterior: totales(anterior),
+      cobros: {
+        llegaron,
+        cobrados: totalesActuales.pedidos,
+        porCobrar,
+        cancelados,
+        noConcretados: Math.max(
+          0,
+          llegaron - totalesActuales.pedidos - porCobrar - cancelados
+        ),
+      },
+      masDeja: { porGanancia: true, productos: masDeja },
+      quietos: {
+        aCosto: true,
+        valorCents: quietos.reduce((total, p) => total + p.valorCents, 0),
+        productos: quietos,
+        recientes: 0,
+      },
+      semana: porDiaDeLaSemana(actual),
+    },
+    vendioAlgunaVez: true,
+    tieneProductos: true,
+    esDemo: true,
+  }
+}

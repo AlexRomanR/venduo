@@ -355,6 +355,7 @@ export function Constructor({
           <Volver />
           <Cabecera
             titulo="Nuevo catálogo."
+            resaltar="catálogo"
             bajada={
               elegida
                 ? `Con la plantilla ${elegida}. Elige los productos en el orden en que van.`
@@ -378,7 +379,7 @@ export function Constructor({
             />
           </div>
         </div>
-        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-tinta bg-papel px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:sticky lg:-mx-10 lg:px-10">
+        <div className="pieza-bandeja bandeja-al-borde fixed inset-x-0 bottom-0 z-20 border-t border-tinta bg-papel px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:sticky lg:-mx-10 lg:border-tinta/15 lg:px-10">
           <div className="flex items-center gap-3 lg:justify-center">
             <div className="lg:hidden">
               <AsiVaQuedandoEnLaBarra
@@ -725,7 +726,7 @@ function Editor({
         type="button"
         onClick={() => abrirPanel("listo")}
         className={cn(
-          "ml-1 flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition-opacity active:opacity-70",
+          "ml-1 flex min-h-11 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition-opacity active:opacity-70",
           sinGuardar || !guardado
             ? "bg-accion text-white"
             : "border border-tinta/25"
@@ -954,11 +955,12 @@ function Editor({
                   // En el celular, una fila que se desliza con ícono y nombre,
                   // como en la app; en una pantalla ancha, cinco del mismo ancho.
                   className={cn(
-                    "flex min-h-11 shrink-0 items-center justify-center gap-2 px-3.5 text-[15px] font-semibold whitespace-nowrap transition-colors lg:min-h-12 lg:min-w-0 lg:flex-1 lg:border-l lg:border-tinta/15 lg:px-0 lg:text-sm lg:first:border-l-0",
+                    // En el celular, píldoras, como toda ficha del cuaderno.
+                    "flex min-h-11 shrink-0 items-center justify-center gap-2 px-3.5 text-[15px] font-semibold whitespace-nowrap transition-colors max-lg:rounded-full max-lg:border lg:min-h-12 lg:min-w-0 lg:flex-1 lg:border-l lg:border-tinta/15 lg:px-0 lg:text-sm lg:first:border-l-0",
                     clave === "listo" && "lg:hidden",
                     panel === clave
-                      ? "bg-tinta text-papel"
-                      : "hover:bg-tinta/[0.05]"
+                      ? "bg-tinta text-papel max-lg:border-tinta"
+                      : "hover:bg-tinta/[0.05] max-lg:border-tinta/20"
                   )}
                 >
                   <Icono aria-hidden="true" className="size-[18px] lg:hidden" />
@@ -1055,7 +1057,7 @@ function Editor({
 
         <section
           aria-label="Vista previa"
-          className="flex min-w-0 flex-col lg:sticky lg:top-6 lg:border lg:border-tinta"
+          className="flex min-w-0 flex-col lg:sticky lg:top-6 lg:overflow-hidden lg:rounded-[20px] lg:border lg:border-tinta/12 lg:bg-hoja lg:shadow-[var(--sombra-cuaderno)]"
         >
           <header className="flex items-center justify-between gap-3 border-b border-tinta/15 px-4 py-3 max-lg:hidden sm:px-5">
             <h2 className="font-titular text-lg leading-tight font-bold tracking-[-0.02em]">
@@ -1294,7 +1296,7 @@ function AccionDeListo({
       type="button"
       disabled={apagado}
       onClick={alTocar}
-      className="flex min-h-16 items-center gap-3 border border-tinta px-3 py-2 text-left transition-colors hover:bg-tinta/[0.04] disabled:opacity-40"
+      className="flex min-h-16 items-center gap-3 rounded-[16px] border border-tinta/25 bg-hoja px-3 py-2 text-left transition-colors hover:bg-tinta/[0.04] disabled:opacity-40"
     >
       <Icono aria-hidden="true" className="size-5 shrink-0" />
       <span className="min-w-0">

@@ -228,7 +228,7 @@ export function Probador({
       <HojasGrandes key={opcion.id} hojas={hojas} columnas={1} />
       {titulo}
       {grupos}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-tinta bg-papel px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <div className="pieza-bandeja bandeja-al-borde fixed inset-x-0 bottom-0 z-20 border-t border-tinta bg-papel px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         {accion}
       </div>
     </div>
@@ -327,7 +327,7 @@ function Grupo({
   alProbar: (id: string) => void
 }) {
   return (
-    <section className={cn(ancha && "border border-tinta")}>
+    <section className={cn(ancha && "pieza-tarjeta border border-tinta")}>
       <h3
         className={cn(
           "flex items-center gap-2 font-titular font-bold tracking-[-0.01em]",
@@ -422,7 +422,7 @@ function Miniatura({
         {opcion.nombre}
       </span>
       {laQueTiene ? (
-        <span className="text-[10px] font-semibold tracking-[0.1em] uppercase opacity-65">
+        <span className="text-xs font-semibold tracking-[0.1em] uppercase opacity-65">
           La que tienes
         </span>
       ) : null}

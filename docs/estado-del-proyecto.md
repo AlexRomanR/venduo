@@ -59,6 +59,16 @@ Actualizado el 9 de octubre de 2026.
 
 ### La marca
 
+- **Desde el 7 de noviembre: Venduo es el cuaderno de ventas, en tres registros**
+  (`DESIGN.md`, "Overview"). La portada, el Resumen y el Inicio de la app van **en
+  escenas** con el scroll. Las pantallas de trabajo —Pedidos, Productos, Catálogos,
+  Estadísticas, Publicar en redes, Apariencia, Compartir, la cuenta— van en **el cuaderno
+  quieto**: tarjetas con radio y sombra teñida, notas pegadas, tickets con sello,
+  titulares con resaltador; se mueven solo al tocar. El ingreso, el alta y `/admin` siguen
+  en **el diario**. Se eligió mirando Pedidos dibujado de tres formas. El mismo día se
+  quitó el principio de "Android de gama baja": el movimiento no se limita por equipos
+  lentos, solo con "Reducir movimiento". Qué pantallas faltan pasar, en "Lo que falta",
+  1.c.
 - El logo es la feria en el celular: el toldo a rayas de un puesto dentro de la pantalla.
   Va en la portada, el ingreso, el alta y la barra lateral
   —plegada, el símbolo solo—, y es el favicon, el ícono del celular y la tarjeta al
@@ -80,7 +90,8 @@ Actualizado el 9 de octubre de 2026.
   las visitas en un embudo y el enlace para copiar al final. GSAP y Lenis; cada escena
   se arma al aparecer y vuelve a empezar al salir. Mismos datos y acciones que antes
   (cobrar, reponer, vacaciones, compartir). En `components/panel/resumen/`; las piezas
-  viejas del tablero se borraron. La app todavía tiene el Inicio de antes.
+  viejas del tablero se borraron. La app tiene el mismo Inicio en escenas, con
+  Reanimated (`src/components/inicio/escenas/`).
 - **Catálogos responde (31 de octubre).** Al elegir los productos, el catálogo se arma al
   lado ("Así va quedando") y cada foto elegida vuela hasta él. La plantilla se elige en un
   probador: tu catálogo en grande y las plantillas en miniatura, que se prueban tocándolas.
@@ -88,7 +99,8 @@ Actualizado el 9 de octubre de 2026.
   recorre las hojas mientras sale el PDF y "Enlace" y "Verlo" guardan solos. En la lista,
   mandar por WhatsApp está a la vista, «N agotados» avisa y lo recién editado se marca; si
   la lectura falla, se dice. Todo con CSS y la API de animaciones del navegador. La app
-  todavía usa la galería de antes (`galeria.tsx`) y la vista previa sin `vivo`.
+  usa el mismo probador y la vista previa con `vivo`, y al elegir un producto su foto
+  vuela hasta el botón que arma el catálogo.
 
 ### Catálogos en PDF (`/panel/catalogos`)
 
@@ -239,13 +251,28 @@ sirven desde `lib/fuentes/` con `next/font/local`: el build ya no las baja de Go
 - **Pedidos**: lista y detalle con el mismo número que llegó por WhatsApp. Tres estados:
   pendiente, pagado y cancelado. Marcar pagado descuenta el stock; cancelar un pagado lo
   devuelve.
-- **Estadísticas**: preguntas en lenguaje natural, gráficos guardados, edición del gráfico
-  por texto e informe en PDF (completo o de un gráfico).
-- **Apariencia**: la puerta al editor, la plantilla, cambiarla y el historial, con
-  **Restaurar** en cada versión. El resumen también lleva al editor, y pide darle estilo
+- **Estadísticas** (rehecha el 8 de noviembre, brief `docs/briefs/2026-11-08-estadisticas.md`):
+  abre con un tablero fijo que va más a fondo que el Resumen —cada cifra contra el
+  período anterior (7, 30 o 90 días), cuántos pedidos se cobran, lo que más deja, lo que
+  no se mueve y los días fuertes— y la IA en una columna fija a la derecha desde 1280 px
+  (por debajo, una bandeja que abre la conversación en una hoja). Lo que arma la IA se
+  agrega a "Tu tablero", que sigue con su PDF. Una tienda sin ventas ve qué falta y
+  tarjetas de ejemplo sin cifras. Las acciones respetan que el administrador apague la
+  pantalla, y lo guardado se valida con zod. **Falta**: probar la IA de punta a punta con
+  una tienda real (en modo demo responde "Todavía no tienes una tienda") y llevarla a la
+  app, que hoy no tiene el tablero fijo (`/api/v1/estadisticas`). Riesgo anotado: el tope
+  de 1000 filas de PostgREST recortaría las ventas de una tienda con mucho movimiento,
+  igual que en el Resumen.
+- **Apariencia** (rehecha el 8 de noviembre, `docs/briefs/2026-11-08-apariencia.md`): tu
+  plantilla y las otras en una sola pasarela, una a la vez al medio y con la tienda de la
+  persona adentro de cada dibujo: la suya con «Abrir el editor» y «Ver tienda», las otras
+  con «Usar X» —que pregunta en una hoja— y el historial con las tres
+  últimas a la vista y **Restaurar** en cada versión. Pasó de 5.700 a 1.500 px de alto
+  en el celular. El resumen también lleva al editor, y pide darle estilo
   mientras la tienda luzca igual a la plantilla.
-- Todas las pantallas —menos el Resumen, en escenas— se arman en paneles: cada cosa en su panel con borde, un
-  título que dice para qué sirve y su estado vacío dentro. **Pedidos y Productos son
+- Las pantallas de trabajo todavía se arman en paneles: cada cosa en su panel con
+  borde, un título que dice para qué sirve y su estado vacío dentro. Pasan al cuaderno
+  quieto de a una ("Lo que falta", 1.c). **Pedidos y Productos son
   las pantallas de la app**: números grandes que filtran, fichas que se deslizan, los
   pedidos por día con su foto y "Cobrado", el detalle con "Marcar pagado" fijo abajo, y
   los productos con su marca sobre la foto y más y menos de stock. Cada pantalla lleva
@@ -419,14 +446,51 @@ borrar la cuenta están publicados. Falta lo que es de quien publica: las cuenta
 Firebase y Play Console, y probarla en un teléfono de verdad. La lista está en
 **`docs/plan-app-movil.md`**, "Lo que falta". iPhone viene después.
 
-### 1.b. Llevar el color y Catálogos a la app — cuando se apruebe la web
+### 1.b. Capturas de la portada
 
-Falta la app (`venduo-app`): copiar los tokens nuevos de `app/globals.css` (tinta para
-botones, frambuesa para lo que pide algo) a su tema y el ícono nuevo de `public/marca/`, y
-llevar el Catálogos nuevo —"Así va quedando", el probador, `vivo` en
-`editor-de-la-app.tsx`—, como pide "web primero, app después". También quedan de la portada nueva: reemplazar la captura de la plantilla
-Fórmula, que muestra un frasco de una marca real, y la de Calle, que dice "lo cerramos
-por WhatsApp".
+El color, Catálogos y el Inicio en escenas ya están en la app (noviembre). Quedan de la
+portada nueva: reemplazar la captura de la plantilla Fórmula, que muestra un frasco de
+una marca real, y la de Calle, que dice "lo cerramos por WhatsApp".
+
+### 1.c. Pasar las pantallas de trabajo al cuaderno — decidido el 7 de noviembre
+
+La regla está en `DESIGN.md`, "Las pantallas de trabajo". **La web está pasada** (7 de
+noviembre), por etapas y vista a 375 y 1280 px en modo demo:
+
+- [x] Las piezas (`components/panel/piezas.tsx`, `lib/estilos.ts`): tarjetas, titular
+      con su palabra resaltada, vacíos, fichas y botones en píldora. Se visten solas
+      adentro del armazón (`data-registro="cuaderno"`); `/admin` y el alta siguen igual.
+- [x] `FichasGrandes` y `FichasDeCobro`: notas pegadas que caen, lo urgente encerrado a
+      mano.
+- [x] Pedidos: cada pedido es un ticket con su talón; el sello "Por cobrar" se toca para
+      marcar pagado, solo late el más viejo y "Pagado" se estampa al confirmarse; el
+      detalle y la venta nueva, en tarjetas.
+- [x] Productos: fotos con radio, más y menos redondos, el número que salta; el
+      formulario, sus opciones y "cargar varios", en tarjetas.
+- [x] Catálogos, Estadísticas, Publicar en redes, Apariencia y Tus datos: con las piezas.
+- [x] Segunda pasada (8 de noviembre), con el diseñador, impeccable y el verificador:
+      tarjetas de hoja (`#fdfcf9`) en vez de blancas; esqueletos con la forma de cada
+      pantalla y su titular; el "1" de las polaroids entero; Productos aligerado (el valor
+      del stock en la bajada, "Todo con stock" cuando no falta nada, botones de ícono en
+      el celular); bandejas flotantes abajo; celdas sin hueco; el resaltador elegido por
+      pantalla; nada por debajo de 12 px; la frambuesa solo en lo que pide algo.
+
+**Falta:**
+
+- [ ] Probarlo con una tienda real: cobrar un pedido y ver el sello, cambiar stock.
+- [x] Los editores (8 de noviembre): el de la tienda lleva la marca del cuaderno en su
+      raíz —está fuera del armazón— y los dos pasaron sus piezas: píldoras, tarjetas de
+      hoja, paletas y cajas con radio, sin el rojo al pasar el cursor. La vista previa
+      de la tienda vive en un `<iframe>` y no se toca.
+- [x] Compartir es una pantalla (`/panel/compartir`), como en la app: el enlace que se
+      copia, un botón por red, tarjetas para historias en PNG con la letra y los colores
+      de la tienda (`/panel/compartir/historia`) y el QR. La barra y las pestañas llevan
+      ahí; el diálogo corto queda para los atajos del Resumen y de Pedidos.
+- [x] Categorías salió de la barra lateral: se entra desde Productos.
+- [x] Reponer stock en el Resumen ya no vacía la escena: lo repuesto queda en su fila,
+      marcado "Repuesto", hasta la próxima vez que se entra.
+- [ ] La app (`src/components/`): Pedidos, Productos y las demás, con `NOTA` y las
+      piezas del Inicio, cuando se apruebe la web.
 
 ### 2. Funciones por plan — cuando se decida
 
@@ -531,8 +595,9 @@ solo lectura con exportación a CSV) y la purga a los 90 días.
   `CANVA_CLIENT_SECRET`.
 - **Dominio propio** para las tiendas con subdominio: comprar el dominio, crear el
   registro DNS comodín y darlo de alta en Vercel.
-- **El rojo de Venduo** está a 4,35:1 contra el papel, un poco por debajo del mínimo AA
-  para texto chico.
+- **El rojo de la base editorial** (`lib/plantillas/clasica.ts`) está a 4,35:1 contra
+  su papel, un poco por debajo del mínimo AA para texto chico. La marca de Venduo ya no
+  tiene el problema: la frambuesa pasa con 4,7:1.
 - **Avisos de Next.js** por `quality="90"` en imágenes de la portada: hace falta
   configurar `images.qualities` antes de pasar a Next 16.
 - Avisos de lint en los scripts de la skill `impeccable`, que es de terceros.

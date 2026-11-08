@@ -55,6 +55,7 @@ export default async function NuevaVentaPage() {
       <Volver href="/panel/pedidos">Pedidos</Volver>
       <Cabecera
         titulo="Nueva venta."
+        resaltar="venta"
         bajada="Lo que vendiste en el chat o en persona. Se descuenta del stock."
       />
       <NuevaVenta

@@ -181,10 +181,10 @@ export function PestanasDePasos({
                 aria-current={activo ? "step" : undefined}
                 aria-label={paso.nombre}
                 className={cn(
-                  "relative flex min-h-14 w-full flex-col items-center justify-center gap-1 border-t-2 text-[10px] font-semibold tracking-[0.02em] transition-colors",
+                  "relative flex min-h-14 w-full flex-col items-center justify-center gap-1 border-t-2 text-xs font-semibold transition-colors",
                   activo
-                    ? "border-senal text-senal"
-                    : "border-transparent opacity-60 hover:opacity-100"
+                    ? "border-tinta text-tinta"
+                    : "border-transparent text-tinta/65 hover:text-tinta"
                 )}
               >
                 <Icono aria-hidden="true" className="size-5" />

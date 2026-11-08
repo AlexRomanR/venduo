@@ -407,7 +407,7 @@ function SelectorDePeriodo({
     >
       <span
         aria-hidden="true"
-        className="absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/3)] rounded-full bg-[var(--papel)] transition-transform duration-500 ease-[cubic-bezier(0.34,1.4,0.64,1)] motion-reduce:transition-none"
+        className="absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/3)] rounded-full bg-[var(--papel)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
         style={{ transform: `translateX(${elegido * 100}%)` }}
       />
       {PERIODOS.map((dias, indice) => {
@@ -425,7 +425,7 @@ function SelectorDePeriodo({
             onClick={() => alCambiar(dias)}
             onKeyDown={(evento) => alTeclear(evento, indice)}
             className={cn(
-              "relative min-h-10 rounded-full px-4 text-[14px] font-semibold tabular-nums transition-colors duration-300",
+              "relative min-h-11 rounded-full px-4 text-[14px] font-semibold tabular-nums transition-colors duration-300",
               esElegido
                 ? "text-[var(--tinta)]"
                 : "text-[var(--papel)]/75 hover:text-[var(--papel)]"

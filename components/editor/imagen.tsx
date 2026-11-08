@@ -86,7 +86,7 @@ export function CampoImagen({
           if (archivo) void subir(archivo)
         }}
         className={cn(
-          "relative mt-2 flex aspect-[16/9] items-center justify-center overflow-hidden border border-dashed bg-tinta/[0.04] transition-colors",
+          "relative mt-2 flex aspect-[16/9] items-center justify-center overflow-hidden rounded-[16px] border border-dashed bg-tinta/[0.04] transition-colors",
           encima ? "border-senal bg-senal/[0.06]" : "border-tinta/25"
         )}
       >
@@ -119,7 +119,7 @@ export function CampoImagen({
           type="button"
           onClick={() => entrada.current?.click()}
           disabled={subiendo}
-          className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:opacity-60 disabled:opacity-50"
         >
           <Upload aria-hidden="true" className="size-4" />
           Subir foto
@@ -128,7 +128,7 @@ export function CampoImagen({
           type="button"
           onClick={() => setConBiblioteca((abierta) => !abierta)}
           aria-expanded={conBiblioteca}
-          className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+          className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:opacity-60"
         >
           <Images aria-hidden="true" className="size-4" />
           Tu biblioteca

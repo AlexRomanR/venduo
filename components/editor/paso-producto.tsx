@@ -147,7 +147,7 @@ export function PasoProducto() {
         {!tienda.whatsapp ? (
           <Link
             href="/cuenta"
-            className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold underline underline-offset-4 hover:text-senal"
+            className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold underline underline-offset-4 hover:opacity-60"
           >
             Agregar mi WhatsApp
           </Link>
@@ -230,7 +230,7 @@ export function PasoProducto() {
             <button
               type="button"
               onClick={() => irAPaso("marca")}
-              className="min-h-11 font-semibold underline underline-offset-4 hover:text-senal"
+              className="min-h-11 font-semibold underline underline-offset-4 hover:opacity-60"
             >
               Tu marca
             </button>
@@ -240,7 +240,7 @@ export function PasoProducto() {
             <button
               type="button"
               onClick={() => irAPaso("catalogo")}
-              className="min-h-11 font-semibold underline underline-offset-4 hover:text-senal"
+              className="min-h-11 font-semibold underline underline-offset-4 hover:opacity-60"
             >
               Catálogo
             </button>

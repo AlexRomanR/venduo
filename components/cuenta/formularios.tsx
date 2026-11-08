@@ -74,10 +74,10 @@ function Par<T extends string | boolean>({
             onClick={() => onChange(opcion.valor)}
             aria-pressed={elegida}
             className={cn(
-              "flex min-h-11 flex-col gap-1.5 border p-4 text-left transition-colors duration-200",
+              "flex min-h-11 flex-col gap-1.5 rounded-[16px] border p-4 text-left transition-colors duration-200",
               elegida
                 ? "border-tinta bg-tinta text-papel"
-                : "border-tinta/15 hover:border-tinta"
+                : "border-tinta/15 bg-hoja hover:border-tinta"
             )}
           >
             <span className="font-titular text-sm leading-tight font-bold tracking-[-0.01em]">

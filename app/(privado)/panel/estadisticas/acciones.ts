@@ -10,7 +10,7 @@ import {
   normalizarForma,
   type FilaInsight,
 } from "@/lib/data/insights"
-import { funcionesDeMiTienda } from "@/lib/data/funciones"
+import { exigirFuncion, funcionesDeMiTienda } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 import { anotarUsoDeIa, permisoDeIa } from "@/lib/data/uso-ia"
 import { createClient, getUsuario } from "@/lib/supabase/server"
@@ -41,12 +41,16 @@ export async function preguntar(
     return { ok: false, error: "Escribe un poco más para poder responderte." }
   }
 
-  const [tienda, permiso, funciones] = await Promise.all([
+  // Lo que Venduo apaga se apaga acá, no solo en la pantalla: la pantalla
+  // entera (`estadisticas`) y la IA de esta pantalla (`permisoDeIa`).
+  const [tienda, pantalla, permiso, funciones] = await Promise.all([
     getMiTienda(),
+    exigirFuncion("estadisticas"),
     permisoDeIa("estadisticas"),
     funcionesDeMiTienda(),
   ])
   if (!tienda) return { ok: false, error: "Todavía no tienes una tienda." }
+  if (!pantalla.ok) return pantalla
   if (!permiso.ok) return permiso
 
   const inicio = Date.now()
@@ -117,28 +121,51 @@ export async function preguntar(
   }
 }
 
-/** Guarda el gráfico en el tablero del emprendedor. */
+/**
+ * Guarda el gráfico en el tablero del emprendedor.
+ *
+ * La consulta llega del navegador, así que se vuelve a validar: lo que se
+ * guarda acá se ejecuta cada vez que se abre el tablero.
+ */
 export async function guardar(consulta: InsightSql, pregunta: string) {
   const supabase = await createClient()
   if (!supabase) return { ok: false, error: "Supabase sin configurar." }
 
-  const user = await getUsuario()
-  const tienda = await getMiTienda()
+  const validada = insightSqlSchema.safeParse(consulta)
+  if (!validada.success) {
+    return { ok: false, error: "No pudimos agregarlo a tu tablero." }
+  }
+
+  const [user, tienda, pantalla] = await Promise.all([
+    getUsuario(),
+    getMiTienda(),
+    exigirFuncion("estadisticas"),
+  ])
 
   if (!user || !tienda) return { ok: false, error: "No tienes una tienda." }
+  if (!pantalla.ok) return pantalla
 
-  const { error } = await supabase.from("insights").insert({
-    store_id: tienda.id,
-    user_id: user.id,
-    titulo: consulta.titulo,
-    pregunta,
-    spec: consulta,
-  })
+  const { data, error } = await supabase
+    .from("insights")
+    .insert({
+      store_id: tienda.id,
+      user_id: user.id,
+      titulo: validada.data.titulo,
+      pregunta: pregunta.trim().slice(0, 500),
+      spec: validada.data,
+    })
+    .select("id")
+    .single()
 
-  if (error) return { ok: false, error: "No pudimos guardar el gráfico." }
+  if (error || !data) {
+    return {
+      ok: false,
+      error: "No pudimos agregarlo a tu tablero. Inténtalo de nuevo.",
+    }
+  }
 
   revalidatePath("/panel/estadisticas")
-  return { ok: true }
+  return { ok: true, id: data.id }
 }
 
 /** Borrado lógico, como todo en el sistema. */
@@ -146,11 +173,19 @@ export async function borrar(id: string) {
   const supabase = await createClient()
   if (!supabase) return { ok: false, error: "Supabase sin configurar." }
 
+  const pantalla = await exigirFuncion("estadisticas")
+  if (!pantalla.ok) return pantalla
+
   // Por una función y no con un UPDATE: ver `dar_de_baja_catalogo`, que
   // tiene el mismo motivo.
   const { error } = await supabase.rpc("quitar_grafico", { p_grafico: id })
 
-  if (error) return { ok: false, error: "No pudimos borrar el gráfico." }
+  if (error) {
+    return {
+      ok: false,
+      error: "No pudimos quitarlo de tu tablero. Inténtalo de nuevo.",
+    }
+  }
 
   revalidatePath("/panel/estadisticas")
   return { ok: true }

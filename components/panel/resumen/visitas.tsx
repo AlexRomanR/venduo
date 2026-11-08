@@ -39,7 +39,7 @@ function IconoDeOrigen({ origen }: { origen: Origen }) {
     directo: <Link2 aria-hidden="true" className="size-5" />,
   }
   return (
-    <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-[var(--regla)] bg-white">
+    <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-[var(--regla)] bg-hoja">
       {iconos[origen] ?? <Globe aria-hidden="true" className="size-5" />}
     </span>
   )
@@ -195,7 +195,7 @@ export function Visitas({ visitas }: { visitas: ResumenDeVisitas }) {
                           opacity: 1 - i * 0.14,
                         }}
                       />
-                      <span className="relative flex items-baseline gap-2 rounded-full bg-white/90 px-3 py-0.5 text-[13.5px] font-semibold">
+                      <span className="relative flex items-baseline gap-2 rounded-full bg-hoja/90 px-3 py-0.5 text-[13.5px] font-semibold">
                         <span className={cn(portada.cifras, "font-bold")}>
                           {formatNumber(etapa.cantidad)}
                         </span>
@@ -232,7 +232,7 @@ export function Visitas({ visitas }: { visitas: ResumenDeVisitas }) {
                   <li key={producto.id}>
                     <Link
                       href={`/panel/productos/${producto.id}`}
-                      className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--regla)] px-4 text-[14px] font-semibold transition-colors hover:border-[var(--tinta)]"
+                      className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--regla)] px-4 text-[14px] font-semibold transition-colors hover:border-[var(--tinta)]"
                     >
                       {producto.nombre}
                       <span className="font-normal text-[var(--tinta)]/55 tabular-nums">

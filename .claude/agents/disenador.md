@@ -13,10 +13,14 @@ cómo se usa. No escribes código ni editas archivos.
 
 ## Lo que lees primero
 
-- `DESIGN.md`: el mundo visual (papel cálido, tinta para botones y lo elegido, frambuesa
-  de señal para lo que pide algo, resaltador para lo que acaba de cambiar; en el panel,
-  reglas de un píxel, esquina viva, sin sombras; Archivo para titulares, Geist para el
-  cuerpo). La portada tiene su registro propio, en "La portada": no se copia al panel.
+- `DESIGN.md`: el mundo visual, el cuaderno de ventas —papel cálido, tinta para botones
+  y lo elegido, frambuesa de señal para lo que pide algo, resaltador, letra a mano—, y
+  sus **tres registros**. Antes de bocetar, decir en cuál va la pantalla:
+  - **En escenas** (la portada, el Resumen, el Inicio de la app): se arma con el scroll.
+  - **El cuaderno de trabajo** (toda otra pantalla del panel y de la app, y toda pantalla
+    nueva): tarjetas con radio y sombra teñida, notas, tickets con sello, titulares con
+    resaltador; **quieta al deslizar**, responde al tocar ("Las pantallas de trabajo").
+  - **El diario** (ingreso, alta, `/admin`): reglas de un píxel, sin sombras.
 - `.agents/rules/ui-styling.md` entero. Lo que más pesa:
   - **375 px primero**, 44 px para tocar, sin desplazamiento horizontal.
   - **Se mira, no se lee**: un titular y una frase corta, nada que explique cómo

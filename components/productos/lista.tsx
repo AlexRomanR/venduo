@@ -121,13 +121,13 @@ function FilaDeProducto({
   const variantes = cuantasVariantes(leerOpciones(producto.opciones))
 
   return (
-    <li className="flex gap-3 border-t border-tinta/15 py-3 pr-3 pl-4 first:border-t-0 sm:pr-4 sm:pl-5 @2xl:items-center @2xl:gap-4">
+    <li className="flex gap-3 border-t border-tinta/12 py-3 pr-3 pl-4 first:border-t-0 sm:pr-4 sm:pl-5 @2xl:items-center @2xl:gap-4">
       <Link
         href={href}
         tabIndex={-1}
         aria-hidden="true"
         className={cn(
-          "relative block size-[76px] shrink-0 overflow-hidden border border-tinta/15 bg-tinta/[0.05] transition-opacity active:opacity-70",
+          "group/foto relative block size-[84px] shrink-0 overflow-hidden rounded-[14px] bg-tinta/[0.05] transition-opacity active:opacity-70",
           oculto && "opacity-45"
         )}
       >
@@ -136,8 +136,11 @@ function FilaDeProducto({
             src={producto.image_url}
             alt=""
             fill
-            sizes="76px"
-            className="object-cover"
+            sizes="84px"
+            className={cn(
+              "object-cover transition-[transform,filter] duration-500 group-hover/foto:scale-105 motion-reduce:transform-none",
+              agotado && "grayscale"
+            )}
           />
         ) : (
           <Package className="absolute inset-0 m-auto size-5 opacity-35" />
@@ -150,7 +153,7 @@ function FilaDeProducto({
         {marca ? (
           <span
             className={cn(
-              "absolute inset-x-0 bottom-0 truncate px-1 py-0.5 text-center text-[11px] leading-[14px] font-semibold text-papel",
+              "absolute inset-x-1 bottom-1 truncate rounded-full px-1 text-center text-xs leading-4 font-semibold tracking-[-0.01em] text-papel",
               marca.rojo ? "bg-senal" : "bg-tinta"
             )}
           >
@@ -164,7 +167,7 @@ function FilaDeProducto({
           href={href}
           className="group flex min-w-0 flex-col gap-0.5 @2xl:flex-1"
         >
-          <span className="line-clamp-2 font-titular text-base leading-5 font-bold tracking-[-0.01em] transition-colors group-hover:text-senal">
+          <span className="line-clamp-2 font-titular text-base leading-5 font-bold tracking-[-0.01em] decoration-tinta/40 underline-offset-4 transition-colors group-hover:underline">
             {producto.name}
             {marca ? <span className="sr-only">, {marca.texto}</span> : null}
           </span>
@@ -190,7 +193,7 @@ function FilaDeProducto({
           // producto, en cada una.
           <Link
             href={`${href}#variantes`}
-            className="flex min-h-10 items-center gap-1.5 self-end border border-tinta px-3 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel @2xl:self-auto"
+            className="flex min-h-10 items-center gap-1.5 self-end rounded-full border border-tinta/20 bg-hoja px-4 text-sm font-semibold transition-colors hover:border-tinta @2xl:self-auto"
           >
             <span
               className={cn(
@@ -206,7 +209,7 @@ function FilaDeProducto({
           <div
             role="group"
             aria-label={`Unidades de ${producto.name}`}
-            className="flex items-center self-end @2xl:self-auto"
+            className="flex items-center gap-1 self-end @2xl:self-auto"
           >
             <Paso
               etiqueta="Una unidad menos"
@@ -215,20 +218,29 @@ function FilaDeProducto({
             >
               <Minus aria-hidden="true" className="size-5" />
             </Paso>
+            {/* El número salta al cambiar: se ve que se tocó. */}
             <span
               aria-live="polite"
               className={cn(
-                "tabular flex h-10 min-w-12 items-center justify-center border-y border-tinta px-1 font-titular text-base font-bold",
+                "tabular flex h-11 min-w-12 items-center justify-center overflow-hidden px-1 font-titular text-2xl leading-none font-extrabold tracking-[-0.03em]",
                 agotado && "text-senal"
               )}
             >
-              {guardando ? (
-                <span className="opacity-40">{formatNumber(stock)}</span>
-              ) : (
-                formatNumber(stock)
-              )}
+              <span
+                key={stock}
+                className={cn(
+                  stock !== producto.stock && "numero-entra",
+                  guardando && "opacity-40"
+                )}
+              >
+                {formatNumber(stock)}
+              </span>
             </span>
-            <Paso etiqueta="Una unidad más" alTocar={() => cambiar(stock + 1)}>
+            <Paso
+              etiqueta="Una unidad más"
+              lleno
+              alTocar={() => cambiar(stock + 1)}
+            >
               <Plus aria-hidden="true" className="size-5" />
             </Paso>
           </div>
@@ -241,11 +253,14 @@ function FilaDeProducto({
 function Paso({
   etiqueta,
   apagado = false,
+  lleno = false,
   alTocar,
   children,
 }: {
   etiqueta: string
   apagado?: boolean
+  /** El de sumar va lleno en tinta: es el que más se toca. */
+  lleno?: boolean
   alTocar: () => void
   children: React.ReactNode
 }) {
@@ -255,7 +270,12 @@ function Paso({
       onClick={alTocar}
       disabled={apagado}
       aria-label={etiqueta}
-      className="flex h-10 w-11 items-center justify-center border border-tinta transition-colors hover:bg-tinta/[0.06] active:bg-tinta active:text-papel disabled:opacity-30"
+      className={cn(
+        "flex size-11 items-center justify-center rounded-full transition-[background-color,transform] active:scale-90 disabled:opacity-30 motion-reduce:transform-none",
+        lleno
+          ? "bg-tinta text-papel hover:bg-accion-alta"
+          : "border border-tinta/20 bg-hoja hover:border-tinta"
+      )}
     >
       {children}
     </button>

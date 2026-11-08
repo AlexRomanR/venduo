@@ -125,7 +125,7 @@ export function PasoPortada() {
                   type="button"
                   onClick={() => ia.pedir(ESCRIBIR_PORTADA)}
                   disabled={ia.cargando}
-                  className="group flex w-full items-center gap-3 border-2 border-tinta p-3 text-left transition-colors hover:bg-tinta hover:text-papel disabled:opacity-50"
+                  className="group flex w-full items-center gap-3 rounded-[16px] border border-tinta bg-hoja p-3 text-left transition-colors hover:bg-tinta hover:text-papel disabled:opacity-50"
                 >
                   <WandSparkles
                     aria-hidden="true"
@@ -156,7 +156,7 @@ export function PasoPortada() {
             <button
               type="button"
               onClick={() => setAgregando(true)}
-              className="flex min-h-12 w-full items-center justify-center gap-2 border-2 border-dashed border-tinta/40 font-semibold transition-colors hover:border-tinta hover:bg-tinta/[0.03]"
+              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-plantilla border-2 border-dashed border-tinta/40 font-semibold transition-colors hover:border-tinta hover:bg-tinta/[0.03]"
             >
               <Plus aria-hidden="true" className="size-5" />
               Agregar una sección
@@ -336,7 +336,7 @@ function FilaDeSeccion({
           !seccion.visible && "opacity-45"
         )}
       >
-        <span className="flex size-9 shrink-0 items-center justify-center border border-tinta/20">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] border border-tinta/20">
           <Icono aria-hidden="true" className="size-4" />
         </span>
         <span className="min-w-0 flex-1">
@@ -431,7 +431,7 @@ function EditorDeSeccion({
         <button
           type="button"
           onClick={alVolver}
-          className="flex min-h-11 items-center gap-2 px-3 text-sm font-semibold transition-colors hover:text-senal"
+          className="flex min-h-11 items-center gap-2 px-3 text-sm font-semibold transition-colors hover:opacity-60"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
           Todas las secciones
@@ -504,7 +504,7 @@ function EditorDeSeccion({
         <button
           type="button"
           onClick={alVolver}
-          className="flex min-h-12 w-full items-center justify-center gap-2 border-2 border-tinta font-semibold transition-colors hover:bg-tinta hover:text-papel"
+          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-plantilla border-2 border-tinta font-semibold transition-colors hover:bg-tinta hover:text-papel"
         >
           Listo
         </button>
@@ -571,7 +571,7 @@ function Galeria({
         <button
           type="button"
           onClick={alCerrar}
-          className="flex min-h-11 items-center gap-2 px-3 text-sm font-semibold transition-colors hover:text-senal"
+          className="flex min-h-11 items-center gap-2 px-3 text-sm font-semibold transition-colors hover:opacity-60"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
           Volver
@@ -593,9 +593,9 @@ function Galeria({
                 type="button"
                 disabled={lleno}
                 onClick={() => agregar(definicion.tipo)}
-                className="group flex w-full items-start gap-3 border border-tinta/20 p-3 text-left transition-colors hover:border-tinta disabled:pointer-events-none disabled:opacity-45"
+                className="group flex w-full items-start gap-3 rounded-[16px] border border-tinta/20 bg-hoja p-3 text-left transition-colors hover:border-tinta disabled:pointer-events-none disabled:opacity-45"
               >
-                <span className="flex size-11 shrink-0 items-center justify-center border border-tinta/20 transition-colors group-hover:bg-tinta group-hover:text-papel">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-tinta/20 transition-colors group-hover:bg-tinta group-hover:text-papel">
                   <Icono aria-hidden="true" className="size-5" />
                 </span>
                 <span className="min-w-0 flex-1">

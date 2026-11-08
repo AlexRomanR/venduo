@@ -20,7 +20,6 @@ import {
   Receipt,
   Share2,
   Store,
-  Tags,
   UserRound,
   X,
   type LucideIcon,
@@ -31,7 +30,6 @@ import { cn } from "@/lib/utils"
 import type { BarraLateral } from "@/lib/data/barra"
 import type { EstadoDeFuncion } from "@/lib/funciones"
 import { ConFuncion } from "@/components/panel/funcion"
-import { CompartirTienda } from "@/components/panel/tablero/compartir"
 import {
   tituloDeRuta,
   useTituloPropio,
@@ -63,15 +61,13 @@ interface Item {
   contador?: { valor: number; urgente: boolean; etiqueta: string }
   /** Lo que le falta, en dos palabras y en rojo: "Falta WhatsApp". */
   estado?: string
-  /** No es una pantalla: abre compartir la tienda. */
-  compartir?: boolean
   /** Si Venduo la apagó: oculta no aparece, desactivada se ve y no responde. */
   funcion?: EstadoDeFuncion
   hijos?: Array<{ href: string; nombre: string; icono: LucideIcon }>
 }
 
 function estaActivo(pathname: string, item: Item) {
-  if (item.sinMarca || item.compartir) return false
+  if (item.sinMarca) return false
   const ruta = item.marca ?? item.href.split(/[?#]/)[0]
   return item.exacto ? pathname === ruta : pathname.startsWith(ruta)
 }
@@ -171,13 +167,6 @@ function Contenido({
                       etiqueta: `${reposicion} por reponer`,
                     }
                   : undefined,
-              hijos: [
-                {
-                  href: "/panel/productos/categorias",
-                  nombre: "Categorías",
-                  icono: Tags,
-                },
-              ],
             },
             {
               href: "/panel/catalogos",
@@ -191,7 +180,7 @@ function Contenido({
               icono: Megaphone,
               funcion: funciones.marketing,
             },
-            { href: "", nombre: "Compartir", icono: Share2, compartir: true },
+            { href: "/panel/compartir", nombre: "Compartir", icono: Share2 },
           ],
         },
         {
@@ -265,7 +254,7 @@ function Contenido({
 
           <div className="flex items-center gap-2">
             {datos.esDemo && !plegada ? (
-              <span className="border border-senal px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-senal uppercase">
+              <span className="border border-senal px-1.5 py-0.5 text-xs font-semibold tracking-[0.12em] text-senal uppercase">
                 Demo
               </span>
             ) : null}
@@ -285,7 +274,7 @@ function Contenido({
                   aria-expanded={!plegada}
                   title={plegada ? undefined : "Ocultar la barra (Ctrl+B)"}
                   className={cn(
-                    "flex size-11 items-center justify-center transition-colors hover:text-senal",
+                    "flex size-11 items-center justify-center transition-colors hover:underline hover:underline-offset-4",
                     plegada ? "" : "-mr-2"
                   )}
                 >
@@ -331,7 +320,7 @@ function Contenido({
                   type="button"
                   onClick={alNavegar}
                   aria-label="Cerrar el menú"
-                  className="-mr-1 flex size-11 shrink-0 items-center justify-center transition-colors hover:text-senal"
+                  className="-mr-1 flex size-11 shrink-0 items-center justify-center transition-colors hover:opacity-60"
                 >
                   <X aria-hidden="true" className="size-5" />
                 </button>
@@ -362,7 +351,6 @@ function Contenido({
               <Entrada
                 key={item.nombre}
                 item={item}
-                tienda={tienda}
                 pathname={pathname}
                 alNavegar={alNavegar}
                 plegada={plegada}
@@ -378,7 +366,7 @@ function Contenido({
               type="submit"
               aria-label={plegada ? "Cerrar sesión" : undefined}
               className={cn(
-                "flex items-center transition-colors hover:text-senal",
+                "flex items-center transition-colors hover:underline hover:underline-offset-4",
                 plegada
                   ? "mx-auto size-11 justify-center border border-tinta/25"
                   : "min-h-12 w-full gap-3 px-3 font-semibold"
@@ -597,14 +585,12 @@ function Abriendo({ className }: { className: string }) {
 
 function Entrada({
   item,
-  tienda,
   pathname,
   alNavegar,
   plegada,
   enCajon,
 }: {
   item: Item
-  tienda: BarraLateral["tienda"]
   pathname: string
   alNavegar?: () => void
   plegada: boolean
@@ -667,12 +653,14 @@ function Entrada({
           className={cn(
             "tabular flex items-center justify-center rounded-full font-bold",
             plegada
-              ? "absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 text-[9px]"
+              ? "absolute -top-1 -right-1 h-5 min-w-5 px-1 text-xs"
               : "h-[22px] min-w-[22px] px-1.5 text-xs",
-            item.contador.urgente
-              ? "bg-senal text-white"
-              : activo
-                ? "bg-papel text-tinta"
+            // En la pantalla en la que estás, lo que pide ya está a la vista:
+            // el contador va en tinta, no en la señal.
+            activo
+              ? "bg-papel text-tinta"
+              : item.contador.urgente
+                ? "bg-senal text-white"
                 : "bg-tinta text-papel"
           )}
         >
@@ -681,29 +669,6 @@ function Entrada({
       ) : null}
     </>
   )
-
-  if (item.compartir) {
-    if (!tienda) return null
-    return (
-      <li>
-        <CompartirTienda
-          nombre={tienda.nombre}
-          slug={tienda.slug}
-          url={tienda.url}
-          legible={legible(tienda.url)}
-        >
-          <button
-            type="button"
-            aria-label={plegada ? nombre : undefined}
-            title={plegada ? nombre : undefined}
-            className={clases}
-          >
-            {interior}
-          </button>
-        </CompartirTienda>
-      </li>
-    )
-  }
 
   return (
     <li>
@@ -843,7 +808,7 @@ function BotonDeMenu({
     <span className="relative block">
       <span
         className={cn(
-          "flex size-11 items-center justify-center border-[1.5px] border-tinta transition-colors duration-200",
+          "flex size-11 items-center justify-center rounded-full border-[1.5px] border-tinta transition-colors duration-200",
           abierto ? "bg-tinta" : "group-active:bg-tinta"
         )}
       >

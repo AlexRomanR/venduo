@@ -113,14 +113,14 @@ export function CompartirTienda({
           </div>
           <DialogClose
             aria-label="Cerrar"
-            className="-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center transition-colors hover:text-senal"
+            className="-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center transition-colors hover:opacity-60"
           >
             <X aria-hidden="true" className="size-5" />
           </DialogClose>
         </div>
 
         <div className="flex flex-col gap-5 p-5">
-          <div className="mx-auto flex size-56 items-center justify-center border border-tinta p-2">
+          <div className="pieza-tarjeta mx-auto flex size-56 items-center justify-center border border-tinta p-2">
             {qr ? (
               <Image
                 src={qr}
@@ -142,7 +142,7 @@ export function CompartirTienda({
             >
               Tu enlace
             </label>
-            <div className="mt-2 flex border border-tinta">
+            <div className="pieza-tarjeta mt-2 flex border border-tinta">
               <input
                 id="enlace-de-la-tienda"
                 readOnly

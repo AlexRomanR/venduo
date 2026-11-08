@@ -22,4 +22,4 @@ export function mensajeDeErrorDeIa(error: unknown): string {
  * nunca: la plataforma cortó la función y la acción terminó en una excepción.
  */
 export const MENSAJE_SIN_RESPUESTA =
-  "La IA no respondió a tiempo. Vuelve a pedirlo en un momento."
+  "La IA no respondió a tiempo. Inténtalo de nuevo."

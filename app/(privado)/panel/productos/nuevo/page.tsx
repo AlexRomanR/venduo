@@ -22,6 +22,7 @@ export default async function NuevoProductoPage() {
 
       <Cabecera
         titulo="Un producto nuevo."
+        resaltar="nuevo"
         bajada="Con foto, nombre y precio ya se puede vender."
       />
       <Link

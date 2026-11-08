@@ -55,7 +55,7 @@ export function Bienvenida({ alEmpezar }: { alEmpezar: () => void }) {
   const { tienda, ia, irAPaso } = useEditor()
 
   return (
-    <div className="mx-5 mt-5 border-2 border-tinta p-4 motion-safe:animate-in motion-safe:duration-500 motion-safe:fade-in motion-safe:slide-in-from-bottom-2">
+    <div className="mx-5 mt-5 rounded-[18px] border border-tinta/15 bg-hoja p-4 shadow-[var(--sombra-cuaderno)] motion-safe:animate-in motion-safe:duration-500 motion-safe:fade-in motion-safe:slide-in-from-bottom-2">
       <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
         {tienda.nombre} ya existe
       </p>
@@ -74,7 +74,7 @@ export function Bienvenida({ alEmpezar }: { alEmpezar: () => void }) {
         <button
           type="button"
           onClick={alEmpezar}
-          className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+          className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:opacity-60"
         >
           Empezar
           <ArrowRight aria-hidden="true" className="size-4" />

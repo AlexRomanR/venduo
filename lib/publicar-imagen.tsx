@@ -52,7 +52,7 @@ function pesoCercano(fuente: keyof typeof PESOS, peso: number): number {
  * Las letras de la tienda, leídas del disco como en el catálogo en PDF: un
  * corte de red no cambia la letra de la imagen. Solo las que usa el dibujo.
  */
-async function fuentesDe(estilo: EstiloResuelto): Promise<Fuente[]> {
+export async function fuentesDe(estilo: EstiloResuelto): Promise<Fuente[]> {
   const carpeta = path.join(process.cwd(), "public", "fuentes")
   const pedidas = [
     [estilo.titular.fuente, estilo.titular.peso],

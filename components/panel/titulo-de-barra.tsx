@@ -52,6 +52,7 @@ const SECCIONES: Array<[RegExp, TituloDeBarra]> = [
   ],
   [/^\/panel\/catalogos$/, { titulo: "Catálogos" }],
   [/^\/panel\/estadisticas/, { titulo: "Estadísticas" }],
+  [/^\/panel\/compartir/, { titulo: "Compartir" }],
   [/^\/panel\/apariencia/, { titulo: "Editar tu tienda" }],
   [
     /^\/panel\/marketing\/tiktok/,

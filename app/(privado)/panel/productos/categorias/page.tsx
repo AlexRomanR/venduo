@@ -21,6 +21,7 @@ export default async function CategoriasPage() {
 
       <Cabecera
         titulo="Categorías."
+        resaltar="Categorías"
         bajada="Son los cajones de tu tienda: quien entra las usa para encontrar lo que busca sin recorrer todo."
         demo={esDemo && "Estás en modo demo: los cambios no se guardan."}
       />

@@ -272,7 +272,7 @@ export function FormularioProducto({
           </div>
         </div>
 
-        <ul className="border border-tinta">
+        <ul className="pieza-tarjeta border border-tinta">
           <li className="flex min-h-16 items-center gap-3 px-4 py-2">
             <Boxes aria-hidden="true" className="size-5 shrink-0" />
             <span className="flex-1 font-semibold">Unidades</span>
@@ -339,7 +339,7 @@ export function FormularioProducto({
           />
         </ul>
 
-        <ul className="border border-tinta">
+        <ul className="pieza-tarjeta border border-tinta">
           <Palanca
             icono={Eye}
             titulo="Visible en tu tienda"
@@ -377,7 +377,7 @@ export function FormularioProducto({
         </ul>
 
         {/* En el celular, la acción queda a mano sobre las pestañas. */}
-        <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 flex gap-3 border-t border-tinta bg-papel px-4 py-3 lg:static lg:border-0 lg:p-0">
+        <div className="pieza-bandeja fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 flex gap-3 border-t border-tinta bg-papel px-4 py-3 lg:static lg:border-0 lg:p-0">
           <button
             type="submit"
             disabled={enCurso}

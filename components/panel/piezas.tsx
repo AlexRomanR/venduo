@@ -7,12 +7,34 @@ import { cn } from "@/lib/utils"
 /*
  * Las piezas con las que se arma toda pantalla del panel.
  *
- * Salen del Resumen, que fue la primera en ordenarse así: cada cosa en su
- * panel, encerrada por una regla, con un título que dice para qué sirve. Las
- * demás pantallas se armaban cada una a su manera —cifras sueltas, rótulos
- * chicos y reglas al 15%— y lo importante se perdía entre lo demás. Cómo se
- * usan está en `.agents/rules/ui-styling.md`, "Las pantallas del panel".
+ * Cada cosa en su panel, con un título que dice para qué sirve. Cómo se usan
+ * está en `.agents/rules/ui-styling.md`, "Las pantallas del panel".
+ *
+ * Cada pieza tiene dos trajes y no lo decide ella: en `/admin` va como el
+ * diario —regla de un píxel, esquina viva— y adentro del armazón del panel,
+ * que marca `data-registro="cuaderno"`, como el cuaderno de trabajo —tarjeta
+ * de hoja con radio y la sombra teñida—. Las clases `pieza-*` son las que
+ * `app/globals.css` viste en el cuaderno.
  */
+
+/**
+ * La frase del titular que lleva el resaltador detrás: "Tus *pedidos*.". La
+ * elige cada pantalla, porque no siempre es la última palabra —"Publica *tus
+ * productos*."— y una de detalle, que nombra una cosa, no lleva. Solo dibuja
+ * en el cuaderno: en el diario la clase no hace nada.
+ */
+function conResaltado(titulo: React.ReactNode, resaltar?: string) {
+  if (typeof titulo !== "string" || !resaltar) return titulo
+  const desde = titulo.indexOf(resaltar)
+  if (desde < 0) return titulo
+  return (
+    <>
+      {titulo.slice(0, desde)}
+      <span className="pieza-resaltado">{resaltar}</span>
+      {titulo.slice(desde + resaltar.length)}
+    </>
+  )
+}
 
 /**
  * El titular de una pantalla, su bajada y sus acciones.
@@ -23,6 +45,7 @@ import { cn } from "@/lib/utils"
 export function Cabecera({
   etiqueta,
   titulo,
+  resaltar,
   bajada,
   demo,
   accionesSoloEnPantallaAncha = false,
@@ -31,6 +54,8 @@ export function Cabecera({
   /** Lo que va arriba del titular, en versalita: "Pedido". */
   etiqueta?: string
   titulo: React.ReactNode
+  /** La frase del titular, tal cual, que va con el resaltador. Sin ella, ninguna. */
+  resaltar?: string
   bajada?: React.ReactNode
   /** El aviso de modo demo, si corresponde. Va en la bajada, resaltado. */
   demo?: string | false
@@ -49,11 +74,11 @@ export function Cabecera({
         ) : null}
         <h1
           className={cn(
-            "font-titular text-[clamp(1.75rem,5vw,2.5rem)] leading-[1.02] font-extrabold tracking-[-0.03em] text-balance",
+            "pieza-titular font-titular text-[clamp(1.75rem,5vw,2.5rem)] leading-[1.02] font-extrabold tracking-[-0.03em] text-balance",
             etiqueta && "mt-1.5"
           )}
         >
-          {titulo}
+          {conResaltado(titulo, resaltar)}
         </h1>
         {bajada || demo ? (
           <p className="mt-3 text-sm leading-relaxed opacity-70">
@@ -96,7 +121,7 @@ export function Volver({
   return (
     <Link
       href={href}
-      className="group inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold transition-colors hover:text-senal max-lg:hidden"
+      className="group inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold transition-colors hover:underline hover:underline-offset-4 max-lg:hidden"
     >
       <ArrowLeft
         aria-hidden="true"
@@ -110,8 +135,9 @@ export function Volver({
 /**
  * Un panel: lo que ordena toda pantalla del panel.
  *
- * Es el panel de demostración de DESIGN.md —regla estructural de un píxel,
- * esquina viva, sin sombra— y no una tarjeta. Encerrada en su panel, cada cosa
+ * En el cuaderno es una tarjeta de hoja con radio y la sombra teñida; en el
+ * diario, el panel de demostración —regla de un píxel, esquina viva, sin
+ * sombra—. Encerrada en su panel, cada cosa
  * se reconoce de un vistazo, y su título dice para qué sirve en vez de solo
  * nombrarla: "Lo que falta cobrar", no "Resumen".
  *
@@ -127,6 +153,7 @@ export function Seccion({
   extra,
   accion,
   relleno = false,
+  extraEnLinea = false,
   className,
   children,
 }: {
@@ -136,6 +163,11 @@ export function Seccion({
   bajada?: React.ReactNode
   /** Lo que va a la derecha del título: un selector, un contador, un botón. */
   extra?: React.ReactNode
+  /**
+   * El `extra` son botones de ícono: se quedan en la línea del título también
+   * en el celular, en vez de bajar a una línea propia.
+   */
+  extraEnLinea?: boolean
   accion?: { href: string; texto: string }
   relleno?: boolean
   className?: string
@@ -146,7 +178,7 @@ export function Seccion({
       id={id}
       aria-labelledby={`${id}-titulo`}
       className={cn(
-        "flex min-w-0 scroll-mt-6 flex-col border border-tinta",
+        "pieza-tarjeta flex min-w-0 scroll-mt-6 flex-col border border-tinta",
         className
       )}
     >
@@ -154,7 +186,12 @@ export function Seccion({
         {/* El título reclama 16rem antes de ceder: en un celular, lo que va a
             la derecha baja a su propia línea en vez de apretar la bajada en
             una columna de una palabra por renglón. */}
-        <div className="flex min-w-[min(100%,16rem)] flex-1 items-start gap-3">
+        <div
+          className={cn(
+            "flex flex-1 items-start gap-3",
+            extraEnLinea ? "min-w-0" : "min-w-[min(100%,16rem)]"
+          )}
+        >
           <Icono aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
           <div className="min-w-0">
             <h2
@@ -168,7 +205,13 @@ export function Seccion({
             ) : null}
           </div>
         </div>
-        {extra}
+        {extra ? (
+          extraEnLinea ? (
+            <div className="shrink-0">{extra}</div>
+          ) : (
+            extra
+          )
+        ) : null}
       </header>
 
       <div
@@ -215,7 +258,7 @@ export function SinDatos({
   children?: React.ReactNode
 }) {
   return (
-    <div className="flex flex-1 flex-col items-start gap-3 px-4 py-6 sm:px-5">
+    <div className="pieza-vacio flex flex-1 flex-col items-start gap-3 px-4 py-6 sm:px-5">
       <Icono aria-hidden="true" className="size-6 opacity-30" />
       <div>
         <p className="font-titular font-bold tracking-[-0.01em]">{titulo}</p>
@@ -236,7 +279,7 @@ export function SinDatos({
  */
 export function Cifras({ children }: { children: React.ReactNode }) {
   return (
-    <dl className="grid grid-cols-2 gap-px bg-tinta/15 lg:grid-cols-4">
+    <dl className="grid grid-cols-2 overflow-hidden lg:grid-cols-4">
       {children}
     </dl>
   )
@@ -262,7 +305,7 @@ export function Cifra({
   alerta?: boolean
 }) {
   return (
-    <div className="flex min-w-0 flex-col bg-papel px-4 py-4 sm:px-5">
+    <div className="pieza-celda -mr-px -mb-px flex min-w-0 flex-col border-r border-b border-tinta/10 px-4 py-4 sm:px-5">
       <dt className="text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
         {etiqueta}
       </dt>
@@ -290,7 +333,7 @@ export function Miniatura({
   icono: LucideIcon
 }) {
   return (
-    <span className="relative flex size-11 shrink-0 items-center justify-center overflow-hidden border border-tinta/15 bg-tinta/[0.05]">
+    <span className="pieza-miniatura relative flex size-11 shrink-0 items-center justify-center overflow-hidden border border-tinta/15 bg-tinta/[0.05]">
       {foto ? (
         <Image
           src={foto}
@@ -322,7 +365,7 @@ export function Insignia({
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 border px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] uppercase",
+        "pieza-insignia inline-flex shrink-0 border px-2 py-0.5 text-xs font-semibold tracking-[0.12em] uppercase",
         tono === "senal" && "border-senal text-senal",
         tono === "llena" && "border-tinta bg-tinta text-papel",
         tono === "tinta" && "border-tinta text-tinta",

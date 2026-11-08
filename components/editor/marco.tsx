@@ -143,7 +143,7 @@ export function MarcoDeVistaPrevia({
         <div
           role="radiogroup"
           aria-label="Ver como"
-          className="flex border border-tinta/25"
+          className="flex overflow-hidden rounded-full border border-tinta/25"
         >
           {(
             [
@@ -176,7 +176,7 @@ export function MarcoDeVistaPrevia({
         className="relative flex min-h-0 flex-1 justify-center overflow-hidden lg:p-4"
       >
         <div
-          className="relative h-full w-full flex-none overflow-hidden bg-white lg:border-2 lg:border-tinta"
+          className="relative h-full w-full flex-none overflow-hidden bg-white lg:rounded-[22px] lg:border lg:border-tinta/15 lg:shadow-[var(--sombra-cuaderno)]"
           style={
             esEscritorio
               ? {

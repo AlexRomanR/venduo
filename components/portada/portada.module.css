@@ -108,6 +108,12 @@
   transform: translateY(0) scale(0.985);
 }
 
+/* En el panel la frambuesa solo avisa: el botón se oscurece en su tinta. */
+:global([data-registro="cuaderno"]) .boton:hover {
+  background: var(--accion-alta);
+  box-shadow: 0 12px 30px -12px rgb(29 28 26 / 0.45);
+}
+
 .enlace {
   display: inline-flex;
   min-height: 3.25rem;

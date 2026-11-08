@@ -45,7 +45,7 @@ función nueva que necesita la tienda la pide ahí, no con su propio `select` a 
   después.
 - **Un `Suspense` empieza a pedir cuando el padre terminó.** Si sus datos no dependen
   del padre, la promesa se arranca arriba y se le pasa: así lo hace el tablero del
-  Resumen en `app/(privado)/panel/page.tsx`.
+  Resumen en `app/(privado)/panel/(inicio)/page.tsx`.
 - Una consulta de más **en paralelo** cuesta casi nada. Si saber si hace falta exige
   otro viaje, conviene pedirla igual: el alta pide la tienda y las plantillas a la vez,
   aunque con tienda terminada redirija sin usarlas.
@@ -53,9 +53,14 @@ función nueva que necesita la tienda la pide ahí, no con su propio `select` a 
 ## El toque responde en el acto
 
 **Toda sección del panel tiene su `loading.tsx`**, con `EsqueletoDePantalla` o
-`EsqueletoDelResumen` (`components/panel/esqueleto.tsx`). Se ve el más cercano a la
-página: una sección sin el suyo mostraría el del Resumen. Una pantalla nueva del panel
-lleva el suyo, con la forma de lo que viene.
+`EsqueletoDelResumen` (`components/panel/esqueleto.tsx`), con el titular de la
+pantalla y la forma de lo que viene. Una pantalla nueva del panel lleva el suyo.
+
+**Un `loading.tsx` envuelve también a las subrutas de su carpeta.** Puesto al lado del
+`page.tsx` del Resumen, aparecía al recargar cualquier pantalla del panel; el de Pedidos,
+al abrir una venta nueva. Por eso la página de una carpeta que tiene subrutas va con su
+esqueleto en un grupo de rutas: `panel/(inicio)/`, `pedidos/(lista)/`,
+`productos/(lista)/`, `catalogos/(lista)/`. El grupo no cambia la dirección.
 
 **Los enlaces de la barra lateral llevan `prefetch`**, completo: en producción la
 pantalla ya está en el navegador cuando se la toca. Si igual tarda, `Abriendo` hace

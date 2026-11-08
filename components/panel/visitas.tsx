@@ -243,7 +243,7 @@ function GraficoDeVisitas({
             <text
               x="0"
               y={alto + 16}
-              className="fill-tinta text-[11px]"
+              className="fill-tinta text-xs"
               fillOpacity="0.65"
             >
               {corto(serie[0].dia)}
@@ -252,7 +252,7 @@ function GraficoDeVisitas({
               x={ancho}
               y={alto + 16}
               textAnchor="end"
-              className="fill-tinta text-[11px]"
+              className="fill-tinta text-xs"
               fillOpacity="0.65"
             >
               {corto(serie[serie.length - 1].dia)}

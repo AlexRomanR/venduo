@@ -254,7 +254,7 @@ export function PublicarEnTiktok({
                 await desconectar()
                 router.refresh()
               }}
-              className="min-h-11 w-fit text-left text-sm font-semibold underline underline-offset-4 transition-colors hover:text-senal"
+              className="min-h-11 w-fit text-left text-sm font-semibold underline underline-offset-4 transition-colors hover:underline hover:underline-offset-4"
             >
               Cambiar de cuenta
             </button>

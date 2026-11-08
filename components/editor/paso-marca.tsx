@@ -156,7 +156,7 @@ function MuestraDePaleta({
       aria-pressed={activa}
       onClick={alElegir}
       className={cn(
-        "group flex flex-col border text-left transition-colors",
+        "group flex flex-col overflow-hidden rounded-[14px] border bg-hoja text-left transition-colors",
         activa
           ? "border-tinta outline-2 outline-offset-2 outline-tinta"
           : "border-tinta/20 hover:border-tinta/60"

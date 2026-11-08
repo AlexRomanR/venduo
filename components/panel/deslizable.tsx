@@ -7,8 +7,10 @@ import { cn } from "@/lib/utils"
 
 /**
  * Una fila que se desliza de lado, con aviso de lo que queda afuera: el borde
- * con fichas detrás se desvanece y lleva una flecha que desliza la fila. Sin
- * ella, en la computadora —sin barra ni dedo— no había cómo llegar a la última.
+ * con fichas detrás se esfuma con una máscara (`franja-deslizable`), que sirve
+ * sobre cualquier fondo. Con un puntero fino lleva además una flecha que
+ * desliza la fila: en la computadora —sin dedo— no había cómo llegar a la
+ * última.
  */
 export function Deslizable({
   etiqueta,
@@ -56,37 +58,38 @@ export function Deslizable({
 
   return (
     <div className="relative isolate">
-      {(["izquierda", "derecha"] as const).map((lado) =>
-        hayMas[lado] ? (
-          <div
-            key={lado}
-            className={cn(
-              "pointer-events-none absolute inset-y-0 z-10 flex w-20 items-center from-papel from-45% to-transparent",
-              lado === "izquierda"
-                ? "left-0 justify-start bg-gradient-to-r pl-2"
-                : "right-0 justify-end bg-gradient-to-l pr-2"
-            )}
-          >
-            <button
-              type="button"
-              aria-label={
-                lado === "izquierda" ? "Ver los anteriores" : "Ver más"
-              }
-              onClick={() => deslizar(lado === "izquierda" ? -1 : 1)}
-              className="pointer-events-auto flex size-9 items-center justify-center border border-tinta bg-papel transition-colors hover:bg-tinta hover:text-papel"
-            >
-              {lado === "izquierda" ? (
-                <ArrowLeft aria-hidden="true" className="size-4" />
-              ) : (
-                <ArrowRight aria-hidden="true" className="size-4" />
-              )}
-            </button>
-          </div>
-        ) : null
-      )}
-      <nav ref={fila} aria-label={etiqueta} className={className}>
+      <nav
+        ref={fila}
+        aria-label={etiqueta}
+        data-mas-izquierda={hayMas.izquierda || undefined}
+        data-mas-derecha={hayMas.derecha || undefined}
+        className={cn("franja-deslizable", className)}
+      >
         {children}
       </nav>
+      {/* Las flechas, solo con puntero fino: en el celular avisan el borde que
+          se esfuma y la ficha que asoma. Van sobre la parte esfumada, así no
+          tapan una ficha que se pueda leer. */}
+      {(["izquierda", "derecha"] as const).map((lado) =>
+        hayMas[lado] ? (
+          <button
+            key={lado}
+            type="button"
+            aria-label={lado === "izquierda" ? "Ver los anteriores" : "Ver más"}
+            onClick={() => deslizar(lado === "izquierda" ? -1 : 1)}
+            className={cn(
+              "sombra-cuaderno absolute top-1/2 z-10 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full border border-tinta/25 bg-hoja transition-colors hover:bg-tinta hover:text-papel [@media(pointer:fine)]:flex",
+              lado === "izquierda" ? "left-1" : "right-1"
+            )}
+          >
+            {lado === "izquierda" ? (
+              <ArrowLeft aria-hidden="true" className="size-4" />
+            ) : (
+              <ArrowRight aria-hidden="true" className="size-4" />
+            )}
+          </button>
+        ) : null
+      )}
     </div>
   )
 }

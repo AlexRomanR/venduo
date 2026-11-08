@@ -12,7 +12,6 @@ import {
   IconoPedidos,
   IconoProductos,
 } from "@/components/panel/iconos-de-pestanas"
-import { CompartirTienda } from "@/components/panel/tablero/compartir"
 
 interface Pestana {
   nombre: string
@@ -53,6 +52,7 @@ export function Pestanas({ datos }: { datos: BarraLateral }) {
             href: "/panel/catalogos",
           },
         ]),
+    { nombre: "Compartir", icono: IconoCompartir, href: "/panel/compartir" },
   ]
 
   return (
@@ -79,25 +79,6 @@ export function Pestanas({ datos }: { datos: BarraLateral }) {
             </li>
           )
         })}
-        <li className="flex-1">
-          <CompartirTienda
-            nombre={tienda.nombre}
-            slug={tienda.slug}
-            url={tienda.url}
-            legible={tienda.url.replace(/^https?:\/\//, "")}
-          >
-            <button
-              type="button"
-              className="group flex h-16 w-full flex-col items-center justify-center gap-1"
-            >
-              <Icono
-                pestana={{ nombre: "Compartir", icono: IconoCompartir }}
-                activa={false}
-              />
-              <Etiqueta activa={false}>Compartir</Etiqueta>
-            </button>
-          </CompartirTienda>
-        </li>
       </ul>
     </nav>
   )
@@ -115,7 +96,13 @@ function Icono({ pestana, activa }: { pestana: Pestana; activa: boolean }) {
     >
       <Dibujo className={cn("size-6", activa ? "" : "opacity-60")} />
       {pestana.insignia ? (
-        <span className="tabular absolute -top-0.5 right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-senal px-1 text-[10px] font-bold text-white">
+        <span
+          className={cn(
+            "tabular absolute -top-1 right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-bold",
+            // En la pestaña en la que estás, lo que pide ya está a la vista.
+            activa ? "bg-tinta text-papel" : "bg-senal text-white"
+          )}
+        >
           {pestana.insignia > 99 ? "99+" : pestana.insignia}
         </span>
       ) : null}

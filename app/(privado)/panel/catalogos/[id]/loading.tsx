@@ -1,5 +1,5 @@
 import { EsqueletoDePantalla } from "@/components/panel/esqueleto"
 
 export default function Cargando() {
-  return <EsqueletoDePantalla volver />
+  return <EsqueletoDePantalla volver="Catálogos" forma="formulario" />
 }

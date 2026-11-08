@@ -145,7 +145,7 @@ export function PasoCarrito() {
         <button
           type="button"
           onClick={() => irAPaso("marca")}
-          className="mt-1 inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+          className="mt-1 inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:opacity-60"
         >
           Cambiar colores y letra
           <ArrowRight aria-hidden="true" className="size-4" />

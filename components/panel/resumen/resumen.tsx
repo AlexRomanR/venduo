@@ -45,7 +45,9 @@ export function Resumen({ children }: { children: ReactNode }) {
         archivoAncho.variable,
         kalam.variable,
         estilos.resumen,
-        "flex flex-col"
+        // Lo que espera a su escena —un sello agrandado, una nota corrida— no
+        // puede empujar la página de costado en el celular.
+        "flex flex-col overflow-x-clip"
       )}
     >
       {children}

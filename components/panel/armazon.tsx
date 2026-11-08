@@ -4,6 +4,8 @@ import { getAIStatus } from "@/lib/ai"
 import { getBarraLateral } from "@/lib/data/barra"
 import { isSupabaseConfigured } from "@/lib/env"
 import { COOKIE_BARRA } from "@/lib/preferencias"
+import { cn } from "@/lib/utils"
+import { archivoAncho, kalam } from "@/components/portada/letras"
 import {
   BarraLateralEscritorio,
   BarraLateralMovil,
@@ -30,7 +32,17 @@ export async function ArmazonDelPanel({
 
   return (
     <ProveedorDeTitulo>
-      <div className="min-h-screen bg-papel text-tinta lg:flex">
+      {/* El panel es el cuaderno de trabajo: las piezas se visten como tal
+          adentro de esta marca (`app/globals.css`). Lleva también las letras
+          del cuaderno —Archivo ancha y la letra a mano—. */}
+      <div
+        data-registro="cuaderno"
+        className={cn(
+          archivoAncho.variable,
+          kalam.variable,
+          "min-h-screen bg-papel text-tinta lg:flex"
+        )}
+      >
         <BarraLateralEscritorio datos={barra} plegadaInicial={plegada} />
 
         <div className="flex min-w-0 flex-1 flex-col">

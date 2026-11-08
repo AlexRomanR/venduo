@@ -248,7 +248,7 @@ function FilaDeProducto({
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
-        "relative flex items-center gap-2 border-t border-tinta/15 bg-papel pr-1 first:border-t-0",
+        "relative flex items-center gap-2 border-t border-tinta/15 bg-hoja pr-1 first:border-t-0",
         isDragging && "z-10 border-2 border-tinta bg-tinta/[0.06]"
       )}
     >

@@ -550,7 +550,7 @@ export function CargaDeProductos({
         <>
           {/* Vino de "Sumar más": los que ya armó siguen esperando. */}
           {borradores.length > 0 ? (
-            <ul className="border border-tinta">
+            <ul className="pieza-tarjeta border border-tinta">
               <Fila
                 icono={Boxes}
                 titulo={`Tus ${borradores.length} ${borradores.length === 1 ? "borrador" : "borradores"}`}
@@ -563,7 +563,7 @@ export function CargaDeProductos({
           <button
             type="button"
             onClick={descargarModelo}
-            className="inline-flex min-h-11 items-center gap-1.5 self-start text-sm font-semibold underline underline-offset-4 transition-colors hover:text-senal"
+            className="inline-flex min-h-11 items-center gap-1.5 self-start text-sm font-semibold underline underline-offset-4 transition-colors hover:underline hover:underline-offset-4"
           >
             <Download aria-hidden="true" className="size-4" />
             Descargar planilla modelo
@@ -579,7 +579,10 @@ export function CargaDeProductos({
       ) : null}
 
       {etapa !== "elegir" && aviso ? (
-        <div role="status" className="border border-tinta px-4 py-3 text-sm">
+        <div
+          role="status"
+          className="pieza-tarjeta border border-tinta px-4 py-3 text-sm"
+        >
           {aviso}
         </div>
       ) : null}
@@ -618,7 +621,7 @@ export function CargaDeProductos({
       ) : null}
 
       {etapa === "revisar" && borradores.length > 0 ? (
-        <ul className="border border-tinta">
+        <ul className="pieza-tarjeta border border-tinta">
           <Palanca
             icono={Eye}
             titulo="Visibles en tu tienda"
@@ -637,7 +640,7 @@ export function CargaDeProductos({
       ) : null}
 
       {etapa === "revisar" && borradores.length > 0 ? (
-        <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 flex items-center gap-3 border-t border-tinta bg-papel px-4 py-3 lg:sticky lg:bottom-0 lg:border lg:px-5">
+        <div className="pieza-bandeja fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 flex items-center gap-3 border-t border-tinta bg-papel px-4 py-3 lg:sticky lg:bottom-3 lg:rounded-[20px] lg:border lg:border-tinta/12 lg:bg-hoja/95 lg:px-5 lg:shadow-[var(--sombra-cuaderno)] lg:backdrop-blur-md">
           <div className="min-w-0 flex-1">
             {sinPrecio + sinNombre > 0 ? (
               <p className="text-xs font-semibold tracking-[0.12em] uppercase">
@@ -739,19 +742,17 @@ export function Puertas({
   alLista: () => void
 }) {
   return (
-    <section className="border border-tinta">
-      <header className="flex items-start gap-3 border-b border-tinta/15 px-4 py-3.5 sm:px-5">
-        <ImagePlus aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
-        <div>
-          <h2 className="font-titular text-lg leading-tight font-bold tracking-[-0.02em]">
-            Lo que ya tienes
-          </h2>
-          <p className="mt-0.5 text-sm leading-snug opacity-70">
-            Un producto por foto, fila o renglón.
-          </p>
-        </div>
-      </header>
-      <ul>
+    <section aria-labelledby="puertas-titulo">
+      <h2
+        id="puertas-titulo"
+        className="font-titular text-lg leading-tight font-bold tracking-[-0.02em]"
+      >
+        ¿Qué tienes a mano?
+      </h2>
+      <p className="mt-0.5 text-sm leading-snug text-tinta/70">
+        Un producto por foto, fila o renglón.
+      </p>
+      <ul className="mt-4 grid gap-3 md:grid-cols-3">
         <Puerta
           icono={Images}
           titulo="Fotos de tus productos"
@@ -806,24 +807,28 @@ function Puerta({
   alTocar: () => void
 }) {
   return (
-    <li className="border-t border-tinta/15 first:border-t-0">
+    <li className="flex">
       <button
         type="button"
         onClick={apagada ? undefined : alTocar}
         aria-disabled={apagada}
         className={cn(
-          "flex min-h-16 w-full items-center gap-3 px-4 py-3 text-left transition-colors sm:px-5",
+          "pieza-tarjeta group flex min-h-[4.75rem] w-full items-center gap-3.5 border border-tinta px-4 py-3.5 text-left transition-[translate] duration-200 motion-reduce:transition-none md:flex-col md:items-start md:gap-4 md:p-5",
           apagada
             ? "cursor-not-allowed"
-            : "hover:bg-tinta/[0.04] active:bg-tinta/[0.07]"
+            : "hover:-translate-y-0.5 active:translate-y-0"
         )}
       >
-        <Icono
-          aria-hidden="true"
-          className={cn("size-5 shrink-0", apagada && "opacity-45")}
-        />
+        <span
+          className={cn(
+            "flex size-11 shrink-0 items-center justify-center rounded-full",
+            apagada ? "bg-tinta/[0.06] text-tinta/45" : "bg-tinta text-papel"
+          )}
+        >
+          <Icono aria-hidden="true" className="size-5" />
+        </span>
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className={cn("font-semibold", apagada && "text-tinta/55")}>
+          <span className={cn("font-semibold", apagada && "text-tinta/65")}>
             {titulo}
           </span>
           <span className="text-sm text-tinta/65">{detalle}</span>
@@ -839,7 +844,7 @@ function Puerta({
         {apagada ? null : (
           <ChevronRight
             aria-hidden="true"
-            className="size-4 shrink-0 opacity-55"
+            className="size-4 shrink-0 opacity-55 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none md:hidden"
           />
         )}
       </button>
@@ -865,7 +870,7 @@ function Progreso({
   return (
     <section
       aria-live="polite"
-      className="border border-tinta px-4 py-4 sm:px-5"
+      className="pieza-tarjeta border border-tinta px-4 py-4 sm:px-5"
     >
       <div className="flex items-baseline justify-between gap-3">
         <p className="font-semibold">{texto}</p>
@@ -960,7 +965,7 @@ function Revision({
   return (
     <>
       {planilla ? (
-        <ul className="border border-tinta">
+        <ul className="pieza-tarjeta border border-tinta">
           <Fila
             icono={FileSpreadsheet}
             titulo={`Así leímos tu ${planilla.de}`}
@@ -970,7 +975,7 @@ function Revision({
         </ul>
       ) : null}
 
-      <section className="border border-tinta">
+      <section className="pieza-tarjeta border border-tinta">
         <header className="flex items-start gap-3 border-b border-tinta/15 px-4 py-3.5 sm:px-5">
           <Boxes aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
           <div className="min-w-0 flex-1">
@@ -1729,7 +1734,7 @@ function LecturaDePlanilla({
 
   return (
     <>
-      <section className="min-w-0 border border-tinta">
+      <section className="pieza-tarjeta min-w-0 border border-tinta">
         <header className="flex items-start gap-3 border-b border-tinta/15 px-4 py-3.5 sm:px-5">
           <FileSpreadsheet
             aria-hidden="true"
@@ -1807,14 +1812,14 @@ function LecturaDePlanilla({
               negrita hasta que algo la volvía a dibujar. */}
           <div
             ref={tabla}
-            className="max-h-[min(60vh,32rem)] overflow-auto overscroll-contain bg-papel"
+            className="max-h-[min(60vh,32rem)] overflow-auto overscroll-contain bg-hoja"
           >
             <table className="w-max min-w-full border-separate border-spacing-0 text-sm">
               <thead>
                 <tr>
                   <th
                     scope="col"
-                    className="sticky top-0 left-0 z-20 w-11 border-b border-tinta/15 bg-papel p-0"
+                    className="sticky top-0 left-0 z-20 w-11 border-b border-tinta/15 bg-hoja p-0"
                   >
                     <span className="sr-only">Cargar</span>
                   </th>
@@ -1828,7 +1833,7 @@ function LecturaDePlanilla({
                         data-columna={c.columna}
                         scope="col"
                         className={cn(
-                          "sticky top-0 z-10 border-b border-tinta/15 bg-papel p-0 text-left align-top font-normal",
+                          "sticky top-0 z-10 border-b border-tinta/15 bg-hoja p-0 text-left align-top font-normal",
                           activa === c.columna &&
                             "border-x-2 border-t-2 border-tinta"
                         )}
@@ -1882,7 +1887,7 @@ function LecturaDePlanilla({
                   const quitada = quitadas.has(indice)
                   return (
                     <tr key={indice}>
-                      <td className="sticky left-0 z-[5] border-t border-tinta/10 bg-papel p-0">
+                      <td className="sticky left-0 z-[5] border-t border-tinta/10 bg-hoja p-0">
                         <label className="flex size-11 cursor-pointer items-center justify-center">
                           <input
                             type="checkbox"
@@ -1936,7 +1941,7 @@ function LecturaDePlanilla({
 
       {/* La pregunta va en la barra de abajo, a mano del pulgar: arriba
           queda la tabla, con la columna enmarcada. */}
-      <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 border-t border-tinta bg-papel px-4 py-3 lg:sticky lg:bottom-0 lg:border lg:px-5">
+      <div className="pieza-bandeja fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 border-t border-tinta bg-papel px-4 py-3 lg:sticky lg:bottom-3 lg:rounded-[20px] lg:border lg:border-tinta/12 lg:bg-hoja/95 lg:px-5 lg:shadow-[var(--sombra-cuaderno)] lg:backdrop-blur-md">
         {columna && pendiente ? (
           <div className="flex flex-col gap-3">
             <div className="flex items-baseline gap-3">

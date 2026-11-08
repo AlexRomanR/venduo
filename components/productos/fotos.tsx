@@ -95,17 +95,19 @@ export function Fotos({
           type="button"
           onClick={() => entrada.current?.click()}
           disabled={subiendo > 0}
-          className="flex aspect-[3/2] w-full flex-col items-center justify-center gap-2 border border-dashed border-tinta/40 transition-colors hover:border-tinta active:bg-tinta/[0.04] disabled:opacity-60 sm:aspect-[16/7]"
+          className="pieza-tarjeta group flex h-40 w-full flex-col items-center justify-center gap-2 border transition-[translate] duration-200 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 motion-reduce:transition-none"
         >
-          {subiendo > 0 ? (
-            <Loader2 aria-hidden="true" className="size-7 animate-spin" />
-          ) : (
-            <ImagePlus aria-hidden="true" className="size-7" />
-          )}
+          <span className="flex size-12 items-center justify-center rounded-full bg-tinta text-papel transition-transform duration-200 group-hover:scale-105 motion-reduce:transition-none">
+            {subiendo > 0 ? (
+              <Loader2 aria-hidden="true" className="size-5 animate-spin" />
+            ) : (
+              <ImagePlus aria-hidden="true" className="size-5" />
+            )}
+          </span>
           <span className="font-semibold">
             {subiendo > 0 ? `Subiendo ${subiendo}…` : "Agregar fotos"}
           </span>
-          <span className="text-xs text-tinta/65">Hasta {MAXIMO}</span>
+          <span className="text-xs text-tinta/70">Hasta {MAXIMO}</span>
         </button>
         {archivo}
       </div>
@@ -119,7 +121,7 @@ export function Fotos({
           <figure
             key={url}
             className={cn(
-              "group relative size-24 overflow-hidden border bg-tinta/5",
+              "pieza-foto group relative size-24 overflow-hidden border bg-tinta/5",
               i === 0 ? "border-tinta" : "border-tinta/25"
             )}
           >
@@ -133,7 +135,7 @@ export function Fotos({
             />
 
             {i === 0 ? (
-              <figcaption className="absolute inset-x-0 bottom-0 bg-tinta px-1 py-0.5 text-center text-[10px] font-semibold tracking-[0.1em] text-white uppercase">
+              <figcaption className="absolute inset-x-1 bottom-1 rounded-full bg-tinta px-1.5 text-center text-xs leading-5 font-semibold text-papel">
                 Portada
               </figcaption>
             ) : (
@@ -141,7 +143,7 @@ export function Fotos({
                 type="button"
                 onClick={() => haciaLaPortada(url)}
                 aria-label="Usar como portada"
-                className="absolute bottom-1 left-1 flex size-7 items-center justify-center bg-papel/90 text-tinta transition-colors hover:bg-senal hover:text-white"
+                className="absolute bottom-1 left-1 flex size-7 items-center justify-center bg-papel/90 text-tinta transition-colors hover:bg-accion-alta hover:text-white"
               >
                 <Star aria-hidden="true" className="size-3.5" />
               </button>
@@ -163,7 +165,7 @@ export function Fotos({
             type="button"
             onClick={() => entrada.current?.click()}
             disabled={subiendo > 0}
-            className="flex size-24 flex-col items-center justify-center gap-1 border border-dashed border-tinta/40 text-xs transition-colors hover:border-senal hover:text-senal disabled:opacity-50"
+            className="pieza-foto flex size-24 flex-col items-center justify-center gap-1 border border-dashed border-tinta/40 text-xs transition-colors hover:border-tinta disabled:opacity-50"
           >
             {subiendo > 0 ? (
               <Loader2 aria-hidden="true" className="size-5 animate-spin" />

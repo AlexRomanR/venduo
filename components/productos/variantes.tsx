@@ -303,9 +303,10 @@ function ElegirTipo({
 }) {
   const disponibles = TIPOS_DE_OPCION.filter((t) => !usados.includes(t.nombre))
   return (
-    // Columnas iguales: fichas de ancho distinto que saltan de renglón dejan
-    // los bordes sin alinear.
-    <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+    // Columnas iguales que dependen del ancho de la hoja, no del de la
+    // pantalla: en la web la hoja sale del costado con 450 px, y cinco
+    // columnas por ser pantalla ancha cortaban "Número" y "Color".
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] gap-2">
       {disponibles.map((tipo) => (
         <Ficha
           key={tipo.nombre}
@@ -357,7 +358,7 @@ function Ficha({
       aria-label={etiqueta}
       onClick={alTocar}
       className={cn(
-        "inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 border px-3 text-sm font-semibold transition-colors",
+        "pieza-ficha inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 border px-3 text-sm font-semibold transition-colors",
         ancha && "w-full min-w-0 px-2",
         elegida
           ? "border-tinta bg-tinta text-papel"
@@ -497,7 +498,7 @@ function EditorDeOpcion({
           <button
             type="button"
             onClick={alCambiarTipo}
-            className="min-h-11 shrink-0 px-1 text-sm font-semibold underline underline-offset-4 transition-colors hover:text-senal"
+            className="min-h-11 shrink-0 px-1 text-sm font-semibold underline underline-offset-4 transition-colors hover:underline hover:underline-offset-4"
           >
             Cambiar
           </button>
@@ -574,7 +575,7 @@ function EditorDeOpcion({
             type="button"
             onClick={agregar}
             disabled={!nuevo.trim()}
-            className="inline-flex min-h-11 shrink-0 items-center border border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel disabled:opacity-35"
+            className="pieza-ficha inline-flex min-h-11 shrink-0 items-center border border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel disabled:opacity-35"
           >
             Agregar
           </button>
@@ -849,7 +850,7 @@ function FilaDeVariante({
       <div
         role="group"
         aria-label={`Unidades de ${completo}`}
-        className="flex h-11 shrink-0 items-stretch border border-tinta"
+        className="pieza-ficha flex h-11 shrink-0 items-stretch overflow-hidden border border-tinta"
       >
         <button
           type="button"

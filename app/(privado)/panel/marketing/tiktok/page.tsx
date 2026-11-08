@@ -108,6 +108,7 @@ export default async function PublicarEnTiktokPage({
       <Volver href={volver}>Publicar en redes</Volver>
       <Cabecera
         titulo="Publicar en TikTok."
+        resaltar="TikTok"
         bajada={`${producto.nombre}: revisa cómo sale y elige quién lo ve.`}
       />
 
