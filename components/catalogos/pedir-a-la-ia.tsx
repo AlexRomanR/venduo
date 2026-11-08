@@ -52,7 +52,10 @@ export function PedirCatalogoALaIa({
   }
 
   return (
-    <section aria-labelledby={`${id}-titulo`} className="border border-tinta">
+    <section
+      aria-labelledby={`${id}-titulo`}
+      className="pieza-tarjeta border border-tinta"
+    >
       <button
         type="button"
         aria-expanded={abierto}
@@ -104,7 +107,7 @@ export function PedirCatalogoALaIa({
                   type="button"
                   disabled={armando}
                   onClick={() => void enviar(idea)}
-                  className="flex min-h-10 items-center gap-1.5 border border-tinta/25 px-3 text-sm transition-colors hover:border-tinta disabled:opacity-50"
+                  className="pieza-ficha flex min-h-11 items-center gap-1.5 border border-tinta/25 px-4 text-sm transition-colors hover:border-tinta disabled:opacity-50"
                 >
                   <Sparkles aria-hidden="true" className="size-3.5" />
                   {idea}

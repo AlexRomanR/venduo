@@ -68,11 +68,11 @@ export function Logo() {
         if (archivo) void usar(archivo)
       }}
       className={cn(
-        "relative flex items-center gap-4 border border-dashed p-3 transition-colors",
+        "relative flex items-center gap-4 rounded-[16px] border border-dashed p-3 transition-colors",
         encima ? "border-senal bg-senal/[0.05]" : "border-tinta/25"
       )}
     >
-      <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden border border-tinta/20 bg-white">
+      <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-[12px] border border-tinta/20 bg-white">
         {logo ? (
           <Image
             src={logo}
@@ -109,7 +109,7 @@ export function Logo() {
             type="button"
             onClick={() => entrada.current?.click()}
             disabled={subiendo}
-            className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal disabled:opacity-50"
+            className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:opacity-60 disabled:opacity-50"
           >
             <Upload aria-hidden="true" className="size-4" />
             {logo ? "Cambiar" : "Subir logo"}

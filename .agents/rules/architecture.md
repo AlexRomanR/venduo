@@ -50,6 +50,8 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/panel/exportar/productos`               | Los productos en Excel                                   | Requiere sesión |
 | `/panel/apariencia`                       | La puerta al editor, la plantilla y el historial         | Requiere sesión |
 | `/panel/estadisticas/pdf`                 | El informe del tablero en PDF. `?g={id}` para uno solo   | Requiere sesión |
+| `/panel/compartir`                        | Compartir la tienda: enlace, redes, historias y QR       | Requiere sesión |
+| `/panel/compartir/historia`               | Una tarjeta para historias en PNG. `?diseno=vitrina`     | Requiere sesión |
 | `/panel/catalogos`                        | Catálogos en PDF: los guardados y las doce plantillas    | Requiere sesión |
 | `/panel/catalogos/nuevo`                  | Armar uno. `?plantilla=` o `?estilo=` llega con ella     | Requiere sesión |
 | `/panel/catalogos/{id}`                   | Editar un catálogo guardado                              | Requiere sesión |
@@ -169,7 +171,9 @@ actualizar esta lista.
 app/
   (privado)/          Grupo de rutas: no aparece en la URL
     layout.tsx        Shell compartido de las áreas privadas
-    panel/            Resumen del emprendedor y sus secciones
+    panel/            Resumen del emprendedor y sus secciones. El Resumen y las
+                      listas con subrutas van en un grupo —(inicio)/, (lista)/—
+                      para que su loading.tsx no cubra a las subrutas
     cuenta/           Ajustes de la persona y de su tienda
   t/[slug]/           Tienda pública: portada, catálogo, producto y carrito, que
                       manda el pedido por WhatsApp. Compone el kit de la
@@ -247,13 +251,17 @@ components/
                       visitas y el cierre; `escena.ts` es su movimiento (GSAP) y
                       `resumen.tsx` el contenedor con Lenis y las letras
     tablero/          Lo que el Resumen comparte con otras pantallas: compartir la
-                      tienda, la franja de vacaciones y el esqueleto de carga
+                      tienda (el diálogo corto), la franja de vacaciones y el
+                      esqueleto de carga
+    compartir.tsx     Las piezas de la pantalla Compartir: el enlace, las redes, las
+                      tarjetas para historias y el QR
   admin/              El armazón de `/admin`, su navegación y los controles de
                       cada pantalla: funciones, plantillas, tiendas, ficha, registro
   portada/            La portada pública: sus secciones, escenas y celulares de
                       muestra, sus letras (Archivo con ancho y Kalam), GSAP y Lenis
                       (`gsap.ts`) y los productos de Rosa Deportes (`productos.ts`).
-                      Del panel, solo `panel/resumen/` importa de acá
+                      Del panel importan de acá `panel/resumen/` y, solo por las
+                      letras (`letras.ts`), el armazón del panel
   legal/              El armazón de las páginas de texto: privacidad, términos y baja
   marca/              `Logo` y `Simbolo`: la marca de Venduo, desde `lib/marca.ts`
   config-status.tsx   Checklist de capas configuradas
@@ -287,6 +295,7 @@ lib/
   tiktok-textos.ts    Las privacidades de TikTok y sus nombres, sin dependencias
   cifrado.ts          AES-256-GCM para lo que se guarda de otras plataformas
   publicar-imagen.tsx La imagen de Publicar en redes, en PNG o en JPEG. Solo servidor
+  historia-imagen.tsx Las tarjetas para historias de Compartir, en PNG. Solo servidor
   marca.ts            La geometría y los colores del logo: la fuente de todo archivo
   demo-data.ts        Datos de ejemplo del modo demo
   estilos.ts          Clases del vestido editorial de los controles
@@ -294,6 +303,9 @@ lib/
   catalogo.ts         Filtrar y ordenar el catálogo público, sin dependencias de servidor
   tablero.ts          El tablero del Resumen: sus tipos y las cuentas de los períodos,
                       sin dependencias de servidor
+  estadisticas.ts     Las cuentas del tablero fijo de Estadísticas (días fuertes, lo
+                      que más deja, lo que no se mueve, cuántos se cobran), puras; sus
+                      consultas en data/estadisticas.ts
   fuentes/            Todas las tipografías, con next/font/local, y sus woff2: no se
                       piden a Google en cada build
   format.ts           Moneda, fechas, slugs

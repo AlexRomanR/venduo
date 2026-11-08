@@ -187,7 +187,7 @@ export function BotonDeCanva({
       <Dialog open={abierto} onOpenChange={setAbierto}>
         <DialogContent
           showCloseButton={false}
-          className="gap-0 rounded-none border-2 border-tinta bg-papel p-0 text-tinta shadow-none sm:max-w-md"
+          className="gap-0 border-tinta/15 bg-papel p-0 text-tinta sm:max-w-md"
         >
           <div className="flex items-start gap-4 border-b border-tinta/15 p-5">
             <DialogTitle className="flex-1 font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">

@@ -21,8 +21,9 @@ import { FichasDeCobro } from "@/components/panel/fichas-grandes"
 import { Cabecera, Seccion, SinDatos } from "@/components/panel/piezas"
 import { DescargarPedidos } from "@/components/panel/descargar"
 import { CompartirTienda } from "@/components/panel/tablero/compartir"
+import { BotonNuevaVenta } from "@/components/pedidos/boton-nueva-venta"
 import { ListaDePedidos, type Renglon } from "@/components/pedidos/lista"
-import { cambiarEstado } from "./acciones"
+import { cambiarEstado } from "../acciones"
 
 export const metadata = { title: "Pedidos" }
 
@@ -84,6 +85,7 @@ export default async function PedidosPage({
     <div className="flex flex-col gap-6 max-lg:pb-16 md:gap-8">
       <Cabecera
         titulo="Tus pedidos."
+        resaltar="pedidos"
         bajada="Llegan a tu WhatsApp. Márcalos pagados y se descuentan del stock."
         accionesSoloEnPantallaAncha
       >
@@ -120,7 +122,8 @@ export default async function PedidosPage({
         id="lista"
         icono={ShoppingBag}
         titulo="Los que llegaron"
-        bajada="Toca uno para ver qué pidió."
+        bajada="Toca el sello para cobrarlo, o el pedido para ver qué pidió."
+        extraEnLinea
         extra={
           resumen.total > 0 ? (
             <DescargarPedidos
@@ -221,16 +224,7 @@ export default async function PedidosPage({
 
       {/* Lo vendido en el chat o en persona también baja el stock: el botón
           flota sobre las pestañas, al alcance del pulgar. */}
-      <Link
-        href="/panel/pedidos/nueva"
-        className={cn(
-          BOTON_PRIMARIO,
-          "fixed right-4 bottom-[calc(4rem+env(safe-area-inset-bottom)+0.75rem)] z-20 min-h-12 px-5 lg:hidden"
-        )}
-      >
-        <Plus aria-hidden="true" className="size-5" />
-        Nueva venta
-      </Link>
+      <BotonNuevaVenta />
     </div>
   )
 }

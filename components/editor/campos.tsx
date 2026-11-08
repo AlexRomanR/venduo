@@ -109,7 +109,7 @@ function CampoDeSeccion({
               aria-label="Menos"
               disabled={numero <= campo.min}
               onClick={() => cambiar(Math.max(campo.min, numero - 1))}
-              className="flex size-11 items-center justify-center border border-tinta/30 transition-colors hover:border-tinta disabled:opacity-30"
+              className="flex size-11 items-center justify-center rounded-full border border-tinta/30 transition-colors hover:border-tinta disabled:opacity-30"
             >
               <Minus aria-hidden="true" className="size-4" />
             </button>
@@ -124,7 +124,7 @@ function CampoDeSeccion({
               aria-label="Más"
               disabled={numero >= campo.max}
               onClick={() => cambiar(Math.min(campo.max, numero + 1))}
-              className="flex size-11 items-center justify-center border border-tinta/30 transition-colors hover:border-tinta disabled:opacity-30"
+              className="flex size-11 items-center justify-center rounded-full border border-tinta/30 transition-colors hover:border-tinta disabled:opacity-30"
             >
               <Plus aria-hidden="true" className="size-4" />
             </button>
@@ -352,7 +352,7 @@ function Lista({
         {elementos.map((elemento, indice) => (
           <li
             key={indice}
-            className="border border-tinta/20 p-3 motion-safe:animate-in motion-safe:duration-200 motion-safe:fade-in"
+            className="rounded-[14px] border border-tinta/20 bg-hoja p-3 motion-safe:animate-in motion-safe:duration-200 motion-safe:fade-in"
           >
             <div className="flex items-center justify-between gap-2">
               <span className="tabular text-xs font-semibold opacity-55">
@@ -385,7 +385,7 @@ function Lista({
                   onClick={() =>
                     alCambiar(elementos.filter((_, i) => i !== indice))
                   }
-                  className="flex size-11 items-center justify-center opacity-60 transition-opacity hover:text-senal hover:opacity-100"
+                  className="flex size-11 items-center justify-center opacity-60 transition-opacity hover:opacity-60 hover:opacity-100"
                 >
                   <Trash2 aria-hidden="true" className="size-4" />
                 </button>

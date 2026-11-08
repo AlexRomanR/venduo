@@ -285,7 +285,11 @@ export async function getCostoDeProducto(id: string): Promise<number | null> {
 
 export async function getProducto(id: string): Promise<Product | null> {
   const supabase = await createClient()
-  if (!supabase) return null
+  // En modo demo, el mismo producto de ejemplo que muestra la lista: sin esto
+  // tocar uno daba 404.
+  if (!supabase) {
+    return catalogoDeDemostracion().productos.find((p) => p.id === id) ?? null
+  }
 
   const tienda = await getMiTienda()
   if (!tienda) return null

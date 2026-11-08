@@ -40,6 +40,7 @@ export default async function CargarProductosPage() {
         cabecera={
           <Cabecera
             titulo="Carga varios a la vez."
+            resaltar="varios"
             bajada="Sube lo que ya tienes. Revisas todo antes de crearlo."
           />
         }

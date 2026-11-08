@@ -7,45 +7,67 @@ import { toast } from "sonner"
 
 import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
 import { cn } from "@/lib/utils"
-import { ESTADOS, SIGUIENTES } from "@/lib/pedidos"
+import { SIGUIENTES } from "@/lib/pedidos"
 import type { OrderStatus } from "@/types"
 import { useConfirmacion } from "@/components/panel/confirmar"
 import { useFestejo } from "@/components/panel/festejo"
 
 const ASPECTO: Record<OrderStatus, string> = {
-  // Rojo solo en lo que pide una acción: un pedido sin gestionar. Si todos los
-  // estados fueran de color, el acento dejaría de señalar nada.
+  // La señal solo en lo que pide una acción: un pedido por cobrar. Si todos
+  // los estados fueran de color, el acento dejaría de señalar nada.
   pendiente: "border-senal text-senal",
   pagado: "border-tinta text-tinta",
-  cancelado: "border-tinta/25 text-tinta/40 line-through",
+  // Sin tachar: el que va tachado es el total.
+  cancelado: "border-tinta/30 text-tinta/60",
+}
+
+/** Lo que dice el sello de cada estado. El pendiente pide algo: "Por cobrar". */
+const ETIQUETA_DEL_SELLO: Record<OrderStatus, string> = {
+  pendiente: "Por cobrar",
+  pagado: "Pagado",
+  cancelado: "Cancelado",
 }
 
 /**
- * El estado de un pedido, en versalita.
+ * El estado de un pedido como un sello de goma (`pieza-sello`): torcido, con
+ * cada palabra en su renglón ("POR / COBRAR") en el cuaderno, y en una línea
+ * de versalita en el diario. El que se acaba de confirmar se estampa; el
+ * pendiente más viejo late (`app/globals.css`).
  *
- * Un pendiente que pasó el plazo dice "No concretado" y deja el rojo: ya no
+ * Un pendiente que pasó el plazo dice "No concretado" y deja la señal: ya no
  * pide una acción. Lo decide quien llama, en el servidor, para que la hora del
  * navegador no dibuje otra cosa que la del servidor.
  */
 export function Estado({
   estado,
   noConcretado = false,
+  recien = false,
+  late = false,
+  className,
 }: {
   estado: OrderStatus
   noConcretado?: boolean
+  /** Se acaba de confirmar: en el cuaderno, el sello se estampa. */
+  recien?: boolean
+  /** Es el pendiente más viejo: el sello se levanta y golpea, despacio. */
+  late?: boolean
+  className?: string
 }) {
-  const etiqueta = noConcretado
-    ? "No concretado"
-    : (ESTADOS.find((e) => e.valor === estado)?.etiqueta ?? estado)
+  const etiqueta = noConcretado ? "No concretado" : ETIQUETA_DEL_SELLO[estado]
 
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 border px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] uppercase",
-        noConcretado ? "border-tinta/40 text-tinta/65" : ASPECTO[estado]
+        "pieza-sello inline-flex shrink-0 gap-x-1 border px-2 py-0.5 text-xs font-semibold tracking-[0.08em] uppercase",
+        noConcretado ? "border-tinta/40 text-tinta/65" : ASPECTO[estado],
+        recien && "sello-estampa",
+        late && "sello-late",
+        className
       )}
     >
-      {etiqueta}
+      {etiqueta.split(" ").map((palabra) => (
+        <span key={palabra}>{palabra}</span>
+      ))}
     </span>
   )
 }
@@ -102,7 +124,7 @@ export function CobrarPedido({
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 flex gap-2 border-t border-tinta bg-papel px-4 py-3 lg:static lg:border-0 lg:p-0">
+    <div className="pieza-bandeja fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 flex gap-2 border-t border-tinta bg-papel px-4 py-3 lg:static lg:border-0 lg:p-0">
       {festejo}
       {whatsapp ? (
         <a
@@ -133,6 +155,95 @@ export function CobrarPedido({
         </button>
       ) : null}
     </div>
+  )
+}
+
+/**
+ * El sello del detalle de un pedido. Si todavía se puede cobrar, se toca, como
+ * en la lista: pregunta y, con la base confirmada, "Pagado" se estampa. Quien
+ * aprendió a cobrar tocando el sello en la lista no se encuentra acá con uno
+ * que no hace nada. El botón "Marcar pagado" sigue: es el camino evidente.
+ */
+export function SelloQueCobra({
+  pedido,
+  noConcretado = false,
+  cambiar,
+  soloLectura = false,
+}: {
+  pedido: { id: string; numero: number; estado: OrderStatus }
+  noConcretado?: boolean
+  cambiar: Cambiar
+  soloLectura?: boolean
+}) {
+  const router = useRouter()
+  const { preguntar, dialogo } = useConfirmacion()
+  const { festejo, festejar } = useFestejo()
+  const [guardando, setGuardando] = React.useState(false)
+  const [recien, setRecien] = React.useState(false)
+  const sePuedePagar = !recien && SIGUIENTES[pedido.estado].includes("pagado")
+
+  if (!sePuedePagar) {
+    return (
+      <Estado
+        estado={recien ? "pagado" : pedido.estado}
+        noConcretado={noConcretado && !recien}
+        recien={recien}
+      />
+    )
+  }
+
+  async function cobrar() {
+    if (soloLectura) {
+      toast.info(AVISO_DE_DEMO)
+      return
+    }
+    const si = await preguntar({
+      titulo: `¿Marcar pagado el pedido #${pedido.numero}?`,
+      texto:
+        "Se descuenta de tu stock. Un pedido pagado no vuelve a pendiente.",
+      confirmar: "Marcar pagado",
+    })
+    if (!si) return
+    if (!navigator.onLine) {
+      toast.error("Sin conexión. El pedido sigue por cobrar.")
+      return
+    }
+    setGuardando(true)
+    const resultado = await cambiar(pedido.id, "pagado")
+    setGuardando(false)
+    if (!resultado.ok) {
+      toast.error(
+        resultado.error ??
+          "No pudimos marcar el pedido pagado. Inténtalo de nuevo."
+      )
+      return
+    }
+    setRecien(true)
+    festejar()
+    toast.success("Pago confirmado. Ya se descontó del stock.")
+    // Se refresca después de que se vio el golpe del sello.
+    window.setTimeout(() => router.refresh(), 900)
+  }
+
+  return (
+    <>
+      {dialogo}
+      {festejo}
+      <button
+        type="button"
+        onClick={cobrar}
+        disabled={guardando}
+        aria-busy={guardando || undefined}
+        aria-label={`Marcar pagado el pedido #${pedido.numero}`}
+        className="group/sello inline-flex min-h-11 min-w-11 items-center justify-center rounded-[10px] p-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tinta disabled:opacity-50"
+      >
+        <Estado
+          estado={pedido.estado}
+          noConcretado={noConcretado}
+          className="transition-[rotate,scale,color] duration-200 ease-out group-hover/sello:scale-105 group-hover/sello:[rotate:0deg] group-active/sello:scale-95 motion-reduce:transition-none"
+        />
+      </button>
+    </>
   )
 }
 

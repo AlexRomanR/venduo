@@ -31,6 +31,7 @@ import {
 import { SECCIONES } from "@/lib/plantillas/secciones"
 import { cn } from "@/lib/utils"
 import { ConFuncion } from "@/components/panel/funcion"
+import { archivoAncho, kalam } from "@/components/portada/letras"
 import type { DisenoParaEditar } from "@/lib/data/editor"
 import { Asistente } from "@/components/editor/asistente"
 import { Bienvenida, Recuperar } from "@/components/editor/avisos"
@@ -487,7 +488,17 @@ export function Editor({
       {/* Una columna de `minmax(0,1fr)` en el celular: sin ella, la columna
           implícita crecía hasta el contenido más ancho y la pantalla entera
           se desbordaba a los costados. */}
-      <div className="grid h-dvh grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)_auto_auto] overflow-hidden bg-papel text-tinta lg:grid-cols-[26rem_minmax(0,1fr)] lg:grid-rows-[auto_auto_minmax(0,1fr)]">
+      {/* Fuera del armazón, pero en el cuaderno: la marca viste las piezas
+          (`app/globals.css`) y trae sus letras. La vista previa de la tienda
+          vive en un <iframe>, así que el cuaderno no la toca. */}
+      <div
+        data-registro="cuaderno"
+        className={cn(
+          archivoAncho.variable,
+          kalam.variable,
+          "grid h-dvh grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)_auto_auto] overflow-hidden bg-papel text-tinta lg:grid-cols-[26rem_minmax(0,1fr)] lg:grid-rows-[auto_auto_minmax(0,1fr)]"
+        )}
+      >
         <BarraDelEditor />
 
         <div className="hidden lg:col-span-2 lg:row-start-2 lg:block">
@@ -596,7 +607,7 @@ function BarraDelEditor() {
     <header className="flex h-14 items-center gap-1 border-b border-tinta/15 px-2 sm:px-3 lg:col-span-2">
       <Link
         href="/panel/apariencia"
-        className="flex min-h-11 min-w-11 items-center justify-center gap-2 px-2 text-sm font-semibold transition-colors hover:text-senal"
+        className="flex min-h-11 min-w-11 items-center justify-center gap-2 px-2 text-sm font-semibold transition-colors hover:opacity-60"
       >
         <X aria-hidden="true" className="size-5" />
         <span className="hidden sm:inline">Salir</span>
@@ -619,7 +630,7 @@ function BarraDelEditor() {
         href={tienda.url}
         target="_blank"
         rel="noreferrer noopener"
-        className="mr-2 hidden min-h-11 items-center gap-1.5 px-2 text-sm font-semibold transition-colors hover:text-senal lg:flex"
+        className="mr-2 hidden min-h-11 items-center gap-1.5 px-2 text-sm font-semibold transition-colors hover:opacity-60 lg:flex"
       >
         Ver mi tienda
         <ExternalLink aria-hidden="true" className="size-4" />
@@ -631,7 +642,7 @@ function BarraDelEditor() {
         disabled={!borrador.puedeDeshacer}
         aria-label="Deshacer"
         title="Deshacer (Ctrl+Z)"
-        className="flex size-11 items-center justify-center transition-colors hover:text-senal disabled:opacity-30 disabled:hover:text-inherit"
+        className="flex size-11 items-center justify-center transition-colors hover:opacity-60 disabled:opacity-30 disabled:hover:opacity-30"
       >
         <Undo2 aria-hidden="true" className="size-5" />
       </button>
@@ -641,7 +652,7 @@ function BarraDelEditor() {
         disabled={!borrador.puedeRehacer}
         aria-label="Rehacer"
         title="Rehacer (Ctrl+Shift+Z)"
-        className="flex size-11 items-center justify-center transition-colors hover:text-senal disabled:opacity-30 disabled:hover:text-inherit"
+        className="flex size-11 items-center justify-center transition-colors hover:opacity-60 disabled:opacity-30 disabled:hover:opacity-30"
       >
         <Redo2 aria-hidden="true" className="size-5" />
       </button>

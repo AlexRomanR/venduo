@@ -43,7 +43,10 @@ se clasifica:
 | Es una explicación                         | La `descripcion` de su hoja, nunca bajo el campo |
 
 Agrupar las filas en dos o tres paneles **por para qué sirven** ("lo de vender",
-"cómo se muestra"), no por tipo de campo.
+"cómo se muestra"), no por tipo de campo. En el panel, cada grupo es una tarjeta del
+cuaderno —blanca, con radio y la sombra teñida— con las filas separadas por una regla
+adentro, y la pantalla queda quieta al deslizar (`DESIGN.md`, "Las pantallas de
+trabajo"). En el alta de la tienda, que es del diario, el grupo es un panel con regla.
 
 ## 3. Investigar cómo lo resuelven otros
 

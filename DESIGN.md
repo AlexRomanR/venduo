@@ -1,6 +1,6 @@
 ---
 name: Venduo
-description: Editorial impreso sobre papel cálido, con un solo color de señal que manda cuando aparece. El panel es el diario; la portada, el cuaderno de ventas pasado en limpio.
+description: El cuaderno de ventas pasado en limpio sobre papel impreso, con un solo color de señal que manda cuando aparece. En escenas en la portada y el Resumen, quieto en las pantallas de trabajo y sobrio, como un diario, en el ingreso y /admin.
 colors:
   papel: "#f7f5f0"
   tinta: "#1d1c1a"
@@ -125,26 +125,35 @@ components:
 
 ## Overview
 
-**Creative North Star: "El diario del mercado", y su cuaderno de ventas**
+**Creative North Star: "El cuaderno de ventas pasado en limpio"**
 
-Venduo se ve como una página impresa: papel cálido, tinta casi negra, reglas de un
-píxel que separan las secciones y un solo color de señal —el bolígrafo del cuaderno de
-ventas— que aparece poco y manda cuando aparece. El color no baña la pantalla; marca.
+Venduo se ve como el cuaderno de quien vende, pasado en limpio sobre papel impreso: papel
+cálido, tinta casi negra, titulares de imprenta y un solo bolígrafo de color —la
+frambuesa— que aparece poco y manda cuando aparece. Sobre el papel van las cosas de un
+mostrador: el ticket con su sello, la nota pegada, la polaroid del producto, el
+resaltador sobre lo que importa y la letra a mano de quien anota rápido. El color no
+baña la pantalla; marca.
 
-Hay **un solo mundo de color y de letra** —papel, tinta, frambuesa, Archivo y Geist— y
-**dos registros**, según lo que la persona vino a hacer:
+Hay **un solo mundo** —papel, tinta, frambuesa, resaltador, Archivo, Geist y Kalam— y
+**tres registros**, según lo que la persona vino a hacer. Se decidió el 7 de noviembre de
+2026, mirando la misma pantalla dibujada de tres formas:
 
-- **El diario (el panel, la cuenta, el ingreso, el alta de la tienda y `/admin`).**
-  Lo que estructura la pantalla es la retícula y la línea, no la caja. No hay
-  degradados, ni tarjetas flotando, ni sombras, ni un teléfono en ángulo. La densidad
-  es alta y el peso visual lo cargan la tipografía y el espacio, porque se usa todos
-  los días, casi siempre en el celular. Rige todo este documento
-  salvo la sección "La portada".
-- **El cuaderno de ventas pasado en limpio (la portada pública, `/`).** Tiene que
-  convencer, así que se permite lo que el panel no: el celular en 3D, las escenas que
-  cuentan un pedido, los productos recortados, la letra a mano y el movimiento con el
-  scroll. Comparte la paleta, las letras y el logo; sus excepciones están medidas en
-  "La portada".
+| Registro                   | Dónde                                                                                                                                                           | Cómo                                                                                                                                                                                                 |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **El cuaderno en escenas** | La portada (`/`), el Resumen (`/panel`) y el Inicio de la app                                                                                                   | Se mira. Cada sección es una escena que se arma con el scroll y vuelve a empezar al salir: el celular en 3D, las notas que caen, la cifra que cuenta.                                                |
+| **El cuaderno de trabajo** | Las demás pantallas del panel y de la app: Pedidos, Productos, Catálogos, Estadísticas, Publicar en redes, Apariencia, Compartir, Datos de la tienda, Tus datos | Se trabaja. El mismo vocabulario —tickets con sello, notas, números que cuentan, tarjetas con radio y sombra teñida, titulares con resaltador—, quieto mientras se desliza: lo mueve lo que se toca. |
+| **El diario**              | El ingreso, el alta de la tienda y `/admin`                                                                                                                     | Se completa o se administra. Reglas de un píxel, esquina viva y nada de sombras: la sobriedad de un formulario impreso.                                                                              |
+
+**La regla para elegir.** Si la pantalla se abre para ver cómo va el negocio, va en
+escenas. Si se abre para hacer algo —buscar, filtrar, cobrar, cambiar un precio, veinte
+veces al día—, va en el cuaderno de trabajo, porque nada puede esperar a que se deslice.
+Si es un trámite o la operación de Venduo, va en el diario. **Una pantalla nueva del panel
+es del cuaderno de trabajo**, salvo que se decida otra cosa.
+
+Este documento describe primero lo común —color, letra, ritmo— y lo del diario, que es
+además la base editorial de las tiendas. Después vienen "El cuaderno de ventas", con lo
+que agregan los dos registros del cuaderno, y "La portada", "El Resumen" y "Las pantallas
+de trabajo".
 
 **Una tienda `/t/{slug}` usa el mundo de su plantilla; el panel de su dueño, este.** La
 tienda queda reconocible en el panel por su sello, un recuadro con su papel, su letra y su
@@ -152,8 +161,12 @@ color de acción. Las plantillas redefinen estos mismos tokens —papel, tinta, 
 cuerpo, radio— y traen sus propios componentes; sus valores están en
 `lib/plantillas` y el sistema entero en `docs/store-templates.md`. Este documento
 es además **la base editorial**: la plantilla de respaldo con la que se dibuja
-toda tienda cuya plantilla se retiró. El `toldo` no lo redefine ninguna plantilla:
-es solo del logo de Venduo.
+toda tienda cuya plantilla se retiró. Sus letras y sus reglas son las de este
+documento, pero **sus colores no siguieron a la marca**: la base editorial
+(`lib/plantillas/clasica.ts`) conserva el papel `#f1f0ee`, la tinta `#16171a` y el rojo
+`#d62d12`, porque es una plantilla de tienda y cambiarla le cambiaría la cara a las
+tiendas que la usan. El `toldo` no lo redefine ninguna plantilla: es solo del logo de
+Venduo.
 
 Los tokens por defecto de shadcn (`--background`, `--foreground`, `--primary`…)
 siguen declarados en `app/globals.css` porque los componentes generados los
@@ -162,14 +175,18 @@ las clases de `lib/estilos.ts`.
 
 **Key Characteristics:**
 
-- Campo de papel cálido `#f7f5f0`, nunca blanco puro, en toda superficie de Venduo.
-- Un solo acento: la frambuesa de señal. En la portada lo acompañan, a dosis medidas, su
-  versión clara sobre oscuro y el resaltador amarillo de los titulares.
-- En el panel, separación por regla de un píxel; cero tarjetas y cero sombras.
+- Campo de papel cálido `#f7f5f0`, nunca blanco puro como fondo de página.
+- Un solo acento: la frambuesa de señal, para lo que pide algo. Los botones y lo elegido
+  van en tinta. El resaltador amarillo va detrás de una frase del titular y de lo que
+  acaba de cambiar.
 - Archivo extrabold con tracking negativo para titulares y cifras; Geist para leer;
-  Kalam, a mano, solo en las notas de la portada.
-- En el panel, un solo gesto de movimiento: entrar al viewport. En la portada, una
-  escena por sección, que arranca a la vista y vuelve a empezar al salir.
+  Kalam, a mano, para las notas, las pistas y los vacíos del cuaderno, nunca para lo que
+  hay que leer de corrido.
+- En el cuaderno, tarjetas de hoja (`#fdfcf9`) con radio y una sola sombra teñida de tinta. En el
+  diario, separación por regla de un píxel, cero tarjetas y cero sombras.
+- El movimiento tiene un porqué: en las escenas va con el scroll, en el cuaderno de
+  trabajo responde a lo que se toca y en el diario hay un solo gesto, entrar. Con
+  "Reducir movimiento", todo queda quieto.
 
 ## Colors
 
@@ -199,9 +216,9 @@ de verdad (`docs/briefs/2026-10-31-productos-vivo-y-color.md`).
 - **Toldo** (`--toldo`, `#d0216a`): las rayas del logo y el color con el que el editor
   marca lo que se toca sobre una tienda. Igual a la señal: la frambuesa sí se ve contra
   el cuerpo del celular.
-- **Resaltador** (`--resaltador`, `#fff1a6`): **lo que espera o acaba de cambiar** —la
-  hoja que se editó, «Cambios sin guardar», la cifra de hojas, el catálogo recién
-  guardado— y, en la portada, una frase por titular. **Siempre detrás de un texto en
+- **Resaltador** (`--resaltador`, `#fff1a6`): **lo que espera o acaba de cambiar**
+  —«Cambios sin guardar», la cifra de hojas, el catálogo recién guardado— y, en el
+  cuaderno, una frase por titular. **Siempre detrás de un texto en
   tinta** (16:1): la frambuesa sobre el amarillo da 4,48:1 y no pasa. Nunca es el
   relleno de un control ni la única señal de algo.
 
@@ -209,26 +226,30 @@ de verdad (`docs/briefs/2026-10-31-productos-vivo-y-color.md`).
 
 - **Papel** (`--papel`, `#f7f5f0`): el campo de toda superficie de Venduo. Reemplaza
   al blanco; el blanco puro solo aparece como texto o borde sobre la señal, y como
-  superficie de una tarjeta de la portada.
+  superficie de una tarjeta del cuaderno.
 - **Tinta** (`--tinta`, `#1d1c1a`): todo el texto de lectura, los bordes plenos, los
-  botones, lo elegido y el campo de la sección oscura de la portada.
+  botones, lo elegido y el campo de las escenas oscuras de la portada y el Resumen.
 - **Plata** (`--plata`): gris de apoyo declarado en los tokens, disponible para
   bordes y estados apagados.
 
-### Solo en la portada
+### Solo en el cuaderno
 
-Declarados en `components/portada/portada.module.css`, no en el sistema:
+Declarados en `components/portada/portada.module.css` y
+`components/panel/resumen/resumen.module.css` —en la app, en `src/theme/index.ts`—, no
+en los tokens de Tailwind:
 
-- **Hoja** (`#fdfcf9`): el campo un punto más claro de una sección que se separa.
+- **Hoja** (`#fdfcf9`): el campo un punto más claro de una sección o del talón de un
+  ticket.
 - **Frambuesa suave** (`#fce4ee`): el fondo de lo marcado sobre papel.
 - **Frambuesa clara** (`#ff7aa8`): la señal sobre la tinta —rótulos, barras de avance,
-  la etiqueta del stock— en la sección oscura (7:1).
+  la etiqueta del stock, el mejor día del gráfico— en las escenas oscuras (7:1).
 
 Las jerarquías intermedias **no son colores nuevos**: son tinta con opacidad.
 La escala en uso es `70%` para texto secundario, `60%` para pie de página,
 `55%` para pies de foto y notas, `45–50%` para descargos, `40%` para numerales
 ordinales, y `15%` para reglas divisorias. Un texto que se tiene que leer no baja de
-`55%`: más claro no pasa 4,5:1 contra el papel.
+`65%` (5,3:1): al `55%` da 3,7:1 contra el papel y no pasa 4,5:1. Lo de menos de 65% es
+decoración o letra grande.
 
 Los errores usan la señal, siempre con su mensaje escrito al lado del campo: un error
 nunca es solo color. El foco de un campo va en tinta (una línea más gruesa y un fondo
@@ -245,8 +266,11 @@ Si aparece en más de dos lugares en un viewport, uno de ellos no pedía nada.
 **La regla de la tinta que trabaja.** Un botón, una pestaña elegida, una ficha
 elegida: tinta. Si algo está en frambuesa, tiene que poder decirse qué pide.
 
-**La regla del papel.** Ninguna superficie de Venduo usa `#fff` como fondo de página.
-El blanco es un color de texto sobre la señal, no un campo.
+**La regla del papel.** Ninguna superficie de Venduo usa `#fff` como fondo de página
+ni de tarjeta. El blanco es un color de texto sobre la señal, no un campo. Lo que se apoya
+sobre el papel (`#f7f5f0`) es de hoja (`#fdfcf9`): una tarjeta, una nota, un diálogo, una
+celda. El blanco puro al lado del papel lo hacía ver amarillento, y una cabecera blanca
+sobre un cuerpo de papel partía la tarjeta en dos.
 
 **La regla de la opacidad.** La jerarquía de texto se construye bajando opacidad
 sobre tinta, nunca introduciendo un gris nuevo.
@@ -258,13 +282,14 @@ sobre tinta, nunca introduciendo un gris nuevo.
 **Body Font:** Geist, en `--font-sans`.
 
 **Hand Font:** Kalam (400 y 700), en `--fuente-mano`, servida desde
-`components/portada/` y cargada solo por la portada.
+`components/portada/letras.ts` y cargada por las pantallas del cuaderno. En la app,
+`@expo-google-fonts/kalam` (`fuentes.mano`).
 
 **Character:** Un grotesco industrial apretado contra una cara de interfaz neutra.
-Archivo grita; Geist explica. En el panel no hay una tercera voz. En la portada,
-Kalam es la letra de quien vende —"¿pagó?", "quedan 3… ¿o 2?"— y solo escribe notas
-sueltas y el cuaderno de la escena de carga; nunca un titular, un botón ni un texto
-que haya que leer de corrido. La portada usa además Archivo con su eje de ancho
+Archivo grita; Geist explica. En el diario no hay una tercera voz. En el cuaderno,
+Kalam es la letra de quien vende —"¿pagó?", "este espera tu cobro", "tu mejor día"— y
+solo escribe notas sueltas, pistas y estados vacíos; nunca un titular, un botón ni un
+texto que haya que leer de corrido. El cuaderno usa además Archivo con su eje de ancho
 (`--fuente-ancha`) para sus titulares.
 
 ### Hierarchy
@@ -277,7 +302,7 @@ que haya que leer de corrido. La portada usa además Archivo con su eje de ancho
   `clamp(1.75rem, 4.5vw, 2.4rem)`; sobre el bloque de señal crece a
   `clamp(2rem, 6vw, 3.5rem)` con interlínea `1.02`.
 - **Numeral** (800, `clamp(2.5rem, 7vw, 3.25rem)`, `1`, `-0.04em`, tabular, en
-  rojo): cifras destacadas. Siempre con `.tabular` y siempre con un detalle debajo
+  tinta; en la señal solo si pide algo): cifras destacadas. Siempre con `.tabular` y siempre con un detalle debajo
   en versalita apagada.
 - **Title** (700, `1.125–1.25rem`, `-0.02em`): el nombre de un ítem dentro de una
   lista o de una retícula.
@@ -325,7 +350,7 @@ desplazamiento horizontal en las dos anchuras.
 
 **La barra fija.** Encabezado adherido con `backdrop-blur`, fondo papel al 90% y
 una regla inferior de tinta al 15%. Las anclas de navegación se esconden bajo
-`md`; la acción en la señal nunca se esconde.
+`md`; la acción principal nunca se esconde.
 
 ### Named Rules
 
@@ -333,12 +358,12 @@ una regla inferior de tinta al 15%. Las anclas de navegación se esconden bajo
 excepción: el mismo papel, la misma tinta, el misma frambuesa y las mismas letras. Lo que
 separa las pantallas del diario entre sí es el **ritmo**, no el sistema: secciones de
 `40–48px` en vez de `80px`, el nombre de la tienda en lugar de un display,
-navegación persistente, y la frambuesa reservado a lo que pide una acción.
+navegación persistente, y la frambuesa reservada a lo que pide una acción.
 
-La portada comparte los tokens pero no el registro: sus excepciones están medidas en
-"La portada" y no se trasladan al panel. Quien llega de la portada al panel reconoce
-la marca —el papel, la frambuesa, el logo— y encuentra una herramienta, no otra página de
-venta.
+Los tres registros comparten los tokens. Quien llega de la portada al panel reconoce el
+mismo cuaderno —el papel, la frambuesa, el ticket, la letra a mano— y encuentra una
+herramienta, no otra página de venta: lo que cambia de la portada a Pedidos es el
+movimiento con el scroll, no el mundo.
 
 **La regla del contenedor único.** En el diario, todo alinea a `max-w-6xl`. La
 portada usa `max-w-[1280px]`, porque sus escenas necesitan el ancho.
@@ -348,13 +373,19 @@ romper esa línea, lo que sale a sangre es el fondo, nunca el texto.
 
 ## Elevation & Depth
 
-**Este sistema no tiene sombras.** Ni una. La profundidad se construye con tres
+**El diario no tiene sombras.** Ni una. La profundidad se construye con tres
 recursos: la regla de un píxel, el cambio de campo (un bloque a sangre en la señal
 contra el resto en papel) y la opacidad del texto. Una tarjeta con sombra
 introduce una fuente de luz que este mundo no tiene.
 
 La única superposición real es el encabezado adherido, y se resuelve con
 translucidez y desenfoque de fondo, no con sombra.
+
+**El cuaderno tiene una sola sombra**, teñida de tinta, para lo que está apoyado sobre
+el papel —una tarjeta, una nota, un ticket, una polaroid—:
+`0 1px 2px rgb(29 28 26 / 0.05), 0 22px 44px -26px rgb(29 28 26 / 0.38)`. El celular de
+muestra lleva una más honda, `0 40px 100px -30px rgb(29 28 26 / 0.45)`. Nunca un halo
+de color ni una sombra gris neutra: la luz es la de una mesa, no la de una pantalla.
 
 ### Named Rules
 
@@ -367,8 +398,13 @@ un cambio de tono se anuncia cambiando el campo entero. No hay estado intermedio
 
 ## Shapes
 
-Todo es rectangular. El radio por defecto es `0`: los paneles, las fotos, las
-celdas de producto y las bandas de sección tienen esquina viva.
+En el diario todo es rectangular. El radio por defecto es `0`: los paneles, las fotos,
+las celdas de producto y las bandas de sección tienen esquina viva.
+
+En el cuaderno, el radio dice qué se puede levantar de la mesa: tarjetas y tickets
+`16–20px`, la foto dentro de una tarjeta `10–12px`, botones y fichas en píldora, el
+celular de muestra `34px` y la polaroid casi recta (`4px`). Las bandas a sangre y las
+escenas oscuras no se redondean en el celular; en una pantalla ancha, `28px`.
 
 Las dos excepciones están medidas:
 
@@ -386,18 +422,19 @@ Las dos excepciones están medidas:
 
 ### Named Rules
 
-**La regla de la esquina viva.** Un contenedor no se redondea. El redondeo se
+**La regla de la esquina viva.** En el diario, un contenedor no se redondea. El redondeo se
 reserva para lo que se toca.
 
-**La regla de la lista sobre la tarjeta.** Una colección se rinde como lista o
-retícula de ítems separados por regla superior, no como tarjetas. La caja no es
+**La regla de la lista sobre la tarjeta.** En el diario, una colección se rinde como
+lista o retícula de ítems separados por regla superior, no como tarjetas. La caja no es
 andamiaje.
 
 ## Components
 
 Los controles se componen sobre shadcn/ui envolviéndolos o con `asChild`; los
 archivos de `components/ui/` se generan y no se editan a mano. Lo que sigue es
-cómo se visten en el diario; la portada tiene los suyos en "La portada".
+cómo se visten en el diario y en la base editorial de las tiendas; el cuaderno tiene
+los suyos en "El cuaderno de ventas".
 
 ### Buttons
 
@@ -416,12 +453,13 @@ cómo se visten en el diario; la portada tiene los suyos en "La portada".
 
 ### Cards / Containers
 
-No hay tarjetas. Lo que cumple ese papel es el **panel de demostración**: campo
+En el diario no hay tarjetas. Lo que cumple ese papel es el **panel de demostración**: campo
 papel encerrado por una regla estructural de 1 px, esquina viva, `16px` de relleno
 interno, y cabecera y pie separados por la misma regla. Sin sombra y sin radio. En el
-panel, cada cosa de cada pantalla es uno de estos —sus cifras, su lista, cada bloque
+diario, cada cosa de cada pantalla es uno de estos —sus cifras, su lista, cada bloque
 de un formulario—, con un ícono, un título que dice para qué sirve y, si hace falta,
-un pie que lleva adonde se sigue.
+un pie que lleva adonde se sigue. En el cuaderno de trabajo es una tarjeta (ver "Las
+pantallas de trabajo").
 
 ### Navigation
 
@@ -429,7 +467,7 @@ Encabezado adherido, papel al 90% con desenfoque, regla inferior al 15%. La marc
 es `<Logo />`: el símbolo de la feria en el celular y el nombre en Archivo extrabold
 `1.125rem` con tracking `-0.02em` (`.agents/rules/marca.md`). Los enlaces son Geist
 `0.875rem` a opacidad `70%` que suben a `100%` en `hover`; no hay subrayado ni
-color de estado activo. La acción en la señal cierra la barra a la derecha y sobrevive al
+color de estado activo. La acción principal, en tinta, cierra la barra a la derecha y sobrevive al
 colapso móvil.
 
 ### Section Header
@@ -465,7 +503,8 @@ oculta.
 
 ### Cifra que cuenta
 
-Numeral en la señal tabular que cuenta hasta su valor al entrar en pantalla, en 900 ms con
+Numeral tabular, en tinta —en la señal si pide algo—, que cuenta hasta su valor al
+entrar en pantalla, en 900 ms con
 salida cúbica, y un detalle debajo en versalita a opacidad `60%`. Renderiza el
 valor final de entrada: si el JavaScript no corre o la persona pidió menos
 movimiento, el número ya está ahí. Toda cifra ilustrativa lleva su descargo al pie
@@ -473,7 +512,7 @@ de la banda.
 
 ### Motion
 
-El gesto de fondo es **entrar**. El elemento sube `14px` y aparece en 500 ms con
+En el diario, el gesto de fondo es **entrar**. El elemento sube `14px` y aparece en 500 ms con
 `cubic-bezier(0.16, 1, 0.3, 1)`. Los elementos hermanos se escalonan de 70 a 90 ms
 entre uno y el siguiente, con un tope práctico de tres pasos. Los cambios de estado
 (`hover`, foco) son solo de color, con la transición corta por defecto; la foto y
@@ -496,8 +535,8 @@ respuesta del sistema es parte de la decisión. Tres gestos sancionados, y no m�
 
 Todo esto respeta `prefers-reduced-motion`, y el estado final se lee sin JavaScript.
 
-**El panel responde a lo que se toca.** Desde el rediseño de Catálogos (31/10/2026), lo
-que se elige o se cambia se ve en el momento, con movimiento que tiene un porqué. Todo
+**El panel responde a lo que se toca.** Es el movimiento del cuaderno de trabajo. Desde
+el rediseño de Catálogos (31/10/2026), lo que se elige o se cambia se ve en el momento, con movimiento que tiene un porqué. Todo
 arranca por un toque —nunca solo al cargar— y va en CSS o con la API de animaciones del
 navegador, sin librerías: GSAP queda en la portada y en el Resumen. Las piezas, en
 `app/globals.css`:
@@ -506,8 +545,6 @@ navegador, sin librerías: GSAP queda en la portada y en el Resumen. Las piezas,
   `components/panel/recien.tsx`): un trazo de resaltador entra detrás del texto de
   izquierda a derecha y se retira hacia abajo en 1,7 s. Para la cifra de hojas, el
   nombre de la plantilla probada, «Cambios sin guardar», el catálogo recién guardado.
-- **Una hoja que cambió** (`.marca-recien`): un velo de resaltador barre la hoja y se va;
-  si cambian más de tres a la vez (un color nuevo), no se marca ninguna.
 - **Una hoja que llega** (`.hoja-entra`): sube, se enfoca y se endereza; la primera tanda
   entra en fila, lo que llega después entra en el acto.
 - **Lo que reemplaza a lo de antes** (`.cambio-entra`): la plantilla nueva en el probador,
@@ -528,32 +565,95 @@ clase que oculta se agrega recién al montar, y con `prefers-reduced-motion: red
 o sin JavaScript todo queda en su posición final. Una animación nunca es requisito
 para leer la página.
 
-**La regla del pliegue.** Lo que se ve sin desplazar se rinde quieto. El revelado
+**La regla del pliegue.** En el diario, lo que se ve sin desplazar se rinde quieto. El revelado
 se usa solo debajo del pliegue, para que en un equipo lento la primera pantalla se
 lea de inmediato.
+
+## El cuaderno de ventas
+
+Lo que comparten la portada, el Resumen, el Inicio de la app y las pantallas de trabajo.
+Es el mismo cuaderno en los tres lugares; lo que cambia es el movimiento: con el scroll
+en la portada y el Resumen, con el toque en las pantallas de trabajo.
+
+### Lo que el cuaderno se permite y el diario no
+
+- **Sombras** para despegar lo que está apoyado sobre el papel, siempre la misma y
+  teñida de tinta ("Elevation & Depth"). Nunca un halo de color.
+- **Radios**: tarjetas y tickets `16–20px`, botones y fichas en píldora ("Shapes").
+- **La letra a mano** (Kalam, en la señal): notas sueltas, pistas y vacíos.
+- **El resaltador** detrás de una frase de cada titular.
+- **Tarjetas de hoja** sobre el papel, con borde de tinta al 12%.
+- **Movimiento rico**: piezas que caen, se estampan, vuelan o cuentan. No se limita
+  pensando en un equipo lento; se limita con "Reducir movimiento".
+
+### Vocabulario
+
+Las piezas del cuaderno y dónde están. En la web, los trazos en
+`components/portada/trazos.tsx` y lo demás en `components/panel/resumen/`; en la app,
+`src/components/inicio/escenas/`.
+
+- **La tarjeta** (`.nota` en `resumen.module.css`, `NOTA` en la app): de hoja, borde de
+  tinta al 12%, radio `16–20px`, la sombra del cuaderno. Es el panel del cuaderno.
+- **La nota pegada**: una tarjeta chica, torcida 1–3°, con un número grande en Archivo y
+  dos palabras. Lo urgente va en la señal y encerrado con un círculo a mano. Al tocarla
+  sube y se endereza.
+- **El ticket**: la foto de lo que pidieron, `#148 · hace 26 min`, qué pidió y, separado
+  por una línea punteada, el talón en el campo hoja con el total y su estado.
+- **El sello**: el estado de un ticket como un sello de goma —versalita en Archivo ancha,
+  borde de 2,5 px, torcido −8°—. "Pagado" en tinta, "Cancelado" apagado.
+- **La polaroid**: la foto de un producto con marco blanco, el nombre a mano debajo y su
+  número en un círculo; el primero, en la señal.
+- **Los trazos a mano**: `Subrayado` bajo una frase, `Circulo` alrededor de lo urgente,
+  `Flecha` hacia lo que se señala, `Visto` cuando algo está al día y `Tachon` sobre lo
+  hecho. Se dibujan al entrar, de a uno.
+- **La cifra que cuenta** hasta su valor, y **el número que salta** al cambiar (`.numero-entra`).
+- **La escena oscura**: una banda en tinta con su rótulo en frambuesa clara, para lo que
+  se mira en grande, como las ventas.
+
+### El movimiento del cuaderno
+
+- **En escenas** (la portada, el Resumen y el Inicio de la app): cada sección se arma
+  cuando aparece y vuelve a empezar cuando sale entera de la pantalla. Web: GSAP con
+  ScrollTrigger y Lenis (`useEscena` de `components/panel/resumen/escena.ts`). App:
+  Reanimated, una línea de tiempo por escena que corre en el hilo de la interfaz
+  (`Escena` y `Pieza` de `src/components/inicio/escenas/escena.tsx`).
+- **Al tocar** (las pantallas de trabajo): al llegar, una entrada corta; al deslizar,
+  nada; al tocar, la respuesta —el sello que se estampa, el número que salta, la foto que
+  vuela, el resaltador sobre lo que cambió—. Las piezas están en "El panel responde a lo
+  que se toca".
+
+### Named Rules
+
+**La regla de la nota que sobra.** Lo que dice una nota a mano también está dicho en
+otro lado, o no hace falta. Si se borra la nota, la pantalla se sigue entendiendo.
+
+**La regla del sello verdadero.** El sello se estampa cuando la base confirmó, no al
+tocar. Sin conexión, el pedido queda esperando y se dice.
+
+**La regla de lo quieto al deslizar.** En una pantalla de trabajo nada se arma con el
+scroll: quien busca un pedido entre ochenta no espera a que aparezca.
+
+**La regla de la escena entera.** Una escena se arma o no se arma: nunca queda una pieza
+a medio camino. Con "Reducir movimiento", todo está en su lugar desde el principio.
 
 ## La portada
 
 **El cuaderno de ventas pasado en limpio.** La portada pública (`/`, en
 `components/portada/`) cuenta Venduo con lo que la persona ya conoce: su celular, su
-WhatsApp, sus productos y sus dudas escritas a mano. Comparte con el panel la paleta,
-las letras y el logo; lo que sigue es lo que agrega. **Desde el 31 de octubre de 2026
-también lo usa el Resumen del panel** (ver "El Resumen", abajo); ninguna otra pantalla.
-La estrategia de la superficie está en `.impeccable/surfaces/app-page-tsx.md`.
+WhatsApp, sus productos y sus dudas escritas a mano. Usa el vocabulario de "El cuaderno de
+ventas"; lo que sigue es lo que agrega ella sola. La estrategia de la superficie está en
+`.impeccable/surfaces/app-page-tsx.md`.
 
-### Lo que la portada se permite y el panel no
+### Lo que agrega la portada
 
-- **Sombras** para despegar lo que flota: el celular, las tarjetas de una escena, las
-  notas. Siempre con desplazamiento y desenfoque teñidos de tinta
-  (`0 24px 50px -28px rgb(29 28 26 / 0.45)`), nunca un halo de color.
-- **Radios**: el celular (`2.3–2.4rem`), las tarjetas de una escena (`rounded-2xl`),
-  los botones y las fichas en píldora.
 - **Productos a color**, recortados sin fondo (`productos.ts`, fotos de Pexels con
   licencia libre). Son los de Rosa Deportes, la tienda de ejemplo, y el pie lo dice.
 - **Movimiento en la primera pantalla**: el titular entra por renglones y el celular
   sube al cargar. El estado final se lee igual sin JavaScript y con movimiento
   reducido.
 - **Un celular en 3D**, inclinado, que sigue al puntero en escritorio.
+- **Sombras más hondas** para el celular y las tarjetas de una escena
+  (`0 24px 50px -28px rgb(29 28 26 / 0.45)`).
 
 ### Vocabulario
 
@@ -614,11 +714,12 @@ escritorio" sin un equivalente.
 ## El Resumen
 
 **El cuaderno de ventas del día.** El Resumen (`/panel`, en `components/panel/resumen/`)
-es la única pantalla del panel que se cuenta en escenas, con el registro de la portada:
+es la pantalla del panel que se cuenta en escenas, con el registro de la portada:
 Archivo ancha, la letra a mano en el bolígrafo, el resaltador bajo una frase del
 titular, tarjetas que flotan con sombra teñida, GSAP con ScrollTrigger y Lenis. Se
 eligió así porque es la pantalla que se abre todos los días: tiene que dar ganas de
-abrirla. Las demás pantallas del panel siguen en su registro de diario.
+abrirla. Las demás pantallas del panel son del cuaderno de trabajo ("Las pantallas de
+trabajo").
 
 Cada escena hace lo que hacía su panel —nada se perdió— y se arma al aparecer:
 
@@ -647,16 +748,80 @@ de la pantalla, todo por `gsap.matchMedia(CON_MOVIMIENTO)`, versión en columna 
 celular— y además: **los datos son los de la tienda**, nunca de ejemplo, y **lo que se
 hace todos los días se sigue haciendo acá** (cobrar, reponer, compartir).
 
+**En la app, el Inicio es la misma pantalla** (`src/components/inicio/escenas/`), escena
+por escena, con Reanimated en vez de GSAP: la línea de tiempo de cada escena lee el
+desplazamiento en el hilo de la interfaz, sin pasar por JavaScript en cada cuadro. Lo
+que cambia es solo lo de una pantalla táctil: el celular en 3D no sigue al puntero, se
+endereza al bajar; las polaroids van en una franja que se desliza; tocar una barra del
+gráfico dice su día.
+
+## Las pantallas de trabajo
+
+**El cuaderno, quieto al deslizar.** Pedidos, Productos, Catálogos, Estadísticas,
+Publicar en redes, Apariencia, Compartir, Datos de la tienda y Tus datos, en la web y en
+la app, usan el vocabulario de "El cuaderno de ventas" sin escenas atadas al scroll. Se
+eligió así el 7 de noviembre de 2026: Venduo se siente una sola app, del Resumen a la
+última pantalla, y lo que se usa veinte veces al día no hace esperar.
+
+Pieza por pieza, lo que antes era el panel del diario:
+
+- **La cabecera**: el titular nombra lo que es de la persona, con la frase que elige la
+  pantalla resaltada —"Tus _pedidos_.", "Publica _tus productos_."—, y una bajada de una
+  frase debajo. Una pantalla de detalle no resalta nada.
+- **Lo que filtra una lista** son notas pegadas con su número —"1 Por cobrar", "2 Sin
+  stock"—, en columnas iguales; lo urgente, en la señal y encerrado a mano. La elegida se
+  endereza y lleva el borde en tinta.
+- **Cada panel es una tarjeta del cuaderno**, con su título en Archivo y su bajada; las
+  filas de adentro siguen separadas por una regla.
+- **Un pedido es un ticket** con su talón: el total y el sello. El sello "Por cobrar" se
+  toca —pregunta y marca pagado—; solo late el pendiente más viejo, que se levanta y
+  golpea el papel cada tanto; y el sello "Pagado" se estampa recién cuando la base lo
+  confirma. Sin píldora aparte: el talón no se desarma.
+- **Lo fijo abajo en el celular** es una bandeja que flota sobre la lista, con radio y
+  sombra, nunca una regla de tinta de lado a lado.
+- **Mientras carga**, la pantalla ya tiene su titular de verdad y, debajo, la forma de lo
+  que viene —las notas, la tarjeta, los tickets— con huesos en píldora donde van los
+  datos.
+- **Un producto se reconoce por su foto**, con radio, y repone su stock con más y menos
+  redondos: el número salta al cambiar.
+- **Un vacío** dice qué va a aparecer, con una nota a mano y una sola acción.
+- **Los botones** son píldoras: el principal en tinta, el secundario con borde.
+- **Un formulario** sigue siendo una pantalla por filas (skill `pantalla-por-filas`), con
+  las filas dentro de una tarjeta y lo opcional en hojas.
+- **El movimiento**: una entrada corta al llegar y después solo lo que responde a un
+  toque ("El panel responde a lo que se toca").
+
+**Cómo está hecho.** Las piezas no deciden su traje. El armazón del panel
+(`components/panel/armazon.tsx`) marca su contenido con `data-registro="cuaderno"` y
+carga las letras del cuaderno; las piezas llevan una clase `pieza-*` —`pieza-tarjeta`,
+`pieza-titular`, `pieza-resaltado`, `pieza-vacio`, `pieza-ficha`, `pieza-foto`,
+`pieza-miniatura`, `pieza-insignia`, `pieza-sello`, `pieza-celda`, `pieza-campo`,
+`pieza-bandeja`, `pieza-hueso`— que `app/globals.css` viste como el
+cuaderno solo adentro de esa marca. Sin la marca, la misma pieza es el diario: así
+`/admin` y el alta usan `Seccion` y `Cabecera` sin cambiar, y las tiendas conservan el
+radio de su plantilla. Adentro del panel, `--radio` vale píldora —también en los
+diálogos— y los botones de `lib/estilos.ts` salen redondos sin tocarlos.
+
+**Una caja nueva lleva su clase.** Un contenedor con borde que no es `Seccion` —una
+lista de filas, el bloque de una nota— lleva `pieza-tarjeta`; un buscador o un control
+con forma, `pieza-ficha`. Sin la clase queda cuadrado, como el diario. Lo que falta pasar
+está en `docs/estado-del-proyecto.md`.
+
 ## Do's and Don'ts
 
 ### Do:
 
 - **Do** usar papel `#f7f5f0` como campo de toda superficie de Venduo y tinta
   `#1d1c1a` para el texto.
-- **Do** reservar la frambuesa para la acción principal, las cifras, el label de sección
-  y, como campo, un solo bloque por página.
-- **Do** separar con reglas de 1 px a tinta 15%, y usar el trazo de 2 px solo para
-  coronar un bloque de apertura o trazar el botón secundario.
+- **Do** reservar la frambuesa para lo que pide algo —un pendiente, un agotado, un
+  error— y para el logo. Los botones y lo elegido van en tinta.
+- **Do** separar con reglas de 1 px a tinta 15% en el diario y dentro de una tarjeta, y
+  usar el trazo de 2 px solo para coronar un bloque de apertura o trazar el botón
+  secundario.
+- **Do** dejar quieta una pantalla de trabajo mientras se desliza, y mover solo lo que
+  responde a un toque.
+- **Do** elegir el registro por lo que la persona vino a hacer: mirar (escenas),
+  trabajar (el cuaderno quieto) o completar un trámite (el diario).
 - **Do** construir la jerarquía de texto bajando opacidad sobre tinta.
 - **Do** poner todo monto por `formatMoney` y con `.tabular`.
 - **Do** mostrar los productos a color, como los subió quien vende.
@@ -669,17 +834,19 @@ hace todos los días se sigue haciendo acá** (cobrar, reponer, compartir).
 
 ### Don't:
 
-- **Don't** usar sombras en el diario (el panel y sus pantallas). La portada las usa
-  solo para despegar lo que flota: el celular, las tarjetas de las escenas.
-- **Don't** rendir una colección como tarjetas: va como lista o retícula separada
-  por reglas.
-- **Don't** redondear un contenedor. El radio es para lo que se toca.
+- **Don't** usar sombras en el diario. En el cuaderno hay una sola, teñida de tinta,
+  para lo que está apoyado sobre el papel.
+- **Don't** rendir una colección como tarjetas en el diario: va como lista o retícula
+  separada por reglas.
+- **Don't** redondear un contenedor en el diario. El radio es para lo que se toca.
 - **Don't** introducir un segundo acento de color, ni un degradado, ni un gris que
   no sea tinta con opacidad o la plata ya declarada.
 - **Don't** usar blanco puro como fondo de página.
 - **Don't** mezclar los tokens de este mundo con los tokens de shadcn en una misma
   pantalla.
-- **Don't** animar en el primer viewport, ni mover, escalar o ensombrecer un botón
-  al pasar el cursor: el `hover` es cambio de color.
+- **Don't** atar al scroll una pantalla de trabajo, ni animar el primer viewport del
+  diario. La portada y el Resumen sí se arman al cargar.
+- **Don't** mover, escalar o ensombrecer un botón al pasar el cursor en el diario: el
+  `hover` es cambio de color.
 - **Don't** mostrar una cifra ilustrativa sin su descargo al pie.
 - **Don't** concatenar clases a mano: las condicionales van por `cn()`.

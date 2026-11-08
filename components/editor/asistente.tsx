@@ -89,7 +89,7 @@ export function Asistente() {
           ) : ia.error ? (
             <p
               role="alert"
-              className="mx-4 my-3 border-l-2 border-tinta py-1 pl-3 text-sm leading-relaxed"
+              className="mx-4 my-3 rounded-[14px] bg-tinta/[0.04] px-3 py-2 text-sm leading-relaxed"
             >
               {ia.error}
             </p>
@@ -136,7 +136,7 @@ export function Asistente() {
             aria-pressed={mostrarIdeas}
             title="Ideas"
             className={cn(
-              "flex size-11 shrink-0 items-center justify-center transition-colors hover:text-senal",
+              "flex size-11 shrink-0 items-center justify-center transition-colors hover:opacity-60",
               mostrarIdeas && "text-senal"
             )}
           >
@@ -173,7 +173,7 @@ function Ideas({
   return (
     <div
       id="ideas-para-la-ia"
-      className="absolute inset-x-0 bottom-full z-20 max-h-[60vh] overflow-y-auto border-t-2 border-tinta bg-papel motion-safe:animate-in motion-safe:duration-200 motion-safe:fade-in motion-safe:slide-in-from-bottom-1"
+      className="absolute inset-x-0 bottom-full z-20 max-h-[60vh] overflow-y-auto rounded-t-[22px] border border-tinta/15 bg-hoja shadow-[var(--sombra-cuaderno)] motion-safe:animate-in motion-safe:duration-200 motion-safe:fade-in motion-safe:slide-in-from-bottom-1"
     >
       <p className="px-4 pt-3 pb-1 text-xs font-semibold tracking-[0.12em] uppercase opacity-60">
         Ideas para empezar
@@ -304,7 +304,7 @@ function TarjetaDePropuesta() {
           type="button"
           aria-pressed={ia.mirandoAntes}
           onClick={() => ia.setMirandoAntes(!ia.mirandoAntes)}
-          className="mt-2 inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+          className="mt-2 inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:opacity-60"
         >
           {ia.mirandoAntes ? (
             <Eye aria-hidden="true" className="size-4" />

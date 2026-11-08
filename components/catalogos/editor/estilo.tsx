@@ -182,7 +182,7 @@ export function PanelDeEstilo({
                 onClick={() =>
                   poner({ colores: { ...estilo.colores, acento: arreglo } })
                 }
-                className="flex min-h-11 w-fit items-center gap-2 border-2 border-tinta px-3 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
+                className="flex min-h-11 w-fit items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
               >
                 <span
                   aria-hidden="true"

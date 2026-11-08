@@ -46,7 +46,7 @@ export function FranjaDeVacaciones({
   return (
     <section
       aria-label="Vacaciones"
-      className="flex flex-col gap-4 border border-tinta px-4 py-4 sm:px-5 lg:flex-row lg:items-center"
+      className="pieza-tarjeta flex flex-col gap-4 border border-tinta px-4 py-4 sm:px-5 lg:flex-row lg:items-center"
     >
       <TreePalm aria-hidden="true" className="size-5 shrink-0 max-lg:hidden" />
       <div className="min-w-0 flex-1">

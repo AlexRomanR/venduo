@@ -17,7 +17,7 @@ import { TituloDeLaBarra } from "@/components/panel/titulo-de-barra"
 import {
   CancelarPedido,
   CobrarPedido,
-  Estado,
+  SelloQueCobra,
 } from "@/components/pedidos/piezas"
 import { NotaDelPedido } from "@/components/pedidos/nota"
 import { cambiarEstado, guardarNota } from "../acciones"
@@ -64,7 +64,16 @@ export default async function PedidoPage({
           <p className="tabular font-titular text-[40px] leading-[44px] font-extrabold tracking-[-0.03em] lg:text-5xl lg:leading-[52px]">
             {formatMoney(pedido.totalCents)}
           </p>
-          <Estado estado={pedido.estado} noConcretado={noConcretado} />
+          <SelloQueCobra
+            pedido={{
+              id: pedido.id,
+              numero: pedido.numero,
+              estado: pedido.estado,
+            }}
+            noConcretado={noConcretado}
+            cambiar={cambiarEstado}
+            soloLectura={soloLectura}
+          />
         </div>
         <LineaDeEstado pedido={pedido} />
         {noConcretado ? (
@@ -177,7 +186,7 @@ export default async function PedidoPage({
                   href={whatsapp}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="tabular inline-flex min-h-11 items-center font-semibold underline underline-offset-4 transition-colors hover:text-senal"
+                  className="tabular inline-flex min-h-11 items-center font-semibold underline decoration-tinta/40 underline-offset-4 transition-colors hover:decoration-tinta"
                 >
                   {pedido.telefono}
                 </a>
@@ -229,8 +238,9 @@ function LineaDeEstado({ pedido }: { pedido: Pedido }) {
               aria-hidden="true"
               className={cn(
                 "size-3.5 shrink-0 rounded-full border-2",
-                paso.rojo ? "border-senal" : "border-tinta",
-                paso.hecho ? "bg-tinta" : "bg-papel"
+                // Lo que falta no va en la señal: la pone el sello "Por cobrar".
+                paso.rojo ? "border-dashed border-tinta/40" : "border-tinta",
+                paso.hecho ? "bg-tinta" : "bg-transparent"
               )}
             />
             {indice < pasos.length - 1 ? (
@@ -244,12 +254,7 @@ function LineaDeEstado({ pedido }: { pedido: Pedido }) {
             ) : null}
           </span>
           <span>
-            <span
-              className={cn(
-                "block text-sm font-semibold",
-                paso.rojo && "text-senal"
-              )}
-            >
+            <span className={cn("block text-sm font-semibold")}>
               {paso.titulo}
             </span>
             {paso.detalle ? (

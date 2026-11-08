@@ -58,16 +58,17 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
 - **Ningún grupo de fichas baja de renglón a su ancho**: `GRILLA_DE_FICHAS` (columnas
   iguales) o una franja que se desliza, sin excepciones. Pasó tres veces. Detalle en
   `ui-styling.md`.
-- **Toda pantalla del panel se arma en paneles**: cada cosa en su panel con borde, con
-  las piezas de `components/panel/piezas.tsx`. **La excepción es el Resumen**, que se
-  cuenta en escenas como la portada (`components/panel/resumen/`). Detalle en
-  `ui-styling.md` y `DESIGN.md`.
+- **Venduo es el cuaderno de ventas, en tres registros.** La portada, el Resumen y el
+  Inicio de la app van **en escenas** con el scroll. Las pantallas de trabajo —Pedidos,
+  Productos, Catálogos, Estadísticas, la cuenta— usan **el cuaderno quieto**: tarjetas con
+  radio y sombra teñida, notas, tickets con sello, titulares con resaltador, y se mueven
+  solo al tocar. El ingreso, el alta y `/admin` son **el diario**: reglas, sin sombras.
+  Una pantalla nueva del panel va en el cuaderno quieto; las que siguen en paneles con
+  borde se pasan enteras. Detalle en `DESIGN.md` y `ui-styling.md`.
 - **La tinta trabaja, la frambuesa avisa.** Papel cálido; botones y lo elegido en tinta
   (`BOTON_PRIMARIO`, `bg-accion`, que en una tienda vale el color de su plantilla); la
   frambuesa (`senal`) solo para lo que pide algo, los errores y el logo; el resaltador
-  para lo que acaba de cambiar. El panel es el diario —reglas, sin sombras— y responde a
-  lo que se toca; la portada (`components/portada/`) tiene escenas y celulares propios.
-  Detalle en `DESIGN.md`.
+  detrás de una frase del titular y de lo que acaba de cambiar. Detalle en `DESIGN.md`.
 - **Cada texto tiene una voz.** Venduo y la tienda hablan en plural ("no pudimos",
   "coordinamos"), las cosas no hablan, nadie tiene género fijo y toda pantalla citada
   lleva su nombre de hoy. Detalle en `ui-styling.md`.

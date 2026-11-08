@@ -482,12 +482,23 @@ estadísticas**, que tiene su propia marca.
 
 ### `/panel/apariencia`
 
-- **La puerta al editor**, arriba de todo: el editor vive aparte, en `/editor`, a pantalla
-  completa.
-- La plantilla actual, con su miniatura, rubro, descripción y rasgos. Si es una plantilla
-  retirada, lo dice.
-- Las otras plantillas, cada una con **Usar {nombre}**.
-- El historial de diseño: las últimas ocho versiones, con su origen, fecha y **Restaurar**.
+- **La pasarela**: una plantilla a la vez, grande y al medio, con la tienda adentro.
+  Arranca en la suya —«La tuya», con **Abrir el editor** y **Ver tienda**; si es una
+  retirada, lo dice— y con las flechas, deslizando o con ← y → se pasa a las otras, que
+  llevan **Usar {nombre}**. Ese botón abre la pregunta en una hoja, con sus rasgos y la
+  elección de portada. El editor vive aparte, en `/editor`, a pantalla completa.
+- El historial de diseño: las últimas ocho versiones, tres a la vista y el resto a
+  pedido, con su origen, fecha y **Restaurar**.
+
+**La tienda adentro de cada miniatura.** `Miniatura` acepta `datos` opcionales
+(`DatosDeMiniatura`): el nombre o el logo, la portada y tres productos con su foto y su
+precio en una etiqueta que se lee a 343 px. Los arma `getAparienciaDeMiTienda` con una
+consulta más en su misma tanda; sin productos a la vista, van los de ejemplo de su
+plantilla y la hoja lo dice. Las otras plantillas se dibujan con los colores de su base,
+porque cambiar de plantilla no lleva la personalización; la actual, con los suyos. Sin
+`datos`, cada dibujo es el de siempre: lo usan también el alta, `/admin` y las capturas
+de la app. Las miniaturas se dibujan en el servidor y viajan ya dibujadas: la pasarela,
+de cliente, no importa las definiciones de plantilla.
 
 ---
 
@@ -881,8 +892,9 @@ A propósito, **no existe**:
   piezas" en Casa Illimani—. Antes solo los veía el dueño.
 - **El informe PDF no toma la plantilla.** Tiene su propia marca y sus fuentes se leen del
   disco.
-- **La vista previa de la galería es un dibujo**, no la tienda real con los productos de
-  quien la elige. La del editor, en cambio, sí es la tienda real.
+- **La vista previa de la galería es un dibujo**, no la tienda real. En Apariencia el
+  dibujo lleva el nombre y tres productos de la tienda, pero el titular de la portada es
+  el de la plantilla. La del editor, en cambio, sí es la tienda real.
 - **La plantilla editorial no dibuja las grillas de productos de su portada**: muestra su
   catálogo completo. El editor lo avisa en esas tiendas.
 - **No hay atributos por rubro** —talla para moda, mililitros o familia olfativa para

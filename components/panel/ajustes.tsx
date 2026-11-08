@@ -18,7 +18,7 @@ import {
  * vista que se abre en una hoja. La receta está en `ui-styling.md` ("Crear o
  * editar algo") y en la skill `pantalla-por-filas`.
  *
- *   <ul className="border border-tinta">
+ *   <ul className="pieza-tarjeta border border-tinta">
  *     <Fila icono={FolderOpen} titulo="Categoría" valor="Ropa" alTocar={…} />
  *     <Palanca icono={Eye} titulo="Visible en tu tienda" valor={…} alCambiar={…} />
  *   </ul>
@@ -87,7 +87,7 @@ export function Fila({
       <span
         className={cn(
           "max-w-[45%] truncate text-right",
-          apagado ? "text-tinta/55" : "font-semibold",
+          apagado ? "text-tinta/65" : "font-semibold",
           peligro && "text-senal",
           detalle && "self-start pt-0.5"
         )}
@@ -199,14 +199,17 @@ export function Cantidad({
     <div
       role="group"
       aria-label={etiqueta}
-      className={cn("flex h-11 shrink-0 items-stretch border", borde)}
+      className="flex h-11 shrink-0 items-center gap-1"
     >
       <button
         type="button"
         onClick={() => alCambiar(acotar(valor - 1))}
         disabled={valor <= minimo}
         aria-label="Una menos"
-        className="flex w-11 items-center justify-center transition-colors hover:bg-tinta hover:text-papel disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-tinta"
+        className={cn(
+          "flex size-11 shrink-0 items-center justify-center rounded-full border bg-hoja transition-[background-color,color,scale] duration-150 hover:bg-tinta hover:text-papel active:scale-95 disabled:opacity-35 disabled:hover:bg-hoja disabled:hover:text-tinta motion-reduce:transition-none",
+          borde
+        )}
       >
         <Minus aria-hidden="true" className="size-4" />
       </button>
@@ -225,9 +228,8 @@ export function Cantidad({
         onFocus={(e) => e.target.select()}
         aria-label={etiqueta}
         className={cn(
-          "tabular [appearance:textfield] border-x bg-transparent text-center font-semibold outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
-          borde,
-          angosta ? "w-10" : "w-14",
+          "tabular h-11 [appearance:textfield] rounded-[10px] bg-transparent text-center text-base font-semibold outline-none focus-visible:bg-tinta/[0.06] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+          angosta ? "w-9" : "w-12",
           error && "text-senal"
         )}
       />
@@ -236,7 +238,10 @@ export function Cantidad({
         onClick={() => alCambiar(acotar(valor + 1))}
         disabled={valor >= maximo}
         aria-label="Una más"
-        className="flex w-11 items-center justify-center transition-colors hover:bg-tinta hover:text-papel disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-tinta"
+        className={cn(
+          "flex size-11 shrink-0 items-center justify-center rounded-full border bg-hoja transition-[background-color,color,scale] duration-150 hover:bg-tinta hover:text-papel active:scale-95 disabled:opacity-35 disabled:hover:bg-hoja disabled:hover:text-tinta motion-reduce:transition-none",
+          borde
+        )}
       >
         <Plus aria-hidden="true" className="size-4" />
       </button>
@@ -350,7 +355,7 @@ export function HojaDeAjuste({
             type="button"
             onClick={alCerrar}
             aria-label="Cerrar"
-            className="-mt-1 -mr-2 flex size-11 shrink-0 items-center justify-center transition-colors hover:bg-tinta/[0.06]"
+            className="-mt-1 -mr-2 flex size-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-tinta/[0.06]"
           >
             <X aria-hidden="true" className="size-5" />
           </button>
@@ -367,7 +372,7 @@ export function HojaDeAjuste({
             <button
               type="button"
               onClick={alCerrar}
-              className="flex min-h-12 w-full items-center justify-center bg-tinta px-5 font-semibold text-papel transition-opacity hover:opacity-90"
+              className="flex min-h-12 w-full items-center justify-center rounded-plantilla bg-tinta px-5 font-semibold text-papel transition-colors hover:bg-accion-alta"
             >
               Listo
             </button>

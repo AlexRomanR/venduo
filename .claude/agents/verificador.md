@@ -44,6 +44,11 @@ algo para probar, dilo en una línea al principio y prueba lo que se pueda.
 5. **Las reglas**: textos en español neutro con "tú" y sin voseo, la señal (la frambuesa) solo
    para lo que pide una acción, `formatMoney` para todo monto, y **ningún grupo de fichas que
    baje de renglón a su ancho** (`GRILLA_DE_FICHAS` o una franja que se desliza).
+6. **El registro**: la pantalla va en el que le toca según `DESIGN.md`, "Overview". Una
+   pantalla de trabajo no se arma con el scroll —deslizar rápido no deja nada a medio
+   aparecer— y responde al tocar; una escena se arma al aparecer y vuelve a empezar al
+   salir. Con "Reducir movimiento" (en Chrome, `emulateMedia({ reducedMotion: 'reduce' })`),
+   todo se ve quieto y en su lugar.
 
 ## Lo que devuelves
 

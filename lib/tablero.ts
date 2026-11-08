@@ -1,4 +1,4 @@
-import { sumarDias } from "@/lib/format"
+import { diaEnBolivia, sumarDias } from "@/lib/format"
 import type { OrderStatus } from "@/types"
 
 /**
@@ -84,6 +84,53 @@ export interface Tablero {
     primerPedido: boolean
   }
   esDemo: boolean
+}
+
+/** Un pedido pagado, como lo trae la base. */
+export interface VentaDeLaBase {
+  total_cents: number
+  created_at: string
+}
+
+/** Una línea de un pedido pagado, con la fecha de su pedido. */
+export interface LineaDeLaBase {
+  quantity: number
+  unit_price_cents: number
+  unit_cost_cents: number | null
+  /** La fecha del pedido, no la de la línea. */
+  creado: string
+}
+
+/**
+ * La serie de ventas: un día por fila, del más viejo a hoy, cada pedido en su
+ * día de Bolivia. Es lo que el Resumen y Estadísticas llaman "venta" —un
+ * pedido pagado, fechado cuando llegó—, en un solo lugar para que las dos
+ * pantallas den las mismas cifras.
+ */
+export function armarSerie(
+  hoy: string,
+  ventas: VentaDeLaBase[],
+  lineas: LineaDeLaBase[],
+  cantidad: number = DIAS_DE_SERIE
+): DiaDeVentas[] {
+  const serie = diasVacios(hoy, cantidad)
+  const posicion = new Map(serie.map((dia, indice) => [dia.dia, indice]))
+  for (const pedido of ventas) {
+    const indice = posicion.get(diaEnBolivia(pedido.created_at))
+    if (indice === undefined) continue
+    serie[indice].ventasCents += pedido.total_cents
+    serie[indice].pedidos += 1
+  }
+  // La ganancia de cada día: solo de lo que tenía costo.
+  for (const linea of lineas) {
+    if (linea.unit_cost_cents === null) continue
+    const indice = posicion.get(diaEnBolivia(linea.creado))
+    if (indice === undefined) continue
+    serie[indice].ventasConCostoCents += linea.quantity * linea.unit_price_cents
+    serie[indice].gananciaCents +=
+      linea.quantity * (linea.unit_price_cents - linea.unit_cost_cents)
+  }
+  return serie
 }
 
 /** Los días de la serie, del más viejo a hoy, todos en cero. */

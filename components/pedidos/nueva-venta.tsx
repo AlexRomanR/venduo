@@ -316,7 +316,7 @@ export function NuevaVenta({
       {festejo}
 
       {!restaurado ? null : lineas.length === 0 ? (
-        <div className="flex flex-col items-start gap-2 border border-tinta p-5">
+        <div className="pieza-tarjeta flex flex-col items-start gap-2 border border-tinta p-5">
           <ShoppingBag aria-hidden="true" className="size-7 opacity-30" />
           <p className="font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">
             ¿Qué vendiste?
@@ -334,7 +334,7 @@ export function NuevaVenta({
           </button>
         </div>
       ) : (
-        <div className="border border-tinta">
+        <div className="pieza-tarjeta border border-tinta">
           <ul>
             {lineas.map((linea) => {
               const { producto, variante, stock, precioCents } = datosDe(linea)
@@ -379,7 +379,7 @@ export function NuevaVenta({
           {/* En el celular, el total y el botón van fijos sobre las pestañas:
               es lo que se vino a hacer. En una pantalla ancha, al pie de la
               venta, como un recibo. */}
-          <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 flex items-center gap-3 border-t border-tinta bg-papel px-4 py-3 lg:static lg:border-tinta/15 lg:py-4">
+          <div className="pieza-bandeja fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 flex items-center gap-3 border-t border-tinta bg-papel px-4 py-3 lg:static lg:border-tinta/15 lg:py-4">
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
                 Total · {formatNumber(unidades)}{" "}
@@ -760,8 +760,8 @@ function HojaParaAgregar({
         </div>
       ) : (
         <>
-          <div className="sticky -top-5 z-10 -mx-4 -mt-5 flex flex-col gap-3 border-b border-tinta/15 bg-papel px-4 pt-5 pb-3">
-            <label className="flex min-h-12 items-center gap-3 border border-tinta px-3">
+          <div className="sticky -top-5 z-10 -mx-4 -mt-5 flex flex-col gap-3 border-b border-tinta/15 bg-hoja px-4 pt-5 pb-3">
+            <label className="pieza-ficha flex min-h-12 items-center gap-3 border border-tinta px-3">
               <Search
                 aria-hidden="true"
                 className="size-5 shrink-0 opacity-60"

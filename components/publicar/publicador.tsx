@@ -42,7 +42,7 @@ import { Seccion, SinDatos } from "@/components/panel/piezas"
 import type { ResultadoDeTextos } from "@/app/(privado)/panel/marketing/acciones"
 
 const FICHA_BASE =
-  "flex min-h-11 shrink-0 items-center gap-1.5 border px-3 text-sm font-semibold whitespace-nowrap transition-colors"
+  "pieza-ficha flex min-h-11 shrink-0 items-center gap-1.5 border px-3 text-sm font-semibold whitespace-nowrap transition-colors"
 const FICHA_SI = "border-tinta bg-tinta text-papel"
 const FICHA_NO = "border-tinta/25 hover:border-tinta"
 const FRANJA =
@@ -162,7 +162,7 @@ function ElegirProducto({
       bajada="Toca un producto."
     >
       <div className="flex flex-col gap-3 border-b border-tinta/15 px-4 py-4 sm:px-5">
-        <label className="flex min-h-12 items-center gap-3 border border-tinta px-3">
+        <label className="pieza-ficha flex min-h-12 items-center gap-3 border border-tinta px-3">
           <Search aria-hidden="true" className="size-5 shrink-0 opacity-60" />
           <span className="sr-only">Buscar un producto</span>
           <input
@@ -208,7 +208,7 @@ function ElegirProducto({
                   onClick={() => alElegir(p.id)}
                   className="group flex w-full flex-col gap-1 text-left"
                 >
-                  <span className="relative flex aspect-square w-full items-center justify-center overflow-hidden border border-tinta/15 bg-tinta/[0.05] transition-colors group-hover:border-tinta">
+                  <span className="pieza-foto relative flex aspect-square w-full items-center justify-center overflow-hidden border border-tinta/15 bg-tinta/[0.05] transition-colors group-hover:border-tinta">
                     {p.foto ? (
                       <Image
                         src={p.foto}
@@ -326,7 +326,7 @@ function Publicacion({
             <div
               role="radiogroup"
               aria-label="Formato"
-              className="grid grid-cols-2 border border-tinta"
+              className="pieza-tarjeta grid grid-cols-2 border border-tinta"
             >
               {FORMATOS.map((opcion) => (
                 <button
@@ -414,7 +414,7 @@ function Publicacion({
                   type="button"
                   onClick={() => void pedirTextos()}
                   disabled={escribiendo}
-                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold underline underline-offset-4 transition-colors hover:text-senal disabled:opacity-50"
+                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold underline underline-offset-4 transition-colors hover:underline hover:underline-offset-4 disabled:opacity-50"
                 >
                   {escribiendo ? (
                     <LoaderCircle
@@ -469,7 +469,7 @@ function Publicacion({
               maxLength={2200}
               aria-busy={escribiendo}
               className={cn(
-                "w-full resize-y border border-tinta/25 bg-papel p-3 text-base leading-relaxed transition-opacity outline-none focus-visible:border-tinta",
+                "pieza-campo w-full resize-y border border-tinta/25 bg-papel p-3 text-base leading-relaxed transition-opacity outline-none focus-visible:border-tinta",
                 escribiendo && "opacity-40"
               )}
             />
@@ -528,8 +528,8 @@ function ProductoElegido({
   alCambiar: () => void
 }) {
   return (
-    <div className="flex items-center gap-3 border border-tinta p-3 sm:px-5">
-      <span className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden border border-tinta/15 bg-tinta/[0.05]">
+    <div className="pieza-tarjeta flex items-center gap-3 border border-tinta p-3 sm:px-5">
+      <span className="pieza-miniatura relative flex size-14 shrink-0 items-center justify-center overflow-hidden border border-tinta/15 bg-tinta/[0.05]">
         {producto.foto ? (
           <Image
             src={producto.foto}
@@ -724,7 +724,7 @@ function Compartir({
       </div>
 
       {compartible ? (
-        <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 border-t border-tinta bg-papel px-4 py-3 lg:static lg:border-t lg:border-tinta/15 lg:px-5">
+        <div className="pieza-bandeja fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 border-t border-tinta bg-papel px-4 py-3 lg:static lg:border-t lg:border-tinta/15 lg:px-5">
           <button
             type="button"
             onClick={() => void compartir()}

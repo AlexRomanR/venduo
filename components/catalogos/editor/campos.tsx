@@ -139,7 +139,7 @@ export function Interruptor({
       <span
         aria-hidden="true"
         className={cn(
-          "relative h-6 w-10 shrink-0 border-2 border-tinta transition-colors",
+          "relative h-6 w-10 shrink-0 rounded-full border-2 border-tinta transition-colors",
           activo ? "bg-tinta" : "bg-transparent"
         )}
       >
@@ -171,7 +171,7 @@ export function Contador({
   alCambiar: (valor: number) => void
 }) {
   const boton =
-    "flex size-11 items-center justify-center border-2 border-tinta transition-colors hover:bg-tinta hover:text-papel disabled:pointer-events-none disabled:opacity-30"
+    "flex size-11 items-center justify-center rounded-full border-2 border-tinta transition-colors hover:bg-tinta hover:text-papel disabled:pointer-events-none disabled:opacity-30"
   return (
     <div>
       <p className={ETIQUETA}>{etiqueta}</p>

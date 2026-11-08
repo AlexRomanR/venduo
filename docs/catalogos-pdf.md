@@ -214,7 +214,8 @@ y dejan las hojas como están.
   abre en una hoja.
 - **Elegir la plantilla**: el probador (`editor/probador.tsx`) muestra tu catálogo en
   grande y las plantillas en miniatura; tocar una la prueba y «Usar esta plantilla» la
-  confirma. La galería de antes (`editor/galeria.tsx`) sigue para la app.
+  confirma. La app usa el mismo probador, dentro de `editor-de-la-app.tsx`; la galería
+  de antes se borró.
 - **Editar**: `VistaPrevia` con `vivo` marca con el resaltador la hoja que cambió (si
   cambian más de tres, ninguna) y hace entrar las nuevas; con `armando`, una luz recorre
   las hojas mientras sale el PDF. "Enlace" y "Verlo" guardan solos antes de abrir.

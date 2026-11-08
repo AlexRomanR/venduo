@@ -243,7 +243,7 @@ function Serie({
                   x={MARGEN.izquierda - 10}
                   y={marca.y + 4}
                   textAnchor="end"
-                  className="fill-tinta text-[11px]"
+                  className="fill-tinta text-xs"
                   fillOpacity={0.5}
                 >
                   {formatoCorto(marca.valor)}
@@ -287,7 +287,7 @@ function Serie({
                       cx={p.x}
                       cy={p.y}
                       r={5}
-                      className="fill-senal stroke-papel"
+                      className="fill-tinta stroke-papel"
                       strokeWidth={2}
                     />
                   ) : null
@@ -325,7 +325,7 @@ function Serie({
             <text
               x={MARGEN.izquierda}
               y={ALTO - 8}
-              className="fill-tinta text-[11px]"
+              className="fill-tinta text-xs"
               fillOpacity={0.5}
             >
               {etiquetaCorta(filas[0].etiqueta)}
@@ -335,7 +335,7 @@ function Serie({
                 x={ancho - MARGEN.derecha}
                 y={ALTO - 8}
                 textAnchor="end"
-                className="fill-tinta text-[11px]"
+                className="fill-tinta text-xs"
                 fillOpacity={0.5}
               >
                 {etiquetaCorta(filas.at(-1)!.etiqueta)}
@@ -345,7 +345,7 @@ function Serie({
 
           {activo !== null ? (
             <div
-              className="pointer-events-none absolute z-10 border border-tinta bg-papel px-3 py-2"
+              className="pieza-tarjeta pointer-events-none absolute z-10 border border-tinta bg-papel px-3 py-2"
               style={{
                 left: Math.min(Math.max(puntos[activo].x - 60, 0), ancho - 130),
                 top: Math.max(puntos[activo].y - 60, 0),
@@ -481,7 +481,7 @@ function etiquetaCorta(valor: string) {
 
 export function Leyenda({ spec }: { spec: InsightSql }) {
   return (
-    <p className={cn("text-xs leading-relaxed opacity-45")}>
+    <p className={cn("text-xs leading-relaxed text-tinta/65")}>
       {spec.explicacion}
     </p>
   )

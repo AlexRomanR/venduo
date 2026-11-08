@@ -3,11 +3,11 @@ import { redirect } from "next/navigation"
 import {
   Boxes,
   ImagePlus,
+  PackageCheck,
   PackageMinus,
   PackageX,
   Plus,
   Tags,
-  Wallet,
 } from "lucide-react"
 
 import { getCatalogo, type FiltrosCatalogo } from "@/lib/data/catalogo"
@@ -15,16 +15,19 @@ import { getMiTienda } from "@/lib/data/panel"
 import { visitasDeMiTienda } from "@/lib/data/visitas"
 import { isSupabaseConfigured } from "@/lib/env"
 import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
-import { formatNumber } from "@/lib/format"
+import { formatMoney, formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { FranjaDeFichas } from "@/components/panel/fichas"
-import { FichasGrandes } from "@/components/panel/fichas-grandes"
+import { FichasGrandes, NotaAlDia } from "@/components/panel/fichas-grandes"
 import { Cabecera, Seccion, SinDatos } from "@/components/panel/piezas"
-import { DescargarProductos } from "@/components/panel/descargar"
+import {
+  DescargarProductos,
+  ENLACE_DE_PANEL,
+} from "@/components/panel/descargar"
 import { BuscadorDeProductos } from "@/components/productos/buscador"
 import { ListaProductos } from "@/components/productos/lista"
 import { PrimerosProductos } from "@/components/productos/primeros"
-import { ajustarStock } from "./acciones"
+import { ajustarStock } from "../acciones"
 
 export const metadata = { title: "Productos" }
 
@@ -100,6 +103,7 @@ export default async function ProductosPage({
       {/* En el celular "Nuevo producto" flota sobre las pestañas, como en la app. */}
       <Cabecera
         titulo="Tus productos."
+        resaltar="productos"
         bajada="Lo que vendes, su precio y cuántas unidades te quedan."
         accionesSoloEnPantallaAncha
       >
@@ -119,7 +123,14 @@ export default async function ProductosPage({
         </Link>
       </Cabecera>
 
-      {resumen.total > 0 ? (
+      {resumen.total === 0 ? null : resumen.sinStock === 0 &&
+        resumen.pocoStock === 0 ? (
+        <NotaAlDia
+          icono={PackageCheck}
+          titulo="Todo con stock"
+          detalle="Nada por reponer."
+        />
+      ) : (
         <FichasGrandes
           fichas={[
             {
@@ -139,16 +150,9 @@ export default async function ProductosPage({
               elegida: estado === "poco_stock",
               href: alternar("poco_stock"),
             },
-            {
-              clave: "valor",
-              valor: resumen.valorInventarioCents,
-              tipo: "dinero",
-              etiqueta: "Valor de tu stock",
-              icono: Wallet,
-            },
           ]}
         />
-      ) : null}
+      )}
 
       <Seccion
         id="productos"
@@ -165,19 +169,26 @@ export default async function ProductosPage({
         bajada={
           hayFiltros
             ? `${formatNumber(productos.length)} de ${formatNumber(resumen.total)} ${resumen.total === 1 ? "producto" : "productos"}`
-            : "Cambia el stock con más y menos."
+            : resumen.total > 0
+              ? `Tu stock vale ${formatMoney(resumen.valorInventarioCents)}.`
+              : "Cambia el stock con más y menos."
         }
+        extraEnLinea
         extra={
-          // Los dos en una fila: entran en los 311 px de un celular.
-          <span className="flex items-center gap-5">
+          // En el celular, dos botones de ícono en la línea del título; desde
+          // una pantalla más ancha, enlaces con su texto.
+          <span className="flex items-center gap-1 sm:gap-5">
             <Link
               href="/panel/productos/categorias"
-              className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold underline underline-offset-4 transition-colors hover:text-senal"
+              title="Categorías"
+              className={ENLACE_DE_PANEL}
             >
               <Tags aria-hidden="true" className="size-4" />
-              {categorias.length === 0
-                ? "Crear categorías"
-                : `${formatNumber(categorias.length)} ${categorias.length === 1 ? "categoría" : "categorías"}`}
+              <span className="max-sm:sr-only">
+                {categorias.length === 0
+                  ? "Crear categorías"
+                  : `${formatNumber(categorias.length)} ${categorias.length === 1 ? "categoría" : "categorías"}`}
+              </span>
             </Link>
             {resumen.total > 0 ? <DescargarProductos esDemo={esDemo} /> : null}
           </span>
@@ -188,6 +199,7 @@ export default async function ProductosPage({
             <BuscadorDeProductos />
             <FranjaDeFichas
               etiqueta="Filtrar por estado"
+              junto={categorias.length > 0 ? "arriba" : undefined}
               fichas={[
                 {
                   href: con({ estado: undefined }),
@@ -199,14 +211,12 @@ export default async function ProductosPage({
                   href: con({ estado: "sin_stock" }),
                   nombre: "Sin stock",
                   cuenta: resumen.sinStock,
-                  urgente: true,
                   activa: estado === "sin_stock",
                 },
                 {
                   href: con({ estado: "poco_stock" }),
                   nombre: "Queda poco",
                   cuenta: resumen.pocoStock,
-                  urgente: true,
                   activa: estado === "poco_stock",
                 },
                 {
@@ -236,6 +246,7 @@ export default async function ProductosPage({
             {categorias.length > 0 ? (
               <FranjaDeFichas
                 etiqueta="Filtrar por categoría"
+                junto="abajo"
                 fichas={[
                   {
                     href: con({ categoria: undefined }),

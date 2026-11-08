@@ -35,10 +35,7 @@ import {
   type MensajeDeLaAppAlCatalogo,
   type MensajeDelCatalogoAlaApp,
 } from "@/lib/catalogos/protocolo-app"
-import {
-  GaleriaDeEstilos,
-  GaleriaDePlantillas,
-} from "@/components/catalogos/editor/galeria"
+import { Probador } from "@/components/catalogos/editor/probador"
 import { VistaPrevia } from "@/components/catalogos/editor/vista-previa"
 
 declare global {
@@ -74,9 +71,10 @@ function nombreDelMes(): string {
  * catálogo y sus hojas.
  *
  * La app manda cambios y acá se aplican con las mismas operaciones que el
- * constructor de la web, con su deshacer. En modo galería muestra cada
- * plantilla ya armada con los productos elegidos, como el constructor, y tocar
- * una la elige. Si se llegó tocando una plantilla en la lista (`empezarCon`),
+ * constructor de la web, con su deshacer. En modo galería muestra el probador
+ * del constructor: el catálogo en grande con los productos elegidos y las
+ * plantillas en miniatura, que se prueban tocándolas; "Usar esta plantilla" la
+ * elige. Las hojas entran vivas, como en la web. Si se llegó tocando una plantilla en la lista (`empezarCon`),
  * los productos van directo a las hojas. Guardar y armar el PDF los hace la
  * app por la API.
  */
@@ -326,26 +324,17 @@ export function EditorDeCatalogoDeLaApp({
     if (productos.length === 0) return null
 
     return (
-      <div className="flex flex-col gap-8 bg-papel px-4 py-5">
-        {sugeridos.length > 0 ? (
-          <GaleriaDeEstilos
-            sugeridos={sugeridos}
-            productos={productos}
-            datos={datos}
-            nombre={catalogo?.nombre ?? nombreDelMes()}
-            packs={catalogo?.packs}
-            alElegir={elegir}
-          />
-        ) : null}
-        <GaleriaDePlantillas
+      <div className="bg-papel px-4 py-5">
+        <Probador
+          sugeridos={sugeridos}
+          claves={plantillas}
           productos={productos}
           datos={datos}
           estilo={catalogo?.estilo ?? estiloDeTienda}
           nombre={catalogo?.nombre ?? nombreDelMes()}
           packs={catalogo?.packs}
           actual={catalogo?.plantilla}
-          claves={plantillas}
-          alElegir={elegir}
+          alUsar={elegir}
         />
       </div>
     )
@@ -357,6 +346,7 @@ export function EditorDeCatalogoDeLaApp({
       datos={datos}
       elegido={elegido}
       pedido={pedido}
+      vivo
       alElegir={(id) => {
         setElegido(id)
         alaApp({ tipo: "tocar", id })

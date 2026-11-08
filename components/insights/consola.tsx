@@ -1,122 +1,103 @@
 "use client"
 
 import * as React from "react"
-import {
-  BookmarkCheck,
-  BookmarkPlus,
-  CornerDownLeft,
-  Loader2,
-} from "lucide-react"
-import { toast } from "sonner"
+import { ArrowUp, Check, Loader2, Plus } from "lucide-react"
 
 import type { InsightSql } from "@/lib/ai/schemas"
 import type { FilaInsight } from "@/lib/data/insights"
+import { MENSAJE_SIN_RESPUESTA } from "@/lib/ai/mensajes"
 import { leerGrafico } from "@/lib/insights/lectura"
+import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
 import { cn } from "@/lib/utils"
 import { Grafico } from "@/components/insights/grafico"
 import type { GraficoEnTablero } from "@/components/insights/tablero"
-import { MENSAJE_SIN_RESPUESTA } from "@/lib/ai/mensajes"
 
-const SUGERENCIAS = [
-  "¿Cuánto vendí en los últimos 30 días?",
-  "Mis productos más vendidos",
+/*
+ * La conversación con la IA de Estadísticas.
+ *
+ * Se dibuja en dos lugares —la columna fija desde 1280 px y la hoja que sale
+ * de abajo en el celular— y su estado vive en `useConversacion`, arriba de los
+ * dos: cerrar la hoja la desmonta, y sin esto se perdían las respuestas y la
+ * pregunta en curso. Lo más nuevo va abajo, junto al campo, como en un chat.
+ */
+
+/** Con ventas: lo que el tablero fijo no responde. */
+const SUGERENCIAS_CON_VENTAS = [
   "Ventas por semana de los últimos 3 meses",
-  "¿Cuántos pedidos tengo sin cobrar?",
+  "¿Qué talla o color se vende más?",
+  "¿Qué categoría vende más?",
+  "Ventas por mi tienda y por chat",
   "¿Cuánto vale mi inventario?",
-  "¿Cuánto gané este mes?",
 ]
 
-interface Entrada {
+/** Sin ventas: preguntas que tienen respuesta con solo productos. */
+const SUGERENCIAS_SIN_VENTAS = [
+  "¿Cuánto vale mi inventario?",
+  "¿Qué productos están sin stock?",
+  "¿A qué productos les falta el costo?",
+  "Mis productos por categoría",
+]
+
+export interface Entrada {
   numero: number
   pregunta: string
   consulta: InsightSql | null
   filas: FilaInsight[]
   lectura: string | null
   error?: string
-  guardado: boolean
-  /** Vino del tablero para seguir editándolo, no de una pregunta nueva. */
+  /** El id del gráfico guardado, si ya está en el tablero. */
+  guardado: string | null
+  /** Vino del tablero para seguir cambiándolo, no de una pregunta nueva. */
   deTablero?: boolean
 }
 
-interface Props {
-  preguntar: (
-    pregunta: string,
-    anterior: InsightSql | null
-  ) => Promise<{
-    ok: boolean
-    error?: string
-    consulta?: InsightSql
-    filas?: FilaInsight[]
-  }>
-  guardar: (
-    spec: InsightSql,
-    pregunta: string
-  ) => Promise<{ ok: boolean; error?: string }>
-  /** Un gráfico del tablero que se acaba de mandar a editar, o nada. */
-  paraEditar: GraficoEnTablero | null
-  alConsumirEdicion: () => void
-}
+type Preguntar = (
+  pregunta: string,
+  anterior: InsightSql | null
+) => Promise<{
+  ok: boolean
+  error?: string
+  consulta?: InsightSql
+  filas?: FilaInsight[]
+}>
 
-/**
- * Cuaderno de análisis.
- *
- * Cada pregunta deja una entrada y las anteriores quedan debajo en vez de
- * reemplazarse. Eso es lo que permite comparar dos respuestas sin volver a
- * pedirlas —cada viaje al modelo cuesta más de diez segundos— y lo que hace que
- * la pantalla se lea como un informe y no como un chat.
- *
- * La entrada más reciente va arriba, pegada al campo: es la que se acaba de
- * pedir, y en móvil es la única que entra en pantalla.
- *
- * Es el cuerpo del panel "Haz una pregunta": el campo arriba y cada entrada
- * en su franja, separada por una regla de lado a lado, como las filas del
- * resto del panel.
- */
-export function Consola({
+type Guardar = (
+  spec: InsightSql,
+  pregunta: string
+) => Promise<{ ok: boolean; error?: string; id?: string }>
+
+export function useConversacion({
   preguntar,
   guardar,
-  paraEditar,
-  alConsumirEdicion,
-}: Props) {
+  alAgregar,
+}: {
+  preguntar: Preguntar
+  guardar: Guardar
+  /** Se agregó un gráfico al tablero: la pantalla lo muestra. */
+  alAgregar: (id: string) => void
+}) {
   const [texto, setTexto] = React.useState("")
+  // De la más vieja a la más nueva: se dibujan en ese orden.
   const [entradas, setEntradas] = React.useState<Entrada[]>([])
-  const [enCurso, setEnCurso] = React.useState(false)
-  const campo = React.useRef<HTMLInputElement>(null)
+  const [enCurso, setEnCurso] = React.useState<string | null>(null)
+  const [cambiando, setCambiando] = React.useState(false)
+  const [agregando, setAgregando] = React.useState<number | null>(null)
+  const [errorAlAgregar, setErrorAlAgregar] = React.useState<number | null>(
+    null
+  )
+  const campo = React.useRef<HTMLTextAreaElement | null>(null)
 
-  // La última consulta que salió bien es el contexto de la siguiente pregunta:
-  // así «ahora por semana» modifica el gráfico en vez de empezar de cero.
-  const anterior = entradas.find((e) => e.consulta)?.consulta ?? null
-
-  // Editar un gráfico guardado es traerlo al cuaderno: entra como la entrada
-  // más reciente, así pasa a ser el `anterior` de la próxima pregunta y el
-  // cambio se pide en palabras, que es lo único que hay que aprender acá.
-  React.useEffect(() => {
-    if (!paraEditar) return
-
-    setEntradas((previas) => [
-      {
-        numero: previas.length + 1,
-        pregunta: paraEditar.pregunta,
-        consulta: paraEditar.consulta,
-        filas: paraEditar.filas,
-        lectura: leerGrafico(paraEditar.consulta, paraEditar.filas),
-        guardado: true,
-        deTablero: true,
-      },
-      ...previas,
-    ])
-
-    campo.current?.focus()
-    campo.current?.scrollIntoView({ block: "center", behavior: "smooth" })
-    alConsumirEdicion()
-  }, [paraEditar, alConsumirEdicion])
+  // La última consulta que salió bien es el punto de partida de la siguiente:
+  // así «ahora por mes» cambia el gráfico en vez de empezar de cero.
+  const anterior =
+    [...entradas].reverse().find((e) => e.consulta)?.consulta ?? null
 
   async function enviar(pregunta: string) {
     const limpia = pregunta.trim()
     if (!limpia || enCurso) return
-
     setTexto("")
-    setEnCurso(true)
+    setCambiando(false)
+    setEnCurso(limpia)
 
     // Si la plataforma corta la función, la acción lanza en vez de responder.
     const respuesta = await preguntar(limpia, anterior).catch(() => ({
@@ -126,8 +107,9 @@ export function Consola({
       filas: undefined,
     }))
 
-    setEnCurso(false)
+    setEnCurso(null)
     setEntradas((previas) => [
+      ...previas,
       {
         numero: previas.length + 1,
         pregunta: limpia,
@@ -140,177 +122,307 @@ export function Consola({
             : null,
         error: respuesta.ok
           ? undefined
-          : (respuesta.error ?? "No pudimos responder eso."),
-        guardado: false,
+          : (respuesta.error ??
+            "No pudimos responder eso. Escríbelo de otra forma."),
+        guardado: null,
       },
-      ...previas,
     ])
   }
 
-  async function alGuardar(entrada: Entrada) {
-    if (!entrada.consulta) return
-
+  async function agregar(entrada: Entrada) {
+    if (!entrada.consulta || agregando !== null) return
+    setAgregando(entrada.numero)
+    setErrorAlAgregar(null)
     const resultado = await guardar(entrada.consulta, entrada.pregunta)
-
-    if (!resultado.ok) {
-      toast.error(resultado.error ?? "No pudimos guardar el gráfico.")
+    setAgregando(null)
+    if (!resultado.ok || !resultado.id) {
+      setErrorAlAgregar(entrada.numero)
       return
     }
-
+    const id = resultado.id
     setEntradas((previas) =>
       previas.map((e) =>
-        e.numero === entrada.numero ? { ...e, guardado: true } : e
+        e.numero === entrada.numero ? { ...e, guardado: id } : e
       )
     )
-    toast.success("Guardado en tu tablero.")
+    alAgregar(id)
   }
 
+  function cambiarAlgo() {
+    setCambiando(true)
+    campo.current?.focus()
+  }
+
+  /** Un gráfico del tablero vuelve a la conversación para cambiarlo. */
+  const traer = React.useCallback((grafico: GraficoEnTablero) => {
+    setEntradas((previas) => [
+      ...previas,
+      {
+        numero: previas.length + 1,
+        pregunta: grafico.pregunta,
+        consulta: grafico.consulta,
+        filas: grafico.filas,
+        lectura: leerGrafico(grafico.consulta, grafico.filas),
+        guardado: grafico.id,
+        deTablero: true,
+      },
+    ])
+    setCambiando(true)
+  }, [])
+
+  return {
+    texto,
+    setTexto,
+    entradas,
+    enCurso,
+    cambiando,
+    agregando,
+    errorAlAgregar,
+    campo,
+    enviar,
+    agregar,
+    cambiarAlgo,
+    traer,
+  }
+}
+
+export type Conversacion = ReturnType<typeof useConversacion>
+
+/** Las respuestas, de la más vieja a la más nueva, o las sugerencias. */
+export function Mensajes({
+  conversacion,
+  conVentas,
+  alVerEnTablero,
+}: {
+  conversacion: Conversacion
+  conVentas: boolean
+  alVerEnTablero: (id: string) => void
+}) {
+  const { entradas, enCurso, agregando, errorAlAgregar } = conversacion
+  const fin = React.useRef<HTMLDivElement>(null)
+
+  // Al llegar algo nuevo, la columna baja hasta eso: solo la columna, no la
+  // página (`block: "nearest"` dentro de un contenedor con scroll propio).
+  React.useEffect(() => {
+    fin.current?.scrollIntoView({ block: "nearest" })
+  }, [entradas.length, enCurso])
+
+  const sugerencias = conVentas
+    ? SUGERENCIAS_CON_VENTAS
+    : SUGERENCIAS_SIN_VENTAS
+
   return (
-    <div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          enviar(texto)
-        }}
-        className="px-4 py-4 sm:px-5"
-      >
-        <div className="flex items-center gap-3 border-b-2 border-tinta pb-3">
-          <label htmlFor="pregunta" className="sr-only">
-            Pregunta sobre tu negocio
-          </label>
-          <input
-            id="pregunta"
-            ref={campo}
-            value={texto}
-            onChange={(e) => setTexto(e.target.value)}
-            placeholder="¿Cuánto vendí esta semana?"
-            autoComplete="off"
-            className="h-12 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-tinta/55 sm:text-lg"
-          />
-          <button
-            type="submit"
-            disabled={enCurso || texto.trim().length === 0}
-            aria-label="Preguntar"
-            className="flex size-12 shrink-0 items-center justify-center rounded-plantilla bg-accion text-white transition-colors hover:bg-accion-alta disabled:opacity-40"
-          >
-            {enCurso ? (
-              <Loader2 aria-hidden="true" className="size-4 animate-spin" />
-            ) : (
-              <CornerDownLeft aria-hidden="true" className="size-4" />
-            )}
-          </button>
-        </div>
-      </form>
-
-      {enCurso ? (
-        <p
-          aria-live="polite"
-          className="mx-4 mb-5 flex items-center gap-3 border-l-2 border-tinta pl-4 text-sm leading-relaxed opacity-70 sm:mx-5"
-        >
-          <Loader2
-            aria-hidden="true"
-            className="size-4 shrink-0 animate-spin"
-          />
-          Escribiendo la consulta y midiendo contra tus datos. Tarda unos
-          segundos.
-        </p>
-      ) : null}
-
-      {entradas.length === 0 ? (
-        <div className="border-t border-tinta/15 px-4 pt-4 pb-5 sm:px-5">
-          <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
+    <div className="flex flex-col">
+      {entradas.length === 0 && !enCurso ? (
+        <div>
+          <p className="text-xs font-semibold tracking-[0.12em] text-tinta/65 uppercase">
             Prueba con
           </p>
-          <ul className="mt-1 grid gap-x-10 sm:grid-cols-2">
-            {SUGERENCIAS.map((sugerencia) => (
+          <ul className="mt-1">
+            {sugerencias.map((sugerencia) => (
               <li key={sugerencia}>
                 <button
                   type="button"
-                  onClick={() => enviar(sugerencia)}
-                  className="flex min-h-11 w-full items-center border-b border-tinta/15 py-3 text-left text-sm transition-colors hover:border-senal hover:text-senal"
+                  onClick={() => conversacion.enviar(sugerencia)}
+                  className="flex min-h-12 w-full items-center justify-between gap-3 border-b border-tinta/12 py-2.5 text-left text-sm transition-colors hover:border-tinta"
                 >
                   {sugerencia}
+                  <ArrowUp
+                    aria-hidden="true"
+                    className="size-4 shrink-0 rotate-45 opacity-55"
+                  />
                 </button>
               </li>
             ))}
           </ul>
-          <p className="mt-4 max-w-[64ch] text-sm leading-relaxed opacity-70">
-            Cada respuesta se queda en esta página, así que puedes comparar
-            varias sin volver a pedirlas. Sobre la última puedes pedir cambios:
-            «ahora por semana», «solo los últimos 7 días», «muéstralo como
-            tabla».
-          </p>
         </div>
       ) : null}
 
       {entradas.map((entrada) => (
         <article
           key={entrada.numero}
-          className="border-t border-tinta/15 px-4 pt-5 pb-8 sm:px-5"
+          className="border-b border-tinta/12 py-5 first:pt-0 last:border-b-0"
         >
-          <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
-            <span className="tabular">
-              {String(entrada.numero).padStart(2, "0")}
-            </span>{" "}
-            · {entrada.deTablero ? "De tu tablero" : "Preguntaste"}
+          <p className="text-xs font-semibold tracking-[0.12em] text-tinta/65 uppercase">
+            {entrada.deTablero ? "De tu tablero" : "Preguntaste"}
           </p>
-          <h3 className="mt-2 max-w-[46ch] font-titular text-lg font-bold tracking-[-0.02em] sm:text-xl">
+          <h3 className="mt-1 font-titular text-base leading-snug font-bold tracking-[-0.015em]">
             {entrada.pregunta}
           </h3>
 
-          {entrada.deTablero ? (
-            <p className="mt-2 max-w-[58ch] text-sm leading-relaxed opacity-70">
-              Escribe arriba qué quieres cambiarle: «por semana», «solo los
-              últimos 30 días», «muéstralo como tabla».
-            </p>
-          ) : null}
-
           {entrada.error ? (
-            <p className="mt-5 max-w-[58ch] border-l-2 border-tinta pl-4 text-sm leading-relaxed">
-              {entrada.error}
-            </p>
+            <div className="mt-3 flex flex-col gap-3">
+              <p role="alert" className="text-sm leading-relaxed">
+                {entrada.error}
+              </p>
+              <button
+                type="button"
+                onClick={() => conversacion.enviar(entrada.pregunta)}
+                className={cn(BOTON_SECUNDARIO, "min-h-11 w-full text-sm")}
+              >
+                Inténtalo de nuevo
+              </button>
+            </div>
           ) : entrada.consulta ? (
             <>
-              <div className="mt-5 flex flex-wrap items-start gap-x-8 gap-y-4">
-                <p className="max-w-[58ch] min-w-[min(100%,18rem)] flex-1 border-l-2 border-tinta pl-4 leading-relaxed">
-                  {entrada.lectura ??
-                    "La consulta salió bien pero no devolvió ningún dato todavía."}
-                </p>
-
+              <p className="mt-3 text-sm leading-relaxed">
+                {entrada.lectura ?? (
+                  <>
+                    <span className="font-semibold">
+                      No hay datos para eso todavía.
+                    </span>{" "}
+                    Prueba con otra pregunta, o con una que no dependa de los
+                    costos si todavía no los cargaste.
+                  </>
+                )}
+              </p>
+              <p className="mt-4 text-xs font-semibold tracking-[0.12em] text-tinta/65 uppercase">
+                {entrada.consulta.titulo}
+              </p>
+              <div className="mt-3">
+                <Grafico spec={entrada.consulta} filas={entrada.filas} />
+              </div>
+              <div className="mt-4 flex flex-col gap-2">
+                {entrada.filas.length === 0 ? null : entrada.guardado ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      entrada.guardado && alVerEnTablero(entrada.guardado)
+                    }
+                    className={cn(
+                      BOTON_SECUNDARIO,
+                      "min-h-11 w-full border-tinta/25 text-sm"
+                    )}
+                  >
+                    <Check aria-hidden="true" className="size-4" />
+                    En tu tablero
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => conversacion.agregar(entrada)}
+                    disabled={agregando !== null}
+                    className={cn(BOTON_PRIMARIO, "min-h-11 w-full text-sm")}
+                  >
+                    {agregando === entrada.numero ? (
+                      <Loader2
+                        aria-hidden="true"
+                        className="size-4 animate-spin"
+                      />
+                    ) : (
+                      <Plus aria-hidden="true" className="size-4" />
+                    )}
+                    Agregar a tu tablero
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={() => alGuardar(entrada)}
-                  disabled={entrada.guardado}
-                  className={cn(
-                    "flex min-h-11 shrink-0 items-center gap-2 rounded-plantilla border-2 px-4 text-sm font-semibold transition-colors",
-                    entrada.guardado
-                      ? "border-tinta/25 text-tinta/65"
-                      : "border-tinta hover:bg-tinta hover:text-papel"
-                  )}
+                  onClick={conversacion.cambiarAlgo}
+                  className={cn(BOTON_SECUNDARIO, "min-h-11 w-full text-sm")}
                 >
-                  {entrada.guardado ? (
-                    <BookmarkCheck aria-hidden="true" className="size-4" />
-                  ) : (
-                    <BookmarkPlus aria-hidden="true" className="size-4" />
-                  )}
-                  {entrada.guardado ? "En tu tablero" : "Guardar"}
+                  Cambiar algo
                 </button>
-              </div>
-
-              <h4 className="mt-8 font-titular text-base font-bold tracking-[-0.01em]">
-                {entrada.consulta.titulo}
-              </h4>
-              <p className="mt-1 max-w-[70ch] text-xs leading-relaxed opacity-65">
-                {entrada.consulta.explicacion}
-              </p>
-
-              <div className="mt-6">
-                <Grafico spec={entrada.consulta} filas={entrada.filas} />
+                {errorAlAgregar === entrada.numero ? (
+                  <p role="alert" className="text-sm text-senal">
+                    No pudimos agregarlo a tu tablero. Inténtalo de nuevo.
+                  </p>
+                ) : null}
               </div>
             </>
           ) : null}
         </article>
       ))}
+
+      {enCurso ? (
+        <article className="border-t border-tinta/12 py-5 first:border-t-0 first:pt-0">
+          <p className="text-xs font-semibold tracking-[0.12em] text-tinta/65 uppercase">
+            Preguntaste
+          </p>
+          <h3 className="mt-1 font-titular text-base leading-snug font-bold tracking-[-0.015em]">
+            {enCurso}
+          </h3>
+          <p
+            aria-live="polite"
+            className="mt-3 flex items-center gap-2 text-sm text-tinta/70"
+          >
+            <Loader2
+              aria-hidden="true"
+              className="size-4 shrink-0 animate-spin"
+            />
+            Lo estamos armando. Tarda unos segundos.
+          </p>
+          <div className="mt-3 flex h-24 items-end gap-1.5">
+            {[40, 65, 30, 80, 55, 70, 45].map((alto, indice) => (
+              <span
+                key={indice}
+                className="pieza-hueso block flex-1 animate-pulse rounded-t-[4px] motion-reduce:animate-none"
+                style={{ height: `${alto}%` }}
+              />
+            ))}
+          </div>
+        </article>
+      ) : null}
+      <div ref={fin} />
     </div>
+  )
+}
+
+/** El campo para preguntar, abajo, al alcance del pulgar. */
+export function CampoDePregunta({
+  conversacion,
+  id,
+}: {
+  conversacion: Conversacion
+  /** Hay dos campos (columna y hoja): cada uno con su id. */
+  id: string
+}) {
+  const { texto, setTexto, enCurso, cambiando } = conversacion
+  return (
+    <form
+      onSubmit={(evento) => {
+        evento.preventDefault()
+        conversacion.enviar(texto)
+      }}
+      className="flex items-end gap-2"
+    >
+      <label htmlFor={id} className="sr-only">
+        Tu pregunta
+      </label>
+      <textarea
+        id={id}
+        ref={(nodo) => {
+          // El que está a la vista es el que se enfoca con "Cambiar algo".
+          if (nodo && nodo.offsetParent !== null)
+            conversacion.campo.current = nodo
+        }}
+        value={texto}
+        rows={1}
+        onChange={(evento) => setTexto(evento.target.value)}
+        onKeyDown={(evento) => {
+          if (evento.key === "Enter" && !evento.shiftKey) {
+            evento.preventDefault()
+            conversacion.enviar(texto)
+          }
+        }}
+        placeholder={
+          cambiando ? "¿Qué le cambiamos? Ej.: por mes" : "Escribe tu pregunta"
+        }
+        autoComplete="off"
+        maxLength={500}
+        className="pieza-campo field-sizing-content max-h-32 min-h-12 min-w-0 flex-1 resize-none border border-tinta/25 bg-papel px-4 py-3 text-base leading-snug outline-none placeholder:text-tinta/65"
+      />
+      <button
+        type="submit"
+        disabled={Boolean(enCurso) || texto.trim().length === 0}
+        aria-label="Preguntar"
+        className="flex size-12 shrink-0 items-center justify-center rounded-full bg-accion text-white transition-colors hover:bg-accion-alta disabled:opacity-40"
+      >
+        {enCurso ? (
+          <Loader2 aria-hidden="true" className="size-5 animate-spin" />
+        ) : (
+          <ArrowUp aria-hidden="true" className="size-5" />
+        )}
+      </button>
+    </form>
   )
 }

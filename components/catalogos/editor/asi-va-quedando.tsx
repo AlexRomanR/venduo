@@ -58,7 +58,7 @@ export function AsiVaQuedando({
   return (
     <section
       aria-label="Así va quedando"
-      className="flex min-w-0 flex-col border border-tinta bg-papel lg:sticky lg:top-6"
+      className="pieza-tarjeta flex min-w-0 flex-col border border-tinta bg-papel lg:sticky lg:top-6"
     >
       <header className="flex items-start justify-between gap-4 border-b border-tinta/15 px-5 py-4">
         <div className="min-w-0">

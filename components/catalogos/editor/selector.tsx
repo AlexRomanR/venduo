@@ -194,7 +194,7 @@ export function SelectorDeProductos({
                   <span
                     aria-hidden="true"
                     className={cn(
-                      "tabular flex size-6 shrink-0 items-center justify-center border-2 text-[11px] font-bold",
+                      "tabular flex size-6 shrink-0 items-center justify-center border-2 text-xs font-bold",
                       marcado
                         ? "border-tinta bg-tinta text-papel"
                         : "border-tinta/40"
@@ -313,7 +313,7 @@ export function SelectorConFotos({
 
   return (
     <div className="flex flex-col gap-4">
-      <label className="flex min-h-12 items-center gap-3 border border-tinta px-3">
+      <label className="pieza-campo flex min-h-12 items-center gap-3 border border-tinta/25 px-4">
         <Search aria-hidden="true" className="size-5 shrink-0 opacity-60" />
         <span className="sr-only">Buscar un producto</span>
         <input
@@ -333,7 +333,7 @@ export function SelectorConFotos({
             aria-pressed={filtro === opcion.valor}
             onClick={() => setFiltro(opcion.valor)}
             className={cn(
-              "flex min-h-11 shrink-0 items-center border px-3 text-sm font-semibold whitespace-nowrap transition-colors",
+              "pieza-ficha flex min-h-11 shrink-0 items-center border px-4 text-sm font-semibold whitespace-nowrap transition-colors",
               filtro === opcion.valor
                 ? "border-tinta bg-tinta text-papel"
                 : "border-tinta/25 hover:border-tinta"
@@ -399,7 +399,7 @@ export function SelectorConFotos({
                   <span
                     data-foto
                     className={cn(
-                      "relative flex aspect-square w-full items-center justify-center overflow-hidden border bg-tinta/[0.05] transition-colors",
+                      "relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-[12px] border bg-tinta/[0.05] transition-colors",
                       marcado
                         ? "border-2 border-tinta"
                         : "border-tinta/15 group-hover:border-tinta"

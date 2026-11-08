@@ -226,7 +226,9 @@ Lo que sigue igual que en la web:
   Los tokens se copian de `app/globals.css` a un archivo de tema de la app; si la paleta
   cambia acá, cambia allá. **El 31 de octubre cambió**: botones y lo elegido en tinta,
   la señal en frambuesa `#d0216a` (también el toldo del ícono), el papel a `#f7f5f0` y la
-  tinta a `#1d1c1a`. Falta llevarlo a la app.
+  tinta a `#1d1c1a`. Ya está en la app (`src/theme/index.ts`, con `accion`), y el
+  ícono se regeneró con `scripts/iconos.cjs`. El Inicio de la app se cuenta en escenas
+  como el Resumen de la web (`src/components/inicio/escenas/`).
 - **Material 3 manda en estructura y navegación en Android**; la identidad de Venduo
   entra por el tema: colores, tipografía, forma y movimiento. En iPhone se respetan sus
   garantías: márgenes seguros, volver deslizando desde el borde y "Reducir movimiento".
@@ -236,8 +238,10 @@ Lo que sigue igual que en la web:
 - **375 px de base**, objetivos táctiles de 48 dp en Android (44 pt en iPhone), una
   acción principal por pantalla.
 - Toda lista con sus tres estados: con datos, vacía —diciendo qué hacer— y cargando.
-- **Rendimiento en gama baja:** listas virtualizadas, imágenes en caché, animaciones
-  livianas y nada que dependa de una animación para entenderse.
+- **Rendimiento:** listas virtualizadas e imágenes en caché. Desde el 7 de noviembre de
+  2026 no se diseña para gama baja: el movimiento puede ser rico —el Inicio va en
+  escenas— siempre que nada dependa de una animación para entenderse y que "Reducir
+  movimiento" lo deje quieto.
 - Las skills de diseño del proyecto alcanzan: `impeccable` trae guía para Android, iPhone
   y apps multiplataforma (`reference/android.md`, `ios.md`, `adapt.native.md`,
   `audit.native.md`). Para animar en Expo existe `animate-expo`, de la misma familia que
@@ -284,7 +288,7 @@ celular ya gana.
 
 - Cuenta de **Google Play Console**: USD 25, pago único.
 - Cuenta de **Apple Developer**: USD 99 al año, en la fase 7.
-- Un **Android de gama baja** para probar: la verificación es manual, en un equipo real.
+- Un **Android de verdad** para probar: la verificación es manual, en un equipo real.
 
 ## Riesgos
 

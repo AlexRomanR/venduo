@@ -72,7 +72,7 @@ export function Foto({
 
   return (
     <div className="flex flex-wrap items-center gap-5">
-      <div className="size-20 shrink-0 overflow-hidden border border-tinta bg-tinta/5">
+      <div className="pieza-tarjeta size-20 shrink-0 overflow-hidden border border-tinta bg-tinta/5">
         {url ? (
           <Image
             src={url}

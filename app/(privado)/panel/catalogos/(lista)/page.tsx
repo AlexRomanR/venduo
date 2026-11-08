@@ -31,7 +31,7 @@ import { EditadoHace } from "@/components/catalogos/editado-hace"
 import { MiniaturaDeCatalogo } from "@/components/catalogos/miniatura"
 import { PedirCatalogoALaIa } from "@/components/catalogos/pedir-a-la-ia"
 import { PlantillasDeLaLista } from "@/components/catalogos/plantillas-de-la-lista"
-import { armarCatalogoConLaIa } from "./acciones"
+import { armarCatalogoConLaIa } from "../acciones"
 
 export const metadata = { title: "Catálogos" }
 
@@ -70,6 +70,7 @@ export default async function CatalogosPage() {
     <div className="flex flex-col gap-6 max-lg:pb-16 md:gap-8">
       <Cabecera
         titulo="Tus catálogos."
+        resaltar="catálogos"
         bajada="Tus productos en PDF, con los precios del día, para mandar por WhatsApp o imprimir."
         accionesSoloEnPantallaAncha
       >

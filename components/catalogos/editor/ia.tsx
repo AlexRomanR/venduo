@@ -117,7 +117,7 @@ export function PedidoALaIa({
       {propuesta ? (
         <div
           role="status"
-          className="flex flex-col gap-3 border-2 border-tinta p-4"
+          className="flex flex-col gap-3 rounded-[18px] border border-tinta/15 bg-hoja p-4 shadow-[var(--sombra-cuaderno)]"
         >
           <div>
             <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-65">

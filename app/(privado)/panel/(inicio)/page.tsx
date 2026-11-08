@@ -37,9 +37,9 @@ import { Resumen } from "@/components/panel/resumen/resumen"
 import { Ventas } from "@/components/panel/resumen/ventas"
 import { Visitas } from "@/components/panel/resumen/visitas"
 import portada from "@/components/portada/portada.module.css"
-import { guardarVacaciones } from "../cuenta/acciones"
-import { cambiarEstado } from "./pedidos/acciones"
-import { ajustarStock } from "./productos/acciones"
+import { guardarVacaciones } from "../../cuenta/acciones"
+import { cambiarEstado } from "../pedidos/acciones"
+import { ajustarStock } from "../productos/acciones"
 
 export const metadata = { title: "Resumen" }
 

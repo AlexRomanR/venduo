@@ -25,15 +25,28 @@ export interface FichaDeFiltro {
 export function FranjaDeFichas({
   fichas,
   etiqueta,
+  junto,
 }: {
   fichas: FichaDeFiltro[]
   /** Para lectores de pantalla: qué filtra. */
   etiqueta: string
+  /**
+   * Dos franjas que filtran la misma lista comparten un bloque: la de arriba
+   * sin regla abajo y con menos aire, la de abajo pegada a ella.
+   */
+  junto?: "arriba" | "abajo"
 }) {
   return (
     <Deslizable
       etiqueta={etiqueta}
-      className="flex [scrollbar-width:none] gap-1.5 overflow-x-auto overscroll-x-contain border-b border-tinta/15 px-4 py-3 sm:px-5 [&::-webkit-scrollbar]:hidden"
+      className={cn(
+        "flex [scrollbar-width:none] gap-1.5 overflow-x-auto overscroll-x-contain px-4 sm:px-5 [&::-webkit-scrollbar]:hidden",
+        junto === "arriba"
+          ? "pt-3 pb-1.5"
+          : junto === "abajo"
+            ? "border-b border-tinta/15 pt-1.5 pb-3"
+            : "border-b border-tinta/15 py-3"
+      )}
     >
       {fichas.map((ficha) => (
         <Link
@@ -42,7 +55,7 @@ export function FranjaDeFichas({
           scroll={false}
           aria-current={ficha.activa ? "page" : undefined}
           className={cn(
-            "flex min-h-11 shrink-0 items-center gap-1.5 border px-3 text-sm font-semibold whitespace-nowrap transition-colors",
+            "pieza-ficha flex min-h-11 shrink-0 items-center gap-1.5 border px-3 text-sm font-semibold whitespace-nowrap transition-colors",
             ficha.activa
               ? "border-tinta bg-tinta text-papel"
               : "border-tinta/25 hover:border-tinta"
@@ -53,11 +66,9 @@ export function FranjaDeFichas({
             <span
               className={cn(
                 "tabular",
-                ficha.activa
-                  ? "opacity-70"
-                  : ficha.urgente && ficha.cuenta > 0
-                    ? "text-senal"
-                    : "opacity-65"
+                // Una ficha de filtro nunca va en la señal: lo urgente lo
+                // dice la nota de arriba.
+                ficha.activa ? "opacity-70" : "opacity-65"
               )}
             >
               {formatNumber(ficha.cuenta)}

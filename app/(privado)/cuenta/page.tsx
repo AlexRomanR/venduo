@@ -55,7 +55,7 @@ export default async function CuentaPage() {
 
     return (
       <div className="flex flex-col gap-6 md:gap-8">
-        <Cabecera titulo="Tus datos." />
+        <Cabecera titulo="Tus datos." resaltar="datos" />
         <Seccion
           id="persona"
           icono={UserRound}
@@ -78,6 +78,7 @@ export default async function CuentaPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <Cabecera
         titulo="Tus datos."
+        resaltar="datos"
         bajada="Los tuyos y los de tu tienda. Cada panel se guarda por separado."
       />
 

@@ -203,7 +203,8 @@ cuando la etiqueta es un rótulo de total. Una consulta agrupada que devolvió u
 tira la etiqueta, y "5" no contesta "¿en qué estado están mis pedidos?".
 
 **El tipo de gráfico que nombra la persona manda.** Torta y dona no existen —la
-paleta es un solo rojo y el color no puede separar categorías, ver
+serie va en tinta, con la señal solo en lo que se mira, y el color no puede separar
+categorías, ver
 `ui-styling.md`—, así que el modelo tiene instrucción de contestar con barra
 ordenada **y decirlo**, en vez de ignorar el pedido en silencio.
 

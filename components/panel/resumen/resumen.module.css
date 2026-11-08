@@ -25,10 +25,15 @@
 /* Una tarjeta que flota sobre el papel: la nota, el ticket, la polaroid. */
 .nota {
   border: 1px solid var(--regla);
-  background: #ffffff;
+  background: var(--hoja);
   box-shadow:
     0 1px 2px rgb(29 28 26 / 0.05),
     0 22px 44px -26px rgb(29 28 26 / 0.38);
+}
+
+/* El nombre a mano de una polaroid: en tinta. La señal queda para el "1". */
+.resumen .nombreAMano {
+  color: var(--tinta);
 }
 
 /* El papel rayado del cuaderno, para la lista de lo que espera. */
@@ -96,21 +101,6 @@
   }
 }
 
-/* Lo que espera respira, despacio. */
-.late {
-  animation: late 1.8s ease-in-out infinite;
-}
-
-@keyframes late {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--boli) 45%, transparent);
-  }
-  50% {
-    box-shadow: 0 0 0 7px color-mix(in srgb, var(--boli) 0%, transparent);
-  }
-}
-
 /* Una franja que se desliza: se esfuma en los bordes para avisarlo. */
 .franja {
   scrollbar-width: none;
@@ -121,7 +111,7 @@
     mask-image: linear-gradient(
       to right,
       transparent,
-      black 12px,
+      black 8px,
       black calc(100% - 40px),
       transparent
     );
@@ -133,8 +123,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .selloRecien,
-  .late {
+  .selloRecien {
     animation: none;
   }
 }

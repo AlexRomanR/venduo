@@ -199,7 +199,7 @@ export function Categorias({
                         type="button"
                         onClick={() => setEditando(categoria.id)}
                         aria-label={`Editar ${categoria.name}`}
-                        className="flex size-11 items-center justify-center opacity-65 transition-colors hover:text-senal hover:opacity-100"
+                        className="flex size-11 items-center justify-center opacity-65 transition-colors hover:underline hover:underline-offset-4 hover:opacity-100"
                       >
                         <Pencil aria-hidden="true" className="size-4" />
                       </button>

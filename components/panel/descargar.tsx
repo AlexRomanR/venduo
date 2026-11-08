@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils"
 
 /** El enlace que va arriba de una lista: "Descargar", como el de categorías. */
 export const ENLACE_DE_PANEL =
-  "inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold underline underline-offset-4 transition-colors hover:text-senal disabled:opacity-50"
+  "inline-flex min-h-11 items-center justify-center gap-1.5 text-sm font-semibold underline decoration-tinta/40 underline-offset-4 transition-colors hover:decoration-tinta disabled:opacity-50 max-sm:size-11 max-sm:rounded-full max-sm:no-underline max-sm:hover:bg-tinta/[0.06]"
 
 /**
  * Baja un archivo de una ruta del panel. Con `fetch` y no con un enlace: así
@@ -75,7 +75,9 @@ export function DescargarProductos({ esDemo }: { esDemo: boolean }) {
       ) : (
         <Download aria-hidden="true" className="size-4" />
       )}
-      {preparando ? "Preparando…" : "Descargar"}
+      <span className="max-sm:sr-only">
+        {preparando ? "Preparando…" : "Descargar"}
+      </span>
     </button>
   )
 }
@@ -104,7 +106,7 @@ export function DescargarPedidos({
         className={ENLACE_DE_PANEL}
       >
         <Download aria-hidden="true" className="size-4" />
-        Descargar
+        <span className="max-sm:sr-only">Descargar</span>
       </button>
       <HojaDeAjuste
         abierta={abierta}

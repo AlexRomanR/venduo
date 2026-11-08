@@ -107,7 +107,7 @@ export function PasoPublicar() {
             href={tienda.url}
             target="_blank"
             rel="noreferrer noopener"
-            className="mt-3 flex min-h-11 items-center justify-center gap-2 text-sm font-semibold transition-colors hover:text-senal"
+            className="mt-3 flex min-h-11 items-center justify-center gap-2 text-sm font-semibold transition-colors hover:opacity-60"
           >
             Ver mi tienda
             <ExternalLink aria-hidden="true" className="size-4" />
@@ -254,7 +254,7 @@ function DescartarCambios() {
       </DialogTrigger>
       <DialogContent
         showCloseButton={false}
-        className="gap-0 rounded-none border-2 border-tinta bg-papel p-0 text-tinta shadow-none sm:max-w-md"
+        className="gap-0 border-tinta/15 bg-papel p-0 text-tinta sm:max-w-md"
       >
         <div className="flex items-start gap-4 border-b border-tinta/15 p-5">
           <DialogTitle className="flex-1 font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">
@@ -262,7 +262,7 @@ function DescartarCambios() {
           </DialogTitle>
           <DialogClose
             aria-label="Cerrar"
-            className="-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center transition-colors hover:text-senal"
+            className="-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center transition-colors hover:opacity-60"
           >
             <X aria-hidden="true" className="size-5" />
           </DialogClose>

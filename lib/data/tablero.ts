@@ -2,8 +2,8 @@ import { diaEnBolivia, sumarDias } from "@/lib/format"
 import { limiteParaConcretar, tituloDePedido } from "@/lib/pedidos"
 import { createClient } from "@/lib/supabase/server"
 import {
+  armarSerie,
   DIAS_DE_SERIE,
-  diasVacios,
   type ProductoVendido,
   type Tablero,
 } from "@/lib/tablero"
@@ -94,25 +94,14 @@ export async function getTablero(): Promise<Tablero | null> {
         .is("deleted_at", null),
     ])
 
-  // La serie: cada pedido cae en su día de Bolivia.
-  const serie = diasVacios(hoy)
-  const posicion = new Map(serie.map((dia, indice) => [dia.dia, indice]))
-  for (const pedido of ventas.data ?? []) {
-    const indice = posicion.get(diaEnBolivia(pedido.created_at))
-    if (indice === undefined) continue
-    serie[indice].ventasCents += pedido.total_cents
-    serie[indice].pedidos += 1
-  }
-
-  // La ganancia de cada día: solo de lo que tenía costo.
-  for (const linea of lineas.data ?? []) {
-    if (linea.unit_cost_cents === null) continue
-    const indice = posicion.get(diaEnBolivia(linea.orders.created_at))
-    if (indice === undefined) continue
-    serie[indice].ventasConCostoCents += linea.quantity * linea.unit_price_cents
-    serie[indice].gananciaCents +=
-      linea.quantity * (linea.unit_price_cents - linea.unit_cost_cents)
-  }
+  const serie = armarSerie(
+    hoy,
+    ventas.data ?? [],
+    (lineas.data ?? []).map((linea) => ({
+      ...linea,
+      creado: linea.orders.created_at,
+    }))
+  )
 
   // Lo más vendido: por producto, o por nombre si el producto ya no existe.
   const porProducto = new Map<string, ProductoVendido>()

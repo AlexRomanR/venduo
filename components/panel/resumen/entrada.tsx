@@ -151,7 +151,7 @@ export function Entrada({
         <div className="js-sube mt-5 flex flex-wrap items-center gap-2">
           <span
             className={cn(
-              "inline-flex min-h-9 items-center gap-2 rounded-full border bg-white px-3.5 text-[14px] font-semibold",
+              "inline-flex min-h-9 items-center gap-2 rounded-full border bg-hoja px-3.5 text-[14px] font-semibold",
               alAire
                 ? "border-[var(--regla)]"
                 : "border-[var(--boli)] text-[var(--boli)]"
@@ -171,7 +171,7 @@ export function Entrada({
           {prueba && prueba.diasRestantes !== null ? (
             <span
               className={cn(
-                "inline-flex min-h-9 items-center gap-2 rounded-full border bg-white px-3.5 text-[14px] font-semibold",
+                "inline-flex min-h-9 items-center gap-2 rounded-full border bg-hoja px-3.5 text-[14px] font-semibold",
                 prueba.porVencer
                   ? "border-[var(--boli)] text-[var(--boli)]"
                   : "border-[var(--regla)]"
@@ -366,7 +366,7 @@ function Celular({ vista }: { vista: { url: string; real: boolean } | null }) {
           />
         ) : null}
         {vista && !vista.real ? (
-          <span className="absolute inset-x-0 bottom-0 bg-[var(--tinta)]/85 py-1.5 text-center text-[11px] text-white">
+          <span className="absolute inset-x-0 bottom-0 bg-[var(--tinta)]/85 py-1.5 text-center text-xs text-white">
             Tu plantilla
           </span>
         ) : null}

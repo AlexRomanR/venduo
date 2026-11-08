@@ -40,11 +40,12 @@ export const ERROR_CAMPO = "text-sm text-senal"
 export const AYUDA_CAMPO = "text-xs text-tinta/65"
 
 /**
- * Una ficha de filtro. La elegida va en tinta llena, nunca en rojo: en el
- * panel el rojo es para lo que pide una acción, y un filtro solo ordena.
+ * Una ficha de filtro. La elegida va en tinta llena, nunca en la señal: en el
+ * panel la señal es para lo que pide una acción, y un filtro solo ordena. En
+ * el cuaderno, en píldora (`pieza-ficha`).
  */
 export const FICHA =
-  "flex min-h-11 items-center border px-3 text-xs font-semibold transition-colors"
+  "pieza-ficha flex min-h-11 items-center border px-3 text-xs font-semibold transition-colors"
 export const FICHA_ELEGIDA = "border-tinta bg-tinta text-papel"
 export const FICHA_LIBRE = "border-tinta/25 hover:border-tinta"
 

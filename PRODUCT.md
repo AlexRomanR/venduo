@@ -74,10 +74,12 @@ La especificación funcional completa vive en `VENDUO.md` y es la fuente de verd
   extranjero a nadie.
   - _Pendiente:_ el código y las reglas escritas hasta ahora usan voseo rioplatense
     ("Ingresá", "Escribí"), heredado del andamiaje inicial. Hay que corregirlo.
-- **Identidad visual: el cuaderno de ventas pasado en limpio.** Papel cálido, tinta y un
-  frambuesa de señal; Archivo para titulares y cifras, Geist para leer. El logo es la
-  feria en el celular, con el toldo en frambuesa (`.agents/rules/marca.md`). El sistema completo,
-  con el registro del panel y el de la portada, está en `DESIGN.md`.
+- **Identidad visual: el cuaderno de ventas pasado en limpio.** Papel cálido, tinta, una
+  frambuesa de señal y el resaltador; Archivo para titulares y cifras, Geist para leer y
+  Kalam para las notas a mano. Sobre el papel, las cosas de un mostrador: el ticket con su
+  sello, la nota pegada, la polaroid del producto. El logo es la feria en el celular, con
+  el toldo en frambuesa (`.agents/rules/marca.md`). El sistema completo, con sus tres
+  registros —en escenas, de trabajo y el diario—, está en `DESIGN.md`.
 
 ## Evidence on Hand
 
@@ -107,12 +109,17 @@ La especificación funcional completa vive en `VENDUO.md` y es la fuente de verd
 
 ## Accessibility & Inclusion
 
-**Android de gama baja y datos móviles.** Es el equipo y la conexión del público real:
-emprendedores vendiendo desde el celular y compradores en la calle.
+**El celular y los datos móviles.** Es el equipo y la conexión del público real:
+emprendedores vendiendo desde el celular y compradores en la calle. Desde el 7 de
+noviembre de 2026 **no se diseña para Android de gama baja**: los celulares de hoy
+mueven escenas, sombras y animaciones sin esfuerzo, y Venduo tiene que sentirse vivo.
 
 Consecuencias que el diseño y el código deben respetar:
 
-- Peso de imágenes y de JavaScript acotado. Una tienda que tarda en cargar no vende.
-- La animación no puede ser requisito para entender la interfaz.
+- Peso de imágenes y de JavaScript acotado. Una tienda que tarda en cargar no vende, y
+  los datos móviles se pagan.
+- El movimiento puede ser rico —escenas, notas que caen, el sello que se estampa— pero
+  nunca es requisito para entender la interfaz, y con "Reducir movimiento" todo queda
+  quieto.
 - Objetivos táctiles de 44 px como mínimo.
 - El diseño se resuelve primero a 375 px de ancho.

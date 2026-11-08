@@ -82,7 +82,7 @@ export function MasVendidos({ productos }: { productos: ProductoVendido[] }) {
         data-lenis-prevent
         className={cn(
           estilos.franja,
-          "-mx-4 mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto px-6 pt-8 pb-10 sm:mx-0 sm:grid sm:grid-cols-5 sm:gap-4 sm:overflow-visible sm:[mask-image:none] sm:px-0 lg:gap-6 lg:pt-12 lg:pb-14"
+          "-mx-4 mt-6 flex snap-x snap-mandatory scroll-pl-11 gap-5 overflow-x-auto pt-12 pr-6 pb-10 pl-11 sm:mx-0 sm:grid sm:grid-cols-5 sm:gap-4 sm:overflow-visible sm:pr-6 sm:pl-6 lg:gap-6 lg:pt-24 lg:pr-8 lg:pb-14 lg:pl-8"
         )}
       >
         {productos.map((producto, i) => {
@@ -97,7 +97,7 @@ export function MasVendidos({ productos }: { productos: ProductoVendido[] }) {
                     alt=""
                     fill
                     sizes="(min-width: 1024px) 180px, 50vw"
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transform-none"
                   />
                 ) : (
                   <Package
@@ -109,12 +109,13 @@ export function MasVendidos({ productos }: { productos: ProductoVendido[] }) {
               <span
                 className={cn(
                   portada.mano,
-                  "mt-2.5 block truncate text-[17px] text-[var(--tinta)]"
+                  estilos.nombreAMano,
+                  "mt-2.5 block truncate text-[17px]"
                 )}
               >
                 {producto.nombre}
               </span>
-              <span className="block text-[12.5px] font-semibold text-[var(--tinta)]/55 tabular-nums">
+              <span className="block text-[12.5px] font-semibold text-[var(--tinta)]/65 tabular-nums">
                 {formatNumber(producto.unidades)}{" "}
                 {producto.unidades === 1 ? "vendido" : "vendidos"}
               </span>
@@ -125,7 +126,8 @@ export function MasVendidos({ productos }: { productos: ProductoVendido[] }) {
             <li
               key={producto.id ?? producto.nombre}
               className={cn(
-                "w-[46%] shrink-0 snap-center sm:w-auto",
+                "w-[46%] shrink-0 snap-start sm:w-auto",
+                primero && "relative z-20",
                 mesa.alto
               )}
             >
@@ -146,7 +148,7 @@ export function MasVendidos({ productos }: { productos: ProductoVendido[] }) {
                   {primero ? (
                     <span
                       aria-hidden="true"
-                      className="pointer-events-none absolute -top-16 left-8 z-10 hidden items-end gap-1 lg:flex"
+                      className="pointer-events-none absolute -top-20 -left-4 z-10 hidden items-end gap-1 lg:flex"
                     >
                       <Flecha className="h-8 w-10 -scale-x-100 rotate-[200deg]" />
                       <Mano className="text-[18px] whitespace-nowrap">
@@ -155,7 +157,7 @@ export function MasVendidos({ productos }: { productos: ProductoVendido[] }) {
                     </span>
                   ) : null}
                   <div
-                    className="transition-[rotate,scale] duration-500 ease-out hover:scale-[1.04] hover:rotate-0"
+                    className="transition-[rotate,scale] duration-500 ease-out hover:scale-[1.04] hover:rotate-0 motion-reduce:transition-none"
                     style={{ rotate: `${mesa.giro}deg` }}
                   >
                     {producto.id ? (
@@ -197,10 +199,19 @@ type Ajustar = (
   stock: number
 ) => Promise<{ ok: boolean; error?: string }>
 
+type FilaDeReponer = ProductoPorAcabarse & { repuesto?: boolean }
+
+const claveDe = (p: ProductoPorAcabarse) => `${p.id}:${p.nombre}`
+
 /**
  * Lo que se quedó sin stock o está por quedarse, y se repone acá mismo: más y
  * menos al lado de cada foto, y se guarda solo cuando se deja de tocar. El
  * número salta al cambiar. Con el stock bien, la escena no está.
+ *
+ * Lo que se repone mientras se mira no se va: al guardar, la página se
+ * recalcula y el producto sale de la lista, y si era el último la escena
+ * desaparecía de golpe y dejaba su lugar en blanco. Se queda en su fila,
+ * marcado "Repuesto", hasta la próxima vez que se entra.
  */
 export function PorAcabarse({
   productos,
@@ -212,6 +223,23 @@ export function PorAcabarse({
   soloLectura: boolean
 }) {
   const raiz = useRef<HTMLElement>(null)
+  const [lista, setLista] = useState<FilaDeReponer[]>(productos)
+
+  // Lo que llega del servidor reemplaza lo que había; lo que ya no viene se
+  // queda en su lugar, como repuesto.
+  useEffect(() => {
+    setLista((previa) => {
+      const nuevos = new Map(productos.map((p) => [claveDe(p), p]))
+      const juntos: FilaDeReponer[] = previa.map((p) => {
+        const fresco = nuevos.get(claveDe(p))
+        nuevos.delete(claveDe(p))
+        return fresco
+          ? { ...fresco, repuesto: false }
+          : { ...p, repuesto: true }
+      })
+      return [...juntos, ...nuevos.values()]
+    })
+  }, [productos])
 
   useEscena(raiz, (tl, piezas) => {
     entra(
@@ -222,8 +250,8 @@ export function PorAcabarse({
     )
   })
 
-  if (productos.length === 0) return null
-  const agotados = productos.filter((p) => p.stock === 0).length
+  if (lista.length === 0) return null
+  const agotados = lista.filter((p) => p.stock === 0 && !p.repuesto).length
 
   return (
     <section
@@ -264,9 +292,9 @@ export function PorAcabarse({
           "self-start overflow-hidden rounded-[20px]"
         )}
       >
-        {productos.map((producto) => (
+        {lista.map((producto) => (
           <FilaParaReponer
-            key={`${producto.id}:${producto.nombre}`}
+            key={claveDe(producto)}
             producto={producto}
             ajustar={ajustar}
             soloLectura={soloLectura}
@@ -285,7 +313,7 @@ function FilaParaReponer({
   ajustar,
   soloLectura,
 }: {
-  producto: ProductoPorAcabarse
+  producto: FilaDeReponer
   ajustar: Ajustar
   soloLectura: boolean
 }) {
@@ -347,16 +375,26 @@ function FilaParaReponer({
           )}
         </span>
         <span className="min-w-0">
-          <span className="line-clamp-2 block text-[15.5px] leading-snug font-semibold group-hover:underline group-hover:decoration-[var(--boli)] group-hover:underline-offset-4 sm:text-[16px]">
+          <span className="line-clamp-2 block text-[15.5px] leading-snug font-semibold decoration-[var(--tinta)]/40 group-hover:underline group-hover:underline-offset-4 sm:text-[16px]">
             {producto.nombre}
           </span>
           <span
             className={cn(
               "block text-[13px] font-semibold",
-              agotado ? "text-[var(--boli)]" : "text-[var(--tinta)]/55"
+              producto.repuesto
+                ? "text-[var(--tinta)]"
+                : agotado
+                  ? "text-[var(--boli)]"
+                  : "text-[var(--tinta)]/65"
             )}
           >
-            {agotado ? "Agotado" : "Queda poco"}
+            {producto.repuesto ? (
+              <span className="pieza-resaltado">Repuesto</span>
+            ) : agotado ? (
+              "Agotado"
+            ) : (
+              "Queda poco"
+            )}
           </span>
         </span>
       </Link>
@@ -364,7 +402,7 @@ function FilaParaReponer({
       {producto.variantes ? (
         <Link
           href={`/panel/productos/${producto.id}#variantes`}
-          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-[var(--regla)] bg-white px-4 text-[14px] font-semibold transition-colors hover:border-[var(--tinta)]"
+          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-[var(--regla)] bg-hoja px-4 text-[14px] font-semibold transition-colors hover:border-[var(--tinta)]"
         >
           <span className={cn("tabular-nums", agotado && "text-[var(--boli)]")}>
             {formatNumber(stock)}
@@ -382,7 +420,7 @@ function FilaParaReponer({
             onClick={() => cambiar(stock - 1)}
             disabled={stock === 0}
             aria-label="Una menos"
-            className="flex size-9 items-center justify-center rounded-full border border-[var(--regla)] bg-white transition-[transform,background-color] hover:bg-[var(--tinta)]/[0.05] active:scale-90 disabled:opacity-30 sm:size-10"
+            className="flex size-11 items-center justify-center rounded-full border border-[var(--regla)] bg-hoja transition-[transform,background-color] hover:bg-[var(--tinta)]/[0.05] active:scale-90 disabled:opacity-30"
           >
             <Minus aria-hidden="true" className="size-4" />
           </button>
@@ -411,7 +449,7 @@ function FilaParaReponer({
             type="button"
             onClick={() => cambiar(stock + 1)}
             aria-label="Una más"
-            className="flex size-9 items-center justify-center rounded-full bg-[var(--tinta)] text-white transition-[transform,background-color] hover:bg-[var(--boli)] active:scale-90 sm:size-10"
+            className="flex size-11 items-center justify-center rounded-full bg-[var(--tinta)] text-white transition-[transform,background-color] hover:bg-[var(--accion-alta)] active:scale-90"
           >
             <Plus aria-hidden="true" className="size-4" />
           </button>

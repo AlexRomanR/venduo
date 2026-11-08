@@ -116,7 +116,7 @@ export function Cierre({
         pégalo en tu bio, en tus estados y en cada historia
       </Mano>
 
-      <div className="js-sube mt-8 flex w-full max-w-md items-center gap-2 rounded-full border border-[var(--regla)] bg-white p-1.5 pl-5">
+      <div className="js-sube mt-8 flex w-full max-w-md items-center gap-2 rounded-full border border-[var(--regla)] bg-hoja p-1.5 pl-5">
         <span className="min-w-0 flex-1 truncate text-left text-[15px] font-semibold">
           {tienda.legible}
         </span>

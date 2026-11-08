@@ -70,7 +70,7 @@ export function RestaurarVersion({
           type="button"
           aria-label={`Restaurar la versión ${etiqueta}`}
           className={cn(
-            "inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold transition-colors hover:text-senal",
+            "inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold transition-colors hover:underline hover:underline-offset-4",
             className
           )}
         >
@@ -81,7 +81,7 @@ export function RestaurarVersion({
 
       <DialogContent
         showCloseButton={false}
-        className="max-h-[92svh] gap-0 overflow-y-auto rounded-none border-2 border-tinta bg-papel p-0 text-tinta shadow-none sm:max-w-lg"
+        className="max-h-[92svh] gap-0 overflow-y-auto border-tinta/15 bg-papel p-0 text-tinta sm:max-w-lg"
       >
         <div className="flex items-start gap-4 border-b border-tinta/15 p-5 sm:p-6">
           <div className="flex-1">
@@ -96,7 +96,7 @@ export function RestaurarVersion({
           <DialogClose
             aria-label="Cerrar"
             disabled={enCurso}
-            className="-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center transition-colors hover:text-senal"
+            className="-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center transition-colors hover:opacity-60"
           >
             <X aria-hidden="true" className="size-5" />
           </DialogClose>
@@ -108,7 +108,7 @@ export function RestaurarVersion({
             colores, el logo y las secciones de la portada con sus textos. Tus
             productos y pedidos no se tocan.
           </DialogDescription>
-          <p className="mt-4 border-l-2 border-tinta pl-3 text-sm leading-relaxed">
+          <p className="mt-4 rounded-[14px] bg-tinta/[0.04] px-4 py-3 text-sm leading-relaxed">
             Antes de volver guardamos cómo está ahora. Si te arrepientes, lo
             restauras desde este mismo historial.
           </p>

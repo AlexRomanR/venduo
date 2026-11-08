@@ -88,7 +88,7 @@ export function PanelDeslizable({
       aria-label="Editar el catálogo"
       style={{ "--alto": `${alto}px` } as React.CSSProperties}
       className={cn(
-        "min-w-0 border border-tinta bg-papel",
+        "pieza-tarjeta min-w-0 border border-tinta bg-papel",
         "max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-30 max-lg:flex max-lg:h-[var(--alto)] max-lg:flex-col max-lg:border-x-0 max-lg:border-b-0",
         arrastre === null &&
           "motion-reduce:transition-none max-lg:transition-[height] max-lg:duration-300 max-lg:ease-out"
