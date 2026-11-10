@@ -52,10 +52,7 @@ export default async function CompartirPage() {
             ) : (
               <>
                 Tu tienda está en borrador: nadie la ve todavía.{" "}
-                <Link
-                  href="/cuenta"
-                  className="underline underline-offset-4"
-                >
+                <Link href="/cuenta" className="underline underline-offset-4">
                   Publícala
                 </Link>
               </>
