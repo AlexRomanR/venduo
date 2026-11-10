@@ -1,8 +1,12 @@
 import type { NextConfig } from "next"
 
-/** Host de Supabase, para permitir sus imágenes en next/image. */
-const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+/**
+ * Supabase, para permitir sus imágenes en next/image. El protocolo y el puerto
+ * salen de la misma URL: con la base local (http://127.0.0.1:54321) la vista
+ * previa de la tienda tumbaba el panel entero.
+ */
+const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL)
   : undefined
 
 const nextConfig: NextConfig = {
@@ -63,13 +67,14 @@ const nextConfig: NextConfig = {
 
   images: {
     remotePatterns: [
-      ...(supabaseHost
+      ...(supabase
         ? [
             {
-              protocol: "https" as const,
-              hostname: supabaseHost,
+              protocol: supabase.protocol === "http:" ? "http" : "https",
+              hostname: supabase.hostname,
+              port: supabase.port,
               pathname: "/storage/v1/object/**",
-            },
+            } as const,
           ]
         : []),
       // Fotografía de uso libre para la portada, mientras no haya imágenes

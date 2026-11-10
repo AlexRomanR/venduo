@@ -45,7 +45,7 @@ export function Cabecera({ marco, enlaceDelCarrito = true }: PropsCabecera) {
           )}
         </Link>
 
-        <p className="hidden font-mono text-[11px] tracking-[0.06em] uppercase opacity-70 lg:block">
+        <p className="hidden font-mono text-xs tracking-[0.06em] uppercase opacity-70 lg:block">
           Pedidos y asesoría por WhatsApp
         </p>
 
@@ -54,7 +54,7 @@ export function Cabecera({ marco, enlaceDelCarrito = true }: PropsCabecera) {
             href={rutaDeTienda(marco.slug, "/catalogo")}
             aria-current={enCatalogo ? "page" : undefined}
             className={cn(
-              "flex min-h-11 items-center px-3 font-mono text-[11px] tracking-[0.06em] uppercase underline-offset-4 transition-colors hover:text-senal",
+              "flex min-h-11 items-center px-3 font-mono text-xs tracking-[0.06em] uppercase underline-offset-4 transition-colors hover:text-senal",
               enCatalogo && "underline"
             )}
           >

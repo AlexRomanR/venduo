@@ -80,7 +80,7 @@ export function Cabecera({ marco, enlaceDelCarrito = true }: PropsCabecera) {
               href={rutaDeTienda(marco.slug, "/catalogo")}
               aria-current={enCatalogo ? "page" : undefined}
               className={cn(
-                "flex min-h-11 items-center border-2 px-3 text-[11px] font-bold tracking-[0.12em] uppercase transition-colors",
+                "flex min-h-11 items-center border-2 px-3 text-xs font-bold tracking-[0.12em] uppercase transition-colors",
                 enCatalogo
                   ? "border-tinta bg-tinta text-papel"
                   : "border-tinta hover:bg-tinta hover:text-papel"

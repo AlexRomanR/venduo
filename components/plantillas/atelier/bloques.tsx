@@ -57,7 +57,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
           ) : null}
           <Link
             href={rutaDeTienda(tienda.slug, "/catalogo")}
-            className="group mt-9 inline-flex min-h-12 items-center gap-3 rounded-plantilla bg-tinta px-8 text-[11px] tracking-[0.22em] text-papel uppercase transition-colors hover:bg-senal hover:text-white active:scale-[0.98]"
+            className="group mt-9 inline-flex min-h-12 items-center gap-3 rounded-plantilla bg-tinta px-8 text-xs tracking-[0.22em] text-papel uppercase transition-colors hover:bg-senal hover:text-white active:scale-[0.98]"
           >
             {accion}
             <ArrowRight
@@ -144,7 +144,7 @@ function Categorias({ bloque, tienda }: PropsBloque) {
                 <span className="font-titular text-xl italic transition-colors group-hover:text-senal md:text-2xl">
                   {categoria.nombre}
                 </span>
-                <span className="tabular text-[11px] tracking-[0.18em] opacity-65">
+                <span className="tabular text-xs tracking-[0.18em] opacity-65">
                   {categoria.productos}{" "}
                   {categoria.productos === 1 ? "pieza" : "piezas"}
                 </span>

@@ -197,15 +197,18 @@ export default async function ProductosPage({
         {resumen.total > 0 ? (
           <>
             <BuscadorDeProductos />
+            {/* Una sola franja para el estado y la categoría: con dos, en el
+                celular había dos filas de fichas antes del primer producto.
+                "Todos" quita los dos filtros; tocar la categoría elegida la
+                quita. */}
             <FranjaDeFichas
-              etiqueta="Filtrar por estado"
-              junto={categorias.length > 0 ? "arriba" : undefined}
+              etiqueta="Filtrar productos"
               fichas={[
                 {
-                  href: con({ estado: undefined }),
+                  href: con({ estado: undefined, categoria: undefined }),
                   nombre: "Todos",
                   cuenta: resumen.total,
-                  activa: !estado,
+                  activa: !estado && !filtros.categoria,
                 },
                 {
                   href: con({ estado: "sin_stock" }),
@@ -241,37 +244,29 @@ export default async function ProductosPage({
                       },
                     ]
                   : []),
+                ...categorias.map((c) => ({
+                  href: con({
+                    categoria: filtros.categoria === c.id ? undefined : c.id,
+                  }),
+                  nombre: c.name,
+                  cuenta: c.productos,
+                  activa: filtros.categoria === c.id,
+                })),
+                ...(categorias.length > 0 && sinCategoria > 0
+                  ? [
+                      {
+                        href: con({
+                          categoria:
+                            filtros.categoria === "sin" ? undefined : "sin",
+                        }),
+                        nombre: "Sin categoría",
+                        cuenta: sinCategoria,
+                        activa: filtros.categoria === "sin",
+                      },
+                    ]
+                  : []),
               ]}
             />
-            {categorias.length > 0 ? (
-              <FranjaDeFichas
-                etiqueta="Filtrar por categoría"
-                junto="abajo"
-                fichas={[
-                  {
-                    href: con({ categoria: undefined }),
-                    nombre: "Todas las categorías",
-                    activa: !filtros.categoria,
-                  },
-                  ...categorias.map((c) => ({
-                    href: con({ categoria: c.id }),
-                    nombre: c.name,
-                    cuenta: c.productos,
-                    activa: filtros.categoria === c.id,
-                  })),
-                  ...(sinCategoria > 0
-                    ? [
-                        {
-                          href: con({ categoria: "sin" }),
-                          nombre: "Sin categoría",
-                          cuenta: sinCategoria,
-                          activa: filtros.categoria === "sin",
-                        },
-                      ]
-                    : []),
-                ]}
-              />
-            ) : null}
           </>
         ) : null}
 

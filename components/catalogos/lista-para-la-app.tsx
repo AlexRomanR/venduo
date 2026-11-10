@@ -35,9 +35,13 @@ export function ListaParaLaApp({ children }: { children: React.ReactNode }) {
   return (
     <div
       ref={caja}
+      // Fuera del armazón del panel: la marca del cuaderno va acá, o las
+      // tarjetas salían como el diario —cuadradas y con borde de tinta—.
+      data-registro="cuaderno"
       // Un píxel a los lados: el ancho de la vista no es entero, y el borde
-      // derecho de cada panel quedaba medio píxel afuera, cortado.
-      className="flex flex-col gap-6 bg-papel px-px"
+      // derecho de cada panel quedaba medio píxel afuera, cortado. Abajo, el
+      // aire de la sombra de la última tarjeta.
+      className="flex flex-col gap-6 bg-papel px-px pb-6"
       onClickCapture={(evento) => {
         const destino = evento.target as HTMLElement
         const tarjeta = destino.closest<HTMLElement>("[data-eleccion]")

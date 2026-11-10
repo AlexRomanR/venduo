@@ -31,7 +31,7 @@ export function Cabecera({ marco, enlaceDelCarrito = true }: PropsCabecera) {
 
   return (
     <header className="sticky top-0 z-30 bg-papel">
-      <p className="bg-tinta px-5 py-2 text-center text-[11px] font-semibold tracking-[0.18em] text-papel uppercase">
+      <p className="bg-tinta px-5 py-2 text-center text-xs font-semibold tracking-[0.18em] text-papel uppercase">
         Pedidos por WhatsApp
       </p>
 

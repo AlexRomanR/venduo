@@ -66,7 +66,7 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
         )}
 
         {agotado ? (
-          <span className="absolute inset-x-0 bottom-4 text-center text-[11px] tracking-[0.24em] uppercase">
+          <span className="absolute inset-x-0 bottom-4 text-center text-xs tracking-[0.24em] uppercase">
             Agotada
           </span>
         ) : null}
@@ -126,7 +126,7 @@ export function Titulo({
       {enlace ? (
         <Link
           href={enlace.href}
-          className="ml-auto inline-flex min-h-11 shrink-0 items-center gap-2 text-[11px] tracking-[0.22em] uppercase underline decoration-tinta/30 underline-offset-[6px] transition-colors hover:text-senal hover:decoration-senal sm:ml-0"
+          className="ml-auto inline-flex min-h-11 shrink-0 items-center gap-2 text-xs tracking-[0.22em] uppercase underline decoration-tinta/30 underline-offset-[6px] transition-colors hover:text-senal hover:decoration-senal sm:ml-0"
         >
           {enlace.etiqueta}
         </Link>
@@ -136,9 +136,7 @@ export function Titulo({
 }
 
 export function Rotulo({ children }: { children: ReactNode }) {
-  return (
-    <span className="text-[11px] tracking-[0.22em] uppercase">{children}</span>
-  )
+  return <span className="text-xs tracking-[0.22em] uppercase">{children}</span>
 }
 
 export function Encabezado({ antetitulo, titulo, bajada }: PropsEncabezado) {
@@ -172,7 +170,7 @@ export function Vacio({ titulo, texto, accion }: PropsVacio) {
       {accion ? (
         <Link
           href={accion.href}
-          className="mt-8 inline-flex min-h-12 items-center gap-3 rounded-plantilla bg-tinta px-8 text-[11px] tracking-[0.22em] text-papel uppercase transition-colors hover:bg-senal hover:text-white active:scale-[0.98]"
+          className="mt-8 inline-flex min-h-12 items-center gap-3 rounded-plantilla bg-tinta px-8 text-xs tracking-[0.22em] text-papel uppercase transition-colors hover:bg-senal hover:text-white active:scale-[0.98]"
         >
           {accion.etiqueta}
         </Link>
@@ -199,7 +197,7 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
           {tienda.productos.length > 0 ? (
             <Link
               href={rutaDeTienda(tienda.slug, "/catalogo")}
-              className="group mt-8 inline-flex min-h-12 items-center gap-3 rounded-plantilla bg-tinta px-8 text-[11px] tracking-[0.22em] text-papel uppercase transition-colors hover:bg-senal hover:text-white active:scale-[0.98]"
+              className="group mt-8 inline-flex min-h-12 items-center gap-3 rounded-plantilla bg-tinta px-8 text-xs tracking-[0.22em] text-papel uppercase transition-colors hover:bg-senal hover:text-white active:scale-[0.98]"
             >
               Ver la colección
               <ArrowRight
@@ -249,7 +247,7 @@ function Dato({ titulo, children }: { titulo: string; children: ReactNode }) {
 
 export function Pie({ marco }: PropsPie) {
   const enlace =
-    "flex min-h-11 items-center text-[11px] tracking-[0.22em] uppercase opacity-75 transition-opacity hover:opacity-100"
+    "flex min-h-11 items-center text-xs tracking-[0.22em] uppercase opacity-75 transition-opacity hover:opacity-100"
 
   return (
     <footer className="bg-tinta text-papel">
@@ -287,7 +285,7 @@ export function Pie({ marco }: PropsPie) {
 
           <Link
             href="/"
-            className="flex min-h-11 items-center text-[11px] tracking-[0.22em] uppercase opacity-70 transition-opacity hover:opacity-100 sm:justify-end"
+            className="flex min-h-11 items-center text-xs tracking-[0.22em] uppercase opacity-70 transition-opacity hover:opacity-100 sm:justify-end"
           >
             Hecho con Venduo
           </Link>

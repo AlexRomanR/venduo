@@ -6,6 +6,7 @@ import {
   type ClavePlantilla,
 } from "@/lib/plantillas"
 import type { Apariencia } from "@/lib/plantillas/apariencia"
+import { productosDeEjemplo } from "@/lib/editor/muestras"
 import { createClient } from "@/lib/supabase/server"
 import type { Json, Product } from "@/types"
 import { deVacaciones } from "@/lib/vacaciones"
@@ -106,14 +107,8 @@ function bloquesDeDemostracion(): BloquePublico[] {
       tipo: "product_grid",
       props: { title: "Nuestros productos", columns: 3, limit: 12 },
     },
-    {
-      id: "demo-about",
-      tipo: "about",
-      props: {
-        title: "Sobre nosotros",
-        body: "Vendemos ropa para entrenar y para el día a día. Haz tu pedido y lo coordinamos contigo por WhatsApp.",
-      },
-    },
+    // Sin bloque "sobre": la plantilla ya cierra con "Sobre la tienda", y los
+    // dos seguidos repetían lo mismo.
   ]
 }
 
@@ -136,6 +131,19 @@ export const getTiendaPublica = cache(async function getTiendaPublica(
     // Modo demo: una sola tienda de ejemplo, para que el repositorio recién
     // clonado tenga una tienda que mirar.
     if (slug !== "rosa-deportes") return null
+    // Los productos de ejemplo de su plantilla, con sus fotos: sin ellos la
+    // tienda de la demo abría sin nada que comprar.
+    const productos = productosDeEjemplo("fashion", "demo")
+    const porCategoria = new Map<string, CategoriaPublica>()
+    for (const producto of productos) {
+      if (!producto.category_id || !producto.category) continue
+      const previa = porCategoria.get(producto.category_id)
+      porCategoria.set(producto.category_id, {
+        id: producto.category_id,
+        nombre: producto.category,
+        productos: (previa?.productos ?? 0) + 1,
+      })
+    }
     return {
       id: "demo",
       slug,
@@ -147,8 +155,8 @@ export const getTiendaPublica = cache(async function getTiendaPublica(
       plantilla: "fashion",
       apariencia: aparienciaDeTienda("fashion", {}),
       bloques: bloquesDeDemostracion(),
-      productos: [],
-      categorias: [],
+      productos,
+      categorias: [...porCategoria.values()],
       esDemo: true,
     }
   }

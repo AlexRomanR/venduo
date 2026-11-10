@@ -258,9 +258,9 @@ sirven desde `lib/fuentes/` con `next/font/local`: el build ya no las baja de Go
   (por debajo, una bandeja que abre la conversación en una hoja). Lo que arma la IA se
   agrega a "Tu tablero", que sigue con su PDF. Una tienda sin ventas ve qué falta y
   tarjetas de ejemplo sin cifras. Las acciones respetan que el administrador apague la
-  pantalla, y lo guardado se valida con zod. **Falta**: probar la IA de punta a punta con
-  una tienda real (en modo demo responde "Todavía no tienes una tienda") y llevarla a la
-  app, que hoy no tiene el tablero fijo (`/api/v1/estadisticas`). Riesgo anotado: el tope
+  pantalla, y lo guardado se valida con zod. La IA se probó de punta a punta con la
+  tienda de Rosa, y la app tiene el mismo tablero fijo (`GET /api/v1/estadisticas?dias=`
+  suma `estadisticas` a lo guardado). Riesgo anotado: el tope
   de 1000 filas de PostgREST recortaría las ventas de una tienda con mucho movimiento,
   igual que en el Resumen.
 - **Apariencia** (rehecha el 8 de noviembre, `docs/briefs/2026-11-08-apariencia.md`): tu
@@ -477,7 +477,8 @@ noviembre), por etapas y vista a 375 y 1280 px en modo demo:
 
 **Falta:**
 
-- [ ] Probarlo con una tienda real: cobrar un pedido y ver el sello, cambiar stock.
+- [x] Probarlo con una tienda real (8 de noviembre, en la base local): cobrar con el
+      sello, reponer desde el Resumen, cambiar de plantilla y deslizar la pasarela.
 - [x] Los editores (8 de noviembre): el de la tienda lleva la marca del cuaderno en su
       raíz —está fuera del armazón— y los dos pasaron sus piezas: píldoras, tarjetas de
       hoja, paletas y cajas con radio, sin el rojo al pasar el cursor. La vista previa
@@ -489,8 +490,16 @@ noviembre), por etapas y vista a 375 y 1280 px en modo demo:
 - [x] Categorías salió de la barra lateral: se entra desde Productos.
 - [x] Reponer stock en el Resumen ya no vacía la escena: lo repuesto queda en su fila,
       marcado "Repuesto", hasta la próxima vez que se entra.
-- [ ] La app (`src/components/`): Pedidos, Productos y las demás, con `NOTA` y las
-      piezas del Inicio, cuando se apruebe la web.
+- [x] La app (9 de noviembre, `docs/briefs/2026-11-08-app-cuaderno.md`): las piezas
+      (`Seccion`, `Tarjeta`, `SinDatos`, fichas y botones en píldora, hojas y avisos de
+      hoja, esqueletos, bandejas) pasaron al cuaderno, y con ellas todas las pantallas
+      de trabajo. Pedidos con tickets y el sello que cobra; Productos con una sola
+      franja de filtros y más y menos redondos; Estadísticas con el tablero fijo y la IA
+      en una hoja; "Editar tu tienda" es la pasarela, con los dibujos que hace la web
+      (`/editor/app/apariencia`). Probado en el emulador contra la base local.
+- [x] Tus datos y Datos de la tienda, unidas en la app (9 de noviembre) como `/cuenta`
+      de la web: una pantalla con cada panel que se guarda por separado. "Datos de la
+      tienda" del menú abre la misma, en el panel de la tienda.
 
 ### 2. Funciones por plan — cuando se decida
 

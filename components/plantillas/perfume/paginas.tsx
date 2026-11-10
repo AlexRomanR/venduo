@@ -115,7 +115,7 @@ function LaCasa({ tienda }: { tienda: TiendaPublica }) {
                   aria-hidden="true"
                   className="mx-auto size-5 stroke-[1.25] text-senal"
                 />
-                <p className="mt-4 text-[11px] tracking-[0.24em] uppercase">
+                <p className="mt-4 text-xs tracking-[0.24em] uppercase">
                   {servicio.titulo}
                 </p>
                 <p className="mx-auto mt-2 max-w-[28ch] text-sm leading-relaxed opacity-70">
@@ -244,7 +244,7 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
               href={rutaDeTienda(tienda.slug, "/catalogo", {
                 categoria: producto.category_id,
               })}
-              className="inline-flex min-h-11 items-center text-[11px] tracking-[0.28em] text-senal uppercase underline-offset-4 hover:underline"
+              className="inline-flex min-h-11 items-center text-xs tracking-[0.28em] text-senal uppercase underline-offset-4 hover:underline"
             >
               {producto.category}
             </Link>
@@ -269,7 +269,7 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
               </span>
             ) : null}
             {rebaja ? (
-              <span className="rounded-plantilla border border-senal px-3 py-0.5 text-[10px] tracking-[0.2em] text-senal uppercase">
+              <span className="rounded-plantilla border border-senal px-3 py-0.5 text-xs tracking-[0.2em] text-senal uppercase">
                 −{rebaja}%
               </span>
             ) : null}
@@ -305,7 +305,7 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
             )}
           >
             <div className="bg-papel px-4 py-5">
-              <dt className="text-[10px] tracking-[0.24em] uppercase opacity-55">
+              <dt className="text-xs tracking-[0.24em] uppercase opacity-55">
                 Familia
               </dt>
               <dd className="mt-1.5 text-sm">
@@ -313,7 +313,7 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
               </dd>
             </div>
             <div className="bg-papel px-4 py-5">
-              <dt className="text-[10px] tracking-[0.24em] uppercase opacity-55">
+              <dt className="text-xs tracking-[0.24em] uppercase opacity-55">
                 Disponibilidad
               </dt>
               <dd className="mt-1.5 text-sm">

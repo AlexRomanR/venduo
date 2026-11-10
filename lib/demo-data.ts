@@ -384,6 +384,17 @@ export function tableroDeDemostracion(): Tablero {
     }
   })
 
+  // Hoy es lo que dicen los pedidos de la demo —uno pagado de Bs 245— y no
+  // una cifra al azar: el Resumen y Pedidos tienen que contar lo mismo.
+  const ventasDeHoy = 24_500
+  serie[serie.length - 1] = {
+    ...serie[serie.length - 1],
+    pedidos: 1,
+    ventasCents: ventasDeHoy,
+    ventasConCostoCents: Math.round(ventasDeHoy * 0.9),
+    gananciaCents: Math.round(ventasDeHoy * 0.9 * 0.4),
+  }
+
   const hace = (minutos: number) =>
     new Date(Date.now() - minutos * 60_000).toISOString()
 
@@ -490,24 +501,20 @@ export function tableroDeDemostracion(): Tablero {
         montoCents: 144_000,
       },
     ],
+    // Los mismos que Productos muestra en la demo, con sus enlaces: el
+    // Resumen decía "Campera agotada" y Productos, "Mochila agotada".
     porAcabarse: [
       {
-        id: "demo-campera",
-        nombre: "Campera rompeviento",
-        foto: fotoDemo("1548883354-7622d03aca27"),
+        id: "demo-3",
+        nombre: "Mochila urbana",
+        foto: fotoDemo("1553062407-98eeb64c6a62"),
         stock: 0,
       },
       {
-        id: "demo-zapatilla",
-        nombre: "Zapatilla running",
-        foto: fotoDemo("1542291026-7eec264c27ff"),
+        id: "demo-2",
+        nombre: "Campera rompeviento",
+        foto: fotoDemo("1548883354-7622d03aca27"),
         stock: 2,
-      },
-      {
-        id: "demo-gorra",
-        nombre: "Gorra deportiva",
-        foto: fotoDemo("1588850561407-ed78c282e89b"),
-        stock: 3,
       },
     ],
     pasos: { producto: true, estilo: true, primerPedido: true },

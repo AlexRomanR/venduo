@@ -609,6 +609,16 @@ body:has([data-registro="cuaderno"]) .pieza-resaltado {
   box-decoration-break: clone;
 }
 
+/* El vacío lleva su título como una nota a mano: dice qué va a aparecer. */
+body:has([data-registro="cuaderno"]) .pieza-vacio .vacio-nota {
+  font-family: var(--fuente-mano), cursive;
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--senal);
+}
+
 body:has([data-registro="cuaderno"]) .pieza-vacio {
   margin: 12px;
   border: 2px dashed rgb(29 28 26 / 0.14);

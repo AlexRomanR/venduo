@@ -27,7 +27,7 @@ import { PrecioDeVitrina } from "@/components/tienda/precio"
  */
 
 /** Los datos van a máquina. Es lo que hace que la tienda se lea como un recetario. */
-export const MAQUINA = "font-mono text-[11px] tracking-[0.06em] uppercase"
+export const MAQUINA = "font-mono text-xs tracking-[0.06em] uppercase"
 
 export function Tarjeta({ producto, tienda }: PropsTarjeta) {
   const agotado = producto.stock === 0
@@ -89,7 +89,7 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
             <PrecioDeVitrina producto={producto} />
           </span>
           {producto.compare_at_price_cents ? (
-            <span className="tabular text-[11px] line-through opacity-55">
+            <span className="tabular text-xs line-through opacity-55">
               {formatMoney(producto.compare_at_price_cents)}
             </span>
           ) : null}

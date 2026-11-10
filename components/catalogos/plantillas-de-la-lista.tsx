@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { LayoutTemplate, Palette, Plus } from "lucide-react"
+import { ChevronDown, LayoutTemplate, Palette, Plus } from "lucide-react"
 
 import type { ClavePlantilla } from "@/lib/catalogos/constantes"
 import type { DatosDelCatalogo } from "@/lib/catalogos/datos"
@@ -110,8 +110,10 @@ export function PlantillasDeLaLista({
         titulo="Plantillas para empezar"
         bajada="Con tus productos y tus colores."
       >
+        {/* Las primeras seis a la vista —llenan las filas de a dos y de a
+            tres— y el resto a pedido: doce abiertas eran casi 3.000 px. */}
         <Rejilla>
-          {plantillas.map((clave) => (
+          {plantillas.slice(0, A_LA_VISTA).map((clave) => (
             <Tarjeta
               key={clave}
               ruta={ruta}
@@ -129,10 +131,48 @@ export function PlantillasDeLaLista({
             />
           ))}
         </Rejilla>
+        {plantillas.length > A_LA_VISTA ? (
+          <details className="group">
+            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 border-t border-tinta/15 px-4 text-sm font-semibold transition-colors hover:bg-tinta/[0.04] sm:px-5 [&::-webkit-details-marker]:hidden">
+              <span className="group-open:hidden">
+                Ver las {plantillas.length - A_LA_VISTA} otras
+              </span>
+              <span className="hidden group-open:inline">
+                Las otras plantillas
+              </span>
+              <ChevronDown
+                aria-hidden="true"
+                className="size-4 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+              />
+            </summary>
+            <Rejilla>
+              {plantillas.slice(A_LA_VISTA).map((clave) => (
+                <Tarjeta
+                  key={clave}
+                  ruta={ruta}
+                  eleccion={{ tipo: "plantilla", clave }}
+                  catalogo={armarCatalogo({
+                    plantilla: clave,
+                    nombre: NOMBRE_DE_MUESTRA,
+                    productos: muestra,
+                    tienda,
+                    estilo: estiloDeTienda,
+                  })}
+                  datos={datos}
+                  nombre={PLANTILLAS_DE_CATALOGO[clave].nombre}
+                  detalle={PLANTILLAS_DE_CATALOGO[clave].ideal}
+                />
+              ))}
+            </Rejilla>
+          </details>
+        ) : null}
       </Seccion>
     </>
   )
 }
+
+/** Cuántas plantillas para empezar se ven antes de "Ver las otras". */
+const A_LA_VISTA = 6
 
 function Rejilla({ children }: { children: React.ReactNode }) {
   return (

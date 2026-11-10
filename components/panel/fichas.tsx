@@ -25,28 +25,15 @@ export interface FichaDeFiltro {
 export function FranjaDeFichas({
   fichas,
   etiqueta,
-  junto,
 }: {
   fichas: FichaDeFiltro[]
   /** Para lectores de pantalla: qué filtra. */
   etiqueta: string
-  /**
-   * Dos franjas que filtran la misma lista comparten un bloque: la de arriba
-   * sin regla abajo y con menos aire, la de abajo pegada a ella.
-   */
-  junto?: "arriba" | "abajo"
 }) {
   return (
     <Deslizable
       etiqueta={etiqueta}
-      className={cn(
-        "flex [scrollbar-width:none] gap-1.5 overflow-x-auto overscroll-x-contain px-4 sm:px-5 [&::-webkit-scrollbar]:hidden",
-        junto === "arriba"
-          ? "pt-3 pb-1.5"
-          : junto === "abajo"
-            ? "border-b border-tinta/15 pt-1.5 pb-3"
-            : "border-b border-tinta/15 py-3"
-      )}
+      className="flex [scrollbar-width:none] gap-1.5 overflow-x-auto overscroll-x-contain border-b border-tinta/15 px-4 py-3 sm:px-5 [&::-webkit-scrollbar]:hidden"
     >
       {fichas.map((ficha) => (
         <Link
