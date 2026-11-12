@@ -22,7 +22,9 @@ export function useFestejo() {
   const festejo =
     vez > 0 ? (
       <div
-        key={vez}
+        // Con prefijo: un número solo chocaba con la `key` de lo que la
+        // pantalla dibuja al lado (la hoja de "Nueva venta" también cuenta).
+        key={`festejo-${vez}`}
         aria-hidden="true"
         className="festejo pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
       >

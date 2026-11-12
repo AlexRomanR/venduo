@@ -1,6 +1,6 @@
 ---
 name: Venduo
-description: El cuaderno de ventas pasado en limpio sobre papel impreso, con un solo color de señal que manda cuando aparece. En escenas en la portada y el Resumen, quieto en las pantallas de trabajo y sobrio, como un diario, en el ingreso y /admin.
+description: El cuaderno de ventas pasado en limpio sobre papel impreso, con un solo color de señal que manda cuando aparece. En escenas en la portada y el Resumen, quieto en las pantallas de trabajo y sobrio, como un diario, en /admin.
 colors:
   papel: "#f7f5f0"
   tinta: "#1d1c1a"
@@ -138,16 +138,19 @@ Hay **un solo mundo** —papel, tinta, frambuesa, resaltador, Archivo, Geist y K
 **tres registros**, según lo que la persona vino a hacer. Se decidió el 7 de noviembre de
 2026, mirando la misma pantalla dibujada de tres formas:
 
-| Registro                   | Dónde                                                                                                                                                           | Cómo                                                                                                                                                                                                 |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **El cuaderno en escenas** | La portada (`/`), el Resumen (`/panel`) y el Inicio de la app                                                                                                   | Se mira. Cada sección es una escena que se arma con el scroll y vuelve a empezar al salir: el celular en 3D, las notas que caen, la cifra que cuenta.                                                |
-| **El cuaderno de trabajo** | Las demás pantallas del panel y de la app: Pedidos, Productos, Catálogos, Estadísticas, Publicar en redes, Apariencia, Compartir, Datos de la tienda, Tus datos | Se trabaja. El mismo vocabulario —tickets con sello, notas, números que cuentan, tarjetas con radio y sombra teñida, titulares con resaltador—, quieto mientras se desliza: lo mueve lo que se toca. |
-| **El diario**              | El ingreso, el alta de la tienda y `/admin`                                                                                                                     | Se completa o se administra. Reglas de un píxel, esquina viva y nada de sombras: la sobriedad de un formulario impreso.                                                                              |
+| Registro                   | Dónde                                                                                             | Cómo                                                                                                                                                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **El cuaderno en escenas** | La portada (`/`), el Resumen (`/panel`), el final del alta (`/crear/listo`) y el Inicio de la app | Se mira. Cada sección es una escena que se arma con el scroll y vuelve a empezar al salir: el celular en 3D, las notas que caen, la cifra que cuenta.                                                |
+| **El cuaderno de trabajo** | Las demás pantallas del panel y de la app, el ingreso y el alta de la tienda                      | Se trabaja. El mismo vocabulario —tickets con sello, notas, números que cuentan, tarjetas con radio y sombra teñida, titulares con resaltador—, quieto mientras se desliza: lo mueve lo que se toca. |
+| **El diario**              | `/admin`                                                                                          | Se completa o se administra. Reglas de un píxel, esquina viva y nada de sombras: la sobriedad de un formulario impreso.                                                                              |
 
 **La regla para elegir.** Si la pantalla se abre para ver cómo va el negocio, va en
 escenas. Si se abre para hacer algo —buscar, filtrar, cobrar, cambiar un precio, veinte
 veces al día—, va en el cuaderno de trabajo, porque nada puede esperar a que se deslice.
-Si es un trámite o la operación de Venduo, va en el diario. **Una pantalla nueva del panel
+Si es la operación de Venduo, va en el diario. El ingreso y el alta pasaron al cuaderno
+de trabajo el 9 de noviembre: son la puerta del panel y se visten como él. El final del
+alta es una escena que cabe en una pantalla: **se arma una vez al llegar** y no vuelve a
+empezar, sin scroll. **Una pantalla nueva del panel
 es del cuaderno de trabajo**, salvo que se decida otra cosa.
 
 Este documento describe primero lo común —color, letra, ritmo— y lo del diario, que es

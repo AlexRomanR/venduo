@@ -47,6 +47,9 @@ export function registrarEvento(
   tipo: TipoDeVisita,
   producto?: string | null
 ) {
+  // Una tienda dentro de otra página no es una visita: es su dueño viéndola
+  // en el editor o al terminar el alta, en el celular de `/crear/listo`.
+  if (window.self !== window.top) return
   try {
     const cuerpo = JSON.stringify({
       tienda,

@@ -85,7 +85,8 @@ que usaba la barra. Lo que el cliente necesita vive en un módulo sin zod
 
 Lo que solo se usa al tocar algo —el QR de compartir— se carga con `import()`.
 
-**La portada y el Resumen son las únicas pantallas con GSAP y Lenis**
+**La portada, el Resumen y el final del alta (`/crear/listo`) son las únicas pantallas
+con GSAP**, y solo la portada y el Resumen con Lenis
 (`components/portada/gsap.ts`). La portada es además la más pesada en imágenes: unas 77,
 la mayoría productos recortados y capturas de las plantillas. Que se queden ahí: un
 componente de otra pantalla del panel que importe algo de `components/portada/` se lleva

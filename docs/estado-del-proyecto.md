@@ -569,6 +569,29 @@ vuelta: "Foto y precio" en serie desde la cámara y duplicar un producto.
 Se modela el estado, no el cobro. Falta el bloqueo real al vencer la prueba (panel en
 solo lectura con exportación a CSV) y la purga a los 90 días.
 
+### 6.b. Lo que dejó el recorrido de punta a punta (9 de noviembre)
+
+Se recorrió la web entera a 390 px contra la base local, con una cuenta nueva: registro,
+alta con la plantilla Calle, un producto con foto, la tienda pública, el carrito y el
+pedido por WhatsApp (el mensaje sale al 591 con el detalle y el total), cobrar con el
+sello (el stock bajó de 5 a 3), un catálogo guardado, una venta directa (el stock llegó a
+0 y la tienda dice "Agotado"), despublicar (quien compra ve "Esto no está disponible") y
+volver a publicar. Todo funcionó. Se arregló un error: el festejo y la hoja de "Nueva
+venta" compartían la `key` "1" al registrar una venta.
+
+Para rediseñar o revisar:
+
+- [x] **El alta y el ingreso, rediseñados** (11 de noviembre, brief
+      `docs/briefs/2026-11-09-alta.md`): en el cuaderno, primero el negocio y después la
+      plantilla en la pasarela de Apariencia con el nombre adentro, y el final en una
+      escena con la tienda en vivo en el celular del Resumen. El ingreso, con el mismo
+      marco y una línea de texto.
+- [ ] **Hojas y confirmaciones de la web, todavía en el diario**: "Agregar producto" de
+      Nueva venta, "¿Marcar pagado el pedido?" y "¿Pasar a X?" de Apariencia llevan la
+      raya de tinta arriba y esquinas vivas; la app ya las tiene en hoja con radio.
+- [ ] **El PDF del catálogo en el celular** no se pudo ver en el navegador automático (el
+      servidor lo arma: `POST /panel/catalogos/pdf` 200). Probarlo en un teléfono.
+
 ### 7. Pendientes chicos
 
 - **Las fotos de una carga que no se crea quedan en Storage** (`product-images/{tienda}/`):

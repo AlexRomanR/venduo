@@ -1,57 +1,92 @@
+import Link from "next/link"
+
 import { cn } from "@/lib/utils"
+import { Visto } from "@/components/portada/trazos"
 
 export interface Paso {
   nombre: string
+  /** Para volver a un paso ya hecho. */
+  href: string
 }
 
 /** Los pasos del alta de una tienda, en un solo lugar para que no se desfasen. */
 export const PASOS_CREAR: Paso[] = [
-  { nombre: "Elige plantilla" },
-  { nombre: "Cuenta tu negocio" },
-  { nombre: "Personaliza tu tienda" },
+  { nombre: "Tu negocio", href: "/crear" },
+  { nombre: "Tu plantilla", href: "/crear/plantilla" },
+  { nombre: "Tu tienda", href: "/crear/listo" },
 ]
 
 /**
- * Indicador de progreso del alta de la tienda.
- *
- * Usa el mismo trazo de apertura de 2 px que corona un tema en el resto del
- * sistema: lleno para lo recorrido y lo actual, al 15% para lo que falta. No
- * hay círculos numerados ni línea de conexión; en este mundo la regla es lo
- * que marca el avance.
+ * Por dónde va el alta, en una línea del cuaderno: lo hecho con un visto a
+ * mano —y se toca para volver—, el paso de ahora con el resaltador detrás, y lo
+ * que falta, apagado. Una vez creada la tienda no se vuelve atrás: los pasos
+ * hechos del final ya no son enlaces.
  */
-export function Pasos({ pasos, actual }: { pasos: Paso[]; actual: number }) {
+export function Pasos({
+  pasos,
+  actual,
+  conVuelta = true,
+}: {
+  pasos: Paso[]
+  actual: number
+  /** Si los pasos hechos llevan a su pantalla. */
+  conVuelta?: boolean
+}) {
   return (
-    <div>
-      <p className="text-xs font-semibold tracking-[0.12em] uppercase">
+    <nav aria-label="Pasos del alta">
+      <p className="sr-only">
         Paso {actual} de {pasos.length}
       </p>
-
-      <ol
-        className="mt-4 grid gap-3"
-        style={{
-          gridTemplateColumns: `repeat(${pasos.length}, minmax(0, 1fr))`,
-        }}
-      >
+      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-semibold">
         {pasos.map((paso, i) => {
-          const recorrido = i + 1 <= actual
+          const numero = i + 1
+          const hecho = numero < actual
+          const ahora = numero === actual
+          const nombre = hecho ? (
+            <span className="inline-flex items-center gap-1">
+              <Visto
+                grosor={3.5}
+                className="size-3.5 [&_path]:stroke-[var(--tinta)]"
+              />
+              {paso.nombre}
+            </span>
+          ) : (
+            paso.nombre
+          )
 
           return (
-            <li
-              key={paso.nombre}
-              aria-current={i + 1 === actual ? "step" : undefined}
-              className={cn(
-                "border-t-2 pt-3 font-titular text-sm font-bold tracking-[-0.01em]",
-                recorrido ? "border-tinta" : "border-tinta/15 opacity-45"
+            <li key={paso.nombre} className="flex items-center gap-2">
+              {i > 0 ? (
+                <span aria-hidden="true" className="text-tinta/35">
+                  ·
+                </span>
+              ) : null}
+              {hecho && conVuelta ? (
+                <Link
+                  href={paso.href}
+                  className="inline-flex min-h-11 items-center text-tinta/65 underline-offset-4 transition-colors hover:text-tinta hover:underline"
+                >
+                  {nombre}
+                </Link>
+              ) : (
+                <span
+                  aria-current={ahora ? "step" : undefined}
+                  className={cn(
+                    "inline-flex min-h-11 items-center",
+                    ahora ? "text-tinta" : "text-tinta/65"
+                  )}
+                >
+                  {ahora ? (
+                    <span className="pieza-resaltado">{nombre}</span>
+                  ) : (
+                    nombre
+                  )}
+                </span>
               )}
-            >
-              <span className="tabular mr-2 opacity-40">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              {paso.nombre}
             </li>
           )
         })}
       </ol>
-    </div>
+    </nav>
   )
 }

@@ -25,9 +25,10 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/t/{slug}/catalogo`                      | Catálogo completo: filtros, búsqueda y orden por URL               | Público         |
 | `/t/{slug}/p/{id}`                        | Ficha de producto, con selector de cantidad                        | Público         |
 | `/t/{slug}/carrito`                       | Carrito: el total y el pedido por WhatsApp                         | Público         |
-| `/crear`                                  | Alta de la tienda, paso 1: elegir plantilla                        | Requiere sesión |
-| `/crear/negocio`                          | Alta de la tienda, paso 2: nombre, rubro y WhatsApp                | Requiere sesión |
-| `/crear/listo`                            | Alta de la tienda, paso 3: ofrece el editor                        | Requiere sesión |
+| `/crear`                                  | Alta de la tienda, paso 1: el negocio (borrador en cookie)         | Requiere sesión |
+| `/crear/plantilla`                        | Alta de la tienda, paso 2: la plantilla; crea la tienda            | Requiere sesión |
+| `/crear/negocio`                          | Enlace viejo: lleva a `/crear`                                     | Requiere sesión |
+| `/crear/listo`                            | Alta de la tienda, paso 3: la tienda en vivo en un celular         | Requiere sesión |
 | `/editor`                                 | Editor de la tienda, a pantalla completa. `?paso=`                 | Requiere sesión |
 | `/editor/vista-previa`                    | La tienda del dueño con su borrador, para el `iframe`              | Requiere sesión |
 | `/editor/app`                             | El editor de la tienda para la app: borrador y vista               | Token de la app |

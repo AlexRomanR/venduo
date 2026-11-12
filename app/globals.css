@@ -509,8 +509,9 @@
  *
  * Las piezas del panel —`Seccion`, `Cabecera`, `SinDatos`, las fichas, los
  * botones— se dibujan como el diario en todo lugar y como el cuaderno solo
- * adentro del armazón del panel, que lleva `data-registro="cuaderno"`. Así
- * `/admin`, el alta y las tiendas siguen como estaban sin tocar una línea. Va
+ * adentro de una marca `data-registro="cuaderno"`: el armazón del panel y el
+ * marco del ingreso y del alta. Así `/admin` y las tiendas siguen como estaban
+ * sin tocar una línea. Va
  * fuera de las capas para ganarle a las utilidades de Tailwind.
  *
  * Todo lo apoyado sobre el papel es de hoja (`--hoja`, `#fdfcf9`): el

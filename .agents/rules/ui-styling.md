@@ -17,11 +17,11 @@ se lee y se toca, una frambuesa de señal para lo que pide algo, el resaltador y
 mano. Un solo mundo en **tres registros**, que se eligen por lo que la persona vino a
 hacer (decisión del 7 de noviembre de 2026, `DESIGN.md`, "Overview"):
 
-| Registro                   | Pantallas                                                                                                                                    | Regla                                                                                                                                                                                                                              |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **El cuaderno en escenas** | La portada, el Resumen (`components/panel/resumen/`) y el Inicio de la app                                                                   | Escenas que se arman con el scroll y vuelven a empezar al salir.                                                                                                                                                                   |
-| **El cuaderno de trabajo** | Pedidos, Productos, Catálogos, Estadísticas, Publicar en redes, Apariencia, Compartir, Datos de la tienda y Tus datos, en la web y en la app | Las mismas piezas —tarjetas con radio y sombra teñida, notas, tickets con sello, titulares con resaltador, letra a mano en las pistas—, **quietas al deslizar**: lo mueve lo que se toca. `DESIGN.md`, "Las pantallas de trabajo". |
-| **El diario**              | El ingreso, el alta de la tienda y `/admin`                                                                                                  | Reglas de un píxel, esquina viva, sin sombras.                                                                                                                                                                                     |
+| Registro                   | Pantallas                                                                                                                                     | Regla                                                                                                                                                                                                                              |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **El cuaderno en escenas** | La portada, el Resumen (`components/panel/resumen/`), el final del alta (`/crear/listo`) y el Inicio de la app                                | Escenas que se arman con el scroll y vuelven a empezar al salir.                                                                                                                                                                   |
+| **El cuaderno de trabajo** | Pedidos, Productos, Catálogos, Estadísticas, Publicar en redes, Apariencia, Compartir, Tus datos, el ingreso y el alta, en la web y en la app | Las mismas piezas —tarjetas con radio y sombra teñida, notas, tickets con sello, titulares con resaltador, letra a mano en las pistas—, **quietas al deslizar**: lo mueve lo que se toca. `DESIGN.md`, "Las pantallas de trabajo". |
+| **El diario**              | `/admin`                                                                                                                                      | Reglas de un píxel, esquina viva, sin sombras.                                                                                                                                                                                     |
 
 **Una pantalla nueva del panel va en el cuaderno de trabajo.** Nunca en escenas: quien
 busca un pedido entre ochenta no espera a que aparezca. Las que todavía van en paneles con
@@ -467,14 +467,14 @@ pensando "necesito una página web"; se levanta respondiendo "¿precio?" por men
 eso Venduo es **más que una tienda online**: la tienda se nombra, pero siempre con lo
 que hay detrás —el stock, los pedidos por WhatsApp, las estadísticas, los catálogos—.
 
-| Sí                                                      | No                                                        |
-| ------------------------------------------------------- | --------------------------------------------------------- |
-| "Tu tienda online, tu inventario y tus ventas"          | "Crea tu página web"                                      |
-| "Tu tienda online, con stock y pedidos incluidos"       | "Tu tienda online en minutos", a secas                    |
-| "Compártelo en tus redes", "mándalo por WhatsApp"       | "Tu sitio", "tu dominio", "tu e-commerce"                 |
-| "Tu negocio" para el panel: stock, pedidos, ventas      | "Dashboard", "backoffice"                                 |
-| Ejemplos de redes: Rosa Deportes, Bella Piel, Tecno Sur | Comida casera: cuñapés, panaderías, cafés                 |
-| Los dolores en su idioma: "vendí algo que ya no tenía"  | Promesas genéricas: "lleva tu negocio al siguiente nivel" |
+| Sí                                                       | No                                                        |
+| -------------------------------------------------------- | --------------------------------------------------------- |
+| "Tu tienda online, tu inventario y tus ventas"           | "Crea tu página web"                                      |
+| "Tu tienda online, con stock y pedidos incluidos"        | "Tu tienda online en minutos", a secas                    |
+| "Compártelo en tus redes", "mándalo por WhatsApp"        | "Tu sitio", "tu dominio", "tu e-commerce"                 |
+| "Tu negocio" para el panel: stock, pedidos, ventas       | "Dashboard", "backoffice"                                 |
+| Ejemplos de redes inventados: Luna Accesorios, Tecno Sur | Comida casera; una tienda real de la demostración         |
+| Los dolores en su idioma: "vendí algo que ya no tenía"   | Promesas genéricas: "lleva tu negocio al siguiente nivel" |
 
 Nunca se borra la palabra "tienda": lo que se evita es que parezca que eso es todo.
 
