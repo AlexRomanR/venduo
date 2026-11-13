@@ -28,6 +28,12 @@ export const PESOS: Record<ClaveFuente, number[]> = {
   barlow: [600, 700, 800],
   instrument: [400],
   bricolage: [600, 700, 800],
+  marcellus: [400],
+  gloock: [400],
+  reemkufi: [600],
+  syne: [700],
+  fraunces: [600],
+  fredoka: [600],
 }
 
 /**
@@ -49,6 +55,12 @@ export const METRICAS: Record<ClaveFuente, { sube: number; baja: number }> = {
   barlow: { sube: 1, baja: 0.2 },
   instrument: { sube: 0.99, baja: 0.31 },
   bricolage: { sube: 0.93, baja: 0.27 },
+  marcellus: { sube: 0.974, baja: 0.28 },
+  gloock: { sube: 0.975, baja: 0.225 },
+  reemkufi: { sube: 1.1, baja: 0.4 },
+  syne: { sube: 0.925, baja: 0.275 },
+  fraunces: { sube: 0.978, baja: 0.255 },
+  fredoka: { sube: 0.974, baja: 0.236 },
 }
 
 /**
@@ -138,6 +150,48 @@ const ANCHOS: Record<
     digito: 0.601,
     espacio: 0.223,
     signo: 0.405,
+  },
+  marcellus: {
+    mayuscula: 0.636,
+    minuscula: 0.502,
+    digito: 0.532,
+    espacio: 0.3,
+    signo: 0.358,
+  },
+  gloock: {
+    mayuscula: 0.689,
+    minuscula: 0.526,
+    digito: 0.554,
+    espacio: 0.215,
+    signo: 0.347,
+  },
+  reemkufi: {
+    mayuscula: 0.705,
+    minuscula: 0.523,
+    digito: 0.526,
+    espacio: 0.13,
+    signo: 0.36,
+  },
+  syne: {
+    mayuscula: 0.82,
+    minuscula: 0.633,
+    digito: 0.649,
+    espacio: 0.241,
+    signo: 0.43,
+  },
+  fraunces: {
+    mayuscula: 0.732,
+    minuscula: 0.56,
+    digito: 0.594,
+    espacio: 0.218,
+    signo: 0.421,
+  },
+  fredoka: {
+    mayuscula: 0.649,
+    minuscula: 0.513,
+    digito: 0.529,
+    espacio: 0.241,
+    signo: 0.374,
   },
 }
 

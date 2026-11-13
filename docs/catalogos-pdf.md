@@ -176,7 +176,9 @@ Antes de las doce plantillas, la galería ofrece cuatro estilos que salen de la 
 mejor lo luce. El primero usa la que más se parece a la plantilla de la tienda online
 (`PLANTILLA_POR_TIENDA`: Pasarela y Pisada van con Lookbook, Esencia con Una foto por
 hoja, Calle con Feria, Atelier con Vitrina de lujo, Fórmula con Grilla minimalista, Bazar
-con Lista de precios y la clásica con Revista):
+con Lista de precios, Quilate y Ámbar con Vitrina de lujo, Probador con Lookbook, Correa con Destacado,
+Taco con Grilla minimalista, Tocador con Historia, Crayón con Feria y la clásica con
+Revista):
 
 | Estilo               | Qué hace                                                          | Plantilla          |
 | -------------------- | ----------------------------------------------------------------- | ------------------ |

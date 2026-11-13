@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, MessageCircle } from "lucide-react"
+import { ArrowRight, MessageCircle, Plus } from "lucide-react"
 import type { ComponentType, ReactNode } from "react"
 
 import { descuento, enlaceDeConsulta } from "@/lib/plantillas/bloques"
@@ -52,6 +52,16 @@ export interface PiezasDePaginas {
   marcoDeFoto?: string
   /** Si la galería muestra la foto entera sobre su paño en vez de recortarla. */
   fotoEntera?: boolean
+  /**
+   * Un dato del rubro que la ficha muestra plegado después de la descripción:
+   * la guía de tallas, cómo cuidar una joya. Se abre al tocarlo.
+   */
+  plegable?: {
+    titulo: string
+    texto: string
+    /** Si va solo en algunos productos: el decant, en los que se venden por ml. */
+    cuando?: (producto: PropsFicha["producto"]) => boolean
+  }
   textos: {
     /** Lo que se dice cuando no hay nada cargado todavía. */
     sinProductos: string
@@ -310,7 +320,7 @@ export function paginasDeKit(
               ) : null}
             </div>
 
-            <dl
+            <div
               className={cn(
                 "mt-10 border-t border-tinta text-left",
                 vitrina && "mx-auto max-w-md"
@@ -322,6 +332,12 @@ export function paginasDeKit(
                     {producto.description}
                   </p>
                 </Detalle>
+              ) : null}
+              {piezas.plegable &&
+              (piezas.plegable.cuando?.(producto) ?? true) ? (
+                <Plegable titulo={piezas.plegable.titulo} Rotulo={Rotulo}>
+                  {piezas.plegable.texto}
+                </Plegable>
               ) : null}
               <SiRecibePedidos>
                 <Detalle titulo="Cómo comprar" Rotulo={Rotulo}>
@@ -336,7 +352,7 @@ export function paginasDeKit(
                   <p className="tabular opacity-80">{producto.sku}</p>
                 </Detalle>
               ) : null}
-            </dl>
+            </div>
           </div>
         </div>
 
@@ -409,12 +425,35 @@ function Detalle({
   children: ReactNode
 }) {
   return (
-    <div className="border-b border-tinta/15 py-5">
+    <dl className="border-b border-tinta/15 py-5">
       <dt>
         <Rotulo>{titulo}</Rotulo>
       </dt>
       <dd className="mt-2 text-sm">{children}</dd>
-    </div>
+    </dl>
+  )
+}
+
+function Plegable({
+  titulo,
+  Rotulo,
+  children,
+}: {
+  titulo: string
+  Rotulo: PiezasDePaginas["Rotulo"]
+  children: ReactNode
+}) {
+  return (
+    <details className="group border-b border-tinta/15">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 [&::-webkit-details-marker]:hidden">
+        <Rotulo>{titulo}</Rotulo>
+        <Plus
+          aria-hidden="true"
+          className="size-4 shrink-0 transition-transform duration-200 group-open:rotate-45 motion-reduce:transition-none"
+        />
+      </summary>
+      <p className="pb-5 text-sm leading-relaxed opacity-80">{children}</p>
+    </details>
   )
 }
 

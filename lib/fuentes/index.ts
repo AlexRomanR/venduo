@@ -135,6 +135,60 @@ export const bricolage = localFont({
   preload: false,
 })
 
+/** Titular de la plantilla `quilate`: una romana de inscripción, de joyería. */
+export const marcellus = localFont({
+  src: "./marcellus-400.woff2",
+  weight: "400",
+  variable: "--fuente-marcellus",
+  display: "swap",
+  preload: false,
+})
+
+/** Titular de la plantilla `probador`: una serif de contraste alto, de revista. */
+export const gloock = localFont({
+  src: "./gloock-400.woff2",
+  weight: "400",
+  variable: "--fuente-gloock",
+  display: "swap",
+  preload: false,
+})
+
+/** Titular de la plantilla `ambar`: un cúfico geométrico, de perfumería árabe. */
+export const reemkufi = localFont({
+  src: "./reemkufi-600.woff2",
+  weight: "600",
+  variable: "--fuente-reemkufi",
+  display: "swap",
+  preload: false,
+})
+
+/** Titular de la plantilla `correa`: una grotesca ancha y alegre. */
+export const syne = localFont({
+  src: "./syne-700.woff2",
+  weight: "700",
+  variable: "--fuente-syne",
+  display: "swap",
+  preload: false,
+})
+
+/** Titular de la plantilla `tocador`: una serif de trazo suave (SOFT 100). */
+export const fraunces = localFont({
+  src: "./fraunces-600.woff2",
+  weight: "600",
+  variable: "--fuente-fraunces",
+  display: "swap",
+  preload: false,
+})
+
+/** Titular de la plantilla `crayon`: una redonda, de cuaderno de colegio. */
+export const fredoka = localFont({
+  src: "./fredoka-600.woff2",
+  weight: "600",
+  variable: "--fuente-fredoka",
+  display: "swap",
+  preload: false,
+})
+
 /** Las clases que declaran las variables. Van en `<html>`. */
 export const VARIABLES_DE_FUENTES = [
   geist,
@@ -148,6 +202,12 @@ export const VARIABLES_DE_FUENTES = [
   barlow,
   instrument,
   bricolage,
+  marcellus,
+  gloock,
+  reemkufi,
+  syne,
+  fraunces,
+  fredoka,
 ]
   .map((fuente) => fuente.variable)
   .join(" ")

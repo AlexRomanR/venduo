@@ -57,6 +57,32 @@ export const FUENTES = {
     variable: "--fuente-bricolage",
     pesos: [600, 700, 800],
   },
+  marcellus: {
+    nombre: "Marcellus",
+    variable: "--fuente-marcellus",
+    pesos: [400],
+  },
+  gloock: { nombre: "Gloock", variable: "--fuente-gloock", pesos: [400] },
+  reemkufi: {
+    nombre: "Reem Kufi",
+    variable: "--fuente-reemkufi",
+    pesos: [600],
+  },
+  syne: {
+    nombre: "Syne",
+    variable: "--fuente-syne",
+    pesos: [700],
+  },
+  fraunces: {
+    nombre: "Fraunces",
+    variable: "--fuente-fraunces",
+    pesos: [600],
+  },
+  fredoka: {
+    nombre: "Fredoka",
+    variable: "--fuente-fredoka",
+    pesos: [600],
+  },
 } as const
 
 export type ClaveFuente = keyof typeof FUENTES

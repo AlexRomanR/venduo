@@ -222,6 +222,13 @@ components/
     pisada/           Pisada: zapatillas y calzado
     formula/          Fórmula: perfumería de autor
     bazar/            Bazar: de todo un poco
+    quilate/          Quilate: joyas y accesorios
+    probador/         Probador: ropa de mujer, boutique
+    ambar/            Ámbar: perfumes árabes y decants
+    correa/           Correa: carteras de color
+    taco/             Taco: zapatos de mujer
+    tocador/          Tocador: maquillaje y skincare
+    crayon/           Crayón: ropa de niños y bebés
     comunes/          Portada, catálogo y ficha armados con las piezas de un kit
   tienda/             Lo compartido por todas las plantillas: carrito, el pedido
                       por WhatsApp, agregar —con la elección de talla y color—,

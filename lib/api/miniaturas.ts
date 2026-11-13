@@ -19,6 +19,13 @@ const CON_MINIATURA = new Set([
   "formula",
   "perfume",
   "pisada",
+  "probador",
+  "quilate",
+  "ambar",
+  "correa",
+  "taco",
+  "tocador",
+  "crayon",
 ])
 
 /** La dirección de la miniatura de una plantilla, o `null` si no tiene. */
@@ -35,7 +42,7 @@ export function miniaturaDePlantilla(clave: string): string | null {
  * borrador, recién creada—: la portada de su plantilla con sus secciones y
  * productos de ejemplo, sacada como la captura real (390 × 780). La miniatura
  * de arriba es la de la galería, apaisada: dentro del celular se veía como
- * una computadora. Las ocho tienen la suya; si se suma una plantilla, se saca
+ * una computadora. Todas tienen la suya; si se suma una plantilla, se saca
  * la de ella.
  */
 export function rutaDeVistaDePlantilla(clave: string | null): string {

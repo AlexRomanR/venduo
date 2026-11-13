@@ -557,6 +557,13 @@ const PLANTILLA_POR_TIENDA: Record<string, ClavePlantilla> = {
   pisada: "lookbook",
   formula: "minimal",
   bazar: "precios",
+  quilate: "lujo",
+  probador: "lookbook",
+  ambar: "lujo",
+  correa: "destacado",
+  taco: "minimal",
+  tocador: "historia",
+  crayon: "feria",
   clasica: "revista",
 }
 

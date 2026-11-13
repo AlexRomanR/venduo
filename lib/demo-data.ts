@@ -201,6 +201,14 @@ export const RUBROS_DEMO: RubroConPlantillas[] = [
         ],
       },
       {
+        key: "probador",
+        name: "Probador",
+        sector: "moda",
+        description:
+          "Ropa de mujer con aire de boutique. Fotos de cuerpo entero y las tallas a la vista antes de entrar al producto.",
+        bloques: ["hero", "categories", "product_grid", "faq"],
+      },
+      {
         key: "atelier",
         name: "Atelier",
         sector: "moda",
@@ -213,6 +221,22 @@ export const RUBROS_DEMO: RubroConPlantillas[] = [
           "about",
           "product_grid",
         ],
+      },
+      {
+        key: "correa",
+        name: "Correa",
+        sector: "moda",
+        description:
+          "Carteras y bolsos de todos los días. Cada pieza sobre un azulejo de color, con sus colores a la vista.",
+        bloques: ["hero", "categories", "product_grid", "cta"],
+      },
+      {
+        key: "taco",
+        name: "Taco",
+        sector: "moda",
+        description:
+          "Zapatos de mujer. Cada par de perfil, sobre su repisa, con los números que quedan a la vista.",
+        bloques: ["hero", "categories", "product_grid", "faq"],
       },
       {
         key: "pisada",
@@ -250,6 +274,50 @@ export const RUBROS_DEMO: RubroConPlantillas[] = [
         description:
           "Perfumería de autor, decants y aceites. Una botica moderna: cada frasco con su etiqueta numerada y su ficha sin adornos.",
         bloques: ["hero", "categories", "product_grid", "product_grid", "faq"],
+      },
+      {
+        key: "ambar",
+        name: "Ámbar",
+        sector: "belleza",
+        description:
+          "Perfumes árabes y decants. Bandas de noche, una regla de estrellas y el precio del decant primero.",
+        bloques: ["hero", "categories", "product_grid", "faq"],
+      },
+      {
+        key: "tocador",
+        name: "Tocador",
+        sector: "belleza",
+        description:
+          "Maquillaje y skincare. La rutina en pasos numerados, los tonos de cada producto a la vista y ayuda con el tono por WhatsApp.",
+        bloques: ["hero", "categories", "product_grid", "faq"],
+      },
+    ],
+  },
+  {
+    key: "ninos",
+    name: "Niños",
+    plantillas: [
+      {
+        key: "crayon",
+        name: "Crayón",
+        sector: "ninos",
+        description:
+          "Ropa de bebés y de niñas y niños. Se busca por edad en un tallímetro, con tarjetas redondas y garabatos de crayón.",
+        bloques: ["hero", "categories", "product_grid", "product_grid", "faq"],
+      },
+    ],
+  },
+  {
+    key: "joyeria",
+    name: "Joyas",
+    plantillas: [
+      {
+        key: "quilate",
+        name: "Quilate",
+        sector: "joyeria",
+        description:
+          "Joyas y accesorios. La pieza de cerca, cómo se ve puesta en un círculo, y el material en un sello.",
+        bloques: ["hero", "categories", "product_grid", "cta"],
       },
     ],
   },
