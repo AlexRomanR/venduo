@@ -258,9 +258,9 @@ sirven desde `lib/fuentes/` con `next/font/local`: el build ya no las baja de Go
   (por debajo, una bandeja que abre la conversación en una hoja). Lo que arma la IA se
   agrega a "Tu tablero", que sigue con su PDF. Una tienda sin ventas ve qué falta y
   tarjetas de ejemplo sin cifras. Las acciones respetan que el administrador apague la
-  pantalla, y lo guardado se valida con zod. **Falta**: probar la IA de punta a punta con
-  una tienda real (en modo demo responde "Todavía no tienes una tienda") y llevarla a la
-  app, que hoy no tiene el tablero fijo (`/api/v1/estadisticas`). Riesgo anotado: el tope
+  pantalla, y lo guardado se valida con zod. La IA se probó de punta a punta con la
+  tienda de Rosa, y la app tiene el mismo tablero fijo (`GET /api/v1/estadisticas?dias=`
+  suma `estadisticas` a lo guardado). Riesgo anotado: el tope
   de 1000 filas de PostgREST recortaría las ventas de una tienda con mucho movimiento,
   igual que en el Resumen.
 - **Apariencia** (rehecha el 8 de noviembre, `docs/briefs/2026-11-08-apariencia.md`): tu
@@ -477,7 +477,8 @@ noviembre), por etapas y vista a 375 y 1280 px en modo demo:
 
 **Falta:**
 
-- [ ] Probarlo con una tienda real: cobrar un pedido y ver el sello, cambiar stock.
+- [x] Probarlo con una tienda real (8 de noviembre, en la base local): cobrar con el
+      sello, reponer desde el Resumen, cambiar de plantilla y deslizar la pasarela.
 - [x] Los editores (8 de noviembre): el de la tienda lleva la marca del cuaderno en su
       raíz —está fuera del armazón— y los dos pasaron sus piezas: píldoras, tarjetas de
       hoja, paletas y cajas con radio, sin el rojo al pasar el cursor. La vista previa
@@ -489,8 +490,16 @@ noviembre), por etapas y vista a 375 y 1280 px en modo demo:
 - [x] Categorías salió de la barra lateral: se entra desde Productos.
 - [x] Reponer stock en el Resumen ya no vacía la escena: lo repuesto queda en su fila,
       marcado "Repuesto", hasta la próxima vez que se entra.
-- [ ] La app (`src/components/`): Pedidos, Productos y las demás, con `NOTA` y las
-      piezas del Inicio, cuando se apruebe la web.
+- [x] La app (9 de noviembre, `docs/briefs/2026-11-08-app-cuaderno.md`): las piezas
+      (`Seccion`, `Tarjeta`, `SinDatos`, fichas y botones en píldora, hojas y avisos de
+      hoja, esqueletos, bandejas) pasaron al cuaderno, y con ellas todas las pantallas
+      de trabajo. Pedidos con tickets y el sello que cobra; Productos con una sola
+      franja de filtros y más y menos redondos; Estadísticas con el tablero fijo y la IA
+      en una hoja; "Editar tu tienda" es la pasarela, con los dibujos que hace la web
+      (`/editor/app/apariencia`). Probado en el emulador contra la base local.
+- [x] Tus datos y Datos de la tienda, unidas en la app (9 de noviembre) como `/cuenta`
+      de la web: una pantalla con cada panel que se guarda por separado. "Datos de la
+      tienda" del menú abre la misma, en el panel de la tienda.
 
 ### 2. Funciones por plan — cuando se decida
 
@@ -559,6 +568,29 @@ vuelta: "Foto y precio" en serie desde la cámara y duplicar un producto.
 
 Se modela el estado, no el cobro. Falta el bloqueo real al vencer la prueba (panel en
 solo lectura con exportación a CSV) y la purga a los 90 días.
+
+### 6.b. Lo que dejó el recorrido de punta a punta (9 de noviembre)
+
+Se recorrió la web entera a 390 px contra la base local, con una cuenta nueva: registro,
+alta con la plantilla Calle, un producto con foto, la tienda pública, el carrito y el
+pedido por WhatsApp (el mensaje sale al 591 con el detalle y el total), cobrar con el
+sello (el stock bajó de 5 a 3), un catálogo guardado, una venta directa (el stock llegó a
+0 y la tienda dice "Agotado"), despublicar (quien compra ve "Esto no está disponible") y
+volver a publicar. Todo funcionó. Se arregló un error: el festejo y la hoja de "Nueva
+venta" compartían la `key` "1" al registrar una venta.
+
+Para rediseñar o revisar:
+
+- [x] **El alta y el ingreso, rediseñados** (11 de noviembre, brief
+      `docs/briefs/2026-11-09-alta.md`): en el cuaderno, primero el negocio y después la
+      plantilla en la pasarela de Apariencia con el nombre adentro, y el final en una
+      escena con la tienda en vivo en el celular del Resumen. El ingreso, con el mismo
+      marco y una línea de texto.
+- [ ] **Hojas y confirmaciones de la web, todavía en el diario**: "Agregar producto" de
+      Nueva venta, "¿Marcar pagado el pedido?" y "¿Pasar a X?" de Apariencia llevan la
+      raya de tinta arriba y esquinas vivas; la app ya las tiene en hoja con radio.
+- [ ] **El PDF del catálogo en el celular** no se pudo ver en el navegador automático (el
+      servidor lo arma: `POST /panel/catalogos/pdf` 200). Probarlo en un teléfono.
 
 ### 7. Pendientes chicos
 

@@ -75,14 +75,14 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
 
         <div className="absolute top-2 left-2 flex flex-col items-start gap-1">
           {rebaja && !agotado ? (
-            <span className="bg-senal px-2 py-1 text-[10px] font-semibold tracking-[0.12em] text-white uppercase">
+            <span className="bg-senal px-2 py-1 text-xs font-semibold tracking-[0.12em] text-white uppercase">
               −{rebaja}%
             </span>
           ) : null}
         </div>
 
         {agotado ? (
-          <span className="absolute inset-x-0 bottom-0 bg-tinta/85 py-2 text-center text-[11px] font-semibold tracking-[0.16em] text-papel uppercase">
+          <span className="absolute inset-x-0 bottom-0 bg-tinta/85 py-2 text-center text-xs font-semibold tracking-[0.16em] text-papel uppercase">
             Agotado
           </span>
         ) : null}
@@ -144,7 +144,7 @@ export function Encabezado({ antetitulo, titulo, bajada }: PropsEncabezado) {
   return (
     <div className="border-b-2 border-tinta pb-5">
       {antetitulo ? (
-        <p className="text-[11px] font-semibold tracking-[0.18em] uppercase opacity-60">
+        <p className="text-xs font-semibold tracking-[0.18em] uppercase opacity-60">
           {antetitulo}
         </p>
       ) : null}

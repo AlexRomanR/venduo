@@ -42,7 +42,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
     return (
       <section className="border-b-2 border-tinta">
         <div className="mx-auto w-full max-w-7xl px-5 py-16 md:py-24">
-          <p className="text-[11px] font-semibold tracking-[0.2em] uppercase opacity-60">
+          <p className="text-xs font-semibold tracking-[0.2em] uppercase opacity-60">
             {tienda.nombre}
           </p>
           <h1 className="mt-4 max-w-[12ch] font-titular text-[clamp(3.25rem,15vw,9rem)] leading-[0.88]">
@@ -87,7 +87,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
       />
 
       <div className="mx-auto w-full max-w-7xl px-5 pb-10 text-papel md:pb-16">
-        <p className="text-[11px] font-semibold tracking-[0.2em] uppercase">
+        <p className="text-xs font-semibold tracking-[0.2em] uppercase">
           {tienda.nombre}
         </p>
         <h1 className="mt-3 max-w-[12ch] font-titular text-[clamp(3.25rem,14vw,9rem)] leading-[0.88]">

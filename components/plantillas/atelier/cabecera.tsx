@@ -53,7 +53,7 @@ export function Cabecera({ marco, enlaceDelCarrito = true }: PropsCabecera) {
           <Link
             href={catalogo}
             className={cn(
-              "hidden min-h-11 items-center px-3 text-[11px] tracking-[0.22em] uppercase transition-colors hover:text-senal sm:flex",
+              "hidden min-h-11 items-center px-3 text-xs tracking-[0.22em] uppercase transition-colors hover:text-senal sm:flex",
               enCatalogo && !categoriaActiva && "text-senal"
             )}
           >
@@ -109,7 +109,7 @@ function Enlace({
       href={href}
       aria-current={activo ? "page" : undefined}
       className={cn(
-        "flex min-h-11 items-center text-[11px] tracking-[0.22em] whitespace-nowrap uppercase transition-[color,opacity]",
+        "flex min-h-11 items-center text-xs tracking-[0.22em] whitespace-nowrap uppercase transition-[color,opacity]",
         activo
           ? "text-senal underline decoration-senal underline-offset-[6px]"
           : "opacity-75 hover:opacity-100"

@@ -139,11 +139,11 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
         )}
 
         {agotado ? (
-          <span className="absolute top-0 left-0 bg-tinta px-2 py-1 text-[10px] font-semibold tracking-[0.12em] text-papel uppercase">
+          <span className="absolute top-0 left-0 bg-tinta px-2 py-1 text-xs font-semibold tracking-[0.12em] text-papel uppercase">
             Agotado
           </span>
         ) : producto.compare_at_price_cents ? (
-          <span className="absolute top-0 left-0 bg-senal px-2 py-1 text-[10px] font-semibold tracking-[0.12em] text-white uppercase">
+          <span className="absolute top-0 left-0 bg-senal px-2 py-1 text-xs font-semibold tracking-[0.12em] text-white uppercase">
             Oferta
           </span>
         ) : null}

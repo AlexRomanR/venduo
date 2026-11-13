@@ -30,7 +30,7 @@ export function Cabecera({ marco, enlaceDelCarrito = true }: PropsCabecera) {
 
   return (
     <header className="sticky top-0 z-30 border-b border-tinta/10 bg-papel/95 backdrop-blur">
-      <p className="border-b border-tinta/10 px-5 py-2 text-center text-[10px] tracking-[0.28em] uppercase opacity-65">
+      <p className="border-b border-tinta/10 px-5 py-2 text-center text-xs tracking-[0.28em] uppercase opacity-65">
         Asesoría personalizada por WhatsApp
       </p>
 
@@ -40,7 +40,7 @@ export function Cabecera({ marco, enlaceDelCarrito = true }: PropsCabecera) {
             href={catalogo}
             aria-label="Ver la colección"
             className={cn(
-              "flex min-h-11 min-w-11 items-center justify-center px-3 text-[11px] tracking-[0.24em] uppercase transition-colors hover:text-senal",
+              "flex min-h-11 min-w-11 items-center justify-center px-3 text-xs tracking-[0.24em] uppercase transition-colors hover:text-senal",
               enCatalogo && !categoriaActiva && "text-senal"
             )}
           >
@@ -125,7 +125,7 @@ function Enlace({
       href={href}
       aria-current={activo ? "page" : undefined}
       className={cn(
-        "flex min-h-11 items-center text-[11px] tracking-[0.22em] whitespace-nowrap uppercase transition-colors hover:text-senal",
+        "flex min-h-11 items-center text-xs tracking-[0.22em] whitespace-nowrap uppercase transition-colors hover:text-senal",
         activo ? "text-senal" : "opacity-75 hover:opacity-100"
       )}
     >

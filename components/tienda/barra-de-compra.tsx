@@ -109,7 +109,7 @@ export function BarraDeCompra({
             className="relative flex size-12 shrink-0 items-center justify-center rounded-plantilla border-2 border-tinta transition-colors hover:bg-tinta hover:text-papel"
           >
             <ShoppingBag aria-hidden="true" className="size-5" />
-            <span className="tabular absolute -top-2 -right-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-tinta px-1 text-[11px] font-semibold text-papel">
+            <span className="tabular absolute -top-2 -right-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-tinta px-1 text-xs font-semibold text-papel">
               {unidades}
             </span>
           </Link>

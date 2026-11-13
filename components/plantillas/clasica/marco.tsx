@@ -88,7 +88,7 @@ export function BotonDelCarrito({
     >
       <ShoppingBag aria-hidden="true" className="size-5" />
       {unidades > 0 ? (
-        <span className="tabular absolute top-1 right-0.5 flex size-5 items-center justify-center rounded-full bg-senal text-[10px] font-bold text-white">
+        <span className="tabular absolute top-1 right-0.5 flex size-5 items-center justify-center rounded-full bg-senal text-xs font-bold text-white">
           {unidades > 9 ? "9+" : unidades}
         </span>
       ) : null}

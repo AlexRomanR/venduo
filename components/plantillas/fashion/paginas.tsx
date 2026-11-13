@@ -115,7 +115,7 @@ function SobreLaTienda({ tienda }: { tienda: TiendaPublica }) {
   return (
     <section className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-14 md:grid-cols-[1.2fr_1fr] md:gap-16 md:py-20">
       <div>
-        <p className="text-[11px] font-semibold tracking-[0.2em] uppercase opacity-60">
+        <p className="text-xs font-semibold tracking-[0.2em] uppercase opacity-60">
           Sobre la tienda
         </p>
         <h2 className="mt-3 font-titular text-[clamp(2rem,7vw,3.75rem)] leading-[0.92]">
@@ -181,7 +181,7 @@ export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
     <div className="mx-auto w-full max-w-7xl px-5 pt-6 pb-16 md:pt-10">
       <nav
         aria-label="Estás en"
-        className="flex items-center gap-2 text-[11px] tracking-[0.16em] uppercase"
+        className="flex items-center gap-2 text-xs tracking-[0.16em] uppercase"
       >
         <Link
           href={rutaDeTienda(tienda.slug, "")}
@@ -265,7 +265,7 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
       <nav
         aria-label="Estás en"
         className={cn(
-          "flex items-center gap-2 overflow-hidden px-5 text-[11px] tracking-[0.16em] whitespace-nowrap uppercase md:px-0",
+          "flex items-center gap-2 overflow-hidden px-5 text-xs tracking-[0.16em] whitespace-nowrap uppercase md:px-0",
           vitrina && "justify-center"
         )}
       >
@@ -335,7 +335,7 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
               </span>
             ) : null}
             {rebaja ? (
-              <span className="bg-senal px-2 py-1 text-[11px] font-semibold tracking-[0.12em] text-white uppercase">
+              <span className="bg-senal px-2 py-1 text-xs font-semibold tracking-[0.12em] text-white uppercase">
                 −{rebaja}%
               </span>
             ) : null}
@@ -425,7 +425,7 @@ function Detalle({
 }) {
   return (
     <div className="border-b border-tinta/15 py-5">
-      <dt className="text-[11px] font-semibold tracking-[0.18em] uppercase">
+      <dt className="text-xs font-semibold tracking-[0.18em] uppercase">
         {titulo}
       </dt>
       <dd className="mt-2 text-sm">{children}</dd>

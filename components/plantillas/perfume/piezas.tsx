@@ -65,24 +65,24 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
         />
 
         {rebaja && !agotado ? (
-          <span className="absolute top-4 left-1/2 -translate-x-1/2 rounded-plantilla bg-papel px-3 py-1 text-[10px] tracking-[0.2em] whitespace-nowrap text-senal uppercase">
+          <span className="absolute top-4 left-1/2 -translate-x-1/2 rounded-plantilla bg-papel px-3 py-1 text-xs tracking-[0.2em] whitespace-nowrap text-senal uppercase">
             −{rebaja}%
           </span>
         ) : producto.is_featured && !agotado ? (
-          <span className="absolute top-4 left-1/2 -translate-x-1/2 rounded-plantilla bg-papel px-3 py-1 text-[10px] tracking-[0.2em] whitespace-nowrap uppercase">
+          <span className="absolute top-4 left-1/2 -translate-x-1/2 rounded-plantilla bg-papel px-3 py-1 text-xs tracking-[0.2em] whitespace-nowrap uppercase">
             Favorito
           </span>
         ) : null}
 
         {agotado ? (
-          <span className="absolute inset-x-0 bottom-0 bg-papel/90 py-2 text-[10px] tracking-[0.24em] uppercase">
+          <span className="absolute inset-x-0 bottom-0 bg-papel/90 py-2 text-xs tracking-[0.24em] uppercase">
             Agotado
           </span>
         ) : null}
       </div>
 
       {producto.category ? (
-        <p className="mt-4 text-[10px] tracking-[0.24em] uppercase opacity-55">
+        <p className="mt-4 text-xs tracking-[0.24em] uppercase opacity-55">
           {producto.category}
         </p>
       ) : null}
@@ -157,7 +157,7 @@ export function TituloDeSeccion({
   return (
     <div className="text-center">
       {antetitulo ? (
-        <p className="text-[11px] tracking-[0.28em] text-senal uppercase">
+        <p className="text-xs tracking-[0.28em] text-senal uppercase">
           {antetitulo}
         </p>
       ) : null}
@@ -199,7 +199,7 @@ export function EnlacePildora({
     <Link
       href={href}
       className={cn(
-        "inline-flex min-h-12 items-center justify-center rounded-plantilla border px-8 text-[11px] tracking-[0.22em] uppercase transition-colors",
+        "inline-flex min-h-12 items-center justify-center rounded-plantilla border px-8 text-xs tracking-[0.22em] uppercase transition-colors",
         claro
           ? "border-papel/45 hover:border-papel hover:bg-papel hover:text-tinta"
           : "border-tinta/35 hover:border-tinta hover:bg-tinta hover:text-papel",
@@ -262,13 +262,13 @@ export function Pie({ marco }: PropsPie) {
         >
           <Link
             href={rutaDeTienda(marco.slug, "")}
-            className="flex min-h-11 items-center text-[11px] tracking-[0.24em] uppercase opacity-70 transition-opacity hover:opacity-100"
+            className="flex min-h-11 items-center text-xs tracking-[0.24em] uppercase opacity-70 transition-opacity hover:opacity-100"
           >
             Inicio
           </Link>
           <Link
             href={rutaDeTienda(marco.slug, "/catalogo")}
-            className="flex min-h-11 items-center text-[11px] tracking-[0.24em] uppercase opacity-70 transition-opacity hover:opacity-100"
+            className="flex min-h-11 items-center text-xs tracking-[0.24em] uppercase opacity-70 transition-opacity hover:opacity-100"
           >
             La colección
           </Link>
@@ -277,7 +277,7 @@ export function Pie({ marco }: PropsPie) {
               href={`https://wa.me/${numeroDeWhatsApp(marco.whatsapp)}`}
               target="_blank"
               rel="noreferrer noopener"
-              className="flex min-h-11 items-center text-[11px] tracking-[0.24em] uppercase opacity-70 transition-opacity hover:opacity-100"
+              className="flex min-h-11 items-center text-xs tracking-[0.24em] uppercase opacity-70 transition-opacity hover:opacity-100"
             >
               WhatsApp
             </a>
@@ -290,7 +290,7 @@ export function Pie({ marco }: PropsPie) {
 
         <Link
           href="/"
-          className="mt-4 inline-flex min-h-11 items-center text-[10px] tracking-[0.24em] uppercase opacity-50 transition-opacity hover:opacity-100"
+          className="mt-4 inline-flex min-h-11 items-center text-xs tracking-[0.24em] uppercase opacity-50 transition-opacity hover:opacity-100"
         >
           Hecho con Venduo
         </Link>

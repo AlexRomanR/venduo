@@ -49,7 +49,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
         <div className={cn("text-center", foto && "md:text-left")}>
           <p
             className={cn(
-              "flex items-center justify-center gap-3 text-[11px] tracking-[0.3em] uppercase opacity-75",
+              "flex items-center justify-center gap-3 text-xs tracking-[0.3em] uppercase opacity-75",
               foto && "md:justify-start"
             )}
           >
@@ -178,7 +178,7 @@ function Categorias({ bloque, tienda }: PropsBloque) {
                   <span className="mt-4 font-titular text-xl leading-tight italic transition-colors group-hover:text-senal">
                     {categoria.nombre}
                   </span>
-                  <span className="tabular mt-1 text-[10px] tracking-[0.22em] uppercase opacity-55">
+                  <span className="tabular mt-1 text-xs tracking-[0.22em] uppercase opacity-55">
                     {categoria.productos}{" "}
                     {categoria.productos === 1 ? "pieza" : "piezas"}
                   </span>
@@ -273,7 +273,7 @@ function Voces({ bloque }: PropsBloque) {
               «{String(item.quote)}»
             </p>
             {typeof item.author === "string" ? (
-              <footer className="mt-4 text-[11px] tracking-[0.24em] uppercase opacity-60">
+              <footer className="mt-4 text-xs tracking-[0.24em] uppercase opacity-60">
                 {item.author}
               </footer>
             ) : null}

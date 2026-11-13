@@ -2,20 +2,27 @@
 
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
+import { ArrowRight, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-import { createClient } from "@/lib/supabase/client"
+import {
+  BOTON_PRIMARIO,
+  CAMPO,
+  CAMPO_LINEA,
+  ERROR_CAMPO,
+  ETIQUETA_CAMPO,
+} from "@/lib/estilos"
+import { cn } from "@/lib/utils"
 import {
   crearTiendaSchema,
   soloCifras,
   type CrearTiendaInput,
 } from "@/lib/validation/tienda"
+import { guardarNegocio } from "@/app/crear/acciones"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,62 +31,53 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
-const ETIQUETA_CAMPO =
-  "text-xs font-semibold tracking-[0.12em] uppercase opacity-55 data-[error=true]:text-senal data-[error=true]:opacity-100"
+/**
+ * Si alguien pega el número con el código del país, el 591 sale: ya está
+ * escrito delante del campo.
+ */
+function sinCodigoDePais(valor: string) {
+  const cifras = soloCifras(valor)
+  return cifras.startsWith("591") && cifras.length > 8
+    ? valor.replace(/^\s*\+?\s*591[\s-]*/, "")
+    : valor
+}
 
-const CAMPO =
-  "rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:ring-0 aria-invalid:border-senal aria-invalid:ring-0 md:text-base"
-
-export function FormularioNegocio({ plantilla }: { plantilla: string }) {
+/**
+ * Paso 1 del alta: lo mínimo para que la tienda exista —cómo se llama, qué
+ * vende y a qué WhatsApp le llegan los pedidos—, escrito ahí mismo. Todavía no
+ * crea nada: lo guarda en el borrador del alta y sigue a la plantilla, que ya
+ * se ve con este nombre.
+ */
+export function FormularioNegocio({
+  inicial,
+}: {
+  /** Lo que ya había escrito, si vuelve del paso 2 o recargó. */
+  inicial: CrearTiendaInput | null
+}) {
   const router = useRouter()
 
   const form = useForm<CrearTiendaInput>({
     resolver: zodResolver(crearTiendaSchema),
-    defaultValues: {
-      nombre: "",
-      descripcion: "",
-      whatsapp: "",
-    },
+    defaultValues: inicial ?? { nombre: "", descripcion: "", whatsapp: "" },
   })
 
   async function onSubmit(values: CrearTiendaInput) {
-    const supabase = createClient()
-    if (!supabase) {
-      toast.error("Falta configurar Supabase en .env.local")
+    const resultado = await guardarNegocio(values)
+    if (!resultado.ok) {
+      toast.error(resultado.error ?? "No pudimos guardar tus datos.")
       return
     }
-
-    // La tienda no se inserta desde el cliente: `create_store` resuelve el
-    // slug único, crea la suscripción de prueba y siembra la plantilla en una
-    // sola transacción.
-    const { error } = await supabase.rpc("create_store", {
-      p_name: values.nombre,
-      p_description: values.descripcion,
-      p_template_key: plantilla,
-      p_whatsapp: soloCifras(values.whatsapp),
-    })
-
-    if (error) {
-      toast.error(
-        error.message.includes("Ya tienes una tienda")
-          ? "Ya tienes una tienda creada."
-          : "No pudimos crear tu tienda. Inténtalo de nuevo."
-      )
-      return
-    }
-
-    toast.success("Tu tienda está creada.")
-    // El último paso del alta ofrece el editor, sin obligar: quien tiene
-    // apuro puede ir directo a cargar productos.
-    router.push("/crear/listo")
-    router.refresh()
+    router.push("/crear/plantilla")
   }
+
+  const enviando =
+    form.formState.isSubmitting || form.formState.isSubmitSuccessful
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-7"
+        className="pieza-tarjeta flex flex-col gap-6 border border-tinta px-4 py-5 sm:px-6 sm:py-6"
       >
         <FormField
           control={form.control}
@@ -87,21 +85,20 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
           render={({ field }) => (
             <FormItem>
               <FormLabel className={ETIQUETA_CAMPO}>
-                ¿Cómo se llama tu negocio?
+                Nombre de tu negocio
               </FormLabel>
               <FormControl>
                 <Input
-                  className={`h-12 ${CAMPO}`}
-                  placeholder="Rosa Deportes"
+                  className={cn(
+                    CAMPO_LINEA,
+                    "font-titular text-xl font-bold tracking-[-0.02em] md:text-xl"
+                  )}
+                  placeholder="Ej.: Luna Accesorios"
                   autoComplete="organization"
                   {...field}
                 />
               </FormControl>
-              <FormDescription className="text-xs text-tinta/55">
-                Es el nombre que van a ver tus clientes, y del que sale el
-                enlace de tu tienda.
-              </FormDescription>
-              <FormMessage className="text-sm text-senal" />
+              <FormMessage className={ERROR_CAMPO} />
             </FormItem>
           )}
         />
@@ -111,22 +108,19 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
           name="descripcion"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className={ETIQUETA_CAMPO}>
-                ¿Qué vendes y a quién?
-              </FormLabel>
+              <FormLabel className={ETIQUETA_CAMPO}>Qué vendes</FormLabel>
               <FormControl>
                 <Textarea
-                  rows={5}
-                  className={`min-h-32 resize-y py-3 ${CAMPO}`}
-                  placeholder="Vendo ropa deportiva por TikTok e Instagram: buzos, poleras y zapatillas. Atiendo en Santa Cruz y coordino todo por WhatsApp."
+                  rows={3}
+                  className={cn(
+                    CAMPO,
+                    "field-sizing-content min-h-24 resize-none py-3"
+                  )}
+                  placeholder="Ej.: Aretes, collares y carteras. Envío a todo Santa Cruz."
                   {...field}
                 />
               </FormControl>
-              <FormDescription className="text-xs text-tinta/55">
-                Escríbelo como se lo contarías a quien te compra. Con esto la IA
-                escribe los textos de tu portada.
-              </FormDescription>
-              <FormMessage className="text-sm text-senal" />
+              <FormMessage className={ERROR_CAMPO} />
             </FormItem>
           )}
         />
@@ -137,36 +131,47 @@ export function FormularioNegocio({ plantilla }: { plantilla: string }) {
           render={({ field }) => (
             <FormItem>
               <FormLabel className={ETIQUETA_CAMPO}>
-                ¿A qué WhatsApp te escriben?
+                WhatsApp para tus pedidos
               </FormLabel>
-              <FormControl>
-                <Input
-                  className={`h-12 ${CAMPO}`}
-                  type="tel"
-                  inputMode="tel"
-                  placeholder="700 12345"
-                  autoComplete="tel"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription className="text-xs text-tinta/55">
-                Cada pedido de tu tienda te llega a este número, con la lista de
-                productos y el total. Lo puedes cambiar después.
-              </FormDescription>
-              <FormMessage className="text-sm text-senal" />
+              <div className="flex items-stretch">
+                <span
+                  aria-hidden="true"
+                  className="flex h-12 items-center border-b border-tinta pr-3 text-base text-tinta/65 tabular-nums"
+                >
+                  +591
+                </span>
+                <FormControl>
+                  <Input
+                    className={cn(CAMPO_LINEA, "flex-1 pl-1 tabular-nums")}
+                    type="tel"
+                    inputMode="tel"
+                    placeholder="700 12345"
+                    autoComplete="tel-national"
+                    aria-description="Con el código de Bolivia, +591, ya puesto."
+                    {...field}
+                    onChange={(evento) =>
+                      field.onChange(sinCodigoDePais(evento.target.value))
+                    }
+                  />
+                </FormControl>
+              </div>
+              <FormMessage className={ERROR_CAMPO} />
             </FormItem>
           )}
         />
 
         <button
           type="submit"
-          disabled={form.formState.isSubmitting}
-          className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-sm bg-accion px-5 font-semibold text-white transition-colors hover:bg-accion-alta disabled:opacity-60 sm:w-auto sm:self-start sm:px-8"
+          disabled={enviando}
+          className={cn(BOTON_PRIMARIO, "w-full")}
         >
-          {form.formState.isSubmitting ? (
+          {enviando ? (
             <Loader2 aria-hidden="true" className="size-4 animate-spin" />
           ) : null}
-          Crear mi tienda
+          Elegir mi plantilla
+          {enviando ? null : (
+            <ArrowRight aria-hidden="true" className="size-4" />
+          )}
         </button>
       </form>
     </Form>

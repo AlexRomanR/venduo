@@ -69,10 +69,11 @@ function barraDeDemostracion(): BarraLateral {
       url: urlDeTienda("rosa-deportes"),
       conWhatsApp: true,
     },
+    // Los mismos que muestran Pedidos y Productos en la demo.
     contadores: {
-      pedidosPendientes: 2,
+      pedidosPendientes: 1,
       productosSinStock: 1,
-      productosPocoStock: 2,
+      productosPocoStock: 1,
     },
     apariencia: aparienciaDeTienda("fashion", {}),
     funciones: TODAS_ACTIVAS,

@@ -270,7 +270,7 @@ export function paginasDeKit(
                 </span>
               ) : null}
               {rebaja ? (
-                <span className="rounded-plantilla bg-senal px-2.5 py-1 text-[11px] font-semibold tracking-[0.1em] text-white uppercase">
+                <span className="rounded-plantilla bg-senal px-2.5 py-1 text-xs font-semibold tracking-[0.1em] text-white uppercase">
                   −{rebaja}%
                 </span>
               ) : null}
@@ -370,7 +370,7 @@ function Migas({
   return (
     <nav
       aria-label="Estás en"
-      className="flex items-center gap-2 overflow-hidden text-[11px] tracking-[0.14em] whitespace-nowrap uppercase"
+      className="flex items-center gap-2 overflow-hidden text-xs tracking-[0.14em] whitespace-nowrap uppercase"
     >
       {pasos.map((paso, i) => (
         <span key={paso.href} className="flex min-w-0 items-center gap-2">

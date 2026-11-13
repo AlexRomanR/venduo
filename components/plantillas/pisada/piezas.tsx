@@ -67,12 +67,12 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
 
         <div className="absolute top-2.5 left-2.5 flex flex-col items-start gap-1">
           {rebaja && !agotado ? (
-            <span className="rounded-full bg-senal px-2.5 py-1 text-[11px] font-bold text-white">
+            <span className="rounded-full bg-senal px-2.5 py-1 text-xs font-bold text-white">
               −{rebaja}%
             </span>
           ) : null}
           {agotado ? (
-            <span className="rounded-full bg-tinta px-2.5 py-1 text-[10px] font-bold tracking-[0.08em] text-papel uppercase">
+            <span className="rounded-full bg-tinta px-2.5 py-1 text-xs font-bold tracking-[0.08em] text-papel uppercase">
               Agotado
             </span>
           ) : null}
@@ -148,7 +148,7 @@ export function Titulo({
       {enlace ? (
         <Link
           href={enlace.href}
-          className="group inline-flex min-h-11 shrink-0 items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-[11px] font-bold tracking-[0.1em] uppercase transition-colors hover:bg-tinta hover:text-papel"
+          className="group inline-flex min-h-11 shrink-0 items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-xs font-bold tracking-[0.1em] uppercase transition-colors hover:bg-tinta hover:text-papel"
         >
           {enlace.etiqueta}
           <ArrowRight
@@ -163,7 +163,7 @@ export function Titulo({
 
 export function Rotulo({ children }: { children: ReactNode }) {
   return (
-    <span className="text-[11px] font-bold tracking-[0.12em] uppercase">
+    <span className="text-xs font-bold tracking-[0.12em] uppercase">
       {children}
     </span>
   )

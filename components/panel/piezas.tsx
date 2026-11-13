@@ -261,7 +261,9 @@ export function SinDatos({
     <div className="pieza-vacio flex flex-1 flex-col items-start gap-3 px-4 py-6 sm:px-5">
       <Icono aria-hidden="true" className="size-6 opacity-30" />
       <div>
-        <p className="font-titular font-bold tracking-[-0.01em]">{titulo}</p>
+        <p className="vacio-nota font-titular font-bold tracking-[-0.01em]">
+          {titulo}
+        </p>
         <p className="mt-1 max-w-[52ch] text-sm leading-relaxed opacity-70">
           {texto}
         </p>

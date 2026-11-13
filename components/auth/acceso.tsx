@@ -2,11 +2,19 @@
 
 import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
+import {
+  AYUDA_CAMPO,
+  BOTON_PRIMARIO,
+  BOTON_SECUNDARIO,
+  CAMPO_LINEA,
+  ERROR_CAMPO,
+  ETIQUETA_CAMPO,
+} from "@/lib/estilos"
 import { CORREO_DE_CONTACTO } from "@/lib/legal"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
@@ -25,37 +33,20 @@ const MIN_PASSWORD = 8
 
 type Modo = "ingresar" | "registrarse"
 
-/** Lo que se lee al lado del registro: la promesa, y por qué creerla. */
+/**
+ * El titular de cada modo, con su frase en el resaltador, y una línea. Sin
+ * párrafos ni lista de virtudes: quien llega acá ya decidió.
+ */
 const REGISTRO = {
-  etiqueta: "Para quien ya vende",
-  titular: "Tu tienda online, tu inventario y tus ventas.",
-  entrada:
-    "Elige una plantilla y tu tienda queda armada. Subes tus productos desde el celular o computadora, los pedidos te llegan por WhatsApp y un panel te muestra lo que vendes cada día.",
-  puntos: [
-    {
-      titulo: "Tu inventario, siempre al día",
-      detalle:
-        "Cuando te pagan, marcas el pedido y se descuenta del stock. Te avisamos de lo que se está acabando.",
-    },
-    {
-      titulo: "Pedidos por WhatsApp",
-      detalle:
-        "Tu cliente arma su carrito y te lo manda a tu WhatsApp, con el total y el número de pedido.",
-    },
-    {
-      titulo: "Catálogos en PDF",
-      detalle:
-        "Con tus productos y tus colores, para mandar por WhatsApp con los precios del día.",
-    },
-  ],
-  pie: "Abrir y publicar no cuesta nada. No pedimos tarjeta.",
+  antes: "Abre ",
+  resaltado: "tu tienda",
+  bajada: "Con tu stock y tus pedidos por WhatsApp. Sin tarjeta.",
 }
 
 const VUELTA = {
-  etiqueta: "Entrar",
-  titular: "Retoma donde lo dejaste.",
-  entrada:
-    "Tu tienda, tus pedidos y tus ventas siguen igual que la última vez.",
+  antes: "Entra a tu ",
+  resaltado: "tienda",
+  bajada: "Tus pedidos y tus ventas, como los dejaste.",
 }
 
 // Los dos esquemas declaran los mismos campos y solo cambian las reglas: si
@@ -92,14 +83,6 @@ export type EstadoDelRegistro = "abierto" | "cerrado" | "invitacion"
 
 type Values = z.infer<typeof baseSchema>
 
-const ETIQUETA_CAMPO =
-  "text-xs font-semibold tracking-[0.12em] uppercase opacity-55 data-[error=true]:text-senal data-[error=true]:opacity-100"
-
-// Campo sin caja: una regla abajo que se pone roja al enfocar. El mundo
-// editorial estructura con la línea, no con el recuadro.
-const CAMPO =
-  "h-12 rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:ring-0 aria-invalid:border-senal aria-invalid:ring-0 md:text-base"
-
 export function Acceso({
   next,
   configured,
@@ -118,6 +101,7 @@ export function Acceso({
   const [modo, setModo] = React.useState<Modo>(
     registro ? "registrarse" : "ingresar"
   )
+  const [verClave, setVerClave] = React.useState(false)
 
   const esRegistro = modo === "registrarse"
   const conInvitacion = estadoDelRegistro === "invitacion"
@@ -174,16 +158,21 @@ export function Acceso({
       })
 
       if (error) {
+        // Ese correo ya tiene cuenta: se pasa a ingresar, con el correo puesto.
+        if (error.message.includes("already registered")) {
+          toast.error("Ese correo ya tiene cuenta. Ingresa con él.")
+          cambiarModo("ingresar")
+          form.setValue("password", "")
+          return
+        }
         // Lo que rechaza el disparador llega como un error genérico de la
         // base: el estado del registro dice qué fue.
         toast.error(
-          error.message.includes("already registered")
-            ? "Ese correo ya tiene cuenta. Prueba ingresando."
-            : error.message.includes("Database error")
-              ? conInvitacion
-                ? "Ese código de invitación no sirve: puede que ya se haya usado o que haya vencido."
-                : "No pudimos crear tu cuenta. Puede que el registro esté cerrado por ahora."
-              : "No pudimos crear tu cuenta. Inténtalo de nuevo."
+          error.message.includes("Database error")
+            ? conInvitacion
+              ? "Ese código de invitación no sirve: puede que ya se haya usado o que haya vencido."
+              : "No pudimos crear tu cuenta. Puede que el registro esté cerrado por ahora."
+            : "No pudimos crear tu cuenta. Inténtalo de nuevo."
         )
         return
       }
@@ -219,42 +208,52 @@ export function Acceso({
     )
   }
 
+  const titulo = esRegistro ? REGISTRO : VUELTA
+
   return (
-    <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-12 lg:grid-cols-[1fr_0.95fr] lg:grid-rows-[auto_1fr] lg:gap-y-0 lg:py-20">
-      <div className="lg:col-start-1 lg:row-start-1 lg:pr-14">
-        <p className="text-xs font-semibold tracking-[0.12em] uppercase">
-          {esRegistro ? REGISTRO.etiqueta : VUELTA.etiqueta}
-        </p>
-        <h1 className="mt-5 max-w-[13ch] font-titular text-[clamp(2.25rem,7vw,3.75rem)] leading-[0.98] font-extrabold tracking-[-0.035em] text-balance">
-          {esRegistro ? REGISTRO.titular : VUELTA.titular}
+    <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 pt-4 pb-12 sm:px-5 lg:grid-cols-[1fr_28rem] lg:items-center lg:gap-16 lg:py-16">
+      <div key={modo} className="cambio-entra">
+        <h1 className="pieza-titular font-titular text-[clamp(1.75rem,5vw,2.5rem)] leading-[1.02] font-extrabold tracking-[-0.03em] text-balance">
+          {titulo.antes}
+          <span className="pieza-resaltado">{titulo.resaltado}</span>.
         </h1>
-        <p className="mt-5 max-w-[46ch] leading-relaxed opacity-70">
-          {esRegistro ? REGISTRO.entrada : VUELTA.entrada}
+        <p className="mt-3 max-w-[40ch] text-sm leading-relaxed opacity-70 sm:text-base">
+          {titulo.bajada}
         </p>
       </div>
 
-      <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:border-l lg:border-tinta/15 lg:pl-14">
+      <div className="pieza-tarjeta flex flex-col gap-6 border border-tinta px-4 py-5 sm:px-6 sm:py-6">
         {!configured ? (
-          <p className="mb-8 border border-tinta p-4 text-sm leading-relaxed">
-            Supabase todavía no está configurado, así que el ingreso no va a
-            funcionar. Completa <code className="font-mono">.env.local</code> y
-            reinicia el servidor.
+          <p className="rounded-[14px] border border-tinta/15 bg-papel p-3 text-sm leading-relaxed">
+            Modo demo: falta configurar Supabase en{" "}
+            <code className="font-mono">.env.local</code>, y el ingreso no va a
+            funcionar.
           </p>
         ) : null}
 
-        {/* La regla de 2 px corona el tema abierto: es el mismo trazo de apertura. */}
-        <div className="grid grid-cols-2">
+        {/* Las dos pestañas en una píldora: la elegida, en tinta llena. */}
+        <div
+          role="group"
+          aria-label="Cuenta"
+          className="relative grid grid-cols-2 rounded-full border border-tinta/15 bg-papel p-1"
+        >
+          <span
+            aria-hidden="true"
+            className={cn(
+              "absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-tinta transition-transform duration-[250ms] ease-out motion-reduce:transition-none",
+              esRegistro ? "translate-x-0" : "translate-x-full"
+            )}
+          />
           {(["registrarse", "ingresar"] as const).map((valor) => (
             <button
               key={valor}
               type="button"
               onClick={() => cambiarModo(valor)}
               aria-pressed={modo === valor}
+              disabled={form.formState.isSubmitting}
               className={cn(
-                "min-h-11 border-t-2 pt-3 text-left font-titular text-sm font-bold tracking-[-0.01em] transition-colors",
-                modo === valor
-                  ? "border-tinta"
-                  : "border-tinta/15 opacity-50 hover:opacity-100"
+                "relative z-10 min-h-11 rounded-full px-2 text-sm font-semibold transition-colors",
+                modo === valor ? "text-papel" : "text-tinta/70 hover:text-tinta"
               )}
             >
               {valor === "registrarse" ? "Cuenta nueva" : "Ya tengo cuenta"}
@@ -263,15 +262,19 @@ export function Acceso({
         </div>
 
         {esRegistro && cerrado ? (
-          <div className="mt-8 flex flex-col gap-5">
-            <p className="max-w-[46ch] leading-relaxed">
-              Por ahora no estamos abriendo cuentas nuevas. Si ya tienes una,
-              ingresa con tu correo.
+          <div className="flex flex-col gap-4">
+            <p>
+              <span className="block font-semibold">
+                Por ahora no abrimos cuentas nuevas.
+              </span>
+              <span className="mt-1 block text-sm opacity-70">
+                Si ya tienes una, ingresa con tu correo.
+              </span>
             </p>
             <button
               type="button"
               onClick={() => cambiarModo("ingresar")}
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border-2 border-tinta px-5 font-semibold transition-colors hover:bg-tinta hover:text-papel"
+              className={cn(BOTON_SECUNDARIO, "w-full")}
             >
               Ya tengo cuenta
             </button>
@@ -280,29 +283,29 @@ export function Acceso({
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="mt-8 flex flex-col gap-7"
+              className="flex flex-col gap-6"
             >
               {esRegistro ? (
-                <>
-                  <FormField
-                    control={form.control}
-                    name="fullName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className={ETIQUETA_CAMPO}>Nombre</FormLabel>
-                        <FormControl>
-                          <Input
-                            className={CAMPO}
-                            placeholder="Tu nombre"
-                            autoComplete="name"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-sm text-senal" />
-                      </FormItem>
-                    )}
-                  />
-                </>
+                <FormField
+                  control={form.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem className="cambio-entra">
+                      <FormLabel className={ETIQUETA_CAMPO}>
+                        Tu nombre
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          className={CAMPO_LINEA}
+                          placeholder="Cómo te llamas"
+                          autoComplete="name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className={ERROR_CAMPO} />
+                    </FormItem>
+                  )}
+                />
               ) : null}
 
               <FormField
@@ -313,14 +316,14 @@ export function Acceso({
                     <FormLabel className={ETIQUETA_CAMPO}>Correo</FormLabel>
                     <FormControl>
                       <Input
-                        className={CAMPO}
+                        className={CAMPO_LINEA}
                         type="email"
                         placeholder="tu@ejemplo.com"
                         autoComplete="email"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-sm text-senal" />
+                    <FormMessage className={ERROR_CAMPO} />
                   </FormItem>
                 )}
               />
@@ -331,23 +334,40 @@ export function Acceso({
                 render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel className={ETIQUETA_CAMPO}>Contraseña</FormLabel>
-                    <FormControl>
-                      <Input
-                        className={CAMPO}
-                        type="password"
-                        autoComplete={
-                          esRegistro ? "new-password" : "current-password"
+                    <div className="relative">
+                      <FormControl>
+                        <Input
+                          className={cn(CAMPO_LINEA, "pr-12")}
+                          type={verClave ? "text" : "password"}
+                          autoComplete={
+                            esRegistro ? "new-password" : "current-password"
+                          }
+                          {...field}
+                        />
+                      </FormControl>
+                      <button
+                        type="button"
+                        onClick={() => setVerClave((antes) => !antes)}
+                        aria-pressed={verClave}
+                        aria-label={
+                          verClave ? "Ocultar contraseña" : "Mostrar contraseña"
                         }
-                        {...field}
-                      />
-                    </FormControl>
+                        className="absolute top-0 right-0 flex size-12 items-center justify-center text-tinta/65 transition-colors hover:text-tinta"
+                      >
+                        {verClave ? (
+                          <EyeOff aria-hidden="true" className="size-5" />
+                        ) : (
+                          <Eye aria-hidden="true" className="size-5" />
+                        )}
+                      </button>
+                    </div>
                     {/* La pista y el error dicen lo mismo: el error la reemplaza. */}
                     {esRegistro && !fieldState.error ? (
-                      <FormDescription className="text-xs text-tinta/55">
+                      <FormDescription className={AYUDA_CAMPO}>
                         Mínimo {MIN_PASSWORD} caracteres.
                       </FormDescription>
                     ) : null}
-                    <FormMessage className="text-sm text-senal" />
+                    <FormMessage className={ERROR_CAMPO} />
                   </FormItem>
                 )}
               />
@@ -364,7 +384,7 @@ export function Acceso({
                       <FormControl>
                         <Input
                           className={cn(
-                            CAMPO,
+                            CAMPO_LINEA,
                             "font-mono tracking-wider uppercase"
                           )}
                           placeholder="XXXX-XXXX"
@@ -375,11 +395,11 @@ export function Acceso({
                         />
                       </FormControl>
                       {!fieldState.error ? (
-                        <FormDescription className="text-xs text-tinta/55">
+                        <FormDescription className={AYUDA_CAMPO}>
                           Por ahora las cuentas nuevas son por invitación.
                         </FormDescription>
                       ) : null}
-                      <FormMessage className="text-sm text-senal" />
+                      <FormMessage className={ERROR_CAMPO} />
                     </FormItem>
                   )}
                 />
@@ -388,38 +408,26 @@ export function Acceso({
               <button
                 type="submit"
                 disabled={form.formState.isSubmitting}
-                className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-sm bg-accion px-5 font-semibold text-white transition-colors hover:bg-accion-alta disabled:opacity-60"
+                className={cn(BOTON_PRIMARIO, "w-full")}
               >
                 {form.formState.isSubmitting ? (
-                  <Loader2 aria-hidden="true" className="size-4 animate-spin" />
-                ) : null}
-                {esRegistro ? "Crear cuenta" : "Ingresar"}
+                  <>
+                    <Loader2
+                      aria-hidden="true"
+                      className="size-4 animate-spin"
+                    />
+                    {esRegistro ? "Creando tu cuenta…" : "Ingresando…"}
+                  </>
+                ) : esRegistro ? (
+                  "Crear cuenta"
+                ) : (
+                  "Ingresar"
+                )}
               </button>
             </form>
           </Form>
         )}
       </div>
-
-      {/* En el ingreso no hay nada que vender: quien vuelve ya conoce esto. */}
-      {esRegistro ? (
-        <div className="lg:col-start-1 lg:row-start-2 lg:self-start lg:pt-14 lg:pr-14">
-          <ul>
-            {REGISTRO.puntos.map((punto) => (
-              <li key={punto.titulo} className="border-t border-tinta/15 py-5">
-                <h2 className="font-titular text-base font-bold tracking-[-0.02em]">
-                  {punto.titulo}
-                </h2>
-                <p className="mt-1.5 max-w-[46ch] text-sm leading-relaxed opacity-70">
-                  {punto.detalle}
-                </p>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-5 border-t border-tinta/15 pt-5 text-sm opacity-55">
-            {REGISTRO.pie}
-          </p>
-        </div>
-      ) : null}
     </div>
   )
 }

@@ -103,7 +103,7 @@ export function Galeria({
         {imagenes.length > 1 ? (
           <p
             aria-live="polite"
-            className="tabular absolute right-3 bottom-3 bg-papel px-2.5 py-1 text-[11px] font-semibold tracking-[0.12em]"
+            className="tabular absolute right-3 bottom-3 bg-papel px-2.5 py-1 text-xs font-semibold tracking-[0.12em]"
           >
             {actual + 1} / {imagenes.length}
           </p>

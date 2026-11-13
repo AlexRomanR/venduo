@@ -80,7 +80,7 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
         </h3>
         <p className="flex shrink-0 flex-col items-end">
           {producto.compare_at_price_cents ? (
-            <span className="tabular text-[11px] line-through opacity-55">
+            <span className="tabular text-xs line-through opacity-55">
               {formatMoney(producto.compare_at_price_cents)}
             </span>
           ) : null}
@@ -127,7 +127,7 @@ export function Titulo({
       {enlace ? (
         <Link
           href={enlace.href}
-          className="group mb-1 inline-flex min-h-11 shrink-0 items-center gap-2 border-2 border-tinta px-3 text-[11px] font-bold tracking-[0.12em] uppercase transition-colors hover:bg-tinta hover:text-papel"
+          className="group mb-1 inline-flex min-h-11 shrink-0 items-center gap-2 border-2 border-tinta px-3 text-xs font-bold tracking-[0.12em] uppercase transition-colors hover:bg-tinta hover:text-papel"
         >
           {enlace.etiqueta}
           <ArrowRight
@@ -142,7 +142,7 @@ export function Titulo({
 
 export function Rotulo({ children }: { children: ReactNode }) {
   return (
-    <span className="flex items-center gap-2 text-[11px] font-bold tracking-[0.14em] uppercase">
+    <span className="flex items-center gap-2 text-xs font-bold tracking-[0.14em] uppercase">
       <span aria-hidden="true" className="size-2 bg-senal" />
       {children}
     </span>
@@ -215,7 +215,7 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
               aria-hidden="true"
               className="size-8 transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transform-none md:size-12"
             />
-            <span className="tabular text-[11px] font-bold tracking-[0.12em] uppercase">
+            <span className="tabular text-xs font-bold tracking-[0.12em] uppercase">
               {tienda.productos.length}{" "}
               {tienda.productos.length === 1 ? "producto" : "productos"}
             </span>

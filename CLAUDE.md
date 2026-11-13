@@ -59,10 +59,11 @@ Tailwind v4 y shadcn/ui · capa de IA propia con proveedor intercambiable · Ver
   iguales) o una franja que se desliza, sin excepciones. Pasó tres veces. Detalle en
   `ui-styling.md`.
 - **Venduo es el cuaderno de ventas, en tres registros.** La portada, el Resumen y el
-  Inicio de la app van **en escenas** con el scroll. Las pantallas de trabajo —Pedidos,
-  Productos, Catálogos, Estadísticas, la cuenta— usan **el cuaderno quieto**: tarjetas con
-  radio y sombra teñida, notas, tickets con sello, titulares con resaltador, y se mueven
-  solo al tocar. El ingreso, el alta y `/admin` son **el diario**: reglas, sin sombras.
+  Inicio de la app van **en escenas** con el scroll; el final del alta, en una escena que
+  se arma al llegar. Las pantallas de trabajo —Pedidos, Productos, Catálogos,
+  Estadísticas, la cuenta— y el ingreso y el alta usan **el cuaderno quieto**: tarjetas
+  con radio y sombra teñida, notas, tickets con sello, titulares con resaltador, y se
+  mueven solo al tocar. `/admin` es **el diario**: reglas, sin sombras.
   Una pantalla nueva del panel va en el cuaderno quieto; las que siguen en paneles con
   borde se pasan enteras. Detalle en `DESIGN.md` y `ui-styling.md`.
 - **La tinta trabaja, la frambuesa avisa.** Papel cálido; botones y lo elegido en tinta

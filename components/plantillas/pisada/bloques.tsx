@@ -54,7 +54,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
           )}
         >
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full bg-papel/10 px-3 py-1.5 text-[11px] font-bold tracking-[0.1em] uppercase">
+            <p className="inline-flex items-center gap-2 rounded-full bg-papel/10 px-3 py-1.5 text-xs font-bold tracking-[0.1em] uppercase">
               <span
                 aria-hidden="true"
                 className="size-2 rounded-full bg-senal-alta"
