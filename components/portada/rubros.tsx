@@ -31,7 +31,7 @@ const RUBROS: {
   },
   {
     nombre: "Belleza y maquillaje",
-    plantilla: "formula",
+    plantilla: "tocador",
     productos: ["labial", "perfume"],
   },
   {
@@ -41,7 +41,7 @@ const RUBROS: {
   },
   {
     nombre: "Accesorios y joyas",
-    plantilla: "atelier",
+    plantilla: "quilate",
     productos: ["cartera", "labial"],
   },
   {

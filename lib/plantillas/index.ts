@@ -2,15 +2,22 @@ import {
   resolverApariencia,
   type Apariencia,
 } from "@/lib/plantillas/apariencia"
+import { ambar } from "@/lib/plantillas/ambar"
 import { atelier } from "@/lib/plantillas/atelier"
 import { bazar } from "@/lib/plantillas/bazar"
 import { calle } from "@/lib/plantillas/calle"
 import { clasica } from "@/lib/plantillas/clasica"
+import { correa } from "@/lib/plantillas/correa"
+import { crayon } from "@/lib/plantillas/crayon"
 import type { DefinicionDePlantilla } from "@/lib/plantillas/definicion"
 import { fashion } from "@/lib/plantillas/fashion"
 import { formula } from "@/lib/plantillas/formula"
 import { perfume } from "@/lib/plantillas/perfume"
 import { pisada } from "@/lib/plantillas/pisada"
+import { probador } from "@/lib/plantillas/probador"
+import { quilate } from "@/lib/plantillas/quilate"
+import { taco } from "@/lib/plantillas/taco"
+import { tocador } from "@/lib/plantillas/tocador"
 
 export type { DefinicionDePlantilla } from "@/lib/plantillas/definicion"
 
@@ -31,6 +38,13 @@ export const PLANTILLAS = {
   pisada,
   formula,
   bazar,
+  quilate,
+  probador,
+  ambar,
+  correa,
+  taco,
+  tocador,
+  crayon,
 } satisfies Record<string, DefinicionDePlantilla>
 
 export type ClavePlantilla = keyof typeof PLANTILLAS

@@ -794,6 +794,618 @@ function DibujoBazar({ d }: Props) {
   )
 }
 
+function DibujoQuilate({ d }: Props) {
+  return (
+    <div className="flex h-full flex-col">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center px-3 py-1.5">
+        <span className="text-[length:1.25cqw] tracking-[0.24em] uppercase opacity-70">
+          Piezas
+        </span>
+        <Marca
+          d={d}
+          centrada
+          className="font-titular text-[length:3.125cqw] leading-none tracking-[0.14em] uppercase"
+        />
+        <span className="size-2 justify-self-end rounded-full border border-tinta/50" />
+      </div>
+      <div className="relative h-px bg-tinta/20">
+        <span className="absolute top-1/2 left-1/2 size-[1.4cqw] -translate-x-1/2 -translate-y-1/2 rotate-45 border border-tinta/50 bg-papel" />
+      </div>
+      <div className="px-3 pt-[4cqw] text-center">
+        <p className="mx-auto max-w-[16ch] font-titular text-[length:5cqw] leading-[1.12] tracking-[0.1em] uppercase">
+          Piezas que se quedan contigo
+        </p>
+        <span className="mt-[2cqw] inline-block rounded-[3px] bg-tinta px-[1.6cqw] py-[0.5cqw] text-[length:1.25cqw] tracking-[0.24em] text-papel uppercase">
+          Ver las piezas
+        </span>
+      </div>
+      <div className="mt-[4cqw] flex items-center gap-2 px-3">
+        <span className="h-px flex-1 bg-tinta/20" />
+        <span className="font-titular text-[length:2.188cqw] tracking-[0.18em] uppercase">
+          Recién llegadas
+        </span>
+        <span className="h-px flex-1 bg-tinta/20" />
+      </div>
+      <div className="grid grid-cols-3 gap-2 px-3 pt-[2cqw]">
+        {huecos(d, 3).map((producto, i) => (
+          <div key={i} className="text-center">
+            <div className="relative aspect-square overflow-hidden rounded-[2px] bg-tinta/[0.06]">
+              {producto === undefined ? (
+                <>
+                  <span className="absolute top-[24%] left-1/2 size-[44%] -translate-x-1/2 rounded-full border-[0.5cqw] border-tinta/35" />
+                  <span className="absolute top-[1.2cqw] left-[1.2cqw] rounded-full border border-tinta/25 bg-papel px-[0.8cqw] text-[length:1.1cqw] tracking-[0.1em] uppercase">
+                    {i === 1 ? "Perlas" : "Plata 925"}
+                  </span>
+                  <span className="absolute right-[1.2cqw] bottom-[1.2cqw] size-[34%] rounded-full bg-tinta/20 ring-1 ring-papel" />
+                </>
+              ) : (
+                <>
+                  <Foto src={producto?.foto} />
+                  <Precio
+                    producto={producto}
+                    className="left-1/2 -translate-x-1/2 font-normal tracking-[0.04em]"
+                  />
+                </>
+              )}
+            </div>
+            {d ? null : (
+              <div className="mx-auto mt-1 h-[3px] w-2/3 bg-tinta/40" />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function DibujoProbador({ d }: Props) {
+  return (
+    <div className="flex h-full flex-col">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center border-b border-tinta/15 px-3 py-1.5">
+        <span className="text-[length:1.562cqw] opacity-75">Catálogo</span>
+        <Marca
+          d={d}
+          centrada
+          className="font-titular text-[length:3.75cqw] leading-none"
+        />
+        <span className="size-2 justify-self-end rounded-full border border-tinta/50" />
+      </div>
+      <div
+        className={cn(
+          "grid shrink-0 grid-cols-[0.8fr_1fr] items-center gap-3 px-3 pt-2",
+          d ? "h-[36%]" : "h-[44%]"
+        )}
+      >
+        <div className="relative h-full overflow-hidden rounded-[0.3rem] bg-tinta/[0.08]">
+          {d?.portada ? (
+            <Foto src={d.portada} />
+          ) : (
+            <div className="absolute inset-x-[30%] top-[16%] bottom-0 rounded-t-full bg-senal/70" />
+          )}
+          <span className="absolute top-[1.4cqw] left-[1.4cqw] rounded-[2px] bg-papel px-[0.9cqw] py-[0.3cqw] text-[length:1.1cqw] font-medium tracking-[0.16em] uppercase">
+            Nuevo ingreso
+          </span>
+        </div>
+        <div>
+          <p className="font-titular text-[length:7.5cqw] leading-[0.92]">
+            Recién llegado
+          </p>
+          <span className="mt-2 inline-block rounded-[3px] bg-tinta px-2 py-[3px] text-[length:1.562cqw] text-papel">
+            Ver lo nuevo
+          </span>
+        </div>
+      </div>
+      <div className="mt-2.5 flex items-end justify-between px-3">
+        <span className="font-titular text-[length:3.125cqw] leading-none">
+          Nuevo ingreso
+        </span>
+        <span className="text-[length:1.406cqw] underline opacity-70">
+          Ver todo
+        </span>
+      </div>
+      <div
+        className={cn(
+          "grid gap-2 px-3 pt-1.5",
+          d ? "grid-cols-3" : "grid-cols-4"
+        )}
+      >
+        {huecos(d, 4).map((producto, i) => (
+          <div key={i}>
+            <div
+              className={cn(
+                "relative overflow-hidden rounded-[0.25rem] bg-tinta/[0.08]",
+                d ? "aspect-square" : "aspect-[2/3]"
+              )}
+            >
+              {producto === undefined ? (
+                <>
+                  <div className="absolute inset-x-[26%] top-[14%] bottom-0 rounded-t-full bg-tinta/20" />
+                  {i === 0 ? (
+                    <span className="absolute top-[1.2cqw] left-[1.2cqw] rounded-[2px] bg-papel px-[0.7cqw] text-[length:1.1cqw] tracking-[0.12em] uppercase">
+                      Nuevo
+                    </span>
+                  ) : null}
+                </>
+              ) : (
+                <>
+                  <Foto src={producto?.foto} />
+                  <Precio producto={producto} className="rounded-[2px]" />
+                </>
+              )}
+            </div>
+            {d ? null : (
+              <>
+                <div className="mt-1 h-[3px] w-3/4 bg-tinta/40" />
+                <div className="mt-1 flex gap-[2px]">
+                  {["S", "M", "L"].map((talla) => (
+                    <span
+                      key={talla}
+                      className={cn(
+                        "rounded-[1px] border border-tinta/30 px-[0.5cqw] text-[length:1.1cqw] leading-tight",
+                        talla === "L" && i === 2 && "line-through opacity-45"
+                      )}
+                    >
+                      {talla}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** Una fila de puntos, por la regla de estrellas de Ámbar. */
+function ReglaDePuntos({ className }: { className?: string }) {
+  return (
+    <span
+      className={cn(
+        "block h-[1.2cqw] bg-[radial-gradient(circle,currentColor_0.35cqw,transparent_0.45cqw)] bg-[length:2.4cqw_100%] opacity-40",
+        className
+      )}
+    />
+  )
+}
+
+function DibujoAmbar({ d }: Props) {
+  return (
+    <div className="flex h-full flex-col">
+      <div
+        className={cn(
+          "flex shrink-0 flex-col bg-tinta text-papel",
+          d ? "h-[46%]" : "h-[54%]"
+        )}
+      >
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center px-3 py-1.5">
+          <span className="text-[length:1.25cqw] opacity-75">Catálogo</span>
+          <Marca
+            d={d}
+            centrada
+            className="font-titular text-[length:3.125cqw] leading-none"
+          />
+          <span className="size-2 justify-self-end rounded-full border border-papel/60" />
+        </div>
+        <ReglaDePuntos />
+        <div className="grid min-h-0 flex-1 grid-cols-[1.15fr_1fr] items-center gap-3 px-3 py-2">
+          <div>
+            <p className="font-titular text-[length:5cqw] leading-[1.05]">
+              Perfumes árabes, del decant al frasco
+            </p>
+            <span className="mt-[1.6cqw] inline-block rounded-[2px] bg-papel px-[1.4cqw] py-[0.4cqw] text-[length:1.25cqw] font-medium text-tinta">
+              Ver los perfumes
+            </span>
+          </div>
+          <div className="relative h-full bg-papel/25 p-px [clip-path:polygon(14%_0,86%_0,100%_14%,100%_86%,86%_100%,14%_100%,0_86%,0_14%)]">
+            <div className="relative size-full bg-papel/10 [clip-path:polygon(14%_0,86%_0,100%_14%,100%_86%,86%_100%,14%_100%,0_86%,0_14%)]">
+              {d?.portada ? (
+                <Foto src={d.portada} />
+              ) : (
+                <div className="absolute inset-x-[34%] top-[22%] bottom-[16%] rounded-t-[30%] rounded-b-md bg-senal" />
+              )}
+            </div>
+          </div>
+        </div>
+        <ReglaDePuntos />
+      </div>
+      <div className="flex items-center gap-1.5 px-3 pt-2">
+        <span className="size-[1.2cqw] rotate-45 bg-senal" />
+        <span className="font-titular text-[length:2.5cqw] leading-none">
+          Los más pedidos
+        </span>
+      </div>
+      <div
+        className={cn(
+          "grid gap-1.5 px-3 pt-1.5",
+          d ? "grid-cols-3" : "grid-cols-4"
+        )}
+      >
+        {huecos(d, 4).map((producto, i) => (
+          <div key={i} className="rounded-[2px] bg-tinta p-[0.6cqw]">
+            <div className="relative aspect-square overflow-hidden bg-papel/10">
+              {producto === undefined ? (
+                <div className="absolute inset-x-[34%] top-[22%] bottom-[12%] rounded-t-[30%] rounded-b-sm bg-papel/30" />
+              ) : (
+                <>
+                  <Foto src={producto?.foto} />
+                  <Precio producto={producto} className="font-medium" />
+                </>
+              )}
+            </div>
+            {d ? null : (
+              <>
+                <div className="mt-1 h-[3px] w-3/4 bg-papel/60" />
+                <div className="mt-1 mb-0.5 h-[3px] w-1/2 bg-papel/35" />
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** Los azulejos de Correa: giros del tono de la señal, muy claros. */
+const AZULEJOS_DE_CORREA = [0, 90, 180, 270].map(
+  (giro) => `oklch(from var(--senal) 0.92 0.045 calc(h + ${giro}))`
+)
+
+function Azulejo({
+  indice,
+  className,
+  children,
+}: {
+  indice: number
+  className?: string
+  children?: React.ReactNode
+}) {
+  return (
+    <div
+      className={cn("relative overflow-hidden bg-senal/15", className)}
+      style={{ backgroundColor: AZULEJOS_DE_CORREA[indice % 4] }}
+    >
+      {children}
+    </div>
+  )
+}
+
+function DibujoCorrea({ d }: Props) {
+  const mosaico = d
+    ? [
+        d.portada ?? d.productos[0]?.foto ?? null,
+        d.productos[1]?.foto ?? null,
+        d.productos[2]?.foto ?? null,
+      ]
+    : [null, null, null]
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex items-center justify-between px-3 py-1.5">
+        <Marca
+          d={d}
+          className="font-titular text-[length:3.438cqw] leading-none font-bold tracking-[-0.03em]"
+        />
+        <span className="flex gap-1">
+          <span className="rounded-full border border-tinta/30 px-[1.2cqw] text-[length:1.25cqw] leading-relaxed">
+            Catálogo
+          </span>
+          <span className="size-[2.6cqw] rounded-full border border-tinta/30" />
+        </span>
+      </div>
+      <div
+        className={cn(
+          "grid shrink-0 grid-cols-[1fr_1.1fr] items-center gap-3 px-3",
+          d ? "h-[40%]" : "h-[46%]"
+        )}
+      >
+        <div>
+          <p className="font-titular text-[length:5.6cqw] leading-[0.95] font-bold tracking-[-0.03em]">
+            Carteras para todos los días
+          </p>
+          <span className="mt-[1.6cqw] inline-block rounded-full bg-senal px-[1.6cqw] py-[0.4cqw] text-[length:1.25cqw] font-semibold text-white">
+            Ver las carteras
+          </span>
+        </div>
+        <div className="grid h-full grid-cols-[1.2fr_1fr] grid-rows-2 gap-1 py-1">
+          <Azulejo indice={0} className="row-span-2 rounded-[0.6rem]">
+            {mosaico[0] ? (
+              <span className="absolute inset-0 mix-blend-multiply">
+                <Foto src={mosaico[0]} />
+              </span>
+            ) : null}
+          </Azulejo>
+          <Azulejo indice={1} className="rounded-[0.6rem]">
+            {mosaico[1] ? (
+              <span className="absolute inset-0 mix-blend-multiply">
+                <Foto src={mosaico[1]} />
+              </span>
+            ) : null}
+          </Azulejo>
+          <Azulejo indice={2} className="rounded-[0.6rem]">
+            {mosaico[2] ? (
+              <span className="absolute inset-0 mix-blend-multiply">
+                <Foto src={mosaico[2]} />
+              </span>
+            ) : null}
+          </Azulejo>
+        </div>
+      </div>
+      <span className="px-3 pt-2 font-titular text-[length:2.8cqw] leading-none font-bold tracking-[-0.03em]">
+        Lo nuevo
+      </span>
+      <div className="grid grid-cols-3 gap-2 px-3 pt-1.5">
+        {huecos(d, 3).map((producto, i) => (
+          <div key={i}>
+            <Azulejo indice={i + 1} className="aspect-square rounded-[0.6rem]">
+              {producto === undefined ? (
+                <div className="absolute inset-x-[26%] top-[28%] bottom-[22%] rounded-t-[40%] rounded-b-md bg-tinta/25" />
+              ) : (
+                <>
+                  <span className="absolute inset-0 mix-blend-multiply">
+                    <Foto src={producto?.foto} />
+                  </span>
+                  <Precio producto={producto} className="rounded-full" />
+                </>
+              )}
+            </Azulejo>
+            {d ? null : (
+              <div className="mt-1 flex gap-[0.6cqw]">
+                {["#1b1b1b", "#d9c7a7", "#f19bbd"].map((color) => (
+                  <span
+                    key={color}
+                    className="size-[1.4cqw] rounded-full ring-1 ring-tinta/20"
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function DibujoTaco({ d }: Props) {
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex items-center justify-between border-b border-tinta/15 px-3 py-1.5">
+        <Marca
+          d={d}
+          className="font-titular text-[length:3.125cqw] leading-none font-medium lowercase"
+        />
+        <span className="text-[length:1.406cqw] lowercase opacity-75">
+          catálogo
+        </span>
+      </div>
+      <div className="px-3 pt-2">
+        <div
+          className={cn(
+            "relative overflow-hidden bg-tinta/[0.06]",
+            "aspect-[4/1]"
+          )}
+        >
+          {d?.portada ? (
+            <span className="absolute inset-0 [&_img]:object-[50%_65%]">
+              <Foto src={d.portada} />
+            </span>
+          ) : (
+            <div className="absolute right-[30%] bottom-0 left-[30%] h-[42%] rounded-tl-[60%] rounded-tr-[10%] bg-senal/80" />
+          )}
+        </div>
+        <span className="block h-[0.4cqw] bg-tinta" />
+        <div className="mt-[1.4cqw] flex items-end justify-between">
+          <p className="font-titular text-[length:6.25cqw] leading-[0.9] font-medium tracking-[-0.03em] lowercase">
+            nuevos pares
+          </p>
+          <span className="mb-[0.4cqw] bg-senal px-[1.4cqw] py-[0.5cqw] text-[length:1.25cqw] text-white">
+            Ver los modelos
+          </span>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-2 px-3 pt-[2.4cqw]">
+        {huecos(d, 3).map((producto, i) => (
+          <div key={i} className="flex aspect-square flex-col bg-tinta/[0.06]">
+            <div className="relative aspect-[4/3] overflow-hidden">
+              {producto === undefined ? (
+                <div className="absolute right-[18%] bottom-0 left-[18%] h-[38%] rounded-tl-[60%] rounded-tr-[10%] bg-tinta/25" />
+              ) : (
+                <>
+                  <span className="absolute inset-0 [&_img]:object-bottom">
+                    <Foto src={producto?.foto} />
+                  </span>
+                  <Precio producto={producto} className="font-medium" />
+                </>
+              )}
+            </div>
+            <span className="block h-[0.4cqw] bg-tinta" />
+            <div className="flex flex-1 items-center gap-[0.6cqw] px-[1cqw]">
+              {(d ? [] : ["36", "37", "38"]).map((n) => (
+                <span
+                  key={n}
+                  className="border border-tinta/30 px-[0.5cqw] text-[length:1.25cqw] leading-tight"
+                >
+                  {n}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function DibujoTocador({ d }: Props) {
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex items-center justify-between border-b border-tinta/10 px-3 py-1.5">
+        <Marca
+          d={d}
+          className="font-titular text-[length:3.438cqw] leading-none font-semibold"
+        />
+        <span className="size-[2.8cqw] rounded-full bg-tinta/10" />
+      </div>
+      <div
+        className={cn(
+          "grid shrink-0 grid-cols-[1fr_0.9fr] items-center gap-3 px-3 pt-1.5",
+          d ? "h-[38%]" : "h-[44%]"
+        )}
+      >
+        <div>
+          <p className="font-titular text-[length:5.6cqw] leading-[0.98] font-semibold">
+            Tu rutina, paso a paso
+          </p>
+          <span className="mt-[1.6cqw] inline-block rounded-full bg-senal px-[1.6cqw] py-[0.4cqw] text-[length:1.25cqw] font-semibold text-white">
+            Ver los productos
+          </span>
+        </div>
+        <div className="relative h-full py-1">
+          <div className="relative h-full overflow-hidden rounded-[1rem] bg-tinta/[0.05]">
+            {d?.portada ? (
+              <Foto src={d.portada} />
+            ) : (
+              <div className="absolute inset-x-[36%] top-[20%] bottom-[18%] rounded-[0.4rem] bg-senal/80" />
+            )}
+          </div>
+          <span className="absolute right-[-1cqw] bottom-[-1.5cqw] flex size-[9cqw] items-center justify-center rounded-full border border-tinta/15 bg-papel text-center text-[length:1.1cqw] leading-tight font-semibold">
+            TU
+            <br />
+            TONO
+          </span>
+        </div>
+      </div>
+      <div className="flex items-center gap-[0.8cqw] px-3 pt-[2.4cqw] text-[length:1.6cqw]">
+        {["Limpiar", "Tratar", "Hidratar"].map((paso, i) => (
+          <span key={paso} className="flex items-center gap-[0.8cqw]">
+            {i > 0 ? <span className="opacity-40">›</span> : null}
+            <span className="rounded-[0.4rem] bg-tinta/[0.05] px-[1cqw] py-[0.3cqw]">
+              <span className="font-titular font-semibold text-senal">
+                {i + 1}
+              </span>{" "}
+              {paso}
+            </span>
+          </span>
+        ))}
+      </div>
+      <div className="grid grid-cols-3 gap-2 px-3 pt-[1.6cqw]">
+        {huecos(d, 3).map((producto, i) => (
+          <div key={i}>
+            <div className="rounded-[0.6rem] bg-tinta/[0.05] p-[1.6cqw]">
+              <div className="relative aspect-square overflow-hidden rounded-[0.4rem]">
+                {producto === undefined ? (
+                  <div className="absolute inset-x-[34%] top-[16%] bottom-[16%] rounded-[0.3rem] bg-tinta/20" />
+                ) : (
+                  <>
+                    <Foto src={producto?.foto} />
+                    <Precio producto={producto} className="rounded-full" />
+                  </>
+                )}
+              </div>
+            </div>
+            {d ? null : (
+              <div className="mt-1 flex gap-[0.6cqw]">
+                {[0.6, 0.45, 0.3, 0.2].map((tono) => (
+                  <span
+                    key={tono}
+                    className="size-[1.4cqw] rounded-full bg-tinta"
+                    style={{ opacity: tono }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function DibujoCrayon({ d }: Props) {
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex items-center justify-between px-3 py-1.5">
+        <Marca
+          d={d}
+          className="font-titular text-[length:3.438cqw] leading-none font-semibold"
+        />
+        <span className="size-[2.8cqw] rounded-full border-2 border-tinta/30" />
+      </div>
+      <div
+        className={cn(
+          "grid shrink-0 grid-cols-[1.1fr_1fr] items-center gap-3 px-3",
+          d ? "h-[34%]" : "h-[40%]"
+        )}
+      >
+        <div>
+          <p className="font-titular text-[length:5.6cqw] leading-[0.98] font-semibold">
+            Ropa para crecer jugando
+          </p>
+          <svg
+            viewBox="0 0 96 12"
+            className="mt-[0.8cqw] h-[1.6cqw] w-[14cqw] text-senal"
+          >
+            <polyline
+              points="0,3 8,9 16,3 24,9 32,3 40,9 48,3 56,9 64,3 72,9 80,3 88,9 96,3"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={3}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span className="mt-[1.4cqw] inline-block rounded-full bg-senal px-[1.6cqw] py-[0.4cqw] text-[length:1.25cqw] font-semibold text-white">
+            Ver por edad
+          </span>
+        </div>
+        <div className="relative mx-auto aspect-square h-[92%] overflow-hidden rounded-full bg-tinta/[0.07]">
+          {d?.portada ? (
+            <Foto src={d.portada} />
+          ) : (
+            <div className="absolute inset-x-[28%] top-[24%] bottom-0 rounded-t-full bg-senal/70" />
+          )}
+        </div>
+      </div>
+      <div className="px-3 pt-[1.6cqw]">
+        <div className="flex justify-around">
+          {["0 a 12 meses", "1 a 3 años", "4 a 8 años"].map((edad) => (
+            <span key={edad} className="flex flex-col items-center">
+              <span className="rounded-full border border-tinta bg-papel px-[1cqw] text-[length:1.25cqw] leading-relaxed font-semibold">
+                {edad}
+              </span>
+              <span className="h-[1.6cqw] w-px bg-tinta" />
+            </span>
+          ))}
+        </div>
+        <span className="block h-[1.2cqw] border-t border-tinta bg-[repeating-linear-gradient(90deg,var(--tinta)_0_1px,transparent_1px_1.2cqw)] bg-[length:100%_50%] bg-no-repeat" />
+      </div>
+      <div className="grid grid-cols-3 gap-2 px-3 pt-[1.6cqw]">
+        {huecos(d, 3).map((producto, i) => (
+          <div
+            key={i}
+            className="relative aspect-square overflow-hidden rounded-[0.8rem] bg-tinta/[0.07]"
+          >
+            {producto === undefined ? (
+              <>
+                <div className="absolute inset-x-[30%] top-[30%] bottom-0 rounded-t-[40%] bg-tinta/20" />
+                <span className="absolute top-[1cqw] left-[1cqw] rounded-full bg-papel px-[0.8cqw] text-[length:1.1cqw] font-semibold">
+                  {["0 a 12 meses", "1 a 3 años", "4 a 8 años"][i % 3]}
+                </span>
+              </>
+            ) : (
+              <>
+                <Foto src={producto?.foto} />
+                <Precio producto={producto} className="rounded-full" />
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const DIBUJOS: Record<ClavePlantilla, (props: Props) => React.JSX.Element> = {
   clasica: DibujoClasico,
   fashion: DibujoFashion,
@@ -803,4 +1415,11 @@ const DIBUJOS: Record<ClavePlantilla, (props: Props) => React.JSX.Element> = {
   pisada: DibujoPisada,
   formula: DibujoFormula,
   bazar: DibujoBazar,
+  quilate: DibujoQuilate,
+  probador: DibujoProbador,
+  ambar: DibujoAmbar,
+  correa: DibujoCorrea,
+  taco: DibujoTaco,
+  tocador: DibujoTocador,
+  crayon: DibujoCrayon,
 }

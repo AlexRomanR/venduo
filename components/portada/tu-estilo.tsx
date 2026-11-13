@@ -16,11 +16,18 @@ import { CON_MOVIMIENTO, gsap, useGSAP } from "@/components/portada/gsap"
 /** Las plantillas que se ofrecen hoy, en el orden en que se muestran. */
 const CLAVES: ClavePlantilla[] = [
   "fashion",
+  "probador",
   "perfume",
+  "ambar",
   "calle",
   "atelier",
+  "correa",
+  "quilate",
   "pisada",
+  "taco",
   "formula",
+  "tocador",
+  "crayon",
   "bazar",
 ]
 
@@ -110,6 +117,13 @@ const DISENOS: Record<
   pisada: { catalogo: "destacado", publicacion: "foto" },
   formula: { catalogo: "lista", publicacion: "color" },
   bazar: { catalogo: "grilla", publicacion: "oferta" },
+  quilate: { catalogo: "revista", publicacion: "color" },
+  probador: { catalogo: "destacado", publicacion: "foto" },
+  ambar: { catalogo: "lista", publicacion: "color" },
+  correa: { catalogo: "grilla", publicacion: "foto" },
+  taco: { catalogo: "destacado", publicacion: "foto" },
+  tocador: { catalogo: "lista", publicacion: "color" },
+  crayon: { catalogo: "grilla", publicacion: "oferta" },
 }
 
 const PRODUCTOS_DEL_CATALOGO = ["zapatillas", "perfume", "labial", "cartera"]

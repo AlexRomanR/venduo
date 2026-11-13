@@ -169,6 +169,72 @@ export const COMBINACIONES: CombinacionDeLetra[] = [
     },
   },
   {
+    nombre: "Vitrina",
+    ideal: "Joyas, relojes, accesorios",
+    tipografia: {
+      titular: "marcellus",
+      cuerpo: "jost",
+      pesoTitular: 400,
+      espaciadoTitular: "abierto",
+      mayusculas: true,
+    },
+  },
+  {
+    nombre: "Boutique",
+    ideal: "Ropa de mujer",
+    tipografia: {
+      titular: "gloock",
+      cuerpo: "jost",
+      pesoTitular: 400,
+      espaciadoTitular: "normal",
+      mayusculas: false,
+    },
+  },
+  {
+    nombre: "Zoco",
+    ideal: "Perfumes árabes, decants",
+    tipografia: {
+      titular: "reemkufi",
+      cuerpo: "jost",
+      pesoTitular: 600,
+      espaciadoTitular: "normal",
+      mayusculas: false,
+    },
+  },
+  {
+    nombre: "Azulejo",
+    ideal: "Carteras y bolsos de color",
+    tipografia: {
+      titular: "syne",
+      cuerpo: "geist",
+      pesoTitular: 700,
+      espaciadoTitular: "apretado",
+      mayusculas: false,
+    },
+  },
+  {
+    nombre: "Crema",
+    ideal: "Maquillaje, skincare",
+    tipografia: {
+      titular: "fraunces",
+      cuerpo: "geist",
+      pesoTitular: 600,
+      espaciadoTitular: "apretado",
+      mayusculas: false,
+    },
+  },
+  {
+    nombre: "Recreo",
+    ideal: "Ropa de niños y bebés",
+    tipografia: {
+      titular: "fredoka",
+      cuerpo: "geist",
+      pesoTitular: 600,
+      espaciadoTitular: "normal",
+      mayusculas: false,
+    },
+  },
+  {
     nombre: "Letrero",
     ideal: "Ferias, ofertas, liquidaciones",
     tipografia: {

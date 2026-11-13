@@ -27,8 +27,9 @@ export interface RubroDelAlta {
  * Paso 2 del alta: los rubros como fichas y, debajo, la pasarela de
  * plantillas —la misma de Apariencia— con el nombre del negocio adentro de
  * cada dibujo. "Crear mi tienda con X" la crea de una vez: el negocio ya está
- * en el borrador. En el celular el botón va en una bandeja fija abajo, al
- * alcance del pulgar; desde 1024 px, bajo la plantilla.
+ * en el borrador. El botón va en una bandeja fija abajo: en el celular queda
+ * al alcance del pulgar, y en la computadora a la vista aunque la plantilla
+ * llene la pantalla.
  */
 export function ElegirPlantilla({
   rubros,
@@ -113,12 +114,15 @@ export function ElegirPlantilla({
   return (
     <div className="flex flex-col gap-6">
       {rubros.length > 1 ? (
-        // Columnas iguales: cuatro no entran en 375 px, y una sola abajo
-        // quedaba desalineada (`GRILLA_DE_FICHAS`).
+        // Columnas iguales, tantas como entren: los rubros crecen con las
+        // plantillas y ninguna ficha puede quedar sola y corrida abajo. Con
+        // `auto-fit` en vez del `auto-fill` de GRILLA_DE_FICHAS: en la
+        // computadora caben todas en una fila y la llenan, centradas sobre la
+        // pasarela, sin columnas vacías a la derecha.
         <div
           role="group"
           aria-label="Filtrar por rubro"
-          className="grid grid-cols-2 gap-1.5 sm:grid-cols-4"
+          className="mx-auto grid w-full max-w-2xl grid-cols-[repeat(auto-fit,minmax(6.5rem,1fr))] gap-1.5"
         >
           {[null, ...rubros.map((r) => r.clave)].map((clave) => {
             const activo = rubro === clave
@@ -154,14 +158,12 @@ export function ElegirPlantilla({
         notas={["Con productos de ejemplo."]}
         bloqueada={creando}
         alCambiar={(nueva) => setVista(nueva)}
-        acciones={() => (
-          <div className="w-full max-lg:hidden sm:max-w-[26rem]">{boton}</div>
-        )}
       />
 
-      {/* En el celular, fija abajo. */}
-      <div className="pieza-bandeja bandeja-al-borde fixed inset-x-0 bottom-0 z-20 border-t border-tinta bg-papel px-4 py-3 lg:hidden">
-        {boton}
+      {/* Fija abajo en todos los tamaños: la miniatura grande deja el nombre
+          y la descripción bajo el pliegue, y el botón ya dice cuál se elige. */}
+      <div className="pieza-bandeja bandeja-al-borde fixed inset-x-0 bottom-0 z-20 border-t border-tinta bg-papel px-4 py-3">
+        <div className="mx-auto w-full sm:max-w-[26rem]">{boton}</div>
       </div>
     </div>
   )

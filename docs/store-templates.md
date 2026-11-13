@@ -235,6 +235,13 @@ lib/plantillas/
   pisada.ts         Pisada
   formula.ts        Fórmula
   bazar.ts          Bazar
+  quilate.ts        Quilate
+  probador.ts       Probador
+  ambar.ts          Ámbar
+  correa.ts         Correa
+  taco.ts           Taco
+  tocador.ts        Tocador
+  crayon.ts         Crayón
   bloques.ts        Qué significa cada bloque, sin decir cómo se ve
   index.ts          El registro: PLANTILLAS, ClavePlantilla, plantillaDeTienda()
 
@@ -679,13 +686,128 @@ Abre el rubro "Variedades".
 - La etiqueta de precio va en fucsia **solo con rebaja**: si todas lo fueran, ninguna se
   notaría. Los títulos llevan un subrayado a mano.
 
+### Quilate (`quilate`) — Joyas y accesorios
+
+Una joya se compra de cerca. Abre el rubro "Joyas" (`joyeria`).
+
+| Token         | Valor                                                            |
+| ------------- | ---------------------------------------------------------------- |
+| Papel / tinta | Perla `#f5f4f2` / `#1a1a1a`                                      |
+| Señal         | Grafito `#4a4744`: sin dorados, la única joya es la que se vende |
+| Titular       | Marcellus 400, en mayúsculas y abierta                           |
+| Cuerpo        | Jost                                                             |
+| Forma         | Suave                                                            |
+| Tarjeta       | Cuadrada, cuatro por fila en la computadora; ficha en vitrina    |
+
+- **Cabecera** con el nombre al centro y un filete fino con un rombo.
+- **Portada** centrada: el titular y, debajo, la pieza con una **lupa** —la misma foto
+  ampliada en un círculo, decorativa—.
+- **Categorías** sin foto: un ícono de línea por dónde se lleva (aretes, collar, anillo,
+  pulsera, reloj, lentes, cabello; un rombo si no se reconoce).
+- **Tarjeta** con la segunda foto —la pieza puesta— en un círculo en la esquina, y el
+  **material en un sello** (`materialDe`: plata 925, bañado en oro, acero, rodio, perlas,
+  plata, oro, fantasía, leído del nombre y la descripción). La rebaja va con un borde,
+  no con color.
+- La ficha pliega **Cuidados**.
+
+### Probador (`probador`) — Ropa de mujer, boutique
+
+La otra ropa de Moda: ni la vitrina de Pasarela ni el afiche de Calle, una boutique.
+
+| Token         | Valor                                                              |
+| ------------- | ------------------------------------------------------------------ |
+| Papel / tinta | Rosa empolvado `#f8f1ee` / `#24161f`                               |
+| Señal         | Ciruela `#66285c`                                                  |
+| Titular       | Gloock 400                                                         |
+| Cuerpo        | Jost                                                               |
+| Forma         | Suave                                                              |
+| Tarjeta       | Retrato dibujado 2:3, dos en el celular y cuatro en la computadora |
+
+- **Cabecera** de boutique: "Catálogo" a un lado, el nombre al centro, la bolsa al otro.
+- **Portada** con una foto alta de cuerpo entero y el rótulo "Nuevo ingreso".
+- **Categorías** como ocasiones, en una franja de fotos altas que se desliza.
+- **Tarjeta** con la segunda foto al pasar, el sello "Nuevo" si entró hace menos de 14
+  días y **las tallas debajo** (`OpcionesDeVitrina`), con la agotada tachada.
+- Las preguntas se pliegan; la ficha pliega **¿Cuál es tu talla?**.
+
+### Ámbar (`ambar`) — Perfumes árabes y decants
+
+Una perfumería de zoco de noche. Papel arena `#ebe3d5`, tinta `#1b1612`, señal púrpura
+oud `#4a2c7a`; Reem Kufi 600 y Jost; recta; tarjeta vertical 3:4.
+
+- La cabecera y la portada son **bandas de tinta** separadas por una **regla de
+  estrellas** de ocho puntas (`ReglaDeEstrellas`, un patrón SVG con `currentColor`).
+- El frasco de la portada va en un marco ochavado; las familias, en azulejos de tinta.
+- **Las tarjetas son de tinta**: la única plantilla con tarjetas oscuras. Debajo del
+  nombre, el primer renglón de la descripción (las notas).
+- El plegable "¿Qué es un decant?" va solo en los productos por ml (`seVendePorMl`).
+
+### Correa (`correa`) — Carteras de color
+
+Papel `#fafaf8`, tinta `#2a1d14`, señal cognac `#8a4a1c`; Syne 700 y Geist; píldora;
+tarjeta vertical 4:5.
+
+- **Los azulejos**: cuatro colores claros que salen de la señal girándole el tono
+  (`azulejos()`, en JS con `hexAHsl`), y cambian si la tienda cambia su color. Cada
+  tarjeta toma el suyo por su lugar en la grilla (`:nth-child(4n+…)`). El pie, que no
+  conoce la apariencia, los gira con color relativo de CSS.
+- La portada es un mosaico de tres azulejos con fotos (`mix-blend-multiply`).
+- Los colores de cada modelo, en puntos bajo la foto (`OpcionesDeVitrina`).
+
+### Taco (`taco`) — Zapatos de mujer
+
+Papel nude `#f2e8de`, tinta charol `#14181c`, señal petróleo `#0d5c63`; Jost 500 en
+minúsculas y Geist; recta; tarjeta cuadrada.
+
+- **La repisa**: una regla de tinta de 2 px bajo cada foto, donde se apoya el par.
+- La tarjeta es una placa cuadrada con la foto 4:3 arriba y los números abajo
+  (`OpcionesDeVitrina`, fichas); sin números, la categoría. Con "Vertical", placa 4:5 y
+  foto 1:1: no hay token de tarjeta apaisada.
+- Títulos, rótulos y el nombre de la tienda en minúsculas; los nombres de producto y los
+  botones no.
+
+### Tocador (`tocador`) — Maquillaje y skincare
+
+Papel leche `#fdf8f5`, tinta `#2b1418`, señal rojo labial `#b3121f`; Fraunces 600 (SOFT 100) y Geist; píldora; tarjeta cuadrada en bandeja.
+
+- **Las categorías son los pasos de una rutina**, numerados por el orden de la tienda y
+  unidos por flechas. Si las categorías no son pasos, el número no dice nada: es una
+  decisión aceptada.
+- **El sello** "Te ayudamos con tu tono", texto en círculo que lleva a WhatsApp y gira
+  al pasar el cursor (respeta Reducir movimiento).
+- Los tonos en puntos bajo la foto; los escritos a mano, sin foto ni color conocido, se
+  cuentan: "5 tonos".
+
+### Crayón (`crayon`) — Ropa de niños y bebés
+
+La única de papel frío: celeste `#edf4f6`, tinta `#1b2a33`, señal verde hoja `#357018`;
+Fredoka 600 y Geist; redondo; tarjeta cuadrada muy redonda. Abre el rubro "Niños"
+(`ninos`).
+
+- **El tallímetro**: las categorías (edades) como burbujas colgadas de una regla con
+  marcas; se desliza en el celular y se reparte en la computadora.
+- **El garabato**: un zigzag verde bajo los títulos.
+- Cada tarjeta lleva una etiqueta con el rango de tallas ("Tallas 1 a 3") o, sin tallas,
+  la categoría.
+
 ### Las pantallas compartidas
 
-Pasarela y Esencia escriben sus tres pantallas enteras. Las cinco de arriba se ordenan
+Pasarela y Esencia escriben sus tres pantallas enteras. Las demás se ordenan
 igual —vitrina de bloques, catálogo con filtros, ficha con galería— y las arman con
 `paginasDeKit()` (`components/plantillas/comunes/paginas.tsx`), que recibe las piezas del
 kit: la tarjeta, el título de sección, el rótulo, la grilla, el cierre de la portada, cómo
-se enmarca una foto y los textos. No sabe de qué plantilla son.
+se enmarca una foto y los textos. No sabe de qué plantilla son. Un kit puede pasarle
+además un `plegable` —un dato del rubro que la ficha muestra cerrado después de la
+descripción: la guía de tallas, cómo cuidar una joya—.
+
+**`OpcionesDeVitrina`** (`components/tienda/opciones-de-vitrina.tsx`) dibuja en una
+tarjeta las tallas, los números o los colores de un producto —en fichas, puntos o el
+rango "34–40"—, tachando el valor que no tiene stock en ninguna variante. Si el
+producto no tiene esa opción no dibuja nada, o lo que se le pase en `respaldo`. "Tono"
+cuenta como color. La usan Probador, Correa, Taco, Tocador y Crayón.
+
+**`preguntasPlegadas(Titulo)`** (`components/plantillas/comunes/preguntas.tsx`): las
+preguntas frecuentes plegadas, con el título de cada kit.
 
 Dos trampas que salieron al hacerlas:
 

@@ -93,10 +93,17 @@ function aparienciaDeDemostracion(): AparienciaDeMiTienda {
     },
     disponibles: [
       elegible("calle", null, null, "Moda"),
+      elegible("probador", null, null, "Moda"),
       elegible("atelier", null, null, "Moda"),
+      elegible("correa", null, null, "Moda"),
+      elegible("taco", null, null, "Moda"),
       elegible("pisada", null, null, "Moda"),
       elegible("perfume", null, null, "Belleza"),
       elegible("formula", null, null, "Belleza"),
+      elegible("ambar", null, null, "Belleza"),
+      elegible("tocador", null, null, "Belleza"),
+      elegible("crayon", null, null, "Niños"),
+      elegible("quilate", null, null, "Joyas"),
       elegible("bazar", null, null, "Variedades"),
     ],
     versiones: [

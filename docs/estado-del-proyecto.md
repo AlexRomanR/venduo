@@ -148,6 +148,17 @@ Actualizado el 9 de octubre de 2026.
   (perfumería), **Fórmula** (perfumería de autor) y **Bazar** (de todo un poco, rubro
   "Variedades"). Cada una con su letra, su paleta medida y su kit; las cinco nuevas se
   dan de alta con `20261008120000_plantillas_nuevas.sql`.
+- Noviembre: **Quilate** (joyas y accesorios, rubro nuevo "Joyas") y **Probador** (ropa
+  de mujer, boutique), la primera tanda de siete (`docs/briefs/2026-11-11-plantillas-nuevas.md`).
+  Traen dos letras nuevas, Marcellus y Gloock, las tallas en la tarjeta
+  (`OpcionesDeVitrina`) y un plegable en la ficha. Migración
+  `20261112120000_quilate_y_probador.sql`, **probada en local y sin aplicar en
+  producción**.
+- Noviembre, segunda tanda: **Ámbar** (perfumes árabes y decants), **Correa** (carteras
+  de color), **Taco** (zapatos de mujer), **Tocador** (maquillaje y skincare) y
+  **Crayón** (ropa de niños y bebés, rubro nuevo "Niños"). Cuatro letras más: Reem
+  Kufi, Syne, Fraunces y Fredoka. Migración `20261113120000_cinco_plantillas.sql`,
+  **probada en local y sin aplicar en producción**. Con esto hay catorce plantillas.
 - La identidad llega a toda la tienda pública. El panel es de Venduo, igual para
   todas; la tienda aparece en su sello y en su tarjeta de la barra lateral.
 - Cambio de plantilla desde `/panel/apariencia` sin perder productos ni pedidos, con

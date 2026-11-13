@@ -34,8 +34,10 @@ export default async function PlantillaPage() {
   )
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-8 px-4 pt-4 pb-32 sm:px-5 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-14 lg:pt-10 lg:pb-20">
-      <div className="flex flex-col gap-6 lg:sticky lg:top-8 lg:gap-10">
+    // Una sola columna, centrada en la computadora: acá lo que se mira es la
+    // plantilla, y el titular a un lado dejaba medio lienzo vacío.
+    <div className="mx-auto flex max-w-3xl flex-col gap-8 px-4 pt-4 pb-32 sm:px-5 lg:pt-8">
+      <div className="flex flex-col gap-6 lg:items-center lg:text-center lg:[&_header]:justify-center">
         <Pasos pasos={PASOS_CREAR} actual={2} />
         <Cabecera
           titulo="Elige tu plantilla."
