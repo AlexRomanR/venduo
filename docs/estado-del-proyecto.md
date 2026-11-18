@@ -457,11 +457,11 @@ borrar la cuenta están publicados. Falta lo que es de quien publica: las cuenta
 Firebase y Play Console, y probarla en un teléfono de verdad. La lista está en
 **`docs/plan-app-movil.md`**, "Lo que falta". iPhone viene después.
 
-### 1.b. Capturas de la portada
+### 1.b. Capturas de la portada — hecho (14 de noviembre)
 
-El color, Catálogos y el Inicio en escenas ya están en la app (noviembre). Quedan de la
-portada nueva: reemplazar la captura de la plantilla Fórmula, que muestra un frasco de
-una marca real, y la de Calle, que dice "lo cerramos por WhatsApp".
+Las capturas de celular de Fórmula y Calle se rehicieron: Fórmula ya no muestra un frasco
+de una marca real (sus ejemplos del editor tampoco) y Calle dice "lo coordinamos por
+WhatsApp".
 
 ### 1.c. Pasar las pantallas de trabajo al cuaderno — decidido el 7 de noviembre
 
@@ -597,9 +597,18 @@ Para rediseñar o revisar:
       plantilla en la pasarela de Apariencia con el nombre adentro, y el final en una
       escena con la tienda en vivo en el celular del Resumen. El ingreso, con el mismo
       marco y una línea de texto.
-- [ ] **Hojas y confirmaciones de la web, todavía en el diario**: "Agregar producto" de
-      Nueva venta, "¿Marcar pagado el pedido?" y "¿Pasar a X?" de Apariencia llevan la
-      raya de tinta arriba y esquinas vivas; la app ya las tiene en hoja con radio.
+      **En la app** (14 de noviembre, rama `alta-cuaderno` de `venduo-app`): el ingreso
+      con el titular corto y las pestañas en píldora, y el alta en tres pasos —el
+      negocio, la plantilla en la pasarela de Apariencia con el nombre adentro
+      (`/editor/app/alta`) y la tienda en línea—. Probado en el emulador contra la base
+      local: una cuenta nueva crea su tienda con Crayón y entra al editor o al Inicio.
+- [x] **Hojas y confirmaciones de la web, en el cuaderno** (14 de noviembre): las hojas
+      de abajo con las esquinas de arriba redondas y una manija, la del costado apoyada
+      en el borde, los diálogos y las confirmaciones como tarjetas de hoja con sombra.
+      Se hizo en `app/globals.css`, sobre los `data-slot` de los diálogos: alcanza a
+      todas y `/admin` sigue en el diario.
+- [x] **La ficha en vitrina** (Quilate, Atelier) mostraba las fotos de 190 px en la
+      computadora; ahora la galería se abre a 672 px con más de una foto.
 - [ ] **El PDF del catálogo en el celular** no se pudo ver en el navegador automático (el
       servidor lo arma: `POST /panel/catalogos/pdf` 200). Probarlo en un teléfono.
 

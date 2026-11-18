@@ -35,6 +35,7 @@ cliente viaja al navegador. Ponerla lo más abajo posible del árbol.
 | `/editor/app/catalogo`                    | El editor de catálogos para la app. `?id=` uno guardado            |
 | `/editor/app/catalogo/plantillas`         | Las plantillas de la lista de catálogos, para la app               | Token de la app |
 | `/editor/app/apariencia`                  | La pasarela de plantillas con la tienda, para la app               | Token de la app |
+| `/editor/app/alta`                        | La pasarela del alta, con el nombre del negocio, para la app       | Token de la app |
 | `/panel`                                  | Resumen del emprendedor                                            | Requiere sesión |
 | `/panel/{seccion}`                        | Productos, pedidos, estadísticas, marketing                        | Requiere sesión |
 | `/panel/marketing`                        | Publicar en redes: imagen y texto. `?producto=` elegido            | Requiere sesión |
