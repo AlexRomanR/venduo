@@ -641,13 +641,53 @@ body:has([data-registro="cuaderno"]) .pieza-ficha {
   border-radius: 9999px;
 }
 
+/*
+ * Los diálogos, las confirmaciones y las hojas, en el cuaderno: de hoja, con
+ * radio y una sombra, sin la raya de tinta del diario. Van en un portal fuera
+ * del armazón, por eso la marca se busca en `body`; en `/admin` no está y
+ * siguen como el diario.
+ */
 body:has([data-registro="cuaderno"])
-  :is([data-slot="dialog-content"], [data-slot="sheet-content"]) {
+  :is(
+    [data-slot="dialog-content"],
+    [data-slot="alert-dialog-content"],
+    [data-slot="sheet-content"]
+  ) {
+  border-color: rgb(29 28 26 / 0.12);
   background: var(--hoja);
 }
-body:has([data-registro="cuaderno"]) [data-slot="dialog-content"] {
+body:has([data-registro="cuaderno"])
+  :is([data-slot="dialog-content"], [data-slot="alert-dialog-content"]) {
+  overflow: hidden;
+  border-width: 1px;
   border-radius: 22px;
   box-shadow: 0 40px 80px -30px rgb(29 28 26 / 0.45);
+}
+/* La hoja de abajo, como la de la app: esquinas de arriba redondas y una manija. */
+body:has([data-registro="cuaderno"])
+  [data-slot="sheet-content"][data-side="bottom"] {
+  border-width: 1px 1px 0;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -24px 60px -28px rgb(29 28 26 / 0.45);
+}
+body:has([data-registro="cuaderno"])
+  [data-slot="sheet-content"][data-side="bottom"]::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 40px;
+  height: 4px;
+  border-radius: 9999px;
+  background: rgb(29 28 26 / 0.15);
+  transform: translateX(-50%);
+}
+/* La hoja del costado, en la computadora: apoyada en el borde derecho. */
+body:has([data-registro="cuaderno"])
+  [data-slot="sheet-content"][data-side="right"] {
+  border-width: 0 0 0 1px;
+  border-radius: 24px 0 0 24px;
+  box-shadow: -24px 0 60px -28px rgb(29 28 26 / 0.45);
 }
 
 .sombra-cuaderno {

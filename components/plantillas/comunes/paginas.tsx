@@ -243,7 +243,17 @@ export function paginasDeKit(
               : "grid gap-8 md:grid-cols-[1.25fr_1fr] md:gap-12"
           )}
         >
-          <div className={cn(vitrina && "w-full max-w-sm px-5 md:px-0")}>
+          {/* En vitrina la foto manda: en la computadora, con más de una
+              foto en dos columnas, cada una quedaba en 190 px. */}
+          <div
+            className={cn(
+              vitrina &&
+                cn(
+                  "w-full max-w-sm px-5 md:px-0",
+                  imagenes.length > 1 ? "md:max-w-2xl" : "md:max-w-md"
+                )
+            )}
+          >
             <Galeria
               imagenes={imagenes}
               nombre={producto.name}
