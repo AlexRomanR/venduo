@@ -3,7 +3,7 @@ import { Children, type ReactElement, type ReactNode } from "react"
 import type { ClaveFuente } from "@/lib/plantillas/fuentes"
 
 /*
- * Las cinco piezas con las que se dibuja un catálogo, y nada más.
+ * Las seis piezas con las que se dibuja un catálogo, y nada más.
  *
  * El mismo dibujo sale por dos lados: en HTML para la vista previa del editor,
  * que tiene que andar en un celular, y en PDF para el archivo, que se arma en
@@ -129,6 +129,16 @@ export interface Primitivas {
   }) => ReactElement
   /** Un tramo dentro de un `Texto`: un precio tachado al lado del nuevo. */
   Tramo: (props: { estilo?: EstiloDibujo; children: ReactNode }) => ReactElement
+  /**
+   * Una caja que se puede tocar: en el PDF abre `href`; en la vista previa
+   * del editor se dibuja igual y no lleva a ningún lado. Es la de "Pedir este
+   * combo".
+   */
+  Enlace: (props: {
+    href: string
+    estilo?: EstiloDibujo
+    children?: ReactNode
+  }) => ReactElement
   /** Una foto que llena su caja. Sin foto, la caja queda con su fondo. */
   Foto: (props: {
     src: string | null

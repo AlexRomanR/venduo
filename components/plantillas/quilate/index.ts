@@ -13,6 +13,7 @@ import {
   Titulo,
   Vacio,
   grilla,
+  materialDe,
 } from "@/components/plantillas/quilate/piezas"
 
 /** El kit de Quilate. */
@@ -38,13 +39,14 @@ export const KIT_QUILATE: KitDeTienda = {
       titulo: "Cuidados",
       texto:
         "Guárdala seca y separada de las demás piezas. Póntela después del perfume y la crema.",
+      // Solo en una joya: la que nombra su material (plata, oro, acero…).
+      cuando: (producto) => materialDe(producto) !== null,
     },
     textos: {
-      sinProductos: "Las piezas están en camino",
-      consulta: "¿Quieres verla de cerca? Pregúntanos",
-      estado: "Estado de la pieza",
+      sinProductos: "La colección está en camino",
+      consulta: "¿Quieres verlo de cerca? Pregúntanos",
       sinResultados:
-        "Ninguna pieza con eso. Prueba con otra categoría o ve todas.",
+        "Nada con eso por ahora. Prueba con otra categoría o ve todo.",
     },
   }),
 }

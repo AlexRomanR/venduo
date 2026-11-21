@@ -5,6 +5,7 @@ import {
   borradorSchema,
   rutaDeAjusteSchema,
 } from "@/lib/editor/protocolo"
+import type { CambioDeLaPropuesta } from "@/lib/editor/propuesta"
 import { operacionSchema } from "@/lib/plantillas/borrador"
 
 /**
@@ -62,6 +63,14 @@ export const mensajeDeLaApp = z.discriminatedUnion("tipo", [
   z.object({ tipo: z.literal("publicado"), borrador: borradorSchema }),
   /** Qué hacer con un borrador guardado de una vez anterior. */
   z.object({ tipo: z.literal("recuperar"), si: z.boolean() }),
+  /** Llevar la vista hasta un cambio de la propuesta: el "Ver" de su lista. */
+  z.object({
+    tipo: z.literal("ver"),
+    lugar: z.object({
+      seccion: z.string().max(120).optional(),
+      ruta: z.string().max(120).optional(),
+    }),
+  }),
 ])
 
 export type MensajeDeLaApp = z.infer<typeof mensajeDeLaApp>
@@ -96,3 +105,8 @@ export type MensajeAlaApp =
   /** Lo que cambia ese ajuste no se ve en esta pantalla. */
   | { tipo: "sin-senal"; ruta: string }
   | { tipo: "sin-tienda" }
+  /**
+   * Lo que cambia la propuesta que se está mirando, en palabras y con dónde se
+   * ve: la lista de la app, con su "Ver".
+   */
+  | { tipo: "propuesta"; cambios: CambioDeLaPropuesta[] }

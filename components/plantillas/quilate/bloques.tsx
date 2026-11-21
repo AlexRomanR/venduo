@@ -37,7 +37,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
   const foto = fotoDePortada(bloque, tienda)
   const titulo = texto(bloque, "title") ?? tienda.nombre
   const bajada = texto(bloque, "subtitle")
-  const accion = accionDePortada(bloque) ?? "Ver las piezas"
+  const accion = accionDePortada(bloque) ?? "Ver la colección"
 
   return (
     <section className="mx-auto w-full max-w-7xl px-5 pt-10 pb-14 text-center md:pt-16 md:pb-20">
@@ -188,7 +188,7 @@ function Categorias({ bloque, tienda }: PropsBloque) {
 
   return (
     <section className="mx-auto w-full max-w-5xl px-5 py-14 md:py-20">
-      <Titulo titulo={texto(bloque, "title") ?? "Por dónde la llevas"} />
+      <Titulo titulo={texto(bloque, "title") ?? "Por categoría"} />
 
       <ul className="mt-8 grid grid-cols-3 border-t border-l border-tinta/15 md:mt-10">
         {categorias.map((categoria) => (
@@ -207,7 +207,7 @@ function Categorias({ bloque, tienda }: PropsBloque) {
               </span>
               <span className="tabular -mt-1.5 text-xs opacity-60">
                 {categoria.productos}{" "}
-                {categoria.productos === 1 ? "pieza" : "piezas"}
+                {categoria.productos === 1 ? "producto" : "productos"}
               </span>
             </Link>
           </li>
@@ -227,9 +227,9 @@ function Grilla({ bloque, tienda }: PropsBloque) {
   return (
     <section className="mx-auto w-full max-w-7xl px-5 py-14 md:py-20">
       <Titulo
-        titulo={texto(bloque, "title") ?? "Recién llegadas"}
+        titulo={texto(bloque, "title") ?? "Recién llegado"}
         enlace={{
-          etiqueta: "Ver todas",
+          etiqueta: "Ver todo",
           href: rutaDeTienda(tienda.slug, "/catalogo"),
         }}
       />
@@ -316,7 +316,7 @@ function Cierre({ bloque, tienda }: PropsBloque) {
         ) : null}
         <div className="mt-8">
           <Boton href={rutaDeTienda(tienda.slug, "/catalogo")}>
-            {texto(bloque, "buttonLabel") ?? "Ver las piezas"}
+            {texto(bloque, "buttonLabel") ?? "Ver la colección"}
           </Boton>
         </div>
       </div>

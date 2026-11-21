@@ -1,6 +1,11 @@
 import { exigirSesion } from "@/lib/api/respuestas"
 import { aviso, respuestaDePdf } from "@/lib/catalogos/pdf"
-import { getCatalogo, getMaterialDelCatalogo } from "@/lib/data/catalogos"
+import {
+  conLosCombos,
+  getCatalogo,
+  getMaterialDelCatalogo,
+} from "@/lib/data/catalogos"
+import { getMiTienda } from "@/lib/data/panel"
 import { exigirFuncion } from "@/lib/data/funciones"
 
 /** Los precios y el stock se leen en el momento: nunca de caché. */
@@ -22,13 +27,17 @@ export async function GET(
   if (!sesion.ok) return sesion.respuesta
 
   const { id } = await params
-  const [abierto, { datos }, permiso] = await Promise.all([
+  const [abierto, { datos }, permiso, tienda] = await Promise.all([
     getCatalogo(id),
     getMaterialDelCatalogo(),
     exigirFuncion("catalogos"),
+    getMiTienda(),
   ])
   if (!permiso.ok) return aviso(permiso.error, 403)
   if (!abierto) return aviso("No encontramos ese catálogo.", 404)
 
-  return respuestaDePdf(abierto.catalogo, datos, { descarga: "1" })
+  const conBotones = tienda
+    ? await conLosCombos(datos, abierto.token, tienda.id)
+    : datos
+  return respuestaDePdf(abierto.catalogo, conBotones, { descarga: "1" })
 }

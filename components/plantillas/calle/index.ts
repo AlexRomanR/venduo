@@ -33,8 +33,7 @@ export const KIT_CALLE: KitDeTienda = {
     Cierre,
     textos: {
       sinProductos: "Pronto, los primeros productos",
-      consulta: "¿Dudas con la talla? Pregúntanos",
-      estado: "Estado de la prenda",
+      consulta: "¿Tienes dudas? Pregúntanos",
       sinResultados:
         "Nada coincide con lo que elegiste. Prueba con otra sección o ve todo el catálogo.",
     },

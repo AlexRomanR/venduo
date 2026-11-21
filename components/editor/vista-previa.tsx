@@ -13,7 +13,10 @@ import {
   type MensajeAlEditor,
 } from "@/lib/editor/protocolo"
 import { PLANTILLAS } from "@/lib/plantillas"
-import { combinarApariencia } from "@/lib/plantillas/apariencia"
+import {
+  combinarApariencia,
+  NOMBRES_DE_AJUSTE,
+} from "@/lib/plantillas/apariencia"
 import { relacionados } from "@/lib/plantillas/bloques"
 import type {
   CategoriaPublica,
@@ -24,6 +27,7 @@ import { cn } from "@/lib/utils"
 import type { Json, Product } from "@/types"
 import { kitDePlantilla } from "@/components/plantillas"
 import { EstiloDePlantilla } from "@/components/plantillas/estilo"
+import { ANCLA_DE_COMPRA } from "@/components/tienda/agregar"
 import { BarraDeCompra } from "@/components/tienda/barra-de-compra"
 import {
   ProveedorCarrito,
@@ -40,6 +44,107 @@ const MARCA = "#d0216a"
 const NEUTRO = "#1d1c1a"
 
 const SIN_FILTROS = leerFiltros({})
+
+/** Dónde se ve lo que no tiene una parte propia marcada en la plantilla. */
+const DONDE_SE_VE: Array<[prefijo: string, selector: string]> = [
+  ["logo", "header"],
+  ["forma.", ".rounded-plantilla"],
+]
+
+/** Dónde estaba una parte, para mostrar el lugar cuando deja de existir. */
+interface Recuerdo {
+  arriba: number
+  izquierda: number
+  ancho: number
+  alto: number
+  fija: boolean
+  /** Una barra fija que estaba escondida: al irse, no se la vio irse. */
+  escondida: boolean
+  nombre: string
+}
+
+const claveDeSeccion = (id: string) => `seccion:${id}`
+
+function visibles(selector: string) {
+  return Array.from(document.querySelectorAll<HTMLElement>(selector)).filter(
+    (elemento) => elemento.getClientRects().length > 0
+  )
+}
+
+function aLaVista(elemento: HTMLElement) {
+  const { top, bottom } = elemento.getBoundingClientRect()
+  return bottom > 0 && top < window.innerHeight
+}
+
+/**
+ * Si un tramo de la página se alcanza a ver, descontando la cabecera fija.
+ *
+ * Con esto se decide si hay que señalar: lo que cambia a la vista se ve solo,
+ * y un recuadro encima no agrega nada. La marca es para lo que estaba afuera.
+ */
+function tramoALaVista(arriba: number, alto: number, techo: number) {
+  const visible =
+    Math.min(arriba + alto, window.innerHeight) - Math.max(arriba, techo)
+  return visible >= Math.min(alto * 0.6, (window.innerHeight - techo) * 0.5)
+}
+
+function techoDeLaPagina() {
+  const cabecera = document.querySelector(".vista-previa header")
+  return Math.max(0, cabecera?.getBoundingClientRect().bottom ?? 0)
+}
+
+function seVe(elemento: HTMLElement) {
+  const { top, height } = elemento.getBoundingClientRect()
+  return tramoALaVista(
+    top,
+    height,
+    elemento.closest("header") ? 0 : techoDeLaPagina()
+  )
+}
+
+function movimiento(): ScrollBehavior {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth"
+}
+
+/** Lo que no entra en la pantalla se muestra desde su comienzo. */
+function llevarA(elemento: Element) {
+  const entra = elemento.getBoundingClientRect().height < window.innerHeight
+  elemento.scrollIntoView({
+    behavior: movimiento(),
+    block: entra ? "center" : "start",
+  })
+}
+
+/** La parte que muestra un ajuste: si hay varias, una que ya se vea. */
+function loQueCambia(ruta: string): HTMLElement | null {
+  const selector =
+    DONDE_SE_VE.find(([prefijo]) => ruta.startsWith(prefijo))?.[1] ??
+    `[data-ajuste~="${ruta}"]`
+  const opciones = visibles(`.vista-previa ${selector}`)
+  return opciones.find(seVe) ?? opciones[0] ?? null
+}
+
+/**
+ * La barra de compra solo aparece cuando el botón de agregar no se ve: si se
+ * ve, se mueve la página hasta sacarlo, o activarla no mostraría nada.
+ * Devuelve si hizo falta moverla.
+ */
+function dejarVerLaBarra() {
+  const boton = document.getElementById(ANCLA_DE_COMPRA)
+  if (!boton || !aLaVista(boton)) return false
+  const { top, height } = boton.getBoundingClientRect()
+  const arriba = top + window.scrollY
+  window.scrollTo({
+    top:
+      arriba > window.innerHeight
+        ? arriba - window.innerHeight
+        : arriba + height + 8,
+    behavior: movimiento(),
+  })
+  return true
+}
 
 /**
  * Por dónde le llegan los mensajes a la vista previa y por dónde contesta.
@@ -134,64 +239,140 @@ export function VistaPrevia({
   // agregada todavía no se dibujó. Se guarda y se cumple al dibujarla.
   const pendiente = React.useRef<string | null>(null)
 
-  const enfocar = React.useCallback((id: string) => {
-    const elemento = document.querySelector(selector(id))
-    if (!elemento) {
-      pendiente.current = id
+  // Lo que se apaga o se oculta ya no está cuando llega el aviso: se anota
+  // dónde estaba cada parte justo antes de dibujar el estado nuevo.
+  const recuerdos = React.useRef(new Map<string, Recuerdo>())
+  const pantallaRecordada = React.useRef<string | null>(null)
+  const [fantasma, setFantasma] = React.useState<Recuerdo | null>(null)
+  const marcoDelFantasma = React.useRef<HTMLDivElement>(null)
+
+  const recordar = React.useCallback((mensaje: Estado) => {
+    const pantalla = `${mensaje.vista}:${mensaje.productoId}`
+    if (pantalla !== pantallaRecordada.current) {
+      pantallaRecordada.current = pantalla
+      recuerdos.current.clear()
       return
     }
-    pendiente.current = null
-
-    const quieto = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    elemento.scrollIntoView({
-      behavior: quieto ? "auto" : "smooth",
-      block: "center",
-    })
-    setDestello(id)
-    window.setTimeout(() => setDestello(null), 1400)
+    const vistas = new Set<string>()
+    document
+      .querySelectorAll<HTMLElement>("[data-seccion], [data-ajuste]")
+      .forEach((elemento) => {
+        const caja = elemento.getBoundingClientRect()
+        if (!caja.width || !caja.height) return
+        const { position } = window.getComputedStyle(elemento)
+        const fija = position === "fixed" || position === "sticky"
+        const claves = elemento.dataset.seccion
+          ? [claveDeSeccion(elemento.dataset.seccion)]
+          : (elemento.dataset.ajuste ?? "").split(" ")
+        for (const clave of claves) {
+          if (vistas.has(clave)) continue
+          vistas.add(clave)
+          recuerdos.current.set(clave, {
+            arriba: fija
+              ? Math.min(caja.top, window.innerHeight - caja.height)
+              : caja.top + window.scrollY,
+            izquierda: caja.left + (fija ? 0 : window.scrollX),
+            ancho: caja.width,
+            alto: caja.height,
+            fija,
+            escondida: fija && caja.top >= window.innerHeight - 1,
+            nombre:
+              elemento.dataset.nombre ??
+              (NOMBRES_DE_AJUSTE as Record<string, string>)[clave] ??
+              "",
+          })
+        }
+      })
   }, [])
+
+  const mostrarLoQuitado = React.useCallback((clave: string) => {
+    const recuerdo = recuerdos.current.get(clave)
+    if (!recuerdo) return false
+    recuerdos.current.delete(clave)
+    const estabaALaVista = recuerdo.fija
+      ? !recuerdo.escondida
+      : tramoALaVista(
+          recuerdo.arriba - window.scrollY,
+          recuerdo.alto,
+          techoDeLaPagina()
+        )
+    if (!estabaALaVista) setFantasma(recuerdo)
+    return true
+  }, [])
+
+  React.useEffect(() => {
+    if (!fantasma) return
+    if (marcoDelFantasma.current) llevarA(marcoDelFantasma.current)
+    const reloj = window.setTimeout(() => setFantasma(null), 1900)
+    return () => window.clearTimeout(reloj)
+  }, [fantasma])
+
+  const enfocar = React.useCallback(
+    (id: string) => {
+      const elemento = document.querySelector<HTMLElement>(selector(id))
+      if (!elemento) {
+        if (!mostrarLoQuitado(claveDeSeccion(id))) pendiente.current = id
+        return
+      }
+      pendiente.current = null
+      if (seVe(elemento)) return
+
+      llevarA(elemento)
+      setDestello(id)
+      window.setTimeout(() => setDestello(null), 1700)
+    },
+    [mostrarLoQuitado]
+  )
 
   // Lo que cambia un ajuste se busca un momento después: el mensaje llega
   // junto con el estado nuevo, y lo que señala puede aparecer recién con él.
-  const [senal, setSenal] = React.useState<string | null>(null)
+  const senalado = React.useRef<HTMLElement | null>(null)
   const relojes = React.useRef<number[]>([])
   const senalar = React.useCallback(
     (ruta: string) => {
       relojes.current.forEach((reloj) => window.clearTimeout(reloj))
+      senalado.current?.removeAttribute("data-senalado")
       relojes.current = [
         window.setTimeout(() => {
-          const elemento = Array.from(
-            document.querySelectorAll(`[data-ajuste~="${ruta}"]`)
-          ).find((e) => e.getClientRects().length > 0)
+          const elemento = loQueCambia(ruta)
           if (!elemento) {
-            setSenal(null)
-            puente.enviar({ tipo: "sin-senal", ruta })
+            if (!mostrarLoQuitado(ruta)) {
+              puente.enviar({ tipo: "sin-senal", ruta })
+            }
             return
           }
-          const quieto = window.matchMedia(
-            "(prefers-reduced-motion: reduce)"
-          ).matches
-          elemento.scrollIntoView({
-            behavior: quieto ? "auto" : "smooth",
-            block: "center",
-          })
-          setSenal(ruta)
-          relojes.current.push(window.setTimeout(() => setSenal(null), 1700))
+          if (ruta === "ficha.barraFija") {
+            if (!dejarVerLaBarra()) return
+          } else {
+            if (seVe(elemento)) return
+            llevarA(elemento)
+          }
+
+          elemento.setAttribute("data-senalado", "")
+          senalado.current = elemento
+          relojes.current.push(
+            window.setTimeout(
+              () => elemento.removeAttribute("data-senalado"),
+              1700
+            )
+          )
         }, 260),
       ]
     },
-    [puente]
+    [puente, mostrarLoQuitado]
   )
 
   React.useEffect(() => {
     const dejar = puente.escuchar((mensaje) => {
-      if (mensaje.tipo === "estado") setEstado(mensaje)
-      else if (mensaje.tipo === "senalar") senalar(mensaje.ruta)
+      if (mensaje.tipo === "estado") {
+        recordar(mensaje)
+        setEstado(mensaje)
+      } else if (mensaje.tipo === "senalar") senalar(mensaje.ruta)
       else enfocar(mensaje.seccion)
     })
     puente.enviar({ tipo: "lista" })
     return dejar
-  }, [enfocar, senalar, puente])
+  }, [enfocar, senalar, recordar, puente])
 
   React.useEffect(() => {
     if (pendiente.current) enfocar(pendiente.current)
@@ -279,6 +460,16 @@ export function VistaPrevia({
         nombre: tocado.dataset.fija,
         ayuda: tocado.dataset.ayuda ?? "",
       })
+    } else {
+      const enlace = (evento.target as HTMLElement).closest("a, button")
+      if (enlace) {
+        puente.enviar({
+          tipo: "fija",
+          nombre: (enlace.textContent ?? "").trim().slice(0, 80),
+          ayuda: "En la vista previa los enlaces y botones no se abren.",
+          navegacion: true,
+        })
+      }
     }
   }
 
@@ -308,9 +499,13 @@ export function VistaPrevia({
   }
 
   const reglas = [
+    // Sin barra de desplazamiento: se ve como en un celular, y en el marco
+    // redondeado de la computadora quedaba pegada al borde.
+    `html{scrollbar-width:none}`,
+    `html::-webkit-scrollbar{display:none}`,
     `[data-seccion]{cursor:pointer}`,
     `[data-seccion]:hover{outline:2px dashed ${MARCA}8c;outline-offset:-2px}`,
-    `[data-seccion]::before{content:attr(data-nombre);position:absolute;top:10px;left:10px;z-index:45;display:none;padding:4px 8px;background:${MARCA};color:#fff;font:600 11px/1.2 var(--fuente-geist),sans-serif;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}`,
+    `[data-seccion]::before{content:attr(data-nombre);position:absolute;top:10px;left:10px;z-index:45;display:none;padding:4px 8px;background:${MARCA};color:#fff;font:600 12px/1.2 var(--fuente-geist),sans-serif;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}`,
     `[data-seccion]:hover::before{display:block}`,
     // Una sección que no dibuja nada no desaparece: queda un recuadro que dice
     // qué le falta, y se puede tocar y arrastrar como las demás.
@@ -320,8 +515,12 @@ export function VistaPrevia({
     // tocar para saber de dónde sale, pero no se edita desde acá.
     `[data-fija]{cursor:help}`,
     `[data-fija]:hover{outline:2px dashed ${NEUTRO}59;outline-offset:-2px}`,
-    `[data-fija]::before{content:attr(data-fija) " · viene con la plantilla";position:absolute;top:10px;left:10px;z-index:45;display:none;padding:4px 8px;background:${NEUTRO};color:#fff;font:600 11px/1.2 var(--fuente-geist),sans-serif;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}`,
+    `[data-fija]::before{content:attr(data-fija) " · viene con la plantilla";position:absolute;top:10px;left:10px;z-index:45;display:none;padding:4px 8px;background:${NEUTRO};color:#fff;font:600 12px/1.2 var(--fuente-geist),sans-serif;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}`,
     `[data-fija]:hover::before{display:block}`,
+    // Sin cursor no hay cómo descubrir que las secciones se tocan.
+    ...(estado?.conPistas
+      ? [`@media (hover:none){[data-seccion]::before{display:block}}`]
+      : []),
     ...(seleccion
       ? [
           `${marcada(seleccion)}{outline:3px solid ${MARCA};outline-offset:-3px}`,
@@ -335,22 +534,22 @@ export function VistaPrevia({
         ]
       : []),
     ...(destello
-      ? [`${marcada(destello)}{animation:vp-destello 1.4s ease-out}`]
+      ? [
+          `${marcada(destello)}{outline:3px solid ${MARCA};outline-offset:-3px;animation:vp-destello .8s ease-out 2}`,
+        ]
       : []),
     ...marcas.map(
       (id) =>
         `${marcada(id)}{outline:3px solid ${MARCA};outline-offset:-3px;animation:vp-destello 1.6s ease-out 2}`
     ),
-    ...(senal
-      ? [
-          `[data-ajuste~="${senal}"]{outline:3px solid ${MARCA};outline-offset:-3px;animation:vp-destello .8s ease-out 2}`,
-        ]
-      : []),
+    // Para que la cabecera fija no tape el comienzo de lo que se señala.
+    `[data-seccion],[data-ajuste]{scroll-margin-top:72px}`,
+    `[data-senalado]{outline:3px solid ${MARCA};outline-offset:-3px;animation:vp-destello .8s ease-out 2}`,
     `@keyframes vp-destello{0%,100%{outline-color:${MARCA}}50%{outline-color:transparent}}`,
     // Los colores nuevos se derraman sobre la tienda en vez de saltar: es lo
     // que hace sentir que el cambio es de verdad y no otra pantalla.
     `@media (prefers-reduced-motion:no-preference){.vista-previa *{transition:background-color .35s ease,color .35s ease,border-color .35s ease,fill .35s ease}}`,
-    `@media (prefers-reduced-motion:reduce){[data-seccion]{animation:none!important}}`,
+    `@media (prefers-reduced-motion:reduce){[data-seccion],[data-senalado]{animation:none!important}}`,
   ].join("\n")
 
   return (
@@ -364,6 +563,34 @@ export function VistaPrevia({
     >
       <EstiloDePlantilla apariencia={actual.apariencia} />
       <style dangerouslySetInnerHTML={{ __html: reglas }} />
+
+      {fantasma ? (
+        <div
+          ref={marcoDelFantasma}
+          aria-hidden="true"
+          className="pointer-events-none z-50"
+          style={{
+            position: fantasma.fija ? "fixed" : "absolute",
+            top: fantasma.arriba,
+            left: fantasma.izquierda,
+            width: fantasma.ancho,
+            height: Math.min(fantasma.alto, 120),
+            outline: `3px dashed ${MARCA}`,
+            outlineOffset: -3,
+            background: `${MARCA}14`,
+          }}
+        >
+          <span
+            className="absolute top-2.5 left-2.5 px-2 py-1 text-xs leading-tight font-semibold tracking-[0.08em] text-white uppercase"
+            style={{
+              background: MARCA,
+              fontFamily: "var(--fuente-geist), sans-serif",
+            }}
+          >
+            Ya no se ve{fantasma.nombre ? ` · ${fantasma.nombre}` : ""}
+          </span>
+        </div>
+      ) : null}
 
       <div
         data-plantilla={plantilla}
@@ -441,7 +668,7 @@ export function VistaPrevia({
         {conEjemplos ? (
           <p
             className={cn(
-              "pointer-events-none fixed inset-x-0 z-50 mx-auto w-fit rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.08em] text-white uppercase sm:px-3 sm:py-1.5 sm:text-[11px]",
+              "pointer-events-none fixed inset-x-0 z-50 mx-auto w-fit rounded-full px-2.5 py-1 text-xs font-semibold tracking-[0.04em] text-white sm:px-3 sm:py-1.5",
               conBarra ? "bottom-[5.5rem] md:bottom-3" : "bottom-2 sm:bottom-3"
             )}
             style={{
@@ -449,7 +676,7 @@ export function VistaPrevia({
               fontFamily: "var(--fuente-geist), sans-serif",
             }}
           >
-            Productos de ejemplo · así se verán los tuyos
+            Productos de ejemplo
           </p>
         ) : null}
       </div>

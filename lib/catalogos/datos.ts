@@ -55,6 +55,22 @@ export interface DatosDelCatalogo {
   categorias: { id: string; nombre: string }[]
   /** El día de los precios y el stock, dicho completo: "1 de octubre de 2026". */
   fecha: string
+  /**
+   * A dónde lleva "Pedir este combo", con `{combo}` donde va su id. Solo en un
+   * catálogo guardado y con los combos encendidos: en el borrador, la página
+   * del combo todavía no existe. Sin esto, la hoja del combo no lleva botón.
+   */
+  combos?: string | null
+}
+
+/** La dirección de la página de un combo, si el catálogo la tiene. */
+export function enlaceDeCombo(
+  datos: DatosDelCatalogo,
+  combo: string
+): string | null {
+  return datos.combos
+    ? datos.combos.replace("{combo}", encodeURIComponent(combo))
+    : null
 }
 
 /** Todo lo que un bloque necesita para dibujarse, el mismo en las dos salidas. */
@@ -187,6 +203,25 @@ export function hojasDelBloque(
  * La foto de un separador: la elegida o, si no, la del primer producto de la
  * sección que abre. Así un separador de "Zapatillas" muestra una zapatilla.
  */
+/** El precio de cada producto, en centavos, por su id. */
+export function preciosDe(datos: DatosDelCatalogo): Record<string, number> {
+  return Object.fromEntries(
+    Object.values(datos.productos).map((producto) => [
+      producto.id,
+      producto.precioCents,
+    ])
+  )
+}
+
+/** Los productos sin unidades: un combo nuevo no los toma. */
+export function agotadosDe(datos: DatosDelCatalogo): Set<string> {
+  return new Set(
+    Object.values(datos.productos)
+      .filter((producto) => producto.stock <= 0)
+      .map((producto) => producto.id)
+  )
+}
+
 export function fotoDeSeparador(
   bloque: BloqueDe<"separador">,
   catalogo: Catalogo,

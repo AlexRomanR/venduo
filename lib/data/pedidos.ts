@@ -16,6 +16,19 @@ export interface LineaPedido {
   cantidad: number
   precioCents: number
   totalCents: number
+  /**
+   * Si es un combo, lo que trae —cuántos de cada producto por combo, con su
+   * opción—. Lo escribió `create_order` al pedir.
+   */
+  partes?: ParteDePedido[]
+}
+
+/** Un producto de una línea de combo. */
+export interface ParteDePedido {
+  nombre: string
+  variante: string | null
+  cantidad: number
+  foto: string | null
 }
 
 export interface Pedido {
@@ -229,21 +242,40 @@ export async function getPedidos(filtro?: FiltroPedidos): Promise<Pedidos> {
       `id, order_number, status, buyer_name, buyer_phone, total_cents,
        created_at, paid_at, origen, nota,
        order_items ( product_id, product_name, quantity, unit_price_cents,
-                     variant_name, products ( image_url ) )`
+                     variant_name, combo_id, products ( image_url ),
+                     order_item_components ( product_name, variant_name, quantity,
+                                             created_at, products ( image_url ) ) )`
     )
     .eq("store_id", tienda.id)
     .order("created_at", { ascending: false })
 
   const pedidos: Pedido[] = (filas ?? []).map((fila) => {
-    const items = (fila.order_items ?? []).map((item) => ({
-      productoId: item.product_id,
-      foto: item.products?.image_url ?? null,
-      nombre: item.product_name,
-      variante: item.variant_name,
-      cantidad: item.quantity,
-      precioCents: item.unit_price_cents,
-      totalCents: item.quantity * item.unit_price_cents,
-    }))
+    const items = (fila.order_items ?? []).map((item) => {
+      // Un combo no tiene producto propio: su foto es la de su primer producto.
+      const partes = item.combo_id
+        ? [...(item.order_item_components ?? [])]
+            .sort((a, b) => a.created_at.localeCompare(b.created_at))
+            .map((parte) => ({
+              nombre: parte.product_name,
+              variante: parte.variant_name,
+              cantidad: parte.quantity,
+              foto: parte.products?.image_url ?? null,
+            }))
+        : undefined
+      return {
+        productoId: item.product_id,
+        foto:
+          item.products?.image_url ??
+          partes?.find((parte) => parte.foto)?.foto ??
+          null,
+        nombre: item.product_name,
+        variante: item.variant_name,
+        cantidad: item.quantity,
+        precioCents: item.unit_price_cents,
+        totalCents: item.quantity * item.unit_price_cents,
+        ...(partes ? { partes } : {}),
+      }
+    })
     return {
       id: fila.id,
       numero: fila.order_number,

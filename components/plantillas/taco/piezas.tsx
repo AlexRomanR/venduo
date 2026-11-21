@@ -90,7 +90,7 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
         <Repisa />
         <div className="flex flex-1 items-center px-2">
           {agotado ? (
-            <span className="text-xs opacity-70">sin números por ahora</span>
+            <span className="text-xs opacity-70">agotado por ahora</span>
           ) : (
             <OpcionesDeVitrina
               producto={producto}
@@ -233,8 +233,8 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
                 <Rotulo>cómo comprar</Rotulo>
               </dt>
               <dd className="mt-1.5 leading-relaxed opacity-85">
-                Elige tus pares y tu número, y envíanos el pedido por WhatsApp.
-                Ahí coordinamos el pago y la entrega.
+                Elige tus favoritos y envíanos el pedido por WhatsApp. Ahí
+                coordinamos el pago y la entrega.
               </dd>
             </div>
           </SiRecibePedidos>
@@ -249,7 +249,7 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
                   className="inline-flex min-h-11 items-center gap-2 underline decoration-tinta/30 underline-offset-4 transition-colors hover:text-senal hover:decoration-senal"
                 >
                   <MessageCircle aria-hidden="true" className="size-4" />
-                  ¿Dudas con tu número? Escríbenos
+                  ¿Tienes dudas? Escríbenos
                 </a>
               </dd>
             </div>

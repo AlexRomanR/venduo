@@ -226,12 +226,6 @@ export function EditorDeVariantes({
         />
       ))}
 
-      {cuantas === 0 ? (
-        <p className="text-sm opacity-70">
-          Marca las que tienes y pon las unidades de cada una.
-        </p>
-      ) : null}
-
       {opciones.length < MAXIMO_DE_OPCIONES ? (
         agregando ? (
           <div className="flex flex-col gap-3">

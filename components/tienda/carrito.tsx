@@ -1,6 +1,8 @@
 "use client"
 
 import * as React from "react"
+
+import { claveDeCombo, type ComboDelCarrito } from "@/lib/combos"
 import { registrarEvento } from "@/components/tienda/visita"
 
 export interface LineaCarrito {
@@ -15,6 +17,12 @@ export interface LineaCarrito {
   cantidad: number
   /** El stock al momento de agregarlo. Solo para no dejar pedir de más acá. */
   stock: number
+  /**
+   * Si es un combo de un catálogo: cuál es y qué se eligió de cada producto.
+   * Su `productoId` es entonces `combo:{catálogo}:{combo}` y su `stock`, los
+   * combos que alcanzan. Un carrito guardado de antes no lo tiene.
+   */
+  combo?: ComboDelCarrito
 }
 
 interface EstadoCarrito {
@@ -45,7 +53,9 @@ const Contexto = React.createContext<EstadoCarrito | null>(null)
 export function claveDeLinea(linea: {
   productoId: string
   varianteId?: string | null
+  combo?: ComboDelCarrito
 }): string {
+  if (linea.combo) return claveDeCombo(linea.combo)
   return linea.varianteId
     ? `${linea.productoId}:${linea.varianteId}`
     : linea.productoId
@@ -130,8 +140,12 @@ export function ProveedorCarrito({
       vacaciones,
 
       agregar(linea, cantidad) {
-        if (tienda && !muestra)
-          registrarEvento(tienda, "carrito", linea.productoId)
+        if (tienda && !deMuestra)
+          registrarEvento(
+            tienda,
+            "carrito",
+            linea.combo ? undefined : linea.productoId
+          )
         const clave = claveDeLinea(linea)
         setLineas((previas) => {
           const existente = previas.find((l) => claveDeLinea(l) === clave)
@@ -173,7 +187,7 @@ export function ProveedorCarrito({
         setLineas((previas) => (previas.length === 0 ? previas : []))
       },
     }
-  }, [lineas, listo, vacaciones])
+  }, [lineas, listo, vacaciones, tienda, deMuestra])
 
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>
 }

@@ -1,6 +1,7 @@
 import type { ReactElement } from "react"
 
 import {
+  enlaceDeCombo,
   precioSuelto,
   type Contexto,
   type Hoja,
@@ -25,10 +26,10 @@ import {
 /*
  * Un pack: varios productos con un precio juntos.
  *
- * El precio del pack lo pone la persona y se muestra solo en el catálogo: la
- * tienda online no lo cobra. Quien quiera el pack lo pide por WhatsApp, y la
- * venta se arma desde ahí. Lo que se ahorra se calcula siempre con los precios
- * de hoy, así que nunca promete un descuento que ya no existe.
+ * El precio del pack lo pone la persona, y es el que se cobra: "Pedir este
+ * combo" abre su página en la tienda, y `create_order` lee el precio del
+ * catálogo guardado. Lo que se ahorra se calcula siempre con los precios de
+ * hoy, así que nunca promete un descuento que ya no existe.
  */
 
 type HojaDePack = Extract<Hoja, { clase: "pack" }>
@@ -47,6 +48,44 @@ function cuentas(hoja: HojaDePack) {
     ahorro: ahorro > 0 ? ahorro : 0,
     porcentaje: ahorro > 0 ? Math.round((ahorro / suelto) * 100) : 0,
   }
+}
+
+/**
+ * "Pedir este combo": lleva a su página en la tienda. En tinta llena, porque
+ * "Combo" y "Ahorras" ya usan el acento. Si algo estaba agotado al armar el
+ * PDF, dice "Agotado por ahora" con borde, y sigue llevando a la página, que
+ * dice lo de hoy. Sin dirección —un borrador—, no se dibuja.
+ */
+function BotonDelCombo({ P, ctx, hoja }: Props) {
+  const href = enlaceDeCombo(ctx.datos, hoja.pack.id)
+  if (!href) return null
+  const m = medidas(ctx)
+  const { colores, radio } = ctx.estilo
+  const agotado = hoja.productos.some((producto) => producto.stock <= 0)
+
+  return (
+    <P.Enlace
+      href={href}
+      estilo={{
+        height: m.vertical ? 48 : 56,
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: radio,
+        borderWidth: 1.5,
+        borderColor: colores.tinta,
+        backgroundColor: agotado ? undefined : colores.tinta,
+      }}
+    >
+      <P.Texto
+        estilo={fuerte(ctx, m.cuerpo * 1.15, {
+          color: agotado ? colores.tinta : colores.papel,
+          textAlign: "center",
+        })}
+      >
+        {agotado ? "Agotado por ahora" : "Pedir este combo"}
+      </P.Texto>
+    </P.Enlace>
+  )
 }
 
 function cantidad(productos: ProductoDelCatalogo[]) {
@@ -69,7 +108,7 @@ function Tarjeta({ P, ctx, hoja }: Props) {
           estilo={{ flexDirection: "row", alignItems: "center", columnGap: 10 }}
         >
           <Etiqueta P={P} ctx={ctx} tamano={m.chico}>
-            Pack
+            Combo
           </Etiqueta>
           <P.Texto estilo={rotulo(ctx, m.chico)}>{cantidad(productos)}</P.Texto>
         </P.Caja>
@@ -128,48 +167,55 @@ function Tarjeta({ P, ctx, hoja }: Props) {
 
       <P.Caja
         estilo={{
-          flexDirection: "row",
-          alignItems: "flex-end",
-          justifyContent: "space-between",
-          columnGap: m.gap,
+          rowGap: m.gap,
           backgroundColor: colores.suave,
           borderRadius: radio,
           padding: m.gap * 1.2,
         }}
       >
-        <P.Caja estilo={{ rowGap: 4, flex: 1 }}>
-          <P.Texto estilo={rotulo(ctx, m.chico)}>Precio del pack</P.Texto>
-          <P.Texto
-            estilo={titular(ctx, m.titulo * 1.4, {
-              textTransform: "none",
-              lineHeight: 1,
-            })}
-          >
-            {formatMoney(pack.precioCents)}
-          </P.Texto>
-        </P.Caja>
-        {ahorro > 0 ? (
-          <P.Caja estilo={{ alignItems: "flex-end", rowGap: 4 }}>
+        <P.Caja
+          estilo={{
+            flexDirection: "row",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            columnGap: m.gap,
+          }}
+        >
+          <P.Caja estilo={{ rowGap: 4, flex: 1 }}>
+            <P.Texto estilo={rotulo(ctx, m.chico)}>Precio del combo</P.Texto>
             <P.Texto
-              estilo={cuerpo(ctx, m.cuerpo, {
-                color: colores.apagado,
-                textDecoration: "line-through",
-                textAlign: "right",
+              estilo={titular(ctx, m.titulo * 1.4, {
+                textTransform: "none",
+                lineHeight: 1,
               })}
             >
-              {`Por separado ${formatMoney(suelto)}`}
+              {formatMoney(pack.precioCents)}
             </P.Texto>
-            <Etiqueta
-              P={P}
-              ctx={ctx}
-              tamano={m.chico * 1.1}
-              mayusculas={false}
-              estilo={{ alignSelf: "flex-end" }}
-            >
-              {`Ahorras ${formatMoney(ahorro)} · ${porcentaje}%`}
-            </Etiqueta>
           </P.Caja>
-        ) : null}
+          {ahorro > 0 ? (
+            <P.Caja estilo={{ alignItems: "flex-end", rowGap: 4 }}>
+              <P.Texto
+                estilo={cuerpo(ctx, m.cuerpo, {
+                  color: colores.apagado,
+                  textDecoration: "line-through",
+                  textAlign: "right",
+                })}
+              >
+                {`Por separado ${formatMoney(suelto)}`}
+              </P.Texto>
+              <Etiqueta
+                P={P}
+                ctx={ctx}
+                tamano={m.chico * 1.1}
+                mayusculas={false}
+                estilo={{ alignSelf: "flex-end" }}
+              >
+                {`Ahorras ${formatMoney(ahorro)} · ${porcentaje}%`}
+              </Etiqueta>
+            </P.Caja>
+          ) : null}
+        </P.Caja>
+        <BotonDelCombo P={P} ctx={ctx} hoja={hoja} />
       </P.Caja>
     </Pagina>
   )
@@ -187,7 +233,7 @@ function Lista({ P, ctx, hoja }: Props) {
     <Pagina P={P} ctx={ctx}>
       <P.Caja estilo={{ rowGap: m.gap * 0.7, marginBottom: m.gap * 1.6 }}>
         <Etiqueta P={P} ctx={ctx} tamano={m.chico}>
-          Pack
+          Combo
         </Etiqueta>
         <P.Texto
           estilo={titular(
@@ -259,7 +305,7 @@ function Lista({ P, ctx, hoja }: Props) {
             {`Por separado ${formatMoney(suelto)}`}
           </P.Texto>
         ) : null}
-        <P.Texto estilo={rotulo(ctx, m.chico)}>Precio del pack</P.Texto>
+        <P.Texto estilo={rotulo(ctx, m.chico)}>Precio del combo</P.Texto>
         <P.Texto
           estilo={titular(ctx, m.display * 0.8, {
             textTransform: "none",
@@ -279,6 +325,9 @@ function Lista({ P, ctx, hoja }: Props) {
             {`Ahorras ${formatMoney(ahorro)} · ${porcentaje}%`}
           </Etiqueta>
         ) : null}
+      </P.Caja>
+      <P.Caja estilo={{ marginTop: m.gap }}>
+        <BotonDelCombo P={P} ctx={ctx} hoja={hoja} />
       </P.Caja>
     </Pagina>
   )

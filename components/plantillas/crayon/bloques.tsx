@@ -37,7 +37,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
   const foto = fotoDePortada(bloque, tienda)
   const titulo = texto(bloque, "title") ?? tienda.nombre
   const bajada = texto(bloque, "subtitle")
-  const accion = accionDePortada(bloque) ?? "Ver por edad"
+  const accion = accionDePortada(bloque) ?? "Ver todo"
 
   return (
     <section className="mx-auto w-full max-w-7xl px-5 pt-8 pb-12 md:pt-14 md:pb-20">
@@ -87,7 +87,7 @@ function Tallimetro({ bloque, tienda }: PropsBloque) {
   return (
     <section className="mx-auto w-full max-w-7xl py-12 md:py-20">
       <div className="px-5">
-        <Titulo titulo={texto(bloque, "title") ?? "Por edad"} />
+        <Titulo titulo={texto(bloque, "title") ?? "¿Qué buscas hoy?"} />
       </div>
       <div className="mt-7 [scrollbar-width:none] overflow-x-auto px-5 [&::-webkit-scrollbar]:hidden">
         <div className="w-max min-w-full">

@@ -2,6 +2,7 @@
 
 import { z } from "zod"
 
+import { getComboDeTienda } from "@/lib/data/combos"
 import { createClient } from "@/lib/supabase/server"
 
 /**
@@ -13,16 +14,38 @@ import { createClient } from "@/lib/supabase/server"
  * y la tienda se resuelve por el slug de la URL. Un comprador que edite el
  * carrito en su navegador no puede declarar lo que va a pagar.
  */
-const pedidoSchema = z.object({
-  items: z
+const lineaDeProducto = z.object({
+  productoId: z.uuid(),
+  /** La opción elegida, si el producto las tiene. */
+  varianteId: z.uuid().nullable().optional(),
+  cantidad: z.number().int().min(1).max(99),
+})
+
+/**
+ * Un combo de un catálogo: cuál es y qué se eligió de cada producto, en el
+ * orden del combo. Ni su precio ni sus productos los decide el navegador: los
+ * lee `create_order` del catálogo guardado.
+ */
+const lineaDeCombo = z.object({
+  combo: z.object({
+    catalogo: z.string().min(1).max(64),
+    id: z.string().min(1).max(64),
+  }),
+  partes: z
     .array(
       z.object({
         productoId: z.uuid(),
-        /** La opción elegida, si el producto las tiene. */
         varianteId: z.uuid().nullable().optional(),
-        cantidad: z.number().int().min(1).max(99),
       })
     )
+    .min(1)
+    .max(12),
+  cantidad: z.number().int().min(1).max(99),
+})
+
+const pedidoSchema = z.object({
+  items: z
+    .array(z.union([lineaDeCombo, lineaDeProducto]))
     .min(1, "Tu carrito está vacío.")
     .max(30, "Demasiados artículos en un solo pedido."),
 })
@@ -35,6 +58,8 @@ export interface LineaPedida {
   variante: string | null
   cantidad: number
   totalCents: number
+  /** Si es un combo, lo que trae, con la opción elegida. */
+  partes?: { nombre: string; variante: string | null }[]
 }
 
 export type ResultadoPedido =
@@ -46,7 +71,12 @@ export type ResultadoPedido =
       lineas: LineaPedida[]
       totalCents: number
     }
-  | { ok: false; error: string }
+  | {
+      ok: false
+      error: string
+      /** El combo que ya no se puede pedir: el carrito lo quita. */
+      comboQuitado?: string
+    }
 
 /** Lo que devuelve `create_order`: se valida porque llega como `Json`. */
 const respuestaSchema = z.object({
@@ -59,6 +89,14 @@ const respuestaSchema = z.object({
       variante: z.string().nullable().optional(),
       cantidad: z.number().int(),
       total_cents: z.number().int(),
+      partes: z
+        .array(
+          z.object({
+            nombre: z.string(),
+            variante: z.string().nullable().optional(),
+          })
+        )
+        .optional(),
     })
   ),
 })
@@ -97,14 +135,32 @@ export async function crearPedido(
   // propósito. `create_order` recalcula los precios y comprueba el stock.
   const { data, error } = await supabase.rpc("create_order", {
     p_store_id: tienda.id,
-    p_items: validado.data.items.map((i) => ({
-      product_id: i.productoId,
-      variant_id: i.varianteId ?? null,
-      quantity: i.cantidad,
-    })),
+    p_items: validado.data.items.map((i) =>
+      "combo" in i
+        ? {
+            combo: i.combo,
+            quantity: i.cantidad,
+            partes: i.partes.map((p) => ({
+              product_id: p.productoId,
+              variant_id: p.varianteId ?? null,
+            })),
+          }
+        : {
+            product_id: i.productoId,
+            variant_id: i.varianteId ?? null,
+            quantity: i.cantidad,
+          }
+    ),
   })
 
-  if (error) return { ok: false, error: mensajeDeError(error.message) }
+  if (error) {
+    const combo = /Combo no disponible: (.+)/.exec(error.message)?.[1]
+    return {
+      ok: false,
+      error: mensajeDeError(error.message),
+      ...(combo ? { comboQuitado: combo } : {}),
+    }
+  }
 
   const respuesta = respuestaSchema.safeParse(data)
   if (!respuesta.success) {
@@ -121,14 +177,56 @@ export async function crearPedido(
       variante: item.variante ?? null,
       cantidad: item.cantidad,
       totalCents: item.total_cents,
+      ...(item.partes
+        ? {
+            partes: item.partes.map((p) => ({
+              nombre: p.nombre,
+              variante: p.variante ?? null,
+            })),
+          }
+        : {}),
     })),
   }
+}
+
+/**
+ * Los combos del carrito, como están hoy: si se pueden pedir y a qué precio.
+ * El carrito lo pregunta al abrirse para quitar los que ya no están y mostrar
+ * el precio que se va a cobrar. Solo lee.
+ */
+export async function revisarCombos(
+  slug: string,
+  combos: { catalogo: string; id: string }[]
+): Promise<{ catalogo: string; id: string; precioCents: number | null }[]> {
+  const pedidos = z
+    .array(
+      z.object({
+        catalogo: z.string().min(1).max(64),
+        id: z.string().min(1).max(64),
+      })
+    )
+    .max(30)
+    .safeParse(combos)
+  if (!pedidos.success) return []
+
+  return Promise.all(
+    pedidos.data.map(async (c) => {
+      const encontrado = await getComboDeTienda(slug, c.catalogo, c.id)
+      return { ...c, precioCents: encontrado?.combo?.precioCents ?? null }
+    })
+  )
 }
 
 function mensajeDeError(crudo: string) {
   // Primero: el carrito pudo quedar abierto de antes de las vacaciones.
   if (/vacaciones/i.test(crudo)) {
     return "Estamos de vacaciones y por ahora no recibimos pedidos."
+  }
+  if (/Combo no disponible/i.test(crudo)) {
+    return "Un combo de tu carrito ya no está disponible y lo quitamos."
+  }
+  if (/combos no están disponibles/i.test(crudo)) {
+    return "Por ahora no recibimos combos. Quítalo de tu carrito para enviar tu pedido."
   }
   const sinOpcion = /Elige una opción de (.+)/.exec(crudo)
   if (sinOpcion) {

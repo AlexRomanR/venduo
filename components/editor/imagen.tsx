@@ -68,7 +68,7 @@ export function CampoImagen({
 
   return (
     <div className="relative">
-      <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-55">
+      <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-70">
         {etiqueta}
       </p>
 
@@ -99,20 +99,35 @@ export function CampoImagen({
             className="object-cover"
           />
         ) : (
-          <span className="flex flex-col items-center gap-2 px-6 text-center text-xs opacity-55">
+          <span className="flex flex-col items-center gap-2 px-6 text-center text-xs opacity-70">
             <ImagePlus aria-hidden="true" className="size-6" />
-            {encima ? "Suéltala aquí" : "Arrastra una foto aquí"}
+            {encima ? "Suéltala aquí" : "Sube una foto aquí"}
           </span>
+        )}
+        {/* Toda la caja abre el selector. Para teclado y lectores de pantalla
+            está «Subir foto», justo debajo. */}
+        {valor ? null : (
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-hidden="true"
+            disabled={subiendo}
+            onClick={() => entrada.current?.click()}
+            className="absolute inset-0"
+          />
         )}
         {subiendo ? (
           <span className="absolute inset-0 flex items-center justify-center gap-2 bg-papel/85 text-sm font-semibold">
-            <Loader2 aria-hidden="true" className="size-4 animate-spin" />
+            <Loader2
+              aria-hidden="true"
+              className="size-4 animate-spin motion-reduce:animate-none"
+            />
             Subiendo…
           </span>
         ) : null}
       </div>
 
-      {ayuda ? <p className="mt-2 text-xs opacity-55">{ayuda}</p> : null}
+      {ayuda ? <p className="mt-2 text-xs opacity-70">{ayuda}</p> : null}
 
       <div className="mt-1 flex flex-wrap gap-x-5">
         <button
@@ -208,7 +223,7 @@ function Biblioteca({
 
   return (
     <div className="mt-2 border-t border-tinta/15 pt-4 motion-safe:animate-in motion-safe:duration-200 motion-safe:fade-in">
-      <p className="text-xs font-semibold opacity-60">Las que subiste</p>
+      <p className="text-xs font-semibold opacity-70">Las que subiste</p>
       {guardadas === null ? (
         <div className="mt-2 grid grid-cols-3 gap-2">
           {[0, 1, 2].map((i) => (
@@ -216,7 +231,7 @@ function Biblioteca({
           ))}
         </div>
       ) : propias.length === 0 ? (
-        <p className="mt-2 text-xs opacity-55">
+        <p className="mt-2 text-xs opacity-70">
           Todavía ninguna. Las fotos que subas quedan aquí para reusarlas.
         </p>
       ) : (
@@ -229,7 +244,7 @@ function Biblioteca({
 
       {deProductos.length > 0 ? (
         <>
-          <p className="mt-4 text-xs font-semibold opacity-60">
+          <p className="mt-4 text-xs font-semibold opacity-70">
             Las de tus productos
           </p>
           <Grilla

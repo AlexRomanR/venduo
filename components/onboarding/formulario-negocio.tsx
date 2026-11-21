@@ -74,7 +74,7 @@ export function FormularioNegocio({
     form.formState.isSubmitting || form.formState.isSubmitSuccessful
 
   return (
-    <Form {...form}>
+    <Form nombre="negocio" {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="pieza-tarjeta flex flex-col gap-6 border border-tinta px-4 py-5 sm:px-6 sm:py-6"

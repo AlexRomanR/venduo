@@ -7,7 +7,7 @@ import {
 } from "@/lib/plantillas"
 import type { Apariencia } from "@/lib/plantillas/apariencia"
 import { productosDeEjemplo } from "@/lib/editor/muestras"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, getUsuario } from "@/lib/supabase/server"
 import type { Json, Product } from "@/types"
 import { deVacaciones } from "@/lib/vacaciones"
 import { leerValores, type VariantePublica } from "@/lib/variantes"
@@ -177,6 +177,34 @@ export const getTiendaPublica = cache(async function getTiendaPublica(
 
   return completarTienda(supabase, tienda)
 })
+
+/**
+ * Si quien mira es el dueño de esta tienda y no cargó ningún producto.
+ *
+ * Cuenta también los ocultos: una tienda que los tiene apagados no está vacía.
+ */
+export async function esTiendaVaciaDeQuienMira(
+  tiendaId: string
+): Promise<boolean> {
+  const [supabase, usuario] = await Promise.all([createClient(), getUsuario()])
+  if (!supabase || !usuario) return false
+
+  const [{ data: propia }, { count, error }] = await Promise.all([
+    supabase
+      .from("stores")
+      .select("id")
+      .eq("id", tiendaId)
+      .eq("owner_id", usuario.id)
+      .is("deleted_at", null)
+      .maybeSingle(),
+    supabase
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .eq("store_id", tiendaId)
+      .is("deleted_at", null),
+  ])
+  return Boolean(propia) && !error && count === 0
+}
 
 type Cliente = NonNullable<Awaited<ReturnType<typeof createClient>>>
 

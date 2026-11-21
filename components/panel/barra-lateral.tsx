@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation"
 import {
   ArrowLeft,
   ArrowUpRight,
+  ChevronRight,
   BookOpen,
   Megaphone,
   ChartColumn,
@@ -16,11 +17,9 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Palette,
-  Plus,
   Receipt,
   Share2,
   Store,
-  UserRound,
   X,
   type LucideIcon,
 } from "lucide-react"
@@ -131,7 +130,7 @@ function Contenido({
   alPlegar?: () => void
 }) {
   const pathname = usePathname()
-  const { tienda, contadores: c, persona, apariencia, funciones } = datos
+  const { tienda, contadores: c, persona, funciones } = datos
   const enCajon = Boolean(alNavegar)
 
   const reposicion = c.productosSinStock + c.productosPocoStock
@@ -208,17 +207,6 @@ function Contenido({
             },
           ],
         },
-        {
-          titulo: "Tu cuenta",
-          items: [
-            {
-              href: "/cuenta#persona",
-              nombre: "Tus datos",
-              icono: UserRound,
-              marca: "/cuenta",
-            },
-          ],
-        },
       ].map((grupo) => ({
         ...grupo,
         items: grupo.items.filter((item: Item) => item.funcion !== "oculta"),
@@ -232,7 +220,7 @@ function Contenido({
       {enCajon ? null : (
         <div
           className={cn(
-            "flex items-center gap-3 pt-5 pb-2",
+            "flex items-center gap-3 border-b border-tinta/30 pt-5 pb-3",
             plegada ? "flex-col px-3" : "justify-between px-5"
           )}
         >
@@ -303,44 +291,30 @@ function Contenido({
           <RielDeTienda datos={datos} />
         ) : (
           <>
-            <div className="flex items-center gap-3 px-3">
-              <Avatar persona={persona} tamano="size-12 text-lg" />
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold">{persona.nombre}</p>
-                {persona.correo ? (
-                  <p className="truncate text-sm opacity-65">
-                    {persona.correo}
-                  </p>
-                ) : null}
-              </div>
-              {/* El cierre que trae shadcn mide 28 px y dice "Close": se apaga
-                  y va este. */}
-              {enCajon ? (
+            {/* El cierre que trae shadcn mide 28 px y dice "Close": se apaga
+                y va este. */}
+            {enCajon ? (
+              <div className="-mt-2 flex justify-end">
                 <button
                   type="button"
                   onClick={alNavegar}
                   aria-label="Cerrar el menú"
-                  className="-mr-1 flex size-11 shrink-0 items-center justify-center transition-colors hover:opacity-60"
+                  className="flex size-11 shrink-0 items-center justify-center transition-colors hover:opacity-60"
                 >
                   <X aria-hidden="true" className="size-5" />
                 </button>
-              ) : null}
-            </div>
-
-            {tienda ? (
-              <TarjetaDeTienda tienda={tienda} apariencia={apariencia} />
+              </div>
             ) : null}
 
-            {/* Un atajo de la computadora: en el celular, Productos tiene su
-                botón para cargar uno. */}
-            {tienda && !enCajon ? (
-              <Link
-                href="/panel/productos/nuevo"
-                className="mx-1 mt-3 flex min-h-11 items-center justify-center gap-2 rounded-plantilla border-2 border-tinta text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
-              >
-                <Plus aria-hidden="true" className="size-4" />
-                Nuevo producto
-              </Link>
+            {tienda ? (
+              <>
+                {/* Con su rótulo, como las secciones del menú: sola, la foto no
+                    decía qué era. "En línea", porque "Tu tienda" ya es un grupo. */}
+                <p className="mt-2 px-3 pb-1 text-xs font-semibold tracking-[0.12em] uppercase opacity-65">
+                  Tu tienda en línea
+                </p>
+                <TarjetaDeTienda tienda={tienda} />
+              </>
             ) : null}
           </>
         )}
@@ -359,8 +333,54 @@ function Contenido({
             ))}
           </Grupo>
         ))}
+      </div>
 
-        <form action="/auth/sign-out" method="post" className="mt-6">
+      {/* La persona, al pie y junto a su salida, como en cualquier herramienta
+          de trabajo. Es la entrada a Tus datos: antes había además un grupo
+          "Tu cuenta" con lo mismo. */}
+      <div
+        className={cn(
+          "shrink-0 border-t border-tinta/30 py-2",
+          plegada ? "flex flex-col items-center gap-2 px-3" : "px-3"
+        )}
+      >
+        {plegada ? (
+          <ConNombre nombre={persona.nombre} plegada>
+            <Link
+              href="/cuenta#persona"
+              onClick={alNavegar}
+              aria-label={`Tus datos, ${persona.nombre}`}
+            >
+              <Avatar persona={persona} tamano="size-11 text-sm" />
+            </Link>
+          </ConNombre>
+        ) : (
+          <Link
+            href="/cuenta#persona"
+            onClick={alNavegar}
+            aria-current={pathname === "/cuenta" ? "page" : undefined}
+            className={cn(
+              "flex items-center gap-3 rounded-[12px] px-2 py-1.5 transition-colors hover:bg-tinta/[0.05]",
+              pathname === "/cuenta" && "bg-tinta/[0.06]"
+            )}
+          >
+            <Avatar persona={persona} tamano="size-10 text-base" />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold">
+                {persona.nombre}
+              </span>
+              <span className="block truncate text-xs opacity-70">
+                Tus datos
+                {persona.correo ? ` · ${persona.correo}` : ""}
+              </span>
+            </span>
+            <ChevronRight
+              aria-hidden="true"
+              className="size-4 shrink-0 opacity-60"
+            />
+          </Link>
+        )}
+        <form action="/auth/sign-out" method="post">
           <ConNombre nombre="Cerrar sesión" plegada={plegada}>
             <button
               type="submit"
@@ -414,18 +434,15 @@ function Avatar({
 }
 
 /**
- * La tienda, con su propia cara: su papel, su letra y su color de acción. Es
- * la única parte del menú que no es de Venduo, igual que en la app. Tocarla
- * la abre.
+ * La tienda como es: la captura de su portada, como una foto pegada en el
+ * cuaderno, con su nombre y si está al aire. Antes era un recuadro con sus
+ * colores y su nombre, y no se reconocía la tienda. Tocarla la abre.
  */
 function TarjetaDeTienda({
   tienda,
-  apariencia,
 }: {
   tienda: NonNullable<BarraLateral["tienda"]>
-  apariencia: BarraLateral["apariencia"]
 }) {
-  const colores = apariencia?.colores
   const alAire = tienda.publicada && !tienda.pausada
 
   return (
@@ -434,41 +451,36 @@ function TarjetaDeTienda({
       target="_blank"
       rel="noreferrer noopener"
       aria-label={`${tienda.nombre}. Abrir tu tienda`}
-      className="mx-1 mt-4 block border p-4 transition-transform active:scale-[0.98] motion-reduce:transform-none"
-      style={{
-        backgroundColor: colores?.papel,
-        color: colores?.tinta,
-        borderColor: colores?.tinta ?? "var(--tinta)",
-        borderBottomWidth: 5,
-        borderBottomColor: colores?.senal ?? "var(--senal)",
-      }}
+      className="group mx-1 mt-4 block rounded-[16px] border border-tinta/12 bg-hoja p-2 shadow-[var(--sombra-cuaderno)] transition-transform active:scale-[0.98] motion-reduce:transform-none"
     >
-      <span className="flex items-center gap-2">
-        {tienda.logoUrl ? (
-          <Image
-            src={tienda.logoUrl}
-            alt=""
-            width={56}
-            height={56}
-            unoptimized
-            className="size-7 object-contain"
-          />
+      <span className="relative block aspect-[16/10] overflow-hidden rounded-[10px] border border-tinta/10 bg-tinta/[0.04]">
+        <Image
+          src={tienda.vista}
+          alt=""
+          fill
+          sizes="256px"
+          quality={85}
+          className="object-cover object-top transition-transform duration-500 ease-out motion-safe:group-hover:scale-[1.03]"
+        />
+        {tienda.vistaDePlantilla ? (
+          <span className="absolute bottom-1.5 left-1.5 rounded-full bg-hoja/95 px-2 py-0.5 text-xs font-semibold">
+            Así se verá
+          </span>
         ) : null}
-        {/* El nombre va en la letra de Venduo, como en la app: la de la
-            plantilla —una condensada en mayúsculas, una antigua fina— no se
-            leía con el resto del menú. La tienda se reconoce por sus colores. */}
-        <span className="line-clamp-2 flex-1 font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">
+      </span>
+      <span className="mt-2 flex items-center gap-2 px-1">
+        <span className="min-w-0 flex-1 truncate font-titular text-lg leading-tight font-extrabold tracking-[-0.02em]">
           {tienda.nombre}
         </span>
         <ArrowUpRight aria-hidden="true" className="size-[18px] shrink-0" />
       </span>
-      <span className="mt-2 flex items-center gap-1.5 text-[13px] font-medium opacity-80">
+      <span className="mt-0.5 flex items-center gap-1.5 px-1 pb-0.5 text-[13px] font-medium opacity-80">
         <span
           aria-hidden="true"
-          className="size-[7px] shrink-0 rounded-full"
-          style={{
-            backgroundColor: alAire ? colores?.tinta : colores?.senal,
-          }}
+          className={cn(
+            "size-[7px] shrink-0 rounded-full",
+            alAire ? "bg-tinta" : "bg-senal"
+          )}
         />
         <span className="truncate">
           {tienda.pausada
@@ -485,16 +497,11 @@ function TarjetaDeTienda({
   )
 }
 
-/** La barra plegada: la persona, la tienda y el atajo de un producto nuevo. */
+/** La barra plegada: la tienda, en chico. La persona va al pie. */
 function RielDeTienda({ datos }: { datos: BarraLateral }) {
-  const { tienda, persona } = datos
+  const { tienda } = datos
   return (
-    <div className="flex flex-col items-center gap-2 border-t-2 border-tinta pt-4">
-      <ConNombre nombre={persona.nombre} plegada>
-        <Link href="/cuenta" aria-label={`Tus datos, ${persona.nombre}`}>
-          <Avatar persona={persona} tamano="size-11 text-sm" />
-        </Link>
-      </ConNombre>
+    <div className="flex flex-col items-center gap-2 pt-2">
       {tienda ? (
         <>
           <ConNombre nombre={tienda.nombre} plegada>
@@ -503,30 +510,17 @@ function RielDeTienda({ datos }: { datos: BarraLateral }) {
               target="_blank"
               rel="noreferrer noopener"
               aria-label={`Ver ${tienda.nombre}`}
-              className="flex size-11 items-center justify-center overflow-hidden border border-tinta/20 bg-tinta/5"
+              className="flex size-11 items-center justify-center overflow-hidden rounded-[10px] border border-tinta/20 bg-tinta/5"
             >
-              {tienda.logoUrl ? (
-                <Image
-                  src={tienda.logoUrl}
-                  alt=""
-                  width={88}
-                  height={88}
-                  unoptimized
-                  className="size-full object-cover"
-                />
-              ) : (
-                <Store aria-hidden="true" className="size-4 opacity-45" />
-              )}
+              <Image
+                src={tienda.vista}
+                alt=""
+                width={88}
+                height={88}
+                quality={85}
+                className="size-full object-cover object-top"
+              />
             </a>
-          </ConNombre>
-          <ConNombre nombre="Nuevo producto" plegada>
-            <Link
-              href="/panel/productos/nuevo"
-              aria-label="Nuevo producto"
-              className="flex size-11 items-center justify-center border-2 border-tinta transition-colors hover:bg-tinta hover:text-papel"
-            >
-              <Plus aria-hidden="true" className="size-4" />
-            </Link>
           </ConNombre>
         </>
       ) : null}
@@ -648,6 +642,7 @@ function Entrada({
       {item.contador ? (
         <span
           aria-hidden={plegada ? true : undefined}
+          role={plegada ? undefined : "img"}
           aria-label={plegada ? undefined : item.contador.etiqueta}
           title={item.contador.etiqueta}
           className={cn(
@@ -944,7 +939,11 @@ export function BarraLateralMovil({ datos }: { datos: BarraLateral }) {
         <p
           aria-hidden={!visible}
           className={cn(
-            "tabular min-w-0 flex-1 truncate font-titular text-[19px] leading-6 font-extrabold tracking-[-0.02em] transition-[opacity,transform] duration-200 motion-reduce:transition-none",
+            "tabular min-w-0 flex-1 font-titular font-extrabold tracking-[-0.02em] transition-[opacity,transform] duration-200 motion-reduce:transition-none",
+            // Con botones al lado, el nombre usa dos renglones antes que cortarse.
+            barra?.acciones
+              ? "line-clamp-2 text-[15px] leading-[18px]"
+              : "truncate text-[19px] leading-6",
             visible ? "opacity-100" : "translate-y-2 opacity-0"
           )}
         >

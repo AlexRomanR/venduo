@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
   ArrowLeft,
@@ -47,6 +48,7 @@ import {
   type CampoDeCarga,
   type ColumnaLeida,
   type Lectura,
+  CARPETA_DE_CARGA,
 } from "@/lib/carga"
 import {
   BOTON_PRIMARIO,
@@ -255,7 +257,15 @@ export function CargaDeProductos({
     for (const archivo of archivos) {
       try {
         urls.push(
-          (await uploadFile(BUCKETS.productImages, archivo, tiendaId)).url
+          // En la carpeta de la carga: lo que no termine en un producto se
+          // borra solo a los dos días (`limpiarCargasViejas`).
+          (
+            await uploadFile(
+              BUCKETS.productImages,
+              archivo,
+              `${tiendaId}/${CARPETA_DE_CARGA}`
+            )
+          ).url
         )
       } catch (error) {
         toast.error(
@@ -568,6 +578,12 @@ export function CargaDeProductos({
             <Download aria-hidden="true" className="size-4" />
             Descargar planilla modelo
           </button>
+          <Link
+            href="/panel/productos/nuevo?uno=1"
+            className="-mt-4 inline-flex min-h-11 items-center self-start text-sm font-semibold underline underline-offset-4 transition-colors hover:text-senal md:-mt-6"
+          >
+            ¿Es uno solo? Cárgalo aquí
+          </Link>
         </>
       ) : null}
 
@@ -1594,8 +1610,11 @@ function LecturaDePlanilla({
   alConfirmar: (lectura: Lectura) => void
 }) {
   // La primera vez se recorren todas las columnas, aunque la lectura esté
-  // segura: así se aprende cómo funciona.
+  // segura: así se aprende cómo funciona. Con una planilla clara —cada
+  // columna con su nombre de siempre— no: preguntar "¿«Nombre» es el
+  // nombre?" cuatro veces no enseña nada.
   const [recorrido] = React.useState(() => {
+    if (lectura.clara) return false
     try {
       return !localStorage.getItem(RECORRIDO_HECHO)
     } catch {

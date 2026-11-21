@@ -211,6 +211,10 @@ visitas— tiene tres estados: **activa**,
 **Apagado se comprueba en el servidor**, no solo en el botón. Y apagarle algo a una
 tienda no le avisa nada.
 
+Una función puede nacer apagada: declara `porDefecto` en `lib/funciones.ts`, y así no se
+enciende para todas si el código llega antes que la migración con su fila. Es el caso de
+"IA: textos a medida", que además corre una vez al crear cada tienda (`ai-layer.md`).
+
 Las piezas, siempre las mismas:
 
 - **`funcionesDeMiTienda()`** (`lib/data/funciones.ts`) lee todas de una vez, con
@@ -293,10 +297,13 @@ se impone siempre en la base o en la API, nunca solo en la app.
 
 - **Se leen los precios y el stock del momento**, cada vez que se arma el PDF.
   Un catálogo guardado o un enlace reenviado nunca muestran un precio viejo.
-- **El precio de un pack se muestra en el catálogo y nada más.** La tienda
-  online cobra cada producto por separado; quien quiere el pack escribe por
-  WhatsApp. Venderlo como pack toca `create_order`: se decide antes de
-  escribirlo.
+- **Un combo (pack) se compra como combo**, desde "Pedir este combo" del PDF
+  guardado, que abre su página en la tienda. Es una sola línea del pedido, con
+  el precio que **`create_order` lee del catálogo guardado** —nunca del
+  carrito— y sus productos en `order_item_components`. Si un producto del
+  combo ya no se vende, el combo no se pide; si uno está agotado, tampoco. Al
+  marcar pagado baja el stock de cada producto (cantidad × combos); al
+  cancelar un pagado, vuelve. Lo apaga la función `combos`.
 - Un producto borrado desaparece del catálogo; uno sin stock sale "Agotado".
 
 ## La suscripción

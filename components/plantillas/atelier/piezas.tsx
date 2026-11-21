@@ -67,7 +67,7 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
 
         {agotado ? (
           <span className="absolute inset-x-0 bottom-4 text-center text-xs tracking-[0.24em] uppercase">
-            Agotada
+            Agotado
           </span>
         ) : null}
       </div>
@@ -211,8 +211,8 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
         <dl className="self-end">
           <SiRecibePedidos>
             <Dato titulo="Cómo comprar">
-              Elige tus piezas y manda el pedido por WhatsApp. Ahí acordamos el
-              pago y la entrega.
+              Elige tus favoritos y envíanos el pedido por WhatsApp. Ahí
+              acordamos el pago y la entrega.
             </Dato>
           </SiRecibePedidos>
           {tienda.whatsapp ? (
@@ -224,7 +224,7 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
                 className="inline-flex min-h-11 items-center gap-2 underline decoration-tinta/30 underline-offset-4 transition-colors hover:text-senal hover:decoration-senal"
               >
                 <MessageCircle aria-hidden="true" className="size-4" />
-                ¿Quieres más fotos o las medidas? Escríbenos
+                ¿Quieres más fotos o detalles? Escríbenos
               </a>
             </Dato>
           ) : null}

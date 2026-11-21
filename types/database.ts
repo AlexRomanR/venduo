@@ -195,6 +195,7 @@ export type Database = {
           created_at: string
           id: string
           operations: Json
+          origen: string
           page_id: string
           prompt: string
           snapshot_before: Json
@@ -208,6 +209,7 @@ export type Database = {
           created_at?: string
           id?: string
           operations: Json
+          origen?: string
           page_id: string
           prompt: string
           snapshot_before: Json
@@ -221,6 +223,7 @@ export type Database = {
           created_at?: string
           id?: string
           operations?: Json
+          origen?: string
           page_id?: string
           prompt?: string
           snapshot_before?: Json
@@ -472,8 +475,113 @@ export type Database = {
         }
         Relationships: []
       }
+      order_item_components: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          order_item_id: string
+          product_id: string | null
+          product_name: string
+          quantity: number
+          store_id: string
+          variant_id: string | null
+          variant_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          order_item_id: string
+          product_id?: string | null
+          product_name: string
+          quantity: number
+          store_id: string
+          variant_id?: string | null
+          variant_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          order_item_id?: string
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          store_id?: string
+          variant_id?: string | null
+          variant_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_item_components_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "mis_ventas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_item_components_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_item_components_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "mis_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_item_components_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_item_components_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "mis_productos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_item_components_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_item_components_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_item_components_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "mis_variantes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_item_components_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
+          catalog_id: string | null
+          combo_id: string | null
           created_at: string
           id: string
           order_id: string
@@ -487,6 +595,8 @@ export type Database = {
           variant_name: string | null
         }
         Insert: {
+          catalog_id?: string | null
+          combo_id?: string | null
           created_at?: string
           id?: string
           order_id: string
@@ -500,6 +610,8 @@ export type Database = {
           variant_name?: string | null
         }
         Update: {
+          catalog_id?: string | null
+          combo_id?: string | null
           created_at?: string
           id?: string
           order_id?: string
@@ -513,6 +625,13 @@ export type Database = {
           variant_name?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "order_items_catalog_id_fkey"
+            columns: ["catalog_id"]
+            isOneToOne: false
+            referencedRelation: "catalogs"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "order_items_order_id_fkey"
             columns: ["order_id"]
@@ -1474,6 +1593,7 @@ export type Database = {
           suspension_reason: string | null
           tagline: string | null
           template_key: string | null
+          textos_a_medida: Json | null
           theme_overrides: Json
           updated_at: string
           vacaciones_desde: string | null
@@ -1500,6 +1620,7 @@ export type Database = {
           suspension_reason?: string | null
           tagline?: string | null
           template_key?: string | null
+          textos_a_medida?: Json | null
           theme_overrides?: Json
           updated_at?: string
           vacaciones_desde?: string | null
@@ -1526,6 +1647,7 @@ export type Database = {
           suspension_reason?: string | null
           tagline?: string | null
           template_key?: string | null
+          textos_a_medida?: Json | null
           theme_overrides?: Json
           updated_at?: string
           vacaciones_desde?: string | null

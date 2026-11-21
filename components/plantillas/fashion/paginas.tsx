@@ -142,7 +142,7 @@ function SobreLaTienda({ tienda }: { tienda: TiendaPublica }) {
               rel="noreferrer noopener"
               className="underline-offset-4 hover:text-senal hover:underline"
             >
-              ¿Dudas con una talla? Escríbenos
+              ¿Tienes dudas? Escríbenos
             </a>
           </Servicio>
         ) : null}
@@ -215,7 +215,7 @@ export function Catalogo({ tienda, filtros, productos }: PropsCatalogo) {
             titulo={hayFiltro ? "Nada por aquí" : "Todavía sin productos"}
             texto={
               hayFiltro
-                ? "Ninguna prenda coincide con lo que elegiste. Prueba con otro filtro o ve todo el catálogo."
+                ? "Nada coincide con lo que elegiste. Prueba con otro filtro o ve todo el catálogo."
                 : "Todavía estamos cargando nuestros productos. Vuelve pronto."
             }
             accion={
@@ -296,6 +296,7 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
           demás debajo. Dividida: la foto manda a lo ancho y el texto la
           acompaña al costado. */}
       <div
+        data-ajuste="ficha.diseno"
         className={cn(
           vitrina
             ? "mx-auto flex max-w-2xl flex-col items-center gap-8"
@@ -361,13 +362,14 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
 
             {consulta ? (
               <a
+                data-ajuste="ficha.consulta"
                 href={consulta}
                 target="_blank"
                 rel="noreferrer noopener"
                 className="mt-4 flex min-h-11 items-center gap-2 text-sm font-semibold underline-offset-4 transition-colors hover:text-senal hover:underline"
               >
                 <MessageCircle aria-hidden="true" className="size-4" />
-                ¿Dudas con la talla o el color? Pregúntanos
+                ¿Tienes una duda? Pregúntanos
               </a>
             ) : null}
           </div>
@@ -388,7 +390,7 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
             <SiRecibePedidos>
               <Detalle titulo="Cómo comprar">
                 <p className="leading-relaxed opacity-80">
-                  Agrégala al carrito y envíanos tu pedido por WhatsApp. Ahí
+                  Agrégalo al carrito y envíanos tu pedido por WhatsApp. Ahí
                   coordinamos el pago y la entrega.
                 </p>
               </Detalle>
@@ -403,7 +405,10 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
       </div>
 
       {ficha.relacionados && relacionados.length > 0 ? (
-        <section className="mt-16 px-5 md:mt-24 md:px-0">
+        <section
+          data-ajuste="ficha.relacionados"
+          className="mt-16 px-5 md:mt-24 md:px-0"
+        >
           <TituloDeSeccion titulo="También te puede gustar" />
           <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 md:gap-x-5 lg:grid-cols-4">
             {relacionados.map((otro) => (

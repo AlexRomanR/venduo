@@ -165,6 +165,29 @@ export const publicacionesSchema = z.object({
 export type Publicaciones = z.infer<typeof publicacionesSchema>
 
 /**
+ * Los textos de la portada, escritos con lo que vende la tienda. Los largos de
+ * cada campo los controla `armarPropuesta`, con la tabla de `SECCIONES`.
+ */
+export const textosATuMedidaSchema = z.object({
+  descripcion: z
+    .string()
+    .max(600)
+    .describe(
+      "Lo que la tienda contó que vende, corregido: ortografía, puntuación y frases cortadas. Mismo sentido, sin agregar nada."
+    ),
+  textos: z
+    .array(
+      z.object({
+        id: z.string().max(80).describe("El id de la sección, tal cual."),
+        campo: z.enum(["title", "subtitle", "ctaLabel", "buttonLabel"]),
+        texto: z.string().min(1).max(240),
+      })
+    )
+    .max(30),
+})
+export type TextosATuMedida = z.infer<typeof textosATuMedidaSchema>
+
+/**
  * Lo que la IA propone para la tienda: operaciones, nunca el estado final.
  *
  * Son las mismas operaciones que usa el editor a mano, salvo el logo, que la

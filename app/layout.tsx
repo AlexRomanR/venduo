@@ -34,7 +34,13 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
-          <Toaster richColors position="top-right" />
+          {/* Debajo de las barras de arriba: tapaban Publicar y Deshacer. */}
+          <Toaster
+            richColors
+            position="top-right"
+            offset={{ top: 64 }}
+            mobileOffset={{ top: 64 }}
+          />
         </ThemeProvider>
       </body>
     </html>

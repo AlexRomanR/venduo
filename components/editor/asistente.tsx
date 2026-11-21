@@ -33,7 +33,9 @@ const MIENTRAS_PIENSA = [
  *
  * La propuesta nunca se aplica sola. Se ve en la vista previa, con lo que
  * cambia marcado, y la persona decide: aplicarla —que es un solo paso de
- * deshacer— o descartarla. Mientras decide puede mirar cómo estaba.
+ * deshacer— o descartarla. Mientras decide puede mirar cómo estaba, y la
+ * propuesta ocupa todo el panel: con los controles al lado no se sabía si
+ * había que responderle o seguir editando.
  */
 export function Asistente() {
   const { ia, propuesta, paso } = useEditor()
@@ -68,7 +70,19 @@ export function Asistente() {
     ia.pedir(pedido)
   }
 
-  const ocupado = ia.cargando || Boolean(propuesta) || Boolean(ia.error)
+  if (propuesta && !propuesta.deTextos) {
+    return (
+      <section
+        aria-label="Propuesta de la IA"
+        className="flex min-h-0 flex-1 flex-col bg-papel"
+      >
+        <TarjetaDePropuesta />
+      </section>
+    )
+  }
+
+  const ocupado =
+    ia.cargando || Boolean(propuesta?.deTextos) || Boolean(ia.error)
   const mostrarIdeas =
     conIdeas && !ia.cargando && !propuesta && !texto && ideas.length > 0
 
@@ -84,8 +98,10 @@ export function Asistente() {
         <div aria-live="polite" className="border-b border-tinta/15">
           {ia.cargando ? (
             <Pensando />
-          ) : propuesta ? (
-            <TarjetaDePropuesta />
+          ) : propuesta?.deTextos ? (
+            <p className="px-4 py-3 text-sm font-semibold">
+              Primero decide sobre tus textos nuevos
+            </p>
           ) : ia.error ? (
             <p
               role="alert"
@@ -107,7 +123,7 @@ export function Asistente() {
         <Sparkles
           aria-hidden="true"
           className={cn(
-            "size-5 shrink-0 text-senal",
+            "size-5 shrink-0",
             ia.cargando && "motion-safe:animate-pulse"
           )}
         />
@@ -123,10 +139,10 @@ export function Asistente() {
             ia.cargando ? "La IA está pensando…" : "Pídele un cambio a la IA"
           }
           maxLength={500}
-          disabled={ia.cargando}
+          disabled={ia.cargando || Boolean(propuesta?.deTextos)}
           autoComplete="off"
           aria-describedby={mostrarIdeas ? "ideas-para-la-ia" : undefined}
-          className="h-11 min-w-0 flex-1 bg-transparent text-base placeholder:text-tinta/50 focus-visible:outline-none disabled:opacity-60"
+          className="h-11 min-w-0 flex-1 rounded-full bg-transparent px-3 text-base placeholder:text-tinta/70 disabled:opacity-60"
         />
         {ideas.length > 0 && !texto && !ia.cargando ? (
           <button
@@ -137,7 +153,7 @@ export function Asistente() {
             title="Ideas"
             className={cn(
               "flex size-11 shrink-0 items-center justify-center transition-colors hover:opacity-60",
-              mostrarIdeas && "text-senal"
+              mostrarIdeas && "bg-tinta/[0.08]"
             )}
           >
             <Lightbulb aria-hidden="true" className="size-5" />
@@ -147,7 +163,7 @@ export function Asistente() {
           type="submit"
           aria-label="Pedir"
           disabled={ia.cargando || texto.trim().length < 3}
-          className="flex size-11 shrink-0 items-center justify-center rounded-plantilla bg-senal text-white transition-colors hover:bg-senal-alta disabled:bg-tinta/15 disabled:text-tinta/45"
+          className="flex size-11 shrink-0 items-center justify-center rounded-plantilla bg-accion text-white transition-colors hover:bg-accion-alta disabled:bg-tinta/15 disabled:text-tinta/60"
         >
           <ArrowUp aria-hidden="true" className="size-5" />
         </button>
@@ -175,7 +191,7 @@ function Ideas({
       id="ideas-para-la-ia"
       className="absolute inset-x-0 bottom-full z-20 max-h-[60vh] overflow-y-auto rounded-t-[22px] border border-tinta/15 bg-hoja shadow-[var(--sombra-cuaderno)] motion-safe:animate-in motion-safe:duration-200 motion-safe:fade-in motion-safe:slide-in-from-bottom-1"
     >
-      <p className="px-4 pt-3 pb-1 text-xs font-semibold tracking-[0.12em] uppercase opacity-60">
+      <p className="px-4 pt-3 pb-1 text-xs font-semibold tracking-[0.12em] uppercase opacity-70">
         Ideas para empezar
       </p>
       <ul>
@@ -188,14 +204,14 @@ function Ideas({
             >
               <Sparkles
                 aria-hidden="true"
-                className="size-4 shrink-0 text-senal"
+                className="size-4 shrink-0 opacity-70"
               />
               <span className="min-w-0 flex-1">{idea}</span>
             </button>
           </li>
         ))}
       </ul>
-      <p className="px-4 py-2 text-xs leading-relaxed opacity-55">
+      <p className="px-4 py-2 text-xs leading-relaxed opacity-70">
         O escribe con tus palabras lo que quieres.
         {ia.demo ? " IA en modo demo: las respuestas son simuladas." : ""}
       </p>
@@ -208,7 +224,7 @@ function Pedido() {
   const { ia } = useEditor()
   if (!ia.pedido) return null
   return (
-    <p className="mt-1 truncate text-xs opacity-60">Pediste: «{ia.pedido}»</p>
+    <p className="mt-1 truncate text-xs opacity-70">Pediste: «{ia.pedido}»</p>
   )
 }
 
@@ -226,9 +242,7 @@ function Pensando() {
 
   return (
     <div className="px-4 py-3">
-      <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-        La IA está pensando
-      </p>
+      <p className="text-sm font-semibold">La IA está pensando</p>
       <Pedido />
       <p
         key={indice}
@@ -237,14 +251,14 @@ function Pensando() {
         {MIENTRAS_PIENSA[indice]}
       </p>
       {segundos > 14 ? (
-        <p className="mt-1 text-xs leading-relaxed opacity-60">
+        <p className="mt-1 text-xs leading-relaxed opacity-70">
           Está tardando un poco más: a veces revisa su primera idea antes de
           mostrártela.
         </p>
       ) : null}
       {/* Una regla que avanza: el único adorno, y dice que algo está pasando. */}
       <div className="mt-2 h-0.5 overflow-hidden bg-tinta/10">
-        <div className="h-full w-1/3 bg-senal motion-safe:animate-[pensando_1.4s_ease-in-out_infinite]" />
+        <div className="h-full w-1/3 bg-tinta motion-safe:animate-[pensando_1.4s_ease-in-out_infinite]" />
       </div>
       <style>{`@keyframes pensando{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}`}</style>
     </div>
@@ -252,13 +266,25 @@ function Pensando() {
 }
 
 function TarjetaDePropuesta() {
-  const { propuesta, ia } = useEditor()
+  const { propuesta, ia, publicacion } = useEditor()
+  const tarjeta = React.useRef<HTMLDivElement>(null)
+
+  // El campo donde se escribió el pedido ya no está: sin esto, el foco se
+  // pierde y un lector de pantalla no se entera de la respuesta.
+  React.useEffect(() => {
+    tarjeta.current?.focus({ preventScroll: true })
+  }, [])
+
   if (!propuesta) return null
 
   const hayCambios = propuesta.operaciones.length > 0
 
   return (
-    <div className="max-h-[30svh] overflow-y-auto px-4 pt-3 motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in motion-safe:slide-in-from-bottom-2 lg:max-h-[46vh]">
+    <div
+      ref={tarjeta}
+      tabIndex={-1}
+      className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pt-4 outline-none motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in motion-safe:slide-in-from-bottom-2"
+    >
       <p className="flex items-center gap-2 text-xs font-semibold tracking-[0.12em] text-senal uppercase">
         <Sparkles aria-hidden="true" className="size-3.5" />
         {hayCambios ? "La IA propone" : "La IA dice"}
@@ -294,56 +320,73 @@ function TarjetaDePropuesta() {
                 />
               )}
               <span className="min-w-0 flex-1">{cambio.texto}</span>
+              {cambio.lugar ? (
+                <button
+                  type="button"
+                  aria-label={`Ver en la tienda: ${cambio.texto}`}
+                  onClick={() =>
+                    cambio.lugar && publicacion.mirarCambio(cambio.lugar)
+                  }
+                  className="-my-2 flex min-h-11 min-w-11 shrink-0 items-center justify-center px-2 font-semibold underline underline-offset-4 transition-opacity hover:opacity-60"
+                >
+                  Ver
+                </button>
+              ) : null}
             </li>
           ))}
         </ul>
       ) : null}
 
-      {hayCambios ? (
-        <button
-          type="button"
-          aria-pressed={ia.mirandoAntes}
-          onClick={() => ia.setMirandoAntes(!ia.mirandoAntes)}
-          className="mt-2 inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:opacity-60"
-        >
-          {ia.mirandoAntes ? (
-            <Eye aria-hidden="true" className="size-4" />
-          ) : (
-            <EyeOff aria-hidden="true" className="size-4" />
-          )}
-          {ia.mirandoAntes ? "Ver la propuesta" : "Ver cómo estaba"}
-        </button>
-      ) : null}
-
-      <div className="flex gap-2 pt-2 pb-3">
+      {/* Siguen a la propuesta y, si es larga, quedan pegados abajo. */}
+      <div className="sticky bottom-0 -mx-5 mt-3 border-t border-tinta/15 bg-papel px-5 pb-3">
         {hayCambios ? (
-          <>
-            <button
-              type="button"
-              onClick={ia.aplicar}
-              className={cn(BOTON_PRIMARIO, "min-h-11 flex-1")}
-            >
-              <Check aria-hidden="true" className="size-4" />
-              Aplicar
-            </button>
+          <button
+            type="button"
+            aria-pressed={ia.mirandoAntes}
+            onClick={() => ia.setMirandoAntes(!ia.mirandoAntes)}
+            className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:opacity-60"
+          >
+            {ia.mirandoAntes ? (
+              <Eye aria-hidden="true" className="size-4" />
+            ) : (
+              <EyeOff aria-hidden="true" className="size-4" />
+            )}
+            {ia.mirandoAntes ? "Ver la propuesta" : "Ver cómo estaba"}
+          </button>
+        ) : null}
+        <div className="flex gap-2">
+          {hayCambios ? (
+            <>
+              <button
+                type="button"
+                onClick={ia.aplicar}
+                className={cn(
+                  BOTON_PRIMARIO,
+                  "min-h-11 flex-1 px-4 whitespace-nowrap"
+                )}
+              >
+                <Check aria-hidden="true" className="size-4 max-sm:hidden" />
+                Aplicar cambios
+              </button>
+              <button
+                type="button"
+                onClick={ia.descartar}
+                className={cn(BOTON_SECUNDARIO, "min-h-11 px-4")}
+              >
+                <X aria-hidden="true" className="size-4 max-sm:hidden" />
+                Descartar
+              </button>
+            </>
+          ) : (
             <button
               type="button"
               onClick={ia.descartar}
-              className={cn(BOTON_SECUNDARIO, "min-h-11")}
+              className={cn(BOTON_SECUNDARIO, "min-h-11 flex-1")}
             >
-              <X aria-hidden="true" className="size-4" />
-              Descartar
+              Entendido
             </button>
-          </>
-        ) : (
-          <button
-            type="button"
-            onClick={ia.descartar}
-            className={cn(BOTON_SECUNDARIO, "min-h-11 flex-1")}
-          >
-            Entendido
-          </button>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

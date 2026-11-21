@@ -20,6 +20,7 @@ const NOMBRES_DE_TIPO: Record<string, string> = {
   catalogos: "Catálogos en PDF",
   marketing: "Publicar en redes",
   productos: "Cargar productos",
+  textos: "Textos a medida",
 }
 
 export default async function IaPage() {

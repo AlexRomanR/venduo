@@ -277,7 +277,7 @@ export function Precio({
   )
 }
 
-/** Una etiqueta de color: "-20%", "Agotado", "Pack". */
+/** Una etiqueta de color: "-20%", "Agotado", "Combo". */
 export function Etiqueta({
   P,
   ctx,

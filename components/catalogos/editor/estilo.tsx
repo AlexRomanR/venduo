@@ -1,11 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { LayoutTemplate, RotateCcw } from "lucide-react"
+import { FileText, LayoutTemplate, Palette, Square, Type } from "lucide-react"
 
 import { HOJAS, type ClaveHoja } from "@/lib/catalogos/constantes"
 import {
-  acentoCercano,
+  arregloDeEstilo,
   problemasDeEstilo,
   resolverEstilo,
 } from "@/lib/catalogos/estilo"
@@ -15,25 +15,37 @@ import {
   type EstiloSugerido,
 } from "@/lib/catalogos/plantillas"
 import { COMBINACIONES, PALETAS } from "@/lib/editor/sugerencias"
-import { BOTON_SECUNDARIO, GRILLA_DE_FICHAS } from "@/lib/estilos"
 import {
   CLAVES_FUENTE,
   FUENTES,
   familiaDe,
   type ClaveFuente,
 } from "@/lib/plantillas/fuentes"
-import { cn } from "@/lib/utils"
-import { Aviso, Grupo, Opciones } from "@/components/editor/piezas"
+import { Fila } from "@/components/panel/ajustes"
+import {
+  AvisoDeLegibilidad,
+  ElegirCadaUno,
+  FilaDeColor,
+  ListaDeLetras,
+  ListaDePaletas,
+  OpcionDeMayusculas,
+} from "@/components/editor/marca"
+import { AjusteAbierto, Opciones } from "@/components/editor/piezas"
 import { Interruptor } from "@/components/catalogos/editor/campos"
 
 /*
- * Cómo se ve el catálogo: parte de los colores y la letra de la tienda, y se
+ * Tu marca en el catálogo: parte de los colores y la letra de la tienda, y se
  * puede cambiar sin tocar la tienda.
  *
- * Las paletas y las parejas de letra son las del editor de la tienda: ya se
- * midieron para leerse. Lo que no se lee se dice acá, con el arreglo a mano,
- * y el PDF no se descarga hasta que se arregle.
+ * Es la misma pantalla que Tu marca en el editor de la tienda, con sus mismas
+ * piezas (`components/editor/marca.tsx`): una fila por ajuste, que se abre en
+ * este panel para seguir viendo las hojas. Lo que no se lee se dice acá, con el
+ * arreglo a mano, y el PDF no se descarga hasta que se arregle.
  */
+
+const ROTULO = "mt-5 mb-2 text-xs font-semibold opacity-70"
+
+type Ajuste = "colores" | "letra" | "esquinas" | "tamano"
 
 export function PanelDeEstilo({
   catalogo,
@@ -49,224 +61,122 @@ export function PanelDeEstilo({
   alCambiar: (catalogo: Catalogo) => void
   alCambiarPlantilla: () => void
 }) {
+  const [abierto, setAbierto] = React.useState<Ajuste | null>(null)
   const estilo = catalogo.estilo
   const poner = (cambios: Partial<Estilo>) =>
     alCambiar({ ...catalogo, estilo: { ...estilo, ...cambios } })
+  const ponerColor = (color: Partial<Estilo["colores"]>) =>
+    poner({ colores: { ...estilo.colores, ...color } })
+  const volver = () => setAbierto(null)
+
   const problemas = problemasDeEstilo(estilo)
-  const arreglo = problemas.length > 0 ? acentoCercano(estilo) : null
-  const comoLaTienda =
-    JSON.stringify({ ...estilo, invertido: false }) ===
-    JSON.stringify({ ...estiloDeTienda, invertido: false })
+  const arreglo = problemas.length > 0 ? arregloDeEstilo(estilo) : null
+  const coloresDeTienda =
+    JSON.stringify(estilo.colores) === JSON.stringify(estiloDeTienda.colores)
+  const letrasDeTienda =
+    JSON.stringify(estilo.letras) === JSON.stringify(estiloDeTienda.letras)
 
-  return (
-    <div className="flex flex-col">
-      <Grupo
-        titulo="Plantilla"
-        className="border-t-0"
-        ayuda="Cambiarla arma las hojas de nuevo. Tus productos, packs y colores se quedan."
-      >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="font-titular text-lg leading-tight font-bold tracking-[-0.02em]">
-            {PLANTILLAS_DE_CATALOGO[catalogo.plantilla].nombre}
-          </p>
-          <button
-            type="button"
-            onClick={alCambiarPlantilla}
-            className={cn(BOTON_SECUNDARIO, "min-h-11 px-4 text-sm")}
-          >
-            <LayoutTemplate aria-hidden="true" className="size-4" />
-            Ver las 12
-          </button>
-        </div>
-      </Grupo>
+  const esLaPaleta = (paleta: (typeof PALETAS)[number]) =>
+    paleta.colores.papel === estilo.colores.papel &&
+    paleta.colores.tinta === estilo.colores.tinta &&
+    paleta.colores.senal === estilo.colores.acento
+  const esLaPareja = ({ tipografia: t }: (typeof COMBINACIONES)[number]) =>
+    t.titular === estilo.letras.titular &&
+    t.cuerpo === estilo.letras.cuerpo &&
+    t.mayusculas === estilo.letras.mayusculas
 
-      {sugeridos.length > 0 ? (
-        <Grupo
-          titulo="Con el estilo de tu tienda"
-          ayuda="Cambian los colores y el fondo; las hojas quedan como están."
-        >
-          <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {sugeridos.map((sugerido) => {
-              const activo =
-                JSON.stringify(sugerido.estilo) === JSON.stringify(estilo)
-              const colores = resolverEstilo(sugerido.estilo).colores
-              return (
-                <li key={sugerido.clave}>
-                  <button
-                    type="button"
-                    aria-pressed={activo}
-                    onClick={() =>
-                      alCambiar({ ...catalogo, estilo: sugerido.estilo })
-                    }
-                    className={cn(
-                      "flex min-h-14 w-full items-center gap-3 border px-3 py-2 text-left transition-colors",
-                      activo
-                        ? "border-tinta bg-tinta/[0.06]"
-                        : "border-tinta/20 hover:border-tinta"
-                    )}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="flex h-9 w-12 shrink-0 overflow-hidden border border-tinta/20"
-                    >
-                      <span
-                        className="flex-[2]"
-                        style={{ backgroundColor: colores.papel }}
-                      />
-                      <span
-                        className="flex-1"
-                        style={{ backgroundColor: colores.tinta }}
-                      />
-                      <span
-                        className="flex-1"
-                        style={{ backgroundColor: colores.acento }}
-                      />
-                    </span>
-                    <span className="text-sm font-semibold">
-                      {sugerido.nombre}
-                    </span>
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
-        </Grupo>
-      ) : null}
+  if (abierto === "colores") {
+    const colores: Array<{
+      clave: keyof Estilo["colores"]
+      nombre: string
+      para: string
+    }> = [
+      { clave: "papel", nombre: "Fondo", para: "El fondo de las hojas" },
+      { clave: "tinta", nombre: "Texto", para: "Títulos, textos y líneas" },
+      {
+        clave: "acento",
+        nombre: "Color destacado",
+        para: "Ofertas y etiquetas",
+      },
+    ]
 
-      <Grupo titulo="Hoja">
-        <Opciones<ClaveHoja>
-          etiqueta="Tamaño de hoja"
-          valor={catalogo.hoja}
-          opciones={(Object.keys(HOJAS) as ClaveHoja[]).map((clave) => ({
-            valor: clave,
-            etiqueta: HOJAS[clave].nombre,
-          }))}
-          alCambiar={(hoja) => alCambiar({ ...catalogo, hoja })}
-        />
-        <p className="mt-2 text-xs leading-relaxed opacity-65">
-          {HOJAS[catalogo.hoja].detalle}
-        </p>
-      </Grupo>
-
-      <Grupo
+    return (
+      <AjusteAbierto
+        volver="Marca"
         titulo="Colores"
-        accion={
-          comoLaTienda ? null : (
-            <button
-              type="button"
-              onClick={() =>
-                poner({
-                  colores: estiloDeTienda.colores,
-                  letras: estiloDeTienda.letras,
-                  esquinas: estiloDeTienda.esquinas,
-                })
-              }
-              className="flex min-h-11 shrink-0 items-center gap-1.5 text-xs font-semibold underline-offset-4 hover:underline"
-            >
-              <RotateCcw aria-hidden="true" className="size-3.5" />
-              Los de tu tienda
-            </button>
-          )
-        }
+        ayuda="Toca una paleta para probarla en tu catálogo."
+        alVolver={volver}
       >
-        {problemas.length > 0 ? (
-          <div className="mb-5 flex flex-col gap-2">
-            {problemas.map((problema) => (
-              <Aviso key={problema} tono="problema">
-                {problema}
-              </Aviso>
-            ))}
-            {arreglo ? (
-              <button
-                type="button"
-                onClick={() =>
-                  poner({ colores: { ...estilo.colores, acento: arreglo } })
+        <ListaDePaletas
+          opciones={[
+            {
+              nombre: "De tu tienda",
+              colores: {
+                papel: estiloDeTienda.colores.papel,
+                tinta: estiloDeTienda.colores.tinta,
+                destacado: estiloDeTienda.colores.acento,
+              },
+              activa: coloresDeTienda,
+              alElegir: () => poner({ colores: estiloDeTienda.colores }),
+            },
+            ...PALETAS.map((paleta) => ({
+              nombre: paleta.nombre,
+              colores: {
+                papel: paleta.colores.papel,
+                tinta: paleta.colores.tinta,
+                destacado: paleta.colores.senal,
+              },
+              activa: !coloresDeTienda && esLaPaleta(paleta),
+              alElegir: () =>
+                poner({
+                  colores: {
+                    papel: paleta.colores.papel,
+                    tinta: paleta.colores.tinta,
+                    acento: paleta.colores.senal,
+                  },
+                }),
+            })),
+          ]}
+        />
+        <AvisoDeLegibilidad
+          problemas={problemas}
+          arreglo={
+            arreglo
+              ? {
+                  hex: arreglo.hex,
+                  texto: `Usar este tono para ${arreglo.nombre}`,
+                  alUsar: () => ponerColor({ [arreglo.color]: arreglo.hex }),
                 }
-                className="flex min-h-11 w-fit items-center gap-2 rounded-plantilla border-2 border-tinta px-4 text-sm font-semibold transition-colors hover:bg-tinta hover:text-papel"
-              >
-                <span
-                  aria-hidden="true"
-                  className="size-4 border border-tinta/30"
-                  style={{ backgroundColor: arreglo }}
-                />
-                Usar un acento que se lea
-              </button>
-            ) : null}
-          </div>
+              : null
+          }
+          sinArreglo="Prueba con otro fondo o con otro color de texto."
+          consecuencia="Mientras no se lea, no se puede guardar ni descargar."
+        />
+
+        {sugeridos.length > 0 ? (
+          <>
+            <p className={ROTULO}>Con el estilo de tu tienda</p>
+            <ListaDePaletas
+              opciones={sugeridos.map((sugerido) => {
+                const resueltos = resolverEstilo(sugerido.estilo).colores
+                return {
+                  nombre: sugerido.nombre,
+                  colores: {
+                    papel: resueltos.papel,
+                    tinta: resueltos.tinta,
+                    destacado: resueltos.acento,
+                  },
+                  activa:
+                    JSON.stringify(sugerido.estilo) === JSON.stringify(estilo),
+                  alElegir: () =>
+                    alCambiar({ ...catalogo, estilo: sugerido.estilo }),
+                }
+              })}
+            />
+          </>
         ) : null}
 
-        <ul className="grid grid-cols-5 gap-2" aria-label="Paletas">
-          {PALETAS.map((paleta) => {
-            const activa =
-              paleta.colores.papel === estilo.colores.papel &&
-              paleta.colores.tinta === estilo.colores.tinta &&
-              paleta.colores.senal === estilo.colores.acento
-            return (
-              <li key={paleta.nombre}>
-                <button
-                  type="button"
-                  aria-pressed={activa}
-                  aria-label={`Paleta ${paleta.nombre}`}
-                  title={paleta.nombre}
-                  onClick={() =>
-                    poner({
-                      colores: {
-                        papel: paleta.colores.papel,
-                        tinta: paleta.colores.tinta,
-                        acento: paleta.colores.senal,
-                      },
-                    })
-                  }
-                  className={cn(
-                    "flex h-11 w-full overflow-hidden border-2 transition-colors",
-                    activa
-                      ? "border-tinta"
-                      : "border-tinta/15 hover:border-tinta/50"
-                  )}
-                >
-                  <span
-                    className="flex-[2]"
-                    style={{ backgroundColor: paleta.colores.papel }}
-                  />
-                  <span
-                    className="flex-1"
-                    style={{ backgroundColor: paleta.colores.tinta }}
-                  />
-                  <span
-                    className="flex-1"
-                    style={{ backgroundColor: paleta.colores.senal }}
-                  />
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-
-        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <CampoDeColor
-            etiqueta="Fondo"
-            valor={estilo.colores.papel}
-            alCambiar={(papel) =>
-              poner({ colores: { ...estilo.colores, papel } })
-            }
-          />
-          <CampoDeColor
-            etiqueta="Texto"
-            valor={estilo.colores.tinta}
-            alCambiar={(tinta) =>
-              poner({ colores: { ...estilo.colores, tinta } })
-            }
-          />
-          <CampoDeColor
-            etiqueta="Acento"
-            valor={estilo.colores.acento}
-            alCambiar={(acento) =>
-              poner({ colores: { ...estilo.colores, acento } })
-            }
-          />
-        </div>
-
-        <div className="mt-4">
+        <div className="mt-5">
           <Interruptor
             etiqueta="Fondo oscuro"
             detalle="El fondo toma el color del texto y el texto, el del fondo."
@@ -274,73 +184,109 @@ export function PanelDeEstilo({
             alCambiar={(invertido) => poner({ invertido })}
           />
         </div>
-      </Grupo>
 
-      <Grupo titulo="Letras">
-        <ul className={GRILLA_DE_FICHAS} aria-label="Parejas de letra">
-          {COMBINACIONES.map((combinacion) => {
-            const t = combinacion.tipografia
-            const activa =
-              t.titular === estilo.letras.titular &&
-              t.cuerpo === estilo.letras.cuerpo &&
-              t.mayusculas === estilo.letras.mayusculas
-            return (
-              <li key={combinacion.nombre}>
-                <button
-                  type="button"
-                  aria-pressed={activa}
-                  onClick={() =>
-                    poner({
-                      letras: {
-                        titular: t.titular,
-                        cuerpo: t.cuerpo,
-                        mayusculas: t.mayusculas,
-                      },
-                    })
-                  }
-                  className={cn(
-                    "flex min-h-11 w-full min-w-0 items-center justify-center border px-2 text-sm transition-colors",
-                    activa
-                      ? "border-tinta bg-tinta text-papel"
-                      : "border-tinta/25 hover:border-tinta"
-                  )}
-                  style={{ fontFamily: familiaDe(t.titular) }}
-                >
-                  <span className="truncate">{combinacion.nombre}</span>
-                </button>
-              </li>
-            )
-          })}
-        </ul>
+        <ElegirCadaUno
+          titulo="Elegir cada color"
+          abiertoAlInicio={!coloresDeTienda && !PALETAS.some(esLaPaleta)}
+        >
+          <ul className="mt-2 border-t border-tinta/15">
+            {colores.map(({ clave, nombre, para }) => (
+              <FilaDeColor
+                key={clave}
+                nombre={nombre}
+                para={para}
+                valor={estilo.colores[clave]}
+                alCambiar={(hex) => ponerColor({ [clave]: hex })}
+                volver={
+                  estilo.colores[clave] === estiloDeTienda.colores[clave]
+                    ? null
+                    : {
+                        titulo: "Volver al de tu tienda",
+                        alTocar: () =>
+                          ponerColor({
+                            [clave]: estiloDeTienda.colores[clave],
+                          }),
+                      }
+                }
+              />
+            ))}
+          </ul>
+        </ElegirCadaUno>
+      </AjusteAbierto>
+    )
+  }
 
-        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <SelectorDeLetra
-            etiqueta="Titulares"
-            valor={estilo.letras.titular}
-            alCambiar={(titular) =>
-              poner({ letras: { ...estilo.letras, titular } })
-            }
-          />
-          <SelectorDeLetra
-            etiqueta="Texto"
-            valor={estilo.letras.cuerpo}
-            alCambiar={(cuerpo) =>
-              poner({ letras: { ...estilo.letras, cuerpo } })
-            }
-          />
-        </div>
-        <div className="mt-4">
-          <Interruptor
-            etiqueta="Titulares en mayúsculas"
-            activo={estilo.letras.mayusculas}
+  if (abierto === "letra") {
+    return (
+      <AjusteAbierto
+        volver="Marca"
+        titulo="Letra"
+        ayuda="Una para los títulos y otra para leer."
+        alVolver={volver}
+      >
+        <ListaDeLetras
+          opciones={[
+            {
+              nombre: "De tu tienda",
+              ideal: "Como en tu tienda",
+              tipografia: estiloDeTienda.letras,
+              activa: letrasDeTienda,
+              alElegir: () => poner({ letras: estiloDeTienda.letras }),
+            },
+            ...COMBINACIONES.map((combinacion) => ({
+              nombre: combinacion.nombre,
+              ideal: combinacion.ideal,
+              tipografia: combinacion.tipografia,
+              activa: !letrasDeTienda && esLaPareja(combinacion),
+              alElegir: () =>
+                poner({
+                  letras: {
+                    titular: combinacion.tipografia.titular,
+                    cuerpo: combinacion.tipografia.cuerpo,
+                    mayusculas: combinacion.tipografia.mayusculas,
+                  },
+                }),
+            })),
+          ]}
+        />
+        <div className="mt-5">
+          <OpcionDeMayusculas
+            valor={estilo.letras.mayusculas}
             alCambiar={(mayusculas) =>
               poner({ letras: { ...estilo.letras, mayusculas } })
             }
           />
         </div>
-      </Grupo>
+        <ElegirCadaUno titulo="Elegir cada letra">
+          <div className="grid grid-cols-1 gap-4 pt-2">
+            <SelectorDeLetra
+              etiqueta="Títulos"
+              valor={estilo.letras.titular}
+              alCambiar={(titular) =>
+                poner({ letras: { ...estilo.letras, titular } })
+              }
+            />
+            <SelectorDeLetra
+              etiqueta="Texto"
+              valor={estilo.letras.cuerpo}
+              alCambiar={(cuerpo) =>
+                poner({ letras: { ...estilo.letras, cuerpo } })
+              }
+            />
+          </div>
+        </ElegirCadaUno>
+      </AjusteAbierto>
+    )
+  }
 
-      <Grupo titulo="Esquinas">
+  if (abierto === "esquinas") {
+    return (
+      <AjusteAbierto
+        volver="Marca"
+        titulo="Esquinas"
+        ayuda="Las de las fotos y las etiquetas."
+        alVolver={volver}
+      >
         <Opciones<Estilo["esquinas"]>
           etiqueta="Esquinas de fotos y etiquetas"
           valor={estilo.esquinas}
@@ -350,60 +296,82 @@ export function PanelDeEstilo({
           ]}
           alCambiar={(esquinas) => poner({ esquinas })}
         />
-      </Grupo>
-    </div>
+      </AjusteAbierto>
+    )
+  }
+
+  if (abierto === "tamano") {
+    return (
+      <AjusteAbierto
+        volver="Marca"
+        titulo="Tamaño de hoja"
+        ayuda={HOJAS[catalogo.hoja].detalle}
+        alVolver={volver}
+      >
+        <Opciones<ClaveHoja>
+          etiqueta="Tamaño de hoja"
+          valor={catalogo.hoja}
+          opciones={(Object.keys(HOJAS) as ClaveHoja[]).map((clave) => ({
+            valor: clave,
+            etiqueta: HOJAS[clave].nombre,
+          }))}
+          alCambiar={(hoja) => alCambiar({ ...catalogo, hoja })}
+        />
+      </AjusteAbierto>
+    )
+  }
+
+  const sugerido = sugeridos.find(
+    (otro) => JSON.stringify(otro.estilo) === JSON.stringify(estilo)
   )
-}
-
-const HEX = /^#[0-9a-fA-F]{6}$/
-
-/**
- * Un color: el selector del sistema y su código, para quien lo tiene anotado.
- * El código se acepta recién cuando está completo, así la vista previa no
- * parpadea con colores a medio escribir.
- */
-function CampoDeColor({
-  etiqueta,
-  valor,
-  alCambiar,
-}: {
-  etiqueta: string
-  valor: string
-  alCambiar: (valor: string) => void
-}) {
-  const id = React.useId()
-  const [texto, setTexto] = React.useState(valor)
-  React.useEffect(() => setTexto(valor), [valor])
+  const colores = coloresDeTienda
+    ? "De tu tienda"
+    : (sugerido?.nombre ?? PALETAS.find(esLaPaleta)?.nombre ?? "A tu gusto")
+  const letra = letrasDeTienda
+    ? "De tu tienda"
+    : (COMBINACIONES.find(esLaPareja)?.nombre ?? "A tu gusto")
 
   return (
-    <div>
-      <label
-        htmlFor={id}
-        className="text-xs font-semibold tracking-[0.12em] uppercase opacity-65"
-      >
-        {etiqueta}
-      </label>
-      <div className="mt-1 flex items-center gap-2 border-b border-tinta/40 focus-within:border-tinta focus-within:bg-tinta/[0.04]">
-        <input
-          type="color"
-          aria-label={`${etiqueta}: elegir en la paleta`}
-          value={valor}
-          onChange={(evento) => alCambiar(evento.target.value)}
-          className="size-9 shrink-0 cursor-pointer border-0 bg-transparent p-0"
+    <div className="p-4 sm:p-5">
+      <p className="mb-4 text-sm leading-relaxed opacity-70">
+        Lo que elijas aquí se aplica solo a este catálogo. Tu tienda no cambia.
+      </p>
+      <ul className="pieza-tarjeta border border-tinta">
+        <Fila
+          icono={Palette}
+          titulo="Colores"
+          valor={colores}
+          error={problemas.length > 0 ? "Algo no se lee bien" : undefined}
+          alTocar={() => setAbierto("colores")}
         />
-        <input
-          id={id}
-          value={texto}
-          maxLength={7}
-          spellCheck={false}
-          onChange={(evento) => {
-            const nuevo = evento.target.value.trim()
-            setTexto(nuevo)
-            if (HEX.test(nuevo)) alCambiar(nuevo.toLowerCase())
-          }}
-          className="tabular h-11 min-w-0 flex-1 border-0 bg-transparent font-mono text-sm uppercase focus-visible:outline-none"
+        <Fila
+          icono={Type}
+          titulo="Letra"
+          valor={letra}
+          alTocar={() => setAbierto("letra")}
         />
-      </div>
+        <Fila
+          icono={Square}
+          titulo="Esquinas"
+          valor={estilo.esquinas === "rectas" ? "Rectas" : "Suaves"}
+          alTocar={() => setAbierto("esquinas")}
+        />
+      </ul>
+      <p className={ROTULO}>Diseño del catálogo</p>
+      <ul className="pieza-tarjeta border border-tinta">
+        <Fila
+          icono={LayoutTemplate}
+          titulo="Plantilla"
+          valor={PLANTILLAS_DE_CATALOGO[catalogo.plantilla].nombre}
+          alTocar={alCambiarPlantilla}
+        />
+        <Fila
+          icono={FileText}
+          titulo="Tamaño"
+          valor={HOJAS[catalogo.hoja].nombre}
+          alTocar={() => setAbierto("tamano")}
+        />
+      </ul>
     </div>
   )
 }
@@ -422,7 +390,7 @@ function SelectorDeLetra({
     <div>
       <label
         htmlFor={id}
-        className="text-xs font-semibold tracking-[0.12em] uppercase opacity-65"
+        className="text-xs font-semibold tracking-[0.12em] uppercase opacity-70"
       >
         {etiqueta}
       </label>

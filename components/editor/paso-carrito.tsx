@@ -75,9 +75,7 @@ function EsquemaDeCarrito({ diseno }: { diseno: Carrito["diseno"] }) {
     >
       {[1, 2].map((numero) => (
         <span key={numero} className="flex items-center gap-1.5">
-          <span className="w-2 text-[10px] leading-none font-bold">
-            {numero}
-          </span>
+          <span className="size-2 rounded-full bg-current" />
           <span className="h-1 flex-1 bg-current opacity-60" />
         </span>
       ))}
@@ -103,9 +101,8 @@ export function PasoCarrito() {
   return (
     <>
       <EncabezadoDePaso
-        numero={5}
         titulo="Carrito"
-        bajada="Así ve tu cliente su pedido antes de mandártelo por WhatsApp. Elige cómo se ordena y qué más le ofreces."
+        bajada="Así ve su pedido quien te compra, antes de mandártelo por WhatsApp. Elige cómo se ordena y qué más ofreces."
       />
 
       <Grupo titulo="Diseño del carrito">
@@ -130,7 +127,7 @@ export function PasoCarrito() {
         <div className="border-t border-tinta/15">
           <Interruptor
             etiqueta="Sugerencias en el carrito"
-            ayuda="Tres productos más de tu tienda para sumar al pedido sin salir del carrito."
+            ayuda="Hasta tres productos más de tu tienda para sumar al pedido sin salir del carrito."
             activo={carrito.sugerencias}
             alCambiar={(activo) => ajustar("sugerencias", activo)}
           />
@@ -140,7 +137,7 @@ export function PasoCarrito() {
       <Grupo titulo="Lo que ya tiene tu estilo">
         <p className="text-sm leading-relaxed opacity-80">
           Los colores, la letra y la forma de los botones son los que elegiste
-          en Tu marca.
+          en Marca.
         </p>
         <button
           type="button"
@@ -165,10 +162,7 @@ export function PasoCarrito() {
         </Aviso>
       </div>
 
-      <SiguientePaso
-        nombre="Revisar y publicar"
-        alIr={() => irAPaso("publicar")}
-      />
+      <SiguientePaso nombre="Publicar" alIr={() => irAPaso("publicar")} />
     </>
   )
 }

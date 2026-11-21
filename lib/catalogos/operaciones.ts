@@ -200,18 +200,92 @@ export function ponerProductos(catalogo: Catalogo, ids: string[]): Catalogo {
  * Packs
  * ------------------------------------------------------------------------ */
 
-/** Un pack con los primeros productos, al diez por ciento menos, y su hoja. */
+/** El descuento con el que nace un combo: 10%, en puntos básicos. */
+export const DESCUENTO_INICIAL_BPS = 1000
+
+/**
+ * Lo que cuestan los productos por separado, menos el descuento, redondeado a
+ * bolivianos enteros. Un producto repetido cuenta las dos veces.
+ */
+export function precioConDescuento(
+  productos: string[],
+  precios: Record<string, number>,
+  descuentoBps: number
+): number {
+  const suelto = productos.reduce((total, id) => total + (precios[id] ?? 0), 0)
+  const bps = Math.min(Math.max(Math.round(descuentoBps), 0), 9000)
+  return Math.round((suelto * (10000 - bps)) / 10000 / 100) * 100
+}
+
+/** El precio con el que nace un combo: diez por ciento menos, en bolivianos enteros. */
+export function precioSugerido(
+  productos: string[],
+  precios: Record<string, number>
+): number {
+  return precioConDescuento(productos, precios, DESCUENTO_INICIAL_BPS)
+}
+
+/**
+ * Los productos de un combo, con su precio al día: si el combo tiene
+ * descuento, el precio sale de la suma de todos sus productos; si el precio
+ * se escribió a mano, se respeta.
+ */
+export function ponerProductosAlPack(
+  pack: Pack,
+  productos: string[],
+  precios: Record<string, number>
+): Pack {
+  return {
+    ...pack,
+    productos,
+    precioCents:
+      pack.descuentoBps == null
+        ? pack.precioCents
+        : precioConDescuento(productos, precios, pack.descuentoBps),
+  }
+}
+
+/** El descuento elegido para un combo, con el precio que le corresponde. */
+export function ponerDescuentoAlPack(
+  pack: Pack,
+  descuentoBps: number,
+  precios: Record<string, number>
+): Pack {
+  const bps = Math.min(Math.max(Math.round(descuentoBps), 0), 9000)
+  return {
+    ...pack,
+    descuentoBps: bps,
+    precioCents: precioConDescuento(pack.productos, precios, bps),
+  }
+}
+
+/** Un precio escrito a mano: deja de seguir al descuento. */
+export function ponerPrecioAlPack(pack: Pack, precioCents: number): Pack {
+  return { ...pack, precioCents, descuentoBps: null }
+}
+
+/**
+ * Un pack con los dos primeros productos que hay, y su hoja.
+ *
+ * Nace al diez por ciento menos de lo que cuestan por separado, redondeado a
+ * bolivianos enteros, y el editor dice que es una sugerencia que se cambia.
+ * Si su precio queda en cero, `faltantes` no deja guardar ni mandar.
+ */
 export function agregarPack(
   catalogo: Catalogo,
-  precios: Record<string, number>
+  precios: Record<string, number>,
+  agotados: ReadonlySet<string> = new Set()
 ): { catalogo: Catalogo; pack: Pack } {
-  const productos = catalogo.productos.slice(0, 2)
-  const suelto = productos.reduce((total, id) => total + (precios[id] ?? 0), 0)
+  const conStock = catalogo.productos.filter((id) => !agotados.has(id))
+  const productos = (
+    conStock.length >= 2 ? conStock : catalogo.productos
+  ).slice(0, 2)
   const pack: Pack = {
     id: idNuevo("pack"),
     nombre: `Combo ${catalogo.packs.length + 1}`,
     productos,
-    precioCents: Math.round((suelto * 0.9) / 100) * 100,
+    precioCents: precioSugerido(productos, precios),
+    descuentoBps: DESCUENTO_INICIAL_BPS,
     nota: "",
   }
   const conPack = { ...catalogo, packs: [...catalogo.packs, pack] }
@@ -264,7 +338,96 @@ export function faltantes(catalogo: Catalogo): string[] {
         !catalogo.packs.some((pack) => pack.id === bloque.pack)
     )
   ) {
-    faltan.push("Hay una hoja de pack sin pack elegido.")
+    faltan.push("Hay una hoja de combo sin combo elegido.")
+  }
+  for (const pack of catalogo.packs) {
+    const seMuestra = catalogo.bloques.some(
+      (bloque) => bloque.tipo === "pack" && bloque.pack === pack.id
+    )
+    if (seMuestra && pack.precioCents <= 0) {
+      faltan.push(
+        `Ponle precio al combo «${pack.nombre.trim() || "sin nombre"}».`
+      )
+    }
   }
   return faltan
+}
+
+/** Las que admite el esquema del catálogo. */
+const MAXIMO_DE_PARTES = 40
+
+/** Lo que la persona escribe o elige en cada parte, sin su diseño. */
+const LO_EDITABLE: Record<TipoDeBloque, string[]> = {
+  portada: ["titulo", "bajada", "foto"],
+  productos: ["titulo", "cuales"],
+  separador: ["titulo", "bajada", "foto"],
+  pack: ["pack"],
+  oferta: ["titulo", "texto", "etiqueta"],
+  contraportada: ["titulo", "texto", "redes", "pago", "whatsapp", "qr"],
+  texto: ["titulo", "texto"],
+}
+
+function porTipo(bloques: Bloque[]) {
+  const grupos = new Map<TipoDeBloque, Bloque[]>()
+  for (const bloque of bloques) {
+    grupos.set(bloque.tipo, [...(grupos.get(bloque.tipo) ?? []), bloque])
+  }
+  return grupos
+}
+
+/**
+ * Pasa a una plantilla nueva lo que la persona hizo en la anterior.
+ *
+ * `base` es la plantilla anterior tal como vino: lo que difiere de ella es lo
+ * editado. Los textos van a la parte equivalente de la nueva (la primera oferta
+ * a la primera oferta); una parte agregada, o una editada sin equivalente, se
+ * mantiene antes de la contraportada. El diseño es siempre el de la nueva.
+ */
+export function conservarEdicion(
+  actual: Catalogo,
+  base: Catalogo,
+  nueva: Catalogo
+): { catalogo: Catalogo; conservados: number } {
+  const originales = porTipo(base.bloques)
+  const destinos = porTipo(nueva.bloques)
+  const vistos = new Map<TipoDeBloque, number>()
+  const bloques = [...nueva.bloques]
+  const sinLugar: Bloque[] = []
+  let conservados = 0
+
+  for (const bloque of actual.bloques) {
+    const indice = vistos.get(bloque.tipo) ?? 0
+    vistos.set(bloque.tipo, indice + 1)
+    const original = originales.get(bloque.tipo)?.[indice]
+    if (!original) {
+      sinLugar.push(bloque)
+      conservados++
+      continue
+    }
+
+    const propio = bloque as unknown as Record<string, unknown>
+    const deBase = original as unknown as Record<string, unknown>
+    const editados = LO_EDITABLE[bloque.tipo].filter(
+      (campo) => JSON.stringify(propio[campo]) !== JSON.stringify(deBase[campo])
+    )
+    if (editados.length === 0) continue
+    conservados++
+
+    const destino = destinos.get(bloque.tipo)?.[indice]
+    if (!destino) {
+      sinLugar.push(bloque)
+      continue
+    }
+    bloques[bloques.indexOf(destino)] = {
+      ...destino,
+      ...Object.fromEntries(editados.map((campo) => [campo, propio[campo]])),
+    } as Bloque
+  }
+
+  const cierre = bloques.findIndex((b) => b.tipo === "contraportada")
+  bloques.splice(cierre === -1 ? bloques.length : cierre, 0, ...sinLugar)
+  return {
+    catalogo: { ...nueva, bloques: bloques.slice(0, MAXIMO_DE_PARTES) },
+    conservados,
+  }
 }

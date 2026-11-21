@@ -2,45 +2,53 @@
 
 import { ArrowRight, History, WandSparkles } from "lucide-react"
 
+import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
 import { formatDate } from "@/lib/format"
+import { useConfirmacion } from "@/components/panel/confirmar"
 import { ConFuncion } from "@/components/panel/funcion"
 import { useEditor } from "@/components/editor/contexto"
 
 /**
- * Si quedó un borrador sin publicar de la vez anterior, se ofrece recuperarlo
- * antes de tocar nada. Mientras no se decida, no se escribe encima.
+ * Si quedó un borrador sin publicar de la vez anterior, hay que decidir antes
+ * de seguir: mientras tanto no se guarda nada, para no pisarlo, y editar al
+ * lado hacía creer que lo nuevo estaba a salvo.
  */
 export function Recuperar() {
   const { borrador } = useEditor()
+  const { preguntar, dialogo } = useConfirmacion()
   const pendiente = borrador.recuperable
   if (!pendiente) return null
 
+  async function descartar() {
+    const si = await preguntar({
+      titulo: "¿Descartar estos cambios?",
+      texto: "No se pueden recuperar. Tu tienda publicada no cambia.",
+      confirmar: "Descartarlos",
+    })
+    if (si) borrador.olvidarRecuperable()
+  }
+
   return (
-    <div
-      role="status"
-      className="mx-5 mt-5 border-l-2 border-senal py-1 pl-3 motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in"
-    >
-      <p className="flex items-center gap-2 text-sm font-semibold">
-        <History aria-hidden="true" className="size-4" />
-        Tienes cambios sin publicar del {formatDate(new Date(pendiente.fecha))}
+    <div className="px-5 py-6 motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in">
+      {dialogo}
+      <History aria-hidden="true" className="size-6" />
+      <h1 className="mt-3 font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">
+        Tienes cambios sin publicar
+      </h1>
+      <p className="mt-1 text-sm leading-relaxed opacity-70">
+        Son del {formatDate(new Date(pendiente.fecha))} y los guardamos en este
+        dispositivo. ¿Sigues donde te quedaste?
       </p>
-      <p className="mt-1 text-xs leading-relaxed opacity-60">
-        Los guardamos en este dispositivo. ¿Sigues donde te quedaste?
-      </p>
-      <div className="mt-1 flex flex-wrap gap-x-5">
+      <div className="mt-4 flex flex-col gap-2">
         <button
           type="button"
           onClick={borrador.recuperar}
-          className="min-h-11 text-sm font-semibold text-senal transition-colors hover:text-senal-alta"
+          className={BOTON_PRIMARIO}
         >
           Recuperarlos
         </button>
-        <button
-          type="button"
-          onClick={borrador.olvidarRecuperable}
-          className="min-h-11 text-sm font-semibold opacity-70 transition-opacity hover:opacity-100"
-        >
-          Empezar de nuevo
+        <button type="button" onClick={descartar} className={BOTON_SECUNDARIO}>
+          Descartarlos
         </button>
       </div>
     </div>
@@ -56,19 +64,12 @@ export function Bienvenida({ alEmpezar }: { alEmpezar: () => void }) {
 
   return (
     <div className="mx-5 mt-5 rounded-[18px] border border-tinta/15 bg-hoja p-4 shadow-[var(--sombra-cuaderno)] motion-safe:animate-in motion-safe:duration-500 motion-safe:fade-in motion-safe:slide-in-from-bottom-2">
-      <p className="text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-        {tienda.nombre} ya existe
-      </p>
-      <p className="mt-2 font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">
+      <p className="font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">
         Ahora, personaliza tu tienda.
       </p>
       <ul className="mt-3 flex flex-col gap-1.5 text-sm leading-relaxed opacity-80">
-        <li>Lo que cambies lo ves al instante, en tu tienda real.</li>
+        <li>Lo ves al instante aquí. Nadie más lo ve hasta que publiques.</li>
         <li>Toca una sección de la vista previa para editarla.</li>
-        <li>
-          Tu tienda ya está en línea: tus clientes ven tus cambios cuando los
-          publiques.
-        </li>
       </ul>
       <div className="mt-3 flex flex-wrap gap-x-5">
         <button
@@ -87,13 +88,13 @@ export function Bienvenida({ alEmpezar }: { alEmpezar: () => void }) {
                 alEmpezar()
                 irAPaso("portada")
                 ia.pedir(
-                  "Escribe los textos de mi portada con lo que conté de mi negocio"
+                  "Escribe los textos de mi página de inicio con lo que conté de mi negocio"
                 )
               }}
-              className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-senal transition-colors hover:text-senal-alta"
+              className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold transition-colors hover:opacity-60"
             >
               <WandSparkles aria-hidden="true" className="size-4" />
-              Que la IA escriba mi portada
+              Que la IA escriba tus textos
             </button>
           </ConFuncion>
         ) : null}

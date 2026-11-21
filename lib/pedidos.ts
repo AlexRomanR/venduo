@@ -94,6 +94,8 @@ export interface LineaDelMensaje {
   variante?: string | null
   cantidad: number
   totalCents: number
+  /** Si es un combo, lo que trae: van debajo de la línea, con su opción. */
+  partes?: { nombre: string; variante?: string | null }[]
 }
 
 /**
@@ -111,10 +113,13 @@ export function mensajeDePedido(pedido: {
   return [
     `Hola ${pedido.tienda}, quiero hacer este pedido (#${pedido.numero}):`,
     "",
-    ...pedido.lineas.map(
-      (l) =>
-        `· ${l.cantidad}× ${l.nombre}${l.variante ? ` (${l.variante})` : ""} — ${formatMoney(l.totalCents)}`
-    ),
+    ...pedido.lineas.flatMap((l) => [
+      `· ${l.cantidad}× ${l.nombre}${l.variante ? ` (${l.variante})` : ""} — ${formatMoney(l.totalCents)}`,
+      // Un combo lleva lo que trae una vez: se entiende que cada combo trae eso.
+      ...(l.partes ?? []).map(
+        (p) => `   - ${p.nombre}${p.variante ? ` (${p.variante})` : ""}`
+      ),
+    ]),
     "",
     `Total: ${formatMoney(pedido.totalCents)}`,
   ].join("\n")

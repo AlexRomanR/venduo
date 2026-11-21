@@ -6,6 +6,7 @@ import {
   Document,
   Font,
   Image,
+  Link,
   Page,
   Text,
   View,
@@ -143,6 +144,12 @@ const pdf: Primitivas = {
   },
 
   Caja: ({ estilo, children }) => <View style={aPdf(estilo)}>{children}</View>,
+
+  Enlace: ({ href, estilo, children }) => (
+    <Link src={href} style={{ ...aPdf(estilo), textDecoration: "none" }}>
+      {children}
+    </Link>
+  ),
 
   Texto: ({ estilo = {}, lineas, children }) => {
     const corrido = corrimiento(estilo)

@@ -26,7 +26,87 @@ verdad**: es lo primero que hay que hacer con el APK de `eas build --profile pre
 
 ## Lo que falta
 
-En orden. Todo es de quien publica: no queda código pendiente para Android.
+En orden. Todo es de quien publica, salvo lo de código que va primero.
+
+0. **Código pendiente en la app**, de lo que la web ya tiene (lista al día el 19 de
+   noviembre, con el estado final de cada cosa: varias cambiaron más de una vez en la web).
+   Se marca al pasarla y probarla en el emulador.
+   El 19 de noviembre se pasaron el ingreso, el menú y el editor de la tienda (rama
+   `editores-como-la-web` de la app), el de catálogos y los textos a medida, y se
+   probó todo en el emulador contra la web y la base locales.
+
+   **El ingreso, el Inicio y el menú**
+   - [x] **"¿La olvidaste?"** en el ingreso: pide el enlace con `resetPasswordForEmail`
+         y la contraseña nueva se elige en la web (`/nueva-clave`).
+   - [x] **La franja "Venduo pausó tu tienda"** arriba del Inicio (`pausada` de
+         `/api/v1/resumen`).
+   - [x] **El menú lateral:** arriba la marca y una raya; debajo, con el rótulo "Tu tienda
+         en línea", la captura de la portada de la tienda como una foto pegada, con su
+         nombre y si está al aire (sin captura, la de su plantilla con "Así se verá").
+         Después "Tu negocio" y "Tu tienda", sin el grupo "Tu cuenta"; al pie, fijos tras
+         otra raya, la persona —que es la entrada a Tus datos— y "Cerrar sesión". Sin
+         "Nuevo producto".
+   - [x] **La primera carga es la de varios:** sin ningún producto, "Nuevo producto" abre
+         la carga de varios, con "¿Es uno solo? Cárgalo aquí". Los textos dicen "Carga tus
+         productos", no "tu primer producto".
+   - [x] **Tienda sin productos:** al publicar, "Publicado" lo avisa, ofrece "Cargar mis
+         productos" y no ofrece compartir por WhatsApp; al abrir la tienda propia sin
+         productos, se avisa antes de abrirla.
+
+   **El editor de la tienda**
+   - [x] **Cinco pasos con el mismo nombre en todas partes:** Marca, Portada, Productos
+         (cómo se ven en la tienda: "En la lista" y "Al abrir uno", con el enlace a
+         Productos para nombre, precio y fotos), Carrito y Publicar. "Catálogo" y
+         "Producto" eran dos pasos y se juntaron.
+   - [x] **La IA es una barra fija** al pie del panel, no un paso. Su propuesta ocupa
+         todo el panel hasta aplicarla o descartarla, sin pasos al lado; lleva la vista al
+         primer cambio, cada línea tiene "Ver", y una paleta entera se dice por su nombre
+         ("Colores: paleta Terracota"). "Cambios aplicados" sale abajo.
+   - [x] **Marca por filas** (Logo, Colores, Letra, Botones), con los mismos textos que
+         la web: "La que trae tu plantilla", "Elegir cada color" cerrado si es una paleta.
+   - [x] **Portada:** al abrir una sección, primero los campos y al final Ocultar,
+         Subir, Bajar y Quitar; "Sube una foto aquí".
+   - [x] **"Publicar", arriba, publica de una vez**; dice "Publicado" si no hay nada que
+         publicar. Si algo lo impide, lleva al paso Publicar, que dice qué falta.
+   - [x] **Salir con cambios pregunta:** "Publicar ahora", "Seguir editando", "Salir"
+         (quedan solo en este teléfono) y "Descartar y salir". La barra dice "Sin publicar ·
+         solo aquí".
+   - [x] **El panel con manija** y al tocar un campo con el panel grande, baja a la mitad
+         para ver la tienda.
+   - [x] **Las señales:** se pide `senalar` en cada cambio, como `lib/editor/senales.ts`;
+         la vista previa, que es la de la web, ya decide si marcar o no.
+
+   **El editor de catálogos**
+   - [x] **Como el de la tienda:** la IA es una barra fija con su propuesta en el panel
+         ("Pediste", qué queda primero, qué se quita, el texto nuevo de la portada, "Ver
+         cómo estaba"); cinco pestañas al pie —Marca, Hojas, Elegidos, Combos y Enviar—
+         con la raya arriba de la elegida. Con una propuesta abierta no se cambia de
+         pestaña.
+   - [x] **Marca** primero, con los mismos Colores y Letra que la tienda, y "Diseño del
+         catálogo" (Plantilla y Tamaño) aparte. Cambiar de plantilla conserva lo editado.
+   - [x] **Hojas:** "Lo que lleva tu catálogo, en orden."; nombres "Cuadrícula", "Título
+         de sección", "Cierre"; al editar una, Subir, Bajar, Duplicar y Quitar con su
+         nombre al pie; "Hoja N de M" arriba de su hoja; la hoja de productos dice "Salen
+         de tus N elegidos" con "Cambiarlos".
+   - [x] **Elegidos:** tocar un producto muestra Subir y Bajar.
+   - [x] **Combos:** con las fotos de los productos; nacen al 10% menos, lo dicen y se
+         cambia; no toman agotados; terminan con «Listo»; sin precio no se guarda ni se
+         manda, y el aviso «Ponerle precio» abre el combo.
+   - [x] **Enviar:** "Enviar por WhatsApp" primero, "Enviar el PDF", "Ver cómo se ve",
+         "Guardar"; en "Más opciones", "Descargar PDF", "Copiar el enlace", Canva y
+         "Borrar el catálogo".
+   - [x] **Salir sin perder nada:** el borrador queda en el teléfono; salir con cambios
+         ofrece "Guardar y salir", "Seguir editando" y "Salir sin guardar"; guardar sin
+         conexión avisa y no bloquea.
+   - [x] **La vista previa sigue a lo que se edita:** al combo, a la propuesta, a la hoja
+         elegida, que se achica para verse sobre el panel.
+
+   **Textos a medida** (brief `docs/briefs/2026-11-18-textos-que-se-adaptan.md`)
+   - [x] La propuesta en el editor, arriba de Portada: "Adaptamos tus textos a lo que
+         vendes", "Ver los cambios" (la tienda ya los muestra), "Usar estos textos" los pone
+         en el borrador y "Descartar". Usa `/api/v1/ia/textos` y `/api/v1/ia/textos/[id]`.
+   - [x] La misma tarjeta en el paso 3 del
+         alta, donde "Usar estos textos" publica. Sin "Frase corta" en Datos de la tienda.
 
 1. **El proyecto de Expo** (`eas init` en la app): sin su identificador el teléfono no
    recibe un token de avisos. La base ya los manda: tablas, disparadores y el

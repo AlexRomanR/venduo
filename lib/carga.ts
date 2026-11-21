@@ -124,6 +124,12 @@ export interface Lectura {
   filaDeEncabezado: number | null
   /** Una por columna con algún dato. */
   columnas: ColumnaLeida[]
+  /**
+   * Cada columna se reconoció por su encabezado, sin dudas: la planilla modelo
+   * o una con los nombres de siempre. Ni se le pregunta a la IA ni se recorren
+   * las columnas: no hay nada que aclarar.
+   */
+  clara?: boolean
 }
 
 export interface Mapeo {
@@ -502,6 +508,15 @@ export function leerColumnas(filas: Filas): Lectura {
       campo,
       seguro,
     })),
+    clara:
+      encabezado !== null &&
+      columnas.some((c) => c.campo === "nombre") &&
+      columnas.every(
+        (c) =>
+          c.seguro &&
+          c.campo !== null &&
+          campoDeEncabezado(filas[encabezado][c.columna] ?? "") === c.campo
+      ),
   }
 }
 
@@ -705,6 +720,13 @@ export function faltaEn(borrador: Borrador): "nombre" | "precio" | null {
   if (borrador.precio === null) return "precio"
   return null
 }
+
+/**
+ * La carpeta de las fotos de la carga de varios, dentro de la de la tienda en
+ * `product-images`. Lo que no termina en un producto se borra solo
+ * (`limpiarCargasViejas`).
+ */
+export const CARPETA_DE_CARGA = "carga"
 
 /**
  * Si una foto está en la carpeta de la tienda, en el bucket de productos. La

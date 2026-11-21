@@ -13,6 +13,7 @@ import {
   type TiendaDelCelular,
 } from "@/components/panel/resumen/celular"
 import { useEscena } from "@/components/panel/resumen/escena"
+import { TextosDelAlta } from "@/components/onboarding/textos-del-alta"
 
 /**
  * El final del alta: la tienda recién creada, de verdad y en vivo, adentro del
@@ -35,6 +36,8 @@ export function EscenaLista({
 }) {
   const raiz = React.useRef<HTMLElement>(null)
   const [copiado, setCopiado] = React.useState(false)
+  // Sube al usar los textos nuevos: el celular vuelve a cargar la tienda.
+  const [version, setVersion] = React.useState(0)
   useEscena(raiz, armarCelular)
 
   async function copiar() {
@@ -69,8 +72,12 @@ export function EscenaLista({
           </p>
         </div>
 
+        <div className="max-lg:order-3 lg:max-w-[26rem]">
+          <TextosDelAlta alUsar={() => setVersion((v) => v + 1)} />
+        </div>
+
         {/* El enlace: se toca para abrirla, y al lado se copia. */}
-        <div className="js-sube pieza-ficha flex min-h-12 items-center gap-2 border border-tinta/15 bg-hoja py-1 pr-1 pl-3 max-lg:order-3">
+        <div className="js-sube pieza-ficha flex min-h-12 items-center gap-2 border border-tinta/15 bg-hoja py-1 pr-1 pl-3 max-lg:order-4">
           <Globe aria-hidden="true" className="size-4 shrink-0 opacity-60" />
           <a
             href={url}
@@ -97,7 +104,7 @@ export function EscenaLista({
 
         <div
           className={cn(
-            "js-sube grid gap-2 max-lg:order-4 lg:max-w-[26rem]",
+            "js-sube grid gap-2 max-lg:order-5 lg:max-w-[26rem]",
             conEditor && "lg:grid-cols-2"
           )}
         >
@@ -126,7 +133,7 @@ export function EscenaLista({
         <EscenaDelCelular
           tienda={tienda}
           vista={vista}
-          enVivo={url}
+          enVivo={version > 0 ? `${url}?textos=${version}` : url}
           destino={conEditor ? "/editor?bienvenida=1" : url}
           externo={!conEditor}
           etiqueta={conEditor ? "Editar tu tienda" : "Ver tu tienda"}

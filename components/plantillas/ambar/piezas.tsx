@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, ImageOff, MessageCircle } from "lucide-react"
-import { useId, type ReactNode } from "react"
+import { type ReactNode } from "react"
 
 import { numeroDeWhatsApp } from "@/lib/pedidos"
 import { descuento } from "@/lib/plantillas/bloques"
@@ -41,18 +41,27 @@ const ESTRELLA = (() => {
   return `M${puntos.join("L")}Z`
 })()
 
-/** La regla de estrellas: una fila de ellas, del color del texto. */
+const MASCARA_DE_ESTRELLAS = `url("data:image/svg+xml,${encodeURIComponent(
+  `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='12'><path d='${ESTRELLA}'/></svg>`
+)}")`
+
+/**
+ * La regla de estrellas: una fila de ellas, del color del texto. Una máscara y
+ * no un patrón SVG: un patrón necesita un id, y varias reglas en la página lo
+ * repetirían.
+ */
 export function ReglaDeEstrellas({ className }: { className?: string }) {
-  const id = `estrellas-${useId().replace(/[^a-zA-Z0-9]/g, "")}`
   return (
-    <svg aria-hidden="true" className={cn("block h-3 w-full", className)}>
-      <defs>
-        <pattern id={id} width="24" height="12" patternUnits="userSpaceOnUse">
-          <path d={ESTRELLA} fill="currentColor" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill={`url(#${id})`} />
-    </svg>
+    <span
+      aria-hidden="true"
+      className={cn("block h-3 w-full bg-current", className)}
+      style={{
+        maskImage: MASCARA_DE_ESTRELLAS,
+        WebkitMaskImage: MASCARA_DE_ESTRELLAS,
+        maskSize: "24px 12px",
+        WebkitMaskSize: "24px 12px",
+      }}
+    />
   )
 }
 
@@ -282,8 +291,8 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
       <dl>
         <SiRecibePedidos>
           <Dato titulo="Cómo comprar">
-            Elige tus perfumes, del decant al frasco, y envíanos el pedido por
-            WhatsApp. Ahí coordinamos el pago y la entrega.
+            Elige con calma y envíanos el pedido por WhatsApp. Ahí coordinamos
+            el pago y la entrega.
           </Dato>
         </SiRecibePedidos>
         {tienda.whatsapp ? (

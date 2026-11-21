@@ -78,7 +78,7 @@ export function publicacionesDeDemostracion(
   ].filter((valor): valor is string => Boolean(valor && valor.length >= 2))
 
   return {
-    whatsapp: [gancho, rebaja ?? pocas, "Escríbeme y te lo separo."]
+    whatsapp: [gancho, rebaja ?? pocas, "Escríbenos y te lo separamos."]
       .filter(Boolean)
       .join("\n"),
     instagram: [

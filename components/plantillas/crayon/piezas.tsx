@@ -304,7 +304,7 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
                 <Rotulo>Cómo comprar</Rotulo>
               </dt>
               <dd className="mt-1.5 leading-relaxed opacity-85">
-                Elige la ropa y la talla, y envíanos el pedido por WhatsApp. Ahí
+                Elige lo que más te guste y envíanos el pedido por WhatsApp. Ahí
                 coordinamos el pago y la entrega.
               </dd>
             </div>
@@ -320,7 +320,7 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
                   className="inline-flex min-h-11 items-center gap-2 font-semibold underline decoration-tinta/30 underline-offset-4 transition-colors hover:text-senal hover:decoration-senal"
                 >
                   <MessageCircle aria-hidden="true" className="size-4" />
-                  ¿No sabes qué talla? Dinos la edad
+                  ¿Tienes dudas? Escríbenos
                 </a>
               </dd>
             </div>

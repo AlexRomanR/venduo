@@ -35,7 +35,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
   const foto = fotoDePortada(bloque, tienda)
   const titulo = texto(bloque, "title") ?? tienda.nombre
   const bajada = texto(bloque, "subtitle")
-  const accion = accionDePortada(bloque) ?? "Ver los modelos"
+  const accion = accionDePortada(bloque) ?? "Ver lo nuevo"
 
   return (
     <section className="mx-auto w-full max-w-7xl px-5 pt-5 pb-12 md:pt-8 md:pb-20">
@@ -87,7 +87,7 @@ function Categorias({ bloque, tienda }: PropsBloque) {
   return (
     <section className="mx-auto w-full max-w-7xl py-12 md:py-20">
       <div className="px-5">
-        <Titulo titulo={texto(bloque, "title") ?? "por tipo de taco"} />
+        <Titulo titulo={texto(bloque, "title") ?? "por categoría"} />
       </div>
       <ul className="mt-7 flex snap-x snap-mandatory scroll-px-5 [scrollbar-width:none] gap-3 overflow-x-auto px-5 md:grid md:grid-cols-6 md:gap-4 md:overflow-visible [&::-webkit-scrollbar]:hidden">
         {categorias.map((categoria) => (
@@ -179,7 +179,7 @@ function Cierre({ bloque, tienda }: PropsBloque) {
           href={rutaDeTienda(tienda.slug, "/catalogo")}
           className={cn(BOTON, "mt-8 mb-12 md:mb-16")}
         >
-          {texto(bloque, "buttonLabel") ?? "Ver los modelos"}
+          {texto(bloque, "buttonLabel") ?? "Ver lo nuevo"}
         </Link>
       </div>
       <Repisa />

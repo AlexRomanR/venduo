@@ -4,9 +4,22 @@ import { sugerenciasDelCarrito } from "@/lib/catalogo"
 import { getTiendaPublica, marcoDeTienda } from "@/lib/data/tienda-publica"
 import { kitDePlantilla } from "@/components/plantillas"
 import { Checkout } from "@/components/tienda/checkout"
-import { crearPedido, type PedidoInput } from "../acciones"
+import { crearPedido, revisarCombos, type PedidoInput } from "../acciones"
 
-export const metadata = { title: "Tu carrito" }
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  // La misma lectura que la página: está en memoria por pedido.
+  const tienda = await getTiendaPublica(slug)
+  return {
+    title: {
+      absolute: tienda ? `Tu carrito · ${tienda.nombre}` : "Tu carrito",
+    },
+  }
+}
 
 /**
  * El carrito, y el pedido que sale por WhatsApp.
@@ -31,6 +44,11 @@ export default async function CarritoPage({
     return crearPedido(slug, entrada)
   }
 
+  async function revisar(combos: { catalogo: string; id: string }[]) {
+    "use server"
+    return revisarCombos(slug, combos)
+  }
+
   const kit = kitDePlantilla(tienda.plantilla)
   const marco = marcoDeTienda(tienda)
 
@@ -49,6 +67,7 @@ export default async function CarritoPage({
             whatsapp={tienda.whatsapp}
             demo={tienda.esDemo}
             crear={pedir}
+            revisarCombos={revisar}
             opciones={tienda.apariencia.carrito}
             sugeridos={
               tienda.apariencia.carrito.sugerencias

@@ -56,9 +56,16 @@ const GIROS = ["-2.5deg", "1.8deg", "-1.2deg"]
 export function ParaHoy({
   pendientes,
   esperas,
+  faltanPasos = false,
 }: {
   pendientes: Pendiente[]
   esperas: Espera[]
+  /**
+   * A una tienda nueva no le espera nada, pero tampoco está "al día": le faltan
+   * los primeros pasos, que van justo debajo. Decirle "Estás al día" ahí se
+   * contradecía con "Te faltan 3 pasos para vender".
+   */
+  faltanPasos?: boolean
 }) {
   const raiz = useRef<HTMLElement>(null)
   const conAlgo = esperas.filter((espera) => espera.valor > 0)
@@ -95,6 +102,8 @@ export function ParaHoy({
       )
     })
   })
+
+  if (alDia && faltanPasos) return null
 
   return (
     <section

@@ -5,7 +5,7 @@ import { after } from "next/server"
 import { exigirFuncion } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 import { diaEnBolivia } from "@/lib/format"
-import type { ClaveFuncion } from "@/lib/funciones"
+import { AVISO_DE_NO_DISPONIBLE, type ClaveFuncion } from "@/lib/funciones"
 import { createAdminClient } from "@/lib/supabase/server"
 
 /**
@@ -18,7 +18,7 @@ import { createAdminClient } from "@/lib/supabase/server"
  */
 
 export type TipoDeIa =
-  "editor" | "estadisticas" | "catalogos" | "marketing" | "productos"
+  "editor" | "estadisticas" | "catalogos" | "marketing" | "productos" | "textos"
 
 const FUNCION: Record<TipoDeIa, ClaveFuncion> = {
   editor: "ia_editor",
@@ -26,25 +26,48 @@ const FUNCION: Record<TipoDeIa, ClaveFuncion> = {
   catalogos: "ia_catalogos",
   marketing: "ia_marketing",
   productos: "ia_productos",
+  textos: "ia_textos",
 }
 
 export const AVISO_DE_TOPE =
   "Llegaste al límite de pedidos a la IA por hoy. Mañana vuelve a estar disponible."
 
 export async function permisoDeIa(
-  tipo: TipoDeIa
+  tipo: TipoDeIa,
+  {
+    sinFuncion = false,
+  }: {
+    /**
+     * No mira si la función está activa para la tienda: los textos a medida
+     * del alta corren una vez aunque "IA: textos a medida" esté oculta. Sí
+     * respeta el interruptor que apaga toda la IA y el tope diario.
+     */
+    sinFuncion?: boolean
+  } = {}
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const db = createAdminClient()
-  const [funcion, tienda, tope] = await Promise.all([
-    exigirFuncion(FUNCION[tipo]),
+  const [funcion, tienda, tope, apagada] = await Promise.all([
+    sinFuncion
+      ? Promise.resolve({ ok: true as const })
+      : exigirFuncion(FUNCION[tipo]),
     getMiTienda(),
     db
       ?.from("platform_settings")
       .select("value")
       .eq("key", "ia_tope_diario")
       .maybeSingle(),
+    sinFuncion
+      ? db
+          ?.from("platform_settings")
+          .select("value")
+          .eq("key", "ia_apagada")
+          .maybeSingle()
+      : null,
   ])
   if (!funcion.ok) return funcion
+  if (apagada?.data?.value === true) {
+    return { ok: false, error: AVISO_DE_NO_DISPONIBLE }
+  }
 
   const maximo = tope?.data?.value
   if (!db || !tienda || typeof maximo !== "number" || maximo < 1) {

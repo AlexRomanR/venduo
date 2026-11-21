@@ -12,13 +12,14 @@ import { isSupabaseConfigured } from "@/lib/env"
 import { formatMoney, formatNumber } from "@/lib/format"
 import { pedidoEnFila } from "@/lib/pedidos"
 import { plantillaDeTienda } from "@/lib/plantillas"
-import { totales, type Tablero } from "@/lib/tablero"
+import { pasosPendientes, totales, type Tablero } from "@/lib/tablero"
 import { enlaceLegible, urlDeTienda } from "@/lib/tienda"
 import { deVacaciones } from "@/lib/vacaciones"
 import { pedirVista, volvioDespuesDeLaCaptura } from "@/lib/vista"
 import type { ResumenDeVisitas } from "@/lib/visitas-resumen"
 import { AvisoSuscripcion } from "@/components/panel/aviso-suscripcion"
 import { EsqueletoDelTablero } from "@/components/panel/tablero/esqueleto"
+import { FranjaDePausa } from "@/components/panel/tablero/pausa"
 import { FranjaDeVacaciones } from "@/components/panel/tablero/vacaciones"
 import { Cierre } from "@/components/panel/resumen/cierre"
 import {
@@ -106,6 +107,8 @@ export default async function PanelPage() {
 
   return (
     <Resumen>
+      {/* Lo primero que se ve: mientras dure, no le llega ningún pedido. */}
+      {deLaTienda.pausada ? <FranjaDePausa tienda={deLaTienda.nombre} /> : null}
       <Entrada
         persona={barra.persona.nombre}
         tienda={deLaTienda}
@@ -222,7 +225,11 @@ async function ContenidoDelTablero({
 
   return (
     <>
-      <ParaHoy pendientes={pendientes} esperas={esperas} />
+      <ParaHoy
+        pendientes={pendientes}
+        esperas={esperas}
+        faltanPasos={pasosPendientes(tablero.pasos) > 0}
+      />
       <PrimerosPasos pasos={tablero.pasos} tienda={deLaTienda} />
       <Ventas
         serie={tablero.serie}

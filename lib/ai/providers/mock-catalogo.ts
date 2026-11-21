@@ -187,7 +187,9 @@ export function catalogoDeDemostracion(mensaje: string): PropuestaDeCatalogo {
     bajada: intencion?.bajada ?? "Escríbenos por WhatsApp y te lo separamos.",
     explicacion:
       `Elegimos ${cantidad}${criterios.length ? ` ${criterios.join(" y ")}` : ""}, ` +
-      `lo destacado primero, y la plantilla ${definicion.nombre}: ` +
-      `${definicion.detalle.charAt(0).toLowerCase()}${definicion.detalle.slice(1)}`,
+      (actuales
+        ? "con lo destacado primero."
+        : `lo destacado primero, y la plantilla ${definicion.nombre}: ` +
+          `${definicion.detalle.charAt(0).toLowerCase()}${definicion.detalle.slice(1)}`),
   }
 }

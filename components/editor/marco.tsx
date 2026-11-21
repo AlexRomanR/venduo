@@ -18,8 +18,8 @@ const ANCHO_DE_COMPUTADORA = 1280
 
 const NOMBRES_DE_VISTA: Record<Vista, string> = {
   inicio: "La portada",
-  catalogo: "El catálogo",
-  producto: "La ficha de un producto",
+  catalogo: "La lista de productos",
+  producto: "Un producto abierto",
   carrito: "El carrito",
 }
 
@@ -65,6 +65,7 @@ function useTamano(ref: React.RefObject<HTMLElement | null>) {
 export function MarcoDeVistaPrevia({
   estado,
   enfoque,
+  senal,
   alMensaje,
   dispositivo,
   setDispositivo,
@@ -72,6 +73,8 @@ export function MarcoDeVistaPrevia({
   estado: EstadoParaLaVistaPrevia
   /** Cada vez que cambia, la vista previa trae esa sección a la vista. */
   enfoque: { seccion: string; vez: number } | null
+  /** Cada vez que cambia, la vista previa muestra dónde se ve ese ajuste. */
+  senal: { ruta: string; vez: number } | null
   alMensaje: (mensaje: MensajeAlEditor) => void
   /** Vive en el editor: hay ajustes que solo se ven en uno de los dos. */
   dispositivo: Dispositivo
@@ -126,6 +129,10 @@ export function MarcoDeVistaPrevia({
     if (lista && enfoque) enviar({ tipo: "enfocar", seccion: enfoque.seccion })
   }, [enfoque, lista, enviar])
 
+  React.useEffect(() => {
+    if (lista && senal) enviar({ tipo: "senalar", ruta: senal.ruta })
+  }, [senal, lista, enviar])
+
   const esEscritorio = useEsEscritorio()
   const reducida = esEscritorio && dispositivo === "computadora" && ancho > 0
   // El borde del marco ocupa 2 px por lado.
@@ -134,10 +141,10 @@ export function MarcoDeVistaPrevia({
   return (
     <div className="flex h-full min-h-0 flex-col bg-tinta/[0.06]">
       <div className="hidden items-center justify-between gap-4 border-b border-tinta/15 bg-papel px-4 py-2 lg:flex">
-        <p className="text-xs font-semibold tracking-[0.12em] uppercase opacity-60">
-          Vista previa ·{" "}
-          <span className="tracking-normal normal-case">
-            {NOMBRES_DE_VISTA[estado.vista]}
+        <p className="text-sm font-semibold">
+          Vista previa{" "}
+          <span className="font-normal opacity-70">
+            · {NOMBRES_DE_VISTA[estado.vista]}
           </span>
         </p>
         <div
@@ -158,7 +165,7 @@ export function MarcoDeVistaPrevia({
               aria-checked={dispositivo === valor}
               onClick={() => setDispositivo(valor)}
               className={cn(
-                "flex min-h-10 items-center gap-2 px-3 text-xs font-semibold transition-colors",
+                "flex min-h-11 items-center gap-2 px-3 text-xs font-semibold transition-colors",
                 dispositivo === valor
                   ? "bg-tinta text-papel"
                   : "hover:bg-tinta/[0.06]"
@@ -191,6 +198,9 @@ export function MarcoDeVistaPrevia({
             ref={marco}
             src="/editor/vista-previa"
             title="Vista previa de tu tienda"
+            // Con el teclado se edita en el panel: los enlaces de la tienda no
+            // llevan a ningún lado aquí, y eran veinte paradas de más.
+            tabIndex={-1}
             className="block border-0 bg-white"
             style={
               reducida
@@ -209,8 +219,8 @@ export function MarcoDeVistaPrevia({
               aria-live="polite"
               className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-papel"
             >
-              <span className="size-8 animate-pulse bg-tinta/15" />
-              <p className="text-sm opacity-60">Armando tu vista previa…</p>
+              <span className="size-8 bg-tinta/15 motion-safe:animate-pulse" />
+              <p className="text-sm opacity-70">Armando tu vista previa…</p>
             </div>
           ) : null}
         </div>

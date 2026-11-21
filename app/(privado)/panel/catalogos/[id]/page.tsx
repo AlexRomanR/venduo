@@ -51,6 +51,7 @@ export default async function CatalogoPage({
         ia: funciones.ia_catalogos,
         canva: funciones.canva,
         compartir: funciones.catalogo_compartido,
+        combos: funciones.combos,
       }}
       plantillas={plantillas}
       inicial={{

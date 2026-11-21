@@ -53,16 +53,30 @@ export const mensajeDeLaAppAlCatalogo = z.discriminatedUnion("tipo", [
   z.object({ tipo: z.literal("estilo"), estilo: estiloSchema }),
   z.object({ tipo: z.literal("nombre"), nombre: z.string().max(80) }),
   z.object({ tipo: z.literal("hoja"), hoja: z.enum(CLAVES_HOJA) }),
-  /** Usar lo que propuso la IA: arma el catálogo entero de nuevo. */
+  /**
+   * Usar lo que propuso la IA. Con un catálogo armado conserva lo editado y
+   * cambia los productos, el nombre y el texto de la portada, como en la web;
+   * sin catálogo, lo arma entero.
+   */
   z.object({
     tipo: z.literal("propuesta"),
     propuesta: propuestaDeCatalogoSchema,
   }),
+  /** Mostrar la propuesta en la vista previa sin aplicarla; `null` vuelve a lo de antes. */
+  z.object({
+    tipo: z.literal("mirar"),
+    propuesta: propuestaDeCatalogoSchema.nullable(),
+  }),
   z.object({ tipo: z.literal("enfocar"), id }),
+  /** Lo que se dejó sin guardar la otra vez: seguir con eso o empezar de lo guardado. */
+  z.object({ tipo: z.literal("recuperar"), si: z.boolean() }),
   z.object({ tipo: z.literal("deshacer") }),
   z.object({ tipo: z.literal("rehacer") }),
-  /** La app lo guardó: lo que hay es lo guardado. */
-  z.object({ tipo: z.literal("guardado") }),
+  /**
+   * La app lo guardó: lo que hay es lo guardado. Trae su id si es la primera
+   * vez, para que el borrador del teléfono quede a su nombre.
+   */
+  z.object({ tipo: z.literal("guardado"), id: id.optional() }),
 ])
 
 export type MensajeDeLaAppAlCatalogo = z.infer<typeof mensajeDeLaAppAlCatalogo>
@@ -90,6 +104,13 @@ export type MensajeDelCatalogoAlaApp =
         estilo: unknown
         muestra: { papel: string; tinta: string; acento: string }
       }[]
+      /** El estilo con los colores y la letra de la tienda: "De tu tienda". */
+      estiloDeTienda: unknown
+      /**
+       * Cuándo se dejó sin guardar lo que quedó en este teléfono, si hay algo
+       * distinto de lo guardado. La app pregunta si seguir con eso.
+       */
+      recuperable: number | null
     }
   | { tipo: "tocar"; id: string }
   | { tipo: "sin-tienda" }

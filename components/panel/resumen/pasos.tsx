@@ -69,11 +69,11 @@ export function PrimerosPasos({
   const lista: Paso[] = [
     {
       hecho: pasos.producto,
-      titulo: "Carga tu primer producto",
-      detalle: "Una foto, un precio y cuántos tienes.",
+      titulo: "Carga tus productos",
+      detalle: "Desde fotos, una planilla o una lista.",
       accion: (
-        <Link href="/panel/productos/nuevo" className={BOTON_DEL_PASO}>
-          Cargar producto
+        <Link href="/panel/productos/cargar" className={BOTON_DEL_PASO}>
+          Cargar productos
           <ArrowRight aria-hidden="true" className="size-4" />
         </Link>
       ),

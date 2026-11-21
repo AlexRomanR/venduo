@@ -68,7 +68,7 @@ export function PlantillasDeLaLista({
             className={cn(BOTON_PRIMARIO, "min-h-11 px-4 text-sm")}
           >
             <Plus aria-hidden="true" className="size-4" />
-            Cargar un producto
+            Cargar productos
           </Link>
         </SinDatos>
       </Seccion>

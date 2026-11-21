@@ -86,7 +86,10 @@ export function Logo() {
         )}
         {subiendo ? (
           <span className="absolute inset-0 flex items-center justify-center bg-papel/80">
-            <Loader2 aria-hidden="true" className="size-5 animate-spin" />
+            <Loader2
+              aria-hidden="true"
+              className="size-5 animate-spin motion-reduce:animate-none"
+            />
           </span>
         ) : null}
       </div>
@@ -99,10 +102,10 @@ export function Logo() {
               ? "Tu logo"
               : "Todavía sin logo"}
         </p>
-        <p className="mt-0.5 text-xs leading-relaxed opacity-55">
+        <p className="mt-0.5 text-xs leading-relaxed opacity-70">
           {encima
             ? "Suéltalo para usarlo."
-            : "Arrástralo aquí o elígelo. JPG, PNG o WebP: ajustamos el tamaño por ti."}
+            : "JPG, PNG o WebP: ajustamos el tamaño por ti."}
         </p>
         <div className="mt-1 flex flex-wrap gap-x-5">
           <button

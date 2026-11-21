@@ -369,6 +369,11 @@ todas desde el día que se escribe en la base editorial.
 agregar al carrito, filtros y buscador. Toman la identidad de los tokens, y lo que
 resuelven —cuánto llevas y cómo se lo mandas a la tienda— no cambia con el rubro.
 
+**Un kit con `Ficha` o `Catalogo` propios marca lo que cada ajuste cambia** con
+`data-ajuste` (`ficha.diseno`, `ficha.consulta`, `ficha.relacionados`,
+`disposicion.tarjeta disposicion.columnas`). El editor lo busca para mostrar el cambio en
+la vista previa: sin la marca, tocar el ajuste no señala nada.
+
 ### El registro
 
 ```ts
@@ -840,6 +845,17 @@ retiradas. Conserva la portada con el catálogo completo debajo.
 
 ---
 
+### Los textos de las plantillas no nombran un producto
+
+Desde el 18 de noviembre, ni la semilla de la portada ni las frases fijas del kit ni la
+miniatura dicen "carteras", "perfumes" o "pares": una tienda de ropa puede usar Correa.
+Cada plantilla conserva su voz y su dibujo. Las ayudas de un rubro —la talla, el número,
+los cuidados de una joya, el decant— son plegables con `cuando`: salen solo si el producto
+las necesita. Una plantilla nueva sigue la misma regla. Lo propio de cada tienda lo
+escribe la persona, o la IA con lo que contó en "Qué vendes" (`ai-layer.md`, "Los textos a
+medida"). Los textos que acepta se guardan en `stores.textos_a_medida`, y si cambia de
+plantilla y empieza con la portada nueva, la nueva los usa.
+
 ## 10. Agregar una plantilla
 
 Cinco pasos. Ningún archivo existente cambia salvo los dos registros.
@@ -901,8 +917,8 @@ ahí todas las plantillas lo dibujan. Cada kit lo reemplaza cuando quiera.
 
 ## 11. El editor de la tienda
 
-`/editor`, a pantalla completa y fuera del armazón del panel. Seis pasos —Tu marca,
-Portada, Catálogo, Producto, Carrito y Publicar— en una barra arriba (abajo en el celular),
+`/editor`, a pantalla completa y fuera del armazón del panel. Cinco pasos —Marca,
+Portada, Productos, Carrito y Publicar— en una barra arriba (abajo en el celular),
 los controles del paso a la izquierda y la tienda de verdad a la derecha. La IA es una sola
 línea al pie de los controles: las ideas aparecen al tocarla. Se entra
 desde `/panel/apariencia`, desde el resumen del panel y al terminar el alta
@@ -1017,12 +1033,13 @@ A propósito, **no existe**:
 - **La vista previa de la galería es un dibujo**, no la tienda real. En Apariencia el
   dibujo lleva el nombre y tres productos de la tienda, pero el titular de la portada es
   el de la plantilla. La del editor, en cambio, sí es la tienda real.
-- **La plantilla editorial no dibuja las grillas de productos de su portada**: muestra su
-  catálogo completo. El editor lo avisa en esas tiendas.
+- **La plantilla editorial dibuja las secciones "Productos" de su portada** (desde el 20
+  de noviembre) y, debajo, su catálogo completo. Antes las omitía para no repetirlo, y lo
+  que se editaba en ellas no se veía.
 - **No hay atributos por rubro** —talla para moda, mililitros o familia olfativa para
   perfumería—. Pedirían variantes en el carrito y en `create_order`, y eso es otro trabajo.
-- **El rojo de la base editorial está a 4,35:1 contra el papel**, un poco por debajo de lo
-  que dice `DESIGN.md`. No se tocó porque es la marca de Venduo; queda anotado.
+- **El rojo de la base editorial** pasó de `#d62d12` (4,35:1 contra el papel) a
+  `#cc2a10` (4,72:1), el mismo rojo apenas más oscuro.
 
 ## Lo que va encima de cualquier plantilla
 

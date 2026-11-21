@@ -30,6 +30,7 @@ export default async function LoginPage({
         configured={isSupabaseConfigured}
         initialError={error}
         registro={modo === "registro"}
+        recuperar={modo === "recuperar"}
         estadoDelRegistro={estadoDelRegistro}
       />
     </Marco>

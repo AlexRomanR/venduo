@@ -52,6 +52,8 @@ export interface DisenoParaEditar {
   datos: DatosDeContexto
   /** Para elegir con cuál mirar la ficha de producto. */
   productos: ProductoDeMuestra[]
+  /** Si cargó alguno, aunque esté oculto: `productos` trae solo los activos. */
+  hayProductos: boolean
   esDemo: boolean
 }
 
@@ -128,6 +130,7 @@ async function disenoDeDemostracion(): Promise<DisenoParaEditar | null> {
     },
     datos,
     productos: [],
+    hayProductos: true,
     esDemo: true,
   }
 }
@@ -237,6 +240,7 @@ export async function leerDisenoParaEditar(): Promise<DisenoParaEditar | null> {
     productos: productos
       .filter((p) => p.is_active)
       .map((p) => ({ id: p.id, nombre: p.name, foto: p.image_url })),
+    hayProductos: productos.length > 0,
     esDemo: false,
   }
 }

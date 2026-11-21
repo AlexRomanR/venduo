@@ -98,7 +98,7 @@ export async function getNombresDeBloque(): Promise<Record<string, string>> {
 export const NOMBRES_DE_BLOQUE_DEMO: Record<string, string> = {
   hero: "Portada",
   categories: "Categorías",
-  product_grid: "Grilla de productos",
+  product_grid: "Cuadrícula de productos",
   about: "Sobre el negocio",
   testimonials: "Testimonios",
   cta: "Cierre con botón",

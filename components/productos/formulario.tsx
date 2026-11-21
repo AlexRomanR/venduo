@@ -203,7 +203,7 @@ export function FormularioProducto({
       : null
 
   return (
-    <Form {...form}>
+    <Form nombre="producto" {...form}>
       <form
         onSubmit={enviar}
         noValidate
@@ -491,6 +491,16 @@ export function FormularioProducto({
         {descuento ? (
           <p className="text-sm font-semibold">
             Se ve con {descuento}% de descuento.
+          </p>
+        ) : anterior &&
+          precio &&
+          anterior <= precio &&
+          !errores.precioAnterior ? (
+          // Antes se aceptaba en la hoja y saltaba recién al guardar el
+          // producto, con la hoja ya cerrada.
+          <p role="alert" className="text-sm font-semibold text-senal">
+            Tiene que ser mayor que el precio de hoy,{" "}
+            {formatMoney(Math.round(precio * 100))}.
           </p>
         ) : null}
         {anterior ? (

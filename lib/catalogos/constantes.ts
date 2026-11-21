@@ -10,14 +10,14 @@
 /** Los tamaños de hoja, en puntos tipográficos (72 por pulgada). */
 export const HOJAS = {
   a4: {
-    nombre: "A4 vertical",
-    detalle: "Para imprimir o mandar por WhatsApp.",
+    nombre: "Para imprimir",
+    detalle: "Hoja A4, también para mandar por WhatsApp.",
     ancho: 595.28,
     alto: 841.89,
   },
   historia: {
-    nombre: "Historia 9:16",
-    detalle: "Para verlo a pantalla completa en el celular.",
+    nombre: "Para el celular",
+    detalle: "A pantalla completa, como una historia.",
     ancho: 405,
     alto: 720,
   },
@@ -59,16 +59,16 @@ export const VARIANTES = {
     marco: "Con marco",
   },
   productos: {
-    grilla: "Grilla",
+    grilla: "Cuadrícula",
     lista: "Lista con detalle",
     menu: "Lista de precios",
     tabla: "Tabla",
-    destacado: "Uno por página",
-    lookbook: "Lookbook",
+    destacado: "Uno por hoja",
+    lookbook: "Fotos grandes",
     pedestal: "Vitrina",
-    historia: "Historia",
+    historia: "Pantalla completa",
     etiquetas: "Etiquetas de feria",
-    flyer: "Flyer",
+    flyer: "Volante",
   },
   separador: {
     titulo: "Título grande",
@@ -79,7 +79,7 @@ export const VARIANTES = {
     lista: "Lista",
   },
   oferta: {
-    banner: "Página completa",
+    banner: "Hoja completa",
     cinta: "Franja",
   },
   contraportada: {
@@ -101,31 +101,31 @@ export const TIPOS_DE_BLOQUE: Record<
 > = {
   portada: {
     nombre: "Portada",
-    detalle: "La primera página: tu marca y el título.",
+    detalle: "La primera hoja: tu marca y el título.",
   },
   productos: {
     nombre: "Productos",
     detalle: "Tus productos, todos o los de una categoría.",
   },
   separador: {
-    nombre: "Separador",
-    detalle: "Una página que abre una categoría o un tema.",
+    nombre: "Título de sección",
+    detalle: "Una hoja que abre una categoría o un tema.",
   },
   pack: {
-    nombre: "Pack o combo",
-    detalle: "Varios productos juntos, con su precio de pack.",
+    nombre: "Combo",
+    detalle: "Varios productos juntos, con su precio de combo.",
   },
   oferta: {
     nombre: "Oferta",
     detalle: "Un aviso grande: un descuento, una temporada.",
   },
   contraportada: {
-    nombre: "Contraportada",
-    detalle: "Cómo comprarte: WhatsApp, redes, QR y pago.",
+    nombre: "Cierre",
+    detalle: "La última hoja: WhatsApp, redes, QR y pago.",
   },
   texto: {
     nombre: "Texto",
-    detalle: "Una página con tus palabras.",
+    detalle: "Una hoja con tus palabras.",
   },
 }
 

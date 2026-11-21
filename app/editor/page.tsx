@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { getAIStatus } from "@/lib/ai"
 import { getDisenoParaEditar } from "@/lib/data/editor"
 import { funcionesDeMiTienda } from "@/lib/data/funciones"
-import { esClaveDePaso } from "@/lib/editor/pasos"
+import { pasoDeLaDireccion } from "@/lib/editor/pasos"
 import { Editor } from "@/components/editor/editor"
 import { decidirPropuesta, proponerCambios, publicarDiseno } from "./acciones"
 
@@ -12,7 +12,7 @@ import { decidirPropuesta, proponerCambios, publicarDiseno } from "./acciones"
 export const maxDuration = 60
 
 export const metadata = {
-  title: "Editar tu tienda",
+  title: "Editor de tu tienda",
   robots: { index: false, follow: false },
 }
 
@@ -42,7 +42,7 @@ export default async function EditorPage({
   return (
     <Editor
       diseno={diseno}
-      pasoInicial={esClaveDePaso(paso) ? paso : "marca"}
+      pasoInicial={pasoDeLaDireccion(paso)}
       bienvenida={bienvenida === "1"}
       publicar={publicarDiseno}
       proponer={proponerCambios}

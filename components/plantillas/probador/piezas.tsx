@@ -264,12 +264,12 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
         <dl>
           <SiRecibePedidos>
             <Dato titulo="Cómo comprar">
-              Elige tus prendas y tu talla, y envíanos el pedido por WhatsApp.
-              Ahí coordinamos el pago y la entrega.
+              Elige tus favoritos y envíanos el pedido por WhatsApp. Ahí
+              coordinamos el pago y la entrega.
             </Dato>
           </SiRecibePedidos>
           {tienda.whatsapp ? (
-            <Dato titulo="¿Dudas con la talla?">
+            <Dato titulo="¿Tienes dudas?">
               <a
                 href={`https://wa.me/${numeroDeWhatsApp(tienda.whatsapp)}`}
                 target="_blank"

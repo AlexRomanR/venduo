@@ -125,7 +125,7 @@ export function FormPersona({ cuenta }: { cuenta: Cuenta }) {
   }
 
   return (
-    <Form {...form}>
+    <Form nombre="persona" {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-6"
@@ -203,7 +203,7 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
   }
 
   return (
-    <Form {...form}>
+    <Form nombre="tienda" {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-7"
@@ -234,27 +234,6 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
             en lo que compartiste.
           </p>
         </div>
-
-        <FormField
-          control={form.control}
-          name="tagline"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className={ETIQUETA_CAMPO}>Frase corta</FormLabel>
-              <FormControl>
-                <Input
-                  className={CAMPO_LINEA}
-                  placeholder="Ropa deportiva en Santa Cruz"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription className={AYUDA_CAMPO}>
-                Es lo que se lee debajo del nombre de tu tienda.
-              </FormDescription>
-              <FormMessage className={ERROR_CAMPO} />
-            </FormItem>
-          )}
-        />
 
         <FormField
           control={form.control}
@@ -301,8 +280,14 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
           )}
         />
 
-        <FormItem>
-          <FormLabel className={ETIQUETA_CAMPO}>Estado de la tienda</FormLabel>
+        <div
+          role="group"
+          aria-labelledby="estado-tienda"
+          className="grid gap-2"
+        >
+          <p id="estado-tienda" className={ETIQUETA_CAMPO}>
+            Estado de la tienda
+          </p>
           <Par
             valor={publicada}
             onChange={(v) => form.setValue("publicada", v)}
@@ -319,7 +304,7 @@ export function FormTienda({ cuenta }: { cuenta: Cuenta }) {
               },
             ]}
           />
-        </FormItem>
+        </div>
 
         <Guardar enCurso={form.formState.isSubmitting} />
       </form>

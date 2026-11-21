@@ -49,6 +49,7 @@ import { cn } from "@/lib/utils"
 import { ConFuncion } from "@/components/panel/funcion"
 import { CamposDeSeccion } from "@/components/editor/campos"
 import { useEditor } from "@/components/editor/contexto"
+import { TextosDelEditor } from "@/components/editor/textos-a-medida"
 import {
   Aviso,
   EncabezadoDePaso,
@@ -57,7 +58,7 @@ import {
 
 /** Lo que se le pide a la IA para el primer empujón. */
 export const ESCRIBIR_PORTADA =
-  "Escribe los textos de mi portada con lo que conté de mi negocio"
+  "Escribe los textos de mi página de inicio con lo que conté de mi negocio"
 
 export const ICONOS_DE_SECCION: Record<TipoDeBloque, LucideIcon> = {
   hero: IconoImagen,
@@ -86,18 +87,31 @@ function resumen(seccion: Seccion): string {
  * previa abre su formulario directamente.
  */
 export function PasoPortada() {
-  const { borrador, seleccion, seleccionar, irAPaso, tienda, ia, productos } =
-    useEditor()
+  const {
+    borrador,
+    seleccion,
+    seleccionar,
+    irAPaso,
+    tienda,
+    ia,
+    productos,
+    textos,
+  } = useEditor()
   const [agregando, setAgregando] = React.useState(false)
+  // Dos botones de IA juntos confunden: mientras haya textos a medida por
+  // decidir, va su tarjeta.
+  const conTextos =
+    textos?.vista?.estado === "lista" ||
+    textos?.vista?.estado === "error" ||
+    (textos?.vista === null && textos.escribiendo)
   const secciones = borrador.presente.secciones
   const elegida = secciones.find((seccion) => seccion.id === seleccion)
 
   return (
     <>
       <EncabezadoDePaso
-        numero={2}
         titulo="Portada"
-        bajada="Las secciones de tu página de inicio. Arrástralas para cambiar el orden y tócalas para editarlas, aquí o en la vista previa."
+        bajada="Lo primero que ve quien entra a tu tienda. Toca una sección para editarla. Adentro también puedes subirla o bajarla."
       />
 
       {elegida ? (
@@ -118,7 +132,8 @@ export function PasoPortada() {
         />
       ) : (
         <>
-          {tienda.descripcion && ia.estado !== "oculta" ? (
+          <TextosDelEditor />
+          {tienda.descripcion && ia.estado !== "oculta" && !conTextos ? (
             <div className="px-5 pb-4">
               <ConFuncion estado={ia.estado}>
                 <button
@@ -129,11 +144,11 @@ export function PasoPortada() {
                 >
                   <WandSparkles
                     aria-hidden="true"
-                    className="size-6 shrink-0 text-senal"
+                    className="size-6 shrink-0"
                   />
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm font-semibold">
-                      Que la IA escriba tu portada
+                      Que la IA escriba tus textos
                     </span>
                     <span className="mt-0.5 block text-xs leading-relaxed opacity-65">
                       Con lo que contaste de tu negocio al crear la tienda.
@@ -146,7 +161,7 @@ export function PasoPortada() {
           {productos.length === 0 ? (
             <div className="px-5 pb-4">
               <Aviso>
-                Todavía no cargaste productos: tus vitrinas se ven con unos de
+                Todavía no cargaste productos: tus secciones se ven con unos de
                 ejemplo, para que veas cómo quedan con los tuyos.
               </Aviso>
             </div>
@@ -162,28 +177,19 @@ export function PasoPortada() {
               Agregar una sección
             </button>
           </div>
-          <p className="flex gap-2 px-5 pt-4 text-xs leading-relaxed opacity-60">
+          <p className="flex gap-2 px-5 pt-4 text-xs leading-relaxed opacity-70">
             <Info aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
             <span>
-              Debajo de tus secciones, la plantilla suma partes fijas con tu
-              nombre, tu descripción y tu WhatsApp. Tócalas en la vista previa
-              para ver de dónde sale cada una.
+              Debajo de tus secciones, tu plantilla agrega tu nombre, tu
+              descripción y tu WhatsApp. Tócalos en la vista previa para ver de
+              dónde sale cada uno.
             </span>
           </p>
-          {tienda.plantilla === "clasica" &&
-          secciones.some((s) => s.tipo === "product_grid") ? (
-            <div className="px-5 pt-3">
-              <Aviso>
-                Tu plantilla muestra el catálogo completo en la portada, así que
-                las secciones «Productos» no se dibujan en ella.
-              </Aviso>
-            </div>
-          ) : null}
         </>
       )}
 
       {elegida ? null : (
-        <SiguientePaso nombre="Catálogo" alIr={() => irAPaso("catalogo")} />
+        <SiguientePaso nombre="Productos" alIr={() => irAPaso("productos")} />
       )}
     </>
   )
@@ -239,8 +245,8 @@ function ListaDeSecciones() {
     return (
       <div className="px-5">
         <Aviso>
-          Tu portada no tiene secciones. Agrega una para empezar: la portada con
-          un título grande es un buen comienzo.
+          Tu página de inicio no tiene secciones. Agrega una para empezar: la
+          presentación con un título grande es un buen comienzo.
         </Aviso>
       </div>
     )
@@ -253,6 +259,9 @@ function ListaDeSecciones() {
       id="editor-secciones"
       sensors={sensores}
       collisionDetection={closestCenter}
+      // Sin esto, cerca del borde la lista se desplaza sola y la sección se
+      // pasa de largo.
+      autoScroll={{ threshold: { x: 0, y: 0.08 }, acceleration: 2 }}
       onDragEnd={alSoltar}
       accessibility={{
         announcements: anuncios,
@@ -321,7 +330,7 @@ function FilaDeSeccion({
         ref={setActivatorNodeRef}
         type="button"
         aria-label={`Mover ${definicion.nombre}`}
-        className="flex size-11 shrink-0 cursor-grab touch-none items-center justify-center opacity-45 transition-opacity hover:opacity-100 active:cursor-grabbing"
+        className="flex size-11 shrink-0 cursor-grab touch-none items-center justify-center opacity-70 transition-opacity hover:opacity-100 active:cursor-grabbing"
         {...attributes}
         {...listeners}
       >
@@ -333,7 +342,7 @@ function FilaDeSeccion({
         onClick={alAbrir}
         className={cn(
           "flex min-h-16 min-w-0 flex-1 items-center gap-3 py-2 pr-1 text-left",
-          !seccion.visible && "opacity-45"
+          !seccion.visible && "opacity-70"
         )}
       >
         <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] border border-tinta/20">
@@ -341,13 +350,13 @@ function FilaDeSeccion({
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-2 text-sm font-semibold">
-            <span className="tabular text-xs opacity-45">{indice + 1}</span>
+            <span className="tabular text-xs opacity-70">{indice + 1}</span>
             {definicion.nombre}
             {!seccion.visible ? (
               <span className="text-xs font-normal">· Oculta</span>
             ) : null}
           </span>
-          <span className="block truncate text-xs opacity-60">
+          <span className="block truncate text-xs opacity-70">
             {resumen(seccion)}
           </span>
         </span>
@@ -444,50 +453,22 @@ function EditorDeSeccion({
             <Icono aria-hidden="true" className="size-5" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="tabular text-xs font-semibold tracking-[0.12em] text-senal uppercase">
+            <p className="tabular text-xs font-semibold opacity-70">
               Sección {indice + 1} de {total}
             </p>
-            <h3 className="mt-1 font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">
+            <h2 className="mt-1 font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">
               {definicion.nombre}
-            </h3>
-            <p className="mt-1 text-sm leading-relaxed opacity-65">
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed opacity-70 max-lg:hidden">
               {definicion.descripcion}
             </p>
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap border-y border-tinta/15">
-          <Accion
-            icono={seccion.visible ? EyeOff : Eye}
-            etiqueta={seccion.visible ? "Ocultar" : "Mostrar"}
-            alTocar={() =>
-              borrador.aplicar([
-                {
-                  op: "mostrar",
-                  seccion: seccion.id,
-                  visible: !seccion.visible,
-                },
-              ])
-            }
-          />
-          <Accion
-            icono={ArrowUp}
-            etiqueta="Subir"
-            deshabilitada={indice === 0}
-            alTocar={() => mover(-1)}
-          />
-          <Accion
-            icono={ArrowDown}
-            etiqueta="Bajar"
-            deshabilitada={indice === total - 1}
-            alTocar={() => mover(1)}
-          />
-          <Accion icono={Trash2} etiqueta="Quitar" alTocar={quitar} peligro />
-        </div>
-
         {!seccion.visible ? (
           <Aviso className="mt-4">
-            Está oculta: tus clientes no la ven. La puedes seguir editando.
+            Está oculta: quienes te compran no la ven. La puedes seguir
+            editando.
           </Aviso>
         ) : null}
       </div>
@@ -498,6 +479,37 @@ function EditorDeSeccion({
           campos={definicion.campos}
           props={seccion.props}
         />
+      </div>
+
+      {/* Después de los campos: en un celular son lo primero que se busca, y
+          estas acciones los dejaban fuera de la vista. */}
+      <div className="grid grid-cols-4 border-t border-tinta/15">
+        <Accion
+          icono={seccion.visible ? EyeOff : Eye}
+          etiqueta={seccion.visible ? "Ocultar" : "Mostrar"}
+          alTocar={() =>
+            borrador.aplicar([
+              {
+                op: "mostrar",
+                seccion: seccion.id,
+                visible: !seccion.visible,
+              },
+            ])
+          }
+        />
+        <Accion
+          icono={ArrowUp}
+          etiqueta="Subir"
+          deshabilitada={indice === 0}
+          alTocar={() => mover(-1)}
+        />
+        <Accion
+          icono={ArrowDown}
+          etiqueta="Bajar"
+          deshabilitada={indice === total - 1}
+          alTocar={() => mover(1)}
+        />
+        <Accion icono={Trash2} etiqueta="Quitar" alTocar={quitar} peligro />
       </div>
 
       <div className="border-t border-tinta/15 p-5">
@@ -574,10 +586,10 @@ function Galeria({
           className="flex min-h-11 items-center gap-2 px-3 text-sm font-semibold transition-colors hover:opacity-60"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
-          Volver
+          Todas las secciones
         </button>
       </div>
-      <p className="border-t border-tinta/15 px-5 pt-5 text-xs font-semibold tracking-[0.12em] uppercase opacity-60">
+      <p className="border-t border-tinta/15 px-5 pt-5 text-xs font-semibold tracking-[0.12em] uppercase opacity-70">
         Elige qué agregar
       </p>
       <ul className="grid gap-2 p-5 sm:grid-cols-2 lg:grid-cols-1">
@@ -602,8 +614,10 @@ function Galeria({
                   <span className="block text-sm font-semibold">
                     {definicion.nombre}
                   </span>
-                  <span className="mt-0.5 block text-xs leading-relaxed opacity-60">
-                    {lleno ? "Ya está en tu portada." : definicion.descripcion}
+                  <span className="mt-0.5 block text-xs leading-relaxed opacity-70">
+                    {lleno
+                      ? "Ya está en tu página de inicio."
+                      : definicion.descripcion}
                   </span>
                 </span>
                 {lleno ? null : (

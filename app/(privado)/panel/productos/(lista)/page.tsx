@@ -114,8 +114,9 @@ export default async function ProductosPage({
           <ImagePlus aria-hidden="true" className="size-4" />
           Cargar varios
         </Link>
+        {/* Al lado de "Cargar varios", tocarlo ya es haber elegido uno. */}
         <Link
-          href="/panel/productos/nuevo"
+          href="/panel/productos/nuevo?uno=1"
           className={cn(BOTON_PRIMARIO, "min-h-11 px-4 text-sm")}
         >
           <Plus aria-hidden="true" className="size-4" />

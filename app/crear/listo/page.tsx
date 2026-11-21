@@ -12,6 +12,9 @@ import { Pasos, PASOS_CREAR } from "@/components/onboarding/pasos"
 
 export const metadata = { title: "Tu tienda está lista" }
 
+// Publicar los textos que propuso la IA pasa por acá.
+export const maxDuration = 60
+
 /**
  * Paso 3 del alta: la tienda ya existe, y se muestra en vez de describirla —en
  * vivo, dentro del celular del Resumen—. Ofrece el editor sin obligar: quien

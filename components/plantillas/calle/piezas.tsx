@@ -239,8 +239,8 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
         <div className="self-end border-2 border-tinta">
           <SiRecibePedidos>
             <p className="border-b-2 border-tinta p-4 text-sm font-semibold">
-              Arma tu pedido y envíanoslo por WhatsApp: ahí coordinamos la
-              talla, el pago y la entrega.
+              Arma tu pedido y envíanoslo por WhatsApp: ahí coordinamos el pago
+              y la entrega.
             </p>
           </SiRecibePedidos>
           {tienda.whatsapp ? (

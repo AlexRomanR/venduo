@@ -70,6 +70,25 @@ describe("leerColumnas", () => {
     ])
   })
 
+  it("con los encabezados de la planilla modelo, la lectura es clara", () => {
+    const lectura = leerColumnas([
+      ["Nombre", "Precio (Bs)", "Stock", "Categoría"],
+      ["Falda plisada", "180", "4", "Faldas"],
+      ["Top de encaje", "95", "6", "Tops"],
+      ["Pantalón palazzo", "210", "3", ""],
+    ])
+    expect(lectura.clara).toBe(true)
+  })
+
+  it("sin encabezados no es clara: hay que confirmarla", () => {
+    const lectura = leerColumnas([
+      ["Falda plisada", "180", "4"],
+      ["Top de encaje", "95", "6"],
+      ["Pantalón palazzo", "210", "3"],
+    ])
+    expect(lectura.clara).toBe(false)
+  })
+
   it("sin encabezados, deduce por el contenido", () => {
     const lectura = leerColumnas([
       ["Polera negra", "Bs 85,50", "Ropa", "S, M, L"],

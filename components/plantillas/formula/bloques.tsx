@@ -37,7 +37,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
   const foto = fotoDePortada(bloque, tienda)
   const titulo = texto(bloque, "title") ?? tienda.nombre
   const bajada = texto(bloque, "subtitle")
-  const accion = accionDePortada(bloque) ?? "Ver los frascos"
+  const accion = accionDePortada(bloque) ?? "Ver el catálogo"
 
   return (
     <section className="border-b border-tinta">
@@ -57,7 +57,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
             <span>{tienda.nombre}</span>
             <span className="tabular">
               {tienda.productos.length}{" "}
-              {tienda.productos.length === 1 ? "frasco" : "frascos"}
+              {tienda.productos.length === 1 ? "producto" : "productos"}
             </span>
           </p>
           <div>
@@ -120,7 +120,7 @@ function Categorias({ bloque, tienda }: PropsBloque) {
 
   return (
     <section className="mx-auto w-full max-w-7xl px-5 py-14 md:py-20">
-      <Titulo titulo={texto(bloque, "title") ?? "Familias"} />
+      <Titulo titulo={texto(bloque, "title") ?? "Índice"} />
 
       <ol className="mt-2 md:columns-2 md:gap-12">
         {categorias.map((categoria, i) => (
@@ -162,7 +162,7 @@ function Grilla({ bloque, tienda }: PropsBloque) {
   return (
     <section className="mx-auto w-full max-w-7xl px-5 py-14 md:py-20">
       <Titulo
-        titulo={texto(bloque, "title") ?? "Frascos"}
+        titulo={texto(bloque, "title") ?? "Productos"}
         enlace={{
           etiqueta: "Ver todo",
           href: rutaDeTienda(tienda.slug, "/catalogo"),

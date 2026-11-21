@@ -163,8 +163,17 @@ export const packSchema = z.object({
   id,
   nombre: z.string().min(1).max(60),
   productos: z.array(id).min(2).max(8),
-  /** El precio del pack junto, en centavos. Solo se muestra en el PDF. */
+  /**
+   * El precio del pack junto, en centavos. Es el que cobra `create_order`
+   * cuando se pide el combo.
+   */
   precioCents: z.number().int().min(0).max(100_000_000),
+  /**
+   * El descuento sobre lo que cuestan por separado, en puntos básicos (1000 es
+   * 10%). Mientras tenga uno, el precio se recalcula al sumar o quitar
+   * productos. `null` o ausente: el precio se escribió a mano y no cambia solo.
+   */
+  descuentoBps: z.number().int().min(0).max(9000).nullable().optional(),
   nota: texto(160),
 })
 

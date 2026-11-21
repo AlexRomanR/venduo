@@ -198,6 +198,19 @@
   html {
     @apply font-sans;
   }
+  /* El anillo gris de shadcn no se distinguía del papel. */
+  :where(
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [tabindex]
+  ):focus-visible {
+    outline: 2px solid var(--tinta);
+    outline-offset: 2px;
+  }
 
   /*
    * Lo que el navegador dibuja solo también lleva el diseño. Sin esto, la
@@ -413,7 +426,7 @@
 
     /* Un número que aparece sobre una foto elegida. */
     .numero-entra {
-      animation: numero-entra 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      animation: numero-entra 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
     /* Lo que reemplaza a lo de antes en el mismo lugar: la plantilla nueva en

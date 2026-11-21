@@ -326,16 +326,43 @@ export function problemasDeEstilo(estilo: Estilo): string[] {
   }
   if (contraste(colores.acento, colores.papel) < MINIMOS.acento) {
     problemas.push(
-      "El color de acento se pierde sobre el fondo, y es el de las ofertas y las etiquetas."
+      "El color destacado se pierde sobre el fondo, y es el de las ofertas y las etiquetas."
     )
   }
   if (contraste(colores.sobreAcento, colores.acento) < MINIMOS.sobreAcento) {
     problemas.push(
-      "Sobre el color de acento no se lee ningún texto. Elige uno más oscuro o más claro."
+      "Sobre el color destacado no se lee ningún texto. Elige uno más oscuro o más claro."
     )
   }
 
   return problemas
+}
+
+/**
+ * El arreglo de un toque para lo primero que no se lee: corrige el color que
+ * causa el problema, conservando su tono. Si es el texto contra el fondo,
+ * cambiar el color destacado no resolvería nada.
+ */
+export function arregloDeEstilo(
+  estilo: Estilo
+): { color: keyof Estilo["colores"]; hex: string; nombre: string } | null {
+  const { colores } = resolverEstilo(estilo)
+  if (contraste(colores.tinta, colores.papel) < MINIMOS.texto) {
+    const color = estilo.invertido ? "papel" : "tinta"
+    const [tono, saturacion, luz] = hexAHsl(estilo.colores[color])
+    for (let paso = 1; paso <= 100; paso++) {
+      for (const candidata of [luz - paso, luz + paso]) {
+        if (candidata < 0 || candidata > 100) continue
+        const hex = hslAHex(tono, saturacion, candidata)
+        if (contraste(hex, colores.papel) >= MINIMOS.texto) {
+          return { color, hex, nombre: "el texto" }
+        }
+      }
+    }
+    return null
+  }
+  const hex = acentoCercano(estilo)
+  return hex ? { color: "acento", hex, nombre: "el color destacado" } : null
 }
 
 /**

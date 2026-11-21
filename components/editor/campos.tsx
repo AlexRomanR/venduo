@@ -9,10 +9,10 @@ import { useEditor } from "@/components/editor/contexto"
 import { CampoImagen } from "@/components/editor/imagen"
 import { Opciones } from "@/components/editor/piezas"
 
-const ETIQUETA = "text-xs font-semibold tracking-[0.12em] uppercase opacity-55"
+const ETIQUETA = "text-xs font-semibold tracking-[0.12em] uppercase opacity-70"
 
 const CAJA =
-  "w-full border-0 border-b border-tinta/40 bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:outline-none"
+  "w-full border-0 border-b border-tinta/60 bg-transparent px-0 text-base transition-colors placeholder:text-tinta/65 focus-visible:border-tinta focus-visible:bg-tinta/[0.04]"
 
 /**
  * Los campos de una sección, armados desde su definición en `secciones.ts`.
@@ -74,7 +74,7 @@ function CampoDeSeccion({
       {error}
     </p>
   ) : campo.ayuda ? (
-    <p className="mt-1.5 text-xs leading-relaxed opacity-55">{campo.ayuda}</p>
+    <p className="mt-1.5 text-xs leading-relaxed opacity-70">{campo.ayuda}</p>
   ) : null
 
   switch (campo.tipo) {
@@ -234,13 +234,11 @@ function Texto({
         <label htmlFor={id} className={ETIQUETA}>
           {campo.etiqueta}
           {campo.requerido ? null : (
-            <span className="ml-1 tracking-normal normal-case opacity-70">
-              (opcional)
-            </span>
+            <span className="ml-1 tracking-normal normal-case">(opcional)</span>
           )}
         </label>
         {cerca ? (
-          <span className="tabular text-xs opacity-55">
+          <span className="tabular text-xs opacity-70">
             {valor.length}/{campo.max}
           </span>
         ) : null}
@@ -286,7 +284,7 @@ function Categoria({
     return (
       <>
         <p className={ETIQUETA}>{etiqueta}</p>
-        <p className="mt-2 text-sm opacity-60">
+        <p className="mt-2 text-sm opacity-70">
           Todavía no tienes categorías: se muestran productos de todo tu
           catálogo.
         </p>
@@ -355,7 +353,7 @@ function Lista({
             className="rounded-[14px] border border-tinta/20 bg-hoja p-3 motion-safe:animate-in motion-safe:duration-200 motion-safe:fade-in"
           >
             <div className="flex items-center justify-between gap-2">
-              <span className="tabular text-xs font-semibold opacity-55">
+              <span className="tabular text-xs font-semibold opacity-70">
                 {campo.elemento.charAt(0).toUpperCase() +
                   campo.elemento.slice(1)}{" "}
                 {indice + 1}
@@ -413,13 +411,13 @@ function Lista({
         <button
           type="button"
           onClick={() => alCambiar([...elementos, nuevo])}
-          className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 border border-dashed border-tinta/40 text-sm font-semibold transition-colors hover:border-tinta"
+          className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 border border-dashed border-tinta/60 text-sm font-semibold transition-colors hover:border-tinta"
         >
           <Plus aria-hidden="true" className="size-4" />
           Agregar {campo.elemento}
         </button>
       ) : (
-        <p className="mt-3 text-xs opacity-55">
+        <p className="mt-3 text-xs opacity-70">
           Llegaste al máximo de {campo.max}.
         </p>
       )}

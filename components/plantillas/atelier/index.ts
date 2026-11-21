@@ -36,10 +36,9 @@ export const KIT_ATELIER: KitDeTienda = {
     fotoEntera: true,
     textos: {
       sinProductos: "La colección está en camino",
-      consulta: "¿Quieres más fotos o las medidas? Pregúntanos",
-      estado: "Estado de la pieza",
+      consulta: "¿Quieres más fotos o detalles? Pregúntanos",
       sinResultados:
-        "Ninguna pieza coincide con lo que elegiste. Prueba con otra línea o ve toda la colección.",
+        "Nada coincide con lo que elegiste. Prueba con otra línea o ve toda la colección.",
     },
   }),
 }

@@ -1,6 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { after } from "next/server"
 
 import { mensajeDeErrorDeIa } from "@/lib/ai/mensajes"
 import { leerPlanilla, leerProductos } from "@/lib/ai/tasks"
@@ -14,6 +15,7 @@ import {
   type Borrador,
   type Lectura,
 } from "@/lib/carga"
+import { limpiarCargasViejas } from "@/lib/data/cargas-viejas"
 import { getMiTienda } from "@/lib/data/panel"
 import { anotarUsoDeIa, permisoDeIa } from "@/lib/data/uso-ia"
 import { env } from "@/lib/env"
@@ -80,6 +82,9 @@ export async function leerFotos(entrada: {
   if (!entrada.urls.every((url) => esFotoDeMiTienda(url, base, tienda.id))) {
     return { ok: false, error: "Una de las fotos no es de tu tienda." }
   }
+  // De paso, lo que quedó de cargas que no se terminaron. Después de responder.
+  const tiendaId = tienda.id
+  after(() => limpiarCargasViejas(tiendaId))
 
   const [imagenes, categorias] = await Promise.all([
     Promise.all(
@@ -248,6 +253,9 @@ export async function leerColumnasDePlanilla(
   }
   // La lectura sin IA mira hasta 40 filas: más contenido, menos dudas.
   const sinIa = leerColumnas(filas.slice(0, 45))
+  // Cada columna dice lo que es en su encabezado: la IA no tiene nada que
+  // agregar, y la persona no espera los segundos que tarda.
+  if (sinIa.clara) return { ok: true, lectura: sinIa, conIa: false }
 
   const [tienda, permiso] = await Promise.all([
     getMiTienda(),

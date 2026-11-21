@@ -1,3 +1,4 @@
+import { huellaDeDiseno } from "@/lib/editor/igual-a-hoy"
 import { isSupabaseConfigured } from "@/lib/env"
 import {
   PLANTILLAS,
@@ -35,6 +36,8 @@ export interface VersionDeDiseno {
   nota: string | null
   plantilla: string
   fecha: string
+  /** Es igual a cómo está la tienda hoy: restaurarla no cambiaría nada. */
+  igualAHoy: boolean
 }
 
 export interface AparienciaDeMiTienda {
@@ -114,6 +117,7 @@ function aparienciaDeDemostracion(): AparienciaDeMiTienda {
         nota: null,
         plantilla: "Pasarela",
         fecha: new Date().toISOString(),
+        igualAHoy: false,
       },
     ],
     ...(() => {
@@ -143,7 +147,7 @@ export async function getAparienciaDeMiTienda(): Promise<AparienciaDeMiTienda | 
   const tienda = await getMiTienda()
   if (!tienda?.template_key) return null
 
-  const [plantillasRes, rubrosRes, versionesRes, productosRes] =
+  const [plantillasRes, rubrosRes, versionesRes, productosRes, paginasRes] =
     await Promise.all([
       // La política solo deja leer las activas. Una plantilla retirada no llega,
       // y eso es lo que la marca como retirada.
@@ -156,7 +160,9 @@ export async function getAparienciaDeMiTienda(): Promise<AparienciaDeMiTienda | 
       supabase.from("sectors").select("key, name"),
       supabase
         .from("store_design_versions")
-        .select("id, number, origin, note, template_key, created_at")
+        .select(
+          "id, number, origin, note, template_key, created_at, theme_overrides, logo_url, pages"
+        )
         .eq("store_id", tienda.id)
         .is("deleted_at", null)
         .order("number", { ascending: false })
@@ -175,6 +181,15 @@ export async function getAparienciaDeMiTienda(): Promise<AparienciaDeMiTienda | 
         .order("is_featured", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(12),
+      // Las páginas de hoy, con la forma que guarda `capture_design_version`,
+      // para saber qué versión es igual a lo de hoy.
+      supabase
+        .from("store_pages")
+        .select(
+          "key, title, is_home, status, store_blocks(block_type_key, position, props, is_visible, deleted_at)"
+        )
+        .eq("store_id", tienda.id)
+        .is("deleted_at", null),
     ])
 
   const rubros = new Map(
@@ -184,6 +199,35 @@ export async function getAparienciaDeMiTienda(): Promise<AparienciaDeMiTienda | 
     (fila) => plantillaDeTienda(fila.key) === fila.key
   )
   const porClave = new Map(activas.map((fila) => [fila.key, fila]))
+  // Sin las páginas no se sabe: se ofrecen todas, como antes.
+  const hoy = paginasRes.error
+    ? null
+    : huellaDeDiseno({
+        template_key: tienda.template_key,
+        theme_overrides: tienda.theme_overrides ?? {},
+        logo_url: tienda.logo_url,
+        pages: [...(paginasRes.data ?? [])]
+          .sort(
+            (a, b) =>
+              Number(b.is_home) - Number(a.is_home) ||
+              (a.key < b.key ? -1 : a.key > b.key ? 1 : 0)
+          )
+          .map((pagina) => ({
+            key: pagina.key,
+            title: pagina.title,
+            is_home: pagina.is_home,
+            status: pagina.status,
+            blocks: (pagina.store_blocks ?? [])
+              .filter((bloque) => !bloque.deleted_at)
+              .sort((a, b) => a.position - b.position)
+              .map((bloque) => ({
+                block_type_key: bloque.block_type_key,
+                position: bloque.position,
+                props: bloque.props,
+                is_visible: bloque.is_visible,
+              })),
+          })),
+      })
   const fila = porClave.get(tienda.template_key)
   const personalizacion = tienda.theme_overrides
 
@@ -242,6 +286,7 @@ export async function getAparienciaDeMiTienda(): Promise<AparienciaDeMiTienda | 
         (version.template_key && porClave.get(version.template_key)?.name) ??
         "Plantilla anterior",
       fecha: version.created_at,
+      igualAHoy: hoy !== null && huellaDeDiseno(version) === hoy,
     })),
     esDemo: false,
   }

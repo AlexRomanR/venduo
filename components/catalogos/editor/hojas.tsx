@@ -19,7 +19,9 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import {
+  ArrowDown,
   ArrowLeft,
+  ArrowUp,
   BadgePercent,
   BookOpen,
   Bookmark,
@@ -44,7 +46,9 @@ import {
   type TipoDeBloque,
 } from "@/lib/catalogos/constantes"
 import {
+  agotadosDe,
   elegidos,
+  preciosDe,
   hojasDelBloque,
   productosDe,
   type DatosDelCatalogo,
@@ -61,6 +65,8 @@ import {
 } from "@/lib/catalogos/operaciones"
 import { GRILLA_DE_FICHAS_LARGAS } from "@/lib/estilos"
 import { cn } from "@/lib/utils"
+import { ElegirCadaUno } from "@/components/editor/marca"
+import { EsquemaDeProductos } from "@/components/catalogos/editor/esquemas"
 import { Aviso } from "@/components/editor/piezas"
 import {
   CampoArea,
@@ -114,6 +120,9 @@ export function PanelDeHojas(props: Props) {
 
   return (
     <div className="flex flex-col">
+      <p className="px-4 pt-3 pb-2 text-sm leading-relaxed opacity-70 sm:px-5">
+        Lo que lleva tu catálogo, en orden.
+      </p>
       <ListaDeHojas {...props} />
       <div className="px-4 py-4 sm:px-5">
         <button
@@ -127,7 +136,7 @@ export function PanelDeHojas(props: Props) {
         </button>
         {catalogo.bloques.length >= TOPE_DE_BLOQUES ? (
           <p className="mt-2 text-xs leading-relaxed opacity-65">
-            Llegaste a cuarenta bloques. Quita alguno para agregar otro.
+            Llegaste a cuarenta hojas. Quita alguna para agregar otra.
           </p>
         ) : null}
       </div>
@@ -154,7 +163,7 @@ function resumen(
     case "pack":
       return (
         catalogo.packs.find((pack) => pack.id === bloque.pack)?.nombre ??
-        "Sin pack elegido"
+        "Sin combo elegido"
       )
     case "oferta":
       return [bloque.etiqueta, bloque.titulo].filter(Boolean).join(" · ")
@@ -212,8 +221,8 @@ function ListaDeHojas({ catalogo, datos, alElegir, alCambiar }: Props) {
     return (
       <div className="px-4 pt-5 sm:px-5">
         <Aviso>
-          El catálogo no tiene hojas. Agrega una portada y una hoja de productos
-          para empezar.
+          El catálogo no tiene hojas. Agrega una portada y una de productos para
+          empezar.
         </Aviso>
       </div>
     )
@@ -226,6 +235,9 @@ function ListaDeHojas({ catalogo, datos, alElegir, alCambiar }: Props) {
       id="catalogo-hojas"
       sensors={sensores}
       collisionDetection={closestCenter}
+      // Sin esto, cerca del borde el panel se desplaza solo y la hoja se pasa
+      // de largo.
+      autoScroll={{ threshold: { x: 0, y: 0.08 }, acceleration: 2 }}
       onDragEnd={alSoltar}
       accessibility={{
         announcements: anuncios,
@@ -291,7 +303,7 @@ function FilaDeHoja({
         ref={setActivatorNodeRef}
         type="button"
         aria-label={`Mover ${tipo.nombre}`}
-        className="flex size-11 shrink-0 cursor-grab touch-none items-center justify-center opacity-45 transition-opacity hover:opacity-100 active:cursor-grabbing"
+        className="flex size-11 shrink-0 cursor-grab touch-none items-center justify-center opacity-70 transition-opacity hover:opacity-100 active:cursor-grabbing"
         {...attributes}
         {...listeners}
       >
@@ -306,7 +318,7 @@ function FilaDeHoja({
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-semibold">
             {tipo.nombre}
-            <span className="font-normal opacity-60"> · {variante}</span>
+            <span className="font-normal opacity-70"> · {variante}</span>
           </span>
           <span className="mt-0.5 block truncate text-xs opacity-65">
             {detalle}
@@ -337,13 +349,14 @@ function AgregarHoja({
   function agregar(tipo: TipoDeBloque) {
     if (tipo === "pack" && catalogo.packs.length === 0) {
       if (catalogo.productos.length < 2) {
-        toast.error("Un pack lleva al menos dos productos: elige otro más.")
+        toast.error("Un combo lleva al menos dos productos: elige otro más.")
         return
       }
-      const precios = Object.fromEntries(
-        Object.values(datos.productos).map((p) => [p.id, p.precioCents])
+      const { catalogo: conPack, pack } = agregarPack(
+        catalogo,
+        preciosDe(datos),
+        agotadosDe(datos)
       )
-      const { catalogo: conPack, pack } = agregarPack(catalogo, precios)
       alCambiar(conPack)
       const hoja = conPack.bloques.find(
         (bloque) => bloque.tipo === "pack" && bloque.pack === pack.id
@@ -426,6 +439,13 @@ function EditorDeHoja({
   const Icono = ICONOS_DE_HOJA[bloque.tipo]
   const tipo = TIPOS_DE_BLOQUE[bloque.tipo]
   const cambiar = (nuevo: Bloque) => alCambiar(cambiarBloque(catalogo, nuevo))
+  const lugar = catalogo.bloques.findIndex((otro) => otro.id === bloque.id)
+
+  // Arrastrar en un panel chico cuesta: con esto se ordena tocando.
+  function mover(hacia: -1 | 1) {
+    alCambiar(moverBloque(catalogo, bloque.id, lugar + hacia))
+    alElegir(bloque.id)
+  }
 
   function quitar() {
     const antes = catalogo
@@ -447,34 +467,15 @@ function EditorDeHoja({
           <ArrowLeft aria-hidden="true" className="size-4" />
           Todas las hojas
         </button>
-        <div className="flex">
-          <button
-            type="button"
-            aria-label="Duplicar esta hoja"
-            disabled={catalogo.bloques.length >= TOPE_DE_BLOQUES}
-            onClick={() => alCambiar(duplicarBloque(catalogo, bloque.id))}
-            className="flex size-11 items-center justify-center opacity-70 transition-opacity hover:opacity-100 disabled:opacity-30"
-          >
-            <Copy aria-hidden="true" className="size-4" />
-          </button>
-          <button
-            type="button"
-            aria-label="Quitar esta hoja"
-            onClick={quitar}
-            className="flex size-11 items-center justify-center opacity-70 transition-opacity hover:opacity-100"
-          >
-            <Trash2 aria-hidden="true" className="size-4" />
-          </button>
-        </div>
       </div>
 
       <div className="flex flex-col gap-6 px-4 py-5 sm:px-5">
         <header className="flex items-start gap-3">
           <Icono aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
           <div>
-            <h3 className="font-titular text-lg leading-tight font-bold tracking-[-0.02em]">
+            <h2 className="font-titular text-lg leading-tight font-bold tracking-[-0.02em]">
               {tipo.nombre}
-            </h3>
+            </h2>
             <p className="mt-0.5 text-sm leading-snug opacity-70">
               {tipo.detalle}
             </p>
@@ -488,7 +489,55 @@ function EditorDeHoja({
           alIrA={alIrA}
         />
       </div>
+
+      {/* Con su nombre y al final, como en la portada de la tienda: los
+          íconos solos no se entendían. */}
+      <div className="grid grid-cols-4 border-t border-tinta/15">
+        <AccionDeHoja
+          icono={ArrowUp}
+          etiqueta="Subir"
+          deshabilitada={lugar <= 0}
+          alTocar={() => mover(-1)}
+        />
+        <AccionDeHoja
+          icono={ArrowDown}
+          etiqueta="Bajar"
+          deshabilitada={lugar >= catalogo.bloques.length - 1}
+          alTocar={() => mover(1)}
+        />
+        <AccionDeHoja
+          icono={Copy}
+          etiqueta="Duplicar"
+          deshabilitada={catalogo.bloques.length >= TOPE_DE_BLOQUES}
+          alTocar={() => alCambiar(duplicarBloque(catalogo, bloque.id))}
+        />
+        <AccionDeHoja icono={Trash2} etiqueta="Quitar" alTocar={quitar} />
+      </div>
     </div>
+  )
+}
+
+function AccionDeHoja({
+  icono: Icono,
+  etiqueta,
+  deshabilitada = false,
+  alTocar,
+}: {
+  icono: LucideIcon
+  etiqueta: string
+  deshabilitada?: boolean
+  alTocar: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={alTocar}
+      disabled={deshabilitada}
+      className="flex min-h-11 items-center justify-center gap-1.5 px-1 text-xs font-semibold transition-colors hover:bg-tinta/[0.04] disabled:opacity-30"
+    >
+      <Icono aria-hidden="true" className="size-4" />
+      {etiqueta}
+    </button>
   )
 }
 
@@ -606,7 +655,7 @@ function CamposDeHoja({
           />
           {catalogo.packs.length > 0 ? (
             <Fichas
-              etiqueta="Qué pack muestra"
+              etiqueta="Qué combo muestra"
               valor={bloque.pack}
               opciones={catalogo.packs.map((pack) => ({
                 valor: pack.id,
@@ -616,7 +665,7 @@ function CamposDeHoja({
             />
           ) : (
             <Aviso tono="problema">
-              No hay packs todavía. Arma uno en la pestaña Packs.
+              No hay combos todavía. Arma uno en la pestaña Combos.
             </Aviso>
           )}
           <button
@@ -624,7 +673,7 @@ function CamposDeHoja({
             onClick={() => alIrA("packs")}
             className="flex min-h-11 w-fit items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline"
           >
-            Editar los packs
+            Editar los combos
             <ChevronRight aria-hidden="true" className="size-4" />
           </button>
         </>
@@ -785,18 +834,33 @@ function CamposDeProductos({
       <Fichas
         etiqueta="Diseño"
         valor={bloque.variante}
-        opciones={opcionesDe("productos")}
+        limite={4}
+        opciones={opcionesDe("productos").map((opcion) => ({
+          ...opcion,
+          dibujo: <EsquemaDeProductos diseno={opcion.valor} />,
+        }))}
         alCambiar={(variante) => cambiar({ ...bloque, variante })}
       />
       <CampoTexto
         id={`${bloque.id}-titulo`}
-        etiqueta="Título de la hoja"
+        etiqueta="Título"
         valor={bloque.titulo}
         maximo={80}
-        ayuda="Opcional. Va arriba de cada hoja de este bloque."
+        ayuda="Opcional. Va arriba de cada una de estas hojas."
         alCambiar={(titulo) => cambiar({ ...bloque, titulo })}
       />
 
+      <p className="-mb-3 text-sm leading-relaxed opacity-80">
+        Salen de tus {productos.length}{" "}
+        {productos.length === 1 ? "elegido" : "elegidos"}.{" "}
+        <button
+          type="button"
+          onClick={() => alIrA("productos")}
+          className="min-h-11 font-semibold underline underline-offset-4 hover:opacity-60"
+        >
+          Cambiarlos
+        </button>
+      </p>
       <Fichas
         etiqueta="Qué productos muestra"
         valor={bloque.cuales.tipo}
@@ -905,8 +969,7 @@ function CamposDeProductos({
         alCambiar={(porPagina) => cambiar({ ...bloque, porPagina })}
       />
 
-      <fieldset className="min-w-0">
-        <legend className={ETIQUETA}>Qué se ve de cada producto</legend>
+      <ElegirCadaUno titulo="Qué se ve de cada producto">
         <div className={cn(GRILLA_DE_FICHAS_LARGAS, "mt-2")}>
           {(Object.keys(CAMPOS) as Campo[]).map((campo) => {
             const activo = bloque.campos[campo]
@@ -922,7 +985,7 @@ function CamposDeProductos({
                   })
                 }
                 className={cn(
-                  "flex min-h-11 w-full min-w-0 items-center justify-center border px-2 py-1.5 text-sm font-semibold transition-colors",
+                  "flex min-h-11 w-full min-w-0 items-center justify-center rounded-[12px] border px-2 py-1.5 text-sm font-semibold transition-colors",
                   activo
                     ? "border-tinta bg-tinta text-papel"
                     : "border-tinta/25 hover:border-tinta"
@@ -935,7 +998,7 @@ function CamposDeProductos({
             )
           })}
         </div>
-      </fieldset>
+      </ElegirCadaUno>
     </>
   )
 }

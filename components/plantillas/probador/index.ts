@@ -1,6 +1,7 @@
 import { KIT_CLASICO } from "@/components/plantillas/clasica"
 import { paginasDeKit } from "@/components/plantillas/comunes/paginas"
 import type { KitDeTienda } from "@/components/plantillas/kit"
+import { tieneOpcion } from "@/lib/variantes"
 import { BLOQUES_PROBADOR } from "@/components/plantillas/probador/bloques"
 import { Cabecera } from "@/components/plantillas/probador/cabecera"
 import {
@@ -36,13 +37,14 @@ export const KIT_PROBADOR: KitDeTienda = {
       titulo: "¿Cuál es tu talla?",
       texto:
         "Mídete el busto, la cintura y la cadera con una cinta, sin apretar. Envíanos las medidas por WhatsApp y te decimos qué talla te queda.",
+      // Solo donde hay talla: en una cartera o un perfume no tiene sentido.
+      cuando: (producto) => tieneOpcion(producto.opciones, "Talla"),
     },
     textos: {
       sinProductos: "La colección está por llegar",
-      consulta: "¿Dudas con la talla? Pregúntanos",
-      estado: "Estado de la prenda",
+      consulta: "¿Tienes dudas? Pregúntanos",
       sinResultados:
-        "No hay prendas con eso. Prueba con otra ocasión o ve toda la colección.",
+        "No hay nada con eso. Prueba con otra ocasión o ve toda la colección.",
     },
   }),
 }

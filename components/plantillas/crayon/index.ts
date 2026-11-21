@@ -14,6 +14,7 @@ import {
   grilla,
 } from "@/components/plantillas/crayon/piezas"
 import type { KitDeTienda } from "@/components/plantillas/kit"
+import { tieneOpcion } from "@/lib/variantes"
 
 /** El kit de Crayón. */
 export const KIT_CRAYON: KitDeTienda = {
@@ -37,12 +38,14 @@ export const KIT_CRAYON: KitDeTienda = {
       titulo: "¿Qué talla elijo?",
       texto:
         "Cada marca talla distinto. Dinos la edad y la estatura de quien la va a usar y te recomendamos la talla.",
+      // Solo donde hay talla: en un juguete o una mochila no tiene sentido.
+      cuando: (producto) => tieneOpcion(producto.opciones, "Talla"),
     },
     textos: {
-      sinProductos: "Estamos doblando la ropita",
-      consulta: "¿No sabes qué talla? Dinos la edad",
-      estado: "Estado de la prenda",
-      sinResultados: "Nada para esa edad por ahora. Prueba con otra o ve todo.",
+      sinProductos: "¡Ya casi está todo listo!",
+      consulta: "¿Tienes dudas? Pregúntanos",
+      sinResultados:
+        "Nada por aquí todavía. Prueba con otra categoría o ve todo.",
     },
   }),
 }

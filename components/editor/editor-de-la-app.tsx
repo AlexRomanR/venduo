@@ -6,6 +6,11 @@ import type { TiendaPublica } from "@/lib/data/tienda-publica"
 import type { DisenoParaEditar } from "@/lib/data/editor"
 import type { MensajeAlaVistaPrevia, Vista } from "@/lib/editor/protocolo"
 import {
+  cambiosDeLaPropuesta,
+  type LugarDeCambio,
+} from "@/lib/editor/propuesta"
+import { senalDelCambio, vistaDeAjuste } from "@/lib/editor/senales"
+import {
   mensajeDeLaApp,
   type MensajeAlaApp,
   type MensajeDeLaApp,
@@ -147,6 +152,67 @@ export function EditorDeLaApp({
     [mostrado, vista, productoId, seleccion, marcas]
   )
 
+  // Lleva la vista hasta donde se ve un cambio: el primero de una propuesta,
+  // o el que la app pide con "Ver".
+  const mostrarLugar = React.useCallback((lugar: LugarDeCambio) => {
+    if (lugar.seccion) {
+      const seccion = lugar.seccion
+      setVista("inicio")
+      window.setTimeout(
+        () =>
+          oyentes.current.forEach((oyente) =>
+            oyente({ tipo: "enfocar", seccion })
+          ),
+        120
+      )
+    } else if (lugar.ruta) {
+      const ruta = lugar.ruta
+      setVista(vistaDeAjuste(ruta) ?? "inicio")
+      window.setTimeout(
+        () =>
+          oyentes.current.forEach((oyente) =>
+            oyente({ tipo: "senalar", ruta })
+          ),
+        120
+      )
+    }
+  }, [])
+
+  // Todo cambio se muestra en la tienda, como en el editor de la web
+  // (`lib/editor/senales.ts`): si lo cambiado está fuera de la vista, va hasta
+  // ahí y lo marca; si ya se ve, no agrega nada. La app ya no lo pide a mano.
+  const vistaActual = React.useRef(vista)
+  React.useEffect(() => {
+    vistaActual.current = vista
+  })
+  const conocido = React.useRef(borrador.presente)
+  React.useEffect(() => {
+    const antes = conocido.current
+    conocido.current = borrador.presente
+    if (antes === borrador.presente) return
+    const cambio = senalDelCambio(antes, borrador.presente, diseno.base)
+    if (!cambio) return
+    const reloj = window.setTimeout(
+      () => {
+        const mirando = vistaActual.current
+        if (cambio.tipo === "seccion") {
+          if (mirando !== "inicio") return
+          oyentes.current.forEach((oyente) =>
+            oyente({ tipo: "enfocar", seccion: cambio.seccion })
+          )
+          return
+        }
+        const donde = vistaDeAjuste(cambio.ruta)
+        if (donde && donde !== mirando) return
+        oyentes.current.forEach((oyente) =>
+          oyente({ tipo: "senalar", ruta: cambio.ruta })
+        )
+      },
+      cambio.tipo === "seccion" ? 350 : 80
+    )
+    return () => window.clearTimeout(reloj)
+  }, [borrador.presente, diseno.base])
+
   const ultimoEstado = React.useRef(estadoDeLaVista)
   React.useEffect(() => {
     ultimoEstado.current = estadoDeLaVista
@@ -254,10 +320,25 @@ export function EditorDeLaApp({
             sinNulos(mensaje.operaciones),
             contexto
           )
-          if (resultado.ok) setMirando(resultado.borrador)
-          else alaApp({ tipo: "rechazado", motivos: resultado.errores })
+          if (!resultado.ok) {
+            alaApp({ tipo: "rechazado", motivos: resultado.errores })
+            return
+          }
+          setMirando(resultado.borrador)
+          // Qué cambia y dónde, para la lista de la app; y la vista va sola al
+          // primer cambio, como en el editor de la web.
+          const cambios = cambiosDeLaPropuesta(
+            sinNulos(mensaje.operaciones),
+            borrador.presente,
+            resultado.borrador
+          )
+          alaApp({ tipo: "propuesta", cambios })
+          const primero = cambios.find((cambio) => cambio.lugar)?.lugar
+          if (primero) window.setTimeout(() => mostrarLugar(primero), 350)
           return
         }
+        case "ver":
+          return mostrarLugar(mensaje.lugar)
         case "publicado":
           setMirando(null)
           return borrador.marcarPublicado(mensaje.borrador as Borrador)
@@ -267,7 +348,7 @@ export function EditorDeLaApp({
             : borrador.olvidarRecuperable()
       }
     },
-    [borrador, contexto]
+    [borrador, contexto, mostrarLugar]
   )
 
   React.useEffect(() => {

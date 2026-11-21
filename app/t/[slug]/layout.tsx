@@ -1,9 +1,14 @@
+import { Suspense } from "react"
 import type { Metadata, Viewport } from "next"
 
-import { getTiendaPublica } from "@/lib/data/tienda-publica"
+import {
+  esTiendaVaciaDeQuienMira,
+  getTiendaPublica,
+} from "@/lib/data/tienda-publica"
 import { urlDeTienda } from "@/lib/tienda"
 import { EstiloDePlantilla } from "@/components/plantillas/estilo"
 import { AvisoDeVacaciones } from "@/components/tienda/aviso-de-vacaciones"
+import { AvisoSinProductos } from "@/components/tienda/aviso-sin-productos"
 import { ProveedorCarrito } from "@/components/tienda/carrito"
 
 /**
@@ -52,6 +57,18 @@ export async function generateViewport({
   return tienda ? { themeColor: tienda.apariencia.colores.papel } : {}
 }
 
+async function AvisoAlDueno({
+  tiendaId,
+  slug,
+}: {
+  tiendaId: string
+  slug: string
+}) {
+  return (await esTiendaVaciaDeQuienMira(tiendaId)) ? (
+    <AvisoSinProductos slug={slug} />
+  ) : null
+}
+
 export default async function TiendaLayout({
   children,
   params,
@@ -84,6 +101,13 @@ export default async function TiendaLayout({
         ) : null}
         {children}
       </div>
+      {/* Solo se pregunta quién mira si la tienda está vacía, y sin hacer
+          esperar a la página: quien compra no paga esta consulta. */}
+      {tienda && !tienda.esDemo && tienda.productos.length === 0 ? (
+        <Suspense fallback={null}>
+          <AvisoAlDueno tiendaId={tienda.id} slug={tienda.slug} />
+        </Suspense>
+      ) : null}
     </ProveedorCarrito>
   )
 }

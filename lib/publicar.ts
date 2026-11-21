@@ -175,7 +175,7 @@ export function textosSinIa(
   const apuro = pocas ? "Quedan pocas unidades." : null
   const descripcion = producto.descripcion?.trim() || null
   return {
-    whatsapp: [gancho, apuro, "Escríbeme y te lo separo."]
+    whatsapp: [gancho, apuro, "Escríbenos y te lo separamos."]
       .filter(Boolean)
       .join("\n"),
     instagram: [

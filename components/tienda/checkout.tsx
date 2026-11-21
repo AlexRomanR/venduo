@@ -19,6 +19,7 @@ import { toast } from "sonner"
 
 import type { ProductoSugerido } from "@/lib/catalogo"
 import { BOTON_PRIMARIO } from "@/lib/estilos"
+import type { ComboDelCarrito } from "@/lib/combos"
 import { formatMoney } from "@/lib/format"
 import { enlaceDeWhatsApp, mensajeDePedido } from "@/lib/pedidos"
 import type { Apariencia } from "@/lib/plantillas/apariencia"
@@ -50,6 +51,7 @@ function firmaDelCarrito(
   lineas: Array<{
     productoId: string
     varianteId?: string | null
+    combo?: ComboDelCarrito
     cantidad: number
   }>
 ): string {
@@ -82,6 +84,7 @@ export function Checkout({
   whatsapp,
   demo = false,
   crear,
+  revisarCombos,
   opciones,
   sugeridos = [],
 }: {
@@ -97,16 +100,55 @@ export function Checkout({
    */
   demo?: boolean
   crear: (entrada: PedidoInput) => Promise<ResultadoPedido>
+  /**
+   * Los combos del carrito como están hoy. Se pregunta al abrirlo: uno que ya
+   * no se puede pedir se quita, con aviso. Sin esto, no se revisa.
+   */
+  revisarCombos?: (
+    combos: { catalogo: string; id: string }[]
+  ) => Promise<{ catalogo: string; id: string; precioCents: number | null }[]>
   opciones: Apariencia["carrito"]
   /** Otros productos de la tienda, por si los ofrece para sumar al pedido. */
   sugeridos?: ProductoSugerido[]
 }) {
-  const { lineas, subtotalCents, unidades, listo, vaciar, vacaciones } =
+  const { lineas, subtotalCents, unidades, listo, vaciar, vacaciones, quitar } =
     useCarrito()
   const router = useRouter()
   const [enCurso, setEnCurso] = React.useState(false)
   const [enviado, setEnviado] = React.useState<Enviado | null>(null)
   const clave = `venduo:enviado:${slug}`
+
+  // Los combos se revisan una vez, al abrir: uno que se borró del catálogo, o
+  // con un producto que ya no se vende, se quita antes de que falle el envío.
+  const revisados = React.useRef(false)
+  React.useEffect(() => {
+    if (!listo || revisados.current || !revisarCombos) return
+    const combos = lineas.flatMap((l) =>
+      l.combo ? [{ linea: l, combo: l.combo }] : []
+    )
+    if (combos.length === 0) return
+    revisados.current = true
+    void revisarCombos(
+      combos.map(({ combo }) => ({ catalogo: combo.catalogo, id: combo.id }))
+    )
+      .then((estado) => {
+        const sinPrecio = new Set(
+          estado
+            .filter((c) => c.precioCents === null)
+            .map((c) => `${c.catalogo}:${c.id}`)
+        )
+        for (const { linea, combo } of combos) {
+          if (!sinPrecio.has(`${combo.catalogo}:${combo.id}`)) continue
+          quitar(claveDeLinea(linea))
+          toast.info(
+            `${linea.nombre} ya no está disponible y lo quitamos de tu carrito.`
+          )
+        }
+      })
+      .catch(() => {
+        // Sin respuesta se deja como está: lo comprueba el pedido al enviar.
+      })
+  }, [listo, lineas, revisarCombos, quitar])
 
   // Quien vuelve de WhatsApp con el botón de atrás encuentra su pedido, y no
   // un carrito vacío que parece que lo perdió.
@@ -142,16 +184,38 @@ export function Checkout({
 
     setEnCurso(true)
     const resultado = await crear({
-      items: lineas.map((l) => ({
-        productoId: l.productoId,
-        varianteId: l.varianteId ?? null,
-        cantidad: l.cantidad,
-      })),
+      items: lineas.map((l) =>
+        l.combo
+          ? {
+              combo: { catalogo: l.combo.catalogo, id: l.combo.id },
+              partes: l.combo.partes.map((p) => ({
+                productoId: p.productoId,
+                varianteId: p.varianteId ?? null,
+              })),
+              cantidad: l.cantidad,
+            }
+          : {
+              productoId: l.productoId,
+              varianteId: l.varianteId ?? null,
+              cantidad: l.cantidad,
+            }
+      ),
     })
 
     if (!resultado.ok) {
       pestana?.close()
       setEnCurso(false)
+      // Un combo que ya no se puede pedir se quita: así el próximo envío sale.
+      const quitado = resultado.comboQuitado
+        ? lineas.find((l) => l.combo?.id === resultado.comboQuitado)
+        : undefined
+      if (quitado) {
+        quitar(claveDeLinea(quitado))
+        toast.error(
+          `${quitado.nombre} ya no está disponible y lo quitamos de tu carrito.`
+        )
+        return
+      }
       toast.error(resultado.error)
       // Si entró de vacaciones con el carrito abierto, la página vuelve a
       // leerse y muestra el aviso en lugar del botón.
@@ -335,116 +399,142 @@ function Lineas({
 
   return (
     <ul className="flex flex-col">
-      {lineas.map((linea) => (
-        <li
-          key={claveDeLinea(linea)}
-          className={cn(
-            "flex border-t first:border-t-0",
-            compacta
-              ? "gap-3 border-dashed border-tinta/25 py-4"
-              : "gap-4 border-tinta/15 py-5 first:pt-0"
-          )}
-        >
-          <Link
-            href={`/t/${slug}/p/${linea.productoId}`}
+      {lineas.map((linea) => {
+        // Un combo lleva a su página, no a la de un producto.
+        const enlace = linea.combo
+          ? `/t/${slug}/combo/${linea.combo.catalogo}/${linea.combo.id}`
+          : `/t/${slug}/p/${linea.productoId}`
+        return (
+          <li
+            key={claveDeLinea(linea)}
             className={cn(
-              "shrink-0 overflow-hidden border border-tinta/15 bg-tinta/5",
-              compacta ? "size-14" : "size-20 sm:size-24"
+              "flex border-t first:border-t-0",
+              compacta
+                ? "gap-3 border-dashed border-tinta/25 py-4"
+                : "gap-4 border-tinta/15 py-5 first:pt-0"
             )}
           >
-            {linea.imagen ? (
-              <Image
-                src={linea.imagen}
-                alt={linea.nombre}
-                width={192}
-                height={192}
-                unoptimized
-                className="size-full object-cover"
-              />
-            ) : (
-              <span className="flex size-full items-center justify-center">
-                <ImageOff aria-hidden="true" className="size-5 opacity-25" />
-              </span>
-            )}
-          </Link>
-
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
-              <h3
-                className={cn(
-                  "min-w-0 flex-1 font-titular font-bold tracking-[-0.01em]",
-                  compacta ? "text-sm" : "text-base"
-                )}
-              >
-                <Link
-                  href={`/t/${slug}/p/${linea.productoId}`}
-                  className="transition-colors hover:text-senal"
-                >
-                  {linea.nombre}
-                </Link>
-                {linea.variante ? (
-                  <span className="block text-sm font-semibold">
-                    {linea.variante}
-                  </span>
-                ) : null}
-              </h3>
-              <p className="tabular font-titular font-bold">
-                {formatMoney(linea.precioCents * linea.cantidad)}
-              </p>
-            </div>
-
-            <p className="tabular mt-1 text-xs opacity-45">
-              {formatMoney(linea.precioCents)} cada uno
-            </p>
-
-            <div
+            <Link
+              href={enlace}
               className={cn(
-                "flex items-center gap-1",
-                compacta ? "mt-2" : "mt-3"
+                "shrink-0 overflow-hidden border border-tinta/15 bg-tinta/5",
+                compacta ? "size-14" : "size-20 sm:size-24"
               )}
             >
-              <button
-                type="button"
-                onClick={() => cambiar(claveDeLinea(linea), linea.cantidad - 1)}
-                aria-label={`Quitar una unidad de ${linea.nombre}`}
-                className="flex size-11 items-center justify-center rounded-plantilla border border-tinta/25 transition-colors hover:border-senal hover:text-senal"
-              >
-                <Minus aria-hidden="true" className="size-3.5" />
-              </button>
-              <span
-                aria-live="polite"
-                className="tabular flex h-11 w-11 items-center justify-center font-semibold"
-              >
-                {linea.cantidad}
-              </span>
-              <button
-                type="button"
-                onClick={() => cambiar(claveDeLinea(linea), linea.cantidad + 1)}
-                disabled={linea.cantidad >= linea.stock}
-                aria-label={`Agregar una unidad de ${linea.nombre}`}
-                className="flex size-11 items-center justify-center rounded-plantilla border border-tinta/25 transition-colors hover:border-senal hover:text-senal disabled:opacity-30"
-              >
-                <Plus aria-hidden="true" className="size-3.5" />
-              </button>
+              {linea.imagen ? (
+                <Image
+                  src={linea.imagen}
+                  alt={linea.nombre}
+                  width={192}
+                  height={192}
+                  unoptimized
+                  className="size-full object-cover"
+                />
+              ) : (
+                <span className="flex size-full items-center justify-center">
+                  <ImageOff aria-hidden="true" className="size-5 opacity-25" />
+                </span>
+              )}
+            </Link>
 
-              <button
-                type="button"
-                onClick={() => quitar(claveDeLinea(linea))}
-                aria-label={`Quitar ${linea.nombre} del carrito`}
-                className="ml-auto flex size-11 items-center justify-center opacity-40 transition-colors hover:text-senal hover:opacity-100"
-              >
-                <Trash2 aria-hidden="true" className="size-4" />
-              </button>
-            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
+                <h3
+                  className={cn(
+                    "min-w-0 flex-1 font-titular font-bold tracking-[-0.01em]",
+                    compacta ? "text-sm" : "text-base"
+                  )}
+                >
+                  <Link
+                    href={enlace}
+                    className="transition-colors hover:text-senal"
+                  >
+                    {linea.nombre}
+                  </Link>
+                  {linea.variante ? (
+                    <span className="block text-sm font-semibold">
+                      {linea.variante}
+                    </span>
+                  ) : null}
+                  {linea.combo ? (
+                    <ul className="mt-1 font-sans text-sm font-normal tracking-normal opacity-70">
+                      {linea.combo.partes.map((parte, indice) => (
+                        <li key={`${parte.productoId}-${indice}`}>
+                          {parte.nombre}
+                          {parte.variante ? (
+                            <span className="font-semibold">
+                              {" "}
+                              · {parte.variante}
+                            </span>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </h3>
+                <p className="tabular font-titular font-bold">
+                  {formatMoney(linea.precioCents * linea.cantidad)}
+                </p>
+              </div>
 
-            {linea.cantidad >= linea.stock ? (
-              <p className="mt-2 text-xs text-senal">
-                Es todo el stock que queda.
+              <p className="tabular mt-1 text-xs opacity-45">
+                {formatMoney(linea.precioCents)}{" "}
+                {linea.combo ? "cada combo" : "cada uno"}
               </p>
-            ) : null}
-          </div>
-        </li>
-      ))}
+
+              <div
+                className={cn(
+                  "flex items-center gap-1",
+                  compacta ? "mt-2" : "mt-3"
+                )}
+              >
+                <button
+                  type="button"
+                  onClick={() =>
+                    cambiar(claveDeLinea(linea), linea.cantidad - 1)
+                  }
+                  aria-label={`Quitar una unidad de ${linea.nombre}`}
+                  className="flex size-11 items-center justify-center rounded-plantilla border border-tinta/25 transition-colors hover:border-senal hover:text-senal"
+                >
+                  <Minus aria-hidden="true" className="size-3.5" />
+                </button>
+                <span
+                  aria-live="polite"
+                  className="tabular flex h-11 w-11 items-center justify-center font-semibold"
+                >
+                  {linea.cantidad}
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    cambiar(claveDeLinea(linea), linea.cantidad + 1)
+                  }
+                  disabled={linea.cantidad >= linea.stock}
+                  aria-label={`Agregar una unidad de ${linea.nombre}`}
+                  className="flex size-11 items-center justify-center rounded-plantilla border border-tinta/25 transition-colors hover:border-senal hover:text-senal disabled:opacity-30"
+                >
+                  <Plus aria-hidden="true" className="size-3.5" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => quitar(claveDeLinea(linea))}
+                  aria-label={`Quitar ${linea.nombre} del carrito`}
+                  className="ml-auto flex size-11 items-center justify-center opacity-40 transition-colors hover:text-senal hover:opacity-100"
+                >
+                  <Trash2 aria-hidden="true" className="size-4" />
+                </button>
+              </div>
+
+              {linea.cantidad >= linea.stock ? (
+                <p className="mt-2 text-xs text-senal">
+                  Es todo el stock que queda.
+                </p>
+              ) : null}
+            </div>
+          </li>
+        )
+      })}
     </ul>
   )
 }

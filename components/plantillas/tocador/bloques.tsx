@@ -87,7 +87,7 @@ function Rutina({ bloque, tienda }: PropsBloque) {
   return (
     <section className="mx-auto w-full max-w-7xl py-12 md:py-20">
       <div className="px-5">
-        <Titulo titulo={texto(bloque, "title") ?? "Tu rutina"} />
+        <Titulo titulo={texto(bloque, "title") ?? "Paso a paso"} />
       </div>
       <ol className="mt-7 flex snap-x snap-mandatory scroll-px-5 [scrollbar-width:none] items-stretch gap-1 overflow-x-auto px-5 md:overflow-visible [&::-webkit-scrollbar]:hidden">
         {categorias.map((categoria, i) => (

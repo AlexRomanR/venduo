@@ -36,7 +36,6 @@ export const KIT_BAZAR: KitDeTienda = {
     textos: {
       sinProductos: "Estamos acomodando el mostrador",
       consulta: "¿Tienes una duda? Pregúntanos",
-      estado: "Estado del producto",
       sinResultados:
         "Nada coincide con lo que buscas. Prueba con otra palabra o pregúntanos por WhatsApp.",
     },

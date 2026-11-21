@@ -106,14 +106,21 @@ export function AccionesDeCatalogo({
         </button>
       )}
       <DropdownMenu>
+        {/* Un id propio: el que genera el menú no siempre coincide entre el
+            servidor y el navegador, y la lista se dibuja en el servidor. */}
         <DropdownMenuTrigger
+          id={`acciones-${id}`}
           aria-label={`Más acciones para ${nombre}`}
           disabled={borrando}
           className={ICONO}
         >
           <MoreHorizontal aria-hidden="true" className="size-4" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-64">
+        <DropdownMenuContent
+          aria-labelledby={`acciones-${id}`}
+          align="end"
+          className="w-64"
+        >
           {/* En el celular el PDF y el lápiz viven acá: tres íconos de 44 px
               le dejaban al nombre del catálogo siete letras. */}
           <DropdownMenuItem asChild className="sm:hidden">

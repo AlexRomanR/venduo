@@ -52,6 +52,8 @@ export const mensajeAlaVistaPrevia = z.discriminatedUnion("tipo", [
     seleccion: z.string().nullable(),
     /** Las secciones que cambió la propuesta que se está mirando. */
     marcas: z.array(z.string()),
+    /** Mostrar el nombre de cada sección, donde no hay cursor que lo revele. */
+    conPistas: z.boolean().optional(),
   }),
   z.object({ tipo: z.literal("enfocar"), seccion: z.string() }),
   /** Llevar la vista hasta lo que cambia un ajuste y hacerlo latir. */
@@ -66,6 +68,8 @@ export const mensajeAlEditor = z.discriminatedUnion("tipo", [
     tipo: z.literal("fija"),
     nombre: z.string().max(80),
     ayuda: z.string().max(300),
+    /** Un enlace o un botón de la tienda: en la vista previa no se abren. */
+    navegacion: z.boolean().optional(),
   }),
   /**
    * Lo que cambia ese ajuste no está en esta pantalla: la tienda no tiene

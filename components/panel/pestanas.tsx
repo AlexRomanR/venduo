@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import type { BarraLateral } from "@/lib/data/barra"
+import type { EstadoDeFuncion } from "@/lib/funciones"
 import { cn } from "@/lib/utils"
 import {
   IconoCatalogos,
@@ -12,6 +13,7 @@ import {
   IconoPedidos,
   IconoProductos,
 } from "@/components/panel/iconos-de-pestanas"
+import { ConFuncion } from "@/components/panel/funcion"
 
 interface Pestana {
   nombre: string
@@ -19,6 +21,8 @@ interface Pestana {
   href?: string
   exacto?: boolean
   insignia?: number
+  /** Si Venduo la apagó: desactivada se ve atenuada y avisa al tocarla. */
+  funcion?: EstadoDeFuncion
 }
 
 /**
@@ -50,6 +54,7 @@ export function Pestanas({ datos }: { datos: BarraLateral }) {
             nombre: "Catálogos",
             icono: IconoCatalogos,
             href: "/panel/catalogos",
+            funcion: funciones.catalogos,
           },
         ]),
     { nombre: "Compartir", icono: IconoCompartir, href: "/panel/compartir" },
@@ -67,15 +72,19 @@ export function Pestanas({ datos }: { datos: BarraLateral }) {
             : Boolean(pestana.href && pathname.startsWith(pestana.href))
           return (
             <li key={pestana.nombre} className="flex-1">
-              <Link
-                href={pestana.href!}
-                prefetch
-                aria-current={activa ? "page" : undefined}
-                className="group flex h-16 flex-col items-center justify-center gap-1"
-              >
-                <Icono pestana={pestana} activa={activa} />
-                <Etiqueta activa={activa}>{pestana.nombre}</Etiqueta>
-              </Link>
+              {/* Desactivada, la pantalla manda al Inicio: sin esto, tocarla
+                  rebotaba sin decir por qué. */}
+              <ConFuncion estado={pestana.funcion ?? "activa"}>
+                <Link
+                  href={pestana.href!}
+                  prefetch
+                  aria-current={activa ? "page" : undefined}
+                  className="group flex h-16 flex-col items-center justify-center gap-1"
+                >
+                  <Icono pestana={pestana} activa={activa} />
+                  <Etiqueta activa={activa}>{pestana.nombre}</Etiqueta>
+                </Link>
+              </ConFuncion>
             </li>
           )
         })}

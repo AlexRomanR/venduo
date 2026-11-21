@@ -112,7 +112,11 @@ export default async function PedidoPage({
           {pedido.items.map((item, indice) => (
             <li
               key={indice}
-              className="flex items-center gap-3 border-t border-tinta/15 px-4 py-3 first:border-t-0 sm:px-5"
+              className={cn(
+                "flex gap-3 border-t border-tinta/15 px-4 py-3 first:border-t-0 sm:px-5",
+                // Un combo es alto: su foto va arriba, junto al nombre.
+                item.partes ? "items-start" : "items-center"
+              )}
             >
               <span className="relative shrink-0">
                 <span className="relative flex size-[52px] items-center justify-center overflow-hidden border border-tinta/15 bg-tinta/[0.05]">
@@ -148,8 +152,45 @@ export default async function PedidoPage({
                   </span>
                 ) : null}
                 <span className="tabular mt-0.5 block text-sm opacity-65">
+                  {item.partes ? "Combo · " : ""}
                   {item.cantidad} × {formatMoney(item.precioCents)}
                 </span>
+                {/* Lo que trae el combo, para armar el paquete: sin precio. */}
+                {item.partes ? (
+                  <span className="mt-2 flex flex-col gap-2 border-l border-tinta/15 pl-3">
+                    {item.partes.map((parte, cual) => (
+                      <span key={cual} className="flex items-center gap-2.5">
+                        <span className="relative flex size-9 shrink-0 items-center justify-center overflow-hidden border border-tinta/15 bg-tinta/[0.05]">
+                          {parte.foto ? (
+                            <Image
+                              src={parte.foto}
+                              alt=""
+                              fill
+                              sizes="36px"
+                              className="object-cover"
+                            />
+                          ) : (
+                            <Package
+                              aria-hidden="true"
+                              className="size-4 opacity-35"
+                            />
+                          )}
+                        </span>
+                        <span className="min-w-0 text-sm">
+                          <span className="block truncate">
+                            {parte.cantidad > 1 ? `${parte.cantidad}× ` : ""}
+                            {parte.nombre}
+                          </span>
+                          {parte.variante ? (
+                            <span className="block font-semibold">
+                              {parte.variante}
+                            </span>
+                          ) : null}
+                        </span>
+                      </span>
+                    ))}
+                  </span>
+                ) : null}
               </span>
               <span className="tabular shrink-0 font-semibold">
                 {formatMoney(item.totalCents)}
@@ -219,14 +260,24 @@ function LineaDeEstado({ pedido }: { pedido: Pedido }) {
       hecho: true,
       rojo: false,
     },
-    cancelado
-      ? { titulo: "Cancelado", detalle: "", hecho: true, rojo: false }
-      : {
-          titulo: "Pagado",
-          detalle: pedido.pagado ? formatDate(pedido.pagado) : "Falta cobrar",
-          hecho: pagado,
-          rojo: !pagado,
-        },
+    // Si se cobró, el paso queda aunque después se cancele: cancelar un pagado
+    // devuelve el stock, y saber que se había cobrado importa.
+    ...(pedido.pagado || !cancelado
+      ? [
+          {
+            titulo: "Pagado",
+            detalle: pedido.pagado
+              ? `${formatDate(pedido.pagado)} · ${formatHora(pedido.pagado)}`
+              : "Falta cobrar",
+            hecho: Boolean(pedido.pagado) || pagado,
+            rojo: !pedido.pagado && !pagado,
+          },
+        ]
+      : []),
+    // La base no guarda cuándo se canceló: sin hora, antes que una inventada.
+    ...(cancelado
+      ? [{ titulo: "Cancelado", detalle: "", hecho: true, rojo: false }]
+      : []),
   ]
 
   return (

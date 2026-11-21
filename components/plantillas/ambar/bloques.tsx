@@ -39,7 +39,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
   const foto = fotoDePortada(bloque, tienda)
   const titulo = texto(bloque, "title") ?? tienda.nombre
   const bajada = texto(bloque, "subtitle")
-  const accion = accionDePortada(bloque) ?? "Ver los perfumes"
+  const accion = accionDePortada(bloque) ?? "Ver la colección"
 
   return (
     <section className="bg-tinta text-papel">
@@ -108,7 +108,7 @@ function Categorias({ bloque, tienda }: PropsBloque) {
 
   return (
     <section className="mx-auto w-full max-w-7xl px-5 py-12 md:py-20">
-      <Titulo titulo={texto(bloque, "title") ?? "Por familia"} />
+      <Titulo titulo={texto(bloque, "title") ?? "Explora la casa"} />
       <ul className="mt-7 grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
         {categorias.map((categoria) => (
           <li key={categoria.id}>
@@ -135,7 +135,7 @@ function Categorias({ bloque, tienda }: PropsBloque) {
               </span>
               <span className="tabular relative mt-0.5 text-xs opacity-70">
                 {categoria.productos}{" "}
-                {categoria.productos === 1 ? "perfume" : "perfumes"}
+                {categoria.productos === 1 ? "producto" : "productos"}
               </span>
             </Link>
           </li>
@@ -196,7 +196,7 @@ function Cierre({ bloque, tienda }: PropsBloque) {
           claro
           className="mt-8"
         >
-          {texto(bloque, "buttonLabel") ?? "Ver los perfumes"}
+          {texto(bloque, "buttonLabel") ?? "Ver la colección"}
         </Boton>
       </div>
       <ReglaDeEstrellas className="text-papel/35" />

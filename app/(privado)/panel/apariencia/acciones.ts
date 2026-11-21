@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
 import { exigirFuncion } from "@/lib/data/funciones"
+import { ponerTextosAceptados } from "@/lib/data/textos-a-medida"
 import { esClavePlantilla } from "@/lib/plantillas"
 import { createClient } from "@/lib/supabase/server"
 import { actualizarVistaDespues } from "@/lib/vista"
@@ -55,6 +56,9 @@ export async function cambiarPlantilla(
         : "No pudimos cambiar la plantilla. Inténtalo de nuevo.",
     }
   }
+
+  // Empieza con la portada de la nueva, pero con los textos que ya aceptó.
+  if (!datos.data.conservarSecciones) await ponerTextosAceptados()
 
   // Cambia cómo se ve todo: el panel, que toma la identidad de la plantilla, y
   // cada pantalla de la tienda pública.

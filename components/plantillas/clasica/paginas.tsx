@@ -32,6 +32,8 @@ import { FiltrosTienda } from "@/components/tienda/filtros"
  * La portada lleva los bloques y, debajo, el catálogo completo con su filtro:
  * los bloques son la cara del negocio, y el catálogo es lo que la gente vino a
  * usar. Por eso está siempre, aunque la plantilla no traiga ninguna grilla.
+ * Las secciones "Productos" se dibujan como las demás: antes se omitían para no
+ * repetir el catálogo, y lo que la persona editaba en ellas no se veía.
  */
 export function Inicio({ tienda, filtros }: PropsInicio) {
   const catalogo = filtrarCatalogo(tienda.productos, {
@@ -58,13 +60,7 @@ export function Inicio({ tienda, filtros }: PropsInicio) {
           </div>
         </section>
       ) : (
-        // La grilla de la plantilla sobra: abajo está el catálogo completo con
-        // su filtro, y dos grillas seguidas se leen como un error.
-        <Bloques
-          componentes={BLOQUES_CLASICOS}
-          tienda={tienda}
-          omitir={["product_grid"]}
-        />
+        <Bloques componentes={BLOQUES_CLASICOS} tienda={tienda} />
       )}
 
       <ParteFija
@@ -271,6 +267,7 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
       </Link>
 
       <div
+        data-ajuste="ficha.diseno"
         className={cn(
           "mt-8",
           vitrina
@@ -377,6 +374,7 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
 
             {consulta ? (
               <a
+                data-ajuste="ficha.consulta"
                 href={consulta}
                 target="_blank"
                 rel="noreferrer noopener"
@@ -391,7 +389,10 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
       </div>
 
       {ficha.relacionados && relacionados.length > 0 ? (
-        <section className="mt-20 border-t-2 border-tinta pt-10">
+        <section
+          data-ajuste="ficha.relacionados"
+          className="mt-20 border-t-2 border-tinta pt-10"
+        >
           <h2 className="font-titular text-[clamp(1.5rem,4vw,2.25rem)] leading-tight font-extrabold tracking-[-0.03em]">
             También te puede gustar
           </h2>
