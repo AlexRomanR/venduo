@@ -1,3 +1,4 @@
+import { conBotonDeMuestra } from "@/lib/catalogos/datos"
 import { leerEleccion } from "@/lib/catalogos/plantillas"
 import {
   getCatalogo,
@@ -43,7 +44,7 @@ export default async function EditorDeCatalogoDeLaAppPage({
 
   return (
     <EditorDeCatalogoDeLaApp
-      datos={material.datos}
+      datos={conBotonDeMuestra(material.datos, funciones.combos === "activa")}
       estiloDeTienda={material.estiloDeTienda}
       plantillaDeLaTienda={material.plantillaDeLaTienda}
       plantillas={plantillas}

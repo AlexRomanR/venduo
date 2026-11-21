@@ -85,4 +85,6 @@ panel); después la app (el pedido en Pedidos). Quien compra no usa la app.
       iPhone).
 - [x] Documentación: `VENDUO.md`, `domain-venduo.md`, `database-rls.md`,
       `docs/catalogos-pdf.md`, `architecture.md`, `estado-del-proyecto.md`.
-- [ ] La app, después de que el dueño apruebe la web.
+- [x] La app (20 de noviembre, rama `combos` de `venduo-app`): el descuento del combo en
+      la pestaña Combos, "Pedir este combo" en la vista previa y el pedido con los
+      productos del combo. Probado en el emulador contra la web y la base locales.

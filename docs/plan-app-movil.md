@@ -108,6 +108,18 @@ En orden. Todo es de quien publica, salvo lo de código que va primero.
    - [x] La misma tarjeta en el paso 3 del
          alta, donde "Usar estos textos" publica. Sin "Frase corta" en Datos de la tienda.
 
+   **Combos que se compran** (20 de noviembre, rama `combos` de la app; brief
+   `docs/briefs/2026-11-20-combos-que-se-compran.md`)
+   - [x] **Descuento del combo:** "Descuento" en % al lado del precio. Con descuento, el
+         precio sigue a los productos al sumar o quitar; escrito a mano queda fijo
+         (`src/nucleo/catalogo.ts`, espejo de `lib/catalogos/operaciones.ts`).
+   - [x] **"Pedir este combo" en la vista previa**: lo dibuja la web
+         (`conBotonDeMuestra`); el PDF guardado ya lo trae con la dirección de verdad.
+   - [x] **El pedido de un combo:** "Combo · 1 × Bs X" y sus productos con foto y talla,
+         y la foto del combo en la lista de Pedidos y en el Inicio.
+   - [x] **Restaurar** dice "Así está hoy" en la versión igual a la de hoy, y las fotos
+         de una carga van a `carga/` para que la web limpie las que quedan sueltas.
+
 1. **El proyecto de Expo** (`eas init` en la app): sin su identificador el teléfono no
    recibe un token de avisos. La base ya los manda: tablas, disparadores y el
    recordatorio diario están aplicados desde el 14 de octubre de 2026.

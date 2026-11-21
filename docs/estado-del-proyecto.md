@@ -775,8 +775,8 @@ textos sin IA de Publicar y el aviso del carrito. Del recorrido salieron:
   `docs/briefs/2026-11-20-combos-que-se-compran.md`): "Pedir este combo" en el PDF, la
   página del combo en la tienda, la línea en el carrito, en WhatsApp y en el pedido del
   panel, y el stock de cada producto al cobrar. Migraciones `20261120110000_combos.sql`
-  y `…_combos_rls.sql`, aplicadas en producción el 20 de noviembre. Falta: la app (el pedido con sus
-  productos), probar el enlace del PDF en un teléfono real, y para más adelante una
+  y `…_combos_rls.sql`, aplicadas en producción el 20 de noviembre. La app lo tiene desde el 20 de
+  noviembre (rama `combos`). Falta probar el enlace del PDF en un teléfono real, y para más adelante una
   sección de combos en la tienda y un lugar en el panel para editarlos.
 - **Canva directo**: crear la integración en el portal de desarrolladores de Canva,
   cargar `CANVA_CLIENT_ID` y `CANVA_CLIENT_SECRET` en Vercel y pedirle a Canva la

@@ -32,6 +32,7 @@ import {
   type ClavePlantilla,
 } from "@/lib/catalogos/constantes"
 import {
+  conBotonDeMuestra,
   elegidos,
   hojasDe,
   type DatosDelCatalogo,
@@ -181,20 +182,6 @@ const TODO_ACTIVO: FuncionesDelCatalogo = {
   combos: "activa",
 }
 
-/**
- * En la vista previa, cada combo lleva "Pedir este combo" como va a salir en
- * el PDF. Ahí no se toca, así que basta una dirección de muestra: la de verdad
- * la pone el servidor al armar el PDF del catálogo guardado.
- */
-function conElBotonDeCombo(
-  datos: DatosDelCatalogo,
-  combos: EstadoDeFuncion
-): DatosDelCatalogo {
-  return combos === "activa" && !datos.combos
-    ? { ...datos, combos: "#{combo}" }
-    : datos
-}
-
 export interface CatalogoInicial {
   id: string
   catalogo: Catalogo
@@ -240,7 +227,7 @@ export function Constructor({
   empezarCon?: EleccionDePlantilla | null
 }) {
   const datos = React.useMemo(
-    () => conElBotonDeCombo(datosDeLaTienda, funciones.combos),
+    () => conBotonDeMuestra(datosDeLaTienda, funciones.combos === "activa"),
     [datosDeLaTienda, funciones.combos]
   )
   const sugeridos = React.useMemo(

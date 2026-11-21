@@ -63,6 +63,20 @@ export interface DatosDelCatalogo {
   combos?: string | null
 }
 
+/**
+ * Para la vista previa del editor: cada combo lleva "Pedir este combo" como va
+ * a salir en el PDF. Ahí no se toca, así que basta una dirección de muestra; la
+ * de verdad la pone el servidor al armar el PDF del catálogo guardado.
+ */
+export function conBotonDeMuestra(
+  datos: DatosDelCatalogo,
+  combosActivos: boolean
+): DatosDelCatalogo {
+  return combosActivos && !datos.combos
+    ? { ...datos, combos: "#{combo}" }
+    : datos
+}
+
 /** La dirección de la página de un combo, si el catálogo la tiene. */
 export function enlaceDeCombo(
   datos: DatosDelCatalogo,
