@@ -159,16 +159,17 @@ que agregan los dos registros del cuaderno, y "La portada", "El Resumen" y "Las 
 de trabajo".
 
 **Una tienda `/t/{slug}` usa el mundo de su plantilla; el panel de su dueño, este.** La
-tienda queda reconocible en el panel por su sello, un recuadro con su papel, su letra y su
-color de acción. Las plantillas redefinen estos mismos tokens —papel, tinta, señal, titular,
+tienda queda reconocible en el panel por su portada: la captura de su tienda, arriba de la
+barra lateral y en el Resumen. Las plantillas redefinen estos mismos tokens —papel, tinta, señal, titular,
 cuerpo, radio— y traen sus propios componentes; sus valores están en
 `lib/plantillas` y el sistema entero en `docs/store-templates.md`. Este documento
 es además **la base editorial**: la plantilla de respaldo con la que se dibuja
 toda tienda cuya plantilla se retiró. Sus letras y sus reglas son las de este
 documento, pero **sus colores no siguieron a la marca**: la base editorial
 (`lib/plantillas/clasica.ts`) conserva el papel `#f1f0ee`, la tinta `#16171a` y el rojo
-`#d62d12`, porque es una plantilla de tienda y cambiarla le cambiaría la cara a las
-tiendas que la usan. El `toldo` no lo redefine ninguna plantilla: es solo del logo de
+`#cc2a10`, porque es una plantilla de tienda y cambiarla le cambiaría la cara a las
+tiendas que la usan. El rojo se oscureció apenas (era `#d62d12`) para llegar a 4,72:1
+contra el papel. El `toldo` no lo redefine ninguna plantilla: es solo del logo de
 Venduo.
 
 Los tokens por defecto de shadcn (`--background`, `--foreground`, `--primary`…)

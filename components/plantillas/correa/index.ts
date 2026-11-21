@@ -33,11 +33,10 @@ export const KIT_CORREA: KitDeTienda = {
     Cierre,
     marcoDeFoto: "rounded-[1.25rem] bg-tinta/[0.04]",
     textos: {
-      sinProductos: "Las carteras están en camino",
-      consulta: "¿Quieres saber las medidas? Pregúntanos",
-      estado: "Estado de la cartera",
+      sinProductos: "Lo nuevo está en camino",
+      consulta: "¿Quieres saber más? Pregúntanos",
       sinResultados:
-        "Ninguna cartera con eso. Prueba con otro tamaño o ve todas.",
+        "Nada con eso por ahora. Prueba con otra categoría o ve todo.",
     },
   }),
 }

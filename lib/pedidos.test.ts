@@ -70,6 +70,36 @@ describe("mensajeDePedido", () => {
       ].join(" ")
     )
   })
+
+  it("un combo lleva lo que trae debajo, con su talla", () => {
+    const mensaje = mensajeDePedido({
+      numero: 7,
+      tienda: "Rosa Deportes",
+      lineas: [
+        {
+          nombre: "Combo Verano",
+          cantidad: 2,
+          totalCents: 50000,
+          partes: [
+            { nombre: "Polera", variante: "M" },
+            { nombre: "Gorra", variante: null },
+          ],
+        },
+      ],
+      totalCents: 50000,
+    })
+    expect(mensaje.replace(/\s/g, " ")).toBe(
+      [
+        "Hola Rosa Deportes, quiero hacer este pedido (#7):",
+        "",
+        "· 2× Combo Verano — Bs 500",
+        "   - Polera (M)",
+        "   - Gorra",
+        "",
+        "Total: Bs 500",
+      ].join(" ")
+    )
+  })
 })
 
 describe("SIGUIENTES", () => {

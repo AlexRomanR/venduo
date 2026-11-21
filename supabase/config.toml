@@ -255,6 +255,14 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# El correo para elegir otra contraseña, en español. Lleva a /auth/confirmar con
+# token_hash, que funciona aunque se abra en otro navegador. En producción se
+# pega el mismo HTML en el panel de Supabase: Authentication → Emails → Reset
+# Password.
+[auth.email.template.recovery]
+subject = "Tu enlace para volver a entrar a Venduo"
+content_path = "./supabase/templates/recuperar.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"

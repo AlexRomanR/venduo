@@ -50,7 +50,7 @@ export const PLANTILLAS_DE_CATALOGO: Record<
 > = {
   minimal: {
     clave: "minimal",
-    nombre: "Grilla minimalista",
+    nombre: "Cuadrícula minimalista",
     detalle: "Tus productos en orden, nueve por hoja y con mucho aire.",
     ideal: "Todo rubro",
     hoja: "a4",
@@ -65,7 +65,7 @@ export const PLANTILLAS_DE_CATALOGO: Record<
   },
   lookbook: {
     clave: "lookbook",
-    nombre: "Lookbook",
+    nombre: "Fotos grandes",
     detalle: "Fotos grandes de a dos por hoja, para mostrar cómo se ve.",
     ideal: "Ropa, calzado, accesorios",
     hoja: "a4",
@@ -95,7 +95,7 @@ export const PLANTILLAS_DE_CATALOGO: Record<
   historia: {
     clave: "historia",
     nombre: "Historia vertical",
-    detalle: "Hojas 9:16 para ver a pantalla completa, una por producto.",
+    detalle: "Para ver a pantalla completa en el celular, una por producto.",
     ideal: "Estados de WhatsApp, historias",
     hoja: "historia",
   },
@@ -115,7 +115,7 @@ export const PLANTILLAS_DE_CATALOGO: Record<
   },
   packs: {
     clave: "packs",
-    nombre: "Packs y combos",
+    nombre: "Combos",
     detalle: "Tus combos primero, con lo que se ahorra quien compra.",
     ideal: "Regalos, kits, promociones",
     hoja: "a4",
@@ -129,7 +129,7 @@ export const PLANTILLAS_DE_CATALOGO: Record<
   },
   flyer: {
     clave: "flyer",
-    nombre: "Flyer",
+    nombre: "Volante",
     detalle: "Una sola hoja con lo mejor, tu contacto y tu QR.",
     ideal: "Imprimir, pegar, mandar",
     hoja: "a4",
@@ -660,7 +660,7 @@ export function estilosDeLaTienda(
     {
       clave: "tonos",
       nombre: "Tonos de tu color",
-      detalle: "Todo en la gama de tu acento, del más claro al más profundo.",
+      detalle: "Todo en la gama de tu color, del más claro al más profundo.",
       plantilla: "feria",
       estilo: {
         ...estilo,

@@ -7,6 +7,7 @@ import { Check, Minus, Plus, Sparkles } from "lucide-react"
 import type { ProductoDelCatalogo } from "@/lib/catalogos/datos"
 import { GRILLA_DE_FICHAS_LARGAS } from "@/lib/estilos"
 import { cn } from "@/lib/utils"
+import { VerTodas } from "@/components/editor/piezas"
 
 /*
  * Los campos del editor de catálogos.
@@ -21,7 +22,7 @@ export const ETIQUETA =
   "text-xs font-semibold tracking-[0.12em] uppercase opacity-65"
 
 const CAJA =
-  "w-full border-0 border-b border-tinta/40 bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:outline-none"
+  "w-full border-0 border-b border-tinta/60 bg-transparent px-0 text-base transition-colors placeholder:text-tinta/65 focus-visible:border-tinta focus-visible:bg-tinta/[0.04]"
 
 export function CampoTexto({
   id,
@@ -85,7 +86,7 @@ export function CampoArea({
         <label htmlFor={id} className={ETIQUETA}>
           {etiqueta}
         </label>
-        <span className="tabular text-xs opacity-55">
+        <span className="tabular text-xs opacity-70">
           {valor.length}/{maximo}
         </span>
       </div>
@@ -145,7 +146,7 @@ export function Interruptor({
       >
         <span
           className={cn(
-            "absolute top-0.5 size-4 transition-[left] duration-200 motion-reduce:transition-none",
+            "absolute top-0.5 size-4 rounded-full transition-[left] duration-200 motion-reduce:transition-none",
             activo ? "left-[18px] bg-papel" : "left-0.5 bg-tinta"
           )}
         />
@@ -208,23 +209,38 @@ export function Contador({
   )
 }
 
-/** Elegir entre pocas opciones con fichas: la variante de una hoja, por ejemplo. */
+/**
+ * Elegir con fichas: el diseño de una parte, por ejemplo. Con `limite` muestra
+ * las primeras y siempre la elegida; con dibujos, se elige mirando.
+ */
 export function Fichas<T extends string>({
   etiqueta,
   valor,
   opciones,
+  limite,
   alCambiar,
 }: {
   etiqueta: string
   valor: T
-  opciones: { valor: T; etiqueta: string }[]
+  opciones: { valor: T; etiqueta: string; dibujo?: React.ReactNode }[]
+  limite?: number
   alCambiar: (valor: T) => void
 }) {
+  const [todas, setTodas] = React.useState(false)
+  const primeras = limite ? opciones.slice(0, limite) : opciones
+  const elegida = opciones.find((opcion) => opcion.valor === valor)
+  const visibles =
+    todas || !limite
+      ? opciones
+      : !elegida || primeras.includes(elegida)
+        ? primeras
+        : [...primeras.slice(0, limite - 1), elegida]
+
   return (
     <fieldset className="min-w-0">
       <legend className={ETIQUETA}>{etiqueta}</legend>
       <div className={cn(GRILLA_DE_FICHAS_LARGAS, "mt-2")}>
-        {opciones.map((opcion) => {
+        {visibles.map((opcion) => {
           const activa = opcion.valor === valor
           return (
             <button
@@ -233,12 +249,13 @@ export function Fichas<T extends string>({
               aria-pressed={activa}
               onClick={() => alCambiar(opcion.valor)}
               className={cn(
-                "flex min-h-11 w-full min-w-0 items-center justify-center border px-2 py-1.5 text-sm font-semibold transition-colors",
+                "flex min-h-11 w-full min-w-0 flex-col items-center justify-center gap-1.5 rounded-[12px] border px-2 py-2 text-sm font-semibold transition-colors",
                 activa
                   ? "border-tinta bg-tinta text-papel"
                   : "border-tinta/25 hover:border-tinta"
               )}
             >
+              {opcion.dibujo}
               <span className="text-center leading-tight">
                 {opcion.etiqueta}
               </span>
@@ -246,6 +263,12 @@ export function Fichas<T extends string>({
           )
         })}
       </div>
+      {todas || !limite || opciones.length <= limite ? null : (
+        <VerTodas
+          texto={`Ver los ${opciones.length} diseños`}
+          alTocar={() => setTodas(true)}
+        />
+      )}
     </fieldset>
   )
 }

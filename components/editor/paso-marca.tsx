@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, CircleCheck, RotateCcw } from "lucide-react"
+import { ImageIcon, Palette, RectangleHorizontal, Type } from "lucide-react"
 
 import {
   COMBINACIONES,
@@ -12,21 +12,26 @@ import {
 } from "@/lib/editor/sugerencias"
 import {
   colorLegibleCercano,
-  ESPACIADOS,
   problemasDeContraste,
   senalAltaDe,
   type Apariencia,
   type TokenDeColor,
 } from "@/lib/plantillas/apariencia"
 import type { Operacion } from "@/lib/plantillas/borrador"
-import { familiaDe } from "@/lib/plantillas/fuentes"
-import { cn } from "@/lib/utils"
+import { Fila } from "@/components/panel/ajustes"
 import { useEditor } from "@/components/editor/contexto"
 import { Logo } from "@/components/editor/logo"
 import {
-  Aviso,
+  AvisoDeLegibilidad,
+  ElegirCadaUno,
+  FilaDeColor,
+  ListaDeLetras,
+  ListaDePaletas,
+  OpcionDeMayusculas,
+} from "@/components/editor/marca"
+import {
+  AjusteAbierto,
   EncabezadoDePaso,
-  Grupo,
   Opciones,
   SiguientePaso,
 } from "@/components/editor/piezas"
@@ -40,16 +45,16 @@ const COLORES_EDITABLES: Array<{
   { token: "tinta", nombre: "Texto", para: "Títulos, textos y líneas" },
   {
     token: "senal",
-    nombre: "Botones",
-    para: "Comprar, precios destacados y acentos",
+    nombre: "Color destacado",
+    para: "Ofertas, precios y algunos botones",
   },
 ]
 
 const NOMBRE_DE_TOKEN: Record<TokenDeColor, string> = {
   papel: "el fondo",
   tinta: "el texto",
-  senal: "los botones",
-  senalAlta: "los botones",
+  senal: "el color destacado",
+  senalAlta: "el color destacado",
 }
 
 const TODOS_LOS_COLORES = ["papel", "tinta", "senal", "senalAlta"] as const
@@ -61,44 +66,125 @@ const TODA_LA_LETRA = [
   "mayusculas",
 ] as const
 
+type Ajuste = "logo" | "colores" | "letra" | "botones"
+
+const NOMBRE_DE_FORMA = {
+  recto: "Rectos",
+  suave: "Suaves",
+  redondo: "Redondos",
+} as const
+
 /**
- * Paso 1: lo que hace reconocible a la tienda. Logo, colores, letra y forma
- * de los botones, que se aplican en todas las pantallas a la vez.
+ * Tu marca: lo que hace reconocible a la tienda, en cuatro filas con lo que hoy
+ * tiene cada una. Tocar una abre su ajuste en este mismo panel, como una sección
+ * de la Página de inicio, y la tienda sigue a la vista.
  */
 export function PasoMarca() {
-  const { irAPaso } = useEditor()
+  const { irAPaso, apariencia, borrador } = useEditor()
+  const [abierto, setAbierto] = React.useState<Ajuste | null>(null)
+  const { personalizacion, logoUrl } = borrador.presente
+  const volver = () => setAbierto(null)
 
-  return (
-    <>
-      <EncabezadoDePaso
-        numero={1}
-        titulo="Tu marca"
-        bajada="Tu logo, tus colores y tu letra. Lo que elijas aquí se aplica en toda tu tienda: la portada, el catálogo, cada producto y el carrito."
-      />
-
-      <Grupo titulo="Logo">
+  if (abierto === "logo") {
+    return (
+      <AjusteAbierto volver="Marca" titulo="Logo" principal alVolver={volver}>
         <Logo />
-      </Grupo>
-
-      <Grupo
+      </AjusteAbierto>
+    )
+  }
+  if (abierto === "colores") {
+    return (
+      <AjusteAbierto
+        volver="Marca"
+        principal
         titulo="Colores"
-        ayuda="Toca una paleta para probarla, o elige cada color."
+        ayuda="Toca una paleta para probarla en tu tienda."
+        alVolver={volver}
       >
         <Paletas />
-        <ColoresPropios />
         <Legibilidad />
-      </Grupo>
-
-      <Grupo titulo="Letra" ayuda="Una para los títulos y otra para leer.">
+        <ColorExacto />
+      </AjusteAbierto>
+    )
+  }
+  if (abierto === "letra") {
+    return (
+      <AjusteAbierto
+        volver="Marca"
+        principal
+        titulo="Letra"
+        ayuda="Una para los títulos y otra para leer."
+        alVolver={volver}
+      >
         <Combinaciones />
         <div className="mt-5">
           <Mayusculas />
         </div>
-      </Grupo>
-
-      <Grupo titulo="Forma de los botones">
+      </AjusteAbierto>
+    )
+  }
+  if (abierto === "botones") {
+    return (
+      <AjusteAbierto
+        volver="Marca"
+        principal
+        titulo="Forma de los botones"
+        ayuda="También cambia los filtros y el buscador."
+        alVolver={volver}
+      >
         <Forma />
-      </Grupo>
+      </AjusteAbierto>
+    )
+  }
+
+  const paleta = PALETAS.find((p) => esLaPaleta(apariencia.colores, p))
+  const colores = sinCambios(personalizacion, "colores")
+    ? "De tu plantilla"
+    : (paleta?.nombre ?? "A tu gusto")
+  const combinacion = COMBINACIONES.find((c) =>
+    esLaCombinacion(apariencia.tipografia, c)
+  )
+  const letra = sinCambios(personalizacion, "tipografia")
+    ? "De tu plantilla"
+    : (combinacion?.nombre ?? "A tu gusto")
+  const noSeLee = problemasDeContraste(apariencia.colores).length > 0
+
+  return (
+    <>
+      <EncabezadoDePaso
+        titulo="Marca"
+        bajada="Lo que elijas aquí se aplica en toda tu tienda."
+      />
+      <div className="px-5 pb-5">
+        <ul className="pieza-tarjeta border border-tinta">
+          <Fila
+            icono={ImageIcon}
+            titulo="Logo"
+            valor={logoUrl ? "Agregado" : "Sin logo"}
+            apagado={!logoUrl}
+            alTocar={() => setAbierto("logo")}
+          />
+          <Fila
+            icono={Palette}
+            titulo="Colores"
+            valor={colores}
+            error={noSeLee ? "Algo no se lee bien" : undefined}
+            alTocar={() => setAbierto("colores")}
+          />
+          <Fila
+            icono={Type}
+            titulo="Letra"
+            valor={letra}
+            alTocar={() => setAbierto("letra")}
+          />
+          <Fila
+            icono={RectangleHorizontal}
+            titulo="Botones"
+            valor={NOMBRE_DE_FORMA[apariencia.forma.radio]}
+            alTocar={() => setAbierto("botones")}
+          />
+        </ul>
+      </div>
 
       <SiguientePaso nombre="Portada" alIr={() => irAPaso("portada")} />
     </>
@@ -118,70 +204,29 @@ function Paletas() {
     borrador.aplicar(operaciones)
   }
 
-  return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-2">
-      <MuestraDePaleta
-        nombre="La de tu plantilla"
-        colores={base.colores}
-        activa={deLaPlantilla}
-        alElegir={() => usar(null)}
-      />
-      {PALETAS.map((paleta) => (
-        <MuestraDePaleta
-          key={paleta.nombre}
-          nombre={paleta.nombre}
-          colores={paleta.colores}
-          activa={!deLaPlantilla && esLaPaleta(apariencia.colores, paleta)}
-          alElegir={() => usar(paleta.colores)}
-        />
-      ))}
-    </div>
-  )
-}
+  const muestra = (colores: Apariencia["colores"]) => ({
+    papel: colores.papel,
+    tinta: colores.tinta,
+    destacado: colores.senal,
+  })
 
-function MuestraDePaleta({
-  nombre,
-  colores,
-  activa,
-  alElegir,
-}: {
-  nombre: string
-  colores: Apariencia["colores"]
-  activa: boolean
-  alElegir: () => void
-}) {
   return (
-    <button
-      type="button"
-      aria-pressed={activa}
-      onClick={alElegir}
-      className={cn(
-        "group flex flex-col overflow-hidden rounded-[14px] border bg-hoja text-left transition-colors",
-        activa
-          ? "border-tinta outline-2 outline-offset-2 outline-tinta"
-          : "border-tinta/20 hover:border-tinta/60"
-      )}
-    >
-      {/* La muestra se pinta con los colores de la paleta, no con los del
-          editor: es un pedacito de la tienda como quedaría. */}
-      <span
-        className="flex h-16 items-end justify-between gap-2 p-2.5"
-        style={{ background: colores.papel, color: colores.tinta }}
-      >
-        <span className="font-titular text-xl leading-none font-extrabold">
-          Aa
-        </span>
-        <span
-          aria-hidden="true"
-          className="h-5 w-10 rounded-sm transition-transform duration-300 group-hover:-translate-y-0.5 motion-reduce:transform-none"
-          style={{ background: colores.senal }}
-        />
-      </span>
-      <span className="flex min-h-9 items-center justify-between gap-2 border-t border-tinta/15 px-2.5 text-xs font-semibold">
-        {nombre}
-        {activa ? <Check aria-hidden="true" className="size-3.5" /> : null}
-      </span>
-    </button>
+    <ListaDePaletas
+      opciones={[
+        {
+          nombre: "De tu plantilla",
+          colores: muestra(base.colores),
+          activa: deLaPlantilla,
+          alElegir: () => usar(null),
+        },
+        ...PALETAS.map((paleta) => ({
+          nombre: paleta.nombre,
+          colores: muestra(paleta.colores),
+          activa: !deLaPlantilla && esLaPaleta(apariencia.colores, paleta),
+          alElegir: () => usar(paleta.colores),
+        })),
+      ]}
+    />
   )
 }
 
@@ -210,114 +255,53 @@ function useCambiarColor() {
   )
 }
 
-function ColoresPropios() {
+/** Cada color por separado, para quien ya tiene los de su marca. */
+function ColorExacto() {
   const { apariencia, borrador } = useEditor()
   const cambiar = useCambiarColor()
   const propios = borrador.presente.personalizacion.colores ?? {}
 
   return (
-    <ul className="mt-5 border-t border-tinta/15">
-      {COLORES_EDITABLES.map(({ token, nombre, para }) => {
-        const valor = apariencia.colores[token]
-        return (
-          <li
+    <ElegirCadaUno
+      titulo="Elegir cada color"
+      abiertoAlInicio={
+        Object.keys(propios).length > 0 &&
+        !PALETAS.some((paleta) => esLaPaleta(apariencia.colores, paleta))
+      }
+    >
+      <ul className="mt-2 border-t border-tinta/15">
+        {COLORES_EDITABLES.map(({ token, nombre, para }) => (
+          <FilaDeColor
             key={token}
-            className="flex items-center gap-3 border-b border-tinta/15 py-2"
-          >
-            <label
-              className="relative size-11 shrink-0 cursor-pointer border border-tinta/25 transition-transform hover:scale-105 motion-reduce:transform-none"
-              style={{ background: valor }}
-            >
-              <span className="sr-only">Elegir el color de {nombre}</span>
-              <input
-                type="color"
-                value={valor}
-                onChange={(evento) => cambiar(token, evento.target.value)}
-                className="absolute inset-0 size-full cursor-pointer opacity-0"
-              />
-            </label>
-            <span className="min-w-0 flex-1">
-              <span className="block text-sm font-semibold">{nombre}</span>
-              <span className="block truncate text-xs opacity-55">{para}</span>
-            </span>
-            <CampoHex
-              etiqueta={`Código del color de ${nombre}`}
-              valor={valor}
-              alCambiar={(hex) => cambiar(token, hex, false)}
-            />
-            {token in propios ? (
-              <button
-                type="button"
-                aria-label={`Volver al color de ${nombre} de la plantilla`}
-                title="Volver al de la plantilla"
-                onClick={() =>
-                  borrador.aplicar(
-                    token === "senal"
-                      ? [
-                          { op: "restablecer", ruta: "colores.senal" },
-                          { op: "restablecer", ruta: "colores.senalAlta" },
-                        ]
-                      : [{ op: "restablecer", ruta: `colores.${token}` }]
-                  )
-                }
-                className="-mr-2 flex size-11 shrink-0 items-center justify-center opacity-60 transition-opacity hover:opacity-100"
-              >
-                <RotateCcw aria-hidden="true" className="size-4" />
-              </button>
-            ) : (
-              <span aria-hidden="true" className="-mr-2 size-11 shrink-0" />
-            )}
-          </li>
-        )
-      })}
-    </ul>
-  )
-}
-
-/** El código del color, para quien ya tiene el de su marca. */
-function CampoHex({
-  etiqueta,
-  valor,
-  alCambiar,
-}: {
-  etiqueta: string
-  valor: string
-  alCambiar: (hex: string) => void
-}) {
-  const [texto, setTexto] = React.useState(valor)
-  React.useEffect(() => setTexto(valor), [valor])
-
-  function confirmar() {
-    const limpio = texto.trim().replace(/^#?/, "#").toLowerCase()
-    if (/^#[0-9a-f]{6}$/.test(limpio)) {
-      if (limpio !== valor) alCambiar(limpio)
-      setTexto(limpio)
-    } else {
-      setTexto(valor)
-    }
-  }
-
-  return (
-    <input
-      aria-label={etiqueta}
-      value={texto}
-      onChange={(evento) => setTexto(evento.target.value)}
-      onBlur={confirmar}
-      onKeyDown={(evento) => {
-        if (evento.key === "Enter") {
-          evento.preventDefault()
-          confirmar()
-        }
-      }}
-      maxLength={7}
-      spellCheck={false}
-      className="tabular h-11 w-[5.5rem] shrink-0 border-0 border-b border-tinta/30 bg-transparent px-0 font-mono text-sm uppercase transition-colors focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:outline-none"
-    />
+            nombre={nombre}
+            para={para}
+            valor={apariencia.colores[token]}
+            alCambiar={(hex, escribiendo) => cambiar(token, hex, !escribiendo)}
+            volver={
+              token in propios
+                ? {
+                    titulo: "Volver al de tu plantilla",
+                    alTocar: () =>
+                      borrador.aplicar(
+                        token === "senal"
+                          ? [
+                              { op: "restablecer", ruta: "colores.senal" },
+                              { op: "restablecer", ruta: "colores.senalAlta" },
+                            ]
+                          : [{ op: "restablecer", ruta: `colores.${token}` }]
+                      ),
+                  }
+                : null
+            }
+          />
+        ))}
+      </ul>
+    </ElegirCadaUno>
   )
 }
 
 /**
- * Si la paleta se lee, y si no, qué no se lee y con qué color se arregla.
+ * Si la paleta se lee, y si no, con qué color se arregla.
  *
  * La sugerencia cambia el color que la persona tocó último, que es el que
  * está eligiendo; si ese no alcanza, prueba con los otros del problema.
@@ -326,15 +310,6 @@ function Legibilidad() {
   const { apariencia, ultimoColor } = useEditor()
   const cambiar = useCambiarColor()
   const problemas = problemasDeContraste(apariencia.colores)
-
-  if (problemas.length === 0) {
-    return (
-      <p className="mt-4 flex items-center gap-2 text-sm opacity-70">
-        <CircleCheck aria-hidden="true" className="size-4 shrink-0" />
-        Todo se lee bien.
-      </p>
-    )
-  }
 
   const candidatos = [
     ...(ultimoColor ? [ultimoColor] : []),
@@ -349,37 +324,23 @@ function Legibilidad() {
       break
     }
   }
+  const elegido = arreglo
 
   return (
-    <Aviso tono="problema" className="mt-4">
-      <p className="font-semibold">Así no se va a leer bien.</p>
-      <ul className="mt-1 opacity-80">
-        {problemas.map((problema) => (
-          <li key={problema.mensaje}>{problema.mensaje}</li>
-        ))}
-      </ul>
-      {arreglo ? (
-        <button
-          type="button"
-          onClick={() => arreglo && cambiar(arreglo.token, arreglo.hex, false)}
-          className="mt-2 inline-flex min-h-11 items-center gap-2 font-semibold text-senal transition-colors hover:text-senal-alta"
-        >
-          <span
-            aria-hidden="true"
-            className="size-5 border border-tinta/25"
-            style={{ background: arreglo.hex }}
-          />
-          Usar este tono para {NOMBRE_DE_TOKEN[arreglo.token]}
-        </button>
-      ) : (
-        <p className="mt-2 opacity-80">
-          Prueba con un fondo más claro: los botones llevan letra blanca.
-        </p>
-      )}
-      <p className="mt-1 text-xs opacity-60">
-        Mientras no se lea, no se puede publicar.
-      </p>
-    </Aviso>
+    <AvisoDeLegibilidad
+      problemas={problemas.map((problema) => problema.mensaje)}
+      arreglo={
+        elegido
+          ? {
+              hex: elegido.hex,
+              texto: `Usar este tono para ${NOMBRE_DE_TOKEN[elegido.token]}`,
+              alUsar: () => cambiar(elegido.token, elegido.hex, false),
+            }
+          : null
+      }
+      sinArreglo="Prueba con un fondo más claro: los botones llevan letra blanca."
+      consecuencia="Mientras no se lea, no se puede publicar."
+    />
   )
 }
 
@@ -404,68 +365,27 @@ function Combinaciones() {
     )
   }
 
-  const opciones = [
-    {
-      nombre: "La de tu plantilla",
-      ideal: "Como vino",
-      tipografia: base.tipografia,
-      activa: deLaPlantilla,
-      usar: () => usar(null),
-    },
-    ...COMBINACIONES.map((combinacion) => ({
-      nombre: combinacion.nombre,
-      ideal: combinacion.ideal,
-      tipografia: combinacion.tipografia,
-      activa:
-        !deLaPlantilla && esLaCombinacion(apariencia.tipografia, combinacion),
-      usar: () => usar(combinacion.tipografia),
-    })),
-  ]
-
   return (
-    <div className="grid grid-cols-2 gap-2">
-      {opciones.map((opcion) => (
-        <button
-          key={opcion.nombre}
-          type="button"
-          aria-pressed={opcion.activa}
-          onClick={opcion.usar}
-          className={cn(
-            "flex flex-col border text-left transition-colors",
-            opcion.activa
-              ? "border-tinta bg-tinta text-papel"
-              : "border-tinta/20 hover:border-tinta/60"
-          )}
-        >
-          <span
-            className="block px-3 pt-3 text-[1.9rem] leading-none"
-            style={{
-              fontFamily: familiaDe(opcion.tipografia.titular),
-              fontWeight: opcion.tipografia.pesoTitular ?? 700,
-              letterSpacing:
-                ESPACIADOS[opcion.tipografia.espaciadoTitular ?? "normal"],
-              textTransform: opcion.tipografia.mayusculas
-                ? "uppercase"
-                : "none",
-            }}
-          >
-            Aa
-          </span>
-          <span
-            className="block px-3 pt-2 text-sm font-semibold"
-            style={{ fontFamily: familiaDe(opcion.tipografia.cuerpo) }}
-          >
-            {opcion.nombre}
-          </span>
-          <span
-            className="block px-3 pb-3 text-xs leading-snug opacity-60"
-            style={{ fontFamily: familiaDe(opcion.tipografia.cuerpo) }}
-          >
-            {opcion.ideal}
-          </span>
-        </button>
-      ))}
-    </div>
+    <ListaDeLetras
+      opciones={[
+        {
+          nombre: "De tu plantilla",
+          ideal: "La que trae tu plantilla",
+          tipografia: base.tipografia,
+          activa: deLaPlantilla,
+          alElegir: () => usar(null),
+        },
+        ...COMBINACIONES.map((combinacion) => ({
+          nombre: combinacion.nombre,
+          ideal: combinacion.ideal,
+          tipografia: combinacion.tipografia,
+          activa:
+            !deLaPlantilla &&
+            esLaCombinacion(apariencia.tipografia, combinacion),
+          alElegir: () => usar(combinacion.tipografia),
+        })),
+      ]}
+    />
   )
 }
 
@@ -473,19 +393,14 @@ function Mayusculas() {
   const { borrador, apariencia } = useEditor()
 
   return (
-    <Opciones
-      etiqueta="Títulos"
-      valor={apariencia.tipografia.mayusculas ? "si" : "no"}
-      opciones={[
-        { valor: "no", etiqueta: "Títulos normales" },
-        { valor: "si", etiqueta: "TÍTULOS EN MAYÚSCULAS" },
-      ]}
-      alCambiar={(valor) =>
+    <OpcionDeMayusculas
+      valor={apariencia.tipografia.mayusculas}
+      alCambiar={(mayusculas) =>
         borrador.aplicar([
           {
             op: "apariencia",
             ruta: "tipografia.mayusculas",
-            valor: valor === "si",
+            valor: mayusculas,
           },
         ])
       }

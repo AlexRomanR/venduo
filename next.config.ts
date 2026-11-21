@@ -9,6 +9,15 @@ const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL)
   : undefined
 
+/**
+ * Solo en local: otra base cuyas fotos también se aceptan. Una tienda copiada
+ * de producción a la base de Docker sigue con sus fotos allá, y sin esto
+ * next/image tumbaba el editor. En Vercel no se define.
+ */
+const otraBase = process.env.IMAGENES_DE_OTRA_BASE
+  ? new URL(process.env.IMAGENES_DE_OTRA_BASE)
+  : undefined
+
 const nextConfig: NextConfig = {
   // `@react-pdf/renderer` arma el documento con un reconciliador propio y
   // lee las fuentes del disco: empaquetarlo lo rompe. Se deja que el runtime
@@ -66,6 +75,9 @@ const nextConfig: NextConfig = {
   },
 
   images: {
+    // Las calidades que se usan con `quality`: Next avisa por cualquier otra, y
+    // desde Next 16 la rechaza. 85 es la de las capturas de la barra lateral.
+    qualities: [75, 85],
     remotePatterns: [
       ...(supabase
         ? [
@@ -74,6 +86,16 @@ const nextConfig: NextConfig = {
               hostname: supabase.hostname,
               port: supabase.port,
               pathname: "/storage/v1/object/**",
+            } as const,
+          ]
+        : []),
+      ...(otraBase
+        ? [
+            {
+              protocol: otraBase.protocol === "http:" ? "http" : "https",
+              hostname: otraBase.hostname,
+              port: otraBase.port,
+              pathname: "/storage/v1/object/public/**",
             } as const,
           ]
         : []),

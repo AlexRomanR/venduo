@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Logo } from "@/components/marca/logo"
+import { VueltaAlPanel } from "@/components/onboarding/vuelta-al-panel"
 import { archivoAncho, kalam } from "@/components/portada/letras"
 
 /**
@@ -56,13 +57,9 @@ export function Marco({
           ) : (
             <>
               {conPanel ? (
-                <Link
-                  href="/auth/destino"
+                <VueltaAlPanel
                   className={cn(accion, "font-semibold text-tinta")}
-                >
-                  <ArrowLeft aria-hidden="true" className="size-4" />
-                  Volver a mi panel
-                </Link>
+                />
               ) : null}
               <form action="/auth/sign-out" method="post">
                 <button type="submit" className={accion}>

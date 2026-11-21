@@ -120,6 +120,11 @@ export const html: Primitivas = {
     <div style={{ ...CAJA, ...aCss(estilo) }}>{children}</div>
   ),
 
+  // En la vista previa no se navega: es la hoja, no la tienda.
+  Enlace: ({ estilo, children }) => (
+    <div style={{ ...CAJA, ...aCss(estilo) }}>{children}</div>
+  ),
+
   Texto: ({ estilo, lineas, children }) => (
     <div
       style={{

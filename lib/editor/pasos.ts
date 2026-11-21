@@ -8,8 +8,7 @@
 export const CLAVES_DE_PASO = [
   "marca",
   "portada",
-  "catalogo",
-  "producto",
+  "productos",
   "carrito",
   "publicar",
 ] as const
@@ -21,4 +20,10 @@ export function esClaveDePaso(valor: unknown): valor is ClaveDePaso {
     typeof valor === "string" &&
     (CLAVES_DE_PASO as readonly string[]).includes(valor)
   )
+}
+
+/** El paso de una dirección, también de las guardadas con los nombres de antes. */
+export function pasoDeLaDireccion(valor: unknown): ClaveDePaso {
+  if (valor === "catalogo" || valor === "producto") return "productos"
+  return esClaveDePaso(valor) ? valor : "marca"
 }

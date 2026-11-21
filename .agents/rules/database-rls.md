@@ -59,6 +59,12 @@ using (store_id = public.my_store_id())
 
 ```
 
+**Una tienda se lee desde afuera solo si se sirve.** La política "tiendas: leer" es
+`owner_id = (select auth.uid()) or store_is_live(id)`: una tienda pausada, bloqueada,
+dada de baja o en borrador no la ve quien compra, aunque esté publicada
+(`20261118120000_tienda_que_no_se_sirve.sql`). Antes bastaba con `is_published` y se
+veía su cascarón sin productos.
+
 ### Dos trampas
 
 **Recursión.** Una política sobre una tabla que consulte esa misma tabla cuelga la
@@ -124,7 +130,17 @@ deja una tienda a medio crear.
 ## Los catálogos en PDF
 
 `catalogs` guarda la configuración de cada catálogo y **nunca precios ni
-stock**: se leen cada vez que se arma el PDF. Es del dueño —leer, crear y editar
+stock** de los productos: se leen cada vez que se arma el PDF. **La excepción es el
+precio de cada combo** (`config.packs[].precioCents`): lo pone la persona, y es el
+que cobra `create_order` cuando se pide ese combo.
+
+**Una línea de combo** en `create_order` es
+`{ combo: { catalogo: <share_token>, id }, quantity, partes: [{ product_id, variant_id }] }`,
+con `partes` en el orden de `pack.productos`. Va a `order_items` sin `product_id`, con
+`catalog_id` y `combo_id`, y sus productos a `order_item_components` —solo lectura
+para el dueño, sin políticas de escritura: la escribe `create_order`—.
+`handle_order_status_change` mueve el stock de esos productos. Fijado en
+`supabase/tests/combos.test.sql`. Es del dueño —leer, crear y editar
 con `my_store_id()`— y no tiene política de DELETE: se da de baja con
 `deleted_at`. Por eso la de UPDATE lleva su `with check` propio: sin él,
 Postgres usaría el `using`, que pide `deleted_at is null`, y rechazaría la baja.

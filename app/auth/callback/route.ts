@@ -25,6 +25,11 @@ export async function GET(request: NextRequest) {
   }
 
   const { error } = await supabase.auth.exchangeCodeForSession(code)
+  // El enlace para elegir otra contraseña abierto en otro navegador, o ya
+  // usado: la pantalla de la contraseña nueva explica qué pasó y ofrece otro.
+  if (error && next.startsWith("/nueva-clave")) {
+    return NextResponse.redirect(`${origin}/nueva-clave`)
+  }
   if (error) {
     return NextResponse.redirect(
       `${origin}/login?error=${encodeURIComponent(error.message)}`

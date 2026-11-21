@@ -1,7 +1,12 @@
 import { catalogoSchema } from "@/lib/catalogos/modelo"
 import { aviso, respuestaDePdf } from "@/lib/catalogos/pdf"
-import { getMaterialDelCatalogo } from "@/lib/data/catalogos"
+import {
+  conLosCombos,
+  getCatalogo,
+  getMaterialDelCatalogo,
+} from "@/lib/data/catalogos"
 import { exigirFuncion } from "@/lib/data/funciones"
+import { getMiTienda } from "@/lib/data/panel"
 
 /** Los precios y el stock se leen en el momento: nunca de caché. */
 export const dynamic = "force-dynamic"
@@ -18,6 +23,10 @@ export const dynamic = "force-dynamic"
  * entra nada que no sea un catálogo. Los productos se leen con la sesión de
  * quien pide, así que RLS sigue puesta y el PDF no puede mostrar un producto de
  * otra tienda aunque el borrador nombre su id.
+ *
+ * Con `?id=` de un catálogo guardado, cada combo lleva "Pedir este combo", pero
+ * solo si los combos que llegan son los guardados: el precio que se cobra es el
+ * del catálogo guardado, y un PDF con otro precio diría algo que no se cumple.
  */
 export async function POST(peticion: Request) {
   const permiso = await exigirFuncion("catalogos")
@@ -47,6 +56,19 @@ export async function POST(peticion: Request) {
     )
   }
 
-  const { datos } = await getMaterialDelCatalogo()
-  return respuestaDePdf(catalogo.data, datos, { descarga })
+  const id = new URL(peticion.url).searchParams.get("id")
+  const [{ datos }, abierto, tienda] = await Promise.all([
+    getMaterialDelCatalogo(),
+    id ? getCatalogo(id) : null,
+    id ? getMiTienda() : null,
+  ])
+  const losMismosCombos =
+    abierto !== null &&
+    JSON.stringify(abierto.catalogo.packs) ===
+      JSON.stringify(catalogo.data.packs)
+  const conBotones =
+    abierto && tienda && losMismosCombos
+      ? await conLosCombos(datos, abierto.token, tienda.id)
+      : datos
+  return respuestaDePdf(catalogo.data, conBotones, { descarga })
 }

@@ -34,7 +34,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
   const foto = fotoDePortada(bloque, tienda)
   const titulo = texto(bloque, "title") ?? tienda.nombre
   const bajada = texto(bloque, "subtitle")
-  const accion = accionDePortada(bloque) ?? "Ver los modelos"
+  const accion = accionDePortada(bloque) ?? "Ver los lanzamientos"
 
   return (
     <section className="mx-auto w-full max-w-7xl px-3 pt-3 pb-10 md:px-5 md:pt-5 md:pb-16">
@@ -137,7 +137,7 @@ function Categorias({ bloque, tienda }: PropsBloque) {
                 </span>
                 <span className="tabular mt-1 block text-xs font-semibold opacity-65">
                   {categoria.productos}{" "}
-                  {categoria.productos === 1 ? "modelo" : "modelos"}
+                  {categoria.productos === 1 ? "producto" : "productos"}
                 </span>
               </span>
               <ArrowUpRight
@@ -162,7 +162,7 @@ function Grilla({ bloque, tienda }: PropsBloque) {
   return (
     <section className="mx-auto w-full max-w-7xl px-5 py-12 md:py-16">
       <Titulo
-        titulo={texto(bloque, "title") ?? "Modelos"}
+        titulo={texto(bloque, "title") ?? "Productos"}
         enlace={{
           etiqueta: "Ver todo",
           href: rutaDeTienda(tienda.slug, "/catalogo"),

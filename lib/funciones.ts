@@ -36,6 +36,13 @@ export interface Funcion {
   nombre: string
   grupo: GrupoDeFuncion
   descripcion: string
+  /**
+   * Cómo está si la base no dice nada: sin su fila, o si la lectura falla.
+   * Casi todas, activas. Una que nace apagada lo declara acá: si el código
+   * llega a producción antes que la migración que agrega su fila, no se
+   * enciende sola para todas las tiendas.
+   */
+  porDefecto?: EstadoDeFuncion
 }
 
 export const FUNCIONES = [
@@ -71,6 +78,14 @@ export const FUNCIONES = [
       "Que la IA arme productos desde fotos, una planilla o una lista.",
   },
   {
+    clave: "ia_textos",
+    nombre: "IA: textos a medida",
+    grupo: "IA",
+    descripcion:
+      "Que la IA reescriba los textos de su portada con lo que vende. Al crear la tienda corre una vez igual.",
+    porDefecto: "oculta",
+  },
+  {
     clave: "catalogos",
     nombre: "Catálogos en PDF",
     grupo: "Herramientas",
@@ -87,6 +102,13 @@ export const FUNCIONES = [
     nombre: "Enlace público de catálogo",
     grupo: "Herramientas",
     descripcion: "Mandar un catálogo como enlace que abre cualquiera.",
+  },
+  {
+    clave: "combos",
+    nombre: "Combos que se compran",
+    grupo: "Herramientas",
+    descripcion:
+      "Pedir un combo de un catálogo desde su botón, con el precio del catálogo.",
   },
   {
     clave: "marketing",
@@ -137,9 +159,17 @@ export const CLAVES_DE_FUNCION = FUNCIONES.map((f) => f.clave) as [
   ...ClaveFuncion[],
 ]
 
-/** Todo activo: lo que ve el modo demo, que no tiene base. */
+/** Cómo está una función cuando la base no dice nada. */
+export function deFabrica(funcion: Funcion): EstadoDeFuncion {
+  return funcion.porDefecto ?? "activa"
+}
+
+/**
+ * Cada función como viene de fábrica: lo que ve el modo demo, que no tiene
+ * base, y lo que se usa si la lectura falla. Casi todo activo.
+ */
 export const TODAS_ACTIVAS = Object.fromEntries(
-  FUNCIONES.map((f) => [f.clave, "activa"])
+  FUNCIONES.map((f) => [f.clave, deFabrica(f)])
 ) as FuncionesDeTienda
 
 export function esEstado(valor: unknown): valor is EstadoDeFuncion {
@@ -148,14 +178,14 @@ export function esEstado(valor: unknown): valor is EstadoDeFuncion {
   )
 }
 
-/** Lo que devuelve la base, ya leído: una clave que falta se toma como activa. */
+/** Lo que devuelve la base, ya leído: una clave que falta toma su estado de fábrica. */
 export function leerFunciones(crudo: unknown): FuncionesDeTienda {
   const datos =
     crudo && typeof crudo === "object" ? (crudo as Record<string, unknown>) : {}
   return Object.fromEntries(
     FUNCIONES.map((f) => [
       f.clave,
-      esEstado(datos[f.clave]) ? datos[f.clave] : "activa",
+      esEstado(datos[f.clave]) ? datos[f.clave] : deFabrica(f),
     ])
   ) as FuncionesDeTienda
 }

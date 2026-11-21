@@ -4,7 +4,9 @@ import * as React from "react"
 
 import type { ClavePlantilla } from "@/lib/catalogos/constantes"
 import {
+  agotadosDe,
   elegidos,
+  preciosDe,
   hojasDelBloque,
   type DatosDelCatalogo,
   type ProductoDelCatalogo,
@@ -35,7 +37,9 @@ import {
   type MensajeDeLaAppAlCatalogo,
   type MensajeDelCatalogoAlaApp,
 } from "@/lib/catalogos/protocolo-app"
+import type { PropuestaDeCatalogo } from "@/lib/ai/schemas"
 import { Probador } from "@/components/catalogos/editor/probador"
+import { armarPropuesta } from "@/components/catalogos/editor/productos"
 import { VistaPrevia } from "@/components/catalogos/editor/vista-previa"
 
 declare global {
@@ -56,6 +60,24 @@ interface Historial {
   pasado: (Catalogo | null)[]
   futuro: (Catalogo | null)[]
   guardado: Catalogo | null
+}
+
+/** Dónde queda lo que no se guardó, por catálogo: uno nuevo va como "nuevo". */
+const BORRADOR = "venduo:catalogo-de-la-app:"
+
+interface BorradorGuardado {
+  catalogo: Catalogo
+  cuando: number
+}
+
+function leerBorrador(clave: string): BorradorGuardado | null {
+  try {
+    const crudo = window.localStorage.getItem(BORRADOR + clave)
+    const leido = crudo ? (JSON.parse(crudo) as BorradorGuardado) : null
+    return leido?.catalogo && typeof leido.cuando === "number" ? leido : null
+  } catch {
+    return null
+  }
 }
 
 function nombreDelMes(): string {
@@ -85,6 +107,7 @@ export function EditorDeCatalogoDeLaApp({
   plantillas,
   inicial,
   empezarCon = null,
+  id = null,
 }: {
   datos: DatosDelCatalogo
   estiloDeTienda: Estilo
@@ -92,7 +115,22 @@ export function EditorDeCatalogoDeLaApp({
   plantillas: readonly ClavePlantilla[]
   inicial: Catalogo | null
   empezarCon?: EleccionDePlantilla | null
+  /** El catálogo guardado que se abre: el borrador del teléfono va a su nombre. */
+  id?: string | null
 }) {
+  // Lo que no se guardó queda en el teléfono, como el borrador de la tienda:
+  // salir, perder la conexión o cerrar la app no lo pierde.
+  const clave = React.useRef(id ?? "nuevo")
+  // Se lee al crear el estado y no en un efecto: si no, el que guarda el
+  // borrador correría antes y lo borraría sin preguntar.
+  const [porRecuperar, setPorRecuperar] =
+    React.useState<BorradorGuardado | null>(() => {
+      const previo = leerBorrador(clave.current)
+      return previo &&
+        JSON.stringify(previo.catalogo) !== JSON.stringify(inicial)
+        ? previo
+        : null
+    })
   const [historial, setHistorial] = React.useState<Historial>({
     presente: inicial,
     pasado: [],
@@ -107,6 +145,8 @@ export function EditorDeCatalogoDeLaApp({
   )
   const [elegido, setElegido] = React.useState<string | null>(null)
   const [pedido, setPedido] = React.useState(0)
+  // La propuesta de la IA que la app está mirando: se ve, no se aplica.
+  const [mirando, setMirando] = React.useState<PropuestaDeCatalogo | null>(null)
 
   const catalogo = historial.presente
   const tienda = React.useMemo(
@@ -141,6 +181,26 @@ export function EditorDeCatalogoDeLaApp({
     [seleccion, datos]
   )
 
+  // Mientras haya algo sin guardar, queda en el teléfono; guardado, se borra.
+  // Lo que espera ser recuperado no se pisa hasta que la persona decide.
+  React.useEffect(() => {
+    if (porRecuperar) return
+    const sinGuardar =
+      JSON.stringify(historial.presente) !== JSON.stringify(historial.guardado)
+    try {
+      if (sinGuardar && historial.presente) {
+        window.localStorage.setItem(
+          BORRADOR + clave.current,
+          JSON.stringify({ catalogo: historial.presente, cuando: Date.now() })
+        )
+      } else {
+        window.localStorage.removeItem(BORRADOR + clave.current)
+      }
+    } catch {
+      // Sin almacenamiento: se edita igual, solo que no se recupera.
+    }
+  }, [historial, porRecuperar])
+
   // Cada cambio se le cuenta a la app: el catálogo, lo que falta para
   // guardarlo y lo que no se lee de su estilo.
   React.useEffect(() => {
@@ -171,8 +231,18 @@ export function EditorDeCatalogoDeLaApp({
           muestra: { papel, tinta, acento },
         }
       }),
+      estiloDeTienda,
+      recuperable: porRecuperar?.cuando ?? null,
     })
-  }, [catalogo, modo, historial, datos, sugeridos])
+  }, [
+    catalogo,
+    modo,
+    historial,
+    datos,
+    sugeridos,
+    estiloDeTienda,
+    porRecuperar,
+  ])
 
   const recibir = React.useCallback(
     (mensaje: MensajeDeLaAppAlCatalogo) => {
@@ -232,15 +302,7 @@ export function EditorDeCatalogoDeLaApp({
         case "pack-agregar":
           return con(
             (actual) =>
-              agregarPack(
-                actual,
-                Object.fromEntries(
-                  Object.values(datos.productos).map((p) => [
-                    p.id,
-                    p.precioCents,
-                  ])
-                )
-              ).catalogo
+              agregarPack(actual, preciosDe(datos), agotadosDe(datos)).catalogo
           )
         case "pack-cambiar":
           return con((actual) => cambiarPack(actual, mensaje.pack))
@@ -252,7 +314,15 @@ export function EditorDeCatalogoDeLaApp({
           return con((actual) => ({ ...actual, nombre: mensaje.nombre }))
         case "hoja":
           return con((actual) => ({ ...actual, hoja: mensaje.hoja }))
+        case "mirar":
+          return setMirando(mensaje.propuesta)
         case "propuesta": {
+          setMirando(null)
+          if (catalogo) {
+            poner(armarPropuesta(catalogo, mensaje.propuesta))
+            setSeleccion(mensaje.propuesta.productos)
+            return setModo("hojas")
+          }
           const productos = mensaje.propuesta.productos
             .map((id) => datos.productos[id])
             .filter((producto): producto is ProductoDelCatalogo =>
@@ -262,7 +332,7 @@ export function EditorDeCatalogoDeLaApp({
             armarDesdePropuesta(mensaje.propuesta, {
               productos,
               tienda,
-              estilo: catalogo?.estilo ?? estiloDeTienda,
+              estilo: estiloDeTienda,
             })
           )
           setSeleccion(mensaje.propuesta.productos)
@@ -271,6 +341,19 @@ export function EditorDeCatalogoDeLaApp({
         case "enfocar":
           setElegido(mensaje.id)
           return setPedido((antes) => antes + 1)
+        case "recuperar": {
+          const previo = porRecuperar
+          setPorRecuperar(null)
+          if (!mensaje.si || !previo) {
+            try {
+              window.localStorage.removeItem(BORRADOR + clave.current)
+            } catch {}
+            return
+          }
+          poner(previo.catalogo)
+          setSeleccion(previo.catalogo.productos)
+          return setModo("hojas")
+        }
         case "deshacer":
           return setHistorial((antes) => {
             if (antes.pasado.length === 0) return antes
@@ -292,13 +375,29 @@ export function EditorDeCatalogoDeLaApp({
             }
           })
         case "guardado":
+          // Uno nuevo pasa a tener nombre: lo que siga sin guardar va al suyo.
+          if (mensaje.id && clave.current !== mensaje.id) {
+            try {
+              window.localStorage.removeItem(BORRADOR + clave.current)
+            } catch {}
+            clave.current = mensaje.id
+          }
           return setHistorial((antes) => ({
             ...antes,
             guardado: antes.presente,
           }))
       }
     },
-    [catalogo, poner, tienda, datos, estiloDeTienda, empezarCon, sugeridos]
+    [
+      catalogo,
+      poner,
+      tienda,
+      datos,
+      estiloDeTienda,
+      empezarCon,
+      sugeridos,
+      porRecuperar,
+    ]
   )
 
   React.useEffect(() => {
@@ -342,7 +441,7 @@ export function EditorDeCatalogoDeLaApp({
 
   return (
     <VistaPrevia
-      catalogo={catalogo}
+      catalogo={mirando ? armarPropuesta(catalogo, mirando) : catalogo}
       datos={datos}
       elegido={elegido}
       pedido={pedido}

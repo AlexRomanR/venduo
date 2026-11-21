@@ -94,6 +94,12 @@ Lanzar **en el mismo mensaje**, para que corran en paralelo:
 
 Esperar los dos. No predecir lo que van a decir.
 
+**El investigador va solo cuando se construye algo de cero**: una función o una pantalla
+que Venduo no tiene. Si el pedido modifica algo que ya existe —una plantilla, una
+pantalla de la administración, un flujo hecho—, va solo el analista: cómo lo resuelven
+otros ya se miró cuando se hizo, y lo que manda es lo que el dueño decidió en la
+entrevista.
+
 ## 4. Diseñar
 
 Lanzar `disenador` con el brief, lo del investigador y el plan del analista. Para una

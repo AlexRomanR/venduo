@@ -114,7 +114,7 @@ export function nombreDeColor(hex: string): string {
         : familia === "rosa"
           ? "ciruela"
           : familia
-  if (luz < 15) return `${oscuro} casi negro`
+  if (luz < 15) return "casi negro"
   if (luz < 30) return familia === oscuro ? `${familia} oscuro` : oscuro
   // Un naranja apagado, entre el café y el naranja de verdad, es terracota.
   if (familia === "naranja" && luz < 45) return "terracota"

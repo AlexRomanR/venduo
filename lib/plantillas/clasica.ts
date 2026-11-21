@@ -20,8 +20,9 @@ export const clasica: DefinicionDePlantilla = {
     colores: {
       papel: "#f1f0ee",
       tinta: "#16171a",
-      senal: "#d62d12",
-      senalAlta: "#ee3a1c",
+      // 4,72:1 contra el papel: el rojo de antes, #d62d12, quedaba en 4,35.
+      senal: "#cc2a10",
+      senalAlta: "#ed3517",
     },
     tipografia: {
       titular: "archivo",

@@ -17,7 +17,7 @@ export const ETIQUETA_CAMPO =
 
 /** Campo sin caja: una regla abajo que se pone roja al enfocar o al fallar. */
 export const CAMPO =
-  "rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/35 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:ring-0 aria-invalid:border-senal aria-invalid:ring-0 md:text-base"
+  "rounded-none border-0 border-b border-tinta bg-transparent px-0 text-base transition-colors placeholder:text-tinta/65 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:ring-0 aria-invalid:border-senal aria-invalid:ring-0 md:text-base"
 
 /** El alto mínimo de un campo de una línea: 48 px, por encima del táctil. */
 export const CAMPO_LINEA = `h-12 ${CAMPO}`

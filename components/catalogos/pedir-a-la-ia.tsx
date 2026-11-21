@@ -29,7 +29,9 @@ export function PedirCatalogoALaIa({
   const [abierto, setAbierto] = React.useState(false)
   const [frase, setFrase] = React.useState("")
   const [armando, setArmando] = React.useState(false)
-  const id = React.useId()
+  // Fijo: hay una sola por pantalla, y `useId` no siempre daba lo mismo en el
+  // servidor y en el navegador.
+  const id = "pedir-catalogo"
 
   async function enviar(pedido: string) {
     const limpio = pedido.trim()

@@ -37,7 +37,7 @@ function Portada({ bloque, tienda }: PropsBloque) {
   const foto = fotoDePortada(bloque, tienda)
   const titulo = texto(bloque, "title") ?? tienda.nombre
   const bajada = texto(bloque, "subtitle")
-  const accion = accionDePortada(bloque) ?? "Ver las carteras"
+  const accion = accionDePortada(bloque) ?? "Ver la colección"
   const otras = tienda.productosDeEjemplo
     ? []
     : tienda.productos
@@ -130,7 +130,7 @@ function Categorias({ bloque, tienda }: PropsBloque) {
       style={variablesDeAzulejos(tienda)}
       className="mx-auto w-full max-w-7xl px-5 py-12 md:py-20"
     >
-      <Titulo titulo={texto(bloque, "title") ?? "Por tamaño"} />
+      <Titulo titulo={texto(bloque, "title") ?? "Encuentra el tuyo"} />
       <ul className="mt-7 grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
         {categorias.map((categoria, i) => (
           <li key={categoria.id}>

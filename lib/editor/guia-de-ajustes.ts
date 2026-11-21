@@ -19,7 +19,7 @@ export type Pantalla = "ambas" | "celular" | "computadora"
 
 export interface GuiaDeAjuste {
   pantalla: Pantalla
-  /** Una línea: qué ve tu cliente. */
+  /** Una línea: qué ve quien compra. */
   ayuda: string
   /** Por qué puede no verse, aunque esté activo. */
   sinSenal?: string
@@ -54,14 +54,14 @@ export const GUIA_DE_AJUSTES: Partial<Record<RutaDeAjuste, GuiaDeAjuste>> = {
   "ficha.barraFija": {
     pantalla: "celular",
     ayuda:
-      "Solo cambia en celular. Una barra con el precio y el botón «Agregar» que acompaña a tu cliente mientras baja por la página.",
+      "Solo cambia en celular. Una barra con el precio y el botón «Agregar» que acompaña a quien te compra mientras baja por la página.",
     sinSenal:
-      "Aparece cuando tu cliente baja y el botón «Agregar» queda atrás.",
+      "Aparece al bajar por la página, cuando el botón «Agregar» queda atrás.",
   },
   "ficha.consulta": {
     pantalla: "ambas",
     ayuda:
-      "Un botón para que tu cliente te escriba por WhatsApp sobre ese producto, con el mensaje ya escrito.",
+      "Un botón para que te escriban por WhatsApp sobre ese producto, con el mensaje ya escrito.",
     sinSenal:
       "Necesita el WhatsApp de tu tienda. Agrégalo en Datos de la tienda.",
   },

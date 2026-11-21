@@ -468,6 +468,9 @@ const enPlural = (nombre: string) =>
   `Los ${nombre.endsWith("s") ? nombre : `${nombre}s`}`
 
 /** 5 · Lo que se vende en promedio cada día de la semana. */
+/** Desde cuántas ventas en el período se dice qué día se vende más. */
+const VENTAS_PARA_DIAS_FUERTES = 5
+
 function DiasFuertes({ periodo }: { periodo: EstadisticasDelPeriodo }) {
   const fuerte = diaFuerte(periodo.semana)
   const [elegido, setElegido] = React.useState<number | null>(null)
@@ -475,6 +478,36 @@ function DiasFuertes({ periodo }: { periodo: EstadisticasDelPeriodo }) {
   const maximo = fuerte.promedioCents
   const unaSemana = periodo.dias === 7
   const tocado = elegido === null ? null : periodo.semana[elegido]
+
+  // Con una o dos ventas, "los martes vendes más" es una casualidad dicha como
+  // si fuera un hábito.
+  if (periodo.actual.pedidos < VENTAS_PARA_DIAS_FUERTES) {
+    return (
+      <Seccion
+        id="dias-fuertes"
+        icono={CalendarDays}
+        titulo="Tus días fuertes"
+        bajada="Qué día de la semana vendes más."
+      >
+        <div className="flex items-center gap-4 px-4 py-5 sm:px-5">
+          <CalendarDays
+            aria-hidden="true"
+            className="size-6 shrink-0 opacity-50"
+          />
+          <span>
+            <span className="block font-titular text-lg font-bold tracking-[-0.02em]">
+              Todavía es pronto
+            </span>
+            <span className="block text-sm text-tinta/70">
+              Con {formatNumber(VENTAS_PARA_DIAS_FUERTES)} ventas en estos{" "}
+              {periodo.dias} días te decimos qué día vendes más. Llevas{" "}
+              {formatNumber(periodo.actual.pedidos)}.
+            </span>
+          </span>
+        </div>
+      </Seccion>
+    )
+  }
 
   return (
     <Seccion
@@ -655,7 +688,7 @@ function TarjetaDeEjemplo({
  */
 export function SinVentasTodavia({ datos }: { datos: Estadisticas }) {
   const pasos = [
-    { hecho: datos.tieneProductos, titulo: "Carga tu primer producto" },
+    { hecho: datos.tieneProductos, titulo: "Carga tus productos" },
     {
       hecho: false,
       titulo: "Recibe tu primer pedido",
@@ -710,11 +743,11 @@ export function SinVentasTodavia({ datos }: { datos: Estadisticas }) {
               href={
                 datos.tieneProductos
                   ? "/panel/pedidos/nueva"
-                  : "/panel/productos/nuevo"
+                  : "/panel/productos/cargar"
               }
               className={cn(BOTON_PRIMARIO, "w-full sm:w-fit")}
             >
-              {datos.tieneProductos ? "Nueva venta" : "Nuevo producto"}
+              {datos.tieneProductos ? "Nueva venta" : "Cargar productos"}
             </Link>
           </li>
         </ol>

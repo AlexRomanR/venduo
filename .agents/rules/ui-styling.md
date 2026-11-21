@@ -103,7 +103,7 @@ mismos nombres y el mismo orden. Quien vende usa las dos y no tiene por qué apr
   "Volver": `Volver` se esconde solo, y la `Cabecera` va en `max-lg:sr-only`.
 - **Lo único distinto es lo que es de una sola plataforma**: los avisos al teléfono y
   "Venduo en la computadora" son de la app; la barra de escritorio, su riel plegado, los
-  atajos de teclado y el atajo "Nuevo producto" de la pantalla ancha son de la web.
+  atajos de teclado son de la web.
   Publicar directo en TikTok también es de la web por ahora: en la app se publica en
   TikTok desde la hoja de compartir del teléfono.
 
@@ -170,16 +170,18 @@ Las pantallas del panel comparten una barra lateral fija desde `lg` y un cajón 
 cajón es el `Sheet` de shadcn con `showCloseButton={false}` y `shadow-none` —el suyo mide
 28 px y dice "Close"— y un cierre propio de 44 px.
 
-Lo que muestra sale de `lib/data/barra.ts` y es el menú de la app: la persona arriba, la
-tarjeta de su tienda con su propia cara, y tres grupos —"Tu negocio" (Inicio, Pedidos,
-Productos, Catálogos, Compartir), "Tu tienda" (Estadísticas, Editar tu tienda, Datos de
-la tienda) y "Tu cuenta"—, con "Cerrar sesión" al final. La elegida va en tinta llena.
+Lo que muestra sale de `lib/data/barra.ts` y es el menú de la app. Arriba, la marca de
+Venduo y una raya. Debajo, con el rótulo "Tu tienda en línea", **la tienda como es**: la
+captura de su portada (`vista_url`) como una foto pegada, con su nombre y si está al aire
+(sin captura, la de su plantilla con "Así se verá"). Después, dos grupos —"Tu negocio"
+(Inicio, Pedidos, Productos, Catálogos, Compartir) y "Tu tienda" (Estadísticas, Editar tu
+tienda, Datos de la tienda)— y, fijos al pie tras otra raya, la persona —que es la
+entrada a Tus datos— y "Cerrar sesión". La elegida va en tinta llena.
 En el celular, abajo, las pestañas de la app (`components/panel/pestanas.tsx`).
 
 Los contadores siguen la regla de la señal: **en la señal solo si pide una acción** —un
 pedido que espera que confirmes su pago, un producto sin stock, la tienda sin WhatsApp—;
-en tinta si solo informa. El atajo "Nuevo producto", solo en la barra de escritorio, va
-con trazo y sin relleno por lo mismo: competiría con el botón principal de cada pantalla.
+en tinta si solo informa.
 En el celular, el botón del menú lleva un punto en la señal si adentro hay algo urgente.
 
 ### Las pantallas del panel

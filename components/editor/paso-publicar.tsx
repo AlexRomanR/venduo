@@ -1,11 +1,14 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import {
   ArrowRight,
+  ChevronRight,
   ExternalLink,
   Loader2,
   MessageCircle,
+  PackagePlus,
   Send,
   Undo2,
   X,
@@ -52,13 +55,8 @@ export function PasoPublicar() {
     comparar,
     setComparar,
     irAPaso,
-    acciones,
+    publicacion,
   } = useEditor()
-  const [publicando, setPublicando] = React.useState(false)
-  const [recien, setRecien] = React.useState(false)
-  const [problemasDelServidor, setProblemasDelServidor] = React.useState<
-    string[]
-  >([])
 
   // Al salir de este paso, la vista previa vuelve a mostrar el borrador.
   React.useEffect(() => () => setComparar("despues"), [setComparar])
@@ -66,24 +64,7 @@ export function PasoPublicar() {
   const cambios = cambiosEntre(borrador.publicado, borrador.presente, base)
   const { problemas } = problemasParaPublicar(borrador.presente, contexto)
 
-  async function publicar() {
-    setPublicando(true)
-    setProblemasDelServidor([])
-    const resultado = await acciones.publicar(borrador.presente)
-    setPublicando(false)
-
-    if (!resultado.ok) {
-      toast.error(resultado.error)
-      setProblemasDelServidor(resultado.problemas ?? [])
-      return
-    }
-
-    borrador.marcarPublicado(resultado.publicado)
-    setComparar("despues")
-    setRecien(true)
-  }
-
-  if (recien) {
+  if (publicacion.lista) {
     return <Publicado alSeguir={() => irAPaso("marca")} />
   }
 
@@ -91,9 +72,8 @@ export function PasoPublicar() {
     return (
       <>
         <EncabezadoDePaso
-          numero={6}
-          titulo="Todo al día"
-          bajada="Tu tienda ya se ve así para tus clientes. Cuando cambies algo, lo vas a ver aquí para publicarlo."
+          titulo="Publicar"
+          bajada="Todo está al día: tu tienda ya se ve así. Cuando cambies algo, lo vas a ver aquí."
         />
         <div className="px-5 pb-6">
           <button
@@ -117,20 +97,19 @@ export function PasoPublicar() {
     )
   }
 
-  const todos = [...new Set([...problemas, ...problemasDelServidor])]
+  const todos = [...new Set([...problemas, ...publicacion.problemas])]
   // Lo que no se lee se arregla en la marca; lo demás, en la portada.
   const deColor = problemasDeContraste(
     combinarApariencia(base, borrador.presente.personalizacion).colores
   ).map((problema) => problema.mensaje)
   const dondeSeArregla = todos.some((problema) => deColor.includes(problema))
-    ? { paso: "marca" as const, nombre: "Tu marca" }
+    ? { paso: "marca" as const, nombre: "Marca" }
     : { paso: "portada" as const, nombre: "Portada" }
 
   return (
     <>
       <EncabezadoDePaso
-        numero={6}
-        titulo="Revisa y publica"
+        titulo="Publicar"
         bajada="Esto es lo que va a cambiar en tu tienda. Antes de publicar guardamos cómo estaba, por si quieres volver."
       />
 
@@ -150,39 +129,59 @@ export function PasoPublicar() {
         titulo={`${cambios.length} ${cambios.length === 1 ? "cambio" : "cambios"}`}
       >
         <ul className="border-t border-tinta/15">
-          {cambios.map((cambio) => (
-            <li
-              key={cambio.texto}
-              className="flex items-center gap-3 border-b border-tinta/15 py-2.5 text-sm"
-            >
-              {cambio.color ? (
-                <span
-                  aria-hidden="true"
-                  className="flex shrink-0 items-center gap-1"
-                >
-                  {cambio.colorAntes ? (
-                    <>
-                      <span
-                        className="size-4 border border-tinta/25"
-                        style={{ background: cambio.colorAntes }}
-                      />
-                      <ArrowRight className="size-3 opacity-50" />
-                    </>
-                  ) : null}
+          {cambios.map((cambio) => {
+            const contenido = (
+              <>
+                {cambio.color ? (
                   <span
-                    className="size-4 border border-tinta/25"
-                    style={{ background: cambio.color }}
+                    aria-hidden="true"
+                    className="flex shrink-0 items-center gap-1"
+                  >
+                    {cambio.colorAntes ? (
+                      <>
+                        <span
+                          className="size-4 border border-tinta/25"
+                          style={{ background: cambio.colorAntes }}
+                        />
+                        <ArrowRight className="size-3 opacity-50" />
+                      </>
+                    ) : null}
+                    <span
+                      className="size-4 border border-tinta/25"
+                      style={{ background: cambio.color }}
+                    />
+                  </span>
+                ) : (
+                  <span
+                    aria-hidden="true"
+                    className="size-1.5 shrink-0 rounded-full bg-tinta/50"
                   />
-                </span>
-              ) : (
-                <span
-                  aria-hidden="true"
-                  className="size-1.5 shrink-0 rounded-full bg-tinta/50"
-                />
-              )}
-              <span className="min-w-0 flex-1">{cambio.texto}</span>
-            </li>
-          ))}
+                )}
+                <span className="min-w-0 flex-1">{cambio.texto}</span>
+              </>
+            )
+            return (
+              <li key={cambio.texto} className="border-b border-tinta/15">
+                {cambio.ruta || cambio.seccion ? (
+                  <button
+                    type="button"
+                    onClick={() => publicacion.mirarCambio(cambio)}
+                    className="flex min-h-11 w-full items-center gap-3 py-2 text-left text-sm transition-colors hover:bg-tinta/[0.04]"
+                  >
+                    {contenido}
+                    <span className="flex shrink-0 items-center gap-0.5 text-xs font-semibold">
+                      Ver
+                      <ChevronRight aria-hidden="true" className="size-4" />
+                    </span>
+                  </button>
+                ) : (
+                  <div className="flex min-h-11 items-center gap-3 py-2 text-sm">
+                    {contenido}
+                  </div>
+                )}
+              </li>
+            )
+          })}
         </ul>
       </Grupo>
 
@@ -212,16 +211,19 @@ export function PasoPublicar() {
         ) : null}
         <button
           type="button"
-          onClick={publicar}
-          disabled={publicando || todos.length > 0 || esDemo}
+          onClick={publicacion.publicar}
+          disabled={publicacion.enCurso || todos.length > 0 || esDemo}
           className={cn(BOTON_PRIMARIO, "w-full")}
         >
-          {publicando ? (
-            <Loader2 aria-hidden="true" className="size-4 animate-spin" />
+          {publicacion.enCurso ? (
+            <Loader2
+              aria-hidden="true"
+              className="size-4 animate-spin motion-reduce:animate-none"
+            />
           ) : (
             <Send aria-hidden="true" className="size-4" />
           )}
-          {publicando ? "Publicando…" : "Publicar cambios"}
+          {publicacion.enCurso ? "Publicando…" : "Publicar cambios"}
         </button>
         <DescartarCambios />
       </div>
@@ -268,8 +270,8 @@ function DescartarCambios() {
           </DialogClose>
         </div>
         <DialogDescription className="p-5 text-sm leading-relaxed text-tinta/70">
-          El editor vuelve a lo que ven hoy tus clientes. Si te arrepientes, lo
-          recuperas con Deshacer.
+          El editor vuelve a lo que ven hoy quienes te compran. Si te
+          arrepientes, lo recuperas con Deshacer.
         </DialogDescription>
         <div className="flex flex-col-reverse gap-3 border-t border-tinta/15 p-5 sm:flex-row sm:justify-end">
           <DialogClose asChild>
@@ -291,44 +293,76 @@ function DescartarCambios() {
  * tienda y mandarla por WhatsApp, que es por donde van a llegar los clientes.
  */
 function Publicado({ alSeguir }: { alSeguir: () => void }) {
-  const { tienda } = useEditor()
+  const { tienda, hayProductos } = useEditor()
   const mensaje = `Mira cómo quedó mi tienda: ${tienda.url}`
 
   return (
-    <div className="px-5 py-8">
+    <div className={cn("px-5", hayProductos ? "py-8" : "py-5")}>
       <p
-        className="inline-block -rotate-3 border-[3px] border-senal px-3 py-1 font-titular text-2xl font-extrabold tracking-[0.04em] text-senal uppercase motion-safe:animate-in motion-safe:duration-500 motion-safe:fade-in motion-safe:zoom-in-150"
+        className="inline-block -rotate-3 border-[3px] border-tinta px-3 py-1 font-titular text-2xl font-extrabold tracking-[0.04em] text-tinta uppercase motion-safe:animate-in motion-safe:duration-500 motion-safe:fade-in motion-safe:zoom-in-150"
         style={{ animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
       >
         Publicado
       </p>
-      <h2 className="mt-6 font-titular text-[1.75rem] leading-none font-extrabold tracking-[-0.03em]">
+      <h2
+        className={cn(
+          "font-titular text-3xl leading-none font-extrabold tracking-[-0.03em]",
+          hayProductos ? "mt-6" : "mt-4"
+        )}
+      >
         Tu tienda ya se ve así.
       </h2>
-      <p className="mt-3 max-w-[40ch] text-sm leading-relaxed opacity-70">
-        Quien abra tu enlace ve los cambios desde ahora. Lo que tenías antes
-        quedó guardado: puedes volver a esa versión desde Editar tu tienda.
-      </p>
 
-      <div className="mt-7 flex flex-col gap-3">
+      {/* Sin productos, lo que sigue es cargarlos: tiene que verse sin bajar
+          en el panel chico del celular. */}
+      {hayProductos ? (
+        <p className="mt-3 max-w-[40ch] text-sm leading-relaxed opacity-70">
+          Quien abra tu enlace ve los cambios desde ahora. Lo que tenías antes
+          quedó guardado: puedes volver a esa versión desde tu panel, en Editar
+          tu tienda.
+        </p>
+      ) : (
+        <Aviso tono="problema" className="mt-3">
+          <p className="font-semibold">Todavía no tienes productos.</p>
+          <p className="mt-0.5 opacity-80">Cárgalos para recibir pedidos.</p>
+        </Aviso>
+      )}
+
+      <div
+        className={cn("flex flex-col gap-3", hayProductos ? "mt-7" : "mt-4")}
+      >
+        {hayProductos ? null : (
+          <Link
+            href="/panel/productos/cargar"
+            className={cn(BOTON_PRIMARIO, "w-full")}
+          >
+            <PackagePlus aria-hidden="true" className="size-4" />
+            Cargar mis productos
+          </Link>
+        )}
         <a
           href={tienda.url}
           target="_blank"
           rel="noreferrer noopener"
-          className={cn(BOTON_PRIMARIO, "w-full")}
+          className={cn(
+            hayProductos ? BOTON_PRIMARIO : BOTON_SECUNDARIO,
+            "w-full"
+          )}
         >
           Ver mi tienda
           <ExternalLink aria-hidden="true" className="size-4" />
         </a>
-        <a
-          href={`https://wa.me/?text=${encodeURIComponent(mensaje)}`}
-          target="_blank"
-          rel="noreferrer noopener"
-          className={cn(BOTON_SECUNDARIO, "w-full")}
-        >
-          <MessageCircle aria-hidden="true" className="size-4" />
-          Compartir por WhatsApp
-        </a>
+        {hayProductos ? (
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(mensaje)}`}
+            target="_blank"
+            rel="noreferrer noopener"
+            className={cn(BOTON_SECUNDARIO, "w-full")}
+          >
+            <MessageCircle aria-hidden="true" className="size-4" />
+            Compartir por WhatsApp
+          </a>
+        ) : null}
         <button
           type="button"
           onClick={alSeguir}

@@ -11,11 +11,33 @@ import {
   type ControllerProps,
   type FieldPath,
   type FieldValues,
+  type FormProviderProps,
 } from "react-hook-form"
 
 import { Label } from "@/components/ui/label"
 
-const Form = FormProvider
+const FormularioContext = React.createContext("formulario")
+
+/**
+ * `nombre` distingue este formulario de los otros de la pantalla: dos pueden
+ * tener un campo "nombre", como los de Tus datos.
+ */
+function Form<
+  TFieldValues extends FieldValues,
+  TContext,
+  TTransformedValues = TFieldValues,
+>({
+  nombre,
+  ...form
+}: FormProviderProps<TFieldValues, TContext, TTransformedValues> & {
+  nombre: string
+}) {
+  return (
+    <FormularioContext.Provider value={nombre}>
+      <FormProvider {...form} />
+    </FormularioContext.Provider>
+  )
+}
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
@@ -71,7 +93,12 @@ function useFormField() {
 }
 
 function FormItem({ className, ...props }: React.ComponentProps<"div">) {
-  const id = React.useId()
+  // Un id fijo y no `useId`: en las páginas que llegan por partes, `useId` a
+  // veces daba otro valor en el navegador que en el servidor, y la etiqueta
+  // quedaba apuntando a un campo que React no reconocía.
+  const formulario = React.useContext(FormularioContext)
+  const { name } = React.useContext(FormFieldContext)
+  const id = `${formulario}-${name}`
 
   return (
     <FormItemContext.Provider value={{ id }}>

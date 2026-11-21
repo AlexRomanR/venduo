@@ -1,5 +1,5 @@
 import { aviso, respuestaDePdf } from "@/lib/catalogos/pdf"
-import { getCatalogoCompartido } from "@/lib/data/catalogos"
+import { conLosCombos, getCatalogoCompartido } from "@/lib/data/catalogos"
 import { funcionDeTienda } from "@/lib/data/funciones"
 
 /** Los precios y el stock se leen en el momento: nunca de caché. */
@@ -34,5 +34,8 @@ export async function GET(
     )
   }
 
-  return respuestaDePdf(compartido.catalogo, compartido.datos)
+  const datos = compartido.tienda
+    ? await conLosCombos(compartido.datos, token, compartido.tienda)
+    : compartido.datos
+  return respuestaDePdf(compartido.catalogo, datos)
 }

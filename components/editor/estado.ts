@@ -160,6 +160,16 @@ export function useBorrador(
           borrador.success &&
           !mismoBorrador(borrador.data, publicadoInicial)
         ) {
+          // Se recargó en esta misma visita: se sigue sin preguntar.
+          if (window.sessionStorage.getItem(clave)) {
+            despachar({
+              tipo: "poner",
+              borrador: borrador.data,
+              momento: Date.now(),
+            })
+            setGuardar(true)
+            return
+          }
           setRecuperable({
             borrador: borrador.data,
             fecha: guardado.fecha ?? Date.now(),
@@ -180,7 +190,9 @@ export function useBorrador(
     try {
       if (mismoBorrador(estado.presente, estado.publicado)) {
         window.localStorage.removeItem(clave)
+        window.sessionStorage.removeItem(clave)
       } else {
+        window.sessionStorage.setItem(clave, "1")
         window.localStorage.setItem(
           clave,
           JSON.stringify({

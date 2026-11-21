@@ -243,9 +243,9 @@ function DibujoFashion({ d }: Props) {
       </div>
       <div className="flex justify-center gap-2.5 border-b border-tinta/15 py-1 text-[length:1.406cqw] font-semibold tracking-[0.14em] uppercase opacity-70">
         <span>Todo</span>
-        <span>Ropa</span>
-        <span>Calzado</span>
-        <span>Carteras</span>
+        <span>Nuevo</span>
+        <span>Ofertas</span>
+        <span>Catálogo</span>
       </div>
       <div
         className={cn(
@@ -343,7 +343,7 @@ function DibujoPerfume({ d }: Props) {
         <div className="flex-1">
           <span className="block h-px w-4 bg-senal-alta" />
           <p className="mt-1.5 font-titular text-[length:5cqw] leading-[1.02] font-medium italic">
-            Aromas que se quedan contigo
+            Elegidos para quedarse contigo
           </p>
           <span className="mt-2 inline-block rounded-full border border-papel/50 px-2 py-[2px] text-[length:1.406cqw] tracking-[0.2em] uppercase">
             Descubrir
@@ -392,9 +392,9 @@ function DibujoCalle({ d }: Props) {
       <div className="flex overflow-hidden bg-tinta py-[3px] font-titular text-[length:1.719cqw] whitespace-nowrap text-papel uppercase">
         {[
           "Pedidos por WhatsApp",
-          "Buzos",
-          "Poleras",
-          "Gorras",
+          "Lo nuevo",
+          "Ofertas",
+          "Catálogo",
           "Pedidos por WhatsApp",
         ].map((frase, i) => (
           <span key={i} className="flex items-center gap-2 pl-2">
@@ -420,9 +420,9 @@ function DibujoCalle({ d }: Props) {
       >
         <div>
           <p className="font-titular text-[length:8.75cqw] leading-[0.84] uppercase">
-            Drop
+            Nueva
             <br />
-            nuevo
+            tanda
           </p>
           <span className="mt-1.5 inline-block bg-tinta px-1.5 py-[2px] text-[length:1.406cqw] font-bold text-papel uppercase">
             Ver lo nuevo
@@ -490,8 +490,8 @@ function DibujoAtelier({ d }: Props) {
       </div>
       <div className="flex gap-3 px-3 py-[3px] text-[length:1.25cqw] tracking-[0.22em] uppercase opacity-70">
         <span className="text-senal">Todo</span>
-        <span>Carteras</span>
-        <span>Billeteras</span>
+        <span>Lo nuevo</span>
+        <span>Ofertas</span>
       </div>
       <div
         className={cn(
@@ -501,7 +501,7 @@ function DibujoAtelier({ d }: Props) {
       >
         <div className="pb-1">
           <p className="font-titular text-[length:6.25cqw] leading-[0.95] font-medium tracking-[-0.03em]">
-            Piezas para todos los días
+            La colección de la casa
           </p>
           <span className="mt-2 inline-block rounded-[3px] bg-tinta px-2 py-[2px] text-[length:1.25cqw] tracking-[0.2em] text-papel uppercase">
             Ver la colección
@@ -559,7 +559,7 @@ function DibujoPisada({ d }: Props) {
         <span className="size-2 rounded-full border border-papel" />
       </div>
       <div className="flex gap-1 px-2.5 py-1">
-        {["Todo", "Urbanas", "Running", "Botas"].map((ficha, i) => (
+        {["Todo", "Lo nuevo", "Ofertas", "Favoritos"].map((ficha, i) => (
           <span
             key={ficha}
             className={cn(
@@ -576,10 +576,10 @@ function DibujoPisada({ d }: Props) {
           <p className="font-titular text-[length:7.5cqw] leading-[0.84] font-extrabold uppercase italic">
             Nuevos
             <br />
-            pares
+            lanzamientos
           </p>
           <span className="mt-1.5 inline-block rounded-full bg-senal px-1.5 py-[2px] text-[length:1.25cqw] font-bold text-white uppercase">
-            Ver los modelos
+            Ver los lanzamientos
           </span>
         </div>
         <div
@@ -593,7 +593,7 @@ function DibujoPisada({ d }: Props) {
       </div>
       <div className="mx-2.5 mt-2 flex items-center font-titular text-[length:3.125cqw] leading-none font-extrabold uppercase italic">
         <span className="mr-1 inline-block h-[0.72em] w-[0.28em] -skew-x-[14deg] bg-senal" />
-        Modelos
+        Lo nuevo
       </div>
       <div
         className={cn(
@@ -649,13 +649,13 @@ function DibujoFormula({ d }: Props) {
             <span className="max-w-[60%] truncate">
               {d?.nombre ?? "Tu tienda"}
             </span>
-            <span>12 frascos</span>
+            <span>12 productos</span>
           </p>
           <p className="mt-2 font-titular text-[length:7.5cqw] leading-[0.88] tracking-[-0.03em]">
-            Aromas de autor
+            Selección de autor
           </p>
           <span className="mt-2 inline-block bg-tinta px-1.5 py-[2px] font-mono text-[length:1.25cqw] text-papel uppercase">
-            Ver los frascos
+            Ver el catálogo
           </span>
         </div>
         <div className="relative m-1.5 overflow-hidden bg-tinta/[0.1]">
@@ -666,10 +666,10 @@ function DibujoFormula({ d }: Props) {
         </div>
       </div>
       <div className="mx-3 mt-2 border-b border-tinta pb-[2px] font-titular text-[length:3.125cqw] leading-none">
-        Frascos
+        Los más pedidos
       </div>
       <div className="grid grid-cols-3 gap-2 px-3 pt-1.5">
-        {(d ? huecos(d, 3) : (["Amaderado", "Cítrico", "Floral"] as const)).map(
+        {(d ? huecos(d, 3) : (["Nº 01", "Nº 02", "Nº 03"] as const)).map(
           (item, i) => {
             const producto = typeof item === "string" ? undefined : item
             return (
@@ -799,7 +799,7 @@ function DibujoQuilate({ d }: Props) {
     <div className="flex h-full flex-col">
       <div className="grid grid-cols-[1fr_auto_1fr] items-center px-3 py-1.5">
         <span className="text-[length:1.25cqw] tracking-[0.24em] uppercase opacity-70">
-          Piezas
+          Colección
         </span>
         <Marca
           d={d}
@@ -813,16 +813,16 @@ function DibujoQuilate({ d }: Props) {
       </div>
       <div className="px-3 pt-[4cqw] text-center">
         <p className="mx-auto max-w-[16ch] font-titular text-[length:5cqw] leading-[1.12] tracking-[0.1em] uppercase">
-          Piezas que se quedan contigo
+          Para mirar de cerca
         </p>
         <span className="mt-[2cqw] inline-block rounded-[3px] bg-tinta px-[1.6cqw] py-[0.5cqw] text-[length:1.25cqw] tracking-[0.24em] text-papel uppercase">
-          Ver las piezas
+          Ver la colección
         </span>
       </div>
       <div className="mt-[4cqw] flex items-center gap-2 px-3">
         <span className="h-px flex-1 bg-tinta/20" />
         <span className="font-titular text-[length:2.188cqw] tracking-[0.18em] uppercase">
-          Recién llegadas
+          Recién llegado
         </span>
         <span className="h-px flex-1 bg-tinta/20" />
       </div>
@@ -992,10 +992,10 @@ function DibujoAmbar({ d }: Props) {
         <div className="grid min-h-0 flex-1 grid-cols-[1.15fr_1fr] items-center gap-3 px-3 py-2">
           <div>
             <p className="font-titular text-[length:5cqw] leading-[1.05]">
-              Perfumes árabes, del decant al frasco
+              Tesoros de la casa
             </p>
             <span className="mt-[1.6cqw] inline-block rounded-[2px] bg-papel px-[1.4cqw] py-[0.4cqw] text-[length:1.25cqw] font-medium text-tinta">
-              Ver los perfumes
+              Ver la colección
             </span>
           </div>
           <div className="relative h-full bg-papel/25 p-px [clip-path:polygon(14%_0,86%_0,100%_14%,100%_86%,86%_100%,14%_100%,0_86%,0_14%)]">
@@ -1101,10 +1101,10 @@ function DibujoCorrea({ d }: Props) {
       >
         <div>
           <p className="font-titular text-[length:5.6cqw] leading-[0.95] font-bold tracking-[-0.03em]">
-            Carteras para todos los días
+            Color para todos los días
           </p>
           <span className="mt-[1.6cqw] inline-block rounded-full bg-senal px-[1.6cqw] py-[0.4cqw] text-[length:1.25cqw] font-semibold text-white">
-            Ver las carteras
+            Ver la colección
           </span>
         </div>
         <div className="grid h-full grid-cols-[1.2fr_1fr] grid-rows-2 gap-1 py-1">
@@ -1197,10 +1197,10 @@ function DibujoTaco({ d }: Props) {
         <span className="block h-[0.4cqw] bg-tinta" />
         <div className="mt-[1.4cqw] flex items-end justify-between">
           <p className="font-titular text-[length:6.25cqw] leading-[0.9] font-medium tracking-[-0.03em] lowercase">
-            nuevos pares
+            nuevos ingresos
           </p>
           <span className="mb-[0.4cqw] bg-senal px-[1.4cqw] py-[0.5cqw] text-[length:1.25cqw] text-white">
-            Ver los modelos
+            Ver lo nuevo
           </span>
         </div>
       </div>
@@ -1255,7 +1255,7 @@ function DibujoTocador({ d }: Props) {
       >
         <div>
           <p className="font-titular text-[length:5.6cqw] leading-[0.98] font-semibold">
-            Tu rutina, paso a paso
+            Para consentirte
           </p>
           <span className="mt-[1.6cqw] inline-block rounded-full bg-senal px-[1.6cqw] py-[0.4cqw] text-[length:1.25cqw] font-semibold text-white">
             Ver los productos
@@ -1270,14 +1270,14 @@ function DibujoTocador({ d }: Props) {
             )}
           </div>
           <span className="absolute right-[-1cqw] bottom-[-1.5cqw] flex size-[9cqw] items-center justify-center rounded-full border border-tinta/15 bg-papel text-center text-[length:1.1cqw] leading-tight font-semibold">
-            TU
+            TE
             <br />
-            TONO
+            AYUDAMOS
           </span>
         </div>
       </div>
       <div className="flex items-center gap-[0.8cqw] px-3 pt-[2.4cqw] text-[length:1.6cqw]">
-        {["Limpiar", "Tratar", "Hidratar"].map((paso, i) => (
+        {["Mira", "Elige", "Pide"].map((paso, i) => (
           <span key={paso} className="flex items-center gap-[0.8cqw]">
             {i > 0 ? <span className="opacity-40">›</span> : null}
             <span className="rounded-[0.4rem] bg-tinta/[0.05] px-[1cqw] py-[0.3cqw]">
@@ -1340,7 +1340,7 @@ function DibujoCrayon({ d }: Props) {
       >
         <div>
           <p className="font-titular text-[length:5.6cqw] leading-[0.98] font-semibold">
-            Ropa para crecer jugando
+            Para elegir jugando
           </p>
           <svg
             viewBox="0 0 96 12"
@@ -1356,7 +1356,7 @@ function DibujoCrayon({ d }: Props) {
             />
           </svg>
           <span className="mt-[1.4cqw] inline-block rounded-full bg-senal px-[1.6cqw] py-[0.4cqw] text-[length:1.25cqw] font-semibold text-white">
-            Ver por edad
+            Ver todo
           </span>
         </div>
         <div className="relative mx-auto aspect-square h-[92%] overflow-hidden rounded-full bg-tinta/[0.07]">
@@ -1369,7 +1369,7 @@ function DibujoCrayon({ d }: Props) {
       </div>
       <div className="px-3 pt-[1.6cqw]">
         <div className="flex justify-around">
-          {["0 a 12 meses", "1 a 3 años", "4 a 8 años"].map((edad) => (
+          {["Lo nuevo", "Favoritos", "Ofertas"].map((edad) => (
             <span key={edad} className="flex flex-col items-center">
               <span className="rounded-full border border-tinta bg-papel px-[1cqw] text-[length:1.25cqw] leading-relaxed font-semibold">
                 {edad}
@@ -1390,7 +1390,7 @@ function DibujoCrayon({ d }: Props) {
               <>
                 <div className="absolute inset-x-[30%] top-[30%] bottom-0 rounded-t-[40%] bg-tinta/20" />
                 <span className="absolute top-[1cqw] left-[1cqw] rounded-full bg-papel px-[0.8cqw] text-[length:1.1cqw] font-semibold">
-                  {["0 a 12 meses", "1 a 3 años", "4 a 8 años"][i % 3]}
+                  {["Tallas 1 a 3", "Tallas 4 a 6", "Tallas 8 a 12"][i % 3]}
                 </span>
               </>
             ) : (

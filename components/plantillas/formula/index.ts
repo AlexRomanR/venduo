@@ -32,11 +32,10 @@ export const KIT_FORMULA: KitDeTienda = {
     grilla,
     Cierre,
     textos: {
-      sinProductos: "Los frascos están en camino",
+      sinProductos: "El catálogo está en camino",
       consulta: "¿No sabes cuál elegir? Te asesoramos",
-      estado: "Estado del frasco",
       sinResultados:
-        "Ningún frasco coincide con lo que elegiste. Prueba con otra familia o ve todo el catálogo.",
+        "Nada coincide con lo que elegiste. Prueba con otra categoría o ve todo el catálogo.",
     },
   }),
 }

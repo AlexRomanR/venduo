@@ -180,7 +180,7 @@ function Categorias({ bloque, tienda }: PropsBloque) {
                   </span>
                   <span className="tabular mt-1 text-xs tracking-[0.22em] uppercase opacity-55">
                     {categoria.productos}{" "}
-                    {categoria.productos === 1 ? "pieza" : "piezas"}
+                    {categoria.productos === 1 ? "producto" : "productos"}
                   </span>
                 </Link>
               </li>

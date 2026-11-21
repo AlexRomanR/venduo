@@ -56,11 +56,14 @@ export async function getEstadisticas(
         .eq("store_id", tienda.id)
         .eq("orders.status", "pagado")
         .gte("orders.created_at", inicio(primerDia)),
-      // Todos los que llegaron en el período, de cualquier estado.
+      // Todos los que llegaron en el período, de cualquier estado. Sin las
+      // ventas directas: nacen cobradas, y contarlas inflaba "cuántos se
+      // cobran" con ventas que nunca esperaron cobro.
       supabase
         .from("orders")
         .select("status, created_at")
         .eq("store_id", tienda.id)
+        .neq("origen", "directa")
         .gte("created_at", inicio(desde)),
       supabase
         .from("products")

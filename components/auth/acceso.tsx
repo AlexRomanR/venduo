@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { ArrowLeft, Eye, EyeOff, Loader2, MailCheck } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -31,7 +31,7 @@ import { Input } from "@/components/ui/input"
 
 const MIN_PASSWORD = 8
 
-type Modo = "ingresar" | "registrarse"
+type Modo = "ingresar" | "registrarse" | "recuperar"
 
 /**
  * El titular de cada modo, con su frase en el resaltador, y una línea. Sin
@@ -47,6 +47,13 @@ const VUELTA = {
   antes: "Entra a tu ",
   resaltado: "tienda",
   bajada: "Tus pedidos y tus ventas, como los dejaste.",
+}
+
+const RECUPERO = {
+  antes: "Recupera tu ",
+  resaltado: "cuenta",
+  bajada:
+    "Te mandamos un enlace a tu correo para que elijas una contraseña nueva.",
 }
 
 // Los dos esquemas declaran los mismos campos y solo cambian las reglas: si
@@ -70,6 +77,9 @@ const signUpSchema = baseSchema.extend({
     .max(72, "Máximo 72 caracteres."),
 })
 
+/** Para pedir el enlace alcanza con el correo. */
+const recuperarSchema = baseSchema
+
 /** Con el registro por invitación, el código es obligatorio. */
 const signUpConInvitacionSchema = signUpSchema.extend({
   invitacion: z
@@ -88,6 +98,7 @@ export function Acceso({
   configured,
   initialError,
   registro = false,
+  recuperar = false,
   estadoDelRegistro = "abierto",
 }: {
   next?: string
@@ -95,25 +106,33 @@ export function Acceso({
   initialError?: string
   /** Quien llega desde "Crear mi tienda" viene a registrarse, no a entrar. */
   registro?: boolean
+  /** Quien llega desde un enlace vencido viene a pedir otro. */
+  recuperar?: boolean
   /** Lo decide Venduo desde la administración; la base lo hace cumplir. */
   estadoDelRegistro?: EstadoDelRegistro
 }) {
   const [modo, setModo] = React.useState<Modo>(
-    registro ? "registrarse" : "ingresar"
+    recuperar ? "recuperar" : registro ? "registrarse" : "ingresar"
   )
   const [verClave, setVerClave] = React.useState(false)
+  // El correo al que se mandó el enlace: con él, la tarjeta pasa a "revisa
+  // tu correo".
+  const [enviadoA, setEnviadoA] = React.useState<string | null>(null)
 
   const esRegistro = modo === "registrarse"
+  const esRecupero = modo === "recuperar"
   const conInvitacion = estadoDelRegistro === "invitacion"
   const cerrado = estadoDelRegistro === "cerrado"
 
   const form = useForm<Values>({
     resolver: zodResolver(
-      esRegistro
-        ? conInvitacion
-          ? signUpConInvitacionSchema
-          : signUpSchema
-        : signInSchema
+      esRecupero
+        ? recuperarSchema
+        : esRegistro
+          ? conInvitacion
+            ? signUpConInvitacionSchema
+            : signUpSchema
+          : signInSchema
     ),
     defaultValues: {
       fullName: "",
@@ -131,10 +150,41 @@ export function Acceso({
   // pendientes dejan de aplicar al cambiar.
   function cambiarModo(siguiente: Modo) {
     setModo(siguiente)
+    setEnviadoA(null)
     form.clearErrors()
   }
 
+  /**
+   * El enlace para elegir otra contraseña. Se dice lo mismo exista o no la
+   * cuenta: contestar distinto le contaría a cualquiera qué correos usan
+   * Venduo.
+   */
+  async function pedirEnlace(correo: string) {
+    const supabase = createClient()
+    if (!supabase) {
+      toast.error("Falta configurar Supabase en .env.local")
+      return
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(correo, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/nueva-clave`,
+    })
+    if (error) {
+      toast.error(
+        error.status === 429 || /rate limit|seconds/i.test(error.message)
+          ? "Ya te mandamos un enlace hace poco. Espera un minuto y vuelve a pedirlo."
+          : "No pudimos mandarte el enlace. Inténtalo de nuevo en un rato."
+      )
+      return
+    }
+    setEnviadoA(correo)
+  }
+
   async function onSubmit(values: Values) {
+    if (esRecupero) {
+      await pedirEnlace(values.email.trim())
+      return
+    }
+
     const supabase = createClient()
     if (!supabase) {
       toast.error("Falta configurar Supabase en .env.local")
@@ -208,7 +258,7 @@ export function Acceso({
     )
   }
 
-  const titulo = esRegistro ? REGISTRO : VUELTA
+  const titulo = esRecupero ? RECUPERO : esRegistro ? REGISTRO : VUELTA
 
   return (
     <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 pt-4 pb-12 sm:px-5 lg:grid-cols-[1fr_28rem] lg:items-center lg:gap-16 lg:py-16">
@@ -231,37 +281,80 @@ export function Acceso({
           </p>
         ) : null}
 
-        {/* Las dos pestañas en una píldora: la elegida, en tinta llena. */}
-        <div
-          role="group"
-          aria-label="Cuenta"
-          className="relative grid grid-cols-2 rounded-full border border-tinta/15 bg-papel p-1"
-        >
-          <span
-            aria-hidden="true"
-            className={cn(
-              "absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-tinta transition-transform duration-[250ms] ease-out motion-reduce:transition-none",
-              esRegistro ? "translate-x-0" : "translate-x-full"
-            )}
-          />
-          {(["registrarse", "ingresar"] as const).map((valor) => (
+        {/* Las dos pestañas en una píldora: la elegida, en tinta llena. Al
+            recuperar la cuenta no hay qué elegir: solo volver, y con el enlace
+            ya mandado volver es el botón de abajo. */}
+        {esRecupero ? (
+          enviadoA ? null : (
             <button
-              key={valor}
               type="button"
-              onClick={() => cambiarModo(valor)}
-              aria-pressed={modo === valor}
-              disabled={form.formState.isSubmitting}
-              className={cn(
-                "relative z-10 min-h-11 rounded-full px-2 text-sm font-semibold transition-colors",
-                modo === valor ? "text-papel" : "text-tinta/70 hover:text-tinta"
-              )}
+              onClick={() => cambiarModo("ingresar")}
+              className="-my-2 flex min-h-11 items-center gap-2 self-start text-sm font-semibold text-tinta/70 transition-colors hover:text-tinta"
             >
-              {valor === "registrarse" ? "Cuenta nueva" : "Ya tengo cuenta"}
+              <ArrowLeft aria-hidden="true" className="size-4" />
+              Volver a ingresar
             </button>
-          ))}
-        </div>
+          )
+        ) : (
+          <div
+            role="group"
+            aria-label="Cuenta"
+            className="relative grid grid-cols-2 rounded-full border border-tinta/15 bg-papel p-1"
+          >
+            <span
+              aria-hidden="true"
+              className={cn(
+                "absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-tinta transition-transform duration-[250ms] ease-out motion-reduce:transition-none",
+                esRegistro ? "translate-x-0" : "translate-x-full"
+              )}
+            />
+            {(["registrarse", "ingresar"] as const).map((valor) => (
+              <button
+                key={valor}
+                type="button"
+                onClick={() => cambiarModo(valor)}
+                aria-pressed={modo === valor}
+                disabled={form.formState.isSubmitting}
+                className={cn(
+                  "relative z-10 min-h-11 rounded-full px-2 text-sm font-semibold transition-colors",
+                  modo === valor
+                    ? "text-papel"
+                    : "text-tinta/70 hover:text-tinta"
+                )}
+              >
+                {valor === "registrarse" ? "Cuenta nueva" : "Ya tengo cuenta"}
+              </button>
+            ))}
+          </div>
+        )}
 
-        {esRegistro && cerrado ? (
+        {esRecupero && enviadoA ? (
+          <div className="cambio-entra flex flex-col gap-4" role="status">
+            <MailCheck aria-hidden="true" className="size-7" />
+            <p>
+              <span className="block font-semibold">Revisa tu correo.</span>
+              <span className="mt-1 block text-sm leading-relaxed opacity-70">
+                Si <span className="font-semibold">{enviadoA}</span> tiene una
+                cuenta en Venduo, te llega un enlace en unos minutos. Si no lo
+                ves, mira en Spam o en Promociones.
+              </span>
+            </p>
+            <button
+              type="button"
+              onClick={() => cambiarModo("ingresar")}
+              className={cn(BOTON_SECUNDARIO, "w-full")}
+            >
+              Volver a ingresar
+            </button>
+            <button
+              type="button"
+              onClick={() => void pedirEnlace(enviadoA)}
+              className="min-h-11 text-sm font-semibold underline underline-offset-4"
+            >
+              No me llegó: mandarlo de nuevo
+            </button>
+          </div>
+        ) : esRegistro && cerrado ? (
           <div className="flex flex-col gap-4">
             <p>
               <span className="block font-semibold">
@@ -280,7 +373,7 @@ export function Acceso({
             </button>
           </div>
         ) : (
-          <Form {...form}>
+          <Form nombre="acceso" {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
               className="flex flex-col gap-6"
@@ -328,49 +421,66 @@ export function Acceso({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormLabel className={ETIQUETA_CAMPO}>Contraseña</FormLabel>
-                    <div className="relative">
-                      <FormControl>
-                        <Input
-                          className={cn(CAMPO_LINEA, "pr-12")}
-                          type={verClave ? "text" : "password"}
-                          autoComplete={
-                            esRegistro ? "new-password" : "current-password"
-                          }
-                          {...field}
-                        />
-                      </FormControl>
-                      <button
-                        type="button"
-                        onClick={() => setVerClave((antes) => !antes)}
-                        aria-pressed={verClave}
-                        aria-label={
-                          verClave ? "Ocultar contraseña" : "Mostrar contraseña"
-                        }
-                        className="absolute top-0 right-0 flex size-12 items-center justify-center text-tinta/65 transition-colors hover:text-tinta"
-                      >
-                        {verClave ? (
-                          <EyeOff aria-hidden="true" className="size-5" />
-                        ) : (
-                          <Eye aria-hidden="true" className="size-5" />
+              {esRecupero ? null : (
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between gap-3">
+                        <FormLabel className={ETIQUETA_CAMPO}>
+                          Contraseña
+                        </FormLabel>
+                        {esRegistro ? null : (
+                          <button
+                            type="button"
+                            onClick={() => cambiarModo("recuperar")}
+                            className="-my-3 min-h-11 text-sm text-tinta/70 underline underline-offset-4 transition-colors hover:text-tinta"
+                          >
+                            ¿La olvidaste?
+                          </button>
                         )}
-                      </button>
-                    </div>
-                    {/* La pista y el error dicen lo mismo: el error la reemplaza. */}
-                    {esRegistro && !fieldState.error ? (
-                      <FormDescription className={AYUDA_CAMPO}>
-                        Mínimo {MIN_PASSWORD} caracteres.
-                      </FormDescription>
-                    ) : null}
-                    <FormMessage className={ERROR_CAMPO} />
-                  </FormItem>
-                )}
-              />
+                      </div>
+                      <div className="relative">
+                        <FormControl>
+                          <Input
+                            className={cn(CAMPO_LINEA, "pr-12")}
+                            type={verClave ? "text" : "password"}
+                            autoComplete={
+                              esRegistro ? "new-password" : "current-password"
+                            }
+                            {...field}
+                          />
+                        </FormControl>
+                        <button
+                          type="button"
+                          onClick={() => setVerClave((antes) => !antes)}
+                          aria-pressed={verClave}
+                          aria-label={
+                            verClave
+                              ? "Ocultar contraseña"
+                              : "Mostrar contraseña"
+                          }
+                          className="absolute top-0 right-0 flex size-12 items-center justify-center text-tinta/65 transition-colors hover:text-tinta"
+                        >
+                          {verClave ? (
+                            <EyeOff aria-hidden="true" className="size-5" />
+                          ) : (
+                            <Eye aria-hidden="true" className="size-5" />
+                          )}
+                        </button>
+                      </div>
+                      {/* La pista y el error dicen lo mismo: el error la reemplaza. */}
+                      {esRegistro && !fieldState.error ? (
+                        <FormDescription className={AYUDA_CAMPO}>
+                          Mínimo {MIN_PASSWORD} caracteres.
+                        </FormDescription>
+                      ) : null}
+                      <FormMessage className={ERROR_CAMPO} />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               {esRegistro && conInvitacion ? (
                 <FormField
@@ -416,8 +526,14 @@ export function Acceso({
                       aria-hidden="true"
                       className="size-4 animate-spin"
                     />
-                    {esRegistro ? "Creando tu cuenta…" : "Ingresando…"}
+                    {esRecupero
+                      ? "Mandando el enlace…"
+                      : esRegistro
+                        ? "Creando tu cuenta…"
+                        : "Ingresando…"}
                   </>
+                ) : esRecupero ? (
+                  "Mandarme el enlace"
                 ) : esRegistro ? (
                   "Crear cuenta"
                 ) : (

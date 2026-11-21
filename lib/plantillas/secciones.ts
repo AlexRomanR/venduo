@@ -83,8 +83,8 @@ const TITULO: CampoDeTexto = {
 export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
   hero: {
     tipo: "hero",
-    nombre: "Portada",
-    descripcion: "Lo primero que ve tu cliente: un título grande y una foto.",
+    nombre: "Presentación",
+    descripcion: "Lo primero que se ve: un título grande y una foto.",
     maximo: 1,
     vacia: "Ponle un título.",
     campos: [
@@ -96,7 +96,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
         max: 240,
         ayuda: "Una o dos líneas que cuenten qué vendes.",
         ejemplo:
-          "Ropa deportiva elegida una por una. Pide aquí y coordinamos la entrega.",
+          "Elegimos cada producto uno por uno. Pide aquí y coordinamos la entrega.",
       },
       {
         clave: "ctaLabel",
@@ -211,7 +211,7 @@ export const SECCIONES: Record<TipoDeBloque, DefinicionDeSeccion> = {
     tipo: "testimonials",
     nombre: "Testimonios",
     descripcion:
-      "Lo que dicen tus clientes. Da confianza a quien compra por primera vez.",
+      "Lo que dicen quienes te compran. Da confianza a quien llega por primera vez.",
     maximo: 1,
     vacia: "Agrégale al menos un testimonio.",
     campos: [

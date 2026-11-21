@@ -135,9 +135,8 @@ export type Personalizacion = z.infer<typeof personalizacionSchema>
  * cuyo blanco se pierde— vuelven a los de la base aunque el esquema los acepte.
  *
  * El contraste se mide solo cuando la tienda cambió colores. La paleta de una
- * base la revisa quien la escribe; la editorial, por ejemplo, tiene su rojo a
- * 4,35:1 contra el papel, y medirla acá descartaría cualquier otro cambio de
- * una tienda que la use.
+ * base la revisa quien la escribe: medirla acá descartaría cualquier otro
+ * cambio de una tienda que la use si su paleta quedara justa.
  */
 export function resolverApariencia(
   base: Apariencia,
@@ -283,7 +282,7 @@ export function colorLegibleCercano(
 export const NOMBRES_DE_AJUSTE = {
   "colores.papel": "Fondo",
   "colores.tinta": "Texto",
-  "colores.senal": "Botones y acentos",
+  "colores.senal": "Color destacado",
   "colores.senalAlta": "Botones al pasar el cursor",
   "tipografia.titular": "Letra de los títulos",
   "tipografia.cuerpo": "Letra del texto",
@@ -293,7 +292,7 @@ export const NOMBRES_DE_AJUSTE = {
   "forma.radio": "Forma de los botones",
   "disposicion.tarjeta": "Forma de las fotos",
   "disposicion.columnas": "Productos por fila",
-  "ficha.diseno": "Diseño de la ficha",
+  "ficha.diseno": "Diseño del producto abierto",
   "ficha.barraFija": "Botón de compra fijo",
   "ficha.consulta": "Botón de WhatsApp",
   "ficha.relacionados": "Productos similares",
@@ -318,8 +317,8 @@ export const NOMBRES_DE_VALOR: Record<string, string> = {
   apretado: "Apretado",
   normal: "Normal",
   abierto: "Abierto",
-  dividida: "Dividida",
-  vitrina: "Vitrina",
+  dividida: "Foto al lado",
+  vitrina: "Foto al centro",
   columnas: "Dos columnas",
   boleta: "Boleta",
   pasos: "Por pasos",

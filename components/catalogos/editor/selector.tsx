@@ -19,7 +19,7 @@ import { Miniatura } from "@/components/panel/piezas"
  * filtros: todo lo rebajado, toda una categoría.
  */
 
-type Filtro = "todos" | "rebaja" | "destacados" | `cat:${string}`
+type Filtro = "todos" | "oferta" | "stock" | `cat:${string}`
 
 function plano(texto: string): string {
   return texto.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase()
@@ -27,8 +27,8 @@ function plano(texto: string): string {
 
 function cumple(producto: ProductoDelCatalogo, filtro: Filtro): boolean {
   if (filtro === "todos") return true
-  if (filtro === "rebaja") return producto.precioAnteriorCents !== null
-  if (filtro === "destacados") return producto.destacado
+  if (filtro === "oferta") return producto.precioAnteriorCents !== null
+  if (filtro === "stock") return producto.stock > 0
   return producto.categoriaId === filtro.slice(4)
 }
 
@@ -65,16 +65,12 @@ export function SelectorDeProductos({
 
   const filtros: { valor: Filtro; etiqueta: string }[] = [
     { valor: "todos", etiqueta: "Todos" },
+    { valor: "oferta", etiqueta: "En oferta" },
+    { valor: "stock", etiqueta: "Con stock" },
     ...categorias.map((categoria) => ({
       valor: `cat:${categoria.id}` as Filtro,
       etiqueta: categoria.nombre,
     })),
-    ...(productos.some((p) => p.precioAnteriorCents !== null)
-      ? [{ valor: "rebaja" as Filtro, etiqueta: "Con descuento" }]
-      : []),
-    ...(productos.some((p) => p.destacado)
-      ? [{ valor: "destacados" as Filtro, etiqueta: "Destacados" }]
-      : []),
   ]
 
   const visiblesSinMarcar = visibles.filter((p) => !marcados.has(p.id))
@@ -99,10 +95,10 @@ export function SelectorDeProductos({
             value={buscar}
             onChange={(evento) => setBuscar(evento.target.value)}
             placeholder="Busca por nombre o código"
-            className="h-11 w-full border-0 border-b border-tinta/40 bg-transparent pl-6 text-base placeholder:text-tinta/40 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:outline-none"
+            className="h-11 w-full border-0 border-b border-tinta/40 bg-transparent pl-6 text-base placeholder:text-tinta/65 focus-visible:border-tinta focus-visible:bg-tinta/[0.04] focus-visible:outline-none"
           />
         </label>
-        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+        <div className="-mx-1 flex [scrollbar-width:none] gap-2 overflow-x-auto px-1 pb-1 [&::-webkit-scrollbar]:hidden">
           {filtros.map((opcion) => (
             <button
               key={opcion.valor}
@@ -216,7 +212,7 @@ export function SelectorDeProductos({
                     <span className="tabular mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
                       <span>{formatMoney(producto.precioCents)}</span>
                       {producto.precioAnteriorCents ? (
-                        <span className="text-xs line-through opacity-60">
+                        <span className="text-xs line-through opacity-70">
                           {formatMoney(producto.precioAnteriorCents)}
                         </span>
                       ) : null}
@@ -321,7 +317,7 @@ export function SelectorConFotos({
           value={buscar}
           onChange={(evento) => setBuscar(evento.target.value)}
           placeholder="Buscar"
-          className="h-11 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-tinta/45 [&::-webkit-search-cancel-button]:hidden"
+          className="h-11 min-w-0 flex-1 bg-transparent text-base placeholder:text-tinta/65 [&::-webkit-search-cancel-button]:hidden"
         />
       </label>
 
@@ -386,59 +382,91 @@ export function SelectorConFotos({
             const posicion = elegidos.indexOf(producto.id) + 1
             return (
               <li key={producto.id}>
-                <button
-                  type="button"
-                  role="checkbox"
-                  aria-checked={marcado}
-                  aria-label={producto.nombre}
-                  onClick={(evento) =>
-                    alternar(producto.id, evento.currentTarget)
-                  }
-                  className="group flex w-full flex-col gap-1 text-left"
-                >
-                  <span
-                    data-foto
-                    className={cn(
-                      "relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-[12px] border bg-tinta/[0.05] transition-colors",
-                      marcado
-                        ? "border-2 border-tinta"
-                        : "border-tinta/15 group-hover:border-tinta"
-                    )}
-                  >
-                    {producto.foto ? (
-                      <Image
-                        src={producto.foto}
-                        alt=""
-                        fill
-                        sizes="(min-width: 1024px) 16vw, 33vw"
-                        className="object-cover"
-                      />
-                    ) : (
-                      <Package
-                        aria-hidden="true"
-                        className="size-6 opacity-35"
-                      />
-                    )}
-                    {marcado ? (
-                      <span
-                        aria-hidden="true"
-                        className="tabular numero-entra absolute top-1.5 right-1.5 flex size-7 items-center justify-center rounded-full bg-tinta text-sm font-bold text-white"
-                      >
-                        {posicion <= 99 ? (
-                          posicion
-                        ) : (
-                          <Check className="size-4" />
-                        )}
-                      </span>
-                    ) : null}
-                  </span>
-                  <span className="truncate text-sm">{producto.nombre}</span>
-                </button>
+                <ProductoConFoto
+                  producto={producto}
+                  marcado={marcado}
+                  marca={posicion <= 99 ? posicion : undefined}
+                  sizes="(min-width: 1024px) 16vw, 33vw"
+                  alTocar={(boton) => alternar(producto.id, boton)}
+                />
               </li>
             )
           })}
         </ul>
       )}
     </div>
+  )
+}
+
+/**
+ * Un producto para elegir por su foto: al armar un catálogo y al armar un combo.
+ * Se reconoce por cómo se ve, con su nombre y su precio debajo.
+ */
+export function ProductoConFoto({
+  producto,
+  marcado,
+  marca,
+  sizes,
+  alTocar,
+}: {
+  producto: ProductoDelCatalogo
+  marcado: boolean
+  /** Su lugar, si el orden importa. Sin él, un visto. */
+  marca?: number
+  sizes: string
+  alTocar: (boton: HTMLElement) => void
+}) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={marcado}
+      aria-label={
+        producto.stock > 0 ? producto.nombre : `${producto.nombre}, agotado`
+      }
+      onClick={(evento) => alTocar(evento.currentTarget)}
+      className="group flex w-full flex-col gap-1 text-left"
+    >
+      <span
+        data-foto
+        className={cn(
+          "relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-[12px] border bg-tinta/[0.05] transition-colors",
+          marcado
+            ? "border-2 border-tinta"
+            : "border-tinta/15 group-hover:border-tinta"
+        )}
+      >
+        {producto.foto ? (
+          <Image
+            src={producto.foto}
+            alt=""
+            fill
+            sizes={sizes}
+            className="object-cover"
+          />
+        ) : (
+          <Package aria-hidden="true" className="size-6 opacity-35" />
+        )}
+        {marcado ? (
+          <span
+            aria-hidden="true"
+            className="tabular numero-entra absolute top-1.5 right-1.5 flex size-7 items-center justify-center rounded-full bg-tinta text-sm font-bold text-white"
+          >
+            {marca ?? <Check className="size-4" />}
+          </span>
+        ) : null}
+        {producto.stock > 0 ? null : (
+          <span className="absolute bottom-1.5 left-1.5 rounded-full bg-tinta px-2 py-0.5 text-xs font-semibold text-papel">
+            Agotado
+          </span>
+        )}
+      </span>
+      <span className="line-clamp-2 text-sm leading-snug">
+        {producto.nombre}
+      </span>
+      <span className="tabular text-xs opacity-70">
+        {formatMoney(producto.precioCents)}
+      </span>
+    </button>
   )
 }

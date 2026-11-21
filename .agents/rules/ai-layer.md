@@ -37,18 +37,19 @@ Se obtiene con `getAIProvider()` de `lib/ai/index.ts`. `getAIStatus()` devuelve
 
 ## Las tareas que existen
 
-En `lib/ai/tasks.ts` hay **ocho**, y todas siguen el mismo molde:
+En `lib/ai/tasks.ts` hay **nueve**, y todas siguen el mismo molde:
 
-| Tarea                    | Devuelve                             |
-| ------------------------ | ------------------------------------ |
-| `generateStoreBlueprint` | `{ blueprint, provider, model }`     |
-| `analyzeSales`           | `{ insight, provider, model }`       |
-| `escribirPublicaciones`  | `{ publicaciones, provider, model }` |
-| `buildInsightSql`        | `{ consulta, provider, model }`      |
-| `proponerEdicion`        | `{ propuesta, provider, model }`     |
-| `proponerCatalogo`       | `{ propuesta, provider, model }`     |
-| `leerProductos`          | `{ lectura, provider, model }`       |
-| `mapearPlanilla`         | `{ mapeo, provider, model }`         |
+| Tarea                     | Devuelve                             |
+| ------------------------- | ------------------------------------ |
+| `generateStoreBlueprint`  | `{ blueprint, provider, model }`     |
+| `analyzeSales`            | `{ insight, provider, model }`       |
+| `escribirPublicaciones`   | `{ publicaciones, provider, model }` |
+| `buildInsightSql`         | `{ consulta, provider, model }`      |
+| `proponerEdicion`         | `{ propuesta, provider, model }`     |
+| `proponerCatalogo`        | `{ propuesta, provider, model }`     |
+| `leerProductos`           | `{ lectura, provider, model }`       |
+| `mapearPlanilla`          | `{ mapeo, provider, model }`         |
+| `escribirTextosATuMedida` | `{ textos, provider, model }`        |
 
 Para agregar otra:
 
@@ -143,6 +144,24 @@ respuesta.
 
 Una tarea nueva que llama al modelo desde una acción **pide permiso y anota**, o queda
 fuera del interruptor de emergencia y de la cuenta.
+
+## Los textos a medida
+
+`escribirTextosATuMedida` corrige lo que la tienda contó en "Qué vendes" y con eso
+reescribe la portada: título, subtítulo, botones y títulos de sección. La lógica sin base
+ni modelo está en `lib/textos-a-medida.ts` y la del servidor, en
+`lib/data/textos-a-medida.ts`.
+
+- **Corre una vez al crear la tienda**, aunque "IA: textos a medida" (`ia_textos`) esté
+  oculta: `permisoDeIa("textos", { sinFuncion: true })` se salta la función, no el
+  interruptor general ni el tope diario. Lo decide el servidor: la tienda tiene que tener
+  menos de 24 horas y ninguna propuesta anterior que haya salido bien.
+- **Después, solo donde el administrador la activa**, y una vez por activación.
+- **Nunca se aplica sola.** Queda en `block_edit_proposals` con `origen = 'textos'`, a lo
+  sumo una pendiente por tienda. Solo propone sobre los campos que siguen iguales a la
+  semilla de su plantilla.
+- **Se pide por `POST /api/v1/ia/textos`, no por una Server Action**: las acciones van en
+  fila, y esta dejaría esperando a "Publicar" en el editor.
 
 ## Inteligencia de negocio: las defensas
 

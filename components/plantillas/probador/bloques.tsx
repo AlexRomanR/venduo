@@ -134,7 +134,7 @@ function Categorias({ bloque, tienda }: PropsBloque) {
               </span>
               <span className="tabular mt-0.5 block text-xs opacity-65">
                 {categoria.productos}{" "}
-                {categoria.productos === 1 ? "prenda" : "prendas"}
+                {categoria.productos === 1 ? "producto" : "productos"}
               </span>
             </Link>
           </li>

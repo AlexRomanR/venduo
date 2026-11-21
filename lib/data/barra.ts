@@ -1,5 +1,7 @@
 import { cache } from "react"
 
+import { rutaDeVistaDePlantilla } from "@/lib/api/miniaturas"
+
 import { funcionesDeMiTienda } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 import { deVacaciones } from "@/lib/vacaciones"
@@ -37,6 +39,10 @@ export interface BarraLateral {
     url: string
     /** Sin WhatsApp no recibe pedidos: el menú lo marca en rojo. */
     conWhatsApp: boolean
+    /** La captura de su portada, o la de su plantilla si todavía no tiene. */
+    vista: string
+    /** Si la vista es la de su plantilla y no la de la tienda de verdad. */
+    vistaDePlantilla: boolean
   } | null
   contadores: Contadores
   /**
@@ -68,6 +74,8 @@ function barraDeDemostracion(): BarraLateral {
       deVacaciones: false,
       url: urlDeTienda("rosa-deportes"),
       conWhatsApp: true,
+      vista: rutaDeVistaDePlantilla("fashion"),
+      vistaDePlantilla: true,
     },
     // Los mismos que muestran Pedidos y Productos en la demo.
     contadores: {
@@ -171,6 +179,10 @@ export const getBarraLateral = cache(
             }),
             url: urlDeTienda(tiendaFila.slug),
             conWhatsApp: Boolean(tiendaFila.whatsapp),
+            vista:
+              tiendaFila.vista_url ??
+              rutaDeVistaDePlantilla(tiendaFila.template_key),
+            vistaDePlantilla: !tiendaFila.vista_url,
           }
         : null,
       contadores,

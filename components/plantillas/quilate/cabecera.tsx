@@ -32,7 +32,7 @@ export function Cabecera({ marco, enlaceDelCarrito = true }: PropsCabecera) {
             enCatalogo && "underline decoration-tinta/40 underline-offset-[6px]"
           )}
         >
-          Piezas
+          Colección
         </Link>
 
         <Link

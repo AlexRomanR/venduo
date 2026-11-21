@@ -40,11 +40,10 @@ export const KIT_AMBAR: KitDeTienda = {
       cuando: seVendePorMl,
     },
     textos: {
-      sinProductos: "Los frascos están en camino",
+      sinProductos: "La colección está en camino",
       consulta: "¿No sabes cuál elegir? Te asesoramos",
-      estado: "Estado del frasco",
       sinResultados:
-        "Ningún perfume de esa familia por ahora. Prueba con otra o ve todos.",
+        "Nada en esa categoría por ahora. Prueba con otra o ve todo.",
     },
   }),
 }

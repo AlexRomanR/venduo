@@ -12,9 +12,22 @@ export function nombreDelArchivo(nombre: string): string {
   return `${slugify(nombre) || "catalogo"}.pdf`
 }
 
+/**
+ * A dónde se pide el PDF. Con el id del catálogo guardado, el servidor le pone
+ * a cada combo "Pedir este combo", si lo que se manda es lo guardado.
+ */
+function rutaDelPdf(id: string | null): string {
+  return id
+    ? `/panel/catalogos/pdf?id=${encodeURIComponent(id)}`
+    : "/panel/catalogos/pdf"
+}
+
 /** El PDF del catálogo tal como está en el editor, guardado o no. */
-export async function pedirPdf(catalogo: Catalogo): Promise<Blob> {
-  const respuesta = await fetch("/panel/catalogos/pdf", {
+export async function pedirPdf(
+  catalogo: Catalogo,
+  id: string | null = null
+): Promise<Blob> {
+  const respuesta = await fetch(rutaDelPdf(id), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(catalogo),
@@ -42,7 +55,10 @@ export async function pedirPdf(catalogo: Catalogo): Promise<Blob> {
  * con la marca de este pedido; un error, en cambio, carga como página en el
  * `iframe`, y su texto es el aviso.
  */
-export function descargarPdf(catalogo: Catalogo): Promise<void> {
+export function descargarPdf(
+  catalogo: Catalogo,
+  id: string | null = null
+): Promise<void> {
   return new Promise((resolver, rechazar) => {
     const marca = crypto.randomUUID().replace(/-/g, "")
     const marco = document.createElement("iframe")
@@ -52,7 +68,7 @@ export function descargarPdf(catalogo: Catalogo): Promise<void> {
 
     const formulario = document.createElement("form")
     formulario.method = "POST"
-    formulario.action = "/panel/catalogos/pdf"
+    formulario.action = rutaDelPdf(id)
     formulario.target = marco.name
     formulario.hidden = true
     for (const [nombre, valor] of [

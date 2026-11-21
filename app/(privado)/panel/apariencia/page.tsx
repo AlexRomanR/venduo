@@ -19,7 +19,7 @@ import { Miniatura } from "@/components/plantillas/miniatura"
 import type { DesignOrigin } from "@/types"
 import { cambiarPlantilla, restaurarVersion } from "./acciones"
 
-export const metadata = { title: "Apariencia" }
+export const metadata = { title: "Editar tu tienda" }
 
 function plantillaDeLaPasarela(
   plantilla: PlantillaElegible
@@ -169,13 +169,20 @@ export default async function AparienciaPage() {
                     {formatDate(version.fecha)}
                   </span>
                 </span>
-                <RestaurarVersion
-                  version={version.id}
-                  numero={version.numero}
-                  descripcion={`${ORIGENES[version.origen]} · ${formatDate(version.fecha)}`}
-                  restaurar={restaurarVersion}
-                  className="shrink-0"
-                />
+                {/* Restaurarla no cambiaría nada: se dice, en vez de ofrecerla. */}
+                {version.igualAHoy ? (
+                  <span className="shrink-0 px-2 text-sm text-tinta/70">
+                    Así está hoy
+                  </span>
+                ) : (
+                  <RestaurarVersion
+                    version={version.id}
+                    numero={version.numero}
+                    descripcion={`${ORIGENES[version.origen]} · ${formatDate(version.fecha)}`}
+                    restaurar={restaurarVersion}
+                    className="shrink-0"
+                  />
+                )}
               </li>
             ))}
           />

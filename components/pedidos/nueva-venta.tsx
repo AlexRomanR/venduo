@@ -298,7 +298,7 @@ export function NuevaVenta({
             className={cn(BOTON_PRIMARIO, "min-h-11 px-4 text-sm")}
           >
             <Plus aria-hidden="true" className="size-4" />
-            Nuevo producto
+            Cargar productos
           </Link>
         </SinDatos>
       </Seccion>
@@ -504,7 +504,12 @@ function LineaDeVenta({
             <span className="text-sm font-semibold text-senal">
               {stock === 0
                 ? "No te queda stock."
-                : `Solo te quedan ${formatNumber(stock)}.`}
+                : `Solo te quedan ${formatNumber(stock)}.`}{" "}
+              {/* La salida está en la hoja de la línea: sin decirlo, el aviso
+                  no tenía arreglo a la vista. */}
+              <span className="font-normal underline underline-offset-2">
+                Toca para corregirlo.
+              </span>
             </span>
           ) : null}
         </span>

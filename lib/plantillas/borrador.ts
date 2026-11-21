@@ -243,12 +243,14 @@ export function aplicarOperaciones(
         const iguales = secciones.filter((s) => s.tipo === operacion.tipo)
         if (definicion.maximo !== null && iguales.length >= definicion.maximo) {
           errores.push(
-            `Tu portada ya tiene ${definicion.maximo === 1 ? "una sección" : `${definicion.maximo} secciones`} «${definicion.nombre}».`
+            `Tu página de inicio ya tiene ${definicion.maximo === 1 ? "una sección" : `${definicion.maximo} secciones`} «${definicion.nombre}».`
           )
           break
         }
         if (secciones.length >= MAXIMO_DE_SECCIONES) {
-          errores.push(`Tu portada ya tiene ${MAXIMO_DE_SECCIONES} secciones.`)
+          errores.push(
+            `Tu página de inicio ya tiene ${MAXIMO_DE_SECCIONES} secciones.`
+          )
           break
         }
         const props = esquemaDeSeccion(operacion.tipo, contexto).safeParse({
@@ -533,6 +535,10 @@ export interface Cambio {
   color?: string
   /** El color que tenía, para dibujar el antes y el después. */
   colorAntes?: string
+  /** El ajuste que cambió, para mostrarlo en la tienda. */
+  ruta?: string
+  /** La sección que cambió, para mostrarla en la tienda. */
+  seccion?: string
 }
 
 /**
@@ -569,12 +575,15 @@ export function cambiosEntre(
         : `${NOMBRES_DE_AJUSTE[ruta]}: ${valorLegible(ruta, valorAntes)} → ${valorLegible(ruta, valorDespues)}`,
       color: esColor ? valorDespues : undefined,
       colorAntes: esColor ? valorAntes : undefined,
+      // Colores y letras cambian toda la tienda: no hay un lugar que mostrar.
+      ruta: grupo === "colores" || grupo === "tipografia" ? undefined : ruta,
     })
   }
 
   if (publicado.logoUrl !== borrador.logoUrl) {
     cambios.push({
       tipo: "logo",
+      ruta: "logo",
       texto: borrador.logoUrl
         ? publicado.logoUrl
           ? "Logo nuevo"
@@ -600,6 +609,7 @@ export function cambiosEntre(
     if (!previa) {
       cambios.push({
         tipo: "seccion",
+        seccion: seccion.visible ? seccion.id : undefined,
         texto: `Nueva sección: ${nombreDeSeccion(seccion)}`,
       })
       continue
@@ -607,13 +617,25 @@ export function cambiosEntre(
     if (previa.visible !== seccion.visible) {
       cambios.push({
         tipo: "seccion",
+        seccion: seccion.visible ? seccion.id : undefined,
         texto: `${seccion.visible ? "Se muestra" : "Se oculta"} ${nombreDeSeccion(seccion)}`,
       })
     }
     if (JSON.stringify(previa.props) !== JSON.stringify(seccion.props)) {
+      const campos = SECCIONES[seccion.tipo].campos
+        .filter(
+          (campo) =>
+            JSON.stringify(previa.props[campo.clave]) !==
+            JSON.stringify(seccion.props[campo.clave])
+        )
+        .map((campo) => campo.etiqueta.toLowerCase())
       cambios.push({
         tipo: "seccion",
-        texto: `Textos o fotos de ${nombreDeSeccion(seccion)}`,
+        seccion: seccion.visible ? seccion.id : undefined,
+        texto:
+          campos.length > 0
+            ? `Cambia ${enumerar(campos)} de ${nombreDeSeccion(seccion)}`
+            : `Cambia ${nombreDeSeccion(seccion)}`,
       })
     }
   }

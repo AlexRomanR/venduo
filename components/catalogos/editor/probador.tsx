@@ -68,6 +68,7 @@ export function Probador({
   nombre,
   packs,
   actual,
+  ajustar,
   alUsar,
   alVolver,
 }: {
@@ -80,6 +81,8 @@ export function Probador({
   packs?: Pack[]
   /** La plantilla del catálogo que se está editando, si se llega desde ahí. */
   actual?: ClavePlantilla
+  /** Pasa a cada opción lo que la persona ya editó, para verlo antes de usarla. */
+  ajustar?: (catalogo: Catalogo) => Catalogo
   alUsar: (catalogo: Catalogo) => void
   /** Volver sin cambiar: si la elegida es la que ya tiene. */
   alVolver?: () => void
@@ -92,40 +95,44 @@ export function Probador({
 
   const deLaTienda = React.useMemo<Opcion[]>(
     () =>
-      sugeridos.map((sugerido) => ({
-        id: `estilo:${sugerido.clave}`,
-        nombre: sugerido.nombre,
-        detalle: sugerido.detalle,
-        hoja: HOJAS[PLANTILLAS_DE_CATALOGO[sugerido.plantilla].hoja].nombre,
-        catalogo: armarConEstilo(sugerido, {
+      sugeridos.map((sugerido) => {
+        const armado = armarConEstilo(sugerido, {
           nombre,
           productos,
           tienda,
           packs,
-        }),
-      })),
-    [sugeridos, nombre, productos, tienda, packs]
+        })
+        return {
+          id: `estilo:${sugerido.clave}`,
+          nombre: sugerido.nombre,
+          detalle: sugerido.detalle,
+          hoja: HOJAS[PLANTILLAS_DE_CATALOGO[sugerido.plantilla].hoja].nombre,
+          catalogo: ajustar ? ajustar(armado) : armado,
+        }
+      }),
+    [sugeridos, nombre, productos, tienda, packs, ajustar]
   )
   const todas = React.useMemo<Opcion[]>(
     () =>
       claves.map((clave) => {
         const plantilla = PLANTILLAS_DE_CATALOGO[clave]
+        const armado = armarCatalogo({
+          plantilla: clave,
+          nombre,
+          productos,
+          tienda,
+          estilo,
+          packs,
+        })
         return {
           id: `plantilla:${clave}`,
           nombre: plantilla.nombre,
           detalle: plantilla.detalle,
           hoja: HOJAS[plantilla.hoja].nombre,
-          catalogo: armarCatalogo({
-            plantilla: clave,
-            nombre,
-            productos,
-            tienda,
-            estilo,
-            packs,
-          }),
+          catalogo: ajustar ? ajustar(armado) : armado,
         }
       }),
-    [claves, nombre, productos, tienda, estilo, packs]
+    [claves, nombre, productos, tienda, estilo, packs, ajustar]
   )
 
   const inicial = actual
@@ -141,6 +148,9 @@ export function Probador({
     [opcion, datos]
   )
   const esLaQueTiene = Boolean(actual) && elegida === `plantilla:${actual}`
+  const [lista, setLista] = React.useState<"tienda" | "todas">(() =>
+    deLaTienda.some((o) => o.id === inicial) ? "tienda" : "todas"
+  )
 
   if (!opcion) return null
 
@@ -223,12 +233,56 @@ export function Probador({
     )
   }
 
+  // En el celular las opciones van abajo, junto al botón: bajar a buscarlas
+  // sacaba de la pantalla justo lo que se estaba probando.
+  const opciones = lista === "tienda" ? deLaTienda : todas
   return (
-    <div className="flex flex-col gap-5 pb-24">
+    <div className="flex flex-col gap-4 pb-72">
       <HojasGrandes key={opcion.id} hojas={hojas} columnas={1} />
       {titulo}
-      {grupos}
-      <div className="pieza-bandeja bandeja-al-borde fixed inset-x-0 bottom-0 z-20 border-t border-tinta bg-papel px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <div className="pieza-bandeja bandeja-al-borde fixed inset-x-0 bottom-0 z-20 flex flex-col gap-3 border-t border-tinta bg-papel px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        {deLaTienda.length > 0 ? (
+          <div className="grid grid-cols-2 gap-2">
+            {(
+              [
+                ["tienda", "De tu tienda"],
+                ["todas", "Todas"],
+              ] as const
+            ).map(([valor, nombre]) => (
+              <button
+                key={valor}
+                type="button"
+                aria-pressed={lista === valor}
+                onClick={() => setLista(valor)}
+                className={cn(
+                  "min-h-11 rounded-full border text-sm font-semibold transition-colors",
+                  lista === valor
+                    ? "border-tinta bg-tinta text-papel"
+                    : "border-tinta/25"
+                )}
+              >
+                {nombre}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        <ul
+          aria-label="Plantillas"
+          className="flex snap-x [scrollbar-width:none] gap-3 overflow-x-auto p-1 [&::-webkit-scrollbar]:hidden"
+        >
+          {opciones.map((otra) => (
+            <li key={otra.id} className="shrink-0 snap-start">
+              <Miniatura
+                opcion={otra}
+                datos={datos}
+                ancho={64}
+                elegida={otra.id === elegida}
+                laQueTiene={false}
+                alProbar={() => setElegida(otra.id)}
+              />
+            </li>
+          ))}
+        </ul>
         {accion}
       </div>
     </div>
@@ -278,7 +332,7 @@ function HojasGrandes({
     )
   }
 
-  const anchoDeHoja = Math.round(ancho * 0.74)
+  const anchoDeHoja = Math.round(ancho * 0.54)
   return (
     <div
       ref={ref}
@@ -328,7 +382,7 @@ function Grupo({
 }) {
   return (
     <section className={cn(ancha && "pieza-tarjeta border border-tinta")}>
-      <h3
+      <h2
         className={cn(
           "flex items-center gap-2 font-titular font-bold tracking-[-0.01em]",
           ancha ? "border-b border-tinta/15 px-5 py-3.5 text-base" : "mb-2.5"
@@ -336,7 +390,7 @@ function Grupo({
       >
         <Icono aria-hidden="true" className="size-[18px]" />
         {titulo}
-      </h3>
+      </h2>
       <ul
         className={cn(
           ancha
@@ -389,6 +443,7 @@ function Miniatura({
       style={{ width: ancho }}
     >
       <span
+        aria-hidden="true"
         className={cn(
           "relative block transition-[box-shadow,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:group-active:scale-[0.97]",
           elegida

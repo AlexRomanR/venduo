@@ -2,25 +2,27 @@
 
 import * as React from "react"
 
-import { cn } from "@/lib/utils"
+import { ChevronDown, ChevronUp } from "lucide-react"
 
-/** Cerrado —solo las pestañas—, a media pantalla o casi entera. */
-export type NivelDelPanel = 0 | 1 | 2
+import { cn } from "@/lib/utils"
+import { useManija, type NivelDelPanel } from "@/components/panel/manija"
+
+export type { NivelDelPanel }
 
 /** Lo que mide cerrado: la manija y las pestañas. */
-const CERRADO = 92
+const CERRADO = 101
 /** Lo que deja libre arriba abierto del todo: la barra y un poco de hoja. */
 const LIBRE_ARRIBA = 120
 
-function altoDe(nivel: NivelDelPanel, pantalla: number): number {
+export function altoDe(nivel: NivelDelPanel, pantalla: number): number {
   if (nivel === 0) return CERRADO
   if (nivel === 1) return Math.round(pantalla * 0.5)
   return pantalla - LIBRE_ARRIBA
 }
 
 /**
- * El panel del editor en el celular, el mismo de la app: sube desde abajo
- * sobre las hojas, con las pestañas arriba. Se arrastra desde la manija y se
+ * El panel del editor en el celular: sube desde abajo sobre las hojas, con la
+ * barra de la IA y las pestañas al pie, como el editor de la tienda. Se arrastra desde la manija y se
  * queda en el nivel más cercano; tocar la manija lo abre o lo cierra.
  *
  * Desde `lg` no flota: es la columna de la izquierda del editor, y la manija
@@ -31,25 +33,30 @@ export function PanelDeslizable({
   nivel,
   alCambiarNivel,
   cabecera,
+  pie,
+  contenido,
   children,
 }: {
   nivel: NivelDelPanel
   alCambiarNivel: (nivel: NivelDelPanel) => void
+  /** Las pestañas: al pie en el celular, arriba en la computadora. */
   cabecera: React.ReactNode
+  /** Lo fijo debajo de lo que se edita: la barra de la IA. */
+  pie?: React.ReactNode
+  /** Al cambiar, lo de adentro vuelve a empezar desde arriba. */
+  contenido: string
   children: React.ReactNode
 }) {
-  const [pantalla, setPantalla] = React.useState(800)
-  const [arrastre, setArrastre] = React.useState<number | null>(null)
-  const inicio = React.useRef<{ y: number; alto: number; movio: boolean }>(null)
+  const { alto, pantalla, arrastrando, propsDeManija } = useManija({
+    nivel,
+    alCambiarNivel,
+    altoDe,
+  })
+  const desplazable = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
-    const medir = () => setPantalla(window.innerHeight)
-    medir()
-    window.addEventListener("resize", medir)
-    return () => window.removeEventListener("resize", medir)
-  }, [])
-
-  const alto = arrastre ?? altoDe(nivel, pantalla)
+    desplazable.current?.scrollTo({ top: 0 })
+  }, [contenido])
 
   // Las hojas dejan abajo el lugar del panel.
   React.useEffect(() => {
@@ -62,71 +69,67 @@ export function PanelDeslizable({
     }
   }, [nivel, pantalla])
 
-  function soltar() {
-    const actual = inicio.current
-    inicio.current = null
-    if (!actual) return
-    if (!actual.movio) {
-      alCambiarNivel(nivel === 0 ? 1 : 0)
-      setArrastre(null)
-      return
-    }
-    // Al nivel más cercano a donde quedó.
-    const niveles: NivelDelPanel[] = [0, 1, 2]
-    const cercano = niveles.reduce((mejor, candidato) =>
-      Math.abs(altoDe(candidato, pantalla) - alto) <
-      Math.abs(altoDe(mejor, pantalla) - alto)
-        ? candidato
-        : mejor
-    )
-    setArrastre(null)
-    alCambiarNivel(cercano)
-  }
-
   return (
     <section
       aria-label="Editar el catálogo"
       style={{ "--alto": `${alto}px` } as React.CSSProperties}
       className={cn(
-        "pieza-tarjeta min-w-0 border border-tinta bg-papel",
-        "max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-30 max-lg:flex max-lg:h-[var(--alto)] max-lg:flex-col max-lg:border-x-0 max-lg:border-b-0",
-        arrastre === null &&
-          "motion-reduce:transition-none max-lg:transition-[height] max-lg:duration-300 max-lg:ease-out"
+        // `overflow-clip` y no `hidden`: recorta las esquinas igual, y deja
+        // que la barra de la IA quede pegada abajo en la computadora.
+        "pieza-tarjeta flex min-w-0 flex-col border border-tinta bg-papel lg:overflow-clip!",
+        "max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-30 max-lg:h-[calc(var(--alto)+env(safe-area-inset-bottom))] max-lg:border-x-0 max-lg:border-b-0",
+        !arrastrando &&
+          "motion-safe:max-lg:transition-[height] motion-safe:max-lg:duration-300 motion-safe:max-lg:ease-out"
       )}
     >
-      <button
-        type="button"
-        aria-label={nivel === 0 ? "Abrir el panel" : "Cerrar el panel"}
-        onPointerDown={(evento) => {
-          evento.currentTarget.setPointerCapture(evento.pointerId)
-          inicio.current = { y: evento.clientY, alto, movio: false }
-        }}
-        onPointerMove={(evento) => {
-          const actual = inicio.current
-          if (!actual) return
-          const delta = actual.y - evento.clientY
-          if (Math.abs(delta) > 6) actual.movio = true
-          if (!actual.movio) return
-          setArrastre(
-            Math.min(
-              altoDe(2, pantalla),
-              Math.max(CERRADO, actual.alto + delta)
-            )
-          )
-        }}
-        onPointerUp={soltar}
-        onPointerCancel={soltar}
-        className="flex h-7 shrink-0 touch-none items-center justify-center lg:hidden"
-      >
-        <span
-          aria-hidden="true"
-          className="h-1 w-10 rounded-full bg-tinta/30"
-        />
-      </button>
+      <div className="flex h-11 shrink-0 items-stretch lg:hidden">
+        <button
+          type="button"
+          aria-label={nivel === 0 ? "Abrir el panel" : "Cerrar el panel"}
+          {...propsDeManija}
+          className="flex min-w-0 flex-1 touch-none items-center justify-center pl-11 -outline-offset-2"
+        >
+          <span
+            aria-hidden="true"
+            className="h-1 w-10 rounded-full bg-tinta/30"
+          />
+        </button>
+        <button
+          type="button"
+          aria-label={nivel === 2 ? "Achicar el panel" : "Agrandar el panel"}
+          onClick={() => alCambiarNivel(nivel === 2 ? 1 : 2)}
+          className="flex size-11 shrink-0 items-center justify-center -outline-offset-2"
+        >
+          {nivel === 2 ? (
+            <ChevronDown aria-hidden="true" className="size-5" />
+          ) : (
+            <ChevronUp aria-hidden="true" className="size-5" />
+          )}
+        </button>
+      </div>
       {cabecera}
-      <div className="max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto max-lg:overscroll-contain">
+      <div
+        ref={desplazable}
+        // Los controles de adentro ya se alcanzan con Tab: la caja sola era una
+        // parada que no mostraba nada.
+        tabIndex={-1}
+        className={cn(
+          "outline-none max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto max-lg:overscroll-contain",
+          nivel === 0 && "max-lg:hidden"
+        )}
+      >
         {children}
       </div>
+      {pie ? (
+        <div
+          className={cn(
+            "shrink-0 lg:sticky lg:bottom-0 lg:z-10",
+            nivel === 0 && "max-lg:hidden"
+          )}
+        >
+          {pie}
+        </div>
+      ) : null}
     </section>
   )
 }

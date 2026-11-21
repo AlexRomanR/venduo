@@ -67,8 +67,6 @@ export interface PiezasDePaginas {
     sinProductos: string
     /** El enlace de consulta de la ficha. */
     consulta: string
-    /** El nombre del estado de un usado: "Estado de la prenda". */
-    estado: string
     /** Cuando un filtro no devuelve nada. */
     sinResultados: string
   }

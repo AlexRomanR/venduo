@@ -49,6 +49,7 @@ export default async function EditorDeCatalogoDeLaAppPage({
       plantillas={plantillas}
       inicial={abierto?.catalogo ?? null}
       empezarCon={leerEleccion(parametros)}
+      id={abierto ? id : null}
     />
   )
 }

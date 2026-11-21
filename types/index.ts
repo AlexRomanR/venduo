@@ -37,6 +37,7 @@ export type CatalogRow = Tables<"catalogs">
 // Venta
 export type Order = Tables<"orders">
 export type OrderItem = Tables<"order_items">
+export type OrderItemComponent = Tables<"order_item_components">
 
 // Tienda visual
 export type StorePage = Tables<"store_pages">

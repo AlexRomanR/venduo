@@ -62,7 +62,7 @@ export function enlaceDeTono(
   tienda: Pick<TiendaPublica, "nombre" | "whatsapp">
 ): string | null {
   if (!tienda.whatsapp) return null
-  const mensaje = `Hola ${tienda.nombre}, quisiera ayuda para elegir mi tono.`
+  const mensaje = `Hola ${tienda.nombre}, quisiera ayuda para elegir.`
   return `https://wa.me/${numeroDeWhatsApp(tienda.whatsapp)}?text=${encodeURIComponent(mensaje)}`
 }
 
@@ -97,7 +97,7 @@ export function Sello({
           style={{ fontSize: 9.6, letterSpacing: 1.6, fontWeight: 600 }}
         >
           <textPath href={`#${trazo}`} textLength="190">
-            TE AYUDAMOS CON TU TONO ·
+            TE AYUDAMOS A ELEGIR ·
           </textPath>
         </text>
       </svg>
@@ -121,7 +121,7 @@ export function Sello({
       href={enlace}
       target="_blank"
       rel="noreferrer noopener"
-      aria-label="Te ayudamos con tu tono por WhatsApp"
+      aria-label="Te ayudamos a elegir por WhatsApp"
       className={clases}
     >
       {dibujo}
@@ -305,14 +305,14 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
               <Rotulo>Cómo comprar</Rotulo>
             </dt>
             <dd className="mt-2 leading-relaxed opacity-85">
-              Arma tu rutina, elige tus tonos y envíanos el pedido por WhatsApp.
-              Ahí coordinamos el pago y la entrega.
+              Arma tu pedido y envíanoslo por WhatsApp. Ahí coordinamos el pago
+              y la entrega.
             </dd>
           </div>
         </SiRecibePedidos>
         {tono ? (
           <div>
-            <dt className="sr-only">Ayuda con el tono</dt>
+            <dt className="sr-only">Ayuda para elegir</dt>
             <dd>
               <a
                 href={tono}
@@ -321,7 +321,7 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
                 className="inline-flex min-h-11 items-center gap-2 font-medium underline decoration-tinta/30 underline-offset-4 transition-colors hover:text-senal hover:decoration-senal"
               >
                 <MessageCircle aria-hidden="true" className="size-4" />
-                ¿No sabes tu tono? Mándanos una foto
+                ¿No sabes cuál elegir? Escríbenos
               </a>
             </dd>
           </div>

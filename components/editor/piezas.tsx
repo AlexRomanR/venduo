@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ArrowRight } from "lucide-react"
+import { ArrowLeft, ArrowRight } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -14,28 +14,100 @@ import { cn } from "@/lib/utils"
  * está eligiendo un color.
  */
 
-/** El encabezado de un paso: número, título y para qué sirve. */
+/** El encabezado de un paso: su nombre y para qué sirve. */
 export function EncabezadoDePaso({
-  numero,
   titulo,
   bajada,
 }: {
-  numero: number
   titulo: string
   bajada: string
 }) {
   return (
-    <header className="px-5 pt-6 pb-5">
-      <p className="tabular text-xs font-semibold tracking-[0.12em] text-senal uppercase">
-        Paso {numero} de 6
-      </p>
-      <h2 className="mt-2 font-titular text-[1.75rem] leading-none font-extrabold tracking-[-0.03em]">
+    <header className="px-5 pt-4 pb-4 lg:pt-6 lg:pb-5 [@media(max-height:700px)]:max-lg:p-0">
+      {/* En el celular el nombre ya está en la barra del panel, y ahí cada
+          renglón cuenta. */}
+      <h1 className="font-titular text-3xl leading-none font-extrabold tracking-[-0.03em] max-lg:sr-only">
         {titulo}
-      </h2>
-      <p className="mt-2 max-w-[42ch] text-sm leading-relaxed opacity-70">
+      </h1>
+      <p className="max-w-[42ch] text-sm leading-relaxed opacity-70 lg:mt-2 [@media(max-height:700px)]:max-lg:hidden">
         {bajada}
       </p>
     </header>
+  )
+}
+
+/**
+ * Un ajuste abierto desde su fila, en el mismo panel: así la vista previa sigue
+ * a la vista mientras se elige, también en el celular.
+ */
+export function AjusteAbierto({
+  volver,
+  titulo,
+  ayuda,
+  principal = false,
+  alVolver,
+  children,
+}: {
+  /** El nombre de la lista a la que se vuelve. */
+  volver: string
+  titulo: string
+  ayuda?: string
+  /** Si es el encabezado principal de la pantalla mientras está abierto. */
+  principal?: boolean
+  alVolver: () => void
+  children: React.ReactNode
+}) {
+  const inicio = React.useRef<HTMLDivElement>(null)
+  const Titulo = principal ? "h1" : "h2"
+
+  React.useEffect(() => {
+    inicio.current?.scrollIntoView({ block: "nearest" })
+  }, [])
+
+  return (
+    <div
+      ref={inicio}
+      className="motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in motion-safe:slide-in-from-right-2"
+    >
+      <div className="border-b border-tinta/15 px-2">
+        <button
+          type="button"
+          onClick={alVolver}
+          className="flex min-h-11 items-center gap-2 px-3 text-sm font-semibold transition-colors hover:opacity-60"
+        >
+          <ArrowLeft aria-hidden="true" className="size-4" />
+          {volver}
+        </button>
+      </div>
+      <div className="px-5 pt-4 pb-6">
+        <Titulo className="font-titular text-xl leading-tight font-extrabold tracking-[-0.02em]">
+          {titulo}
+        </Titulo>
+        {ayuda ? (
+          <p className="mt-1 text-sm leading-relaxed opacity-70">{ayuda}</p>
+        ) : null}
+        <div className="mt-4">{children}</div>
+      </div>
+    </div>
+  )
+}
+
+/** Para mostrar el resto de una lista larga de opciones. */
+export function VerTodas({
+  texto,
+  alTocar,
+}: {
+  texto: string
+  alTocar: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={alTocar}
+      className="mt-2 min-h-11 text-sm font-semibold underline underline-offset-4 transition-colors hover:opacity-60"
+    >
+      {texto}
+    </button>
   )
 }
 
@@ -57,11 +129,11 @@ export function Grupo({
     <section className={cn("border-t border-tinta/15 px-5 py-5", className)}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-xs font-semibold tracking-[0.12em] uppercase opacity-60">
+          <h2 className="text-xs font-semibold tracking-[0.12em] uppercase opacity-70">
             {titulo}
-          </h3>
+          </h2>
           {ayuda ? (
-            <p className="mt-1 text-xs leading-relaxed opacity-55">{ayuda}</p>
+            <p className="mt-1 text-xs leading-relaxed opacity-70">{ayuda}</p>
           ) : null}
         </div>
         {accion}
@@ -130,7 +202,7 @@ export function Opciones<T extends string | number>({
             onClick={() => alCambiar(opcion.valor)}
             onKeyDown={(evento) => mover(evento, indice)}
             className={cn(
-              "flex min-h-11 flex-col items-center justify-center gap-2 border px-2 py-3 text-xs font-semibold transition-colors",
+              "flex min-h-11 flex-col items-center justify-center gap-2 rounded-[12px] border px-2 py-3 text-xs font-semibold transition-colors",
               activa
                 ? "border-tinta bg-tinta text-papel"
                 : "border-tinta/20 hover:border-tinta/60"
@@ -161,14 +233,14 @@ export function SiguientePaso({
         className="group flex min-h-12 w-full items-center justify-between gap-3 rounded-plantilla border-2 border-tinta px-5 font-semibold transition-colors hover:bg-tinta hover:text-papel"
       >
         <span>
-          <span className="mr-2 text-xs font-semibold tracking-[0.12em] uppercase opacity-60">
+          <span className="mr-2 text-xs font-semibold tracking-[0.12em] uppercase opacity-70">
             Siguiente
           </span>
           {nombre}
         </span>
         <ArrowRight
           aria-hidden="true"
-          className="size-5 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transform-none"
+          className="size-5 transition-transform duration-300 motion-safe:group-hover:translate-x-1"
         />
       </button>
     </div>
@@ -203,8 +275,7 @@ export function Aviso({
  * Un ajuste que se prende o se apaga, con lo que hace dicho al lado.
  *
  * Toda la fila es el interruptor: se toca en cualquier parte, no solo en la
- * perilla, y mide 44 px o más. La perilla es cuadrada, como el resto del
- * mundo editorial, que no tiene formas redondeadas.
+ * perilla, y mide 44 px o más.
  */
 export function Interruptor({
   etiqueta,
@@ -219,7 +290,9 @@ export function Interruptor({
   alCambiar: (activo: boolean) => void
   deshabilitado?: boolean
 }) {
-  const id = React.useId()
+  // Sale de la etiqueta y no de `useId`: el paso puede venir dibujado del
+  // servidor, y ahí `useId` no siempre daba lo mismo que en el navegador.
+  const id = `ajuste-${etiqueta.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`
 
   return (
     <button
@@ -248,14 +321,14 @@ export function Interruptor({
       <span
         aria-hidden="true"
         className={cn(
-          "relative h-6 w-11 shrink-0 border-2 transition-colors",
+          "relative h-6 w-11 shrink-0 rounded-full border-2 transition-colors",
           activo ? "border-tinta bg-tinta" : "border-tinta/40",
           deshabilitado && "opacity-40"
         )}
       >
         <span
           className={cn(
-            "absolute top-0.5 size-4 transition-[left] duration-200 motion-reduce:transition-none",
+            "absolute top-0.5 size-4 rounded-full transition-[left] duration-200 motion-reduce:transition-none",
             activo ? "left-[1.375rem] bg-papel" : "left-0.5 bg-tinta/45"
           )}
         />

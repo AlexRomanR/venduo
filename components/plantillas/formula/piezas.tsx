@@ -73,7 +73,7 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
           )}
         >
           <span className="truncate opacity-75">
-            {producto.category ?? "Sin familia"}
+            {producto.category ?? "De la casa"}
           </span>
           {agotado ? (
             <span>Agotado</span>
@@ -214,11 +214,11 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
         </div>
 
         <dl className="flex flex-col">
-          <Fila titulo="Frascos">
+          <Fila titulo="Productos">
             <span className="tabular">{tienda.productos.length}</span>
           </Fila>
           {familias > 0 ? (
-            <Fila titulo="Familias">
+            <Fila titulo="Categorías">
               <span className="tabular">{familias}</span>
             </Fila>
           ) : null}

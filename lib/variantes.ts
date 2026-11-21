@@ -102,6 +102,19 @@ export function tipoDe(opcion: { nombre: string }): TipoDeOpcion | null {
 }
 
 /**
+ * Si un producto se elige por alguno de esos tipos de opción, por su nombre:
+ * "Talla", "Número". Lo usan las plantillas para mostrar la ayuda de la talla
+ * solo donde hay talla.
+ */
+export function tieneOpcion(crudo: unknown, ...nombres: string[]): boolean {
+  const buscados = nombres.map((n) => n.toLowerCase())
+  return leerOpciones(crudo).some((o) => {
+    const tipo = tipoDe(o)
+    return tipo !== null && buscados.includes(tipo.nombre.toLowerCase())
+  })
+}
+
+/**
  * Las palabras con que empieza el nombre de una categoría que suele venderse
  * por tallas, números o tamaños. Se compara con el comienzo de cada palabra:
  * "Tops" es ropa y "Laptops" no. Calzado va primero: "Zapatillas deportivas"

@@ -65,15 +65,15 @@ Un catálogo es una lista de **bloques**. Cada tipo tiene variantes, y todas las
 de un tipo leen los mismos campos: se cambia de variante sin perder lo escrito.
 **Cualquier bloque sirve en cualquier plantilla.**
 
-| Bloque        | Variantes                                                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Portada       | Foto completa · Solo letra · Foto y texto · Mosaico de fotos · Con marco                                                            |
-| Productos     | Grilla · Lista con detalle · Lista de precios · Tabla · Uno por página · Lookbook · Vitrina · Historia · Etiquetas de feria · Flyer |
-| Separador     | Título grande · Con foto                                                                                                            |
-| Pack          | Tarjeta · Lista                                                                                                                     |
-| Oferta        | Página completa · Franja                                                                                                            |
-| Contraportada | Contacto · QR grande                                                                                                                |
-| Texto         | Texto · Cita                                                                                                                        |
+| Bloque            | Variantes                                                                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Portada           | Foto completa · Solo letra · Foto y texto · Mosaico de fotos · Con marco                                                                                |
+| Productos         | Cuadrícula · Lista con detalle · Lista de precios · Tabla · Uno por página · Fotos grandes · Vitrina · Pantalla completa · Etiquetas de feria · Volante |
+| Título de sección | Título grande · Con foto                                                                                                                                |
+| Pack              | Tarjeta · Lista                                                                                                                                         |
+| Oferta            | Página completa · Franja                                                                                                                                |
+| Cierre            | Contacto · QR grande                                                                                                                                    |
+| Texto             | Texto · Cita                                                                                                                                            |
 
 **Una plantilla no es un dibujo cerrado**: es la composición con la que arranca un
 catálogo —qué bloques, con qué variantes—, la hoja (A4 o historia 9:16) y si arranca con
@@ -174,9 +174,9 @@ y `acentoCercano()` es el arreglo de un toque.
 Antes de las doce plantillas, la galería ofrece cuatro estilos que salen de la tienda
 (`estilosDeLaTienda()`, en `lib/catalogos/plantillas.ts`), cada uno con la plantilla que
 mejor lo luce. El primero usa la que más se parece a la plantilla de la tienda online
-(`PLANTILLA_POR_TIENDA`: Pasarela y Pisada van con Lookbook, Esencia con Una foto por
+(`PLANTILLA_POR_TIENDA`: Pasarela y Pisada van con Fotos grandes, Esencia con Una foto por
 hoja, Calle con Feria, Atelier con Vitrina de lujo, Fórmula con Grilla minimalista, Bazar
-con Lista de precios, Quilate y Ámbar con Vitrina de lujo, Probador con Lookbook, Correa con Destacado,
+con Lista de precios, Quilate y Ámbar con Vitrina de lujo, Probador con Fotos grandes, Correa con Destacado,
 Taco con Grilla minimalista, Tocador con Historia, Crayón con Feria y la clásica con
 Revista):
 
@@ -252,12 +252,23 @@ queda con menos de dos productos se quita con sus hojas.
 Las miniaturas de la lista se dibujan **en el servidor** (`MiniaturaDeCatalogo`): al
 teléfono llega HTML y no el catálogo con todos los productos.
 
-En el celular es el editor de la app: las hojas ocupan la pantalla y el panel sube
-desde abajo (`PanelDeslizable`, con tres alturas y su manija), con seis pestañas —Hojas,
-Productos, Packs, Estilo, IA y Listo— en una fila que se desliza. La barra de arriba
-lleva la X, el nombre, deshacer, rehacer y "Guardar", que abre Listo: el nombre,
-guardar, mandarlo y Canva. Tocar una hoja la abre en el panel. En una pantalla ancha
-el panel es la columna de la izquierda y Listo no existe: eso va en la cabecera.
+En el celular, las hojas ocupan la pantalla y el panel sube desde abajo
+(`PanelDeslizable`, con tres alturas y su manija). Al pie van la barra de la IA y cinco
+pestañas —Marca, Hojas, Elegidos, Combos y **Enviar**—, como los pasos del editor de la
+tienda. Enviar lleva "Enviar por WhatsApp", el PDF y guardar, con Canva y Borrar en "Más
+opciones". La barra de arriba lleva la X, el nombre, deshacer, rehacer si hay qué rehacer
+y "Guardar". Tocar una hoja la abre en el panel. En una pantalla ancha el panel es la
+columna de la izquierda, con las pestañas arriba y la IA pegada abajo, y Enviar no
+existe: eso va en la cabecera.
+
+Tu marca va por filas (Colores, Letra, Esquinas, Plantilla, Tamaño) y cada una se abre en
+el mismo panel, para seguir viendo las hojas. Colores y Letra usan las mismas piezas que
+Tu marca del editor de la tienda (`components/editor/marca.tsx`): lo que cambie en una
+cambia en la otra. Al armar un combo, los productos se eligen por su foto. Cambiar de plantilla conserva
+los textos editados y las partes agregadas (`conservarEdicion`): "Parte" es lo que se
+edita y "hoja", lo impreso. Lo que no se
+guardó queda en este dispositivo y se ofrece recuperarlo; salir por cualquier enlace o
+con Atrás pregunta antes.
 
 Deshacer y rehacer guardan hasta 60 pasos, igual que el editor de la app. Los productos
 se eligen por sus fotos (`SelectorConFotos`), como en la app.
@@ -321,8 +332,23 @@ Un `iframe` no avisa cuándo empezó una descarga. Por eso la respuesta trae ade
 cookie `descarga={marca}`, que `descargarPdf()` (`exportar.ts`) espera para decir que
 terminó. Si en el `iframe` carga una página, es un error, y se muestra su texto.
 
-**El precio de un pack se muestra en el catálogo y nada más.** La tienda online cobra
-cada producto por separado; quien quiere el pack escribe por WhatsApp.
+**El precio de un pack es el que se cobra.** En un catálogo guardado, cada hoja de
+combo lleva "Pedir este combo" (`BotonDelCombo` en `variantes/pack.tsx`), un enlace
+dentro del PDF —la primitiva `Enlace`— a `/t/{slug}/combo/{token}/{combo}`. Ahí se
+eligen las tallas y el combo entra al carrito como una sola línea; `create_order` lee
+el precio del catálogo guardado. La dirección la ponen las rutas del PDF guardado y
+del enlace compartido con `conLosCombos`, y la del borrador (`/panel/catalogos/pdf?id=`)
+solo si sus combos son los guardados: un PDF con otro precio diría algo que no se
+cumple. Por eso el editor, si hay combos y cambios sin guardar, guarda antes de bajar o
+compartir el PDF. La vista previa dibuja el botón con una dirección de muestra
+(`conElBotonDeCombo` en el constructor). Si algo estaba agotado al armar el PDF, dice
+"Agotado por ahora" y sigue llevando a la página, que dice lo de hoy.
+
+**El precio del combo sigue a sus productos** mientras tiene descuento
+(`pack.descuentoBps`, 10% al crearlo): sumar o quitar un producto lo recalcula sobre la
+suma de todos, en bolivianos enteros (`precioConDescuento`). Escribir el precio a mano
+quita el descuento y lo deja fijo; elegir un descuento vuelve a recalcularlo. Un combo
+de antes, sin `descuentoBps`, se trata como precio a mano.
 
 ---
 
@@ -432,7 +458,10 @@ otra casi siempre es una de las trampas de la sección 5.
 - El enlace abre la versión guardada: los cambios sin guardar no están en él.
 - Con fotos nuevas el PDF tarda de uno a cuatro segundos; después, la conversión queda
   en memoria mientras viva la función.
-- Un pack no se puede comprar como pack en la tienda online.
+- El enlace dentro del PDF depende del visor del teléfono: hay que probarlo abriendo el
+  PDF desde WhatsApp en Android y en iPhone. La copia en Canva probablemente lo pierde.
+- Un PDF ya mandado apunta a `{token}/{combo}`: si el combo se borra o se rehace con
+  otro id, ese botón lleva a "Este combo ya no está disponible".
 - El diseño de Canva no se actualiza: es una copia del PDF del día en que se mandó.
 - Canva convierte el PDF a su manera: una letra que no tiene la cambia por otra
   parecida, y un texto largo puede quedar partido en varias cajas.

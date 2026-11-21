@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest"
 
-import { CLAVES_DE_FUNCION, esEstado, leerFunciones } from "@/lib/funciones"
+import {
+  CLAVES_DE_FUNCION,
+  FUNCIONES,
+  TODAS_ACTIVAS,
+  deFabrica,
+  esEstado,
+  leerFunciones,
+} from "@/lib/funciones"
 
 describe("leerFunciones", () => {
   const [primera, segunda] = CLAVES_DE_FUNCION
@@ -20,8 +27,17 @@ describe("leerFunciones", () => {
     expect(leidas[primera]).toBe("activa")
     expect(leidas[segunda]).toBe("activa")
     expect(Object.values(leerFunciones(null))).toEqual(
-      CLAVES_DE_FUNCION.map(() => "activa")
+      FUNCIONES.map((f) => deFabrica(f))
     )
+  })
+
+  it("una función que nace apagada no se enciende si falta su fila", () => {
+    // Si el código llega antes que la migración, "IA: textos a medida" no
+    // puede quedar activa para todas las tiendas.
+    expect(leerFunciones({}).ia_textos).toBe("oculta")
+    expect(leerFunciones(null).ia_textos).toBe("oculta")
+    expect(TODAS_ACTIVAS.ia_textos).toBe("oculta")
+    expect(leerFunciones({ ia_textos: "activa" }).ia_textos).toBe("activa")
   })
 })
 

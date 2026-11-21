@@ -14,6 +14,7 @@ import {
   type Estilo,
 } from "@/lib/catalogos/modelo"
 import { armarCatalogo } from "@/lib/catalogos/plantillas"
+import { funcionDeTienda } from "@/lib/data/funciones"
 import { getMiTienda } from "@/lib/data/panel"
 import { PRODUCTOS_DE_CATALOGO_DEMO } from "@/lib/demo-data"
 import { getSiteUrl } from "@/lib/env"
@@ -132,6 +133,22 @@ async function armarDatos(
     categorias: categoriasDe(productos),
     fecha: formatFechaLarga(new Date()),
   }
+}
+
+/**
+ * Los datos de un catálogo guardado, con a dónde lleva "Pedir este combo":
+ * `{tienda}/combo/{token}/{combo}`, con la marca de que vino del catálogo.
+ * Si los combos están apagados para la tienda, sin botón.
+ */
+export async function conLosCombos(
+  datos: DatosDelCatalogo,
+  token: string,
+  tiendaId: string
+): Promise<DatosDelCatalogo> {
+  if (!(await funcionDeTienda(tiendaId, "combos"))) return datos
+  const url = new URL(datos.tienda.url)
+  url.pathname = `${url.pathname.replace(/\/$/, "")}/combo/${token}/COMBO`
+  return { ...datos, combos: url.toString().replace("/COMBO", "/{combo}") }
 }
 
 /* ---------------------------------------------------------------------------

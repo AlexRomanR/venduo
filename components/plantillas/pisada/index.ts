@@ -34,11 +34,10 @@ export const KIT_PISADA: KitDeTienda = {
     Cierre,
     marcoDeFoto: PLACA,
     textos: {
-      sinProductos: "Los modelos están en camino",
-      consulta: "¿No sabes tu talla? Pregúntanos",
-      estado: "Estado del par",
+      sinProductos: "Lo nuevo está en camino",
+      consulta: "¿Tienes dudas? Pregúntanos",
       sinResultados:
-        "Ningún modelo coincide con lo que elegiste. Prueba con otro estilo o ve todo el catálogo.",
+        "Nada coincide con lo que elegiste. Prueba con otro estilo o ve todo el catálogo.",
     },
   }),
 }

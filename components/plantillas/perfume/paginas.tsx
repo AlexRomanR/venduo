@@ -223,6 +223,7 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
       {/* Vitrina: el frasco solo, en su arco, y todo centrado debajo, como en
           un mostrador. Dividida: foto y texto lado a lado en la computadora. */}
       <div
+        data-ajuste="ficha.diseno"
         className={cn(
           vitrina
             ? "mx-auto flex max-w-2xl flex-col items-center gap-12"
@@ -306,10 +307,10 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
           >
             <div className="bg-papel px-4 py-5">
               <dt className="text-xs tracking-[0.24em] uppercase opacity-55">
-                Familia
+                Categoría
               </dt>
               <dd className="mt-1.5 text-sm">
-                {producto.category ?? "Sin familia"}
+                {producto.category ?? "Sin categoría"}
               </dd>
             </div>
             <div className="bg-papel px-4 py-5">
@@ -328,6 +329,7 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
 
           {consulta ? (
             <a
+              data-ajuste="ficha.consulta"
               href={consulta}
               target="_blank"
               rel="noreferrer noopener"
@@ -344,7 +346,10 @@ export function Ficha({ tienda, producto, relacionados }: PropsFicha) {
       </div>
 
       {ficha.relacionados && relacionados.length > 0 ? (
-        <section className="mt-20 border-t border-tinta/10 pt-16 md:mt-28">
+        <section
+          data-ajuste="ficha.relacionados"
+          className="mt-20 border-t border-tinta/10 pt-16 md:mt-28"
+        >
           <TituloDeSeccion titulo="Quizás también te guste" />
           <div className="mt-12">
             <Vitrina columnas={4}>

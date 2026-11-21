@@ -296,17 +296,15 @@ export const PEDIDOS_SUGERIDOS: Record<ClaveDePaso, string[]> = {
     "Botones redondos",
   ],
   portada: [
-    "Escribe los textos de mi portada",
+    "Escribe los textos de mi página de inicio",
     "Sube las preguntas frecuentes",
     "Agrega testimonios",
     "Portada para el Día de la Madre",
   ],
-  catalogo: [
+  productos: [
     "Fotos cuadradas en 4 columnas",
     "Que los productos se vean más grandes",
-  ],
-  producto: [
-    "Ficha tipo vitrina, todo centrado",
+    "Producto abierto con todo centrado",
     "Botón de compra siempre a la vista",
     "Sin productos similares",
   ],

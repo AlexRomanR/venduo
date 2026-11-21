@@ -137,6 +137,14 @@ Actualizado el 9 de octubre de 2026.
 - El registro puede estar **abierto, cerrado o con invitación**; lo decide el
   administrador y lo hace cumplir el disparador `handle_new_user`.
 - `/auth/destino` decide a dónde entra cada cuenta según sus datos.
+- **Olvidé mi contraseña** (18 de noviembre): "¿La olvidaste?" en el ingreso manda un
+  enlace al correo (`resetPasswordForEmail`), y `/nueva-clave` deja elegir otra y entra
+  directo. El correo es una plantilla en español (`supabase/templates/recuperar.html`)
+  que lleva a `/auth/confirmar` con `token_hash`, así que sirve aunque se abra en otro
+  navegador. **En producción falta**: pegar esa plantilla en Supabase (Authentication →
+  Emails → Reset Password), revisar que el Site URL sea el de Vercel y configurar un
+  SMTP propio: el correo de fábrica de Supabase solo les llega a las cuentas del equipo.
+  La app, cuando se apruebe la web.
 - Alta de la tienda en tres pasos (`/crear`): elegir plantilla, contar el negocio con su
   **WhatsApp obligatorio** y, en `/crear/listo`, la oferta de personalizarla en el editor
   o hacerlo más tarde. Nace con suscripción de prueba y su versión inicial de diseño.
@@ -152,13 +160,13 @@ Actualizado el 9 de octubre de 2026.
   de mujer, boutique), la primera tanda de siete (`docs/briefs/2026-11-11-plantillas-nuevas.md`).
   Traen dos letras nuevas, Marcellus y Gloock, las tallas en la tarjeta
   (`OpcionesDeVitrina`) y un plegable en la ficha. Migración
-  `20261112120000_quilate_y_probador.sql`, **probada en local y sin aplicar en
-  producción**.
+  `20261112120000_quilate_y_probador.sql`, aplicada en producción el 14 de
+  noviembre.
 - Noviembre, segunda tanda: **Ámbar** (perfumes árabes y decants), **Correa** (carteras
   de color), **Taco** (zapatos de mujer), **Tocador** (maquillaje y skincare) y
   **Crayón** (ropa de niños y bebés, rubro nuevo "Niños"). Cuatro letras más: Reem
   Kufi, Syne, Fraunces y Fredoka. Migración `20261113120000_cinco_plantillas.sql`,
-  **probada en local y sin aplicar en producción**. Con esto hay catorce plantillas.
+  aplicada en producción el 14 de noviembre. Con esto hay catorce plantillas.
 - La identidad llega a toda la tienda pública. El panel es de Venduo, igual para
   todas; la tienda aparece en su sello y en su tarjeta de la barra lateral.
 - Cambio de plantilla desde `/panel/apariencia` sin perder productos ni pedidos, con
@@ -194,9 +202,10 @@ sirven desde `lib/fuentes/` con `next/font/local`: el build ya no las baja de Go
 
 ### Editor de la tienda (`/editor`)
 
-- Pantalla completa, en seis pasos: **Tu marca**, **Portada**, **Catálogo**, **Producto**,
-  **Carrito** y **Publicar**, en una barra arriba (abajo en el celular). Se puede saltar a
-  cualquiera.
+- Pantalla completa, en cinco pasos: **Marca**, **Portada**, **Productos** (cómo se ven los
+  productos, en la lista y al abrir uno), **Carrito** y **Publicar**, con los mismos nombres
+  en la barra de arriba de la computadora y en las pestañas del celular. Ninguno repite una
+  pestaña del panel. Se puede saltar a cualquiera.
 - **Vista previa real** en un `iframe`: la tienda con el kit de su plantilla y sus
   productos. En la computadora se mira como celular (390 px) o como computadora; en el
   celular, la vista previa es la pantalla. Tocar una sección la abre para editarla y
@@ -612,19 +621,145 @@ Para rediseñar o revisar:
 - [ ] **El PDF del catálogo en el celular** no se pudo ver en el navegador automático (el
       servidor lo arma: `POST /panel/catalogos/pdf` 200). Probarlo en un teléfono.
 
+### 6.c. La revisión del 17 de noviembre
+
+Se recorrió cada función de la web contra la base local. Funcionó todo lo de negocio;
+se arreglaron la pestaña "Catálogos" desactivada en el celular, el singular de los
+textos sin IA de Publicar y el aviso del carrito. Del recorrido salieron:
+
+- [x] Olvidé mi contraseña (arriba, en "Cuentas y altas").
+- [x] **La tienda pausada**: la base dejaba leer cualquier tienda publicada aunque
+      estuviera pausada, bloqueada o dada de baja, y se veía su cascarón sin productos.
+      La política ahora pide `store_is_live` (`20261118120000_tienda_que_no_se_sirve.sql`,
+      aplicada en producción el 18 de noviembre). La dueña ve arriba del Resumen
+      "Venduo pausó tu tienda" con "Escríbenos". La app, cuando se apruebe la web.
+- [ ] La IA de respaldo: si Gemini se satura, toda la IA falla junta.
+- [x] **Los textos de la plantilla** (brief `docs/briefs/2026-11-18-textos-que-se-adaptan.md`,
+      construido en la web; migraciones aplicadas en producción el 20 de noviembre):
+  - las 14 plantillas pasan a textos sin producto, con su voz;
+  - al crear la tienda, la IA corrige "Qué vendes" y propone título, subtítulo, botones,
+    secciones y descripción, y la persona elige en el paso 3;
+  - después solo propone donde `/admin` activa "IA: textos a medida", en el paso Portada;
+  - lo aceptado se conserva al cambiar de plantilla.
+
+  Falta probar el texto con Gemini de verdad: el día de la prueba respondía 503 y 429.
+  La app, cuando se apruebe la web.
+
+- [x] Lo menor de diseño y flujo (18 de noviembre):
+  - el Resumen de una tienda nueva ya no dice "Estás al día" encima de "Te faltan 3
+    pasos";
+  - "Guardar" en el editor de catálogos guarda;
+  - Nueva venta dice "Toca para corregirlo" cuando falta stock;
+  - la oferta avisa en su hoja si el precio anterior no es mayor;
+  - "Tallas y colores" sin la frase repetida;
+  - el pedido muestra "Pagado" con hora, y el paso queda aunque después se cancele;
+  - Estadísticas ya no cuenta las ventas directas en "cuántos se cobran" y no dice "tu
+    día fuerte" con menos de cinco ventas;
+  - una planilla con los encabezados de siempre se lee sin IA y sin preguntar columna por
+    columna;
+  - el final del alta tiene un solo "Ir a mi panel";
+  - la pestaña de Editar tu tienda y la del carrito llevan su nombre.
+- [x] El editor muestra lo que cambia (18 de noviembre): si lo que cambió está fuera de la
+      vista, la vista previa va hasta ahí y lo marca en frambuesa; si ya se ve, no agrega
+      nada, y colores y letras nunca se marcan (`lib/editor/senales.ts`). Lo que se apaga
+      fuera de la vista deja un recuadro punteado "Ya no se ve". La propuesta de la IA ocupa
+      todo el panel hasta aplicarla o descartarla. "Publicar", arriba, publica de una vez,
+      igual que el botón del último paso. La app, cuando se apruebe la web.
+- [x] Revisión de los dos editores con `impeccable` (18 de noviembre), todo arreglado en la
+      web. Tienda: un borrador pendiente se resuelve antes de editar, Tu marca va por filas,
+      "Publicar" lleva su palabra en el celular, cada paso tiene un solo nombre ("Página de
+      inicio", "Ficha de producto"). Catálogos: borrador en el dispositivo, salir por
+      cualquier lado pregunta, pestaña "Enviar" fija, "Tu marca" primero y con las mismas
+      piezas que la tienda (`components/editor/marca.tsx`), combos elegidos por foto, la
+      propuesta de la IA dice qué cambia y se ve antes de aplicarla, y palabras simples
+      (Partes, Combos, Volante, Fotos grandes). La app, cuando se apruebe la web.
+- [x] Segunda revisión de los editores (18 de noviembre). Tienda: panel con manija en el
+      celular, cada cambio de Publicar lleva a donde se ve, la sección de arriba se llama
+      Presentación y recargar en la misma visita sigue sin preguntar. Catálogos: cambiar de
+      plantilla conserva textos y partes (`conservarEdicion`), "Enviar por WhatsApp" es la
+      acción principal, seis pestañas a la vista, el arreglo de color corrige el color que
+      falla (`arregloDeEstilo`) y los diseños de productos van dibujados.
+- [x] Tercera revisión de los editores (18 de noviembre), los cinco problemas graves.
+      Catálogos: salir con cambios ofrece "Guardar y salir" (si algo impide guardar, dice
+      qué), una propuesta de la IA abierta no deja cambiar de pestaña ni de hoja, y en el
+      celular la hoja se achica para verse sobre el panel. Tienda: salir con cambios sin
+      publicar pregunta, con "Publicar ahora". Los paneles de los dos editores respetan
+      "Reducir movimiento". La app, cuando se apruebe la web.
+- [x] Cuarta revisión de los editores (19 de noviembre), todo lo encontrado. Tienda: "Catálogo"
+      y "Producto" son un solo paso, "Cómo se ven tus productos" (`?paso=catalogo` y
+      `?paso=producto` siguen abriendo), con el aviso de que nombre, precio y fotos se cambian
+      en Productos; la propuesta de la IA lleva la vista al primer cambio y cada línea tiene
+      "Ver"; en un celular bajo, al abrir una sección se ven primero los campos; con Tab se
+      llega a los controles antes que a la vista previa. Catálogos: guardar sin conexión
+      avisa y no congela el editor; "Partes" pasa a "Hojas", "Grilla" a "Cuadrícula",
+      "Separador" a "Título de sección" y "Contraportada" a "Cierre"; editar un combo o
+      mirar una propuesta lleva la vista previa a su hoja, y la propuesta tiene "Ver cómo
+      estaba"; hojas y productos se ordenan también con Subir y Bajar; un solo verbo,
+      "Enviar"; Canva y Borrar van en "Más opciones". Los dos: los avisos reciben el foco
+      (`components/panel/aviso.tsx`), anillo de foco en tinta, placeholders y contadores con
+      contraste AA y nada se mueve al pasar el mouse con "Reducir movimiento". La app,
+      cuando se apruebe la web.
+- [x] Quinta revisión de los editores (19 de noviembre), todo lo encontrado. Tienda: los
+      pasos se llaman igual en el celular y en la computadora —Marca, Portada, Productos,
+      Carrito, Publicar—; la vista previa ya no es una parada del teclado; una propuesta con
+      los colores de una paleta dice su nombre, y "casi negro" ya no lleva tono; "Publicar"
+      dice "Publicado" cuando no hay nada que publicar; el panel grande deja ver un pedazo de
+      la tienda. Catálogos: un combo nace sin precio y sin agotados, y hasta tener precio no
+      se guarda ni se manda (`faltantes`, con su test); la propuesta de la IA dice qué queda
+      primero, qué se quita y si cambia el texto de la portada; Subir, Bajar, Duplicar y
+      Quitar van con su nombre al pie de la hoja; "Hoja N de M" va arriba de su hoja; las
+      hojas se ven grandes salvo mientras se edita una; "Enviar" es la acción principal
+      también en la computadora; la pestaña se llama "Marca", como en la tienda. La app,
+      cuando se apruebe la web.
+- [x] Sexta revisión de los editores (19 de noviembre), los cuatro primeros. Catálogos: un
+      combo sin precio se arregla en su combo —"Guardar" y el aviso «Ponerle precio» abren
+      el combo con el precio listo para escribir—; la pestaña donde se eligen los productos
+      se llama "Elegidos", y cada hoja de productos dice "Salen de tus N elegidos" con
+      "Cambiarlos". Tienda: al tocar un campo con el panel grande en el celular, el panel
+      baja a la mitad para ver la tienda; salir con cambios ofrece "Descartar y salir"; en
+      el celular dice "Sin publicar · solo aquí". La app, cuando se apruebe la web.
+- [x] El editor de catálogos, como el de la tienda (19 de noviembre). La IA dejó de ser
+      pestaña: es la barra fija «Pídele a la IA», con sus ideas, y su propuesta ocupa el
+      panel hasta aplicarla o descartarla (`components/catalogos/editor/ia.tsx`). En el
+      celular, las cinco pestañas —Marca, Hojas, Elegidos, Combos, Enviar— van al pie, con
+      la raya arriba de la elegida, como los pasos de la tienda. Un combo vuelve a nacer al
+      10% menos (`precioSugerido`), lo dice y se cambia, y termina con «Listo». La app,
+      cuando se apruebe la web.
+- [x] La barra lateral, de nuevo (19 de noviembre): arriba va la tienda como es, la
+      captura de su portada como una foto pegada, con su nombre y si está al aire (sin
+      captura, la de su plantilla con "Así se verá"); la persona y "Cerrar sesión" van
+      fijos al pie —la persona es la entrada a Tus datos, y el grupo "Tu cuenta" se
+      quitó—; la tienda lleva el rótulo "Tu tienda en línea" y una raya la separa de la
+      marca; el atajo "Nuevo producto" se quitó. La app, cuando se apruebe la web.
+- [x] Los mismos textos en el celular y en la computadora (19 de noviembre), comparados
+      pantalla por pantalla en los dos editores. Catálogos: "Enviar por WhatsApp", "Enviar
+      el PDF", "Descargar PDF", "Copiar el enlace", "Ver cómo se ve" y "Borrar el catálogo"
+      existen en los dos tamaños con el mismo nombre, y el renglón de estado dice lo mismo.
+      Tienda: "Sin publicar · solo aquí" y "Sube una foto aquí" en los dos.
+- [x] Tienda sin productos (18 de noviembre): su dueño, y nadie más, ve al abrirla un aviso
+      con "Cargar mis productos"; el servidor comprueba la sesión y que la tienda sea suya.
+      La pantalla "Publicado" dice lo mismo. Los productos ocultos cuentan como cargados.
+- [x] La primera carga es la de varios (18 de noviembre): sin ningún producto,
+      `/panel/productos/nuevo` lleva a `/panel/productos/cargar`. El formulario de uno sigue
+      a mano con `?uno=1`: "¿Es uno solo?" y "Uno por uno".
+- [x] Error de hidratación en los formularios (`/cuenta`, `/crear`): `useId` a veces daba
+      otro valor en el navegador. `FormItem` usa ahora un id fijo, con el `nombre` del
+      `Form` y el del campo.
+- [x] Restaurar se ofrecía también en la versión igual a la de hoy (20 de noviembre): esa
+      dice "Así está hoy", en la web y en la app (`lib/editor/igual-a-hoy.ts`).
+- [ ] En el alta, el rubro "Moda" abre con Atelier, que es de carteras: se ordena desde
+      `/admin/plantillas`.
+
 ### 7. Pendientes chicos
 
-- **Las fotos de una carga que no se crea quedan en Storage** (`product-images/{tienda}/`):
-  se suben al procesarlas. Cuestan centavos; si molestan, subirlas a una carpeta propia y
-  limpiarla.
 - **Una vez, entrar a `/panel/apariencia` después de horas sin uso terminó en `/panel`**
   (revisión del 8 de octubre). El registro muestra pedidos a `/auth/destino` y `/crear`
   justo después, como si en ese instante la sesión no encontrara la tienda. No se pudo
   reproducir: si vuelve a pasar, mirar el refresco del token cuando varias precargas de
   la barra salen a la vez con un token vencido.
-- **La plantilla editorial no dibuja las grillas de productos de su portada**: muestra
-  su catálogo completo. El editor lo avisa en esas tiendas, pero editar una grilla ahí no
-  se ve.
+- **Hecho el 20 de noviembre**: la plantilla editorial dibuja las secciones "Productos"
+  de su portada, y Pasarela abre el rubro "Moda" en el alta
+  (`20261120100000_pasarela_primero.sql`, aplicada en producción el 20 de noviembre).
 - **Una propuesta de la IA puede tardar** entre 6 y 55 segundos: si la primera no pasa
   la validación y queda tiempo, hay un segundo intento. Pasado el tope, la pantalla lo
   dice y se puede volver a pedir.
@@ -636,9 +771,13 @@ Para rediseñar o revisar:
 - **Tiendas de comida sembradas en producción** (Panadería Doña Elsa y otras de la
   demostración): contradicen el mensaje nuevo, pero cambiarlas toca datos compartidos
   y se acuerda antes.
-- **Un pack del catálogo no se compra como pack** en la tienda online: su precio se
-  muestra en el PDF y la venta se arma por WhatsApp. Venderlo como pack toca
-  `create_order`.
+- **Combos que se compran** (20 de noviembre, brief
+  `docs/briefs/2026-11-20-combos-que-se-compran.md`): "Pedir este combo" en el PDF, la
+  página del combo en la tienda, la línea en el carrito, en WhatsApp y en el pedido del
+  panel, y el stock de cada producto al cobrar. Migraciones `20261120110000_combos.sql`
+  y `…_combos_rls.sql`, aplicadas en producción el 20 de noviembre. Falta: la app (el pedido con sus
+  productos), probar el enlace del PDF en un teléfono real, y para más adelante una
+  sección de combos en la tienda y un lugar en el panel para editarlos.
 - **Canva directo**: crear la integración en el portal de desarrolladores de Canva,
   cargar `CANVA_CLIENT_ID` y `CANVA_CLIENT_SECRET` en Vercel y pedirle a Canva la
   revisión, sin la cual no la puede autorizar cualquier cuenta. Mientras tanto, "Editar
@@ -647,11 +786,10 @@ Para rediseñar o revisar:
   `CANVA_CLIENT_SECRET`.
 - **Dominio propio** para las tiendas con subdominio: comprar el dominio, crear el
   registro DNS comodín y darlo de alta en Vercel.
-- **El rojo de la base editorial** (`lib/plantillas/clasica.ts`) está a 4,35:1 contra
-  su papel, un poco por debajo del mínimo AA para texto chico. La marca de Venduo ya no
-  tiene el problema: la frambuesa pasa con 4,7:1.
-- **Avisos de Next.js** por `quality="90"` en imágenes de la portada: hace falta
-  configurar `images.qualities` antes de pasar a Next 16.
+- **Hecho el 20 de noviembre**: las fotos de la carga de varios van a
+  `product-images/{tienda}/carga/`, y lo que a los dos días no está en ningún producto se
+  borra solo al volver a usar la carga (`lib/data/cargas-viejas.ts`); el rojo de la base
+  editorial pasó a `#cc2a10` (4,72:1); `images.qualities` declara el 85 de la barra.
 - Avisos de lint en los scripts de la skill `impeccable`, que es de terceros.
 
 ---

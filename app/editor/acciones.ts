@@ -8,6 +8,7 @@ import { proponerEdicion, type TiendaParaLaIa } from "@/lib/ai/tasks"
 import type { PropuestaDeDiseno } from "@/lib/ai/schemas"
 import { leerDisenoParaEditar, type DisenoParaEditar } from "@/lib/data/editor"
 import { exigirFuncion } from "@/lib/data/funciones"
+import { anotarTextosPublicados } from "@/lib/data/textos-a-medida"
 import { anotarUsoDeIa, permisoDeIa } from "@/lib/data/uso-ia"
 import { borradorSchema } from "@/lib/editor/protocolo"
 import {
@@ -99,6 +100,7 @@ export async function publicarDiseno(
   // su plantilla.
   revalidatePath("/", "layout")
   await actualizarVistaDespues()
+  await anotarTextosPublicados(borrador)
 
   const releido = await leerDisenoParaEditar()
   return { ok: true, publicado: releido?.publicado ?? borrador }

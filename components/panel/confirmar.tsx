@@ -3,9 +3,9 @@
 import * as React from "react"
 
 import { BOTON_PRIMARIO, BOTON_SECUNDARIO } from "@/lib/estilos"
+import { CerrarAviso, ContenidoDeAviso } from "@/components/panel/aviso"
 import {
   AlertDialog,
-  AlertDialogContent,
   AlertDialogDescription,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
@@ -50,7 +50,7 @@ export function useConfirmacion() {
         if (!abierto) cerrar(false)
       }}
     >
-      <AlertDialogContent className="gap-0 rounded-none border-2 border-tinta bg-papel p-0 text-tinta shadow-none ring-0 data-[size=default]:max-w-[calc(100%-2rem)] data-[size=default]:sm:max-w-md">
+      <ContenidoDeAviso>
         <div className="p-5 sm:p-6">
           <AlertDialogTitle className="font-titular text-2xl leading-tight font-extrabold tracking-[-0.03em]">
             {pendiente?.titulo}
@@ -62,13 +62,7 @@ export function useConfirmacion() {
           ) : null}
         </div>
         <div className="flex flex-col-reverse gap-3 border-t border-tinta/15 p-5 sm:flex-row sm:justify-end sm:p-6">
-          <button
-            type="button"
-            onClick={() => cerrar(false)}
-            className={BOTON_SECUNDARIO}
-          >
-            Volver
-          </button>
+          <CerrarAviso className={BOTON_SECUNDARIO}>Volver</CerrarAviso>
           <button
             type="button"
             onClick={() => cerrar(true)}
@@ -77,7 +71,7 @@ export function useConfirmacion() {
             {pendiente?.confirmar}
           </button>
         </div>
-      </AlertDialogContent>
+      </ContenidoDeAviso>
     </AlertDialog>
   )
 

@@ -10,11 +10,25 @@ import { guardarProducto } from "../acciones"
 
 export const metadata = { title: "Nuevo producto" }
 
-export default async function NuevoProductoPage() {
+/**
+ * Un producto. Quien todavía no tiene ninguno llega antes a la carga de varios,
+ * que es por donde conviene empezar; `?uno=1` es haber elegido este formulario.
+ */
+export default async function NuevoProductoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ uno?: string }>
+}) {
   const tienda = await getMiTienda()
   if (isSupabaseConfigured && !tienda?.template_key) redirect("/crear")
 
-  const { categorias } = await getCatalogo()
+  const [{ uno }, { categorias, productos }] = await Promise.all([
+    searchParams,
+    getCatalogo(),
+  ])
+  if (productos.length === 0 && uno !== "1") {
+    redirect("/panel/productos/cargar")
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 md:gap-8">

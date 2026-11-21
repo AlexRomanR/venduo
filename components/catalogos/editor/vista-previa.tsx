@@ -2,6 +2,7 @@
 
 import * as React from "react"
 
+import { HOJAS, TIPOS_DE_BLOQUE } from "@/lib/catalogos/constantes"
 import type { DatosDelCatalogo } from "@/lib/catalogos/datos"
 import type { Catalogo } from "@/lib/catalogos/modelo"
 import { cn } from "@/lib/utils"
@@ -88,6 +89,7 @@ export function VistaPrevia({
   soloVer = false,
   armando = false,
   anchoMaximo = 620,
+  altoDisponible,
 }: {
   catalogo: Catalogo
   datos: DatosDelCatalogo
@@ -106,6 +108,11 @@ export function VistaPrevia({
   /** Mientras se arma el PDF, una luz recorre las hojas. */
   armando?: boolean
   anchoMaximo?: number
+  /**
+   * El alto que deja libre el panel del celular: la hoja se achica hasta
+   * entrar, para ver lo que cambia mientras se edita.
+   */
+  altoDisponible?: number
 }) {
   const diferido = React.useDeferredValue(catalogo)
   const hojas = React.useMemo(
@@ -114,7 +121,16 @@ export function VistaPrevia({
   )
   const desplazable = React.useRef<HTMLDivElement>(null)
   const [ref, ancho] = useAncho<HTMLDivElement>()
-  const anchoDeHoja = Math.min(ancho, anchoMaximo)
+  const medidas = HOJAS[diferido.hoja]
+  const anchoDeHoja = Math.floor(
+    Math.min(
+      ancho,
+      anchoMaximo,
+      altoDisponible
+        ? (altoDisponible * medidas.ancho) / medidas.alto
+        : Infinity
+    )
+  )
 
   // Solo la primera tanda de hojas entra en fila; lo que llega después, en el acto.
   const primeraVez = React.useRef(true)
@@ -201,7 +217,7 @@ export function VistaPrevia({
                 </>
               )
               const marco = cn(
-                "relative block overflow-hidden outline-offset-4 transition-shadow",
+                "relative block scroll-mt-24 overflow-hidden outline-offset-4 transition-shadow max-lg:scroll-mb-[calc(var(--alto-del-panel,0px)+1rem)]",
                 activa
                   ? "ring-2 ring-tinta ring-offset-4 ring-offset-papel"
                   : "ring-1 ring-tinta/15",
@@ -225,6 +241,11 @@ export function VistaPrevia({
                       : undefined
                   }
                 >
+                  {/* Arriba de su hoja: debajo, junto al marco de la elegida,
+                      parecía el título de la siguiente. */}
+                  <figcaption className="tabular text-xs opacity-70">
+                    Hoja {ctx.numero} de {ctx.total}
+                  </figcaption>
                   {soloVer ? (
                     <div className={marco}>{dibujo}</div>
                   ) : (
@@ -234,16 +255,13 @@ export function VistaPrevia({
                         tocada.current = hoja.bloque.id
                         alElegir?.(hoja.bloque.id)
                       }}
-                      aria-label={`Editar la hoja ${ctx.numero}`}
+                      aria-label={`Editar la hoja ${ctx.numero}: ${TIPOS_DE_BLOQUE[hoja.bloque.tipo].nombre}`}
                       aria-pressed={activa}
                       className={marco}
                     >
                       {dibujo}
                     </button>
                   )}
-                  <figcaption className="tabular text-xs opacity-65">
-                    Hoja {ctx.numero} de {ctx.total}
-                  </figcaption>
                 </figure>
               )
             })

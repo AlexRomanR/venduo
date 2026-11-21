@@ -42,7 +42,7 @@ export function PrimerosProductos() {
           detalle="Foto del cuaderno o el texto"
         />
         <Puerta
-          href="/panel/productos/nuevo"
+          href="/panel/productos/nuevo?uno=1"
           icono={Plus}
           titulo="Uno por uno"
           detalle="Con su foto, su precio y sus unidades"

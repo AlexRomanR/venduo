@@ -6,6 +6,7 @@ import type { ClaveDePaso } from "@/lib/editor/pasos"
 import type { EstadoDeFuncion } from "@/lib/funciones"
 import type { Vista } from "@/lib/editor/protocolo"
 import type { Apariencia } from "@/lib/plantillas/apariencia"
+import type { Cambio } from "@/lib/plantillas/borrador"
 import type {
   Borrador,
   ContextoDeDiseno,
@@ -18,11 +19,15 @@ import type {
   ResultadoDePublicar,
 } from "@/app/editor/acciones"
 import type { EstadoDelBorrador } from "@/components/editor/estado"
+import type { TextosAMedida } from "@/components/editor/textos-a-medida"
 
 export type { ClaveDePaso } from "@/lib/editor/pasos"
 
 /** Cómo se mira la vista previa en la computadora. En el celular, siempre celular. */
 export type Dispositivo = "celular" | "computadora"
+
+/** Dónde se ve un cambio en la tienda. */
+export type LugarDeCambio = Pick<Cambio, "seccion" | "ruta">
 
 /** Lo que la IA propuso y todavía no se aplicó. */
 export interface Propuesta {
@@ -31,11 +36,13 @@ export interface Propuesta {
   /** Lo que se dejó afuera y por qué, si algo se dejó. */
   aviso?: string
   operaciones: Operacion[]
-  /** Cada cambio en palabras, con su color si es un color. */
-  cambios: Array<{ texto: string; color?: string }>
+  /** Cada cambio en palabras, con su color y dónde se ve, si se puede. */
+  cambios: Array<{ texto: string; color?: string; lugar?: LugarDeCambio }>
   borrador: Borrador
   /** Las secciones que cambia, para marcarlas en la vista previa. */
   marcas: string[]
+  /** Es la de los textos a medida: se decide en su tarjeta del paso Portada. */
+  deTextos?: boolean
 }
 
 export interface ValorDelEditor {
@@ -43,6 +50,7 @@ export interface ValorDelEditor {
   base: Apariencia
   datos: DatosDeContexto
   productos: ProductoDeMuestra[]
+  hayProductos: boolean
   esDemo: boolean
   contexto: ContextoDeDiseno
   borrador: EstadoDelBorrador
@@ -91,6 +99,19 @@ export interface ValorDelEditor {
     mirandoAntes: boolean
     setMirandoAntes: (valor: boolean) => void
   }
+  /** Publicar: lo mismo desde la barra de arriba y desde el último paso. */
+  publicacion: {
+    enCurso: boolean
+    /** Se acaba de publicar: el último paso lo celebra. */
+    lista: boolean
+    /** Lo que el servidor no dejó pasar. */
+    problemas: string[]
+    publicar: () => void
+    /** Lleva la vista previa a donde se ve un cambio de la lista. */
+    mirarCambio: (cambio: LugarDeCambio) => void
+  }
+  /** Los textos a medida. El editor de la app todavía no los muestra. */
+  textos?: TextosAMedida
   /** El último color que tocó la persona: el que se ofrece corregir. */
   ultimoColor: keyof Apariencia["colores"] | null
   setUltimoColor: (token: keyof Apariencia["colores"]) => void

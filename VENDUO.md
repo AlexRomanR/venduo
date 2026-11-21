@@ -344,6 +344,8 @@ Sin marca de borrado: un pedido se cancela, no se borra.
 
 **`order_items`** — líneas del pedido, con el nombre y el precio del producto copiados al momento de la compra, y su costo copiado al cobrarse (`unit_cost_cents`). Lleva también el identificador de la tienda por el principio de redundancia deliberada.
 
+**`order_item_components`** — los productos de una línea de combo, con la opción elegida y cuántos por combo. La línea del combo va en `order_items` sin producto propio, con `catalog_id` y `combo_id`. La escribe solo `create_order`.
+
 **`product_variants`** — las variantes de un producto: su combinación (`valores`, como
 `{"Talla": "M", "Color": "Negro"}`), su nombre armado, su stock, su precio si es distinto,
 su código y su foto. Las opciones del producto van en `products.opciones`. El stock del
@@ -375,7 +377,7 @@ El vínculo de un bloque con su tipo **no se puede romper**: no se retira del ca
 
 Un catálogo es una lista de **bloques** —portada, páginas de productos, separador, pack, oferta, texto y contraportada— y cada uno se dibuja con la variante que se elija: cualquier bloque sirve en cualquier plantilla. La plantilla solo decide con qué bloques arranca. El estilo sale de la tienda —sus colores, su letra y sus esquinas— y se puede cambiar sin tocarla; un catálogo cuyo texto no se lee no se descarga.
 
-El **precio de un pack** se muestra en el catálogo y nada más: la tienda online cobra cada producto por separado, y quien quiere el pack escribe por WhatsApp.
+El **precio de un pack** —un combo— es el que se cobra: cada combo del PDF guardado lleva "Pedir este combo", que abre su página en la tienda (`/t/{slug}/combo/{token}/{combo}`), donde se eligen las tallas y entra al carrito como una sola línea. `create_order` lee el precio del catálogo guardado, nunca del carrito; si un producto del combo ya no se vende, el combo deja de pedirse, y si uno está agotado, no se puede pedir. Al marcar el pedido pagado baja el stock de cada producto. Los combos se apagan desde `/admin` con su propia función, `combos`. Brief: `docs/briefs/2026-11-20-combos-que-se-compran.md`.
 
 El enlace compartido lo abre cualquiera, sin cuenta. Lo lee `catalogo_compartido`, que devuelve un solo catálogo por su token y solo si la tienda se sirve al público; la tabla no tiene política para anónimos.
 
@@ -422,7 +424,7 @@ Todas las llamadas pasan por una capa propia que traduce el pedido al formato de
 
 ### Edición de la tienda
 
-El emprendedor edita su tienda en `/editor`: un recorrido de seis pasos —su marca, la portada, el catálogo, la ficha de producto, el carrito y publicar— con la tienda de verdad en una vista previa al lado. Puede hacerlo a mano, arrastrando secciones y tocando textos, colores, letra, logo y fotos, o pidiéndoselo a la IA en sus palabras. La ficha de producto y el carrito se eligen entre formas cerradas —la ficha dividida o en vitrina, el carrito en dos columnas, como boleta o por pasos— con lo que los acompaña: botón de compra fijo en el celular, consulta por WhatsApp, productos parecidos, sugerencias en el carrito.
+El emprendedor edita su tienda en `/editor`: un recorrido de cinco pasos —Marca, Portada, Productos (cómo se ven sus productos, en la lista y al abrir uno), Carrito y Publicar, con los mismos nombres en el celular y en la computadora— con la tienda de verdad en una vista previa al lado. Puede hacerlo a mano, arrastrando secciones y tocando textos, colores, letra, logo y fotos, o pidiéndoselo a la IA en sus palabras. La ficha de producto y el carrito se eligen entre formas cerradas —el producto con la foto al lado o al centro, el carrito en dos columnas, como boleta o por pasos— con lo que los acompaña: botón de compra fijo en el celular, consulta por WhatsApp, productos parecidos, sugerencias en el carrito.
 
 Se le entrega a la IA el catálogo de tipos de bloque con sus campos, la apariencia actual y las secciones de la portada. La IA devuelve una **lista de operaciones**: cambiar un ajuste de la apariencia, agregar un bloque, quitarlo, ocultarlo, editar sus propiedades o moverlo de posición. Son las mismas operaciones que usa el editor a mano.
 

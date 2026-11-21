@@ -222,7 +222,7 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
         >
           <span className="tabular text-xs font-bold tracking-[0.12em] uppercase">
             {tienda.productos.length}{" "}
-            {tienda.productos.length === 1 ? "modelo" : "modelos"}
+            {tienda.productos.length === 1 ? "producto" : "productos"}
           </span>
           <span className="flex items-end justify-between gap-4">
             <span className="font-titular text-[clamp(3rem,14vw,8.5rem)] leading-[0.82] italic">
@@ -264,7 +264,7 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
               >
                 <span className="flex items-center gap-3">
                   <MessageCircle aria-hidden="true" className="size-5" />
-                  ¿No sabes tu talla? Pregúntanos
+                  ¿Tienes dudas? Pregúntanos
                 </span>
                 <ArrowRight aria-hidden="true" className="size-4" />
               </a>

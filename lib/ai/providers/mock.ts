@@ -4,6 +4,7 @@ import { borradoresDeDemostracion, lecturaDeDemostracion } from "./mock-carga"
 import { catalogoDeDemostracion } from "./mock-catalogo"
 import { publicacionesDeDemostracion } from "./mock-publicaciones"
 import { propuestaDeDemostracion } from "./mock-propuesta"
+import { textosDeDemostracion } from "./mock-textos"
 import {
   AIError,
   type AIProvider,
@@ -327,6 +328,22 @@ export function createMockProvider(
           return {
             object: validadas.data,
             raw: JSON.stringify(escritas, null, 2),
+            provider: "mock",
+            model,
+          }
+        }
+      }
+
+      // Y para los textos a medida: con lo que la tienda dijo que vende.
+      if (options.schemaName === "TextosATuMedida") {
+        const pedido = options.messages.at(-1)?.content ?? ""
+        const escritos = textosDeDemostracion(pedido)
+        const validados = options.schema.safeParse(escritos)
+
+        if (validados.success) {
+          return {
+            object: validados.data,
+            raw: JSON.stringify(escritos, null, 2),
             provider: "mock",
             model,
           }

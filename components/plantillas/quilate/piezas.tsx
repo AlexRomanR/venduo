@@ -150,7 +150,7 @@ export function Tarjeta({ producto, tienda }: PropsTarjeta) {
 
         {agotado ? (
           <span className="absolute inset-x-0 bottom-3 text-center text-xs tracking-[0.24em] uppercase">
-            Agotada
+            Agotado
           </span>
         ) : null}
       </div>
@@ -286,7 +286,7 @@ export function Cierre({ tienda }: { tienda: TiendaPublica }) {
               <Rotulo>Cómo comprar</Rotulo>
             </dt>
             <dd className="mt-2 leading-relaxed opacity-80">
-              Elige tus piezas y envíanos el pedido por WhatsApp. Ahí
+              Elige lo que te gusta y envíanos el pedido por WhatsApp. Ahí
               coordinamos el pago y la entrega.
             </dd>
           </div>
@@ -335,7 +335,7 @@ export function Pie({ marco }: PropsPie) {
             Inicio
           </Link>
           <Link href={rutaDeTienda(marco.slug, "/catalogo")} className={enlace}>
-            Las piezas
+            La colección
           </Link>
           {marco.whatsapp ? (
             <a

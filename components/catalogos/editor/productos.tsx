@@ -18,7 +18,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { GripVertical, Package, X } from "lucide-react"
+import { ArrowDown, ArrowUp, GripVertical, Package, X } from "lucide-react"
 
 import type { PropuestaDeCatalogo } from "@/lib/ai/schemas"
 import {
@@ -30,11 +30,8 @@ import type { Catalogo } from "@/lib/catalogos/modelo"
 import { ponerProductos } from "@/lib/catalogos/operaciones"
 import { BOTON_SECUNDARIO } from "@/lib/estilos"
 import { formatMoney } from "@/lib/format"
-import type { EstadoDeFuncion } from "@/lib/funciones"
 import { cn } from "@/lib/utils"
-import { ConFuncion } from "@/components/panel/funcion"
 import { Miniatura } from "@/components/panel/piezas"
-import { PedidoALaIa } from "@/components/catalogos/editor/ia"
 import { SelectorDeProductos } from "@/components/catalogos/editor/selector"
 
 /*
@@ -44,54 +41,76 @@ import { SelectorDeProductos } from "@/components/catalogos/editor/selector"
  * muestran así, y las de una categoría también, filtrando.
  */
 
-/**
- * La pestaña IA del editor, la misma de la app: un orden para los productos de
- * este catálogo y un nombre. Nada cambia hasta "Usar este orden".
- */
-export function PanelDeIa({
+/** El catálogo como quedaría con la propuesta de la IA. */
+export function armarPropuesta(
+  catalogo: Catalogo,
+  propuesta: PropuestaDeCatalogo
+): Catalogo {
+  const nuevo = ponerProductos(catalogo, propuesta.productos)
+  const portada = nuevo.bloques.find((bloque) => bloque.tipo === "portada")
+  return {
+    ...nuevo,
+    nombre: propuesta.nombre,
+    bloques: nuevo.bloques.map((bloque) =>
+      bloque === portada && propuesta.bajada
+        ? { ...bloque, bajada: propuesta.bajada }
+        : bloque
+    ),
+  }
+}
+
+/** Qué cambia si se aplica la propuesta, dicho antes de aplicarla. */
+export function DetalleDePropuesta({
   catalogo,
-  ia = "activa",
-  alCambiar,
+  datos,
+  propuesta,
 }: {
   catalogo: Catalogo
-  /** Si Venduo dejó la IA de catálogos activa en esta tienda. */
-  ia?: EstadoDeFuncion
-  alCambiar: (catalogo: Catalogo) => void
+  datos: DatosDelCatalogo
+  propuesta: PropuestaDeCatalogo
 }) {
-  function usar(propuesta: PropuestaDeCatalogo) {
-    let nuevo = ponerProductos(catalogo, propuesta.productos)
-    const portada = nuevo.bloques.find((bloque) => bloque.tipo === "portada")
-    nuevo = {
-      ...nuevo,
-      nombre: propuesta.nombre,
-      bloques: nuevo.bloques.map((bloque) =>
-        bloque === portada && propuesta.bajada
-          ? { ...bloque, bajada: propuesta.bajada }
-          : bloque
-      ),
-    }
-    alCambiar(nuevo)
-  }
-
-  if (ia === "oculta") return null
+  const quedan = new Set(propuesta.productos)
+  const salen = catalogo.productos
+    .filter((id) => !quedan.has(id))
+    .map((id) => datos.productos[id]?.nombre)
+    .filter(Boolean)
+  const portada = catalogo.bloques.find((bloque) => bloque.tipo === "portada")
+  const cambiaPortada =
+    propuesta.bajada &&
+    portada?.tipo === "portada" &&
+    portada.bajada !== propuesta.bajada
+  const primeros = propuesta.productos
+    .slice(0, 3)
+    .map((id) => datos.productos[id]?.nombre)
+    .filter(Boolean)
 
   return (
-    <div className="px-4 py-5 sm:px-5">
-      <ConFuncion estado={ia}>
-        <PedidoALaIa
-          titulo="Pídele a la IA un orden"
-          ayuda="Ordena los productos de este catálogo y le pone nombre. Tú decides si lo usas."
-          ejemplos={[
-            "Lo más vendible primero",
-            "Solo lo que está en oferta",
-            "Agrupado por categoría",
-          ]}
-          actuales={catalogo.productos}
-          textoDeUsar="Usar este orden"
-          alUsar={usar}
-        />
-      </ConFuncion>
-    </div>
+    <ul className="mt-3 flex flex-col gap-1 border-t border-tinta/15 pt-3 text-sm">
+      {propuesta.nombre !== catalogo.nombre ? (
+        <li>
+          <span className="font-semibold">Nombre nuevo:</span>{" "}
+          {propuesta.nombre}
+        </li>
+      ) : null}
+      <li>
+        <span className="font-semibold">Primero:</span> {primeros.join(", ")}
+        {propuesta.productos.length > primeros.length
+          ? ` y ${propuesta.productos.length - primeros.length} más`
+          : ""}
+      </li>
+      {salen.length > 0 ? (
+        <li>
+          <span className="font-semibold">Se quitan del catálogo:</span>{" "}
+          {salen.join(", ")}
+        </li>
+      ) : null}
+      {cambiaPortada ? (
+        <li>
+          <span className="font-semibold">Texto de la portada:</span> «
+          {propuesta.bajada}»
+        </li>
+      ) : null}
+    </ul>
   )
 }
 
@@ -136,8 +155,8 @@ export function PanelDeProductos({
             <p className="tabular text-sm">
               <span className="font-semibold">{lista.length}</span>
               <span className="opacity-70">
-                {lista.length === 1 ? " producto" : " productos"} · arrástralos
-                para cambiar el orden
+                {lista.length === 1 ? " producto" : " productos"} · toca uno
+                para subirlo o bajarlo
               </span>
             </p>
             <button
@@ -166,6 +185,7 @@ function ListaOrdenable({
   alOrdenar: (ids: string[]) => void
 }) {
   const ids = productos.map((producto) => producto.id)
+  const [abierto, setAbierto] = React.useState<string | null>(null)
   const sensores = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, {
@@ -215,6 +235,14 @@ function ListaOrdenable({
               key={producto.id}
               producto={producto}
               posicion={indice + 1}
+              total={productos.length}
+              abierto={abierto === producto.id}
+              alAbrir={() =>
+                setAbierto(abierto === producto.id ? null : producto.id)
+              }
+              alMover={(hacia) =>
+                alOrdenar(arrayMove(ids, indice, indice + hacia))
+              }
               alQuitar={() => alOrdenar(ids.filter((id) => id !== producto.id))}
             />
           ))}
@@ -227,10 +255,18 @@ function ListaOrdenable({
 function FilaDeProducto({
   producto,
   posicion,
+  total,
+  abierto,
+  alAbrir,
+  alMover,
   alQuitar,
 }: {
   producto: ProductoDelCatalogo
   posicion: number
+  total: number
+  abierto: boolean
+  alAbrir: () => void
+  alMover: (hacia: -1 | 1) => void
   alQuitar: () => void
 }) {
   const {
@@ -242,47 +278,90 @@ function FilaDeProducto({
     transition,
     isDragging,
   } = useSortable({ id: producto.id })
+  const fila = React.useRef<HTMLLIElement | null>(null)
+
+  // Subir y Bajar aparecen debajo: en el último producto quedaban fuera.
+  React.useEffect(() => {
+    if (abierto) fila.current?.scrollIntoView({ block: "nearest" })
+  }, [abierto])
 
   return (
     <li
-      ref={setNodeRef}
+      ref={(elemento) => {
+        setNodeRef(elemento)
+        fila.current = elemento
+      }}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
-        "relative flex items-center gap-2 border-t border-tinta/15 bg-hoja pr-1 first:border-t-0",
+        "relative border-t border-tinta/15 bg-hoja first:border-t-0",
         isDragging && "z-10 border-2 border-tinta bg-tinta/[0.06]"
       )}
     >
-      <button
-        ref={setActivatorNodeRef}
-        type="button"
-        aria-label={`Mover ${producto.nombre}`}
-        className="flex size-11 shrink-0 cursor-grab touch-none items-center justify-center opacity-45 transition-opacity hover:opacity-100 active:cursor-grabbing"
-        {...attributes}
-        {...listeners}
-      >
-        <GripVertical aria-hidden="true" className="size-5" />
-      </button>
-      <span className="tabular w-6 shrink-0 text-xs opacity-55">
-        {posicion}
-      </span>
-      <Miniatura foto={producto.foto} icono={Package} />
-      <span className="min-w-0 flex-1 py-2">
-        <span className="block truncate text-sm font-semibold">
-          {producto.nombre}
-        </span>
-        <span className="tabular block text-xs opacity-65">
-          {formatMoney(producto.precioCents)}
-          {producto.stock > 0 ? ` · ${producto.stock} en stock` : " · Agotado"}
-        </span>
-      </span>
-      <button
-        type="button"
-        aria-label={`Quitar ${producto.nombre} del catálogo`}
-        onClick={alQuitar}
-        className="flex size-11 shrink-0 items-center justify-center opacity-60 transition-opacity hover:opacity-100"
-      >
-        <X aria-hidden="true" className="size-4" />
-      </button>
+      <div className="flex items-center gap-2 pr-1">
+        <button
+          ref={setActivatorNodeRef}
+          type="button"
+          aria-label={`Arrastrar ${producto.nombre}`}
+          className="flex size-11 shrink-0 cursor-grab touch-none items-center justify-center opacity-70 transition-opacity hover:opacity-100 active:cursor-grabbing"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical aria-hidden="true" className="size-5" />
+        </button>
+        <button
+          type="button"
+          aria-expanded={abierto}
+          aria-label={`Mover ${producto.nombre}, lugar ${posicion} de ${total}`}
+          onClick={alAbrir}
+          className="flex min-w-0 flex-1 items-center gap-2 py-2 text-left"
+        >
+          <span className="tabular w-6 shrink-0 text-xs opacity-70">
+            {posicion}
+          </span>
+          <Miniatura foto={producto.foto} icono={Package} />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-semibold">
+              {producto.nombre}
+            </span>
+            <span className="tabular block text-xs opacity-70">
+              {formatMoney(producto.precioCents)}
+              {producto.stock > 0
+                ? ` · ${producto.stock} en stock`
+                : " · Agotado"}
+            </span>
+          </span>
+        </button>
+        <button
+          type="button"
+          aria-label={`Quitar ${producto.nombre} del catálogo`}
+          onClick={alQuitar}
+          className="flex size-11 shrink-0 items-center justify-center opacity-70 transition-opacity hover:opacity-100"
+        >
+          <X aria-hidden="true" className="size-4" />
+        </button>
+      </div>
+      {abierto ? (
+        <div className="grid grid-cols-2 border-t border-tinta/10">
+          <button
+            type="button"
+            disabled={posicion === 1}
+            onClick={() => alMover(-1)}
+            className="flex min-h-11 items-center justify-center gap-1.5 text-sm font-semibold transition-colors hover:bg-tinta/[0.04] disabled:opacity-30"
+          >
+            <ArrowUp aria-hidden="true" className="size-4" />
+            Subir
+          </button>
+          <button
+            type="button"
+            disabled={posicion === total}
+            onClick={() => alMover(1)}
+            className="flex min-h-11 items-center justify-center gap-1.5 text-sm font-semibold transition-colors hover:bg-tinta/[0.04] disabled:opacity-30"
+          >
+            <ArrowDown aria-hidden="true" className="size-4" />
+            Bajar
+          </button>
+        </div>
+      ) : null}
     </li>
   )
 }

@@ -33,10 +33,10 @@ export const KIT_TOCADOR: KitDeTienda = {
     Cierre,
     marcoDeFoto: "rounded-[1.25rem] bg-tinta/[0.04]",
     textos: {
-      sinProductos: "Estamos armando el tocador",
-      consulta: "¿No sabes tu tono? Mándanos una foto",
-      estado: "Estado del producto",
-      sinResultados: "Nada en ese paso por ahora. Prueba con otro o ve todo.",
+      sinProductos: "Estamos preparando todo",
+      consulta: "¿No sabes cuál elegir? Pregúntanos",
+      sinResultados:
+        "Nada con eso por ahora. Prueba con otra categoría o ve todo.",
     },
   }),
 }

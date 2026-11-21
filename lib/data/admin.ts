@@ -6,6 +6,7 @@ import { PLANTILLAS_DE_CATALOGO } from "@/lib/catalogos/plantillas"
 import { isCanvaConfigured } from "@/lib/env"
 import {
   FUNCIONES,
+  deFabrica,
   esEstado,
   type ClaveFuncion,
   type EstadoDeFuncion,
@@ -145,7 +146,7 @@ export async function tiendaDeAdmin(db: Db, id: string) {
     const p = propio.get(f.clave)
     return {
       ...f,
-      general: (esEstado(g) ? g : "activa") as EstadoDeFuncion,
+      general: (esEstado(g) ? g : deFabrica(f)) as EstadoDeFuncion,
       propio: (esEstado(p) ? p : null) as EstadoDeFuncion | null,
     }
   })
@@ -252,7 +253,10 @@ export async function funcionesDeAdmin(db: Db) {
   return {
     funciones: FUNCIONES.map((f) => {
       const g = general.get(f.clave)
-      return { ...f, estado: (esEstado(g) ? g : "activa") as EstadoDeFuncion }
+      return {
+        ...f,
+        estado: (esEstado(g) ? g : deFabrica(f)) as EstadoDeFuncion,
+      }
     }),
     excepciones: (propias.data ?? [])
       .filter((p) => nombres.has(p.store_id) && esEstado(p.state))
